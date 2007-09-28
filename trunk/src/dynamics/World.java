@@ -51,8 +51,8 @@ public class World {
 		m_contactManager.m_world = this;
 		m_broadPhase = new BroadPhase(worldAABB, m_contactManager);
 
-		b2BodyDescription bd;
-		m_groundBody = CreateBody(&bd);
+		BodyDescription bd;
+		m_groundBody = CreateBody(bd);
 	}
 
 // b2World::~b2World()

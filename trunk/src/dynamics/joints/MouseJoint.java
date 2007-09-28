@@ -58,7 +58,7 @@ public class MouseJoint extends Joint {
 	}
 
 	@Override
-	void PreSolve() {
+	public void PreSolve() {
 		Body body = m_body2;
 
 		// Compute the effective mass matrix.
@@ -89,12 +89,12 @@ public class MouseJoint extends Joint {
 	}
 
 	@Override
-	boolean SolvePositionConstraints() {
+	public boolean SolvePositionConstraints() {
 		return true;
 	}
 
 	@Override
-	void SolveVelocityConstraints(float dt) {
+	public void SolveVelocityConstraints(float dt) {
 		Body body = m_body2;
 
 		Vec2 r = body.m_R.mul(m_localAnchor);

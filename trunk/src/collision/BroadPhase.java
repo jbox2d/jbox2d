@@ -177,6 +177,190 @@ public class BroadPhase {
 	// Call MoveProxy as many times as you like, then when you are done
 	// call Flush to finalized the proxy pairs (for your time step).
 	 void MoveProxy(short proxyId, AABB aabb) {
+			if (proxyId == PairManager.NULL_PROXY || Settings.maxProxies <= proxyId)
+			{
+				
+				return;
+			}
+
+			if (aabb.isValid() == false)
+			{
+				assert false;
+				return;
+			}
+
+			int edgeCount = 2 * m_proxyCount;
+
+			Proxy proxy = m_proxyPool [ proxyId];
+			int lowerValues[] = new int[2];
+			int upperValues[] = new int[2];
+			ComputeBounds(lowerValues, upperValues, aabb);
+
+			for (int axis = 0; axis < 2; ++axis)
+			{
+				Bound[] bounds = m_bounds[axis];
+
+				int lowerIndex = proxy.lowerBounds[axis];
+				int upperIndex = proxy.upperBounds[axis];
+
+				int lowerValue = lowerValues[axis];
+				int upperValue = upperValues[axis];
+
+				int deltaLower = lowerValue - bounds[lowerIndex].value;
+				int deltaUpper = upperValue - bounds[upperIndex].value;
+
+				bounds[lowerIndex].value = lowerValue;
+				bounds[upperIndex].value = upperValue;
+
+				//
+				// Expanding adds overlaps
+				//
+
+				// Should we move the lower bound down?
+				if (deltaLower < 0)
+				{
+					int index = lowerIndex;
+					while (index > 0 && lowerValue < bounds[index-1].value)
+					{
+						Bound bound = bounds [ index];
+						Bound prevEdge = bounds[index-1];
+
+						int prevProxyId = prevEdge.proxyId;
+						Proxy prevProxy = m_proxyPool [ prevEdge.proxyId];
+
+						++prevEdge.stabbingCount;
+
+						if (prevEdge.IsUpper() == true)
+						{
+							if (TestOverlap(proxy, prevProxy))
+							{
+								AddPair(proxyId, prevProxyId);
+							}
+
+							++prevProxy.upperBounds[axis];
+							++bound.stabbingCount;
+						}
+						else
+						{
+							++prevProxy.lowerBounds[axis];
+							--bound.stabbingCount;
+						}
+
+						--proxy.lowerBounds[axis];
+						b2Swap(*bound, *prevEdge);
+						--index;
+					}
+				}
+
+				// Should we move the upper bound up?
+				if (deltaUpper > 0)
+				{
+					int index = upperIndex;
+					while (index < edgeCount-1 && bounds[index+1].value <= upperValue)
+					{
+						Bound bound = bounds [ index];
+						Bound nextEdge = bounds [ index+ 1];
+						int nextProxyId = nextEdge.proxyId;
+						Proxy nextProxy = m_proxyPool [nextProxyId];
+
+						++nextEdge.stabbingCount;
+
+						if (nextEdge.IsLower() == true)
+						{
+							if (TestOverlap(proxy, nextProxy))
+							{
+								AddPair(proxyId, nextProxyId);
+							}
+
+							--nextProxy.lowerBounds[axis];
+							++bound.stabbingCount;
+						}
+						else
+						{
+							--nextProxy.upperBounds[axis];
+							--bound.stabbingCount;
+						}
+
+						++proxy.upperBounds[axis];
+						b2Swap(*bound, *nextEdge);
+						++index;
+					}
+				}
+
+				//
+				// Shrinking removes overlaps
+				//
+
+				// Should we move the lower bound up?
+				if (deltaLower > 0)
+				{
+					int index = lowerIndex;
+					while (index < edgeCount-1 && bounds[index+1].value <= lowerValue)
+					{
+						Bound bound = bounds [index];
+						Bound nextEdge = bounds [index+ 1];
+
+						int nextProxyId = nextEdge.proxyId;
+						Proxy nextProxy = m_proxyPool [nextProxyId];
+
+						--nextEdge.stabbingCount;
+
+						if (nextEdge.IsUpper())
+						{
+							RemovePair(proxyId, nextProxyId);
+
+							--nextProxy.upperBounds[axis];
+							--bound.stabbingCount;
+						}
+						else
+						{
+							--nextProxy.lowerBounds[axis];
+							++bound.stabbingCount;
+						}
+
+						++proxy.lowerBounds[axis];
+						b2Swap(*bound, *nextEdge);
+						++index;
+					}
+				}
+
+				// Should we move the upper bound down?
+				if (deltaUpper < 0)
+				{
+					int index = upperIndex;
+					while (index > 0 && upperValue < bounds[index-1].value)
+					{
+						Bound bound = bounds[index];
+						Bound prevEdge = bounds[index-1];
+
+						int prevProxyId = prevEdge.proxyId;
+						Proxy prevProxy = m_proxyPool[prevProxyId];
+
+						--prevEdge.stabbingCount;
+
+						if (prevEdge.IsLower() == true)
+						{
+							RemovePair(proxyId, prevProxyId);
+
+							++prevProxy.lowerBounds[axis];
+							--bound.stabbingCount;
+						}
+						else
+						{
+							++prevProxy.upperBounds[axis];
+							++bound.stabbingCount;
+						}
+
+						--proxy.upperBounds[axis];
+						b2Swap(*bound, *prevEdge);
+						--index;
+					}
+				}
+			}
+
+// #if defined(_DEBUG) && B2BP_VALIDATE == 1
+// Validate();
+// #endif
 	 }
 
 	 public void Flush() {
@@ -201,7 +385,7 @@ public class BroadPhase {
 		// Bump lower bounds downs and upper bounds up. This ensures correct
 		// sorting of
 		// lower/upper bounds that would have equal values.
-		// TODO_ERIN implement fast float to uint16 conversion.
+		// TODO_ERIN implement fast float to int conversion.
 		lowerValues[0] = (int) (m_quantizationFactor.x * (minVertex.x - m_worldAABB.minVertex.x))
 				& (Integer.MAX_VALUE - 1);
 		upperValues[0] = (int) (m_quantizationFactor.x * (maxVertex.x - m_worldAABB.minVertex.x)) | 1;

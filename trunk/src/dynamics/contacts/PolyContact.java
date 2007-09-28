@@ -39,7 +39,7 @@ public class PolyContact extends Contact implements ContactCreator {
 	}
 
 	@Override
-	void Evaluate() {
+	public void Evaluate() {
 		Manifold m0 = new Manifold(m_manifold);
 
 		CollidePoly.b2CollidePoly(m_manifold, (PolyShape) m_shape1,

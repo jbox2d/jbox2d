@@ -28,7 +28,7 @@ public class CircleShape extends Shape {
 	}
 
 	@Override
-	void UpdateProxy() {
+	public void UpdateProxy() {
 		AABB aabb = new AABB(new Vec2(m_position.x - m_radius, m_position.y
 				- m_radius), new Vec2(m_position.x + m_radius, m_position.y
 				+ m_radius));
