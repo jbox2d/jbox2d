@@ -32,7 +32,7 @@ public class Body {
 	public Shape m_shapeList;
 
 	public JointNode m_jointList;
-	public ContactNode[] m_contactList;
+	public ContactNode m_contactList;
 
 	public float m_mass, m_invMass;
 	public float m_I, m_invI;

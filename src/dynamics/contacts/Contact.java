@@ -38,7 +38,7 @@ public abstract class Contact {
 	public float m_friction;
 	public float m_restitution;
 
-	boolean m_islandFlag;
+	public boolean m_islandFlag;
 
 	void InitializeRegisters() {
 		s_registers = new ArrayList<ContactRegister>();
