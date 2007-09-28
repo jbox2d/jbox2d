@@ -41,7 +41,7 @@ public class DistanceJoint extends Joint {
 	}
 
 	@Override
-	void PreSolve() {
+	public void PreSolve() {
 		// Compute the effective mass matrix.
 		Vec2 r1 = m_body1.m_R.mul(m_localAnchor1);
 		Vec2 r2 = m_body2.m_R.mul(m_localAnchor2);
@@ -75,7 +75,7 @@ public class DistanceJoint extends Joint {
 	}
 
 	@Override
-	boolean SolvePositionConstraints() {
+	public boolean SolvePositionConstraints() {
 		Vec2 r1 = m_body1.m_R.mul(m_localAnchor1);
 		Vec2 r2 = m_body2.m_R.mul(m_localAnchor2);
 		Vec2 d = m_body2.m_position.add(r2).sub(m_body1.m_position).sub(r1);
@@ -97,7 +97,7 @@ public class DistanceJoint extends Joint {
 	}
 
 	@Override
-	void SolveVelocityConstraints(float dt) {
+	public void SolveVelocityConstraints(float dt) {
 		Vec2 r1 = m_body1.m_R.mul(m_localAnchor1);
 		Vec2 r2 = m_body2.m_R.mul(m_localAnchor2);
 

@@ -91,7 +91,7 @@ public class PrismaticJoint extends Joint {
 		return b2.m_position.add(b2.m_R.mul(m_localAnchor2));
 	}
 
-	void PreSolve() {
+	public void PreSolve() {
 		Body b1 = m_body1;
 		Body b2 = m_body2;
 
@@ -184,7 +184,7 @@ public class PrismaticJoint extends Joint {
 		m_limitPositionImpulse = 0.0f;
 	}
 
-	void SolveVelocityConstraints(float dt) {
+	public void SolveVelocityConstraints(float dt) {
 		Body b1 = m_body1;
 		Body b2 = m_body2;
 
@@ -270,7 +270,7 @@ public class PrismaticJoint extends Joint {
 		}
 	}
 
-	boolean SolvePositionConstraints() {
+	public boolean SolvePositionConstraints() {
 		Body b1 = m_body1;
 		Body b2 = m_body2;
 

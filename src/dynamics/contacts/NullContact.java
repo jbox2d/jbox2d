@@ -11,7 +11,7 @@ public class NullContact extends Contact {
 	}
 
 	@Override
-	void Evaluate() {
+	public void Evaluate() {
 	}
 
 	@Override

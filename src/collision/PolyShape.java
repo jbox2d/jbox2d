@@ -98,7 +98,7 @@ public class PolyShape extends Shape {
 	}
 
 	@Override
-	void UpdateProxy() {
+	public void UpdateProxy() {
 		Mat22 absR = m_R.abs();
 		Vec2 h = absR.mul(m_extents);
 		AABB aabb = new AABB(m_position.sub(h), m_position.add(h));
