@@ -16,7 +16,7 @@ public class ContactSolver {
 	List<ContactConstraint> m_constraints;
 	int m_constraintCount;
 
-	public ContactSolver(List<Contact> contacts, int contactCount, float inv_dt) {
+	public ContactSolver(Contact[] contacts, int contactCount, float inv_dt) {
 		m_constraintCount = 0;
 
 		for (Contact c : contacts) {
@@ -109,7 +109,7 @@ public class ContactSolver {
 		assert (count == m_constraintCount);
 	}
 
-	void PreSolve() {
+	public void PreSolve() {
 		// Warm start.
 		for (ContactConstraint c : m_constraints) {
 			Body b1 = c.body1;
@@ -136,7 +136,7 @@ public class ContactSolver {
 		}
 	}
 
-	void SolveVelocityConstraints() {
+	public void SolveVelocityConstraints() {
 		for (ContactConstraint c : m_constraints) {
 			Body b1 = c.body1;
 			Body b2 = c.body2;
@@ -215,7 +215,7 @@ public class ContactSolver {
 		}
 	}
 
-	boolean SolvePositionConstraints(float beta) {
+	public boolean SolvePositionConstraints(float beta) {
 		float minSeparation = 0.0f;
 
 		for (ContactConstraint c : m_constraints) {
@@ -271,7 +271,7 @@ public class ContactSolver {
 		return minSeparation >= -Settings.linearSlop;
 	}
 
-	void PostSolve() {
+	public void PostSolve() {
 		for (ContactConstraint c : m_constraints) {
 			Manifold m = c.manifold;
 

@@ -5,17 +5,17 @@ import dynamics.Body;
 
 public abstract class Joint {
 
-	JointType m_type;
-	Joint m_prev;
-	Joint m_next;
-	JointNode m_node1;
-	JointNode m_node2;
-	Body m_body1;
-	Body m_body2;
+	public JointType m_type;
+	public Joint m_prev;
+	public Joint m_next;
+	public JointNode m_node1;
+	public JointNode m_node2;
+	public Body m_body1;
+	public Body m_body2;
 
-	boolean m_islandFlag;
+	public boolean m_islandFlag;
 
-	static Joint Create(JointDescription description) {
+	public static Joint Create(JointDescription description) {
 		Joint joint = null;
 
 		if (description.type == JointType.distanceJoint) {
@@ -42,12 +42,12 @@ public abstract class Joint {
 
 	}
 
-	abstract void PreSolve();
+	public abstract void PreSolve();
 
-	abstract void SolveVelocityConstraints(float dt);
+	public abstract void SolveVelocityConstraints(float dt);
 
 	// This returns true if the position errors are within tolerance.
-	abstract boolean SolvePositionConstraints();
+	public abstract boolean SolvePositionConstraints();
 
 	abstract Vec2 GetAnchor1();
 

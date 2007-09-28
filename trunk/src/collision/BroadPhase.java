@@ -171,26 +171,26 @@ public class BroadPhase {
 		return proxyId;
 	}
 
-//	void DestroyProxy(short proxyId) {
-//	}
+	void DestroyProxy(short proxyId) {
+	}
 
 	// Call MoveProxy as many times as you like, then when you are done
 	// call Flush to finalized the proxy pairs (for your time step).
-	// void MoveProxy(short proxyId, AABB aabb) {
-	// }
+	 void MoveProxy(short proxyId, AABB aabb) {
+	 }
 
-	// public void Flush() {
-	// }
+	 public void Flush() {
+	 }
 
 	// Query an AABB for overlapping proxies, returns the user data and
 	// the count, up to the supplied maximum count.
-	// int Query(AABB aabb, void** userData, int maxCount){}
+	 int Query(AABB aabb, void** userData, int maxCount){}
 
-	// void Validate() {
-	// }
+	 void Validate() {
+	 }
 
-	// void ValidatePairs() {
-	// }
+	 void ValidatePairs() {
+	 }
 
 	private void ComputeBounds(int[] lowerValues, int[] upperValues, AABB aabb) {
 		Vec2 minVertex = MathUtils.clamp(aabb.minVertex, m_worldAABB.minVertex,
