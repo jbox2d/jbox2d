@@ -6,6 +6,7 @@ import common.Vec2;
 public class Manifold {
 	public ContactPoint[] points;
 	public Vec2 normal;
+	public int pointCount;
 
 	public Manifold() {
 		points = new ContactPoint[Settings.maxManifoldPoints];

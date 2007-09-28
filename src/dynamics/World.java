@@ -29,13 +29,12 @@ public class World {
 	Vec2 m_gravity;
 	boolean m_doSleep;
 
-	Body groundBody;
+	Body m_groundBody;
 
 	static int s_enablePositionCorrection;
 	static int s_enableWarmStarting;
 
-	public World(AABB worldAABB, Vec2 gravity, boolean doSleep)
-	{
+	public World(AABB worldAABB, Vec2 gravity, boolean doSleep) {
 		m_bodyList = null;
 		m_contactList = null;
 		m_jointList = null;
@@ -55,20 +54,18 @@ public class World {
 		m_groundBody = CreateBody(bd);
 	}
 
-// b2World::~b2World()
-// {
-// DestroyBody(m_groundBody);
-// delete m_broadPhase;
-// }
+	// b2World::~b2World()
+	// {
+	// DestroyBody(m_groundBody);
+	// delete m_broadPhase;
+	// }
 
-	Body CreateBody(BodyDescription description)
-	{
+	Body CreateBody(BodyDescription description) {
 		Body b = new Body(description, this);
 		b.m_prev = null;
-		
+
 		b.m_next = m_bodyList;
-		if (m_bodyList!=null)
-		{
+		if (m_bodyList != null) {
 			m_bodyList.m_prev = b;
 		}
 		m_bodyList = b;
@@ -92,19 +89,19 @@ public class World {
 			
 			JointNode node = other.m_jointList;
 			boolean found = false;
- while (*node)
- {
- if (*node == jn0)
- {
- *node = (*node)->next;
- found = true;
- break;
- }
- else
- {
- node = &(*node)->next;
- }
- }
+			 while (*node)
+			 {
+			 if (*node == jn0)
+			 {
+			 *node = (*node)->next;
+			 found = true;
+			 break;
+			 }
+			 else
+			 {
+			 node = &(*node)->next;
+			 }
+			 }
 			assert found == true;
 
 			// Remove joint from world list.
@@ -148,15 +145,13 @@ public class World {
 		--m_bodyCount;
 	}
 
-	Joint CreateJoint(JointDescription description)
-	{
+	Joint CreateJoint(JointDescription description) {
 		Joint j = Joint.Create(description);
 
 		// Connect to the world list.
 		j.m_prev = null;
 		j.m_next = m_jointList;
-		if (m_jointList!=null)
-		{
+		if (m_jointList != null) {
 			m_jointList.m_prev = j;
 		}
 		m_jointList = j;
@@ -167,34 +162,34 @@ public class World {
 		j.m_node1.other = j.m_body2;
 		j.m_node1.prev = null;
 		j.m_node1.next = j.m_body1.m_jointList;
-		if (j.m_body1.m_jointList!=null){ j.m_body1.m_jointList.prev = j.m_node1;}
+		if (j.m_body1.m_jointList != null) {
+			j.m_body1.m_jointList.prev = j.m_node1;
+		}
 		j.m_body1.m_jointList = j.m_node1;
 
 		j.m_node2.joint = j;
 		j.m_node2.other = j.m_body1;
 		j.m_node2.prev = null;
 		j.m_node2.next = j.m_body2.m_jointList;
-		if (j.m_body2.m_jointList!=null) {j.m_body2.m_jointList.prev = j.m_node2;}
+		if (j.m_body2.m_jointList != null) {
+			j.m_body2.m_jointList.prev = j.m_node2;
+		}
 		j.m_body2.m_jointList = j.m_node2;
 
 		return j;
 	}
 
-	void DestroyJoint(Joint j)
-	{
+	void DestroyJoint(Joint j) {
 		// Remove from the world.
-		if (j.m_prev!=null)
-		{
+		if (j.m_prev != null) {
 			j.m_prev.m_next = j.m_next;
 		}
 
-		if (j.m_next!=null)
-		{
+		if (j.m_next != null) {
 			j.m_next.m_prev = j.m_prev;
 		}
 
-		if (j == m_jointList)
-		{
+		if (j == m_jointList) {
 			m_jointList = j.m_next;
 		}
 
@@ -207,18 +202,15 @@ public class World {
 		body2.wakeUp();
 
 		// Remove from body 1
-		if (j.m_node1.prev!=null)
-		{
+		if (j.m_node1.prev != null) {
 			j.m_node1.prev.next = j.m_node1.next;
 		}
 
-		if (j.m_node1.next!=null)
-		{
+		if (j.m_node1.next != null) {
 			j.m_node1.next.prev = j.m_node1.prev;
 		}
 
-		if (j.m_node1 == body1.m_jointList)
-		{
+		if (j.m_node1 == body1.m_jointList) {
 			body1.m_jointList = j.m_node1.next;
 		}
 
@@ -226,18 +218,15 @@ public class World {
 		j.m_node1.next = null;
 
 		// Remove from body 2
-		if (j.m_node2.prev!=null)
-		{
+		if (j.m_node2.prev != null) {
 			j.m_node2.prev.next = j.m_node2.next;
 		}
 
-		if (j.m_node2.next!=null)
-		{
+		if (j.m_node2.next != null) {
 			j.m_node2.next.prev = j.m_node2.prev;
 		}
 
-		if (j.m_node2 == body2.m_jointList)
-		{
+		if (j.m_node2 == body2.m_jointList) {
 			body2.m_jointList = j.m_node2.next;
 		}
 
@@ -248,8 +237,7 @@ public class World {
 		--m_jointCount;
 	}
 
-	void Step(float dt, int iterations)
-	{
+	void Step(float dt, int iterations) {
 		// Create and/or update contacts.
 		m_contactManager.Collide();
 
@@ -257,28 +245,22 @@ public class World {
 		Island island = new Island(m_bodyCount, m_contactCount, m_jointCount);
 
 		// Clear all the island flags.
-		for (Body b = m_bodyList; b!=null; b = b.m_next)
-		{
+		for (Body b = m_bodyList; b != null; b = b.m_next) {
 			b.m_islandFlag = false;
 		}
-		for (Contact c = m_contactList; c!=null; c = c.m_next)
-		{
+		for (Contact c = m_contactList; c != null; c = c.m_next) {
 			c.m_islandFlag = false;
 		}
-		for (Joint j = m_jointList; j!=null; j = j.m_next)
-		{
+		for (Joint j = m_jointList; j != null; j = j.m_next) {
 			j.m_islandFlag = false;
 		}
-		
+
 		// Build and simulate all awake islands.
 		int stackSize = m_bodyCount;
 		Body[] stack = new Body[stackSize];
-		for (Body seed = m_bodyList; seed!=null; seed = seed.m_next)
-		{
-			if (seed.m_invMass == 0.0f ||
-				seed.m_islandFlag == true ||
-				seed.m_isSleeping == true)
-			{
+		for (Body seed = m_bodyList; seed != null; seed = seed.m_next) {
+			if (seed.m_invMass == 0.0f || seed.m_islandFlag == true
+					|| seed.m_isSleeping == true) {
 				continue;
 			}
 
@@ -289,8 +271,7 @@ public class World {
 			seed.m_islandFlag = true;
 
 			// Perform a depth first search (DFS) on the constraint graph.
-			while (stackCount > 0)
-			{
+			while (stackCount > 0) {
 				// Grab the next body off the stack and add it to the island.
 				Body b = stack[--stackCount];
 				island.Add(b);
@@ -300,16 +281,13 @@ public class World {
 
 				// To keep islands as small as possible, we don't
 				// propagate islands across static bodies.
-				if (b.m_invMass == 0.0f)
-				{
+				if (b.m_invMass == 0.0f) {
 					continue;
 				}
 
 				// Search all contacts connected to this body.
-				for (ContactNode cn = b.m_contactList; cn!=null; cn = cn.next)
-				{
-					if (cn.contact.m_islandFlag == true)
-					{
+				for (ContactNode cn = b.m_contactList; cn != null; cn = cn.next) {
+					if (cn.contact.m_islandFlag == true) {
 						continue;
 					}
 
@@ -317,8 +295,7 @@ public class World {
 					cn.contact.m_islandFlag = true;
 
 					Body other = cn.other;
-					if (other.m_islandFlag == true)
-					{
+					if (other.m_islandFlag == true) {
 						continue;
 					}
 
@@ -328,10 +305,8 @@ public class World {
 				}
 
 				// Search all joints connect to this body.
-				for (JointNode jn = b.m_jointList; jn!=null; jn = jn.next)
-				{
-					if (jn.joint.m_islandFlag == true)
-					{
+				for (JointNode jn = b.m_jointList; jn != null; jn = jn.next) {
+					if (jn.joint.m_islandFlag == true) {
 						continue;
 					}
 
@@ -339,12 +314,11 @@ public class World {
 					jn.joint.m_islandFlag = true;
 
 					Body other = jn.other;
-					if (other.m_islandFlag == true)
-					{
+					if (other.m_islandFlag == true) {
 						continue;
 					}
 
-					assert(stackCount < stackSize);
+					assert (stackCount < stackSize);
 					stack[stackCount++] = other;
 					other.m_islandFlag = true;
 				}
@@ -354,31 +328,23 @@ public class World {
 			island.UpdateSleep(dt);
 
 			// Allow static bodies to participate in other islands.
-			for (int i = 0; i < island.m_bodyCount; ++i)
-			{
+			for (int i = 0; i < island.m_bodyCount; ++i) {
 				Body b = island.m_bodies[i];
-				if (b.m_invMass == 0.0f)
-				{
+				if (b.m_invMass == 0.0f) {
 					b.m_islandFlag = false;
 				}
 			}
 		}
 
-		m_broadPhase.flush();
+		m_broadPhase.Flush();
 	}
 
-	int32 b2World::Query(const b2AABB& aabb, b2Shape** shapes, int32 maxCount)
-	{
-		void** results = (void**)m_stackAllocator.Allocate(maxCount * sizeof(void*));
+	Shape[] Query(AABB aabb, int maxCount) {
+		Object[] objs = m_broadPhase.Query(aabb, maxCount);
+		Shape[] ret = new Shape[objs.length];
 
-		int32 count = m_broadPhase->Query(aabb, results, maxCount);
+		System.arraycopy(objs, 0, ret, 0, objs.length);
 
-		for (int32 i = 0; i < count; ++i)
-		{
-			shapes[i] = (b2Shape*)results[i];
-		}
-
-		m_stackAllocator.Free(results);
-		return count;
+		return ret;
 	}
 }

@@ -187,8 +187,8 @@ public class PairManager {
 		return m_pairCount;
 	}
 
-	List<Pair> GetPairs() {
-		return Arrays.asList(m_pairs);
+	Pair[] GetPairs() {
+		return m_pairs;
 	}
 
 	private Pair Find(int proxyId1, int proxyId2, int hash) {
