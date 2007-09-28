@@ -1,5 +1,7 @@
 package collision;
 
+import java.util.Collections;
+
 import common.MathUtils;
 import common.Settings;
 import common.Vec2;
@@ -103,7 +105,9 @@ public class BroadPhase {
 		for (int axis = 0; axis < 2; ++axis) {
 			Bound[] bounds = m_bounds[axis];
 			int lowerIndex, upperIndex;
-			int[] indexes = Query(lowerValues[axis], upperValues[axis], bounds,
+			int[] indexes = new int[2];
+
+			Query(indexes, lowerValues[axis], upperValues[axis], bounds,
 					edgeCount, axis);
 			lowerIndex = indexes[0];
 			upperIndex = indexes[1];
@@ -176,7 +180,7 @@ public class BroadPhase {
 
 	// Call MoveProxy as many times as you like, then when you are done
 	// call Flush to finalized the proxy pairs (for your time step).
-	 void MoveProxy(short proxyId, AABB aabb) {
+	void MoveProxy(short proxyId, AABB aabb) {
 			if (proxyId == PairManager.NULL_PROXY || Settings.maxProxies <= proxyId)
 			{
 				
@@ -363,18 +367,154 @@ public class BroadPhase {
 // #endif
 	 }
 
-	 public void Flush() {
-	 }
+	public void Flush() {
+	}
 
 	// Query an AABB for overlapping proxies, returns the user data and
 	// the count, up to the supplied maximum count.
-	 int Query(AABB aabb, void** userData, int maxCount){}
+	public Object[] Query(AABB aabb, int maxCount) {
+		int lowerValues[] = new int[2];
+		int upperValues[] = new int[2];
+		ComputeBounds(lowerValues, upperValues, aabb);
 
-	 void Validate() {
-	 }
+		int indexes[] = new int[2]; // lowerIndex, upperIndex;
 
-	 void ValidatePairs() {
-	 }
+		Query(indexes, lowerValues[0], upperValues[0], m_bounds[0],
+				2 * m_proxyCount, 0);
+		Query(indexes, lowerValues[1], upperValues[1], m_bounds[1],
+				2 * m_proxyCount, 1);
+
+		assert m_queryResultCount < Settings.maxProxies;
+
+		Object[] results = new Object[maxCount];
+
+		int count = 0;
+		for (int i = 0; i < m_queryResultCount && count < maxCount; ++i, ++count) {
+			assert m_queryResults[i] < Settings.maxProxies;
+			Proxy proxy = m_proxyPool[m_queryResults[i]];
+			proxy.IsValid();
+			results[i] = proxy.userData;
+		}
+
+		// Prepare for next query.
+		m_queryResultCount = 0;
+		IncrementTimeStamp();
+
+		return results;
+	}
+
+	void Validate() {
+		for (int axis = 0; axis < 2; ++axis) {
+			Bound[] bounds = m_bounds[axis];
+
+			int pointCount = 2 * m_proxyCount;
+			int stabbingCount = 0;
+
+			for (int i = 0; i < pointCount; ++i) {
+				Bound bound = bounds[i];
+				if (i > 0) {
+					Bound prevEdge = bounds[i - 1];
+					assert prevEdge.value <= bound.value;
+				}
+
+				int proxyId = bound.proxyId;
+
+				assert proxyId != PairManager.NULL_PROXY;
+
+				Proxy proxy = m_proxyPool[bound.proxyId];
+
+				assert (proxy.IsValid());
+
+				if (bound.IsLower() == true) {
+					assert (proxy.lowerBounds[axis] == i);
+					++stabbingCount;
+				} else {
+					assert (proxy.upperBounds[axis] == i);
+					--stabbingCount;
+				}
+
+				assert (bound.stabbingCount == stabbingCount);
+			}
+		}
+
+		Pair[] pairs = m_pairManager.GetPairs();
+		int pairCount = m_pairManager.GetCount();
+		assert (m_pairBufferCount <= pairCount);
+
+		// TODO after it implements Comparable
+		// TODO Collections.sort(m_pairBuffer);
+		sort(m_pairBuffer, m_pairBuffer + m_pairBufferCount);
+
+		for (int i = 0; i < m_pairBufferCount; ++i) {
+			if (i > 0) {
+				assert (Equals(m_pairBuffer[i], m_pairBuffer[i - 1]) == false);
+			}
+
+			Pair pair = m_pairManager.Find(m_pairBuffer[i].proxyId1,
+					m_pairBuffer[i].proxyId2);
+			assert (pair.IsBuffered());
+
+			Proxy proxy1 = m_proxyPool[pair.proxyId1];
+			Proxy proxy2 = m_proxyPool[pair.proxyId2];
+
+			assert (proxy1.IsValid() == true);
+			assert (proxy2.IsValid() == true);
+
+			boolean overlap = TestOverlap(proxy1, proxy2);
+
+			if (pair.IsRemoved() == true) {
+				assert (overlap == false);
+			} else {
+				assert (overlap == true);
+			}
+		}
+
+		for (int i = 0; i < pairCount; ++i) {
+			Pair pair = pairs[i];
+
+			Proxy proxy1 = m_proxyPool[pair.proxyId1];
+			Proxy proxy2 = m_proxyPool[pair.proxyId2];
+
+			assert (proxy1.IsValid() == true);
+			assert (proxy2.IsValid() == true);
+
+			boolean overlap = TestOverlap(proxy1, proxy2);
+
+			if (pair.IsBuffered()) {
+				if (pair.IsRemoved() == true) {
+					assert (overlap == false);
+				} else {
+					assert (overlap == true);
+				}
+			} else {
+				assert (overlap == true);
+			}
+		}
+	}
+
+	void ValidatePairs() {
+		Pair[] pairs = m_pairManager.GetPairs();
+		int pairCount = m_pairManager.GetCount();
+		assert (m_pairBufferCount <= pairCount);
+
+		sort(m_pairBuffer, m_pairBuffer + m_pairBufferCount);
+
+		for (int i = 0; i < m_pairBufferCount; ++i) {
+			if (i > 0) {
+				assert (Equals(m_pairBuffer[i], m_pairBuffer[i - 1]) == false);
+			}
+
+			Pair pair = m_pairManager.Find(m_pairBuffer[i].proxyId1,
+					m_pairBuffer[i].proxyId2);
+			assert (pair.IsBuffered());
+
+			Proxy proxy1 = m_proxyPool[pair.proxyId1];
+			Proxy proxy2 = m_proxyPool[pair.proxyId2];
+
+			assert (proxy1.IsValid() == true);
+			assert (proxy2.IsValid() == true);
+		}
+	}
 
 	private void ComputeBounds(int[] lowerValues, int[] upperValues, AABB aabb) {
 		Vec2 minVertex = MathUtils.clamp(aabb.minVertex, m_worldAABB.minVertex,
@@ -395,8 +535,72 @@ public class BroadPhase {
 		upperValues[1] = (int) (m_quantizationFactor.y * (maxVertex.y - m_worldAABB.minVertex.y)) | 1;
 	}
 
-	// private void AddPair(int proxyId1, int proxyId2);
-	// private void RemovePair(int proxyId1, int proxyId2);
+	private void AddPair(int id1, int id2) {
+		assert (m_proxyPool[id1].IsValid() && m_proxyPool[id2].IsValid());
+
+		Pair pair = m_pairManager.Add(id1, id2);
+
+		if (pair == null) {
+			return;
+		}
+
+		// If this pair is not in the pair buffer ...
+		if (pair.IsBuffered() == false) {
+			// This must be a new pair.
+			assert (pair.userData == null);
+
+			// If there is room in the pair buffer ...
+			if (m_pairBufferCount < Settings.maxPairs) {
+				// Add it to the pair buffer.
+				pair.SetBuffered();
+				m_pairBuffer[m_pairBufferCount].proxyId1 = pair.proxyId1;
+				m_pairBuffer[m_pairBufferCount].proxyId2 = pair.proxyId2;
+				++m_pairBufferCount;
+			}
+
+			assert (m_pairBufferCount <= m_pairManager.GetCount());
+		}
+
+		// Confirm this pair for the subsequent call to Flush.
+		pair.SetAdded();
+
+		// #if defined(_DEBUG) && B2BP_VALIDATE == 1
+		// ValidatePairs();
+		// #endif
+
+	}
+
+	private void RemovePair(int id1, int id2) {
+		assert (m_proxyPool[id1].IsValid() && m_proxyPool[id2].IsValid());
+
+		Pair pair = m_pairManager.Find(id1, id2);
+
+		if (pair == null) {
+			return;
+		}
+
+		// If this pair is not in the pair buffer ...
+		if (pair.IsBuffered() == false) {
+			// This must be an old pair.
+			assert (pair.userData != null);
+
+			if (m_pairBufferCount < Settings.maxPairs) {
+				pair.SetBuffered();
+				m_pairBuffer[m_pairBufferCount].proxyId1 = pair.proxyId1;
+				m_pairBuffer[m_pairBufferCount].proxyId2 = pair.proxyId2;
+				++m_pairBufferCount;
+			}
+
+			assert (m_pairBufferCount <= m_pairManager.GetCount());
+		}
+
+		pair.SetRemoved();
+
+		// #if defined(_DEBUG) && B2BP_VALIDATE == 1
+		// ValidatePairs();
+		// #endif
+
+	}
 
 	private boolean TestOverlap(Proxy p1, Proxy p2) {
 		for (int axis = 0; axis < 2; ++axis) {
@@ -415,8 +619,8 @@ public class BroadPhase {
 	/**
 	 * return [lowerQuery, upperQuery]
 	 */
-	private int[] Query(int lowerValue, int upperValue, Bound[] bounds,
-			int edgeCount, int axis) {
+	private void Query(int[] results, int lowerValue, int upperValue,
+			Bound[] bounds, int edgeCount, int axis) {
 		int lowerQuery = BinarySearch(bounds, edgeCount, lowerValue);
 		int upperQuery = BinarySearch(bounds, edgeCount, upperValue);
 
@@ -449,7 +653,8 @@ public class BroadPhase {
 			}
 		}
 
-		return new int[] { lowerQuery, upperQuery };
+		results[0] = lowerQuery;
+		results[1] = upperQuery;
 	}
 
 	private void IncrementOverlapCount(int proxyId) {

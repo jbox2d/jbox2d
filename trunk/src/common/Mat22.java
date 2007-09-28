@@ -1,5 +1,6 @@
 package common;
 
+
 public class Mat22 {
 	public Vec2 col1, col2;
 
@@ -55,5 +56,4 @@ public class Mat22 {
 	public Mat22 add(Mat22 B) {
 		return new Mat22(col1.add(B.col1), col2.add(B.col2));
 	}
-
 }
