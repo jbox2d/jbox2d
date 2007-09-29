@@ -64,7 +64,7 @@ public abstract class Contact {
 		}
 	}
 
-	Contact Create(Shape shape1, Shape shape2) {
+	public Contact Create(Shape shape1, Shape shape2) {
 		if (s_initialized == false) {
 			InitializeRegisters();
 			s_initialized = true;
