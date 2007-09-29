@@ -233,5 +233,5 @@ public class ContactManager extends PairCallback {
 				c.m_node2.next = null;
 			}
 		}
-
+	}
 }

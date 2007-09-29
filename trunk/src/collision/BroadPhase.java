@@ -104,18 +104,22 @@ public class BroadPhase {
 
 		for (int axis = 0; axis < 2; ++axis) {
 			Bound[] bounds = m_bounds[axis];
-			int lowerIndex, upperIndex;
 			int[] indexes = new int[2];
 
 			Query(indexes, lowerValues[axis], upperValues[axis], bounds,
 					edgeCount, axis);
-			lowerIndex = indexes[0];
-			upperIndex = indexes[1];
+			int lowerIndex = indexes[0];
+			int upperIndex = indexes[1];
 
-			memmove(bounds[upperIndex + 2], bounds[upperIndex],
-					(edgeCount - upperIndex) * sizeof(b2Bound));
-			memmove(bounds[lowerIndex + 1], bounds[lowerIndex],
-					(upperIndex - lowerIndex) * sizeof(b2Bound));
+			// memmove(bounds[upperIndex + 2], bounds[upperIndex],
+			// (edgeCount - upperIndex) * sizeof(b2Bound));
+			System.arraycopy(bounds, upperIndex, bounds, upperIndex + 2,
+					edgeCount - upperIndex);
+
+			// memmove(bounds[lowerIndex + 1], bounds[lowerIndex],
+			// (upperIndex - lowerIndex) * sizeof(b2Bound));
+			System.arraycopy(bounds, lowerIndex, bounds, lowerIndex + 1,
+					edgeCount - lowerIndex);
 
 			// The upper index has increased because of the lower bound
 			// insertion.
@@ -617,7 +621,8 @@ public class BroadPhase {
 	}
 
 	/**
-	 * return [lowerQuery, upperQuery]
+	 * @param results
+	 *            out variable
 	 */
 	private void Query(int[] results, int lowerValue, int upperValue,
 			Bound[] bounds, int edgeCount, int axis) {
