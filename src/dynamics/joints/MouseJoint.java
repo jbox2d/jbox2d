@@ -19,8 +19,8 @@ import dynamics.Body;
 
 public class MouseJoint extends Joint {
 
-	Vec2 m_localAnchor;
-	Vec2 m_target;
+    public Vec2 m_localAnchor;
+	public Vec2 m_target;
 	Vec2 m_u;
 	float m_positionError;
 	float m_impulse;
@@ -42,7 +42,7 @@ public class MouseJoint extends Joint {
 		m_impulse = 0.0f;
 	}
 
-	void SetTarget(Vec2 target) {
+	public void SetTarget(Vec2 target) {
 		m_body2.wakeUp();
 		m_target = target;
 	}
