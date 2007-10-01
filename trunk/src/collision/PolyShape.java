@@ -8,8 +8,8 @@ import dynamics.Body;
 public class PolyShape extends Shape {
 
 	Vec2 m_extents;
-	Vec2 m_vertices[];
-	int m_vertexCount;
+	public Vec2 m_vertices[];
+	public int m_vertexCount;
 	Vec2 m_normals[];
 	int m_next[];
 

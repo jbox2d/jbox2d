@@ -80,13 +80,13 @@ public class PrismaticJoint extends Joint {
 	}
 
 	@Override
-	Vec2 GetAnchor1() {
+	public Vec2 GetAnchor1() {
 		Body b1 = m_body1;
 		return b1.m_position.add(b1.m_R.mul(m_localAnchor1));
 	}
 
 	@Override
-	Vec2 GetAnchor2() {
+	public Vec2 GetAnchor2() {
 		Body b2 = m_body2;
 		return b2.m_position.add(b2.m_R.mul(m_localAnchor2));
 	}

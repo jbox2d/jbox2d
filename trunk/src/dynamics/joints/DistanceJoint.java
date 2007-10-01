@@ -31,12 +31,12 @@ public class DistanceJoint extends Joint {
 	}
 
 	@Override
-	Vec2 GetAnchor1() {
+	public Vec2 GetAnchor1() {
 		return m_body1.m_position.add(m_body1.m_R.mul(m_localAnchor1));
 	}
 
 	@Override
-	Vec2 GetAnchor2() {
+	public Vec2 GetAnchor2() {
 		return m_body2.m_position.add(m_body2.m_R.mul(m_localAnchor2));
 	}
 

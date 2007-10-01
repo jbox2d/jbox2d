@@ -48,12 +48,12 @@ public class MouseJoint extends Joint {
 	}
 
 	@Override
-	Vec2 GetAnchor1() {
+	public Vec2 GetAnchor1() {
 		return m_target;
 	}
 
 	@Override
-	Vec2 GetAnchor2() {
+	public Vec2 GetAnchor2() {
 		return m_body2.m_position.add(m_body2.m_R.mul(m_localAnchor));
 	}
 

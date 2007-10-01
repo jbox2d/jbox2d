@@ -4,7 +4,7 @@ import common.Vec2;
 
 public class RevoluteDescription extends JointDescription {
 
-	Vec2 anchorPoint;
+	public Vec2 anchorPoint;
 	float lowerAngle;
 	float upperAngle;
 	float motorTorque;
