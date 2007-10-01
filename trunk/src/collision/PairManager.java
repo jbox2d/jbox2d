@@ -1,8 +1,5 @@
 package collision;
 
-import java.util.Arrays;
-import java.util.List;
-
 import common.MathUtils;
 import common.Settings;
 
@@ -14,8 +11,8 @@ public class PairManager {
 	// of two
 	static final int TABLE_MASK = TABLE_CAPACITY - 1;
 
-	Pair m_pairs[];
-	int m_pairCount;
+	public Pair m_pairs[];
+	public int m_pairCount;
 
 	int m_hashTable[];
 	int m_next[];

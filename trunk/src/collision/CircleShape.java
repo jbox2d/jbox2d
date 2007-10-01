@@ -22,7 +22,7 @@ public class CircleShape extends Shape {
 	}
 
 	@Override
-	boolean TestPoint(Vec2 p) {
+	public boolean TestPoint(Vec2 p) {
 		Vec2 d = p.sub(m_position);
 		return Vec2.dot(d, d) <= m_radius * m_radius;
 	}

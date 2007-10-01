@@ -1,6 +1,5 @@
 package collision;
 
-import collision.ContactPoint;
 import common.Settings;
 import common.Vec2;
 

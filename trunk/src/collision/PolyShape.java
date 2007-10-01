@@ -84,7 +84,7 @@ public class PolyShape extends Shape {
 	}
 
 	@Override
-	boolean TestPoint(Vec2 p) {
+	public boolean TestPoint(Vec2 p) {
 		Vec2 pLocal = m_R.mulT(p.sub(m_position));
 
 		for (int i = 0; i < m_vertexCount; ++i) {
