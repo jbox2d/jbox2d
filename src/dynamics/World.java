@@ -60,12 +60,6 @@ public class World {
         m_groundBody = CreateBody(bd);
     }
 
-    // b2World::~b2World()
-    // {
-    // DestroyBody(m_groundBody);
-    // delete m_broadPhase;
-    // }
-
     public Body CreateBody(BodyDescription description) {
         Body b = new Body(description, this);
         b.m_prev = null;
