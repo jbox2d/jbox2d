@@ -30,7 +30,7 @@ public abstract class Shape {
 
 	public abstract void UpdateProxy();
 
-	abstract boolean TestPoint(Vec2 p);
+	public abstract boolean TestPoint(Vec2 p);
 
 	public static Shape Create(ShapeDescription description, Body body, Vec2 center,
 			MassData massData) {

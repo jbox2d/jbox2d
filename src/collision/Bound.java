@@ -1,7 +1,7 @@
 package collision;
 
 public class Bound {
-	int value;
+	public int value;
 	int proxyId;
 	int stabbingCount;
 

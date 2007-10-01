@@ -1,25 +1,30 @@
 package collision;
 
 public class Proxy {
-	int lowerBounds[], upperBounds[];
-	int overlapCount;
-	int timeStamp;
-	Object userData;
+    public int lowerBounds[];
 
-	public Proxy() {
-		lowerBounds = new int[2];
-		upperBounds = new int[2];
-	}
+    public int upperBounds[];
 
-	int GetNext() {
-		return lowerBounds[0];
-	}
+    int overlapCount;
 
-	void SetNext(int next) {
-		lowerBounds[0] = next;
-	}
+    int timeStamp;
 
-	boolean IsValid() {
-		return overlapCount != BroadPhase.INVALID;
-	}
+    Object userData;
+
+    public Proxy() {
+        lowerBounds = new int[2];
+        upperBounds = new int[2];
+    }
+
+    int GetNext() {
+        return lowerBounds[0];
+    }
+
+    void SetNext(int next) {
+        lowerBounds[0] = next;
+    }
+
+    public boolean IsValid() {
+        return overlapCount != BroadPhase.INVALID;
+    }
 }
