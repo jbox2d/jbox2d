@@ -31,7 +31,7 @@ public class PolyContact extends Contact implements ContactCreator {
 	}
 
 	@Override
-	List<Manifold> GetManifolds() {
+	public List<Manifold> GetManifolds() {
 		List<Manifold> ret = new ArrayList<Manifold>(1);
 		if (m_manifold != null) {
 			ret.add(m_manifold);
