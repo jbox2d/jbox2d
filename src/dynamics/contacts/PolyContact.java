@@ -14,7 +14,7 @@ import collision.ShapeType;
 public class PolyContact extends Contact implements ContactCreator {
 
 	Manifold m_manifold;
-
+	
 	PolyContact(Shape s1, Shape s2) {
 		super(s1, s2);
 
@@ -22,6 +22,12 @@ public class PolyContact extends Contact implements ContactCreator {
 		assert (m_shape2.m_type == ShapeType.POLY_SHAPE);
 
 		m_manifold = new Manifold();
+	}
+
+	public PolyContact() {
+		// TODO Auto-generated constructor stub
+		super();
+		m_manifold = null;
 	}
 
 	@Override

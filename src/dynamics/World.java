@@ -15,7 +15,7 @@ import dynamics.joints.JointDescription;
 import dynamics.joints.JointNode;
 
 public class World {
-	BroadPhase m_broadPhase;
+	public BroadPhase m_broadPhase;
 	ContactManager m_contactManager;
 
 	Body m_bodyList;
@@ -47,10 +47,11 @@ public class World {
 
 		m_gravity = gravity;
 
+		m_contactManager = new ContactManager();
 		m_contactManager.m_world = this;
 		m_broadPhase = new BroadPhase(worldAABB, m_contactManager);
 
-		BodyDescription bd;
+		BodyDescription bd = new BodyDescription();
 		m_groundBody = CreateBody(bd);
 	}
 
@@ -60,7 +61,7 @@ public class World {
 	// delete m_broadPhase;
 	// }
 
-	Body CreateBody(BodyDescription description) {
+	public Body CreateBody(BodyDescription description) {
 		Body b = new Body(description, this);
 		b.m_prev = null;
 
@@ -74,6 +75,7 @@ public class World {
 		return b;
 	}
 
+	//ewjordan: this function changed by 1.2.0 - see ewjordan/Dynamics/b2World.java
 	void DestroyBody(Body b)
 	{
 		// Delete the attached joints
@@ -89,18 +91,14 @@ public class World {
 			
 			JointNode node = other.m_jointList;
 			boolean found = false;
-			 while (*node)
-			 {
-			 if (*node == jn0)
-			 {
-			 *node = (*node)->next;
-			 found = true;
-			 break;
-			 }
-			 else
-			 {
-			 node = &(*node)->next;
-			 }
+			 while (node != null){
+		       if (node == jn0){
+			     node = node.next;
+			     found = true;
+			     break;
+		       } else{
+			     node = node.next;
+			   }
 			 }
 			assert found == true;
 
@@ -237,7 +235,7 @@ public class World {
 		--m_jointCount;
 	}
 
-	void Step(float dt, int iterations) {
+	public void Step(float dt, int iterations) {
 		// Create and/or update contacts.
 		m_contactManager.Collide();
 

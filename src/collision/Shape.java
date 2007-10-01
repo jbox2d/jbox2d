@@ -6,6 +6,8 @@ import common.Vec2;
 import dynamics.Body;
 
 public abstract class Shape {
+	public int uid; //unique id for shape for sorting
+	static private int uidcount = 0;
 
 	public ShapeType m_type;
 
@@ -30,7 +32,7 @@ public abstract class Shape {
 
 	abstract boolean TestPoint(Vec2 p);
 
-	public Shape create(ShapeDescription description, Body body, Vec2 center,
+	public static Shape Create(ShapeDescription description, Body body, Vec2 center,
 			MassData massData) {
 
 		if (description.type == ShapeType.CIRCLE_SHAPE) {
@@ -55,6 +57,7 @@ public abstract class Shape {
 		m_R = new Mat22(m_rotation);
 
 		m_proxyId = PairManager.NULL_PROXY;
+		uid = uidcount++;
 	}
 
 	// b2Shape::~b2Shape()

@@ -21,12 +21,38 @@ public class ShapeDescription {
 	// };
 
 	public ShapeDescription() {
+		//System.out.println("Unknown");
 		type = ShapeType.UNKNOWN_SHAPE;
 		localPosition = new Vec2(0.0f, 0.0f);
 		localRotation = 0.0f;
 		friction = 0.2f;
 		restitution = 0.0f;
 		density = 0.0f;
+	}
+	
+	public ShapeDescription(ShapeType s){
+		this();
+		type = s;
+		switch (s) {
+		case CIRCLE_SHAPE:
+			//System.out.println("circ");
+			circle = new CircleData();
+			break;
+
+		case BOX_SHAPE:
+			//System.out.println("box");
+			box = new BoxData();
+			break;
+
+		case POLY_SHAPE:
+			//System.out.println("poly");
+			poly = new PolyData();
+			break;
+
+		default:
+		}
+		
+		
 	}
 
 	public void computeMass(MassData massData) {
@@ -127,17 +153,31 @@ public class ShapeDescription {
 	}
 
 	public class BoxData {
-		Vec2 m_extents;
+		public Vec2 m_extents;
+		
+		public BoxData(){
+			m_extents = new Vec2();
+		}
+		
 	};
 
 	public class CircleData {
-		float m_radius;
+		public float m_radius;
+		
+		public CircleData(){
+		
+		}
 	};
 
 	// Convex polygon, vertices must be in CCW order.
 	public class PolyData {
-		List<Vec2> m_vertices;
+		public List<Vec2> m_vertices;
 		// b2Vec2 m_vertices[b2_maxPolyVertices];
 		// int32 m_vertexCount;
+		
+		public PolyData(){
+			//m_vertices = new List();
+		}
+		
 	};
 }

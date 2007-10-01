@@ -7,13 +7,13 @@ import common.Vec2;
 
 public class BodyDescription {
 
-	ShapeDescription[] shapes;
-	Vec2 position;
-	float rotation;
-	Vec2 linearVelocity;
-	float angularVelocity;
-	boolean allowSleep;
-	boolean isSleeping;
+	public ShapeDescription[] shapes;
+	public Vec2 position;
+	public float rotation;
+	public Vec2 linearVelocity;
+	public float angularVelocity;
+	public boolean allowSleep;
+	public boolean isSleeping;
 
 	public BodyDescription() {
 		shapes = new ShapeDescription[Settings.maxShapesPerBody];
@@ -25,10 +25,11 @@ public class BodyDescription {
 		isSleeping = false;
 	}
 
-	void addShape(ShapeDescription shape) {
+	public void addShape(ShapeDescription shape) {
 		for (int i = 0; i < Settings.maxShapesPerBody; ++i) {
 			if (shapes[i] == null) {
 				shapes[i] = shape;
+				//System.out.println(shape.type);
 				break;
 			}
 		}
