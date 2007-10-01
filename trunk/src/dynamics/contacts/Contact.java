@@ -11,7 +11,7 @@ import dynamics.World;
 public abstract class Contact {
 	public abstract void Evaluate();
 
-	abstract List<Manifold> GetManifolds();
+	public abstract List<Manifold> GetManifolds();
 
 	public int GetManifoldCount() {
 		return GetManifolds().size();

@@ -15,7 +15,7 @@ public class NullContact extends Contact {
 	}
 
 	@Override
-	List<Manifold> GetManifolds() {
+	public List<Manifold> GetManifolds() {
 		return null;
 	}
 }
