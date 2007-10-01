@@ -47,6 +47,18 @@ public class Body {
 	public boolean IsStatic() {
 		return m_invMass == 0.0f;
 	}
+	
+	// Get the position of the body's origin. The body's origin does not
+	// necessarily coincide with the center of mass. It depends on how the
+	// shapes are created.
+	public Vec2 GetOriginPosition(){
+		return (m_position.sub(m_R.mul(m_center)));
+	}
+	
+	// Get the rotation in radians.
+	public float GetRotation(){
+		return m_rotation;
+	}
 
 	Body(BodyDescription bd, World world) {
 		m_position = bd.position;
@@ -71,6 +83,7 @@ public class Body {
 			if (sd == null) {
 				break;
 			}
+			massDatas[i] = new MassData();
 			MassData massData = massDatas[i];
 			sd.computeMass(massData);
 			m_mass += massData.mass;
@@ -122,6 +135,8 @@ public class Body {
 				break;
 			}
 			Shape shape = Shape.Create(sd, this, m_center, massDatas[i]);
+			//System.out.println(sd.type);
+			//if (shape == null) System.out.println(shape);
 			shape.m_next = m_shapeList;
 			m_shapeList = shape;
 		}

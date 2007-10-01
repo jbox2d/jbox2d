@@ -6,9 +6,20 @@ public class ContactID {
 	Features features;
 
 	class Features {
-		int referenceFace;
-		int incidentEdge;
-		int incidentVertex;
-		int flip;
+		public int referenceFace;
+		public int incidentEdge;
+		public int incidentVertex;
+		public int flip;
+		
+		public Features(){
+			referenceFace=incidentEdge=incidentVertex=flip=0;
+		}
+		
 	}
+	
+	public ContactID(){
+		key = 0;
+		features = new Features();
+	}
+	
 }

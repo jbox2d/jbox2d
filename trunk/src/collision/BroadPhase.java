@@ -49,6 +49,13 @@ public class BroadPhase {
 		m_pairBuffer = new BufferedPair[Settings.maxPairs];
 		m_bounds = new Bound[2][2 * Settings.maxProxies];
 		m_queryResults = new int[Settings.maxProxies];
+		
+		for (int i=0; i<Settings.maxProxies; i++){
+			m_bounds[0][i] = new Bound();
+			m_bounds[1][i] = new Bound();
+		}
+		
+		m_pairManager = new PairManager();
 
 		assert worldAABB.isValid();
 		m_worldAABB = worldAABB;
@@ -56,15 +63,16 @@ public class BroadPhase {
 		m_proxyCount = 0;
 
 		Vec2 d = worldAABB.maxVertex.sub(worldAABB.minVertex);
-		m_quantizationFactor.x = Integer.MAX_VALUE / d.x;
-		m_quantizationFactor.y = Integer.MAX_VALUE / d.y;
+		m_quantizationFactor = new Vec2( Integer.MAX_VALUE / d.x, Integer.MAX_VALUE / d.y);
 
 		for (int i = 0; i < Settings.maxProxies - 1; ++i) {
+			m_proxyPool[i] = new Proxy();
 			m_proxyPool[i].SetNext(i + 1);
 			m_proxyPool[i].timeStamp = 0;
 			m_proxyPool[i].overlapCount = INVALID;
 			m_proxyPool[i].userData = null;
 		}
+		m_proxyPool[Settings.maxProxies - 1] = new Proxy();
 		m_proxyPool[Settings.maxProxies - 1].SetNext(PairManager.NULL_PROXY);
 		m_proxyPool[Settings.maxProxies - 1].timeStamp = 0;
 		m_proxyPool[Settings.maxProxies - 1].overlapCount = INVALID;
@@ -110,12 +118,14 @@ public class BroadPhase {
 					edgeCount, axis);
 			int lowerIndex = indexes[0];
 			int upperIndex = indexes[1];
-
+			
+			//System.out.println(lowerIndex+" "+upperIndex+" "+bounds.length);
+			
 			// memmove(bounds[upperIndex + 2], bounds[upperIndex],
 			// (edgeCount - upperIndex) * sizeof(b2Bound));
 			System.arraycopy(bounds, upperIndex, bounds, upperIndex + 2,
 					edgeCount - upperIndex);
-
+			
 			// memmove(bounds[lowerIndex + 1], bounds[lowerIndex],
 			// (upperIndex - lowerIndex) * sizeof(b2Bound));
 			System.arraycopy(bounds, lowerIndex, bounds, lowerIndex + 1,
@@ -126,6 +136,10 @@ public class BroadPhase {
 			++upperIndex;
 
 			// Copy in the new bounds.
+			//System.out.println(bounds[lowerIndex].value);
+			if (bounds[lowerIndex] == null) bounds[lowerIndex] = new Bound();
+			if (bounds[upperIndex] == null) bounds[upperIndex] = new Bound();
+			
 			bounds[lowerIndex].value = lowerValues[axis];
 			bounds[lowerIndex].proxyId = proxyId;
 			bounds[upperIndex].value = upperValues[axis];
@@ -184,7 +198,7 @@ public class BroadPhase {
 
 	// Call MoveProxy as many times as you like, then when you are done
 	// call Flush to finalized the proxy pairs (for your time step).
-	void MoveProxy(short proxyId, AABB aabb) {
+	void MoveProxy(int proxyId, AABB aabb) {
 			if (proxyId == PairManager.NULL_PROXY || Settings.maxProxies <= proxyId)
 			{
 				
@@ -213,7 +227,7 @@ public class BroadPhase {
 
 				int lowerValue = lowerValues[axis];
 				int upperValue = upperValues[axis];
-
+				//System.out.println(lowerIndex + " " +upperIndex+" "+bounds.length);
 				int deltaLower = lowerValue - bounds[lowerIndex].value;
 				int deltaUpper = upperValue - bounds[upperIndex].value;
 
@@ -255,7 +269,10 @@ public class BroadPhase {
 						}
 
 						--proxy.lowerBounds[axis];
-						b2Swap(*bound, *prevEdge);
+						//b2Swap(*bound, *prevEdge);
+						Bound tmp = bound;
+						bound = prevEdge;
+						prevEdge = tmp;
 						--index;
 					}
 				}
@@ -290,7 +307,10 @@ public class BroadPhase {
 						}
 
 						++proxy.upperBounds[axis];
-						b2Swap(*bound, *nextEdge);
+						//b2Swap(*bound, *nextEdge);
+						Bound tmp = bound;
+						bound = nextEdge;
+						nextEdge = tmp;
 						++index;
 					}
 				}
@@ -327,7 +347,10 @@ public class BroadPhase {
 						}
 
 						++proxy.lowerBounds[axis];
-						b2Swap(*bound, *nextEdge);
+						//b2Swap(*bound, *nextEdge);
+						Bound tmp = bound;
+						bound = nextEdge;
+						nextEdge = tmp;
 						++index;
 					}
 				}
@@ -360,7 +383,10 @@ public class BroadPhase {
 						}
 
 						--proxy.upperBounds[axis];
-						b2Swap(*bound, *prevEdge);
+						//b2Swap(*bound, *prevEdge);
+						Bound tmp = bound;
+						bound = prevEdge;
+						prevEdge = tmp;
 						--index;
 					}
 				}
@@ -372,6 +398,7 @@ public class BroadPhase {
 	 }
 
 	public void Flush() {
+		//TODO
 	}
 
 	// Query an AABB for overlapping proxies, returns the user data and
@@ -445,13 +472,19 @@ public class BroadPhase {
 		int pairCount = m_pairManager.GetCount();
 		assert (m_pairBufferCount <= pairCount);
 
-		// TODO after it implements Comparable
+		// TODO after it implements Comparable (DONE)
 		// TODO Collections.sort(m_pairBuffer);
+		// First need to change m_pairBuffer so it is a List<BufferedPair>
+		// instead of an array...watch out, also, because the m_pairBuffer
+		// array is longer than the number of active elements.  For now
+		// we might just want to do a manual sort of the correct number
+		// of elements until we get everything working with the container.
+		// Also, if the list is mostly sorted, this may be faster anyways.
 		sort(m_pairBuffer, m_pairBuffer + m_pairBufferCount);
 
 		for (int i = 0; i < m_pairBufferCount; ++i) {
 			if (i > 0) {
-				assert (Equals(m_pairBuffer[i], m_pairBuffer[i - 1]) == false);
+				assert (BufferedPair.Equals(m_pairBuffer[i], m_pairBuffer[i - 1]) == false);
 			}
 
 			Pair pair = m_pairManager.Find(m_pairBuffer[i].proxyId1,
@@ -501,11 +534,11 @@ public class BroadPhase {
 		int pairCount = m_pairManager.GetCount();
 		assert (m_pairBufferCount <= pairCount);
 
-		sort(m_pairBuffer, m_pairBuffer + m_pairBufferCount);
+		sort(m_pairBuffer, m_pairBuffer + m_pairBufferCount);		
 
 		for (int i = 0; i < m_pairBufferCount; ++i) {
 			if (i > 0) {
-				assert (Equals(m_pairBuffer[i], m_pairBuffer[i - 1]) == false);
+				assert (BufferedPair.Equals(m_pairBuffer[i], m_pairBuffer[i - 1]) == false);
 			}
 
 			Pair pair = m_pairManager.Find(m_pairBuffer[i].proxyId1,
@@ -557,6 +590,7 @@ public class BroadPhase {
 			if (m_pairBufferCount < Settings.maxPairs) {
 				// Add it to the pair buffer.
 				pair.SetBuffered();
+				m_pairBuffer[m_pairBufferCount] = new BufferedPair();
 				m_pairBuffer[m_pairBufferCount].proxyId1 = pair.proxyId1;
 				m_pairBuffer[m_pairBufferCount].proxyId2 = pair.proxyId2;
 				++m_pairBufferCount;
@@ -703,21 +737,5 @@ public class BroadPhase {
 		return low;
 	}
 
-	// TODO move this as into BufferedPair
-	boolean Equals(BufferedPair pair1, BufferedPair pair2) {
-		return pair1.proxyId1 == pair2.proxyId1
-				&& pair1.proxyId2 == pair2.proxyId2;
-	}
 
-	// TODO move this as into BufferedPair (implements Comparable)
-	boolean minor(BufferedPair pair1, BufferedPair pair2) {
-		if (pair1.proxyId1 < pair2.proxyId1)
-			return true;
-
-		if (pair1.proxyId1 == pair2.proxyId1) {
-			return pair1.proxyId2 < pair2.proxyId2;
-		}
-
-		return false;
-	}
 }

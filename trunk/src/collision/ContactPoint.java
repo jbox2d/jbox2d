@@ -8,4 +8,11 @@ public class ContactPoint {
 	public float normalImpulse;
 	public float tangentImpulse;
 	public ContactID id;
+	
+	public ContactPoint(){
+		position = new Vec2();
+		separation = normalImpulse = tangentImpulse = 0f;
+		id = new ContactID();
+	}
+	
 }

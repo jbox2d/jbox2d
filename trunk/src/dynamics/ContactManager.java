@@ -35,8 +35,14 @@ public class ContactManager extends PairCallback {
 		// Ensure that body2 is dynamic (body1 is static or dynamic).
 		if (body2.m_invMass == 0.0f)
 		{
-			b2Swap(shape1, shape2);
-			b2Swap(body1, body2);
+			//b2Swap(shape1, shape2);
+			//b2Swap(body1, body2);
+			Shape tmps = shape1;
+			shape1 = shape2;
+			shape2 = tmps;
+			Body tmpb = body1;
+			body1 = body2;
+			body2 = tmpb;
 		}
 
 		if (body2.isConnected(body1))

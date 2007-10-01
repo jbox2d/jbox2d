@@ -6,9 +6,14 @@ public class AABB {
 	public Vec2 minVertex, maxVertex;
 
 	public AABB(Vec2 minVertex, Vec2 maxVertex) {
-		super();
+		//super(); //ewjordan: no superclass
 		this.minVertex = minVertex;
 		this.maxVertex = maxVertex;
+	}
+	
+	public AABB(){
+		minVertex = new Vec2();
+		maxVertex = new Vec2();
 	}
 
 	boolean isValid() {

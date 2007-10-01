@@ -33,6 +33,7 @@ public class PairManager {
 		}
 		for (int i = 0; i < Settings.maxPairs; ++i) {
 			m_next[i] = NULL_PAIR;
+			m_pairs[i] = new Pair();
 		}
 		m_pairCount = 0;
 	}
@@ -84,17 +85,24 @@ public class PairManager {
 
 		int hash = Hash(proxyId1, proxyId2) & TABLE_MASK;
 
-		Pair pair = Find(proxyId1, proxyId2, hash);
-		if (pair == null) {
+		//Pair pair = Find(proxyId1, proxyId2, hash);
+		//if (pair == null) {
+		int pairIndex = FindIndex(proxyId1, proxyId2, hash);
+		if (pairIndex == -1){ //-1 returned if not found
 			return null;
 		}
+		
+		Pair pair = m_pairs[pairIndex];
 
 		Object userData = pair.userData;
 
 		assert pair.proxyId1 == proxyId1;
 		assert pair.proxyId2 == proxyId2;
 
-		int pairIndex = int32(pair - m_pairs);
+		//Java note: this was a nasty one to fix, because in the C++
+		//pair - m_pairs was pointer arithmetic, used to extract the
+		//array index.  Should be resolved now using FindIndex method above
+		//int pairIndex = int32(pair - m_pairs);
 		assert pairIndex < m_pairCount;
 
 		// Remove the pair from the hash table.
@@ -182,6 +190,31 @@ public class PairManager {
 
 		return m_pairs[index];
 	}
+	
+	int FindIndex(int proxyId1, int proxyId2){
+		if (proxyId1 > proxyId2) {
+			// integer primitive swap
+			proxyId1 += proxyId2;
+			proxyId2 = proxyId1 - proxyId2;
+			proxyId1 -= proxyId2;
+		}
+
+		int hash = Hash(proxyId1, proxyId2) & TABLE_MASK;
+
+		int index = m_hashTable[hash];
+		while (index != NULL_PAIR
+				&& Equals(m_pairs[index], proxyId1, proxyId2) == false) {
+			index = m_next[index];
+		}
+
+		if (index == NULL_PAIR) {
+			return -1;
+		}
+
+		assert index < m_pairCount;
+
+		return index;
+	}
 
 	int GetCount() {
 		return m_pairCount;
@@ -206,6 +239,23 @@ public class PairManager {
 		assert index < m_pairCount;
 
 		return m_pairs[index];
+	}
+	
+	private int FindIndex(int proxyId1, int proxyId2, int hash) {
+		int index = m_hashTable[hash];
+
+		while (index != NULL_PAIR
+				&& Equals(m_pairs[index], proxyId1, proxyId2) == false) {
+			index = m_next[index];
+		}
+
+		if (index == NULL_PAIR) {
+			return -1;
+		}
+
+		assert index < m_pairCount;
+
+		return index;
 	}
 
 	private int Hash(int proxyId1, int proxyId2) {

@@ -1,35 +1,40 @@
 package collision;
 
-public class Pair {
+public class Pair implements Comparable{
 	private final int e_bufferedPair = 0x0001;
 	private final int e_removePair = 0x0002;
 
-	Object userData;
-	int proxyId1;
-	int proxyId2;
-	int status;
+	public Object userData;
+	public int proxyId1;
+	public int proxyId2;
+	public int status;
 
-	void SetBuffered() {
+	public void SetBuffered() {
 		status |= e_bufferedPair;
 	}
 
-	void ClearBuffered() {
+	public void ClearBuffered() {
 		status &= ~e_bufferedPair;
 	}
 
-	boolean IsBuffered() {
+	public boolean IsBuffered() {
 		return (status & e_bufferedPair) != 0;
 	}
 
-	void SetAdded() {
+	public void SetAdded() {
 		status &= ~e_removePair;
 	}
 
-	void SetRemoved() {
+	public void SetRemoved() {
 		status |= e_removePair;
 	}
 
-	boolean IsRemoved() {
+	public boolean IsRemoved() {
 		return (status & e_removePair) == e_removePair;
+	}
+	
+	public int compareTo(Object c){
+		
+		return 0;
 	}
 }

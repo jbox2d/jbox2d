@@ -40,13 +40,13 @@ public abstract class Contact {
 
 	public boolean m_islandFlag;
 
-	void InitializeRegisters() {
+	static void InitializeRegisters() {
 		s_registers = new ArrayList<ContactRegister>();
 
 		AddType(new PolyContact(), ShapeType.POLY_SHAPE, ShapeType.POLY_SHAPE);
 	}
 
-	void AddType(ContactCreator createFcn, ShapeType type1, ShapeType type2) {
+	static void AddType(ContactCreator createFcn, ShapeType type1, ShapeType type2) {
 		ContactRegister cr = new ContactRegister();
 		cr.s1 = type1;
 		cr.s2 = type2;
@@ -64,7 +64,7 @@ public abstract class Contact {
 		}
 	}
 
-	public Contact Create(Shape shape1, Shape shape2) {
+	public static Contact Create(Shape shape1, Shape shape2) {
 		if (s_initialized == false) {
 			InitializeRegisters();
 			s_initialized = true;
@@ -95,7 +95,7 @@ public abstract class Contact {
 		}
 	}
 
-	private ContactRegister getContactRegister(ShapeType type1, ShapeType type2) {
+	private static ContactRegister getContactRegister(ShapeType type1, ShapeType type2) {
 		for (ContactRegister cr : s_registers) {
 			if (cr.s1 == type1 && cr.s2 == type2) {
 				return cr;
@@ -121,6 +121,10 @@ public abstract class Contact {
 		// assert(ShapeType.unknownShape < type2 && type2 <
 		// ShapeType.shapeTypeCount);
 	}
+	
+	public Contact(){
+		//TODO: fill in details
+	}
 
 	public Contact(Shape s1, Shape s2) {
 		// Get the shapes in a repeatable order.
@@ -132,7 +136,8 @@ public abstract class Contact {
 			assert s1.m_body.IsStatic() == false;
 			m_shape1 = s2;
 			m_shape2 = s1;
-		} else if (s1 < s2) {
+		//} else if (s1 < s2) { //Java note: this was a pointer compare...darn
+		} else if (s1.uid < s2.uid){//replaced with unique id
 			m_shape1 = s1;
 			m_shape2 = s2;
 		} else {
