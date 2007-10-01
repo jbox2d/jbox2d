@@ -86,7 +86,7 @@ public class Island {
 		}
 
 		// Solve position constraints.
-		if (World.s_enablePositionCorrection != 0) {
+		if (World.s_enablePositionCorrection) {
 			for (m_positionIterations = 0; m_positionIterations < iterations; ++m_positionIterations) {
 				boolean contactsOkay = contactSolver
 						.SolvePositionConstraints(Settings.contactBaumgarte);
