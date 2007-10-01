@@ -1,7 +1,5 @@
 package dynamics;
 
-import java.util.List;
-
 import collision.MassData;
 import collision.Shape;
 import collision.ShapeDescription;
@@ -9,6 +7,7 @@ import collision.ShapeDescription;
 import common.Mat22;
 import common.Settings;
 import common.Vec2;
+
 import dynamics.contacts.ContactNode;
 import dynamics.joints.JointNode;
 
@@ -150,7 +149,7 @@ public class Body {
 		}
 	}
 
-	void SetRootPosition(Vec2 position, float rotation) {
+	public void SetRootPosition(Vec2 position, float rotation) {
 		m_rotation = rotation;
 		m_R.set(m_rotation);
 		m_position = position.add(m_R.mul(m_center));
