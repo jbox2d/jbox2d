@@ -76,7 +76,7 @@ public class World {
 
     // ewjordan: this function changed by 1.2.0 - see
     // ewjordan/Dynamics/b2World.java
-    void DestroyBody(Body b) {
+    public void DestroyBody(Body b) {
         // Delete the attached joints
         JointNode jn = b.m_jointList;
         while (jn != null) {

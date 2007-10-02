@@ -3,8 +3,8 @@ package dynamics.joints;
 import common.Vec2;
 
 public class DistanceJointDescription extends JointDescription {
-	Vec2 anchorPoint1;
-	Vec2 anchorPoint2;
+	public Vec2 anchorPoint1;
+	public Vec2 anchorPoint2;
 
 	public DistanceJointDescription() {
 		type = JointType.distanceJoint;

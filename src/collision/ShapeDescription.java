@@ -1,5 +1,6 @@
 package collision;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import common.Vec2;
@@ -182,7 +183,7 @@ public class ShapeDescription {
         // int32 m_vertexCount;
 
         public PolyData() {
-            // m_vertices = new List();
+            m_vertices = new ArrayList<Vec2>();
         }
 
     };

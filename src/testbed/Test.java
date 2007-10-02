@@ -275,7 +275,7 @@ public abstract class Test {
         Vec2 p1 = joint.GetAnchor1();
         Vec2 p2 = joint.GetAnchor2();
 
-        g.setColor(/* new Color(0.5f, 0.8f, 0.8f) */Color.black);
+        g.setColor(new Color(0.5f, 0.8f, 0.8f));
 
         if (joint.m_type == JointType.distanceJoint) {
             g.drawLine((int) p1.x, (int) p1.y, (int) p2.x, (int) p2.y);
@@ -469,10 +469,12 @@ public abstract class Test {
             // render
             long beforeRender = System.currentTimeMillis();
             Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
-            // g.setColor(Color.white);
-            // g.fillRect(0, 0, 500, 500);
+            g.setColor(Color.white);
+            g.fillRect(0, 0, 500, 500);
 
-            // XXX draw(g);
+            g.translate(200, 100);
+            g.scale(2, 2);
+
             // update data model
             long beforeLogic = System.currentTimeMillis();
             // for (int i = 0; i < 4; i++) {
