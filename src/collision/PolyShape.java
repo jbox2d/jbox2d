@@ -21,7 +21,7 @@ public class PolyShape extends Shape {
 		m_normals = new Vec2[Settings.maxPolyVertices];
 		m_next = new int[Settings.maxPolyVertices];
 
-		m_type = ShapeType.BOX_SHAPE;
+		m_type = ShapeType.BOX_SHAPE; //TODO: hmm? why BOX_SHAPE?
 
 		if (description.type == ShapeType.BOX_SHAPE) {
 			m_vertexCount = 4;
