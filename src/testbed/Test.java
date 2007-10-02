@@ -163,11 +163,11 @@ public abstract class Test {
 
         m_world.Step(timeStep, settings.iterationCount);
 
-        //m_world.m_broadPhase.Validate();
+        // m_world.m_broadPhase.Validate();
 
         for (Body b = m_world.m_bodyList; b != null; b = b.m_next) {
             for (Shape s = b.m_shapeList; s != null; s = s.m_next) {
-            	 if (b.m_invMass == 0.0f) {
+                if (b.m_invMass == 0.0f) {
                     DrawShape(s, new Color(0.5f, 0.9f, 0.5f), g);
                 }
                 else if (b.m_isSleeping) {
@@ -178,7 +178,7 @@ public abstract class Test {
                 }
                 else {
                     DrawShape(s, new Color(0.9f, 0.9f, 0.9f), g);
-                    
+
                 }
             }
         }
@@ -250,8 +250,8 @@ public abstract class Test {
 
     void DrawShape(Shape shape, Color c, Graphics2D g) {
         g.setColor(c);
-        //System.out.println(shape.m_type);
-        if (shape.m_type == ShapeType.POLY_SHAPE || shape.m_type == ShapeType.BOX_SHAPE) {
+        if (shape.m_type == ShapeType.POLY_SHAPE
+                || shape.m_type == ShapeType.BOX_SHAPE) {
             PolyShape poly = (PolyShape) shape;
 
             int x[] = new int[poly.m_vertexCount];
@@ -262,7 +262,6 @@ public abstract class Test {
 
                 x[i] = (int) v.x;
                 y[i] = (int) v.y;
-                //System.out.println(x[i]+" "+y[i]);
             }
             g.drawPolygon(x, y, poly.m_vertexCount);
         }
@@ -276,7 +275,7 @@ public abstract class Test {
         Vec2 p1 = joint.GetAnchor1();
         Vec2 p2 = joint.GetAnchor2();
 
-        g.setColor(new Color(0.5f, 0.8f, 0.8f));
+        g.setColor(/* new Color(0.5f, 0.8f, 0.8f) */Color.black);
 
         if (joint.m_type == JointType.distanceJoint) {
             g.drawLine((int) p1.x, (int) p1.y, (int) p2.x, (int) p2.y);
@@ -470,24 +469,10 @@ public abstract class Test {
             // render
             long beforeRender = System.currentTimeMillis();
             Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
-            g.setColor(Color.white);
-            g.fillRect(0, 0, 500, 500);
+            // g.setColor(Color.white);
+            // g.fillRect(0, 0, 500, 500);
 
             // XXX draw(g);
-            renderGUI(g);
-            g.setColor(Color.black);
-            g.drawString("FAv: " + frameAverage, 10, 50);
-            g.drawString("FPS: " + (int) (1000 / frameAverage), 10, 70);
-            g.drawString("Yield: " + yield, 10, 90);
-            // XXX g.drawString("Bodies: " + m_world.getBodies().size(), 10,
-            // 130);
-            g.drawString("R: " + renderTime, 10, 150);
-            g.drawString("L: " + logicTime, 10, 170);
-            // XXX g.drawString("Energy: " + m_world.getTotalEnergy(), 10, 190);
-            g.dispose();
-            strategy.show();
-            renderTime = System.currentTimeMillis() - beforeRender;
-
             // update data model
             long beforeLogic = System.currentTimeMillis();
             // for (int i = 0; i < 4; i++) {
@@ -495,6 +480,21 @@ public abstract class Test {
             // }
             Step(settings, g);
             logicTime = System.currentTimeMillis() - beforeLogic;
+
+            g.setColor(Color.black);
+            // g.drawString("FAv: " + frameAverage, 10, 50);
+            // g.drawString("FPS: " + (int) (1000 / frameAverage), 10, 70);
+            // g.drawString("Yield: " + yield, 10, 90);
+            // XXX g.drawString("Bodies: " + m_world.getBodies().size(), 10,
+            // 130);
+            // g.drawString("R: " + renderTime, 10, 150);
+            // g.drawString("L: " + logicTime, 10, 170);
+            // XXX g.drawString("Energy: " + m_world.getTotalEnergy(), 10, 190);
+
+            renderGUI(g);
+            g.dispose();
+            strategy.show();
+            renderTime = System.currentTimeMillis() - beforeRender;
 
             if (needsReset) {
                 // XXX m_world.clear();
