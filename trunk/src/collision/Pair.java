@@ -5,6 +5,8 @@ public class Pair implements Comparable<Pair> {
 
     private final int e_removePair = 0x0002;
 
+	private final int e_pairReceived = 0x0004;
+
     public Object userData;
 
     public int proxyId1;
@@ -37,6 +39,12 @@ public class Pair implements Comparable<Pair> {
         return (status & e_removePair) == e_removePair;
     }
 
+	public void SetReceived()		{ status |= e_pairReceived; }
+
+	public boolean IsReceived()		{ return (status & e_pairReceived) == e_pairReceived; }
+
+
+    
     public int compareTo(Pair p) {
         // TODO implement
         return 0;

@@ -58,15 +58,21 @@ public class BroadPhase {
         m_bounds = new Bound[2][2 * Settings.maxProxies];
         m_queryResults = new int[Settings.maxProxies];
 
-        for (int i = 0; i < Settings.maxProxies; i++) {
+        for (int i = 0; i < 2*Settings.maxProxies; i++) {
             m_bounds[0][i] = new Bound();
             m_bounds[1][i] = new Bound();
         }
+        
+        /*
+         //Doesn't seem to be necessary, for now
+        for (int i=0; i<Settings.maxProxies; i++){
+        	m_pairBuffer[i] = new BufferedPair();
+        }*/
 
         m_pairManager = new PairManager();
 
         assert worldAABB.isValid();
-        m_worldAABB = worldAABB;
+        m_worldAABB = new AABB(worldAABB);
         m_pairCallback = callback;
         m_proxyCount = 0;
 
@@ -86,7 +92,7 @@ public class BroadPhase {
         m_proxyPool[Settings.maxProxies - 1].timeStamp = 0;
         m_proxyPool[Settings.maxProxies - 1].overlapCount = INVALID;
         m_proxyPool[Settings.maxProxies - 1].userData = null;
-        m_freeProxy = 0;
+        m_freeProxy = PairManager.NULL_PROXY;
 
         m_pairBufferCount = 0;
 
@@ -97,6 +103,7 @@ public class BroadPhase {
 
     // Create and destroy proxies. These call Flush first.
     int CreateProxy(AABB aabb, Object userData) {
+    	//System.out.println("Creating proxy: " + aabb.minVertex.x+","+aabb.minVertex.y+"; "+aabb.maxVertex.x+","+aabb.maxVertex.y);
         if (m_freeProxy == PairManager.NULL_PROXY) {
             return PairManager.NULL_PROXY;
         }
@@ -122,6 +129,7 @@ public class BroadPhase {
         for (int axis = 0; axis < 2; ++axis) {
             Bound[] bounds = m_bounds[axis];
             int[] indexes = new int[2];
+            //System.out.println("axis: "+axis);
 
             Query(indexes, lowerValues[axis], upperValues[axis], bounds,
                     edgeCount, axis);
@@ -138,7 +146,7 @@ public class BroadPhase {
             // memmove(bounds[lowerIndex + 1], bounds[lowerIndex],
             // (upperIndex - lowerIndex) * sizeof(b2Bound));
             System.arraycopy(bounds, lowerIndex, bounds, lowerIndex + 1,
-                    edgeCount - lowerIndex);
+                    upperIndex - lowerIndex);
 
             // The upper index has increased because of the lower bound
             // insertion.
@@ -147,9 +155,11 @@ public class BroadPhase {
             // Copy in the new bounds.
             // System.out.println(bounds[lowerIndex].value);
             if (bounds[lowerIndex] == null)
-                bounds[lowerIndex] = new Bound();
+                //bounds[lowerIndex] = new Bound();
+            	assert false:"Null pointer (lower)";
             if (bounds[upperIndex] == null)
-                bounds[upperIndex] = new Bound();
+                //bounds[upperIndex] = new Bound();
+            	assert false:"Null pointer (upper)";
 
             bounds[lowerIndex].value = lowerValues[axis];
             bounds[lowerIndex].proxyId = proxyId;
@@ -211,7 +221,7 @@ public class BroadPhase {
     // Call MoveProxy as many times as you like, then when you are done
     // call Flush to finalized the proxy pairs (for your time step).
     void MoveProxy(int proxyId, AABB aabb) {
-        if (proxyId == PairManager.NULL_PROXY || Settings.maxProxies <= proxyId) {
+    	if (proxyId == PairManager.NULL_PROXY || Settings.maxProxies <= proxyId) {
 
             return;
         }
@@ -391,9 +401,52 @@ public class BroadPhase {
         // #endif
     }
 
-    public void Flush() {
-        // TODO
+
+    public void Flush(){
+    	int removeCount = 0;
+
+    	for (int i = 0; i < m_pairBufferCount; ++i){
+    		Pair pair = m_pairManager.Find(m_pairBuffer[i].proxyId1, m_pairBuffer[i].proxyId2);
+    		assert (pair.IsBuffered());
+
+    		Proxy proxy1 = m_proxyPool[pair.proxyId1];
+    		Proxy proxy2 = m_proxyPool[pair.proxyId2];
+
+    		assert (proxy1.IsValid());
+    		assert (proxy2.IsValid());
+
+    		boolean overlap = TestOverlap(proxy1, proxy2);
+
+    		if (pair.IsRemoved()){
+    			assert (overlap == false);
+
+    			if (pair.IsReceived()){
+    				m_pairCallback.PairRemoved(proxy1.userData, proxy2.userData, pair.userData);
+    			}
+
+    			// Store the ids so we can actually remove the pair below.
+    			m_pairBuffer[removeCount].proxyId1 = pair.proxyId1;
+    			m_pairBuffer[removeCount].proxyId2 = pair.proxyId2;
+    			++removeCount;
+    		} else{
+    			assert (overlap == true);
+    			pair.ClearBuffered();
+
+    			if (pair.IsReceived() == false){
+    				pair.userData = m_pairCallback.PairAdded(proxy1.userData, proxy2.userData);
+    				pair.SetReceived();
+    			}
+    		}
+    	}
+
+    	for (int i = 0; i < removeCount; ++i){
+    		m_pairManager.Remove(m_pairBuffer[i].proxyId1, m_pairBuffer[i].proxyId2);
+    	}
+
+    	m_pairBufferCount = 0;
     }
+
+
 
     // Query an AABB for overlapping proxies, returns the user data and
     // the count, up to the supplied maximum count.
@@ -667,16 +720,16 @@ public class BroadPhase {
             }
         }
 
+        //System.out.println(lowerQuery+" "+upperQuery);
         // Hard case: lowerIndex(i) < lowerQuery < upperIndex(i)
         // Solution: use the stabbing count to search down the bound array.
         if (lowerQuery > 0) {
             int i = lowerQuery - 1;
             int s = bounds[i].stabbingCount;
-
+            System.out.println(i+"\n"+bounds[i]);
             // Find the s overlaps.
             while (s != 0) {
-                assert i >= 0;
-
+                assert (i >= 0):("i = "+i+"; s = "+s);
                 if (bounds[i].IsLower()) {
                     Proxy proxy = m_proxyPool[bounds[i].proxyId];
                     if (lowerQuery <= proxy.upperBounds[axis]) {
@@ -697,8 +750,7 @@ public class BroadPhase {
         if (proxy.timeStamp < m_timeStamp) {
             proxy.timeStamp = m_timeStamp;
             proxy.overlapCount = 1;
-        }
-        else {
+        } else {
             proxy.overlapCount = 2;
             assert m_queryResultCount < Settings.maxProxies;
             m_queryResults[m_queryResultCount] = proxyId;

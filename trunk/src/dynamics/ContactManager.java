@@ -147,6 +147,77 @@ public class ContactManager extends PairCallback {
 			--m_world.m_contactCount;
 		}
 	}
+	
+	// This is a callback from the broadphase when two AABB proxies cease
+	// to overlap. We destroy the b2Contact.
+	public void PairRemoved(Object proxyUserData1, Object proxyUserData2, Object pairUserData){
+		//NOT_USED(proxyUserData1);
+		//NOT_USED(proxyUserData2);
+		
+		Contact c = (Contact)pairUserData;
+		if (c != m_nullContact){
+			// Remove from the world.
+			if (c.m_prev != null){
+				c.m_prev.m_next = c.m_next;
+			}
+			
+			if (c.m_next != null){
+				c.m_next.m_prev = c.m_prev;
+			}
+			
+			if (c == m_world.m_contactList){
+				m_world.m_contactList = c.m_next;
+			}
+			
+			if (c.GetManifoldCount() > 0){
+				Body body1 = c.m_shape1.m_body;
+				Body body2 = c.m_shape2.m_body;
+				
+				// Wake up touching bodies.
+				body1.wakeUp();
+				body2.wakeUp();
+				
+				// Disconnect from island graph.
+				// Remove from body 1
+				if (c.m_node1.prev != null){
+					c.m_node1.prev.next = c.m_node1.next;
+				}
+				
+				if (c.m_node1.next != null){
+					c.m_node1.next.prev = c.m_node1.prev;
+				}
+				
+				if (c.m_node1 == body1.m_contactList){
+					body1.m_contactList = c.m_node1.next;
+				}
+				
+				c.m_node1.prev = null;
+				c.m_node1.next = null;
+				
+				// Remove from body 2
+				if (c.m_node2.prev != null){
+					c.m_node2.prev.next = c.m_node2.next;
+				}
+				
+				if (c.m_node2.next != null){
+					c.m_node2.next.prev = c.m_node2.prev;
+				}
+				
+				if (c.m_node2 == body2.m_contactList){
+					body2.m_contactList = c.m_node2.next;
+				}
+				
+				c.m_node2.prev = null;
+				c.m_node2.next = null;
+			}
+			
+			// Call the factory.
+			Contact.Destroy(c);//, &m_world->m_blockAllocator);
+			--(m_world.m_contactCount);
+		}
+	}
+	
+
 
 	void Collide()
 	{

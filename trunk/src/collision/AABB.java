@@ -11,6 +11,10 @@ public class AABB {
 		this.maxVertex = maxVertex;
 	}
 	
+	public AABB(AABB copy){
+		this(new Vec2(copy.minVertex.x,copy.minVertex.y),new Vec2(copy.maxVertex.x,copy.maxVertex.y));
+	}
+	
 	public AABB(){
 		minVertex = new Vec2();
 		maxVertex = new Vec2();

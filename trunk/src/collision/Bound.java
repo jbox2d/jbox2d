@@ -12,4 +12,12 @@ public class Bound {
 	boolean IsUpper() {
 		return (value & 1) == 1;
 	}
+	
+	public String toString(){
+		String ret = "Bound variable:\n";
+		ret += "value: "+value+"\n";
+		ret += "proxyId: "+proxyId+"\n";
+		ret += "stabbing count: "+stabbingCount+"\n";
+		return ret;
+	}
 }

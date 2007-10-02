@@ -60,10 +60,10 @@ public class Body {
 	}
 
 	Body(BodyDescription bd, World world) {
-		m_position = bd.position;
+		m_position = bd.position.clone();
 		m_rotation = bd.rotation;
 		m_R = new Mat22(m_rotation);
-		m_linearVelocity = bd.linearVelocity;
+		m_linearVelocity = bd.linearVelocity.clone();
 		m_angularVelocity = bd.angularVelocity;
 		m_world = world;
 
