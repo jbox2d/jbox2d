@@ -6,4 +6,6 @@ public abstract class PairCallback {
 
 	// This should free the pair's user data.
 	public abstract void PairRemoved(Object pairUserData);
+	
+	public abstract void PairRemoved(Object proxyUserData1, Object proxyUserData2, Object pairUserData);
 }

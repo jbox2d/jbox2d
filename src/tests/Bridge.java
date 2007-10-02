@@ -39,7 +39,8 @@ public class Bridge extends Test {
 
         Body prevBody = ground;
         for (int i = 0; i < numPlanks; ++i) {
-            bd.position = new Vec2(-15.5f + 1.25f * i, 5.0f);
+            bd2.position = new Vec2(-15.5f + 1.25f * i, 5.0f);
+            System.out.println("Creating plank "+i);
             Body body = m_world.CreateBody(bd2);
 
             jd.anchorPoint = new Vec2(-16.125f + 1.25f * i, 5.0f);

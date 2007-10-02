@@ -105,7 +105,7 @@ public abstract class Contact {
 		return null;
 	}
 
-	void Destroy(Contact contact) {
+	public static void Destroy(Contact contact) {
 		assert (s_initialized == true);
 
 		if (contact.GetManifoldCount() > 0) {
