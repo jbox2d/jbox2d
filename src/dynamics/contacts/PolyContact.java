@@ -10,14 +10,14 @@ import collision.Manifold;
 import collision.PolyShape;
 import collision.Shape;
 import collision.ShapeType;
+import dynamics.World;
 
 public class PolyContact extends Contact implements ContactCreator {
 
 	Manifold m_manifold;
 	
-	PolyContact(Shape s1, Shape s2) {
+	public PolyContact(Shape s1, Shape s2) {
 		super(s1, s2);
-
 		assert (m_shape1.m_type == ShapeType.POLY_SHAPE);
 		assert (m_shape2.m_type == ShapeType.POLY_SHAPE);
 
@@ -25,9 +25,30 @@ public class PolyContact extends Contact implements ContactCreator {
 	}
 
 	public PolyContact() {
-		// TODO Auto-generated constructor stub
 		super();
 		m_manifold = null;
+	}
+	
+	public Contact clone(){
+		PolyContact newC = new PolyContact(this.m_shape1,this.m_shape2);
+		newC.m_manifold = this.m_manifold;
+		// The parent world.
+		newC.m_world = this.m_world;
+
+		// World pool and list pointers.
+		newC.m_prev = this.m_prev;
+		newC.m_next = this.m_next;
+
+		// Nodes for connecting bodies.
+		newC.m_node1 = this.m_node1;
+		newC.m_node2 = this.m_node2;
+
+		// Combined friction
+		newC.m_friction = this.m_friction;
+		newC.m_restitution = this.m_restitution;
+
+		newC.m_islandFlag = this.m_islandFlag;
+		return newC;
 	}
 
 	@Override

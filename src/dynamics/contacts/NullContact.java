@@ -8,10 +8,15 @@ public class NullContact extends Contact {
 
 	public NullContact() {
 		super(null, null);
+		
 	}
 
 	@Override
 	public void Evaluate() {
+	}
+	
+	public Contact clone(){
+		return new NullContact();
 	}
 
 	@Override
