@@ -6,11 +6,6 @@ import collision.Manifold;
 
 public class NullContact extends Contact {
 
-	public NullContact() {
-		super();//null, null);
-		
-	}
-
 	@Override
 	public void Evaluate() {
 	}

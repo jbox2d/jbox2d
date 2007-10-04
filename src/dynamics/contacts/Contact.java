@@ -9,159 +9,166 @@ import collision.ShapeType;
 import dynamics.World;
 
 public abstract class Contact {
-	public abstract void Evaluate();
+    public abstract void Evaluate();
 
-	public abstract List<Manifold> GetManifolds();
+    public abstract List<Manifold> GetManifolds();
 
-	public int GetManifoldCount() {
-		List<Manifold> m = GetManifolds();
-		if (m == null) return 0;
-		else return GetManifolds().size();
-	}
+    public int GetManifoldCount() {
+        List<Manifold> m = GetManifolds();
+        if (m == null)
+            return 0;
+        else
+            return GetManifolds().size();
+    }
 
-	static List<ContactRegister> s_registers;
-	static boolean s_initialized;
+    static List<ContactRegister> s_registers;
 
-	// The parent world.
-	public World m_world;
+    static boolean s_initialized;
 
-	// World pool and list pointers.
-	public Contact m_prev;
-	public Contact m_next;
+    // The parent world.
+    public World m_world;
 
-	// Nodes for connecting bodies.
-	public ContactNode m_node1;
-	public ContactNode m_node2;
+    // World pool and list pointers.
+    public Contact m_prev;
 
-	public Shape m_shape1;
-	public Shape m_shape2;
+    public Contact m_next;
 
-	// Combined friction
-	public float m_friction;
-	public float m_restitution;
+    // Nodes for connecting bodies.
+    public ContactNode m_node1;
 
-	public boolean m_islandFlag;
+    public ContactNode m_node2;
 
-	static void InitializeRegisters() {
-		s_registers = new ArrayList<ContactRegister>();
+    public Shape m_shape1;
 
-		AddType(new PolyContact(), ShapeType.POLY_SHAPE, ShapeType.POLY_SHAPE);
-		AddType(new PolyContact(), ShapeType.BOX_SHAPE, ShapeType.BOX_SHAPE);
-	}
+    public Shape m_shape2;
 
-	static void AddType(ContactCreator createFcn, ShapeType type1, ShapeType type2) {
-		ContactRegister cr = new ContactRegister();
-		cr.s1 = type1;
-		cr.s2 = type2;
-		cr.createFcn = createFcn;
-		cr.primary = true;
-		s_registers.add(cr);
+    // Combined friction
+    public float m_friction;
 
-		if (type1 != type2) {
-			ContactRegister cr2 = new ContactRegister();
-			cr2.s2 = type1;
-			cr2.s1 = type2;
-			cr2.createFcn = createFcn;
-			cr2.primary = false;
-			s_registers.add(cr2);
-		}
-	}
+    public float m_restitution;
 
-	public static Contact Create(Shape shape1, Shape shape2) {
-		System.out.println("Creating contact");
-		if (s_initialized == false) {
-			InitializeRegisters();
-			s_initialized = true;
-		}
+    public boolean m_islandFlag;
 
-		ShapeType type1 = shape1.m_type;
-		ShapeType type2 = shape2.m_type;
+    static void InitializeRegisters() {
+        s_registers = new ArrayList<ContactRegister>();
 
-		// assert ShapeType.UNKNOWN_SHAPE< type1 && type1 <
-		// ShapeType.SHAPE_TYPE_COUNT;
-		// assert ShapeType.UNKNOWN_SHAPE < type2 && type2 <
-		// ShapeType.SHAPE_TYPE_COUNT;
-System.out.println(type1+" "+type2);
-		ContactRegister register = getContactRegister(type1, type2);
-		if (register != null) {
-			if (register.primary) {
-				return register.createFcn.create(shape1, shape2);
-			} else {
-				Contact c = register.createFcn.create(shape2, shape1);
-				for (int i = 0; i < c.GetManifoldCount(); ++i) {
-					Manifold m = c.GetManifolds().get(i);
-					m.normal.negateLocal();
-				}
-				return c;
-			}
-		} else {
-			return null;
-		}
-	}
+        AddType(new PolyContact(), ShapeType.POLY_SHAPE, ShapeType.POLY_SHAPE);
+        AddType(new PolyContact(), ShapeType.BOX_SHAPE, ShapeType.BOX_SHAPE);
+    }
 
-	private static ContactRegister getContactRegister(ShapeType type1, ShapeType type2) {
-		for (ContactRegister cr : s_registers) {
-			if (cr.s1 == type1 && cr.s2 == type2) {
-				return cr;
-			}
-		}
+    static void AddType(ContactCreator createFcn, ShapeType type1,
+            ShapeType type2) {
+        ContactRegister cr = new ContactRegister();
+        cr.s1 = type1;
+        cr.s2 = type2;
+        cr.createFcn = createFcn;
+        cr.primary = true;
+        s_registers.add(cr);
 
-		return null;
-	}
+        if (type1 != type2) {
+            ContactRegister cr2 = new ContactRegister();
+            cr2.s2 = type1;
+            cr2.s1 = type2;
+            cr2.createFcn = createFcn;
+            cr2.primary = false;
+            s_registers.add(cr2);
+        }
+    }
 
-	public static void Destroy(Contact contact) {
-		assert (s_initialized == true);
+    public static Contact Create(Shape shape1, Shape shape2) {
+        if (s_initialized == false) {
+            InitializeRegisters();
+            s_initialized = true;
+        }
 
-		if (contact.GetManifoldCount() > 0) {
-			contact.m_shape1.m_body.wakeUp();
-			contact.m_shape2.m_body.wakeUp();
-		}
+        ShapeType type1 = shape1.m_type;
+        ShapeType type2 = shape2.m_type;
 
-		// ShapeType type1 = contact.m_shape1.m_type;
-		// ShapeType type2 = contact.m_shape2.m_type;
+        // assert ShapeType.UNKNOWN_SHAPE< type1 && type1 <
+        // ShapeType.SHAPE_TYPE_COUNT;
+        // assert ShapeType.UNKNOWN_SHAPE < type2 && type2 <
+        // ShapeType.SHAPE_TYPE_COUNT;
+        ContactRegister register = getContactRegister(type1, type2);
+        if (register != null) {
+            if (register.primary) {
+                return register.createFcn.create(shape1, shape2);
+            }
+            else {
+                Contact c = register.createFcn.create(shape2, shape1);
+                for (int i = 0; i < c.GetManifoldCount(); ++i) {
+                    Manifold m = c.GetManifolds().get(i);
+                    m.normal.negateLocal();
+                }
+                return c;
+            }
+        }
+        else {
+            return null;
+        }
+    }
 
-		// assert(ShapeType.unknownShape < type1 && type1 <
-		// ShapeType.shapeTypeCount);
-		// assert(ShapeType.unknownShape < type2 && type2 <
-		// ShapeType.shapeTypeCount);
-	}
-	
-	public Contact(){
-		System.out.println("contact()");
-		//TODO: fill in details
-	}
-	
-	public abstract Contact clone();
+    private static ContactRegister getContactRegister(ShapeType type1,
+            ShapeType type2) {
+        for (ContactRegister cr : s_registers) {
+            if (cr.s1 == type1 && cr.s2 == type2) {
+                return cr;
+            }
+        }
 
-	public Contact(Shape s1, Shape s2) {
-		System.out.println("contact(Shape,Shape)");
-		// Get the shapes in a repeatable order.
-		if (s1.m_body.IsStatic()) {
-			assert s2.m_body.IsStatic() == false;
-			m_shape1 = s1;
-			m_shape2 = s2;
-		} else if (s2.m_body.IsStatic()) {
-			assert s1.m_body.IsStatic() == false;
-			m_shape1 = s2;
-			m_shape2 = s1;
-		//} else if (s1 < s2) { //Java note: this was a pointer compare...darn
-		} else if (s1.uid < s2.uid){//replaced with unique id
-			m_shape1 = s1;
-			m_shape2 = s2;
-		} else {
-			m_shape1 = s2;
-			m_shape2 = s1;
-		}
+        return null;
+    }
 
-		// m_manifoldCount = 0;
-		GetManifolds().clear();
+    public static void Destroy(Contact contact) {
+        assert (s_initialized == true);
 
-		m_friction = (float) Math.sqrt(m_shape1.m_friction
-				* m_shape2.m_friction);
-		m_restitution = Math
-				.max(m_shape1.m_restitution, m_shape2.m_restitution);
-		m_world = s1.m_body.m_world;
-		m_prev = null;
-		m_next = null;
-	}
+        if (contact.GetManifoldCount() > 0) {
+            contact.m_shape1.m_body.wakeUp();
+            contact.m_shape2.m_body.wakeUp();
+        }
+    }
+
+    public Contact() {
+        // TODO: fill in details
+        m_node1 = new ContactNode();
+        m_node2 = new ContactNode();
+    }
+
+    public abstract Contact clone();
+
+    public Contact(Shape s1, Shape s2) {
+        this();
+        
+        // Get the shapes in a repeatable order.
+        if (s1.m_body.IsStatic()) {
+            assert s2.m_body.IsStatic() == false;
+            m_shape1 = s1;
+            m_shape2 = s2;
+        }
+        else if (s2.m_body.IsStatic()) {
+            assert s1.m_body.IsStatic() == false;
+            m_shape1 = s2;
+            m_shape2 = s1;
+            // } else if (s1 < s2) { //Java note: this was a pointer
+            // compare...darn
+        }
+        else if (s1.uid < s2.uid) {// replaced with unique id
+            m_shape1 = s1;
+            m_shape2 = s2;
+        }
+        else {
+            m_shape1 = s2;
+            m_shape2 = s1;
+        }
+
+        // m_manifoldCount = 0;
+        GetManifolds().clear();
+
+        m_friction = (float) Math.sqrt(m_shape1.m_friction
+                * m_shape2.m_friction);
+        m_restitution = Math
+                .max(m_shape1.m_restitution, m_shape2.m_restitution);
+        m_world = s1.m_body.m_world;
+        m_prev = null;
+        m_next = null;
+    }
 }

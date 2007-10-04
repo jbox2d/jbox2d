@@ -43,7 +43,7 @@ public class PairManager {
     // Add a pair and return the new pair. If the pair already exists,
     // no new pair is created and the old one is returned.
     Pair Add(int proxyId1, int proxyId2) {
-        System.out.printf("PairManager.Add(%d, %d)\n", proxyId1, proxyId2);
+        // System.out.printf("PairManager.Add(%d, %d)\n", proxyId1, proxyId2);
         if (proxyId1 > proxyId2) {
             // integer primitive swap
             proxyId1 += proxyId2;
@@ -79,7 +79,8 @@ public class PairManager {
 
     // Remove a pair, return the pair's userData.
     Object Remove(int proxyId1, int proxyId2) {
-        System.out.printf("PairManager.Remove(%d, %d)\n", proxyId1, proxyId2);
+        // System.out.printf("PairManager.Remove(%d, %d)\n", proxyId1,
+        // proxyId2);
         if (proxyId1 > proxyId2) {
             // integer primitive swap
             proxyId1 += proxyId2;
@@ -174,7 +175,7 @@ public class PairManager {
     }
 
     Pair Find(int proxyId1, int proxyId2) {
-        System.out.printf("PairManager.Find(%d, %d)\n", proxyId1, proxyId2);
+        // System.out.printf("PairManager.Find(%d, %d)\n", proxyId1, proxyId2);
         if (proxyId1 > proxyId2) {
             // integer primitive swap
             proxyId1 += proxyId2;
@@ -201,8 +202,8 @@ public class PairManager {
     }
 
     int FindIndex(int proxyId1, int proxyId2) {
-        System.out
-                .printf("PairManager.FindIndex(%d, %d)\n", proxyId1, proxyId2);
+        // System.out.printf("PairManager.FindIndex(%d, %d)\n", proxyId1,
+        // proxyId2);
         if (proxyId1 > proxyId2) {
             // integer primitive swap
             proxyId1 += proxyId2;
