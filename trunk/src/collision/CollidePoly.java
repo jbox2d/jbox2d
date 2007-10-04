@@ -4,9 +4,14 @@ import common.Settings;
 import common.Vec2;
 
 public class CollidePoly {
-	class ClipVertex {
+	static class ClipVertex {
 		Vec2 v;
 		ContactID id;
+		
+		public ClipVertex(){
+			v = new Vec2();
+			id = new ContactID();
+		}
 	}
 
 	static int ClipSegmentToLine(ClipVertex vOut[/* 2 */],
@@ -195,7 +200,10 @@ public class CollidePoly {
 		}
 
 		// Build the clip vertices for the incident edge.
-		c[0].v = poly2.m_position.add(poly2.m_R.mul(vert2s[vertex21])); // FIXME NPE here
+		c[0] = new ClipVertex();
+		c[1] = new ClipVertex();
+		
+		c[0].v = poly2.m_position.add(poly2.m_R.mul(vert2s[vertex21]));
 		c[0].id.features.referenceFace = edge1;
 		c[0].id.features.incidentEdge = vertex21;
 		c[0].id.features.incidentVertex = vertex21;
