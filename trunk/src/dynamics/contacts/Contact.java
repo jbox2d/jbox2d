@@ -44,6 +44,7 @@ public abstract class Contact {
 		s_registers = new ArrayList<ContactRegister>();
 
 		AddType(new PolyContact(), ShapeType.POLY_SHAPE, ShapeType.POLY_SHAPE);
+		AddType(new PolyContact(), ShapeType.BOX_SHAPE, ShapeType.BOX_SHAPE);
 	}
 
 	static void AddType(ContactCreator createFcn, ShapeType type1, ShapeType type2) {
@@ -65,7 +66,7 @@ public abstract class Contact {
 	}
 
 	public static Contact Create(Shape shape1, Shape shape2) {
-		//System.out.println("Creating contact");
+		System.out.println("Creating contact");
 		if (s_initialized == false) {
 			InitializeRegisters();
 			s_initialized = true;
@@ -78,7 +79,7 @@ public abstract class Contact {
 		// ShapeType.SHAPE_TYPE_COUNT;
 		// assert ShapeType.UNKNOWN_SHAPE < type2 && type2 <
 		// ShapeType.SHAPE_TYPE_COUNT;
-
+System.out.println(type1+" "+type2);
 		ContactRegister register = getContactRegister(type1, type2);
 		if (register != null) {
 			if (register.primary) {
@@ -124,10 +125,14 @@ public abstract class Contact {
 	}
 	
 	public Contact(){
+		System.out.println("contact()");
 		//TODO: fill in details
 	}
+	
+	public abstract Contact clone();
 
 	public Contact(Shape s1, Shape s2) {
+		System.out.println("contact(Shape,Shape)");
 		// Get the shapes in a repeatable order.
 		if (s1.m_body.IsStatic()) {
 			assert s2.m_body.IsStatic() == false;

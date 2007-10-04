@@ -437,8 +437,8 @@ public class BroadPhase {
     	for (int i = 0; i < m_pairBufferCount; ++i){
     		Pair pair = m_pairManager.Find(m_pairBuffer[i].proxyId1, m_pairBuffer[i].proxyId2);
     		assert (pair.IsBuffered());
-
-    		Proxy proxy1 = m_proxyPool[pair.proxyId1];//FIXME: NPE thrown here
+//System.out.println(pair.proxyId1+" "+pair.proxyId2);
+    		Proxy proxy1 = m_proxyPool[pair.proxyId1];
     		Proxy proxy2 = m_proxyPool[pair.proxyId2];
 
     		assert (proxy1.IsValid());

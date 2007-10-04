@@ -3,6 +3,7 @@ package dynamics;
 import common.Settings;
 import common.Vec2;
 
+import dynamics.contacts.NullContact;
 import dynamics.contacts.Contact;
 import dynamics.contacts.ContactSolver;
 import dynamics.joints.Joint;
@@ -34,6 +35,10 @@ public class Island {
 		m_bodies = new Body[bodyCapacity];
 		m_contacts = new Contact[contactCapacity];
 		m_joints = new Joint[jointCapacity];
+		
+		for (int i=0; i<contactCapacity; i++){
+			m_contacts[i] = new NullContact();
+		}
 	}
 
 	void Clear() {
@@ -160,7 +165,7 @@ public class Island {
 
 	void Add(Contact contact) {
 		assert (m_contactCount < m_contactCapacity);
-		m_contacts[m_contactCount++] = contact;
+		m_contacts[m_contactCount++] = contact.clone();
 	}
 
 	void Add(Joint joint) {
