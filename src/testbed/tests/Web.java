@@ -1,19 +1,18 @@
 package testbed.tests;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
+
+import testbed.Test;
+import collision.ShapeDescription;
+import collision.ShapeType;
 
 import common.Vec2;
 
-import collision.ShapeDescription;
-import collision.ShapeType;
 import dynamics.Body;
 import dynamics.BodyDescription;
 import dynamics.World;
-import dynamics.joints.DistanceJoint;
 import dynamics.joints.DistanceJointDescription;
 import dynamics.joints.Joint;
-import testbed.Test;
 
 public class Web extends Test {
 
