@@ -5,269 +5,282 @@ import common.Settings;
 
 public class PairManager {
 
-	static final int NULL_PAIR = Integer.MAX_VALUE;
-	static final int NULL_PROXY = Integer.MAX_VALUE;
-	static final int TABLE_CAPACITY = Settings.maxPairs; // must be a power
-	// of two
-	static final int TABLE_MASK = TABLE_CAPACITY - 1;
+    static final int NULL_PAIR = Integer.MAX_VALUE;
 
-	public Pair m_pairs[];
-	public int m_pairCount;
+    static final int NULL_PROXY = Integer.MAX_VALUE;
 
-	int m_hashTable[];
-	int m_next[];
+    static final int TABLE_CAPACITY = Settings.maxPairs; // must be a power
 
-	PairManager() {
-		m_pairs = new Pair[Settings.maxPairs];
-		m_hashTable = new int[TABLE_CAPACITY];
-		m_next = new int[Settings.maxPairs];
+    // of two
+    static final int TABLE_MASK = TABLE_CAPACITY - 1;
 
-		assert MathUtils.isPowerOfTwo(TABLE_CAPACITY) == true;
-		assert TABLE_CAPACITY >= Settings.maxPairs;
+    public Pair m_pairs[];
 
-		for (int i = 0; i < TABLE_CAPACITY; ++i) {
-			m_hashTable[i] = NULL_PAIR;
-		}
-		for (int i = 0; i < Settings.maxPairs; ++i) {
-			m_next[i] = NULL_PAIR;
-			m_pairs[i] = new Pair();
-		}
-		m_pairCount = 0;
-	}
+    public int m_pairCount;
 
-	// Add a pair and return the new pair. If the pair already exists,
-	// no new pair is created and the old one is returned.
-	Pair Add(int proxyId1, int proxyId2) {
-		if (proxyId1 > proxyId2) {
-			// integer primitive swap
-			proxyId1 += proxyId2;
-			proxyId2 = proxyId1 - proxyId2;
-			proxyId1 -= proxyId2;
-		}
+    int m_hashTable[];
 
-		int hash = Hash(proxyId1, proxyId2) & TABLE_MASK;
+    int m_next[];
 
-		Pair pair = Find(proxyId1, proxyId2, hash);
-		if (pair != null) {
-			return pair;
-		}
+    PairManager() {
+        m_pairs = new Pair[Settings.maxPairs];
+        m_hashTable = new int[TABLE_CAPACITY];
+        m_next = new int[Settings.maxPairs];
 
-		if (m_pairCount == Settings.maxPairs) {
-			assert false;
-			return null;
-		}
+        assert MathUtils.isPowerOfTwo(TABLE_CAPACITY) == true;
+        assert TABLE_CAPACITY >= Settings.maxPairs;
 
-		pair = m_pairs[m_pairCount];
-		pair.proxyId1 = proxyId1;
-		pair.proxyId2 = proxyId2;
-		pair.status = 0;
-		pair.userData = null;
+        for (int i = 0; i < TABLE_CAPACITY; ++i) {
+            m_hashTable[i] = NULL_PAIR;
+        }
+        for (int i = 0; i < Settings.maxPairs; ++i) {
+            m_next[i] = NULL_PAIR;
+            m_pairs[i] = new Pair();
+        }
+        m_pairCount = 0;
+    }
 
-		m_next[m_pairCount] = m_hashTable[hash];
-		m_hashTable[hash] = m_pairCount;
+    // Add a pair and return the new pair. If the pair already exists,
+    // no new pair is created and the old one is returned.
+    Pair Add(int proxyId1, int proxyId2) {
+        System.out.printf("PairManager.Add(%d, %d)\n", proxyId1, proxyId2);
+        if (proxyId1 > proxyId2) {
+            // integer primitive swap
+            proxyId1 += proxyId2;
+            proxyId2 = proxyId1 - proxyId2;
+            proxyId1 -= proxyId2;
+        }
 
-		++m_pairCount;
+        int hash = Hash(proxyId1, proxyId2) & TABLE_MASK;
 
-		return pair;
-	}
+        Pair pair = Find(proxyId1, proxyId2, hash);
+        if (pair != null) {
+            return pair;
+        }
 
-	// Remove a pair, return the pair's userData.
-	Object Remove(int proxyId1, int proxyId2) {
-		if (proxyId1 > proxyId2) {
-			// integer primitive swap
-			proxyId1 += proxyId2;
-			proxyId2 = proxyId1 - proxyId2;
-			proxyId1 -= proxyId2;
-		}
+        if (m_pairCount == Settings.maxPairs) {
+            assert false;
+            return null;
+        }
 
-		int hash = Hash(proxyId1, proxyId2) & TABLE_MASK;
+        pair = m_pairs[m_pairCount];
+        pair.proxyId1 = proxyId1;
+        pair.proxyId2 = proxyId2;
+        pair.status = 0;
+        pair.userData = null;
 
-		//Pair pair = Find(proxyId1, proxyId2, hash);
-		//if (pair == null) {
-		int pairIndex = FindIndex(proxyId1, proxyId2, hash);
-		if (pairIndex == -1){ //-1 returned if not found
-			return null;
-		}
-		
-		Pair pair = m_pairs[pairIndex];
+        m_next[m_pairCount] = m_hashTable[hash];
+        m_hashTable[hash] = m_pairCount;
 
-		Object userData = pair.userData;
+        ++m_pairCount;
 
-		assert pair.proxyId1 == proxyId1;
-		assert pair.proxyId2 == proxyId2;
+        return pair;
+    }
 
-		//Java note: this was a nasty one to fix, because in the C++
-		//pair - m_pairs was pointer arithmetic, used to extract the
-		//array index.  Should be resolved now using FindIndex method above
-		//int pairIndex = int32(pair - m_pairs);
-		assert pairIndex < m_pairCount;
+    // Remove a pair, return the pair's userData.
+    Object Remove(int proxyId1, int proxyId2) {
+        System.out.printf("PairManager.Remove(%d, %d)\n", proxyId1, proxyId2);
+        if (proxyId1 > proxyId2) {
+            // integer primitive swap
+            proxyId1 += proxyId2;
+            proxyId2 = proxyId1 - proxyId2;
+            proxyId1 -= proxyId2;
+        }
 
-		// Remove the pair from the hash table.
-		int index = m_hashTable[hash];
-		assert index != NULL_PAIR;
+        int hash = Hash(proxyId1, proxyId2) & TABLE_MASK;
 
-		int previous = NULL_PAIR;
-		while (index != pairIndex) {
-			previous = index;
-			index = m_next[index];
-		}
+        // Pair pair = Find(proxyId1, proxyId2, hash);
+        // if (pair == null) {
+        int pairIndex = FindIndex(proxyId1, proxyId2, hash);
+        if (pairIndex == -1) { // -1 returned if not found
+            return null;
+        }
 
-		if (previous != NULL_PAIR) {
-			assert m_next[previous] == pairIndex;
-			m_next[previous] = m_next[pairIndex];
-		} else {
-			m_hashTable[hash] = m_next[pairIndex];
-		}
+        Pair pair = m_pairs[pairIndex];
 
-		// We now move the last pair into spot of the
-		// pair being removed. We need to fix the hash
-		// table indices to support the move.
+        Object userData = pair.userData;
 
-		int lastPairIndex = m_pairCount - 1;
+        assert pair.proxyId1 == proxyId1;
+        assert pair.proxyId2 == proxyId2;
 
-		// If the removed pair is the last pair, we are done.
-		if (lastPairIndex == pairIndex) {
-			--m_pairCount;
-			return userData;
-		}
+        // FIXME?
+        // Java note: this was a nasty one to fix, because in the C++
+        // pair - m_pairs was pointer arithmetic, used to extract the
+        // array index. Should be resolved now using FindIndex method above
+        // int pairIndex = int32(pair - m_pairs);
+        assert pairIndex < m_pairCount;
 
-		// Remove the last pair from the hash table.
-		Pair last = m_pairs[lastPairIndex];
-		int lastHash = Hash(last.proxyId1, last.proxyId2) & TABLE_MASK;
+        // Remove the pair from the hash table.
+        int index = m_hashTable[hash];
+        assert index != NULL_PAIR;
 
-		index = m_hashTable[lastHash];
-		assert index != NULL_PAIR;
+        int previous = NULL_PAIR;
+        while (index != pairIndex) {
+            previous = index;
+            index = m_next[index];
+        }
 
-		previous = NULL_PAIR;
-		while (index != lastPairIndex) {
-			previous = index;
-			index = m_next[index];
-		}
+        if (previous != NULL_PAIR) {
+            assert m_next[previous] == pairIndex;
+            m_next[previous] = m_next[pairIndex];
+        }
+        else {
+            m_hashTable[hash] = m_next[pairIndex];
+        }
 
-		if (previous != NULL_PAIR) {
-			assert m_next[previous] == lastPairIndex;
-			m_next[previous] = m_next[lastPairIndex];
-		} else {
-			m_hashTable[lastHash] = m_next[lastPairIndex];
-		}
+        // We now move the last pair into spot of the
+        // pair being removed. We need to fix the hash
+        // table indices to support the move.
+        int lastPairIndex = m_pairCount - 1;
 
-		// Copy the last pair into the remove pair's spot.
-		m_pairs[pairIndex] = m_pairs[lastPairIndex];
+        // If the removed pair is the last pair, we are done.
+        if (lastPairIndex == pairIndex) {
+            --m_pairCount;
+            return userData;
+        }
 
-		// Insert the last pair into the hash table
-		m_next[pairIndex] = m_hashTable[lastHash];
-		m_hashTable[lastHash] = pairIndex;
+        // Remove the last pair from the hash table.
+        Pair last = m_pairs[lastPairIndex];
+        int lastHash = Hash(last.proxyId1, last.proxyId2) & TABLE_MASK;
 
-		--m_pairCount;
+        index = m_hashTable[lastHash];
+        assert index != NULL_PAIR;
 
-		return userData;
-	}
+        previous = NULL_PAIR;
+        while (index != lastPairIndex) {
+            previous = index;
+            index = m_next[index];
+        }
 
-	Pair Find(int proxyId1, int proxyId2) {
-		if (proxyId1 > proxyId2) {
-			// integer primitive swap
-			proxyId1 += proxyId2;
-			proxyId2 = proxyId1 - proxyId2;
-			proxyId1 -= proxyId2;
-			
-		}
+        if (previous != NULL_PAIR) {
+            assert m_next[previous] == lastPairIndex;
+            m_next[previous] = m_next[lastPairIndex];
+        }
+        else {
+            m_hashTable[lastHash] = m_next[lastPairIndex];
+        }
 
-		int hash = Hash(proxyId1, proxyId2) & TABLE_MASK;
+        // Copy the last pair into the remove pair's spot.
+        // m_pairs[pairIndex] = m_pairs[lastPairIndex];
+        m_pairs[pairIndex] = new Pair(m_pairs[lastPairIndex]);
 
-		int index = m_hashTable[hash];
-		while (index != NULL_PAIR
-				&& Equals(m_pairs[index], proxyId1, proxyId2) == false) {
-			index = m_next[index];
-		}
+        // Insert the last pair into the hash table
+        m_next[pairIndex] = m_hashTable[lastHash];
+        m_hashTable[lastHash] = pairIndex;
 
-		if (index == NULL_PAIR) {
-			return null;
-		}
+        --m_pairCount;
 
-		assert index < m_pairCount;
+        return userData;
+    }
 
-		return m_pairs[index];
-	}
-	
-	int FindIndex(int proxyId1, int proxyId2){
-		if (proxyId1 > proxyId2) {
-			// integer primitive swap
-			proxyId1 += proxyId2;
-			proxyId2 = proxyId1 - proxyId2;
-			proxyId1 -= proxyId2;
-		}
+    Pair Find(int proxyId1, int proxyId2) {
+        System.out.printf("PairManager.Find(%d, %d)\n", proxyId1, proxyId2);
+        if (proxyId1 > proxyId2) {
+            // integer primitive swap
+            proxyId1 += proxyId2;
+            proxyId2 = proxyId1 - proxyId2;
+            proxyId1 -= proxyId2;
 
-		int hash = Hash(proxyId1, proxyId2) & TABLE_MASK;
+        }
 
-		int index = m_hashTable[hash];
-		while (index != NULL_PAIR
-				&& Equals(m_pairs[index], proxyId1, proxyId2) == false) {
-			index = m_next[index];
-		}
+        int hash = Hash(proxyId1, proxyId2) & TABLE_MASK;
 
-		if (index == NULL_PAIR) {
-			return -1;
-		}
+        int index = m_hashTable[hash];
+        while (index != NULL_PAIR
+                && Equals(m_pairs[index], proxyId1, proxyId2) == false) {
+            index = m_next[index];
+        }
 
-		assert index < m_pairCount;
+        if (index == NULL_PAIR) {
+            return null;
+        }
 
-		return index;
-	}
+        assert index < m_pairCount;
 
-	int GetCount() {
-		return m_pairCount;
-	}
+        return m_pairs[index];
+    }
 
-	Pair[] GetPairs() {
-		return m_pairs;
-	}
+    int FindIndex(int proxyId1, int proxyId2) {
+        System.out
+                .printf("PairManager.FindIndex(%d, %d)\n", proxyId1, proxyId2);
+        if (proxyId1 > proxyId2) {
+            // integer primitive swap
+            proxyId1 += proxyId2;
+            proxyId2 = proxyId1 - proxyId2;
+            proxyId1 -= proxyId2;
+        }
 
-	private Pair Find(int proxyId1, int proxyId2, int hash) {
-		int index = m_hashTable[hash];
+        int hash = Hash(proxyId1, proxyId2) & TABLE_MASK;
 
-		while (index != NULL_PAIR
-				&& Equals(m_pairs[index], proxyId1, proxyId2) == false) {
-			index = m_next[index];
-		}
+        int index = m_hashTable[hash];
+        while (index != NULL_PAIR
+                && Equals(m_pairs[index], proxyId1, proxyId2) == false) {
+            index = m_next[index];
+        }
 
-		if (index == NULL_PAIR) {
-			return null;
-		}
+        if (index == NULL_PAIR) {
+            return -1;
+        }
 
-		assert index < m_pairCount;
+        assert index < m_pairCount;
 
-		return m_pairs[index];
-	}
-	
-	private int FindIndex(int proxyId1, int proxyId2, int hash) {
-		int index = m_hashTable[hash];
+        return index;
+    }
 
-		while (index != NULL_PAIR
-				&& Equals(m_pairs[index], proxyId1, proxyId2) == false) {
-			index = m_next[index];
-		}
+    int GetCount() {
+        return m_pairCount;
+    }
 
-		if (index == NULL_PAIR) {
-			return -1;
-		}
+    Pair[] GetPairs() {
+        return m_pairs;
+    }
 
-		assert index < m_pairCount;
+    private Pair Find(int proxyId1, int proxyId2, int hash) {
+        int index = m_hashTable[hash];
 
-		return index;
-	}
+        while (index != NULL_PAIR
+                && Equals(m_pairs[index], proxyId1, proxyId2) == false) {
+            index = m_next[index];
+        }
 
-	private int Hash(int proxyId1, int proxyId2) {
-		int key = (proxyId2 << 16) | proxyId1;
-		key = ~key + (key << 15);
-		key = key ^ (key >>> 12);
-		key = key + (key << 2);
-		key = key ^ (key >>> 4);
-		key = key * 2057;
-		key = key ^ (key >>> 16);
-		return key;
-	}
+        if (index == NULL_PAIR) {
+            return null;
+        }
 
-	boolean Equals(Pair pair, int proxyId1, int proxyId2) {
-		return pair.proxyId1 == proxyId1 && pair.proxyId2 == proxyId2;
-	}
+        assert index < m_pairCount;
+
+        return m_pairs[index];
+    }
+
+    private int FindIndex(int proxyId1, int proxyId2, int hash) {
+        int index = m_hashTable[hash];
+
+        while (index != NULL_PAIR
+                && Equals(m_pairs[index], proxyId1, proxyId2) == false) {
+            index = m_next[index];
+        }
+
+        if (index == NULL_PAIR) {
+            return -1;
+        }
+
+        assert index < m_pairCount;
+
+        return index;
+    }
+
+    private int Hash(int proxyId1, int proxyId2) {
+        int key = (proxyId2 << 16) | proxyId1;
+        key = ~key + (key << 15);
+        key = key ^ (key >>> 12);
+        key = key + (key << 2);
+        key = key ^ (key >>> 4);
+        key = key * 2057;
+        key = key ^ (key >>> 16);
+        return key;
+    }
+
+    boolean Equals(Pair pair, int proxyId1, int proxyId2) {
+        return pair.proxyId1 == proxyId1 && pair.proxyId2 == proxyId2;
+    }
 }
