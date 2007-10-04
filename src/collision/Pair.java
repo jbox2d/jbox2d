@@ -18,16 +18,6 @@ public class Pair implements Comparable<Pair> {
     public Pair(){
     	
     }
-    
-    public Pair(Pair myp){
-    	proxyId1 = myp.proxyId1;
-    	proxyId2 = myp.proxyId1;
-    	status = myp.status;
-    	userData = myp.userData;
-    }
-
-    public Pair() {
-    }
 
     /**
      * Copy constructor
