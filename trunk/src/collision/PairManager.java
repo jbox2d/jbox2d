@@ -169,6 +169,7 @@ public class PairManager {
 			proxyId1 += proxyId2;
 			proxyId2 = proxyId1 - proxyId2;
 			proxyId1 -= proxyId2;
+			
 		}
 
 		int hash = Hash(proxyId1, proxyId2) & TABLE_MASK;
@@ -258,11 +259,11 @@ public class PairManager {
 	private int Hash(int proxyId1, int proxyId2) {
 		int key = (proxyId2 << 16) | proxyId1;
 		key = ~key + (key << 15);
-		key = key ^ (key >> 12);
+		key = key ^ (key >>> 12);
 		key = key + (key << 2);
-		key = key ^ (key >> 4);
+		key = key ^ (key >>> 4);
 		key = key * 2057;
-		key = key ^ (key >> 16);
+		key = key ^ (key >>> 16);
 		return key;
 	}
 

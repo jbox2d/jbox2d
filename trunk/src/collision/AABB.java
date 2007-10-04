@@ -7,8 +7,8 @@ public class AABB {
 
 	public AABB(Vec2 minVertex, Vec2 maxVertex) {
 		//super(); //ewjordan: no superclass
-		this.minVertex = minVertex;
-		this.maxVertex = maxVertex;
+		this.minVertex = minVertex.clone(); //clone to be safe
+		this.maxVertex = maxVertex.clone();
 	}
 	
 	public AABB(AABB copy){

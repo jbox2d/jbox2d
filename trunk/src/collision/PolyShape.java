@@ -21,11 +21,11 @@ public class PolyShape extends Shape {
 		m_normals = new Vec2[Settings.maxPolyVertices];
 		m_next = new int[Settings.maxPolyVertices];
 
-		m_type = ShapeType.BOX_SHAPE; //TODO: hmm? why BOX_SHAPE?
+		m_type = description.type;// ShapeType.BOX_SHAPE; //TODO: hmm? why BOX_SHAPE?
 
 		if (description.type == ShapeType.BOX_SHAPE) {
 			m_vertexCount = 4;
-			Vec2 h = description.box.m_extents;
+			Vec2 h = description.box.m_extents.clone();
 			m_vertices[0] = new Vec2(h.x, h.y);
 			m_vertices[1] = new Vec2(-h.x, h.y);
 			m_vertices[2] = new Vec2(-h.x, -h.y);
@@ -40,6 +40,7 @@ public class PolyShape extends Shape {
 			m_next[3] = 0;
 
 			m_extents = h;
+			//System.out.println(description.box.m_extents.y);
 		} else {
 			AABB aabb = new AABB(new Vec2(Float.MAX_VALUE, Float.MAX_VALUE),
 					new Vec2(-Float.MAX_VALUE, -Float.MAX_VALUE));
@@ -73,13 +74,15 @@ public class PolyShape extends Shape {
 				// Ensure the polygon in convex.
 				assert Vec2.cross(m_normals[i], m_normals[m_next[i]]) > 0.0f;
 			}
-
+			//System.out.println("branch else");
 			m_extents = aabb.maxVertex.sub(aabb.minVertex).mul(0.5f);
 		}
 
 		Mat22 absR = m_R.abs();
 		Vec2 h = absR.mul(m_extents);
+		//System.out.printf("h: %f %f ; m_extents: %f %f \n", h.x,h.y,m_extents.x,m_extents.y);
 		AABB aabb = new AABB(m_position.sub(h), m_position.add(h));
+		//System.out.println(aabb.minVertex.x + " " +aabb.minVertex.y + "; "+aabb.maxVertex.x+" "+aabb.maxVertex.y);
 		m_proxyId = m_body.m_world.m_broadPhase.CreateProxy(aabb, this);
 	}
 

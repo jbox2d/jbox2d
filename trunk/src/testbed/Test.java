@@ -77,7 +77,7 @@ public abstract class Test {
         this.title = title;
 
         m_world = new World(new AABB(new Vec2(-100, -100), new Vec2(100, 100)),
-                new Vec2(0.0f, 10.0f), true);
+                new Vec2(0.0f, -10.0f), true);
 
         m_bomb = null;
         m_textLine = 30;
@@ -260,8 +260,8 @@ public abstract class Test {
             for (int i = 0; i < poly.m_vertexCount; ++i) {
                 Vec2 v = poly.m_position.add(poly.m_R.mul(poly.m_vertices[i]));
 
-                x[i] = (int) v.x;
-                y[i] = (int) v.y;
+                x[i] =  (int)v.x;
+                y[i] =  (int)v.y;
             }
             g.drawPolygon(x, y, poly.m_vertexCount);
         }
@@ -473,7 +473,7 @@ public abstract class Test {
             g.fillRect(0, 0, 500, 500);
 
             g.translate(200, 100);
-            g.scale(2, 2);
+            g.scale(4.0, 4.0);
 
             // update data model
             long beforeLogic = System.currentTimeMillis();

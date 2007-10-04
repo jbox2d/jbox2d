@@ -20,7 +20,7 @@ public class Bridge extends Test {
     public void init(World world) {
         ShapeDescription sd = new ShapeDescription(ShapeType.BOX_SHAPE);
         sd.box.m_extents = new Vec2(50.0f, 10.0f);
-
+        //System.out.println(sd.box.m_extents.y);
         BodyDescription bd = new BodyDescription();
         bd.position = new Vec2(0.0f, -10.0f);
         bd.addShape(sd);
@@ -40,7 +40,7 @@ public class Bridge extends Test {
         Body prevBody = ground;
         for (int i = 0; i < numPlanks; ++i) {
             bd2.position = new Vec2(-15.5f + 1.25f * i, 5.0f);
-            System.out.println("Creating plank "+i);
+            //System.out.println("Creating plank "+i);
             Body body = world.CreateBody(bd2);
 
             jd.anchorPoint = new Vec2(-16.125f + 1.25f * i, 5.0f);
