@@ -14,7 +14,9 @@ public abstract class Contact {
 	public abstract List<Manifold> GetManifolds();
 
 	public int GetManifoldCount() {
-		return GetManifolds().size();
+		List<Manifold> m = GetManifolds();
+		if (m == null) return 0;
+		else return GetManifolds().size();
 	}
 
 	static List<ContactRegister> s_registers;
