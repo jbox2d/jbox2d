@@ -19,14 +19,15 @@ public class ContactSolver {
 	public ContactSolver(Contact[] contacts, int contactCount, float inv_dt) {
 		m_constraintCount = 0;
 
-		for (Contact c : contacts) {
-			m_constraintCount += c.GetManifoldCount();
+		for (int i=0; i<contactCount; i++){//Contact c : contacts) {
+			m_constraintCount += contacts[i].GetManifoldCount();
 		}
 
 		m_constraints = new ArrayList<ContactConstraint>(m_constraintCount);
 
 		int count = 0;
-		for (Contact contact : contacts) {
+		for (int i=0; i<contactCount; i++){//Contact contact : contacts) {
+			Contact contact = contacts[i];
 			Body b1 = contact.m_shape1.m_body;
 			Body b2 = contact.m_shape2.m_body;
 			List<Manifold> manifolds = contact.GetManifolds();

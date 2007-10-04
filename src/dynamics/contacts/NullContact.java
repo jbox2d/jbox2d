@@ -7,7 +7,7 @@ import collision.Manifold;
 public class NullContact extends Contact {
 
 	public NullContact() {
-		super(null, null);
+		super();//null, null);
 		
 	}
 
@@ -21,6 +21,7 @@ public class NullContact extends Contact {
 
 	@Override
 	public List<Manifold> GetManifolds() {
+		System.out.println("NullContact.GetManifolds()");
 		return null;
 	}
 }
