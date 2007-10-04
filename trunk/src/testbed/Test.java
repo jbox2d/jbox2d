@@ -260,8 +260,8 @@ public abstract class Test {
             for (int i = 0; i < poly.m_vertexCount; ++i) {
                 Vec2 v = poly.m_position.add(poly.m_R.mul(poly.m_vertices[i]));
 
-                x[i] =  (int)v.x;
-                y[i] =  (int)v.y;
+                x[i] = (int) v.x;
+                y[i] = (int) v.y;
             }
             g.drawPolygon(x, y, poly.m_vertexCount);
         }
@@ -472,8 +472,9 @@ public abstract class Test {
             g.setColor(Color.white);
             g.fillRect(0, 0, 500, 500);
 
-            g.translate(200, 100);
-            g.scale(4.0, 4.0);
+            g.translate(300, 100);
+            g.scale(2.0, 2.0);
+            g.rotate(Math.PI);
 
             // update data model
             long beforeLogic = System.currentTimeMillis();
@@ -487,11 +488,11 @@ public abstract class Test {
             // g.drawString("FAv: " + frameAverage, 10, 50);
             // g.drawString("FPS: " + (int) (1000 / frameAverage), 10, 70);
             // g.drawString("Yield: " + yield, 10, 90);
-            // XXX g.drawString("Bodies: " + m_world.getBodies().size(), 10,
+            // g.drawString("Bodies: " + m_world.getBodies().size(), 10,
             // 130);
             // g.drawString("R: " + renderTime, 10, 150);
             // g.drawString("L: " + logicTime, 10, 170);
-            // XXX g.drawString("Energy: " + m_world.getTotalEnergy(), 10, 190);
+            // g.drawString("Energy: " + m_world.getTotalEnergy(), 10, 190);
 
             renderGUI(g);
             g.dispose();
