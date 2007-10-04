@@ -65,6 +65,7 @@ public abstract class Contact {
 	}
 
 	public static Contact Create(Shape shape1, Shape shape2) {
+		//System.out.println("Creating contact");
 		if (s_initialized == false) {
 			InitializeRegisters();
 			s_initialized = true;
