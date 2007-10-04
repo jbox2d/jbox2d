@@ -195,7 +195,7 @@ public class CollidePoly {
 		}
 
 		// Build the clip vertices for the incident edge.
-		c[0].v = poly2.m_position.add(poly2.m_R.mul(vert2s[vertex21]));
+		c[0].v = poly2.m_position.add(poly2.m_R.mul(vert2s[vertex21])); // FIXME NPE here
 		c[0].id.features.referenceFace = edge1;
 		c[0].id.features.incidentEdge = vertex21;
 		c[0].id.features.incidentVertex = vertex21;
