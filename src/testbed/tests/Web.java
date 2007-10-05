@@ -108,7 +108,7 @@ public class Web extends PTest {
         jd.anchorPoint2 = b1.m_position.add(new Vec2(0.0f, 0.5f));
         m_joints[7] = world.CreateJoint(jd);
     }
-
+/*
     @Override
     protected void renderGUI(Graphics2D g) {
         g.drawString("Press (b) to break constraints", 5, m_textLine);
@@ -127,7 +127,7 @@ public class Web extends PTest {
             }
         }
         super.keyHit(c);
-    }
+    }*/
 
     /**
      * Entry point
