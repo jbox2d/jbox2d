@@ -15,4 +15,12 @@ public class ContactPoint {
 		id = new ContactID();
 	}
 	
+	public ContactPoint(ContactPoint cp){
+	    position = cp.position.clone();
+	    separation = cp.separation;
+	    normalImpulse = cp.normalImpulse;
+	    tangentImpulse = cp.tangentImpulse;
+	    id = new ContactID(cp.id);
+	}
+	
 }

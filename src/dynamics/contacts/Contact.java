@@ -14,11 +14,12 @@ public abstract class Contact {
     public abstract List<Manifold> GetManifolds();
 
     public int GetManifoldCount() {
-        List<Manifold> m = GetManifolds();
+        /*List<Manifold> m = GetManifolds();
         if (m == null)
             return 0;
         else
-            return GetManifolds().size();
+            return GetManifolds().size();*/
+        return m_manifoldCount;
     }
 
     static List<ContactRegister> s_registers;
@@ -48,6 +49,8 @@ public abstract class Contact {
     public float m_restitution;
 
     public boolean m_islandFlag;
+    
+    public int m_manifoldCount;
 
     static void InitializeRegisters() {
         s_registers = new ArrayList<ContactRegister>();
@@ -128,7 +131,6 @@ public abstract class Contact {
     }
 
     public Contact() {
-        // TODO: fill in details
         m_node1 = new ContactNode();
         m_node2 = new ContactNode();
     }

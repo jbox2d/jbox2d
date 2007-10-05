@@ -12,4 +12,10 @@ public class ContactConstraintPoint {
 	float tangentMass;
 	float separation;
 	float velocityBias;
+	
+	public ContactConstraintPoint(){
+	    //Probably unnecessary to init
+	    localAnchor1 = new Vec2();
+	    localAnchor2 = new Vec2();
+	}
 }
