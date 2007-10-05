@@ -1,6 +1,7 @@
 package testbed.tests;
 
-import testbed.Test;
+import processing.core.PApplet;
+import testbed.PTest;
 import collision.ShapeDescription;
 import collision.ShapeType;
 
@@ -11,13 +12,13 @@ import dynamics.BodyDescription;
 import dynamics.World;
 import dynamics.joints.RevoluteDescription;
 
-public class Bridge extends Test {
+public class Bridge extends PTest {
 
     public Bridge() {
         super("Bridge");
     }
 
-    public void init(World world) {
+    public void go(World world) {
         ShapeDescription sd = new ShapeDescription(ShapeType.BOX_SHAPE);
         sd.box.m_extents = new Vec2(50.0f, 10.0f);
         //System.out.println(sd.box.m_extents.y);
@@ -61,6 +62,6 @@ public class Bridge extends Test {
      * Entry point
      */
     public static void main(String[] argv) {
-        new Bridge().start();
+    	PApplet.main(new String[] { "testbed.tests.Bridge" });
     }
 }

@@ -2,7 +2,8 @@ package testbed.tests;
 
 import java.awt.Graphics2D;
 
-import testbed.Test;
+import processing.core.PApplet;
+import testbed.PTest;
 import collision.ShapeDescription;
 import collision.ShapeType;
 
@@ -14,7 +15,7 @@ import dynamics.World;
 import dynamics.joints.DistanceJointDescription;
 import dynamics.joints.Joint;
 
-public class Web extends Test {
+public class Web extends PTest {
 
     Joint m_joints[];
 
@@ -23,7 +24,7 @@ public class Web extends Test {
     }
 
     @Override
-    protected void init(World world) {
+    public void go(World world) {
         m_joints = new Joint[8];
 
         Body ground;
@@ -132,6 +133,6 @@ public class Web extends Test {
      * Entry point
      */
     public static void main(String[] argv) {
-        new Web().start();
+        PApplet.main(new String[] { "testbed.tests.Web" });
     }
 }

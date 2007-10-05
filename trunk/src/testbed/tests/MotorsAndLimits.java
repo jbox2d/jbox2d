@@ -2,7 +2,8 @@ package testbed.tests;
 
 import java.awt.Graphics2D;
 
-import testbed.Test;
+import processing.core.PApplet;
+import testbed.PTest;
 import collision.ShapeDescription;
 import collision.ShapeType;
 
@@ -16,7 +17,7 @@ import dynamics.joints.PrismaticJointDescription;
 import dynamics.joints.RevoluteDescription;
 import dynamics.joints.RevoluteJoint;
 
-public class MotorsAndLimits extends Test {
+public class MotorsAndLimits extends PTest {
 
     RevoluteJoint m_joint1;
 
@@ -28,7 +29,7 @@ public class MotorsAndLimits extends Test {
         super("MotorsAndLimits");
     }
 
-    public void init(World world) {
+    public void go(World world) {
         Body ground = null;
         {
             ShapeDescription sd = new ShapeDescription(ShapeType.BOX_SHAPE);
@@ -155,5 +156,7 @@ public class MotorsAndLimits extends Test {
      */
     public static void main(String[] argv) {
         new MotorsAndLimits().start();
+        PApplet.main(new String[] { "testbed.tests.CompoundShapes" });
+
     }
 }

@@ -1,6 +1,7 @@
 package testbed.tests;
 
-import testbed.Test;
+import processing.core.PApplet;
+import testbed.PTest;
 import collision.ShapeDescription;
 import collision.ShapeType;
 
@@ -9,14 +10,14 @@ import common.Vec2;
 import dynamics.BodyDescription;
 import dynamics.World;
 
-public class Pyramid extends Test {
+public class Pyramid extends PTest {
 
     public Pyramid() {
         super("Pyramid");
     }
 
     @Override
-    protected void init(World world) {
+    public void go(World world) {
         {
             ShapeDescription sd = new ShapeDescription(ShapeType.BOX_SHAPE);
             sd.box.m_extents = new Vec2(50.0f, 10.0f);
@@ -60,6 +61,6 @@ public class Pyramid extends Test {
      * Entry point
      */
     public static void main(String[] argv) {
-        new Pyramid().start();
+        PApplet.main(new String[] { "testbed.tests.Pyramid" });
     }
 }

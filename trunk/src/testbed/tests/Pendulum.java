@@ -1,23 +1,25 @@
 package testbed.tests;
 
-import common.Vec2;
-
+import processing.core.PApplet;
+import testbed.PTest;
 import collision.ShapeDescription;
 import collision.ShapeType;
+
+import common.Vec2;
+
 import dynamics.Body;
 import dynamics.BodyDescription;
 import dynamics.World;
 import dynamics.joints.RevoluteDescription;
-import testbed.Test;
 
-public class Pendulum extends Test {
+public class Pendulum extends PTest {
 
     public Pendulum() {
         super("Pendulum");
     }
 
     @Override
-    protected void init(World world) {
+    public void go(World world) {
         Body ground = null;
         {
             ShapeDescription sd = new ShapeDescription(ShapeType.BOX_SHAPE);
@@ -60,6 +62,6 @@ public class Pendulum extends Test {
      * Entry point
      */
     public static void main(String[] argv) {
-        new Pendulum().start();
+        PApplet.main(new String[] { "testbed.tests.Pendulum" });
     }
 }

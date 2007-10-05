@@ -1,6 +1,7 @@
 package testbed.tests;
 
-import testbed.Test;
+import processing.core.PApplet;
+import testbed.PTest;
 import collision.ShapeDescription;
 import collision.ShapeType;
 
@@ -9,14 +10,14 @@ import common.Vec2;
 import dynamics.BodyDescription;
 import dynamics.World;
 
-public class VerticalStack extends Test {
+public class VerticalStack extends PTest {
 
     public VerticalStack() {
         super("VerticalStack");
     }
 
     @Override
-    protected void init(World world) {
+    public void go(World world) {
         {
             ShapeDescription sd = new ShapeDescription(ShapeType.BOX_SHAPE);
             sd.box.m_extents = new Vec2(50.0f, 10.0f);
@@ -50,6 +51,6 @@ public class VerticalStack extends Test {
     }
 
     public static void main(String[] args) {
-        new VerticalStack().start();
+        PApplet.main(new String[] { "testbed.tests.VerticalStack" });
     }
 }
