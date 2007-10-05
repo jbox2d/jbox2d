@@ -107,7 +107,7 @@ public class MotorsAndLimits extends PTest {
             m_joint3 = (PrismaticJoint) world.CreateJoint(pjd);
         }
     }
-
+/*
     @Override
     protected void keyHit(char c) {
         switch (c) {
@@ -150,12 +150,12 @@ public class MotorsAndLimits extends PTest {
         // torque2, force3);
         // m_textLine += 15;
     }
-
+*/
     /**
      * Entry point
      */
     public static void main(String[] argv) {
-        new MotorsAndLimits().start();
+  //      new MotorsAndLimits().start();
         PApplet.main(new String[] { "testbed.tests.CompoundShapes" });
 
     }

@@ -109,7 +109,7 @@ public class PolyShapes extends PTest {
         bodies[bodyIndex] = world.CreateBody(bd);
         bodyIndex = (bodyIndex + 1) % bodies.length;
     }
-
+/*
     protected void keyHit(char c) {
         switch (c) {
         case '1':
@@ -127,10 +127,10 @@ public class PolyShapes extends PTest {
         super.renderGUI(g);
         g.drawString("Press 1-4 to drop stuff", 5, m_textLine);
         // m_textLine += 15;
-    }
+    }*/
 
     public static void main(String[] args) {
-        new PolyShapes().start();
+        //new PolyShapes().start();
         PApplet.main(new String[] { "testbed.tests.PolyShapes" });
     }
 }
