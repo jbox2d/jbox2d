@@ -21,7 +21,7 @@ public class Manifold {
 		points = new ContactPoint[Settings.maxManifoldPoints];
 		System.arraycopy(other.points, 0, points, 0, other.points.length);
 		normal = other.normal.clone();
-		pointCount = points.length;
+		pointCount = other.pointCount;//points.length;
 	}
 
 }

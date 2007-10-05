@@ -17,13 +17,16 @@ public class ContactSolver {
 	int m_constraintCount;
 
 	public ContactSolver(Contact[] contacts, int contactCount, float inv_dt) {
-		m_constraintCount = 0;
+	    m_constraintCount = 0;
 
 		for (int i=0; i<contactCount; i++){//Contact c : contacts) {
 			m_constraintCount += contacts[i].GetManifoldCount();
 		}
 
 		m_constraints = new ArrayList<ContactConstraint>(m_constraintCount);
+		for (int i=0; i<m_constraintCount; i++){
+		    m_constraints.add(new ContactConstraint());
+		}
 
 		int count = 0;
 		for (int i=0; i<contactCount; i++){//Contact contact : contacts) {
@@ -34,8 +37,8 @@ public class ContactSolver {
 			float friction = contact.m_friction;
 			float restitution = contact.m_restitution;
 
-			Vec2 v1 = b1.m_linearVelocity;
-			Vec2 v2 = b2.m_linearVelocity;
+			Vec2 v1 = b1.m_linearVelocity.clone();
+			Vec2 v2 = b2.m_linearVelocity.clone();
 			float w1 = b1.m_angularVelocity;
 			float w2 = b2.m_angularVelocity;
 
@@ -50,7 +53,7 @@ public class ContactSolver {
 				c.body1 = b1;
 				c.body2 = b2;
 				c.manifold = manifold;
-				c.normal = normal;
+				c.normal = normal.clone();
 				c.pointCount = manifold.pointCount;
 				c.friction = friction;
 				c.restitution = restitution;

@@ -14,23 +14,26 @@ import collision.ShapeType;
 public class PolyContact extends Contact implements ContactCreator {
 
     Manifold m_manifold;
-
+    
     public PolyContact(Shape s1, Shape s2) {
         super(s1, s2);
         assert (m_shape1.m_type == ShapeType.POLY_SHAPE);
         assert (m_shape2.m_type == ShapeType.POLY_SHAPE);
 
         m_manifold = new Manifold();
+        m_manifoldCount = 0;
     }
 
     public PolyContact() {
         super();
-        m_manifold = null;
+        m_manifold = new Manifold();
+        m_manifoldCount = 0;
     }
 
     public Contact clone() {
         PolyContact newC = new PolyContact(this.m_shape1, this.m_shape2);
-        newC.m_manifold = this.m_manifold;
+        newC.m_manifold = new Manifold(this.m_manifold);
+        newC.m_manifoldCount = this.m_manifoldCount;
         // The parent world.
         newC.m_world = this.m_world;
 
@@ -67,7 +70,7 @@ public class PolyContact extends Contact implements ContactCreator {
 
     @Override
     public void Evaluate() {
-        Manifold m0 = new Manifold(m_manifold);
+        Manifold m0 = m_manifold;
 
         CollidePoly.b2CollidePoly(m_manifold, (PolyShape) m_shape1,
                 (PolyShape) m_shape2);
@@ -93,7 +96,7 @@ public class PolyContact extends Contact implements ContactCreator {
                     }
 
                     ContactPoint cp0 = m0.points[j];
-                    ContactID id0 = cp0.id;
+                    ContactID id0 = new ContactID(cp0.id);
 
                     if (id0.key == id.key) {
                         match[j] = true;
@@ -103,12 +106,11 @@ public class PolyContact extends Contact implements ContactCreator {
                     }
                 }
             }
-            // m_manifoldCount = 1;
-            // TODO
+            m_manifoldCount = 1;
         }
         else {
-            // m_manifoldCount = 0;
-            m_manifold = null;
+            m_manifoldCount = 0;
+            //m_manifold = null; //Cleaner to actually store the count...
         }
     }
 }

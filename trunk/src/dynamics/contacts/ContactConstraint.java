@@ -2,10 +2,11 @@ package dynamics.contacts;
 
 import collision.Manifold;
 import common.Vec2;
+import common.Settings;
 import dynamics.Body;
 
 public class ContactConstraint {
-	ContactConstraintPoint points[]; //FIXME ContactConstraintPoint points[Settings.maxManifoldPoints]
+	ContactConstraintPoint points[];
 	Vec2 normal;
 	Manifold manifold;
 	Body body1;
@@ -13,4 +14,13 @@ public class ContactConstraint {
 	float friction;
 	float restitution;
 	int pointCount;
+	
+	public ContactConstraint(){
+	    points = new ContactConstraintPoint[Settings.maxManifoldPoints];
+	    for (int i=0; i<Settings.maxManifoldPoints; i++){
+	        points[i] = new ContactConstraintPoint();
+	    }
+	    normal = new Vec2();
+	    manifold = new Manifold();
+	}
 }

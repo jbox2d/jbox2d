@@ -104,7 +104,7 @@ public class PairManager {
         assert pair.proxyId1 == proxyId1;
         assert pair.proxyId2 == proxyId2;
 
-        // FIXME?
+        // FIXME? [ewj: I think this is safe, leaving the note just in case]
         // Java note: this was a nasty one to fix, because in the C++
         // pair - m_pairs was pointer arithmetic, used to extract the
         // array index. Should be resolved now using FindIndex method above
