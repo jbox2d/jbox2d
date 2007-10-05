@@ -3,16 +3,19 @@ package testbed.tests;
 import java.awt.Graphics2D;
 import java.util.Random;
 
-import common.Vec2;
+import processing.core.PApplet;
 
+import testbed.PTest;
 import collision.ShapeDescription;
 import collision.ShapeType;
+
+import common.Vec2;
+
 import dynamics.Body;
 import dynamics.BodyDescription;
 import dynamics.World;
-import testbed.Test;
 
-public class PolyShapes extends Test {
+public class PolyShapes extends PTest {
 
     int bodyIndex;
 
@@ -30,7 +33,7 @@ public class PolyShapes extends Test {
     }
 
     @Override
-    protected void init(World world) {
+    public void go(World world) {
         this.world = world;
         // Ground body
         {
@@ -128,5 +131,6 @@ public class PolyShapes extends Test {
 
     public static void main(String[] args) {
         new PolyShapes().start();
+        PApplet.main(new String[] { "testbed.tests.PolyShapes" });
     }
 }

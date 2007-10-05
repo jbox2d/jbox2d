@@ -1,18 +1,8 @@
 package testbed;
 
-import processing.core.*;
+import java.util.Random;
 
-import java.applet.*;
-import java.awt.*;
-import java.awt.image.*;
-import java.awt.event.*;
-import java.io.*;
-import java.net.*;
-import java.text.*;
-import java.util.*;
-import java.util.zip.*;
-import javax.swing.*;
-
+import processing.core.PApplet;
 import collision.AABB;
 import collision.BroadPhase;
 import collision.Manifold;
@@ -416,6 +406,7 @@ public abstract class PTest extends PApplet {
     	size(500,500);
     	frameRate(60);
     	initDemo();
+    	smooth();
         settings = new TestSettings();
     }
 
