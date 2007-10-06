@@ -92,13 +92,15 @@ public class Island {
 
 		// Solve position constraints.
 		if (World.s_enablePositionCorrection) {
+		    //System.out.println("position correcting");
 			for (m_positionIterations = 0; m_positionIterations < iterations; ++m_positionIterations) {
+			    //System.out.println(m_positionIterations);
 				boolean contactsOkay = contactSolver
 						.SolvePositionConstraints(Settings.contactBaumgarte);
 
 				boolean jointsOkay = true;
 				for (int i = 0; i < m_jointCount; ++i) {
-					jointsOkay = m_joints[i].SolvePositionConstraints();
+					jointsOkay &= m_joints[i].SolvePositionConstraints();
 				}
 
 				if (contactsOkay && jointsOkay) {

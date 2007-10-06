@@ -26,6 +26,10 @@ import dynamics.joints.MouseDescription;
 import dynamics.joints.MouseJoint;
 
 public abstract class PTest extends PApplet {
+
+    public boolean[] keyDown;
+    public boolean[] newKeyDown;
+    
 	public float scaleFactor = 10.0f;
 	
 	static public void main(String args[]) {
@@ -397,11 +401,30 @@ public abstract class PTest extends PApplet {
             contacts = !contacts;
         }
     }
+    
+    public void keyPressed() {
+        if (key >= 0  && key < 255) {
+            if (!keyDown[key]) newKeyDown[key] = true;
+            keyDown[key] = true;
+        }
+    }
+    
+    public void keyReleased() {
+        if (key >= 0 && key < 255){
+            keyDown[key] = false;
+        }
+    }
 
     /**
      * Initialise the GUI
      */
     public void setup() {
+        keyDown = new boolean[255];
+        newKeyDown = new boolean[255];
+        for (int i=0; i<keyDown.length; i++){
+            keyDown[i] = false;
+            newKeyDown[i] = false;
+        }
     	System.out.println("Setting up graphics, performing initialization");
     	size(500,500);
     	frameRate(60);
@@ -416,6 +439,9 @@ public abstract class PTest extends PApplet {
             translate(mouseX, mouseY);
             scale(scaleFactor, -scaleFactor);
             strokeWeight(1.0f/scaleFactor);
+            
+            checkKeys();
+            
             // update data model
             Step(settings);
             
@@ -424,7 +450,13 @@ public abstract class PTest extends PApplet {
                 initDemo();
                 needsReset = false;
             }
-
+            for (int i=0; i<newKeyDown.length; i++){
+                newKeyDown[i] = false;
+            }
+    }
+    
+    protected void checkKeys(){
+        //override if needed
     }
     
 

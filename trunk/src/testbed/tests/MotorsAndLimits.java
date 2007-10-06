@@ -107,35 +107,32 @@ public class MotorsAndLimits extends PTest {
             m_joint3 = (PrismaticJoint) world.CreateJoint(pjd);
         }
     }
-/*
+
     @Override
-    protected void keyHit(char c) {
-        switch (c) {
-        case 'l':
+    protected void checkKeys() {
+        if (newKeyDown['l']) {
             m_joint2.m_enableLimit = !m_joint2.m_enableLimit;
             m_joint3.m_enableLimit = !m_joint3.m_enableLimit;
             m_joint2.m_body1.wakeUp();
             m_joint2.m_body2.wakeUp();
             m_joint3.m_body2.wakeUp();
-            break;
+        }
 
-        case 'm':
+        if (newKeyDown['m']) {
             m_joint1.m_enableMotor = !m_joint1.m_enableMotor;
             m_joint2.m_enableMotor = !m_joint2.m_enableMotor;
             m_joint3.m_enableMotor = !m_joint3.m_enableMotor;
             m_joint2.m_body1.wakeUp();
             m_joint2.m_body2.wakeUp();
             m_joint3.m_body2.wakeUp();
-            break;
+        }
 
-        case 'p':
+        if (newKeyDown['p']) {
             m_joint3.m_body2.wakeUp();
             m_joint3.m_motorSpeed = -m_joint3.m_motorSpeed;
-            break;
         }
-        super.keyHit(c);
     }
-
+/*
     @Override
     protected void renderGUI(Graphics2D g) {
         super.renderGUI(g);
@@ -156,7 +153,7 @@ public class MotorsAndLimits extends PTest {
      */
     public static void main(String[] argv) {
   //      new MotorsAndLimits().start();
-        PApplet.main(new String[] { "testbed.tests.CompoundShapes" });
+        PApplet.main(new String[] { "testbed.tests.MotorsAndLimits" });
 
     }
 }
