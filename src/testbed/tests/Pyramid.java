@@ -43,7 +43,7 @@ public class Pyramid extends PTest {
             Vec2 deltaY = new Vec2(1.125f, 0.0f);
 
             for (int i = 0; i < 25; ++i) {
-                y = x;
+                y = x.clone();
 
                 for (int j = i; j < 25; ++j) {
                     bd.position = y;

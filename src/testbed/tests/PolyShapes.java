@@ -93,6 +93,7 @@ public class PolyShapes extends PTest {
     }
 
     void CreateBody(int index) {
+        //FIXME: bodies not colliding with ground
         if (bodies[bodyIndex] != null) {
             world.DestroyBody(bodies[bodyIndex]);
             bodies[bodyIndex] = null;
@@ -109,19 +110,23 @@ public class PolyShapes extends PTest {
         bodies[bodyIndex] = world.CreateBody(bd);
         bodyIndex = (bodyIndex + 1) % bodies.length;
     }
-/*
-    protected void keyHit(char c) {
-        switch (c) {
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-            CreateBody(c - '1');
-            break;
-        }
-        super.keyHit(c);
-    }
 
+    @Override
+    protected void checkKeys() {
+        if (newKeyDown['1']){
+            CreateBody('1' - '1');
+        }
+        if (newKeyDown['2']){
+            CreateBody('2' - '1');
+        }
+        if (newKeyDown['3']){
+            CreateBody('3' - '1');
+        }
+        if (newKeyDown['4']){
+            CreateBody('4' - '1');
+        }
+    }
+/*
     @Override
     protected void renderGUI(Graphics2D g) {
         super.renderGUI(g);
