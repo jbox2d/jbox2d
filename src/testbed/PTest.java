@@ -1,6 +1,7 @@
 package testbed;
 
 import java.util.Random;
+import java.awt.event.*;
 
 import processing.core.PApplet;
 import collision.AABB;
@@ -25,12 +26,20 @@ import dynamics.joints.JointType;
 import dynamics.joints.MouseDescription;
 import dynamics.joints.MouseJoint;
 
-public abstract class PTest extends PApplet {
+public abstract class PTest extends PApplet{
 
     public boolean[] keyDown;
     public boolean[] newKeyDown;
     
-	public float scaleFactor = 10.0f;
+  //World 0,0 maps to transX, transY on screen
+    public float transX;
+    public float transY;
+    public float scaleFactor = 10.0f;
+    
+    public Vec2 mouseWorld; //world coordinates of mouse
+    
+    public boolean pmousePressed; //was mouse pressed last frame?
+    
 	
 	static public void main(String args[]) {
 		PApplet.main(new String[] { "testbed.PTest" });
@@ -81,8 +90,8 @@ public abstract class PTest extends PApplet {
         m_textLine = 30;
         m_mouseJoint = null;
         System.out.println("Constructing PTest");
-
     }
+    
 
     void MouseDown(Vec2 p) {
         assert m_mouseJoint == null;
@@ -98,7 +107,7 @@ public abstract class PTest extends PApplet {
         Body body = null;
         for (int j = 0; j < shapes.length; j++) {
             Shape shape = shapes[j];
-            if (!shape.m_body.IsStatic()) {
+            if (shape != null && !shape.m_body.IsStatic()) {
                 boolean inside = shape.TestPoint(p);
                 if (inside) {
                     body = shape.m_body;
@@ -365,15 +374,12 @@ public abstract class PTest extends PApplet {
 
         fill(0,255,0);
         noStroke();
-        //g.setColor(new Color(0.0f, 1.0f, 0.0f));
-        //g.fillOval((int) p1.x, (int) p1.y, 4, 4);
-        //g.fillOval((int) p2.x, (int) p2.y, 4, 4);
-        ellipse(p1.x,p1.y,4,4);
-        ellipse(p2.x,p2.y,4,4);
+        
+        float diam = 5.0f/scaleFactor;
+        ellipse(p1.x,p1.y,diam,diam);
+        ellipse(p2.x,p2.y,diam,diam);
 
         stroke(200,200,200);
-        //g.setColor(new Color(0.8f, 0.8f, 0.8f));
-        //g.drawLine((int) p1.x, (int) p1.y, (int) p2.x, (int) p2.y);
         line(p1.x,p1.y,p2.x,p2.y);
     }
 
@@ -415,10 +421,12 @@ public abstract class PTest extends PApplet {
         }
     }
 
+    
     /**
      * Initialise the GUI
      */
     public void setup() {
+        
         keyDown = new boolean[255];
         newKeyDown = new boolean[255];
         for (int i=0; i<keyDown.length; i++){
@@ -430,15 +438,49 @@ public abstract class PTest extends PApplet {
     	frameRate(60);
     	initDemo();
     	smooth();
-        settings = new TestSettings();
+    	transX = width/2.0f;
+    	transY = height/2.0f;
+    	pmousePressed = false;
+    	settings = new TestSettings();
+    	
+    	
+    	addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                int notches = e.getWheelRotation();
+                if (notches < 0) {
+                    scaleFactor = min(100f, scaleFactor * 1.1f);
+                }
+                else if (notches > 0) {
+                    scaleFactor = max(.01f, scaleFactor / 1.1f);
+                }
+            }
+        });
+    	
     }
 
     
     public void draw(){
             background(255);
-            translate(mouseX, mouseY);
+            translate(transX, transY);
             scale(scaleFactor, -scaleFactor);
             strokeWeight(1.0f/scaleFactor);
+            
+            mouseWorld = screenToWorld(mouseX,mouseY);
+            //System.out.println(mouseButton);
+            if (mouseButton == LEFT){
+                if (mousePressed && !pmousePressed) {
+                    MouseDown(mouseWorld);
+                } else if (mousePressed){
+                    if (mouseX != pmouseX || mouseY != pmouseY) MouseMove(mouseWorld);
+                } else if (pmousePressed){
+                    MouseUp();
+                }
+            } else if (mouseButton == RIGHT){
+                if (mousePressed){
+                    transX += mouseX - pmouseX;
+                    transY += mouseY - pmouseY;
+                }
+            }
             
             checkKeys();
             
@@ -453,6 +495,13 @@ public abstract class PTest extends PApplet {
             for (int i=0; i<newKeyDown.length; i++){
                 newKeyDown[i] = false;
             }
+            pmousePressed = mousePressed;
+    }
+    
+    protected Vec2 screenToWorld(float x, float y){
+        float wX = map(x-(transX-width/2.0f),0f,width,-width/(2.0f*scaleFactor),width/(2.0f*scaleFactor));
+        float wY = map(y-(transY-height/2.0f),height,0f,-height/(2.0f*scaleFactor),height/(2.0f*scaleFactor));
+        return new Vec2(wX,wY);
     }
     
     protected void checkKeys(){
