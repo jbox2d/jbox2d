@@ -45,7 +45,7 @@ public class ContactSolver {
 
 			for (int j = 0; j < manifoldCount; ++j){//Manifold manifold : manifolds) {
 				Manifold manifold = manifolds.get(j);
-			    assert (manifold.pointCount > 0);
+			    assert (manifold.pointCount > 0):"Manifold "+j+" has length 0";
 
 				Vec2 normal = manifold.normal.clone();
 
