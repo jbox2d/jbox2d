@@ -70,7 +70,14 @@ public class PolyContact extends Contact implements ContactCreator {
 
     @Override
     public void Evaluate() {
-        Manifold m0 = m_manifold;
+        //Manifold m0 = m_manifold;
+        Manifold m0 = new Manifold();
+        for (int k = 0; k < m_manifold.pointCount; k++){
+           m0.points[k].normalImpulse = m_manifold.points[k].normalImpulse;
+           m0.points[k].tangentImpulse = m_manifold.points[k].tangentImpulse;
+           m0.points[k].id.key = m_manifold.points[k].id.key;
+        }
+        m0.pointCount = m_manifold.pointCount;
 
         CollidePoly.b2CollidePoly(m_manifold, (PolyShape) m_shape1,
                 (PolyShape) m_shape2);
