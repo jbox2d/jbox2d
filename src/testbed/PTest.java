@@ -85,10 +85,10 @@ public abstract class PTest extends PApplet{
 
         m_world = new World(new AABB(new Vec2(-100, -100), new Vec2(100, 100)),
                 new Vec2(0.0f, -10.0f), true);
-
         m_bomb = null;
-        m_textLine = 30;
         m_mouseJoint = null;
+
+        m_textLine = 30;
         System.out.println("Constructing PTest");
     }
     
@@ -406,6 +406,9 @@ public abstract class PTest extends PApplet{
             normals = !normals;
             contacts = !contacts;
         }
+        if (key == ' ') {
+            LaunchBomb();
+        }
     }
     
     public void keyPressed() {
@@ -448,10 +451,10 @@ public abstract class PTest extends PApplet{
             public void mouseWheelMoved(MouseWheelEvent e) {
                 int notches = e.getWheelRotation();
                 if (notches < 0) {
-                    scaleFactor = min(100f, scaleFactor * 1.1f);
+                    scaleFactor = min(100f, scaleFactor * 1.05f);
                 }
                 else if (notches > 0) {
-                    scaleFactor = max(.01f, scaleFactor / 1.1f);
+                    scaleFactor = max(.01f, scaleFactor / 1.05f);
                 }
             }
         });
@@ -514,7 +517,10 @@ public abstract class PTest extends PApplet{
      */
     public final void initDemo() {
         // XXX m_world.clear();
-
+        m_world = new World(new AABB(new Vec2(-100, -100), new Vec2(100, 100)),
+                new Vec2(0.0f, -10.0f), true);
+        m_bomb = null;
+        m_mouseJoint = null;
         System.out.println("Initialising:" + getTitle());
         init(m_world);
     }
