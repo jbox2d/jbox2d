@@ -52,6 +52,9 @@ public class ShapeDescription {
             break;
 
         default:
+            circle = new CircleData();
+            box = new BoxData();
+            poly = new PolyData();
         }
 
         localPosition = new Vec2(0.0f, 0.0f);
