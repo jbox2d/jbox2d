@@ -20,97 +20,106 @@ import dynamics.Body;
 public class MouseJoint extends Joint {
 
     public Vec2 m_localAnchor;
-	public Vec2 m_target;
-	Vec2 m_u;
-	float m_positionError;
-	float m_impulse;
 
-	float m_mEff; // effective mass
-	float m_motorForce;
-	float m_length;
-	float m_beta;
+    public Vec2 m_target;
 
-	public MouseJoint(MouseDescription description) {
-		super(description);
-		m_target = description.target;
-		m_localAnchor = m_body2.m_R.mulT(m_target.sub(m_body2.m_position));
+    Vec2 m_u;
 
-		m_motorForce = description.motorForce;
-		m_length = description.length;
-		m_beta = description.beta;
+    float m_positionError;
 
-		m_impulse = 0.0f;
-	}
+    float m_impulse;
 
-	public void SetTarget(Vec2 target) {
-		m_body2.wakeUp();
-		m_target = target;
-	}
+    float m_mEff; // effective mass
 
-	@Override
-	public Vec2 GetAnchor1() {
-		return m_target;
-	}
+    float m_motorForce;
 
-	@Override
-	public Vec2 GetAnchor2() {
-		return m_body2.m_position.add(m_body2.m_R.mul(m_localAnchor));
-	}
+    float m_length;
 
-	@Override
-	public void PreSolve() {
-		Body body = m_body2;
+    float m_beta;
 
-		// Compute the effective mass matrix.
-		Vec2 r = body.m_R.mul(m_localAnchor);
-		m_u = body.m_position.add(r).sub(m_target);
+    public MouseJoint(MouseDescription description) {
+        super(description);
+        m_target = description.target;
+        m_localAnchor = m_body2.m_R.mulT(m_target.sub(m_body2.m_position));
 
-		// Handle singularity.
-		float length = m_u.length();
-		if (length > Settings.EPSILON) {
-			m_u.mulLocal(1.0f / length);
-		} else {
-			m_u.set(0.0f, 1.0f);
-		}
+        m_motorForce = description.motorForce;
+        m_length = description.length;
+        m_beta = description.beta;
 
-		m_positionError = length - m_length;
+        m_impulse = 0.0f;
+    }
 
-		float cru = Vec2.cross(r, m_u);
-		m_mEff = body.m_invMass + body.m_invI * cru * cru;
+    public void SetTarget(Vec2 target) {
+        m_body2.wakeUp();
+        m_target = target;
+    }
 
-		assert m_mEff > Settings.EPSILON;
+    @Override
+    public Vec2 GetAnchor1() {
+        return m_target;
+    }
 
-		m_mEff = 1.0f / m_mEff;
+    @Override
+    public Vec2 GetAnchor2() {
+        return m_body2.m_position.add(m_body2.m_R.mul(m_localAnchor));
+    }
 
-		// Warm starting.
-		Vec2 P = m_u.mul(m_impulse);
-		body.m_linearVelocity.addLocal(P.mul(body.m_invMass));
-		body.m_angularVelocity += body.m_invI * Vec2.cross(r, P);
-	}
+    @Override
+    public void PreSolve() {
+        Body body = m_body2;
 
-	@Override
-	public boolean SolvePositionConstraints() {
-		return true;
-	}
+        // Compute the effective mass matrix.
+        Vec2 r = body.m_R.mul(m_localAnchor);
+        // m_u = body.m_position.add(r).sub(m_target);
+        m_u = body.m_position.clone().addLocal(r).subLocal(m_target);
 
-	@Override
-	public void SolveVelocityConstraints(float dt) {
-		Body body = m_body2;
+        // Handle singularity.
+        float length = m_u.length();
+        if (length > Settings.EPSILON) {
+            m_u.mulLocal(1.0f / length);
+        }
+        else {
+            m_u.set(0.0f, 1.0f);
+        }
 
-		Vec2 r = body.m_R.mul(m_localAnchor);
+        m_positionError = length - m_length;
 
-		// Cdot = dot(u, v + cross(w, r))
-		float Cdot = Vec2.dot(m_u, body.m_linearVelocity.add(Vec2.cross(
-				body.m_angularVelocity, r)));
-		float impulse = -m_mEff * (Cdot + m_beta / dt * m_positionError);
+        float cru = Vec2.cross(r, m_u);
+        m_mEff = body.m_invMass + body.m_invI * cru * cru;
 
-		float oldImpulse = m_impulse;
-		m_impulse = MathUtils.clamp(m_impulse + impulse, -dt * m_motorForce,
-				0.0f);
-		impulse = m_impulse - oldImpulse;
+        assert m_mEff > Settings.EPSILON;
 
-		Vec2 p = m_u.mul(impulse);
-		body.m_linearVelocity.addLocal(p.mul(body.m_invMass));
-		body.m_angularVelocity += body.m_invI * Vec2.cross(r, p);
-	}
+        m_mEff = 1.0f / m_mEff;
+
+        // Warm starting.
+        Vec2 P = m_u.mul(m_impulse);
+        body.m_linearVelocity.addLocal(P.mul(body.m_invMass));
+        body.m_angularVelocity += body.m_invI * Vec2.cross(r, P);
+    }
+
+    @Override
+    public boolean SolvePositionConstraints() {
+        return true;
+    }
+
+    @Override
+    public void SolveVelocityConstraints(float dt) {
+        Body body = m_body2;
+
+        Vec2 r = body.m_R.mul(m_localAnchor);
+
+        // Cdot = dot(u, v + cross(w, r))
+        float Cdot = Vec2.dot(m_u, body.m_linearVelocity.add(Vec2.cross(
+                body.m_angularVelocity, r)));
+        float impulse = -m_mEff * (Cdot + m_beta / dt * m_positionError);
+
+        float oldImpulse = m_impulse;
+        m_impulse = MathUtils.clamp(m_impulse + impulse, -dt * m_motorForce,
+                0.0f);
+        impulse = m_impulse - oldImpulse;
+
+        Vec2 p = m_u.mul(impulse);
+        body.m_linearVelocity.addLocal(p.mul(body.m_invMass));
+        body.m_angularVelocity += body.m_invI * Vec2.cross(r, p);
+    }
 }

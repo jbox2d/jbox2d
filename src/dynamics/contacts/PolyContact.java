@@ -14,7 +14,7 @@ import collision.ShapeType;
 public class PolyContact extends Contact implements ContactCreator {
 
     Manifold m_manifold;
-    
+
     public PolyContact(Shape s1, Shape s2) {
         super(s1, s2);
         assert (m_shape1.m_type == ShapeType.POLY_SHAPE);
@@ -70,12 +70,12 @@ public class PolyContact extends Contact implements ContactCreator {
 
     @Override
     public void Evaluate() {
-        //Manifold m0 = m_manifold;
+        // Manifold m0 = m_manifold;
         Manifold m0 = new Manifold();
-        for (int k = 0; k < m_manifold.pointCount; k++){
-           m0.points[k].normalImpulse = m_manifold.points[k].normalImpulse;
-           m0.points[k].tangentImpulse = m_manifold.points[k].tangentImpulse;
-           m0.points[k].id.key = m_manifold.points[k].id.key;
+        for (int k = 0; k < m_manifold.pointCount; k++) {
+            m0.points[k].normalImpulse = m_manifold.points[k].normalImpulse;
+            m0.points[k].tangentImpulse = m_manifold.points[k].tangentImpulse;
+            m0.points[k].id.key = m_manifold.points[k].id.key;
         }
         m0.pointCount = m_manifold.pointCount;
 
@@ -117,7 +117,7 @@ public class PolyContact extends Contact implements ContactCreator {
         }
         else {
             m_manifoldCount = 0;
-            //m_manifold = null; //Cleaner to actually store the count...
+            // m_manifold = null; //Cleaner to actually store the count...
         }
     }
 }

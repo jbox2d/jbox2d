@@ -1,14 +1,16 @@
 package testbed.tests;
 
-import common.Vec2;
-import processing.core.*;
+import processing.core.PApplet;
+import testbed.PTest;
 import collision.ShapeDescription;
 import collision.ShapeType;
+
+import common.Vec2;
+
 import dynamics.Body;
 import dynamics.BodyDescription;
 import dynamics.World;
 import dynamics.joints.RevoluteDescription;
-import testbed.PTest;
 
 public class PPendulum extends PTest {
 

@@ -14,9 +14,9 @@ public class Pair implements Comparable<Pair> {
     public int proxyId2;
 
     public int status;
-    
-    public Pair(){
-    	
+
+    public Pair() {
+
     }
 
     /**

@@ -1,5 +1,5 @@
 package dynamics.joints;
 
 public enum LimitState {
-	inactiveLimit, atLowerLimit, atUpperLimit, equalLimits
+    inactiveLimit, atLowerLimit, atUpperLimit, equalLimits
 }

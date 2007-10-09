@@ -1,7 +1,5 @@
 package common;
 
-import testbed.PTest;
-
 public class Vec2 {
     public float x, y;
 
@@ -12,7 +10,7 @@ public class Vec2 {
     public Vec2(float x, float y) {
         this.x = x;
         this.y = y;
-        //testbed.PTest.debugCount++;
+        // testbed.PTest.debugCount++;
     }
 
     public void setZero() {
@@ -41,24 +39,28 @@ public class Vec2 {
         return new Vec2(-x, -y);
     }
 
-    public void negateLocal() {
+    public Vec2 negateLocal() {
         x = -x;
         y = -y;
+        return this;
     }
 
-    public void addLocal(Vec2 v) {
+    public Vec2 addLocal(Vec2 v) {
         x += v.x;
         y += v.y;
+        return this;
     }
 
-    public void subLocal(Vec2 v) {
+    public Vec2 subLocal(Vec2 v) {
         x -= v.x;
         y -= v.y;
+        return this;
     }
 
-    public void mulLocal(float a) {
+    public Vec2 mulLocal(float a) {
         x *= a;
         y *= a;
+        return this;
     }
 
     public float length() {

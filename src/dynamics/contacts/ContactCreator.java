@@ -4,5 +4,5 @@ import collision.Shape;
 
 public interface ContactCreator {
 
-	Contact create(Shape s1, Shape s2);
+    Contact create(Shape s1, Shape s2);
 }
