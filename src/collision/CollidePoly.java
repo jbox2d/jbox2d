@@ -235,6 +235,10 @@ public class CollidePoly {
     // The normal points from 1 to 2
     public static void b2CollidePoly(Manifold manif, PolyShape polyA,
             PolyShape polyB) {
+        //~84 vec2 creations in Pyramid test, per run
+        //Runs ~625 times per step
+        //625 * 84 = 52,500, out of ~95,000 total creations
+        //Probably worth optimizing...
         MaxSeparation sepA = FindMaxSeparation(polyA, polyB);
         if (sepA.bestSeparation > 0.0f) {
             return;

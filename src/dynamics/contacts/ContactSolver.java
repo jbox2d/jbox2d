@@ -46,8 +46,6 @@ public class ContactSolver {
 			for (int j = 0; j < manifoldCount; ++j){//Manifold manifold : manifolds) {
 				Manifold manifold = manifolds.get(j);
 			    
-				//FIXME: this assert is being tripped, so I disabled it
-				//However, we might want to track it down at some point.
 				//assert (manifold.pointCount > 0):"Manifold "+j+" has length 0";
 				//if (manifold.pointCount == 0) System.out.println(contact);
 				
@@ -134,14 +132,27 @@ public class ContactSolver {
 
 			for (int j = 0; j < c.pointCount; ++j) {//ContactConstraintPoint ccp : c.points) {
 				ContactConstraintPoint ccp = c.points[j];
-			    Vec2 P = normal.mul(ccp.normalImpulse).add(
-						tangent.mul(ccp.tangentImpulse));
-				Vec2 r1 = b1.m_R.mul(ccp.localAnchor1);
-				Vec2 r2 = b2.m_R.mul(ccp.localAnchor2);
-				b1.m_angularVelocity -= invI1 * Vec2.cross(r1, P);
-				b1.m_linearVelocity.subLocal(P.mul(invMass1));
-				b2.m_angularVelocity += invI2 * Vec2.cross(r2, P);
-				b2.m_linearVelocity.addLocal(P.mul(invMass2));
+			    //Vec2 P = normal.mul(ccp.normalImpulse).add(
+				//		tangent.mul(ccp.tangentImpulse));
+				//Vec2 r1 = b1.m_R.mul(ccp.localAnchor1);
+				//Vec2 r2 = b2.m_R.mul(ccp.localAnchor2);
+				float px = normal.x*ccp.normalImpulse + tangent.x*ccp.tangentImpulse;
+				float py = normal.y*ccp.normalImpulse + tangent.y*ccp.tangentImpulse;
+				float r1x = b1.m_R.col1.x*ccp.localAnchor1.x + b1.m_R.col2.x*ccp.localAnchor1.y;
+				float r1y = b1.m_R.col1.y*ccp.localAnchor1.x + b1.m_R.col2.y*ccp.localAnchor1.y;
+				float r2x = b2.m_R.col1.x*ccp.localAnchor2.x + b2.m_R.col2.x*ccp.localAnchor2.y;
+				float r2y = b2.m_R.col1.y*ccp.localAnchor2.x + b2.m_R.col2.y*ccp.localAnchor2.y;
+                
+				//b1.m_angularVelocity -= invI1 * Vec2.cross(r1, P);
+				b1.m_angularVelocity -= invI1 * (r1x*py-r1y*px);
+				//b1.m_linearVelocity.subLocal(P.mul(invMass1));
+				b1.m_linearVelocity.x -= px*invMass1;
+				b1.m_linearVelocity.y -= py*invMass1;
+				//b2.m_angularVelocity += invI2 * Vec2.cross(r2, P);
+				b2.m_angularVelocity += invI2 * (r2x*py-r2y*px);
+				//b2.m_linearVelocity.addLocal(P.mul(invMass2));
+				b2.m_linearVelocity.x += px*invMass2;
+				b2.m_linearVelocity.y += py*invMass2;
 
 				ccp.positionImpulse = 0.0f;
 			}
@@ -149,7 +160,7 @@ public class ContactSolver {
 	}
 
 	public void SolveVelocityConstraints() {
-		for (ContactConstraint c : m_constraints) {
+	    for (ContactConstraint c : m_constraints) {
 			Body b1 = c.body1;
 			Body b2 = c.body2;
 			float invMass1 = b1.m_invMass;
@@ -162,17 +173,26 @@ public class ContactSolver {
 			// Solver normal constraints
 			for (ContactConstraintPoint ccp : c.points) {
 
-				Vec2 r1 = b1.m_R.mul(ccp.localAnchor1);
-				Vec2 r2 = b2.m_R.mul(ccp.localAnchor2);
-
+			    //Vec2 r1 = b1.m_R.mul(ccp.localAnchor1);
+			    //Vec2 r2 = b2.m_R.mul(ccp.localAnchor2);
+			    //new Vec2(col1.x * v.x + col2.x * v.y, 
+			    //         col1.y * v.x + col2.y * v.y)
+			    float r1x = b1.m_R.col1.x*ccp.localAnchor1.x + b1.m_R.col2.x*ccp.localAnchor1.y;
+			    float r1y = b1.m_R.col1.y*ccp.localAnchor1.x + b1.m_R.col2.y*ccp.localAnchor1.y;
+			    float r2x = b2.m_R.col1.x*ccp.localAnchor2.x + b2.m_R.col2.x*ccp.localAnchor2.y;
+			    float r2y = b2.m_R.col1.y*ccp.localAnchor2.x + b2.m_R.col2.y*ccp.localAnchor2.y;
+                
 				// Relative velocity at contact
-				Vec2 dv = b2.m_linearVelocity.add(
-						Vec2.cross(b2.m_angularVelocity, r2)).sub(
-						b1.m_linearVelocity).sub(
-						Vec2.cross(b1.m_angularVelocity, r1));
-
+				//Vec2 dv = b2.m_linearVelocity.add(
+				//		Vec2.cross(b2.m_angularVelocity, r2)).sub(
+				//		b1.m_linearVelocity).sub(
+				//		Vec2.cross(b1.m_angularVelocity, r1));
+				float dvx = b2.m_linearVelocity.x + (-b2.m_angularVelocity*r2y) - b1.m_linearVelocity.x - (-b1.m_angularVelocity*r1y);
+				float dvy = b2.m_linearVelocity.y + (b2.m_angularVelocity*r2x) - b1.m_linearVelocity.y - (b1.m_angularVelocity*r1x);
+                
 				// Compute normal impulse
-				float vn = Vec2.dot(dv, normal);
+				//float vn = Vec2.dot(dv, normal);
+				float vn = dvx*normal.x+dvy*normal.y;
 				float lambda = -ccp.normalMass * (vn - ccp.velocityBias);
 
 				// b2Clamp the accumulated impulse
@@ -180,31 +200,49 @@ public class ContactSolver {
 				lambda = newImpulse - ccp.normalImpulse;
 
 				// Apply contact impulse
-				Vec2 P = normal.mul(lambda);
+				//Vec2 P = normal.mul(lambda);
+				float px = normal.x*lambda;
+				float py = normal.y*lambda;
 
-				b1.m_linearVelocity.subLocal(P.mul(invMass1));
-				b1.m_angularVelocity -= invI1 * Vec2.cross(r1, P);
+				//b1.m_linearVelocity.subLocal(P.mul(invMass1));
+				b1.m_linearVelocity.x -= px*invMass1;
+				b1.m_linearVelocity.y -= py*invMass1;
+				//b1.m_angularVelocity -= invI1 * Vec2.cross(r1, P);
+				b1.m_angularVelocity -= invI1 * (r1x*py-r1y*px);
 
-				b2.m_linearVelocity.addLocal(P.mul(invMass2));
-				b2.m_angularVelocity += invI2 * Vec2.cross(r2, P);
+				//b2.m_linearVelocity.addLocal(P.mul(invMass2));
+				b2.m_linearVelocity.x += px*invMass2;
+				b2.m_linearVelocity.y += py*invMass2;
+				//b2.m_angularVelocity += invI2 * Vec2.cross(r2, P);
+				b2.m_angularVelocity += invI2 * (r2x*py - r2y*px);
 
 				ccp.normalImpulse = newImpulse;
 			}
 
 			// Solver tangent constraints
 			for (ContactConstraintPoint ccp : c.points) {
-
-				Vec2 r1 = b1.m_R.mul(ccp.localAnchor1);
-				Vec2 r2 = b2.m_R.mul(ccp.localAnchor2);
-
+			    //12 temp Vec2 creations per run
+				//Vec2 r1 = b1.m_R.mul(ccp.localAnchor1);
+				//Vec2 r2 = b2.m_R.mul(ccp.localAnchor2);
+				float r1x = b1.m_R.col1.x*ccp.localAnchor1.x + b1.m_R.col2.x*ccp.localAnchor1.y;
+				float r1y = b1.m_R.col1.y*ccp.localAnchor1.x + b1.m_R.col2.y*ccp.localAnchor1.y;
+				float r2x = b2.m_R.col1.x*ccp.localAnchor2.x + b2.m_R.col2.x*ccp.localAnchor2.y;
+				float r2y = b2.m_R.col1.y*ccp.localAnchor2.x + b2.m_R.col2.y*ccp.localAnchor2.y;
+                
 				// Relative velocity at contact
-				Vec2 dv = b2.m_linearVelocity.add(
-						Vec2.cross(b2.m_angularVelocity, r2)).sub(
-						b1.m_linearVelocity).sub(
-						Vec2.cross(b1.m_angularVelocity, r1));
+				//Vec2 dv = b2.m_linearVelocity.add(
+				//		Vec2.cross(b2.m_angularVelocity, r2)).sub(
+				//		b1.m_linearVelocity).sub(
+				//		Vec2.cross(b1.m_angularVelocity, r1));
+				//cross -> new Vec2(-s * a.y, s * a.x);
+				float dvx = b2.m_linearVelocity.x + (-b2.m_angularVelocity*r2y) - b1.m_linearVelocity.x - (-b1.m_angularVelocity*r1y);
+				float dvy = b2.m_linearVelocity.y + (b2.m_angularVelocity*r2x) - b1.m_linearVelocity.y - (b1.m_angularVelocity*r1x);
+                
+				
 
 				// Compute tangent impulse
-				float vt = Vec2.dot(dv, tangent);
+				//float vt = Vec2.dot(dv, tangent);
+				float vt = dvx*tangent.x + dvy*tangent.y;
 				float lambda = ccp.tangentMass * (-vt);
 
 				// b2Clamp the accumulated impulse
@@ -214,13 +252,21 @@ public class ContactSolver {
 				lambda = newImpulse - ccp.tangentImpulse;
 
 				// Apply contact impulse
-				Vec2 P = tangent.mul(lambda);
+				//Vec2 P = tangent.mul(lambda);
+				float px = tangent.x*lambda;
+				float py = tangent.y*lambda;
 
-				b1.m_linearVelocity.subLocal(P.mul(invMass1));
-				b1.m_angularVelocity -= invI1 * Vec2.cross(r1, P);
-
-				b2.m_linearVelocity.addLocal(P.mul(invMass2));
-				b2.m_angularVelocity += invI2 * Vec2.cross(r2, P);
+				//b1.m_linearVelocity.subLocal(P.mul(invMass1));
+				b1.m_linearVelocity.x -= px*invMass1;
+				b1.m_linearVelocity.y -= py*invMass1;
+				//b1.m_angularVelocity -= invI1 * Vec2.cross(r1, P);
+				b1.m_angularVelocity -= invI1 * (r1x*py-r1y*px);
+				
+				//b2.m_linearVelocity.addLocal(P.mul(invMass2));
+				b2.m_linearVelocity.x += px*invMass2;
+				b2.m_linearVelocity.x += py*invMass2;
+				//b2.m_angularVelocity += invI2 * Vec2.cross(r2, P);
+				b2.m_angularVelocity += invI2 * (r2x*py-r2y*px);
 
 				ccp.tangentImpulse = newImpulse;
 			}
@@ -242,16 +288,31 @@ public class ContactSolver {
 
 			// Solver normal constraints
 			for (ContactConstraintPoint ccp : c.points) {
-				Vec2 r1 = b1.m_R.mul(ccp.localAnchor1);
-				Vec2 r2 = b2.m_R.mul(ccp.localAnchor2);
-
-				Vec2 p1 = b1.m_position.add(r1);
-				Vec2 p2 = b2.m_position.add(r2);
-				Vec2 dp = p2.sub(p1);
+			    //10 temp Vec2 creations per run
+				//Vec2 r1 = b1.m_R.mul(ccp.localAnchor1);
+				//Vec2 r2 = b2.m_R.mul(ccp.localAnchor2);
+				
+			    //m_R.mul -> new Vec2(col1.x * v.x + col2.x * v.y, col1.y * v.x + col2.y
+               // * v.y)
+				float r1x = b1.m_R.col1.x*ccp.localAnchor1.x + b1.m_R.col2.x*ccp.localAnchor1.y;
+				float r1y = b1.m_R.col1.y*ccp.localAnchor1.x + b1.m_R.col2.y*ccp.localAnchor1.y;
+				float r2x = b2.m_R.col1.x*ccp.localAnchor2.x + b2.m_R.col2.x*ccp.localAnchor2.y;
+				float r2y = b2.m_R.col1.y*ccp.localAnchor2.x + b2.m_R.col2.y*ccp.localAnchor2.y;
+                
+				//Vec2 p1 = b1.m_position.add(r1);
+				//Vec2 p2 = b2.m_position.add(r2);
+				//Vec2 dp = p2.sub(p1);
+				float p1x = b1.m_position.x + r1x;
+				float p1y = b1.m_position.y + r1y;
+				float p2x = b2.m_position.x + r2x;
+				float p2y = b2.m_position.y + r2y;
+				float dpx = p2x-p1x;
+				float dpy = p2y-p1y;
 
 				// Approximate the current separation.
-				float separation = Vec2.dot(dp, normal) + ccp.separation;
-
+				//float separation = Vec2.dot(dp, normal) + ccp.separation;
+				float separation = dpx*normal.x+dpy*normal.y + ccp.separation;
+				
 				// Prevent large corrections
 				separation = Math
 						.max(separation, -Settings.maxLinearCorrection);
@@ -268,14 +329,22 @@ public class ContactSolver {
 				ccp.positionImpulse = Math.max(impulse0 + dImpulse, 0.0f);
 				dImpulse = ccp.positionImpulse - impulse0;
 
-				Vec2 impulse = normal.mul(dImpulse);
+				//Vec2 impulse = normal.mul(dImpulse);
+				float impulsex = normal.x*dImpulse;
+				float impulsey = normal.y*dImpulse;
 
-				b1.m_position.subLocal(impulse.mul(invMass1));
-				b1.m_rotation -= invI1 * Vec2.cross(r1, impulse);
+				//b1.m_position.subLocal(impulse.mul(invMass1));
+				b1.m_position.x -= impulsex*invMass1;
+				b1.m_position.y -= impulsey*invMass1;
+				//b1.m_rotation -= invI1 * Vec2.cross(r1, impulse);
+				b1.m_rotation -= invI1 * (r1x*impulsey-r1y*impulsex);
 				b1.m_R.set(b1.m_rotation);
 
-				b2.m_position.addLocal(impulse.mul(invMass2));
-				b2.m_rotation += invI2 * Vec2.cross(r2, impulse);
+				//b2.m_position.addLocal(impulse.mul(invMass2));
+				b2.m_position.x += impulsex*invMass2;
+				b2.m_position.y += impulsey*invMass2;
+				//b2.m_rotation += invI2 * Vec2.cross(r2, impulse);
+				b2.m_rotation += invI2 * (r2x*impulsey-r2y*impulsex);
 				b2.m_R.set(b2.m_rotation);
 			}
 		}
