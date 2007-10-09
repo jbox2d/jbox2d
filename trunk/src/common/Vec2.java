@@ -1,5 +1,7 @@
 package common;
 
+import testbed.PTest;
+
 public class Vec2 {
     public float x, y;
 
@@ -10,6 +12,7 @@ public class Vec2 {
     public Vec2(float x, float y) {
         this.x = x;
         this.y = y;
+        //testbed.PTest.debugCount++;
     }
 
     public void setZero() {

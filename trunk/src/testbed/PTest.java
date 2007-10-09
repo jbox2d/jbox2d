@@ -83,10 +83,7 @@ public abstract class PTest extends PApplet{
     public PTest(String title) {
         this.title = title;
 
-        m_world = new World(new AABB(new Vec2(-100, -100), new Vec2(100, 100)),
-                new Vec2(0.0f, -10.0f), true);
-        m_bomb = null;
-        m_mouseJoint = null;
+        setupWorld();
 
         m_textLine = 30;
         System.out.println("Constructing PTest");
@@ -212,7 +209,7 @@ public abstract class PTest extends PApplet{
         if (settings.drawPairs) {
             drawPairs();
         }
-
+        DrawAABB(m_world.m_broadPhase.m_worldAABB, color(0,255,0));
         if (settings.drawAABBs) {
             BroadPhase bp = m_world.m_broadPhase;
             Vec2 invQ = new Vec2(1.0f / bp.m_quantizationFactor.x,
@@ -461,6 +458,7 @@ public abstract class PTest extends PApplet{
     	
     }
 
+    static public int debugCount;
     
     public void draw(){
             background(255);
@@ -486,9 +484,12 @@ public abstract class PTest extends PApplet{
             }
             
             checkKeys();
-            
+
+            debugCount = 0;
             // update data model
             Step(settings);
+
+            if (keyDown['d']) System.out.println(debugCount);
             
             if (needsReset) {
                 // XXX m_world.clear();
@@ -517,12 +518,16 @@ public abstract class PTest extends PApplet{
      */
     public final void initDemo() {
         // XXX m_world.clear();
-        m_world = new World(new AABB(new Vec2(-100, -100), new Vec2(100, 100)),
+        setupWorld();
+        System.out.println("Initialising:" + getTitle());
+        init(m_world);
+    }
+    
+    public void setupWorld() {
+        m_world = new World(new AABB(new Vec2(-100f, -100f), new Vec2(100f, 100f)),
                 new Vec2(0.0f, -10.0f), true);
         m_bomb = null;
         m_mouseJoint = null;
-        System.out.println("Initialising:" + getTitle());
-        init(m_world);
     }
 
     /**

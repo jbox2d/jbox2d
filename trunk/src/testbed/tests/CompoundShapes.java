@@ -5,6 +5,7 @@ import java.util.Random;
 import processing.core.PApplet;
 
 import testbed.PTest;
+import collision.AABB;
 import collision.ShapeDescription;
 import collision.ShapeType;
 
@@ -19,6 +20,14 @@ public class CompoundShapes extends PTest {
         super("CompoundShapes");
     }
 
+    @Override
+    public void setupWorld() {
+        m_world = new World(new AABB(new Vec2(-100f, -100f), new Vec2(100f, 200f)),
+                new Vec2(0.0f, -10.0f), true);
+        m_bomb = null;
+        m_mouseJoint = null;
+    }
+    
     @Override
     public void go(World world) {
         {
