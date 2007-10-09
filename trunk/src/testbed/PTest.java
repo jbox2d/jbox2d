@@ -447,12 +447,17 @@ public abstract class PTest extends PApplet {
         addMouseWheelListener(new java.awt.event.MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 int notches = e.getWheelRotation();
+                Vec2 oldCenter = screenToWorld(width/2.0f,height/2.0f);
                 if (notches < 0) {
                     scaleFactor = min(100f, scaleFactor * 1.05f);
                 }
                 else if (notches > 0) {
                     scaleFactor = max(.01f, scaleFactor / 1.05f);
                 }
+                Vec2 newCenter = screenToWorld(width/2.0f,height/2.0f);
+                //System.out.println(newCenter + " " +oldCenter);
+                transX -= (oldCenter.x-newCenter.x)*scaleFactor;
+                transY += (oldCenter.y-newCenter.y)*scaleFactor;
             }
         });
 
