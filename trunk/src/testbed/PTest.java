@@ -1,7 +1,7 @@
 package testbed;
 
+import java.awt.event.MouseWheelEvent;
 import java.util.Random;
-import java.awt.event.*;
 
 import processing.core.PApplet;
 import collision.AABB;
@@ -26,27 +26,29 @@ import dynamics.joints.JointType;
 import dynamics.joints.MouseDescription;
 import dynamics.joints.MouseJoint;
 
-public abstract class PTest extends PApplet{
+public abstract class PTest extends PApplet {
 
     public boolean[] keyDown;
+
     public boolean[] newKeyDown;
-    
-  //World 0,0 maps to transX, transY on screen
+
+    // World 0,0 maps to transX, transY on screen
     public float transX;
+
     public float transY;
+
     public float scaleFactor = 10.0f;
-    
-    public Vec2 mouseWorld; //world coordinates of mouse
-    
-    public boolean pmousePressed; //was mouse pressed last frame?
-    
-	
-	static public void main(String args[]) {
-		PApplet.main(new String[] { "testbed.PTest" });
-	}
-	
-	protected TestSettings settings;
-    
+
+    public Vec2 mouseWorld; // world coordinates of mouse
+
+    public boolean pmousePressed; // was mouse pressed last frame?
+
+    static public void main(String args[]) {
+        PApplet.main(new String[] { "testbed.PTest" });
+    }
+
+    protected TestSettings settings;
+
     /** The title of the current demo */
     protected String title;
 
@@ -88,7 +90,6 @@ public abstract class PTest extends PApplet{
         m_textLine = 30;
         System.out.println("Constructing PTest");
     }
-    
 
     void MouseDown(Vec2 p) {
         assert m_mouseJoint == null;
@@ -209,7 +210,7 @@ public abstract class PTest extends PApplet{
         if (settings.drawPairs) {
             drawPairs();
         }
-        DrawAABB(m_world.m_broadPhase.m_worldAABB, color(0,255,0));
+        DrawAABB(m_world.m_broadPhase.m_worldAABB, color(0, 255, 0));
         if (settings.drawAABBs) {
             BroadPhase bp = m_world.m_broadPhase;
             Vec2 invQ = new Vec2(1.0f / bp.m_quantizationFactor.x,
@@ -230,23 +231,21 @@ public abstract class PTest extends PApplet{
                 b.maxVertex.y = bp.m_worldAABB.minVertex.y + invQ.y
                         * bp.m_bounds[1][p.upperBounds[1]].value;
 
-                DrawAABB(b, color(255,150,150));
+                DrawAABB(b, color(255, 150, 150));
             }
         }
 
-/*        if (settings.drawStats) {
-            g.drawString("proxies(max) = " + m_world.m_broadPhase.m_proxyCount
-                    + "(" + Settings.maxProxies + "), pairs(max) = "
-                    + m_world.m_broadPhase.m_pairManager.m_pairCount + "("
-                    + Settings.maxPairs + ")", 5, m_textLine);
-
-            m_textLine += 15;
-
-            g.drawString(
-                    "bodies/contacts/joints = " + m_world.m_bodyCount + "/"
-                            + m_world.m_contactCount + "/"
-                            + m_world.m_jointCount, 5, m_textLine);
-        }*/
+        /*
+         * if (settings.drawStats) { g.drawString("proxies(max) = " +
+         * m_world.m_broadPhase.m_proxyCount + "(" + Settings.maxProxies + "),
+         * pairs(max) = " + m_world.m_broadPhase.m_pairManager.m_pairCount + "(" +
+         * Settings.maxPairs + ")", 5, m_textLine);
+         * 
+         * m_textLine += 15;
+         * 
+         * g.drawString( "bodies/contacts/joints = " + m_world.m_bodyCount + "/" +
+         * m_world.m_contactCount + "/" + m_world.m_jointCount, 5, m_textLine); }
+         */
 
         if (m_mouseJoint != null) {
             drawMouseJoint();
@@ -254,7 +253,7 @@ public abstract class PTest extends PApplet{
     }
 
     void DrawShape(Shape shape, int c) {
-    	stroke(c);
+        stroke(c);
         noFill();
         if (shape.m_type == ShapeType.POLY_SHAPE
                 || shape.m_type == ShapeType.BOX_SHAPE) {
@@ -263,10 +262,10 @@ public abstract class PTest extends PApplet{
             beginShape(POLYGON);
             for (int i = 0; i < poly.m_vertexCount; ++i) {
                 Vec2 v = poly.m_position.add(poly.m_R.mul(poly.m_vertices[i]));
-                vertex(v.x,v.y);
+                vertex(v.x, v.y);
             }
             Vec2 v = poly.m_position.add(poly.m_R.mul(poly.m_vertices[0]));
-            vertex(v.x,v.y);
+            vertex(v.x, v.y);
             endShape();
         }
     }
@@ -279,54 +278,56 @@ public abstract class PTest extends PApplet{
         Vec2 p1 = joint.GetAnchor1();
         Vec2 p2 = joint.GetAnchor2();
 
-        stroke(0.5f,0.8f,0.8f);
+        stroke(0.5f, 0.8f, 0.8f);
         noFill();
 
         if (joint.m_type == JointType.distanceJoint) {
-            line(p1.x,p1.y,p2.x,p2.y);
+            line(p1.x, p1.y, p2.x, p2.y);
         }
         else {
-        	line(x1.x,x1.y,p1.x,p1.y);
-        	line(x2.x,x2.y,p2.x,p2.y);
+            line(x1.x, x1.y, p1.x, p1.y);
+            line(x2.x, x2.y, p2.x, p2.y);
         }
     }
 
     void DrawAABB(AABB aabb, int c) {
-    	stroke(c);
-    	noFill();
-    	rect(aabb.minVertex.x,aabb.minVertex.y,(aabb.maxVertex.x-aabb.minVertex.x),(aabb.maxVertex.y-aabb.minVertex.y));
+        stroke(c);
+        noFill();
+        rect(aabb.minVertex.x, aabb.minVertex.y,
+                (aabb.maxVertex.x - aabb.minVertex.x),
+                (aabb.maxVertex.y - aabb.minVertex.y));
     }
 
     void drawContact(Contact c) {
-        //g.setColor(new Color(1.0f, 0.0f, 0.0f));
-        fill(255,0,0);
+        // g.setColor(new Color(1.0f, 0.0f, 0.0f));
+        fill(255, 0, 0);
         noStroke();
         for (Manifold m : c.GetManifolds()) {
             for (int j = 0; j < m.pointCount; ++j) {
                 Vec2 v = m.points[j].position;
-                //g.fillOval((int) v.x, (int) v.y, 4, 4);
-                ellipse(v.x,v.y,4,4);
+                // g.fillOval((int) v.x, (int) v.y, 4, 4);
+                ellipse(v.x, v.y, 4, 4);
             }
         }
     }
 
     void drawImpulse(Contact c) {
-        //g.setColor(new Color(0.9f, 0.9f, 0.3f));
-    	stroke(230,230,80);
+        // g.setColor(new Color(0.9f, 0.9f, 0.3f));
+        stroke(230, 230, 80);
         for (Manifold m : c.GetManifolds()) {
             for (int j = 0; j < m.pointCount; ++j) {
                 Vec2 v1 = m.points[j].position;
                 Vec2 v2 = v1.add(m.normal.mul(m.points[j].normalImpulse));
 
-                //g.drawLine((int) v1.x, (int) v1.y, (int) v2.x, (int) v2.y);
-                line(v1.x,v1.y,v2.x,v2.y);
+                // g.drawLine((int) v1.x, (int) v1.y, (int) v2.x, (int) v2.y);
+                line(v1.x, v1.y, v2.x, v2.y);
             }
         }
     }
 
     void drawPairs() {
-        //g.setColor(new Color(0.9f, 0.9f, 0.3f));
-    	stroke(230,230,80);
+        // g.setColor(new Color(0.9f, 0.9f, 0.3f));
+        stroke(230, 230, 80);
         BroadPhase bp = m_world.m_broadPhase;
         Vec2 invQ = new Vec2(1.0f / bp.m_quantizationFactor.x,
                 1.0f / bp.m_quantizationFactor.y);
@@ -359,8 +360,8 @@ public abstract class PTest extends PApplet{
             Vec2 x1 = b1.minVertex.add(b1.maxVertex).mul(0.5f);
             Vec2 x2 = b2.minVertex.add(b2.maxVertex).mul(0.5f);
 
-            //g.drawLine((int) x1.x, (int) x1.y, (int) x2.x, (int) x2.y);
-            line(x1.x,x1.y,x2.x,x2.y);
+            // g.drawLine((int) x1.x, (int) x1.y, (int) x2.x, (int) x2.y);
+            line(x1.x, x1.y, x2.x, x2.y);
         }
     }
 
@@ -369,15 +370,15 @@ public abstract class PTest extends PApplet{
         Vec2 p1 = body.m_position.add(body.m_R.mul(m_mouseJoint.m_localAnchor));
         Vec2 p2 = m_mouseJoint.m_target;
 
-        fill(0,255,0);
+        fill(0, 255, 0);
         noStroke();
-        
-        float diam = 5.0f/scaleFactor;
-        ellipse(p1.x,p1.y,diam,diam);
-        ellipse(p2.x,p2.y,diam,diam);
 
-        stroke(200,200,200);
-        line(p1.x,p1.y,p2.x,p2.y);
+        float diam = 5.0f / scaleFactor;
+        ellipse(p1.x, p1.y, diam, diam);
+        ellipse(p2.x, p2.y, diam, diam);
+
+        stroke(200, 200, 200);
+        line(p1.x, p1.y, p2.x, p2.y);
     }
 
     /**
@@ -407,44 +408,43 @@ public abstract class PTest extends PApplet{
             LaunchBomb();
         }
     }
-    
+
     public void keyPressed() {
-        if (key >= 0  && key < 255) {
-            if (!keyDown[key]) newKeyDown[key] = true;
+        if (key >= 0 && key < 255) {
+            if (!keyDown[key])
+                newKeyDown[key] = true;
             keyDown[key] = true;
         }
     }
-    
+
     public void keyReleased() {
-        if (key >= 0 && key < 255){
+        if (key >= 0 && key < 255) {
             keyDown[key] = false;
         }
     }
 
-    
     /**
      * Initialise the GUI
      */
     public void setup() {
-        
+
         keyDown = new boolean[255];
         newKeyDown = new boolean[255];
-        for (int i=0; i<keyDown.length; i++){
+        for (int i = 0; i < keyDown.length; i++) {
             keyDown[i] = false;
             newKeyDown[i] = false;
         }
-    	System.out.println("Setting up graphics, performing initialization");
-    	size(500,500);
-    	frameRate(60);
-    	initDemo();
-    	smooth();
-    	transX = width/2.0f;
-    	transY = height/2.0f;
-    	pmousePressed = false;
-    	settings = new TestSettings();
-    	
-    	
-    	addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+        System.out.println("Setting up graphics, performing initialization");
+        size(500, 500);
+        frameRate(60);
+        initDemo();
+        smooth();
+        transX = width / 2.0f;
+        transY = height / 2.0f;
+        pmousePressed = false;
+        settings = new TestSettings();
+
+        addMouseWheelListener(new java.awt.event.MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 int notches = e.getWheelRotation();
                 if (notches < 0) {
@@ -455,63 +455,69 @@ public abstract class PTest extends PApplet{
                 }
             }
         });
-    	
+
     }
 
     static public int debugCount;
-    
-    public void draw(){
-            background(255);
-            translate(transX, transY);
-            scale(scaleFactor, -scaleFactor);
-            strokeWeight(1.0f/scaleFactor);
-            
-            mouseWorld = screenToWorld(mouseX,mouseY);
-            //System.out.println(mouseButton);
-            if (mouseButton == LEFT){
-                if (mousePressed && !pmousePressed) {
-                    MouseDown(mouseWorld);
-                } else if (mousePressed){
-                    if (mouseX != pmouseX || mouseY != pmouseY) MouseMove(mouseWorld);
-                } else if (pmousePressed){
-                    MouseUp();
-                }
-            } else if (mouseButton == RIGHT){
-                if (mousePressed){
-                    transX += mouseX - pmouseX;
-                    transY += mouseY - pmouseY;
-                }
-            }
-            
-            checkKeys();
 
-            debugCount = 0;
-            // update data model
-            Step(settings);
+    public void draw() {
+        background(255);
+        translate(transX, transY);
+        scale(scaleFactor, -scaleFactor);
+        strokeWeight(1.0f / scaleFactor);
 
-            if (keyDown['d']) System.out.println(debugCount);
-            
-            if (needsReset) {
-                // XXX m_world.clear();
-                initDemo();
-                needsReset = false;
+        mouseWorld = screenToWorld(mouseX, mouseY);
+        // System.out.println(mouseButton);
+        if (mouseButton == LEFT) {
+            if (mousePressed && !pmousePressed) {
+                MouseDown(mouseWorld);
             }
-            for (int i=0; i<newKeyDown.length; i++){
-                newKeyDown[i] = false;
+            else if (mousePressed) {
+                if (mouseX != pmouseX || mouseY != pmouseY)
+                    MouseMove(mouseWorld);
             }
-            pmousePressed = mousePressed;
+            else if (pmousePressed) {
+                MouseUp();
+            }
+        }
+        else if (mouseButton == RIGHT) {
+            if (mousePressed) {
+                transX += mouseX - pmouseX;
+                transY += mouseY - pmouseY;
+            }
+        }
+
+        checkKeys();
+
+        debugCount = 0;
+        // update data model
+        Step(settings);
+
+        if (keyDown['d'])
+            System.out.println(debugCount);
+
+        if (needsReset) {
+            // XXX m_world.clear();
+            initDemo();
+            needsReset = false;
+        }
+        for (int i = 0; i < newKeyDown.length; i++) {
+            newKeyDown[i] = false;
+        }
+        pmousePressed = mousePressed;
     }
-    
-    protected Vec2 screenToWorld(float x, float y){
-        float wX = map(x-(transX-width/2.0f),0f,width,-width/(2.0f*scaleFactor),width/(2.0f*scaleFactor));
-        float wY = map(y-(transY-height/2.0f),height,0f,-height/(2.0f*scaleFactor),height/(2.0f*scaleFactor));
-        return new Vec2(wX,wY);
+
+    protected Vec2 screenToWorld(float x, float y) {
+        float wX = map(x - (transX - width / 2.0f), 0f, width, -width
+                / (2.0f * scaleFactor), width / (2.0f * scaleFactor));
+        float wY = map(y - (transY - height / 2.0f), height, 0f, -height
+                / (2.0f * scaleFactor), height / (2.0f * scaleFactor));
+        return new Vec2(wX, wY);
     }
-    
-    protected void checkKeys(){
-        //override if needed
+
+    protected void checkKeys() {
+        // override if needed
     }
-    
 
     /**
      * Initialise the demo - clear the world
@@ -522,10 +528,10 @@ public abstract class PTest extends PApplet{
         System.out.println("Initialising:" + getTitle());
         init(m_world);
     }
-    
+
     public void setupWorld() {
-        m_world = new World(new AABB(new Vec2(-100f, -100f), new Vec2(100f, 100f)),
-                new Vec2(0.0f, -10.0f), true);
+        m_world = new World(new AABB(new Vec2(-100f, -100f), new Vec2(100f,
+                100f)), new Vec2(0.0f, -10.0f), true);
         m_bomb = null;
         m_mouseJoint = null;
     }
@@ -536,9 +542,9 @@ public abstract class PTest extends PApplet{
      * @param world
      *            The world in which the simulation is going to run
      */
-    protected void init(World world){
-    	this.go(world);
+    protected void init(World world) {
+        this.go(world);
     }
-    
+
     public abstract void go(World w);
 }

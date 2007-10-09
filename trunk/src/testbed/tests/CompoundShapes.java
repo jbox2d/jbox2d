@@ -22,12 +22,12 @@ public class CompoundShapes extends PTest {
 
     @Override
     public void setupWorld() {
-        m_world = new World(new AABB(new Vec2(-100f, -100f), new Vec2(100f, 200f)),
-                new Vec2(0.0f, -10.0f), true);
+        m_world = new World(new AABB(new Vec2(-100f, -100f), new Vec2(100f,
+                200f)), new Vec2(0.0f, -10.0f), true);
         m_bomb = null;
         m_mouseJoint = null;
     }
-    
+
     @Override
     public void go(World world) {
         {

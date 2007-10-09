@@ -121,7 +121,7 @@ public class PrismaticJoint extends Joint {
         // Compute point to line constraint effective mass.
         // J = [-ay1 -cross(d+r1,ay1) ay1 cross(r2,ay1)]
         Vec2 ay1 = b1.m_R.mul(m_localYAxis1);
-        Vec2 e = b2.m_position.add(r2).sub(b1.m_position);
+        Vec2 e = b2.m_position.clone().addLocal(r2).subLocal(b1.m_position);
 
         m_linearJacobian.set(ay1.negate(), -Vec2.cross(e, ay1), ay1, Vec2
                 .cross(r2, ay1));
@@ -183,9 +183,13 @@ public class PrismaticJoint extends Joint {
         }
 
         // Warm starting.
-        Vec2 P1 = m_linearJacobian.linear1.mul(m_linearImpulse).add(
+        // Vec2 P1 = m_linearJacobian.linear1.mul(m_linearImpulse).add(
+        // m_motorJacobian.linear1.mul(m_motorImpulse + m_limitImpulse));
+        // Vec2 P2 = m_linearJacobian.linear2.mul(m_linearImpulse).add(
+        // m_motorJacobian.linear2.mul(m_motorImpulse + m_limitImpulse));
+        Vec2 P1 = m_linearJacobian.linear1.mul(m_linearImpulse).addLocal(
                 m_motorJacobian.linear1.mul(m_motorImpulse + m_limitImpulse));
-        Vec2 P2 = m_linearJacobian.linear2.mul(m_linearImpulse).add(
+        Vec2 P2 = m_linearJacobian.linear2.mul(m_linearImpulse).addLocal(
                 m_motorJacobian.linear2.mul(m_motorImpulse + m_limitImpulse));
         float L1 = m_linearImpulse * m_linearJacobian.angular1
                 - m_angularImpulse + (m_motorImpulse + m_limitImpulse)

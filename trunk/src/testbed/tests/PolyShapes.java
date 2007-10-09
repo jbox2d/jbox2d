@@ -1,10 +1,8 @@
 package testbed.tests;
 
-import java.awt.Graphics2D;
 import java.util.Random;
 
 import processing.core.PApplet;
-
 import testbed.PTest;
 import collision.ShapeDescription;
 import collision.ShapeType;
@@ -93,7 +91,7 @@ public class PolyShapes extends PTest {
     }
 
     void CreateBody(int index) {
-        //FIXME: bodies not colliding with ground
+        // FIXME: bodies not colliding with ground
         if (bodies[bodyIndex] != null) {
             world.DestroyBody(bodies[bodyIndex]);
             bodies[bodyIndex] = null;
@@ -113,29 +111,28 @@ public class PolyShapes extends PTest {
 
     @Override
     protected void checkKeys() {
-        if (newKeyDown['1']){
+        if (newKeyDown['1']) {
             CreateBody('1' - '1');
         }
-        if (newKeyDown['2']){
+        if (newKeyDown['2']) {
             CreateBody('2' - '1');
         }
-        if (newKeyDown['3']){
+        if (newKeyDown['3']) {
             CreateBody('3' - '1');
         }
-        if (newKeyDown['4']){
+        if (newKeyDown['4']) {
             CreateBody('4' - '1');
         }
     }
-/*
-    @Override
-    protected void renderGUI(Graphics2D g) {
-        super.renderGUI(g);
-        g.drawString("Press 1-4 to drop stuff", 5, m_textLine);
-        // m_textLine += 15;
-    }*/
+
+    /*
+     * @Override protected void renderGUI(Graphics2D g) { super.renderGUI(g);
+     * g.drawString("Press 1-4 to drop stuff", 5, m_textLine); // m_textLine +=
+     * 15; }
+     */
 
     public static void main(String[] args) {
-        //new PolyShapes().start();
+        // new PolyShapes().start();
         PApplet.main(new String[] { "testbed.tests.PolyShapes" });
     }
 }

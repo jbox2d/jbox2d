@@ -133,7 +133,9 @@ public class ShapeDescription {
             area += triangleArea;
 
             // Area weighted centroid
-            center.addLocal(p1.add(p2).add(p3).mul(triangleArea * inv3));
+            // center.addLocal(p1.add(p2).add(p3).mul(triangleArea * inv3));
+            center.addLocal(p1.clone().addLocal(p2).addLocal(p3).mul(
+                    triangleArea * inv3));
 
             float px = p1.x, py = p1.y;
             float ex1 = e1.x, ey1 = e1.y;

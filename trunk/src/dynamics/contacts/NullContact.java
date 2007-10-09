@@ -6,17 +6,17 @@ import collision.Manifold;
 
 public class NullContact extends Contact {
 
-	@Override
-	public void Evaluate() {
-	}
-	
-	public Contact clone(){
-		return new NullContact();
-	}
+    @Override
+    public void Evaluate() {
+    }
 
-	@Override
-	public List<Manifold> GetManifolds() {
-		//System.out.println("NullContact.GetManifolds()");
-		return null;
-	}
+    public Contact clone() {
+        return new NullContact();
+    }
+
+    @Override
+    public List<Manifold> GetManifolds() {
+        // System.out.println("NullContact.GetManifolds()");
+        return null;
+    }
 }

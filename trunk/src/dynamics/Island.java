@@ -9,169 +9,177 @@ import dynamics.contacts.ContactSolver;
 import dynamics.joints.Joint;
 
 public class Island {
-	Body[] m_bodies;
-	Contact[] m_contacts;
-	Joint[] m_joints;
+    Body[] m_bodies;
 
-	int m_bodyCount;
-	int m_jointCount;
-	int m_contactCount;
+    Contact[] m_contacts;
 
-	int m_bodyCapacity;
-	int m_contactCapacity;
-	int m_jointCapacity;
+    Joint[] m_joints;
 
-	int m_positionIterations;
-	float m_positionError;
+    int m_bodyCount;
 
-	Island(int bodyCapacity, int contactCapacity, int jointCapacity) {
-		m_bodyCapacity = bodyCapacity;
-		m_contactCapacity = contactCapacity;
-		m_jointCapacity = jointCapacity;
-		m_bodyCount = 0;
-		m_contactCount = 0;
-		m_jointCount = 0;
+    int m_jointCount;
 
-		m_bodies = new Body[bodyCapacity];
-		m_contacts = new Contact[contactCapacity];
-		m_joints = new Joint[jointCapacity];
-		
-		for (int i=0; i<contactCapacity; i++){
-			m_contacts[i] = new NullContact();
-		}
-	}
+    int m_contactCount;
 
-	void Clear() {
-		m_bodyCount = 0;
-		m_contactCount = 0;
-		m_jointCount = 0;
-	}
+    int m_bodyCapacity;
 
-	void Solve(Vec2 gravity, int iterations, float dt) {
-		for (int i = 0; i < m_bodyCount; ++i) {
-			Body b = m_bodies[i];
+    int m_contactCapacity;
 
-			if (b.m_invMass == 0.0f)
-				continue;
+    int m_jointCapacity;
 
-			b.m_linearVelocity.addLocal((gravity
-					.add(b.m_force.mul(b.m_invMass))).mul(dt));
-			b.m_angularVelocity += dt * b.m_invI * b.m_torque;
-		}
+    int m_positionIterations;
 
-		float inv_dt = dt > 0.0f ? 1.0f / dt : 0.0f;
+    float m_positionError;
 
-		ContactSolver contactSolver = new ContactSolver(m_contacts,
-				m_contactCount, inv_dt);
+    Island(int bodyCapacity, int contactCapacity, int jointCapacity) {
+        m_bodyCapacity = bodyCapacity;
+        m_contactCapacity = contactCapacity;
+        m_jointCapacity = jointCapacity;
+        m_bodyCount = 0;
+        m_contactCount = 0;
+        m_jointCount = 0;
 
-		// Pre-solve
-		contactSolver.PreSolve();
+        m_bodies = new Body[bodyCapacity];
+        m_contacts = new Contact[contactCapacity];
+        m_joints = new Joint[jointCapacity];
 
-		for (int i = 0; i < m_jointCount; ++i) {
-			m_joints[i].PreSolve();
-		}
+        for (int i = 0; i < contactCapacity; i++) {
+            m_contacts[i] = new NullContact();
+        }
+    }
 
-		// Solve velocity constraints.
-		for (int i = 0; i < iterations; ++i) {
-			contactSolver.SolveVelocityConstraints();
+    void Clear() {
+        m_bodyCount = 0;
+        m_contactCount = 0;
+        m_jointCount = 0;
+    }
 
-			for (int j = 0; j < m_jointCount; ++j) {
-				m_joints[j].SolveVelocityConstraints(dt);
-			}
-		}
+    void Solve(Vec2 gravity, int iterations, float dt) {
+        for (int i = 0; i < m_bodyCount; ++i) {
+            Body b = m_bodies[i];
 
-		// Integrate positions.
-		for (int i = 0; i < m_bodyCount; ++i) {
-			Body b = m_bodies[i];
+            if (b.m_invMass == 0.0f)
+                continue;
 
-			b.m_position.addLocal(b.m_linearVelocity.mul(dt));
-			b.m_rotation += dt * b.m_angularVelocity;
+            b.m_linearVelocity.addLocal((gravity
+                    .add(b.m_force.mul(b.m_invMass))).mul(dt));
+            b.m_angularVelocity += dt * b.m_invI * b.m_torque;
+        }
 
-			b.m_R.set(b.m_rotation);
-		}
+        float inv_dt = dt > 0.0f ? 1.0f / dt : 0.0f;
 
-		// Solve position constraints.
-		if (World.s_enablePositionCorrection) {
-		    //System.out.println("position correcting");
-			for (m_positionIterations = 0; m_positionIterations < iterations; ++m_positionIterations) {
-			    //System.out.println(m_positionIterations);
-				boolean contactsOkay = contactSolver
-						.SolvePositionConstraints(Settings.contactBaumgarte);
+        ContactSolver contactSolver = new ContactSolver(m_contacts,
+                m_contactCount, inv_dt);
 
-				boolean jointsOkay = true;
-				for (int i = 0; i < m_jointCount; ++i) {
-					jointsOkay &= m_joints[i].SolvePositionConstraints();
-				}
+        // Pre-solve
+        contactSolver.PreSolve();
 
-				if (contactsOkay && jointsOkay) {
-					break;
-				}
-			}
-		}
+        for (int i = 0; i < m_jointCount; ++i) {
+            m_joints[i].PreSolve();
+        }
 
-		// Post-solve.
-		contactSolver.PostSolve();
+        // Solve velocity constraints.
+        for (int i = 0; i < iterations; ++i) {
+            contactSolver.SolveVelocityConstraints();
 
-		// Synchronize shapes and reset forces.
-		for (int i = 0; i < m_bodyCount; ++i) {
-			Body b = m_bodies[i];
-			b.SynchronizeShapes();
-			b.m_force.set(0.0f, 0.0f);
-			b.m_torque = 0.0f;
-		}
+            for (int j = 0; j < m_jointCount; ++j) {
+                m_joints[j].SolveVelocityConstraints(dt);
+            }
+        }
 
-	}
+        // Integrate positions.
+        for (int i = 0; i < m_bodyCount; ++i) {
+            Body b = m_bodies[i];
 
-	void UpdateSleep(float dt) {
-		float minSleepTime = Float.MAX_VALUE;
+            b.m_position.addLocal(b.m_linearVelocity.mul(dt));
+            b.m_rotation += dt * b.m_angularVelocity;
 
-		float linTolSqr = Settings.linearSleepTolerance
-				* Settings.linearSleepTolerance;
-		float angTolSqr = Settings.angularSleepTolerance
-				* Settings.angularSleepTolerance;
+            b.m_R.set(b.m_rotation);
+        }
 
-		for (int i = 0; i < m_bodyCount; ++i) {
-			Body b = m_bodies[i];
-			if (b.m_invMass == 0.0f) {
-				continue;
-			}
+        // Solve position constraints.
+        if (World.s_enablePositionCorrection) {
+            // System.out.println("position correcting");
+            for (m_positionIterations = 0; m_positionIterations < iterations; ++m_positionIterations) {
+                // System.out.println(m_positionIterations);
+                boolean contactsOkay = contactSolver
+                        .SolvePositionConstraints(Settings.contactBaumgarte);
 
-			if (b.m_allowSleep == false) {
-				b.m_sleepTime = 0.0f;
-				minSleepTime = 0.0f;
-			}
+                boolean jointsOkay = true;
+                for (int i = 0; i < m_jointCount; ++i) {
+                    jointsOkay &= m_joints[i].SolvePositionConstraints();
+                }
 
-			if (b.m_allowSleep == false
-					|| b.m_angularVelocity * b.m_angularVelocity > angTolSqr
-					|| Vec2.dot(b.m_linearVelocity, b.m_linearVelocity) > linTolSqr) {
-				b.m_sleepTime = 0.0f;
-				minSleepTime = 0.0f;
-			} else {
-				b.m_sleepTime += dt;
-				minSleepTime = Math.min(minSleepTime, b.m_sleepTime);
-			}
-		}
+                if (contactsOkay && jointsOkay) {
+                    break;
+                }
+            }
+        }
 
-		if (minSleepTime >= Settings.timeToSleep) {
-			for (int i = 0; i < m_bodyCount; ++i) {
-				Body b = m_bodies[i];
-				b.m_isSleeping = true;
-			}
-		}
-	}
+        // Post-solve.
+        contactSolver.PostSolve();
 
-	void Add(Body body) {
-		assert m_bodyCount < m_bodyCapacity;
-		m_bodies[m_bodyCount++] = body;
-	}
+        // Synchronize shapes and reset forces.
+        for (int i = 0; i < m_bodyCount; ++i) {
+            Body b = m_bodies[i];
+            b.SynchronizeShapes();
+            b.m_force.set(0.0f, 0.0f);
+            b.m_torque = 0.0f;
+        }
 
-	void Add(Contact contact) {
-		assert (m_contactCount < m_contactCapacity);
-		m_contacts[m_contactCount++] = contact.clone();
-	}
+    }
 
-	void Add(Joint joint) {
-		assert (m_jointCount < m_jointCapacity);
-		m_joints[m_jointCount++] = joint;
-	}
+    void UpdateSleep(float dt) {
+        float minSleepTime = Float.MAX_VALUE;
+
+        float linTolSqr = Settings.linearSleepTolerance
+                * Settings.linearSleepTolerance;
+        float angTolSqr = Settings.angularSleepTolerance
+                * Settings.angularSleepTolerance;
+
+        for (int i = 0; i < m_bodyCount; ++i) {
+            Body b = m_bodies[i];
+            if (b.m_invMass == 0.0f) {
+                continue;
+            }
+
+            if (b.m_allowSleep == false) {
+                b.m_sleepTime = 0.0f;
+                minSleepTime = 0.0f;
+            }
+
+            if (b.m_allowSleep == false
+                    || b.m_angularVelocity * b.m_angularVelocity > angTolSqr
+                    || Vec2.dot(b.m_linearVelocity, b.m_linearVelocity) > linTolSqr) {
+                b.m_sleepTime = 0.0f;
+                minSleepTime = 0.0f;
+            }
+            else {
+                b.m_sleepTime += dt;
+                minSleepTime = Math.min(minSleepTime, b.m_sleepTime);
+            }
+        }
+
+        if (minSleepTime >= Settings.timeToSleep) {
+            for (int i = 0; i < m_bodyCount; ++i) {
+                Body b = m_bodies[i];
+                b.m_isSleeping = true;
+            }
+        }
+    }
+
+    void Add(Body body) {
+        assert m_bodyCount < m_bodyCapacity;
+        m_bodies[m_bodyCount++] = body;
+    }
+
+    void Add(Contact contact) {
+        assert (m_contactCount < m_contactCapacity);
+        m_contacts[m_contactCount++] = contact.clone();
+    }
+
+    void Add(Joint joint) {
+        assert (m_jointCount < m_jointCapacity);
+        m_joints[m_jointCount++] = joint;
+    }
 }
