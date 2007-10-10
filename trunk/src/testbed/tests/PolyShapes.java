@@ -91,7 +91,6 @@ public class PolyShapes extends PTest {
     }
 
     void CreateBody(int index) {
-        // FIXME: bodies not colliding with ground
         if (bodies[bodyIndex] != null) {
             world.DestroyBody(bodies[bodyIndex]);
             bodies[bodyIndex] = null;

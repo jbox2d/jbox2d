@@ -71,11 +71,6 @@ public class Domino extends PTest {
                     world.CreateBody(bd);   
                 }
             }
-            //sd.friction = friction;
-            //bd.position = new Vec2(-10f,7.3f);
-            //world.CreateBody(bd);
-            //bd.position.x += 5f;
-            //world.CreateBody(bd);
         }
     }
 
