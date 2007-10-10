@@ -54,7 +54,7 @@ public class Domino extends PTest {
 
             float friction = .5f;
             int numPerRow = 25;
-            /*
+            
             for (int i = 0; i < 4; ++i) {
                 for (int j = 0; j < numPerRow; j++){
                     sd.friction = friction;
@@ -70,10 +70,10 @@ public class Domino extends PTest {
                     else bd.rotation = 0f;
                     world.CreateBody(bd);   
                 }
-            }*/
-            sd.friction = friction;
-            bd.position = new Vec2(-10f,7.3f);
-            world.CreateBody(bd);
+            }
+            //sd.friction = friction;
+            //bd.position = new Vec2(-10f,7.3f);
+            //world.CreateBody(bd);
             //bd.position.x += 5f;
             //world.CreateBody(bd);
         }
