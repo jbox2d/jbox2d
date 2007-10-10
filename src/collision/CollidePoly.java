@@ -239,6 +239,7 @@ public class CollidePoly {
         // Runs ~625 times per step
         // 625 * 84 = 52,500, out of ~95,000 total creations
         // Probably worth optimizing...
+        manif.pointCount = 0; //Fixed a problem with contacts
         MaxSeparation sepA = FindMaxSeparation(polyA, polyB);
         if (sepA.bestSeparation > 0.0f) {
             return;
@@ -319,7 +320,7 @@ public class CollidePoly {
         }
 
         // Now clipPoints2 contains the clipped points.
-        manif.normal = flip != 0 ? frontNormal.negate() : frontNormal;
+        manif.normal = flip != 0 ? frontNormal.negate() : frontNormal.clone();
 
         int pointCount = 0;
         for (int i = 0; i < Settings.maxManifoldPoints; ++i) {
@@ -329,8 +330,8 @@ public class CollidePoly {
             if (separation <= 0.0f) {
                 ContactPoint cp = manif.points[pointCount];
                 cp.separation = separation;
-                cp.position = clipPoints2[i].v;
-                cp.id = clipPoints2[i].id;
+                cp.position = clipPoints2[i].v.clone();
+                cp.id = new ContactID(clipPoints2[i].id);
                 cp.id.features.flip = flip;
                 ++pointCount;
             }

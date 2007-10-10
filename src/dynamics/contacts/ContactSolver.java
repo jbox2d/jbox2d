@@ -48,10 +48,8 @@ public class ContactSolver {
                 // manifolds) {
                 Manifold manifold = manifolds.get(j);
 
-                // assert (manifold.pointCount > 0):"Manifold "+j+" has length
-                // 0";
-                // if (manifold.pointCount == 0) System.out.println(contact);
-
+                assert (manifold.pointCount > 0):"Manifold "+j+" has length 0";
+               
                 Vec2 normal = manifold.normal.clone();
 
                 assert (count < m_constraintCount);
@@ -293,7 +291,7 @@ public class ContactSolver {
 
                 // b2.m_linearVelocity.addLocal(P.mul(invMass2));
                 b2.m_linearVelocity.x += px * invMass2;
-                b2.m_linearVelocity.x += py * invMass2;
+                b2.m_linearVelocity.y += py * invMass2;
                 // b2.m_angularVelocity += invI2 * Vec2.cross(r2, P);
                 b2.m_angularVelocity += invI2 * (r2x * py - r2y * px);
 

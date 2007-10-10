@@ -48,7 +48,7 @@ public class Pendulum extends PTest {
                 bd.position = new Vec2(0.5f + i, y);
                 Body body = world.CreateBody(bd);
 
-                jd.anchorPoint = new Vec2((float) i, y);
+                jd.anchorPoint = new Vec2(i, y);
                 jd.body1 = prevBody;
                 jd.body2 = body;
                 world.CreateJoint(jd);

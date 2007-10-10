@@ -13,6 +13,7 @@ public class ContactManager extends PairCallback {
     NullContact m_nullContact;
 
     ContactManager() {
+        m_nullContact = new NullContact();
     }
 
     public Object PairAdded(Object proxyUserData1, Object proxyUserData2) {

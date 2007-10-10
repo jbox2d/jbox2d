@@ -306,7 +306,7 @@ public abstract class PTest extends PApplet {
             for (int j = 0; j < m.pointCount; ++j) {
                 Vec2 v = m.points[j].position;
                 // g.fillOval((int) v.x, (int) v.y, 4, 4);
-                ellipse(v.x, v.y, 4, 4);
+                ellipse(v.x, v.y, 4f/scaleFactor, 4f/scaleFactor);
             }
         }
     }
@@ -403,6 +403,8 @@ public abstract class PTest extends PApplet {
         if (key == 'c') {
             normals = !normals;
             contacts = !contacts;
+            //settings.drawNormals = normals;
+            settings.drawContacts = contacts;
         }
         if (key == ' ') {
             LaunchBomb();
@@ -455,7 +457,6 @@ public abstract class PTest extends PApplet {
                     scaleFactor = max(.01f, scaleFactor / 1.05f);
                 }
                 Vec2 newCenter = screenToWorld(width/2.0f,height/2.0f);
-                //System.out.println(newCenter + " " +oldCenter);
                 transX -= (oldCenter.x-newCenter.x)*scaleFactor;
                 transY += (oldCenter.y-newCenter.y)*scaleFactor;
             }
@@ -469,7 +470,7 @@ public abstract class PTest extends PApplet {
         background(255);
         translate(transX, transY);
         scale(scaleFactor, -scaleFactor);
-        strokeWeight(1.0f / scaleFactor);
+        strokeWeight(1.2f / scaleFactor);
 
         mouseWorld = screenToWorld(mouseX, mouseY);
         // System.out.println(mouseButton);
