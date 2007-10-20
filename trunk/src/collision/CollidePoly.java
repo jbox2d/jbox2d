@@ -37,10 +37,6 @@ public class CollidePoly {
             // Find intersection point of edge and plane
             float interp = distance0 / (distance0 - distance1);
             vOut[numOut] = new ClipVertex();
-            // ewj: vector already created in new ClipVertex()
-            // Math inlined to optimize - shouldn't change much.
-            // vOut[numOut].v =
-            // vIn[0].v.add((vIn[1].v.sub(vIn[0].v)).mul(interp));
             vOut[numOut].v.x = vIn[0].v.x + interp * (vIn[1].v.x - vIn[0].v.x);
             vOut[numOut].v.y = vIn[0].v.y + interp * (vIn[1].v.y - vIn[0].v.y);
 
@@ -238,7 +234,7 @@ public class CollidePoly {
         // (Some from called functions)
         // Runs ~625 times per step
         // 625 * 84 = 52,500, out of ~95,000 total creations
-        // Probably worth optimizing...
+        // TODO Probably worth optimizing...
         manif.pointCount = 0; // Fixed a problem with contacts
         MaxSeparation sepA = findMaxSeparation(polyA, polyB);
         if (sepA.bestSeparation > 0.0f) {
