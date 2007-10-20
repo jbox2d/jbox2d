@@ -142,6 +142,11 @@ public abstract class PTest extends PApplet {
     }
 
     void LaunchBomb() {
+        if (m_bomb != null && m_bomb.isFrozen()) {
+            m_world.destroyBody(m_bomb);
+            m_world.cleanBodyList();
+            m_bomb = null;
+        }
         if (m_bomb == null) {
             BoxDef sd = new BoxDef();
             float a = 0.5f;
@@ -178,16 +183,16 @@ public abstract class PTest extends PApplet {
         for (Body b = m_world.m_bodyList; b != null; b = b.m_next) {
             for (Shape s = b.m_shapeList; s != null; s = s.m_next) {
                 if (b.m_invMass == 0.0f) {
-                    DrawShape(s, color(0.5f, 0.9f, 0.5f));
+                    DrawShape(s, color(100, 100, 100));
                 }
                 else if (b.isSleeping()) {
-                    DrawShape(s, color(0.5f, 0.5f, 0.9f));
+                    DrawShape(s, color(30, 30, 90));
                 }
                 else if (b == m_bomb) {
-                    DrawShape(s, color(0.9f, 0.9f, 0.4f));
+                    DrawShape(s, color(255, 0, 0));
                 }
                 else {
-                    DrawShape(s, color(0.1f, 0.1f, 0.1f));
+                    DrawShape(s, color(30, 30, 30));
 
                 }
             }
@@ -303,6 +308,12 @@ public abstract class PTest extends PApplet {
             PulleyJoint pj = (PulleyJoint) joint;
             line(x1.x, x1.y, pj.m_groundAnchor1.x, pj.m_groundAnchor1.y);
             line(x2.x, x2.y, pj.m_groundAnchor2.x, pj.m_groundAnchor2.y);
+        }
+        else if (joint.m_type == JointType.PRISMATIC_JOINT) {
+            // TODO: draw Prismatic Joint
+        }
+        else if (joint.m_type == JointType.GEAR_JOINT) {
+            // TODO?: draw Gear Joint? (not much to draw...)
         }
         else {
             line(x1.x, x1.y, p1.x, p1.y);
