@@ -31,7 +31,7 @@ public class Jacobian {
         angular2 = a2;
     }
 
-    float Compute(Vec2 x1, float a1, Vec2 x2, float a2) {
+    float compute(Vec2 x1, float a1, Vec2 x2, float a2) {
         return Vec2.dot(linear1, x1) + angular1 * a1 + Vec2.dot(linear2, x2)
                 + angular2 * a2;
     }

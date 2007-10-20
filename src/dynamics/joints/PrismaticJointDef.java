@@ -20,7 +20,7 @@ public class PrismaticJointDef extends JointDef {
     public boolean enableMotor;
 
     public PrismaticJointDef() {
-        type = JointType.prismaticJoint;
+        type = JointType.PRISMATIC_JOINT;
         anchorPoint = new Vec2(0.0f, 0.0f);
         axis = new Vec2(1.0f, 0.0f);
         lowerTranslation = 0.0f;

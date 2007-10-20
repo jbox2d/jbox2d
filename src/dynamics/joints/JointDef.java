@@ -8,17 +8,16 @@ public class JointDef {
     public Body body1;
 
     public Body body2;
-    
+
     public Object userData;
-    
+
     public boolean collideConnected;
 
     public JointDef() {
-        type = JointType.unknownJoint;
+        type = JointType.UNKNOWN_JOINT;
         body1 = null;
         body2 = null;
         userData = null;
         collideConnected = false;
     }
-
 }

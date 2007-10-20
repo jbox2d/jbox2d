@@ -12,11 +12,10 @@ public class MouseDef extends JointDef {
     public float length;
 
     public MouseDef() {
-        type = JointType.mouseJoint;
+        type = JointType.MOUSE_JOINT;
         target = new Vec2(0.0f, 0.0f);
         motorForce = 0.0f;
         beta = 0.2f;
         length = 1.0f;
     }
-
 }

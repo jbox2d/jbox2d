@@ -37,26 +37,26 @@ public class DistanceJoint extends Joint {
     }
 
     @Override
-    public Vec2 GetAnchor1() {
+    public Vec2 getAnchor1() {
         return m_body1.m_position.add(m_body1.m_R.mul(m_localAnchor1));
     }
 
     @Override
-    public Vec2 GetAnchor2() {
+    public Vec2 getAnchor2() {
         return m_body2.m_position.add(m_body2.m_R.mul(m_localAnchor2));
     }
-    
-    public Vec2 GetReactionForce(float invTimeStep) {
-        Vec2 F = m_u.mul(m_impulse*invTimeStep);
+
+    public Vec2 getReactionForce(float invTimeStep) {
+        Vec2 F = m_u.mul(m_impulse * invTimeStep);
         return F;
     }
-    
-    public float GetReactionTorque(float invTimeStep) {
+
+    public float getReactionTorque(float invTimeStep) {
         return 0.0f;
     }
 
     @Override
-    public void PreSolve() {
+    public void preSolve() {
         // Compute the effective mass matrix.
         Vec2 r1 = m_body1.m_R.mul(m_localAnchor1);
         Vec2 r2 = m_body2.m_R.mul(m_localAnchor2);
@@ -83,7 +83,7 @@ public class DistanceJoint extends Joint {
 
         m_mass = 1.0f / m_mass;
 
-        if (World.s_enableWarmStarting) {
+        if (World.ENABLE_WARM_STARTING) {
             // Warm starting.
             Vec2 p = m_u.mul(m_impulse);
 
@@ -98,7 +98,7 @@ public class DistanceJoint extends Joint {
     }
 
     @Override
-    public boolean SolvePositionConstraints() {
+    public boolean solvePositionConstraints() {
         Vec2 r1 = m_body1.m_R.mul(m_localAnchor1);
         Vec2 r2 = m_body2.m_R.mul(m_localAnchor2);
         // Vec2 d = m_body2.m_position.add(r2).sub(m_body1.m_position).sub(r1);
@@ -115,14 +115,14 @@ public class DistanceJoint extends Joint {
         m_body2.m_position.addLocal(P.mul(m_body2.m_invMass));
         m_body2.m_rotation += m_body2.m_invI * Vec2.cross(r2, P);
 
-        m_body1.m_R.set(m_body1.m_rotation);
-        m_body2.m_R.set(m_body2.m_rotation);
+        m_body1.m_R.setAngle(m_body1.m_rotation);
+        m_body2.m_R.setAngle(m_body2.m_rotation);
 
         return Math.abs(c) < Settings.linearSlop;
     }
 
     @Override
-    public void SolveVelocityConstraints(float dt) {
+    public void solveVelocityConstraints(float dt) {
         Vec2 r1 = m_body1.m_R.mul(m_localAnchor1);
         Vec2 r2 = m_body2.m_R.mul(m_localAnchor2);
 
