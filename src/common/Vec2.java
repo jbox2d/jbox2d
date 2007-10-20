@@ -22,6 +22,11 @@ public class Vec2 {
         this.x = x;
         this.y = y;
     }
+    
+    public void set(Vec2 v) {
+        this.x = v.x;
+        this.y = v.y;
+    }
 
     public Vec2 add(Vec2 v) {
         return new Vec2(x + v.x, y + v.y);
@@ -67,10 +72,15 @@ public class Vec2 {
         return (float) Math.sqrt(x * x + y * y);
     }
 
-    public void normalize() {
-        float invLength = 1.0f / length();
+    public float normalize() {
+        float length = length();
+        if (length < Settings.EPSILON) {
+            return 0f;
+        }
+        float invLength = 1.0f / length;
         x *= invLength;
         y *= invLength;
+        return length;
     }
 
     public boolean isValid() {

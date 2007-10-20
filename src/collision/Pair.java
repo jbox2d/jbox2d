@@ -1,9 +1,9 @@
 package collision;
 
 public class Pair implements Comparable<Pair> {
-    private static final int e_bufferedPair = 0x0001;
+    private static final int e_pairBuffered = 0x0001;
 
-    private static final int e_removePair = 0x0002;
+    private static final int e_pairRemoved = 0x0002;
 
     private static final int e_pairReceived = 0x0004;
 
@@ -30,27 +30,27 @@ public class Pair implements Comparable<Pair> {
     }
 
     public void SetBuffered() {
-        status |= e_bufferedPair;
+        status |= e_pairBuffered;
     }
 
     public void ClearBuffered() {
-        status &= ~e_bufferedPair;
+        status &= ~e_pairBuffered;
     }
 
     public boolean IsBuffered() {
-        return (status & e_bufferedPair) != 0;
+        return (status & e_pairBuffered) == e_pairBuffered;
     }
 
-    public void SetAdded() {
-        status &= ~e_removePair;
+    public void ClearRemoved() {
+        status &= ~e_pairRemoved;
     }
 
     public void SetRemoved() {
-        status |= e_removePair;
+        status |= e_pairRemoved;
     }
 
     public boolean IsRemoved() {
-        return (status & e_removePair) == e_removePair;
+        return (status & e_pairRemoved) == e_pairRemoved;
     }
 
     public void SetReceived() {

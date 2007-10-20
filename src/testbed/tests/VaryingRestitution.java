@@ -2,12 +2,12 @@ package testbed.tests;
 
 import processing.core.PApplet;
 import testbed.PTest;
-import collision.ShapeDescription;
-import collision.ShapeType;
+import collision.BoxDef;
+import collision.CircleDef;
 
 import common.Vec2;
 
-import dynamics.BodyDescription;
+import dynamics.BodyDef;
 import dynamics.World;
 
 public class VaryingRestitution extends PTest {
@@ -19,32 +19,22 @@ public class VaryingRestitution extends PTest {
     @Override
     public void go(World world) {
         {
-            ShapeDescription sd = new ShapeDescription(ShapeType.BOX_SHAPE);
-            sd.box.m_extents = new Vec2(50.0f, 10.0f);
+            BoxDef sd = new BoxDef();
+            sd.extents = new Vec2(50.0f, 10.0f);
 
-            BodyDescription bd = new BodyDescription();
+            BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
             bd.addShape(sd);
             world.CreateBody(bd);
         }
 
         {
-            ShapeDescription sd = new ShapeDescription(ShapeType.POLY_SHAPE);
+            CircleDef sd = new CircleDef();;
             // sd.poly.m_vertexCount = 8;
-            float w = 1.5f;
-            float b = w / (2.0f + (float) Math.sqrt(2.0f));
-            float s = (float) Math.sqrt(2.0f) * b;
-            sd.poly.m_vertices.add(new Vec2(0.5f * s, 0.0f));
-            sd.poly.m_vertices.add(new Vec2(0.5f * w, b));
-            sd.poly.m_vertices.add(new Vec2(0.5f * w, b + s));
-            sd.poly.m_vertices.add(new Vec2(0.5f * s, w));
-            sd.poly.m_vertices.add(new Vec2(-0.5f * s, w));
-            sd.poly.m_vertices.add(new Vec2(-0.5f * w, b + s));
-            sd.poly.m_vertices.add(new Vec2(-0.5f * w, b));
-            sd.poly.m_vertices.add(new Vec2(-0.5f * s, 0.0f));
+            sd.radius = .6f;
             sd.density = 5.0f;
 
-            BodyDescription bd = new BodyDescription();
+            BodyDef bd = new BodyDef();
             bd.addShape(sd);
 
             float restitution[] = new float[] { 0.0f, 0.1f, 0.3f, 0.5f, 0.75f,

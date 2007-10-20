@@ -4,13 +4,16 @@ import java.util.Random;
 
 import processing.core.PApplet;
 import testbed.PTest;
-import collision.ShapeDescription;
+import collision.BoxDef;
+import collision.PolyDef;
+import collision.CircleDef;
+import collision.ShapeDef;
 import collision.ShapeType;
 
 import common.Vec2;
 
 import dynamics.Body;
-import dynamics.BodyDescription;
+import dynamics.BodyDef;
 import dynamics.World;
 
 public class PolyShapes extends PTest {
@@ -19,7 +22,7 @@ public class PolyShapes extends PTest {
 
     Body bodies[];
 
-    ShapeDescription sds[];
+    ShapeDef sds[];
 
     World world;
 
@@ -27,7 +30,7 @@ public class PolyShapes extends PTest {
         super("PolyShapes");
 
         bodies = new Body[256];
-        sds = new ShapeDescription[4];
+        sds = new ShapeDef[4];
     }
 
     @Override
@@ -35,56 +38,50 @@ public class PolyShapes extends PTest {
         this.world = world;
         // Ground body
         {
-            ShapeDescription sd = new ShapeDescription(ShapeType.BOX_SHAPE);
-            sd.box.m_extents = new Vec2(50.0f, 10.0f);
+            BoxDef sd = new BoxDef();
+            sd.extents = new Vec2(50.0f, 10.0f);
             sd.friction = 0.3f;
 
-            BodyDescription bd = new BodyDescription();
+            BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
             bd.addShape(sd);
             world.CreateBody(bd);
         }
 
-        sds[0] = new ShapeDescription(ShapeType.POLY_SHAPE);
+        sds[0] = new PolyDef();
+        PolyDef poly = (PolyDef)sds[0];
         // sds[0].poly.m_vertexCount = 3;
-        sds[0].poly.m_vertices.add(new Vec2(-0.5f, 0.0f));
-        sds[0].poly.m_vertices.add(new Vec2(0.5f, 0.0f));
-        sds[0].poly.m_vertices.add(new Vec2(0.0f, 1.5f));
-        sds[0].density = 1.0f;
-        sds[0].friction = 0.3f;
+        poly.vertices.add(new Vec2(-0.5f, 0.0f));
+        poly.vertices.add(new Vec2(0.5f, 0.0f));
+        poly.vertices.add(new Vec2(0.0f, 1.5f));
+        poly.density = 1.0f;
+        poly.friction = 0.3f;
 
-        sds[1] = new ShapeDescription(ShapeType.POLY_SHAPE);
+        sds[1] = new PolyDef();
+        PolyDef poly2 = (PolyDef)sds[1];
         // sds[1].poly.m_vertexCount = 3;
-        sds[1].poly.m_vertices.add(new Vec2(-0.1f, 0.0f));
-        sds[1].poly.m_vertices.add(new Vec2(0.1f, 0.0f));
-        sds[1].poly.m_vertices.add(new Vec2(0.0f, 1.5f));
-        sds[1].density = 1.0f;
-        sds[1].friction = 0.3f;
+        poly2.vertices.add(new Vec2(-0.1f, 0.0f));
+        poly2.vertices.add(new Vec2(0.1f, 0.0f));
+        poly2.vertices.add(new Vec2(0.0f, 1.5f));
+        poly2.density = 1.0f;
+        poly2.friction = 0.3f;
 
-        sds[2] = new ShapeDescription(ShapeType.POLY_SHAPE);
+        sds[2] = new CircleDef();
+        CircleDef circ = (CircleDef)sds[2];
         // sds[2].poly.m_vertexCount = 8;
-        float w = 1.0f;
-        float b = w / (2.0f + (float) Math.sqrt(2.0f));
-        float s = (float) Math.sqrt(2.0f) * b;
-        sds[2].poly.m_vertices.add(new Vec2(0.5f * s, 0.0f));
-        sds[2].poly.m_vertices.add(new Vec2(0.5f * w, b));
-        sds[2].poly.m_vertices.add(new Vec2(0.5f * w, b + s));
-        sds[2].poly.m_vertices.add(new Vec2(0.5f * s, w));
-        sds[2].poly.m_vertices.add(new Vec2(-0.5f * s, w));
-        sds[2].poly.m_vertices.add(new Vec2(-0.5f * w, b + s));
-        sds[2].poly.m_vertices.add(new Vec2(-0.5f * w, b));
-        sds[2].poly.m_vertices.add(new Vec2(-0.5f * s, 0.0f));
-        sds[2].density = 1.0f;
-        sds[2].friction = 0.3f;
+        circ.radius = .6f;
+        circ.density = 1.0f;
+        circ.friction = 0.3f;
 
-        sds[3] = new ShapeDescription(ShapeType.POLY_SHAPE);
+        sds[3] = new PolyDef();
+        PolyDef poly3 = (PolyDef)sds[3];
         // sds[3].poly.m_vertexCount = 4;
-        sds[3].poly.m_vertices.add(new Vec2(-0.5f, 0.0f));
-        sds[3].poly.m_vertices.add(new Vec2(0.5f, 0.0f));
-        sds[3].poly.m_vertices.add(new Vec2(0.5f, 1.0f));
-        sds[3].poly.m_vertices.add(new Vec2(-0.5f, 1.0f));
-        sds[3].density = 1.0f;
-        sds[3].friction = 0.3f;
+        poly3.vertices.add(new Vec2(-0.5f, 0.0f));
+        poly3.vertices.add(new Vec2(0.5f, 0.0f));
+        poly3.vertices.add(new Vec2(0.5f, 1.0f));
+        poly3.vertices.add(new Vec2(-0.5f, 1.0f));
+        poly3.density = 1.0f;
+        poly3.friction = 0.3f;
 
         bodyIndex = 0;
         // memset(bodies, 0, sizeof(bodies));
@@ -98,7 +95,7 @@ public class PolyShapes extends PTest {
 
         Random r = new Random();
 
-        BodyDescription bd = new BodyDescription();
+        BodyDef bd = new BodyDef();
         bd.addShape(sds[index]);
         float x = r.nextFloat() * 4 - 2;
         bd.position = new Vec2(x, 10.0f);

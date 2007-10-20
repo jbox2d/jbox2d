@@ -37,7 +37,7 @@ public class MouseJoint extends Joint {
 
     float m_beta;
 
-    public MouseJoint(MouseDescription description) {
+    public MouseJoint(MouseDef description) {
         super(description);
         m_target = description.target;
         m_localAnchor = m_body2.m_R.mulT(m_target.sub(m_body2.m_position));

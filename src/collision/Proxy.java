@@ -2,12 +2,14 @@ package collision;
 
 public class Proxy {
     public int lowerBounds[];
-
     public int upperBounds[];
 
     int overlapCount;
-
     int timeStamp;
+    
+    int categoryBits;
+    int maskBits;
+    int groupIndex;
 
     Object userData;
 

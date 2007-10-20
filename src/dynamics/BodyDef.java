@@ -1,13 +1,15 @@
 package dynamics;
 
-import collision.ShapeDescription;
+import collision.ShapeDef;
 
 import common.Settings;
 import common.Vec2;
 
-public class BodyDescription {
+public class BodyDef {
+    
+    public Object userData;
 
-    public ShapeDescription[] shapes;
+    public ShapeDef[] shapes;
 
     public Vec2 position;
 
@@ -20,18 +22,22 @@ public class BodyDescription {
     public boolean allowSleep;
 
     public boolean isSleeping;
+    
+    public boolean preventRotation;
 
-    public BodyDescription() {
-        shapes = new ShapeDescription[Settings.maxShapesPerBody];
+    public BodyDef() {
+        userData = null;
+        shapes = new ShapeDef[Settings.maxShapesPerBody];
         position = new Vec2(0.0f, 0.0f);
         rotation = 0.0f;
         linearVelocity = new Vec2(0.0f, 0.0f);
         angularVelocity = 0.0f;
         allowSleep = true;
         isSleeping = false;
+        preventRotation = false;
     }
 
-    public void addShape(ShapeDescription shape) {
+    public void addShape(ShapeDef shape) {
         for (int i = 0; i < Settings.maxShapesPerBody; ++i) {
             if (shapes[i] == null) {
                 shapes[i] = shape;

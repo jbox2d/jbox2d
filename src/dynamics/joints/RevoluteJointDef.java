@@ -2,7 +2,7 @@ package dynamics.joints;
 
 import common.Vec2;
 
-public class RevoluteDescription extends JointDescription {
+public class RevoluteJointDef extends JointDef {
 
     public Vec2 anchorPoint;
 
@@ -18,7 +18,7 @@ public class RevoluteDescription extends JointDescription {
 
     public boolean enableMotor;
 
-    public RevoluteDescription() {
+    public RevoluteJointDef() {
         type = JointType.revoluteJoint;
         anchorPoint = new Vec2(0.0f, 0.0f);
         lowerAngle = 0.0f;

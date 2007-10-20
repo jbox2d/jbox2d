@@ -2,15 +2,14 @@ package testbed.tests;
 
 import processing.core.PApplet;
 import testbed.PTest;
-import collision.ShapeDescription;
-import collision.ShapeType;
+import collision.BoxDef;
 
 import common.Vec2;
 
 import dynamics.Body;
-import dynamics.BodyDescription;
+import dynamics.BodyDef;
 import dynamics.World;
-import dynamics.joints.DistanceJointDescription;
+import dynamics.joints.DistanceJointDef;
 import dynamics.joints.Joint;
 
 public class Web extends PTest {
@@ -27,21 +26,21 @@ public class Web extends PTest {
 
         Body ground;
         {
-            ShapeDescription sd = new ShapeDescription(ShapeType.BOX_SHAPE);
-            sd.box.m_extents = new Vec2(50.0f, 10.0f);
+            BoxDef sd = new BoxDef();
+            sd.extents = new Vec2(50.0f, 10.0f);
 
-            BodyDescription bd = new BodyDescription();
+            BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
             bd.addShape(sd);
             ground = m_world.CreateBody(bd);
         }
 
-        ShapeDescription sd = new ShapeDescription(ShapeType.BOX_SHAPE);
-        sd.box.m_extents = new Vec2(0.5f, 0.5f);
+        BoxDef sd = new BoxDef();
+        sd.extents = new Vec2(0.5f, 0.5f);
         sd.density = 5.0f;
         sd.friction = 0.2f;
 
-        BodyDescription bd = new BodyDescription();
+        BodyDef bd = new BodyDef();
         bd.addShape(sd);
 
         bd.position = new Vec2(-5.0f, 5.0f);
@@ -56,7 +55,7 @@ public class Web extends PTest {
         bd.position = new Vec2(-5.0f, 15.0f);
         Body b4 = world.CreateBody(bd);
 
-        DistanceJointDescription jd = new DistanceJointDescription();
+        DistanceJointDef jd = new DistanceJointDef();
 
         jd.body1 = ground;
         jd.body2 = b1;

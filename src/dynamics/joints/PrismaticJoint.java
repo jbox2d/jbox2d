@@ -64,7 +64,7 @@ public class PrismaticJoint extends Joint {
 
     LimitState m_limitState;
 
-    public PrismaticJoint(PrismaticJointDescription description) {
+    public PrismaticJoint(PrismaticJointDef description) {
         super(description);
         m_localAnchor1 = m_body1.m_R.mulT(description.anchorPoint
                 .sub(m_body1.m_position));

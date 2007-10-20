@@ -5,63 +5,35 @@ import java.util.List;
 
 import common.Vec2;
 
-public class ShapeDescription {
+public class ShapeDef {
     public ShapeType type;
 
     public Vec2 localPosition;
-
     public float localRotation;
 
     public float friction;
-
     public float restitution;
-
     public float density;
+    
+    public Object userData;
+    
+    public int categoryBits;
+    public int maskBits;
+    public int groupIndex;
 
-    // TODO union
-    // {
-    public BoxData box;
-
-    public CircleData circle;
-
-    public PolyData poly;
-
-    // };
-
-    public ShapeDescription() {
+    public ShapeDef() {
         // System.out.println("Unknown");
-        this(ShapeType.UNKNOWN_SHAPE);
-    }
-
-    public ShapeDescription(ShapeType s) {
-        this.type = s;
-        switch (s) {
-        case CIRCLE_SHAPE:
-            // System.out.println("circ");
-            circle = new CircleData();
-            break;
-
-        case BOX_SHAPE:
-            // System.out.println("box");
-            box = new BoxData();
-            break;
-
-        case POLY_SHAPE:
-            // System.out.println("poly");
-            poly = new PolyData();
-            break;
-
-        default:
-            circle = new CircleData();
-            box = new BoxData();
-            poly = new PolyData();
-        }
-
-        localPosition = new Vec2(0.0f, 0.0f);
+        //this(ShapeType.UNKNOWN_SHAPE);
+        type = ShapeType.UNKNOWN_SHAPE;
+        userData = null;
+        localPosition = new Vec2();
         localRotation = 0.0f;
         friction = 0.2f;
         restitution = 0.0f;
         density = 0.0f;
+        categoryBits = 0x0001;
+        maskBits = 0xFFFF;
+        groupIndex = 0;
     }
 
     public void computeMass(MassData massData) {
@@ -73,21 +45,24 @@ public class ShapeDescription {
 
         switch (type) {
         case CIRCLE_SHAPE:
-            massData.mass = (float) (density * Math.PI * circle.m_radius * circle.m_radius);
+            CircleDef circle = (CircleDef)this;
+            massData.mass = (float) (density * Math.PI * circle.radius * circle.radius);
             massData.center.set(0.0f, 0.0f);
-            massData.I = 0.5f * (massData.mass) * circle.m_radius
-                    * circle.m_radius;
+            massData.I = 0.5f * (massData.mass) * circle.radius
+                    * circle.radius;
             break;
 
         case BOX_SHAPE:
-            massData.mass = 4.0f * density * box.m_extents.x * box.m_extents.y;
+            BoxDef box = (BoxDef)this;
+            massData.mass = 4.0f * density * box.extents.x * box.extents.y;
             massData.center.set(0.0f, 0.0f);
             massData.I = massData.mass / 3.0f
-                    * Vec2.dot(box.m_extents, box.m_extents);
+                    * Vec2.dot(box.extents, box.extents);
             break;
 
         case POLY_SHAPE:
-            PolyMass(massData, poly.m_vertices, density);
+            PolyDef poly = (PolyDef)this;
+            PolyMass(massData, poly.vertices, density);
             break;
 
         default:
@@ -107,20 +82,20 @@ public class ShapeDescription {
         float area = 0.0f;
         float I = 0.0f;
 
-        Vec2 a = new Vec2(0.0f, 0.0f);
+        Vec2 pRef = new Vec2(0.0f, 0.0f);
 
         // #if 0 XXX ?
         // for (int i = 0; i < count; ++i) {
-        // a.addLocal(vs.get(i));
+        // pRef.addLocal(vs.get(i));
         // }
-        // a.mulLocal(1.0f / count);
+        // pRef.mulLocal(1.0f / count);
         // #endif XXX ?
 
         final float inv3 = 1.0f / 3.0f;
 
         for (int i = 0; i < vs.size(); ++i) {
             // Triangle vertices.
-            Vec2 p1 = a;
+            Vec2 p1 = pRef.clone();
             Vec2 p2 = vs.get(i);
             Vec2 p3 = i + 1 < count ? vs.get(i + 1) : vs.get(0);
 
@@ -163,33 +138,4 @@ public class ShapeDescription {
         massData.I = I;
     }
 
-    public class BoxData {
-        public Vec2 m_extents;
-
-        public BoxData() {
-            m_extents = new Vec2();
-        }
-
-    };
-
-    public class CircleData {
-        public float m_radius;
-
-        public CircleData() {
-
-        }
-    };
-
-    // Convex polygon, vertices must be in CCW order.
-    public class PolyData {
-        public List<Vec2> m_vertices;
-
-        // b2Vec2 m_vertices[b2_maxPolyVertices];
-        // int32 m_vertexCount;
-
-        public PolyData() {
-            m_vertices = new ArrayList<Vec2>();
-        }
-
-    };
 }

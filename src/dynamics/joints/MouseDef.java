@@ -2,7 +2,7 @@ package dynamics.joints;
 
 import common.Vec2;
 
-public class MouseDescription extends JointDescription {
+public class MouseDef extends JointDef {
     public Vec2 target;
 
     public float beta;
@@ -11,7 +11,7 @@ public class MouseDescription extends JointDescription {
 
     public float length;
 
-    public MouseDescription() {
+    public MouseDef() {
         type = JointType.mouseJoint;
         target = new Vec2(0.0f, 0.0f);
         motorForce = 0.0f;
