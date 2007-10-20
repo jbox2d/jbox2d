@@ -120,12 +120,6 @@ public class PolyShapes extends PTest {
         }
     }
 
-    /*
-     * @Override protected void renderGUI(Graphics2D g) { super.renderGUI(g);
-     * g.drawString("Press 1-4 to drop stuff", 5, m_textLine); // m_textLine +=
-     * 15; }
-     */
-
     public static void main(String[] args) {
         // new PolyShapes().start();
         PApplet.main(new String[] { "testbed.tests.PolyShapes" });
