@@ -1,6 +1,7 @@
 package testbed;
 
 import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.Random;
 
 import processing.core.PApplet;
@@ -465,7 +466,7 @@ public abstract class PTest extends PApplet {
         pmousePressed = false;
         settings = new TestSettings();
 
-        addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+        addMouseWheelListener(new MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 int notches = e.getWheelRotation();
                 Vec2 oldCenter = screenToWorld(width / 2.0f, height / 2.0f);
@@ -518,8 +519,9 @@ public abstract class PTest extends PApplet {
         // update data model
         Step(settings);
 
-        if (keyDown['d'])
+        if (keyDown['d']) {
             System.out.println(debugCount);
+        }
 
         if (needsReset) {
             // XXX m_world.clear();

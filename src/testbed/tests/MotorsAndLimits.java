@@ -130,16 +130,6 @@ public class MotorsAndLimits extends PTest {
         }
     }
 
-    /*
-     * @Override protected void renderGUI(Graphics2D g) { super.renderGUI(g); //
-     * g.drawString(5, m_textLine, // "Keys: l - limits, m - motors, p -
-     * prismatic speed"); // m_textLine += 15; // float torque1 =
-     * m_joint1.GetMotorTorque(settings.hz); // float torque2 =
-     * m_joint2.GetMotorTorque(settings.hz); // float force3 =
-     * m_joint3.GetMotorForce(settings.hz); // g.drawString(5, m_textLine, //
-     * "Motor Torque = %4.0f, %4.0f : Motor Force = %4.0f", torque1, // torque2,
-     * force3); // m_textLine += 15; }
-     */
     /**
      * Entry point
      */
