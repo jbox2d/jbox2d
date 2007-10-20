@@ -58,9 +58,9 @@ public class Web extends PTest {
         DistanceJointDef jd = new DistanceJointDef();
 
         jd.body1 = ground;
-        jd.body2 = b3;
-        jd.anchorPoint1 = new Vec2(10.0f, 20.0f);
-        jd.anchorPoint2 = b3.m_position.add(new Vec2(0.5f, 0.5f));
+        jd.body2 = b2;
+        jd.anchorPoint1 = new Vec2(10.0f, 0.0f);
+        jd.anchorPoint2 = b2.m_position.add(new Vec2(0.5f, -0.5f));
         m_joints[0] = world.createJoint(jd);
 
         jd.body1 = ground;
@@ -76,9 +76,9 @@ public class Web extends PTest {
         m_joints[2] = world.createJoint(jd);
 
         jd.body1 = ground;
-        jd.body2 = b2;
-        jd.anchorPoint1 = new Vec2(10.0f, 0.0f);
-        jd.anchorPoint2 = b2.m_position.add(new Vec2(0.5f, -0.5f));
+        jd.body2 = b3;
+        jd.anchorPoint1 = new Vec2(10.0f, 20.0f);
+        jd.anchorPoint2 = b3.m_position.add(new Vec2(0.5f, 0.5f));
         m_joints[3] = world.createJoint(jd);
 
         jd.body1 = b1;
