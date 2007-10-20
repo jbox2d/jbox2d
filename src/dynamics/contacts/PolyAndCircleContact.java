@@ -3,9 +3,12 @@ package dynamics.contacts;
 import java.util.ArrayList;
 import java.util.List;
 
-import dynamics.contacts.Contact;
+import collision.CircleShape;
+import collision.CollideCircle;
 import collision.Manifold;
-import collision.*;
+import collision.PolyShape;
+import collision.Shape;
+import collision.ShapeType;
 
 class PolyAndCircleContact extends Contact implements ContactCreator {
 
@@ -13,15 +16,15 @@ class PolyAndCircleContact extends Contact implements ContactCreator {
 
     public PolyAndCircleContact(Shape s1, Shape s2) {
         super(s1, s2);
-        assert(m_shape1.m_type == ShapeType.POLY_SHAPE);
-        assert(m_shape2.m_type == ShapeType.CIRCLE_SHAPE);
+        assert (m_shape1.m_type == ShapeType.POLY_SHAPE);
+        assert (m_shape2.m_type == ShapeType.CIRCLE_SHAPE);
         m_manifold = new Manifold();
         m_manifoldCount = 0;
         // These should not be necessary, manifold was
         // just created...
-        //m_manifold.pointCount = 0;
-        //m_manifold.points[0].normalImpulse = 0.0f;
-        //m_manifold.points[0].tangentImpulse = 0.0f;
+        // m_manifold.pointCount = 0;
+        // m_manifold.points[0].normalImpulse = 0.0f;
+        // m_manifold.points[0].tangentImpulse = 0.0f;
     }
 
     public PolyAndCircleContact() {
@@ -31,7 +34,8 @@ class PolyAndCircleContact extends Contact implements ContactCreator {
     }
 
     public Contact clone() {
-        PolyAndCircleContact newC = new PolyAndCircleContact(this.m_shape1, this.m_shape2);
+        PolyAndCircleContact newC = new PolyAndCircleContact(this.m_shape1,
+                this.m_shape2);
         newC.m_manifold = new Manifold(this.m_manifold);
         newC.m_manifoldCount = this.m_manifoldCount;
         // The parent world.
@@ -52,11 +56,10 @@ class PolyAndCircleContact extends Contact implements ContactCreator {
         newC.m_flags = this.m_flags;
         return newC;
     }
-    
+
     public Contact create(Shape shape1, Shape shape2) {
-        return new PolyAndCircleContact(shape1,shape2);
+        return new PolyAndCircleContact(shape1, shape2);
     }
-    
 
     @Override
     public List<Manifold> GetManifolds() {
@@ -66,14 +69,16 @@ class PolyAndCircleContact extends Contact implements ContactCreator {
         }
         return ret;
     }
-    
-    public void Evaluate() {
-        //System.out.println("PolyAndCircleContact.Evaluate()");
-        CollideCircle.b2CollidePolyAndCircle(m_manifold,(PolyShape)m_shape1,(CircleShape)m_shape2);
-        
+
+    public void evaluate() {
+        // System.out.println("PolyAndCircleContact.Evaluate()");
+        CollideCircle.collidePolyAndCircle(m_manifold, (PolyShape) m_shape1,
+                (CircleShape) m_shape2);
+
         if (m_manifold.pointCount > 0) {
             m_manifoldCount = 1;
-        } else {
+        }
+        else {
             m_manifoldCount = 0;
         }
     }

@@ -69,8 +69,8 @@ public class PolyContact extends Contact implements ContactCreator {
     }
 
     @Override
-    public void Evaluate() {
-        //Manifold m0 = m_manifold;
+    public void evaluate() {
+        // Manifold m0 = m_manifold;
         Manifold m0 = new Manifold(m_manifold);
         for (int k = 0; k < m_manifold.pointCount; k++) {
             m0.points[k] = new ContactPoint(m_manifold.points[k]);
@@ -80,7 +80,7 @@ public class PolyContact extends Contact implements ContactCreator {
         }
         m0.pointCount = m_manifold.pointCount;
 
-        CollidePoly.b2CollidePoly(m_manifold, (PolyShape) m_shape1,
+        CollidePoly.collidePoly(m_manifold, (PolyShape) m_shape1,
                 (PolyShape) m_shape2);
 
         // Match contact ids to facilitate warm starting.

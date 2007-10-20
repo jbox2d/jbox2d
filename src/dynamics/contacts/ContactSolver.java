@@ -49,8 +49,9 @@ public class ContactSolver {
                 // manifolds) {
                 Manifold manifold = manifolds.get(j);
 
-                assert (manifold.pointCount > 0):"Manifold "+j+" has length 0";
-               
+                assert (manifold.pointCount > 0) : "Manifold " + j
+                        + " has length 0";
+
                 Vec2 normal = manifold.normal.clone();
 
                 assert (count < m_constraintCount);
@@ -123,7 +124,7 @@ public class ContactSolver {
         assert (count == m_constraintCount);
     }
 
-    public void PreSolve() {
+    public void preSolve() {
         // Warm start.
         for (int i = 0; i < m_constraintCount; ++i) {// ContactConstraint c :
             // m_constraints) {
@@ -137,7 +138,7 @@ public class ContactSolver {
             Vec2 normal = c.normal;
             Vec2 tangent = Vec2.cross(normal, 1.0f);
 
-            if (World.s_enableWarmStarting) {
+            if (World.ENABLE_WARM_STARTING) {
 
                 for (int j = 0; j < c.pointCount; ++j) {// ContactConstraintPoint
                     // ccp : c.points) {
@@ -173,7 +174,8 @@ public class ContactSolver {
                     ccp.positionImpulse = 0.0f;
                 }
 
-            } else {
+            }
+            else {
                 for (int j = 0; j < c.pointCount; ++j) {
                     ContactConstraintPoint ccp = c.points[j];
                     ccp.normalImpulse = 0.0f;
@@ -185,7 +187,7 @@ public class ContactSolver {
         }
     }
 
-    public void SolveVelocityConstraints() {
+    public void solveVelocityConstraints() {
         for (ContactConstraint c : m_constraints) {
             Body b1 = c.body1;
             Body b2 = c.body2;
@@ -313,7 +315,7 @@ public class ContactSolver {
         }
     }
 
-    public boolean SolvePositionConstraints(float beta) {
+    public boolean solvePositionConstraints(float beta) {
         float minSeparation = 0.0f;
 
         for (ContactConstraint c : m_constraints) {
@@ -359,13 +361,15 @@ public class ContactSolver {
                 float separation = dpx * normal.x + dpy * normal.y
                         + ccp.separation;
 
-               // Track max constraint error.
+                // Track max constraint error.
                 minSeparation = Math.min(minSeparation, separation);
 
                 // Prevent large corrections and allow slop.
-                float C = beta * MathUtils.clamp(separation + Settings.linearSlop, -Settings.maxLinearCorrection, 0.0f);
+                float C = beta
+                        * MathUtils.clamp(separation + Settings.linearSlop,
+                                -Settings.maxLinearCorrection, 0.0f);
 
-                 // Compute normal impulse
+                // Compute normal impulse
                 float dImpulse = -ccp.normalMass * C;
 
                 // b2Clamp the accumulated impulse
@@ -382,21 +386,21 @@ public class ContactSolver {
                 b1.m_position.y -= impulsey * invMass1;
                 // b1.m_rotation -= invI1 * Vec2.cross(r1, impulse);
                 b1.m_rotation -= invI1 * (r1x * impulsey - r1y * impulsex);
-                b1.m_R.set(b1.m_rotation);
+                b1.m_R.setAngle(b1.m_rotation);
 
                 // b2.m_position.addLocal(impulse.mul(invMass2));
                 b2.m_position.x += impulsex * invMass2;
                 b2.m_position.y += impulsey * invMass2;
                 // b2.m_rotation += invI2 * Vec2.cross(r2, impulse);
                 b2.m_rotation += invI2 * (r2x * impulsey - r2y * impulsex);
-                b2.m_R.set(b2.m_rotation);
+                b2.m_R.setAngle(b2.m_rotation);
             }
         }
 
         return minSeparation >= -Settings.linearSlop;
     }
 
-    public void PostSolve() {
+    public void postSolve() {
         for (ContactConstraint c : m_constraints) {
             Manifold m = c.manifold;
 

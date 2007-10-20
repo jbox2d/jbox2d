@@ -11,22 +11,22 @@ public class ContactManager extends PairCallback {
     // This lets us provide broadphase proxy pair user data for
     // contacts that shouldn't exist.
     NullContact m_nullContact;
-    
+
     boolean m_destroyImmediate;
 
-    ContactManager() {
+    public ContactManager() {
         m_nullContact = new NullContact();
         m_destroyImmediate = false;
     }
 
-    public Object PairAdded(Object proxyUserData1, Object proxyUserData2) {
+    public Object pairAdded(Object proxyUserData1, Object proxyUserData2) {
         Shape shape1 = (Shape) proxyUserData1;
         Shape shape2 = (Shape) proxyUserData2;
 
         Body body1 = shape1.m_body;
         Body body2 = shape2.m_body;
 
-        if (body1.IsStatic() && body2.IsStatic()) {
+        if (body1.isStatic() && body2.isStatic()) {
             return m_nullContact;
         }
 
@@ -51,7 +51,7 @@ public class ContactManager extends PairCallback {
         }
 
         // Call the factory.
-        Contact contact = Contact.Create(shape1, shape2);
+        Contact contact = Contact.createContact(shape1, shape2);
 
         if (contact == null) {
             return m_nullContact;
@@ -70,23 +70,25 @@ public class ContactManager extends PairCallback {
         return contact;
     }
 
-    public void PairRemoved(Object proxyUserData1, Object proxyUserData2, Object pairUserData) {
+    public void pairRemoved(Object proxyUserData1, Object proxyUserData2,
+            Object pairUserData) {
         if (pairUserData == null) {
             return;
         }
-        
+
         Contact c = (Contact) pairUserData;
         if (c != m_nullContact) {
             if (m_destroyImmediate == true) {
-                DestroyContact(c);
+                destroyContact(c);
                 c = null;
-            } else {
+            }
+            else {
                 c.m_flags |= Contact.e_destroyFlag;
             }
         }
     }
-        
-    public void DestroyContact(Contact c) {
+
+    public void destroyContact(Contact c) {
         assert (m_world.m_contactCount > 0);
 
         // Remove from the world.
@@ -145,25 +147,25 @@ public class ContactManager extends PairCallback {
         }
 
         // Call the factory.
-        Contact.Destroy(c);
+        Contact.destroy(c);
         --m_world.m_contactCount;
 
     }
-    
-    public void CleanContactList() {
+
+    public void cleanContactList() {
         Contact c = m_world.m_contactList;
         while (c != null) {
             Contact c0 = c;
             c = c.m_next;
-            
-            if ( (c0.m_flags & Contact.e_destroyFlag) > 0) {
-                DestroyContact(c0);
+
+            if ((c0.m_flags & Contact.e_destroyFlag) > 0) {
+                destroyContact(c0);
                 c0 = null;
             }
         }
     }
 
-    void Collide() {
+    void collide() {
         for (Contact c = m_world.m_contactList; c != null; c = c.m_next) {
             if (c.m_shape1.m_body.isSleeping()
                     && c.m_shape2.m_body.isSleeping()) {
@@ -171,12 +173,12 @@ public class ContactManager extends PairCallback {
             }
 
             int oldCount = c.GetManifoldCount();
-            c.Evaluate();
+            c.evaluate();
 
             int newCount = c.GetManifoldCount();
 
             if (oldCount == 0 && newCount > 0) {
-                assert(c.GetManifolds().get(0).pointCount > 0);
+                assert (c.GetManifolds().get(0).pointCount > 0);
                 // Connect to island graph.
 
                 Body body1 = c.m_shape1.m_body;

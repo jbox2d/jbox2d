@@ -6,7 +6,7 @@ import common.Settings;
 import common.Vec2;
 
 public class BodyDef {
-    
+
     public Object userData;
 
     public ShapeDef[] shapes;
@@ -22,7 +22,7 @@ public class BodyDef {
     public boolean allowSleep;
 
     public boolean isSleeping;
-    
+
     public boolean preventRotation;
 
     public BodyDef() {
