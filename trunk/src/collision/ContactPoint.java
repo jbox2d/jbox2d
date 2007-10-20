@@ -26,5 +26,4 @@ public class ContactPoint {
         tangentImpulse = cp.tangentImpulse;
         id = new ContactID(cp.id);
     }
-
 }

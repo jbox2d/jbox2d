@@ -33,42 +33,56 @@ public abstract class Shape {
     public float m_restitution;
 
     public Shape m_next;
-    
+
     public Object m_userData;
-    
-    public Vec2 GetPosition(){
+
+    public Shape(ShapeDef description, Body body, Vec2 center) {
+        m_localPosition = new Vec2();// description.localPosition.sub(center);
+        // m_localRotation = description.localRotation;
+        m_friction = description.friction;
+        m_restitution = description.restitution;
+        m_body = body;
+
+        m_position = new Vec2();// m_body.m_position.add(m_body.m_R.mul(m_localPosition));
+        // m_rotation = m_body.m_rotation + m_localRotation;
+        m_R = new Mat22();// (m_rotation);
+
+        m_proxyId = PairManager.NULL_PROXY;
+        uid = uidcount++;
+    }
+
+    public Vec2 getPosition() {
         return m_position;
     }
-    
-    public Mat22 GetRotationMatrix(){
+
+    public Mat22 getRotationMatrix() {
         return m_R;
     }
-    
-    public ShapeType GetType() {
+
+    public ShapeType getType() {
         return m_type;
     }
-    
-    public Object GetUserData() {
+
+    public Object getUserData() {
         return m_userData;
     }
-    
-    public Body GetBody() {
+
+    public Body getBody() {
         return m_body;
     }
-    
-    public Shape GetNext() {
+
+    public Shape getNext() {
         return m_next;
     }
 
-    //public abstract void UpdateProxy();
-    public abstract void Synchronize(Vec2 position, Mat22 R);
-    
-    public abstract void ResetProxy(BroadPhase broadPhase);
+    // public abstract void UpdateProxy();
+    public abstract void synchronize(Vec2 position, Mat22 R);
 
-    public abstract boolean TestPoint(Vec2 p);
+    public abstract void resetProxy(BroadPhase broadPhase);
 
-    public static Shape Create(ShapeDef description, Body body,
-            Vec2 center) {
+    public abstract boolean testPoint(Vec2 p);
+
+    public static Shape create(ShapeDef description, Body body, Vec2 center) {
 
         if (description.type == ShapeType.CIRCLE_SHAPE) {
             return new CircleShape(description, body, center);
@@ -79,30 +93,10 @@ public abstract class Shape {
         }
         return null;
     }
-    
-    public static void Destroy(Shape shape) {
-        shape.Destructor();
-    }
-    
-    public void Destructor() {
+
+    public void destructor() {
         if (m_proxyId != PairManager.NULL_PROXY) {
-            m_body.m_world.m_broadPhase.DestroyProxy(m_proxyId);
+            m_body.m_world.m_broadPhase.destroyProxy(m_proxyId);
         }
     }
-
-    public Shape(ShapeDef description, Body body, Vec2 center) {
-        m_localPosition = new Vec2();//description.localPosition.sub(center);
-        //m_localRotation = description.localRotation;
-        m_friction = description.friction;
-        m_restitution = description.restitution;
-        m_body = body;
-
-        m_position = new Vec2();//m_body.m_position.add(m_body.m_R.mul(m_localPosition));
-        //m_rotation = m_body.m_rotation + m_localRotation;
-        m_R = new Mat22();//(m_rotation);
-
-        m_proxyId = PairManager.NULL_PROXY;
-        uid = uidcount++;
-    }
-
 }

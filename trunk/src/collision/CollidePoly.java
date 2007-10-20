@@ -13,14 +13,9 @@ public class CollidePoly {
             v = new Vec2();
             id = new ContactID();
         }
-
-        // public ClipVertex(ClipVertex other){
-        // v = other.v.clone();
-        // id = other.id.clone();
-        // }
     }
 
-    static int ClipSegmentToLine(ClipVertex vOut[], ClipVertex vIn[],
+    static int clipSegmentToLine(ClipVertex vOut[], ClipVertex vIn[],
             Vec2 normal, float offset) {
         // Start with no output points
         int numOut = 0;
@@ -42,12 +37,13 @@ public class CollidePoly {
             // Find intersection point of edge and plane
             float interp = distance0 / (distance0 - distance1);
             vOut[numOut] = new ClipVertex();
-            //ewj: vector already created in new ClipVertex()
-            //Math inlined to optimize - shouldn't change much.
-            //vOut[numOut].v = vIn[0].v.add((vIn[1].v.sub(vIn[0].v)).mul(interp));
+            // ewj: vector already created in new ClipVertex()
+            // Math inlined to optimize - shouldn't change much.
+            // vOut[numOut].v =
+            // vIn[0].v.add((vIn[1].v.sub(vIn[0].v)).mul(interp));
             vOut[numOut].v.x = vIn[0].v.x + interp * (vIn[1].v.x - vIn[0].v.x);
             vOut[numOut].v.y = vIn[0].v.y + interp * (vIn[1].v.y - vIn[0].v.y);
-            
+
             if (distance0 > 0.0f) {
                 vOut[numOut].id = vIn[0].id;
             }
@@ -60,7 +56,7 @@ public class CollidePoly {
         return numOut;
     }
 
-    static float EdgeSeparation(PolyShape poly1, int edge1, PolyShape poly2) {
+    static float edgeSeparation(PolyShape poly1, int edge1, PolyShape poly2) {
         int count1 = poly1.m_vertexCount;
         Vec2[] vert1s = poly1.m_vertices;
         int count2 = poly2.m_vertexCount;
@@ -96,13 +92,11 @@ public class CollidePoly {
 
     // Find the max separation between poly1 and poly2 using face normals
     // from poly1.
-    static MaxSeparation FindMaxSeparation(PolyShape poly1, PolyShape poly2) {
+    static MaxSeparation findMaxSeparation(PolyShape poly1, PolyShape poly2) {
         MaxSeparation separation = new MaxSeparation();
 
         int count1 = poly1.m_vertexCount;
         Vec2[] vert1s = poly1.m_vertices;
-        // int count2 = poly2.m_vertexCount;
-        // Vec2[] vert2s = poly2.m_vertices;
 
         // Vector pointing from the origin of poly1 to the origin of poly2.
         Vec2 d = poly2.m_position.sub(poly1.m_position);
@@ -122,14 +116,14 @@ public class CollidePoly {
         // Check the separation for the edges straddling the vertex.
         int prevFaceIndex = vertexIndex1 - 1 >= 0 ? vertexIndex1 - 1
                 : count1 - 1;
-        float sPrev = EdgeSeparation(poly1, prevFaceIndex, poly2);
+        float sPrev = edgeSeparation(poly1, prevFaceIndex, poly2);
         if (sPrev > 0.0f) {
             separation.bestSeparation = sPrev;
             return separation;
         }
 
         int nextFaceIndex = vertexIndex1;
-        float sNext = EdgeSeparation(poly1, nextFaceIndex, poly2);
+        float sNext = edgeSeparation(poly1, nextFaceIndex, poly2);
         if (sNext > 0.0f) {
             separation.bestSeparation = sNext;
             return separation;
@@ -150,7 +144,7 @@ public class CollidePoly {
             bestSeparation = sNext;
         }
 
-        for ( ; ; ) {
+        while (true) {
             int edgeIndex;
             if (increment == -1)
                 edgeIndex = bestFaceIndex - 1 >= 0 ? bestFaceIndex - 1
@@ -158,7 +152,7 @@ public class CollidePoly {
             else
                 edgeIndex = bestFaceIndex + 1 < count1 ? bestFaceIndex + 1 : 0;
 
-            float sep = EdgeSeparation(poly1, edgeIndex, poly2);
+            float sep = edgeSeparation(poly1, edgeIndex, poly2);
             if (sep > 0.0f) {
                 separation.bestSeparation = sep;
                 return separation;
@@ -179,8 +173,8 @@ public class CollidePoly {
         return separation;
     }
 
-    static void FindIncidentEdge(ClipVertex c[/* 2 */], PolyShape poly1,
-            int edge1, PolyShape poly2) {
+    static void findIncidentEdge(ClipVertex c[], PolyShape poly1, int edge1,
+            PolyShape poly2) {
         int count1 = poly1.m_vertexCount;
         Vec2[] vert1s = poly1.m_vertices;
         int count2 = poly2.m_vertexCount;
@@ -238,20 +232,20 @@ public class CollidePoly {
     // Clip
 
     // The normal points from 1 to 2
-    public static void b2CollidePoly(Manifold manif, PolyShape polyA,
+    public static void collidePoly(Manifold manif, PolyShape polyA,
             PolyShape polyB) {
         // ~84 vec2 creations in Pyramid test, per run
         // (Some from called functions)
         // Runs ~625 times per step
         // 625 * 84 = 52,500, out of ~95,000 total creations
         // Probably worth optimizing...
-        manif.pointCount = 0; //Fixed a problem with contacts
-        MaxSeparation sepA = FindMaxSeparation(polyA, polyB);
+        manif.pointCount = 0; // Fixed a problem with contacts
+        MaxSeparation sepA = findMaxSeparation(polyA, polyB);
         if (sepA.bestSeparation > 0.0f) {
             return;
         }
 
-        MaxSeparation sepB = FindMaxSeparation(polyB, polyA);
+        MaxSeparation sepB = findMaxSeparation(polyB, polyA);
         if (sepB.bestSeparation > 0.0f) {
             return;
         }
@@ -279,17 +273,14 @@ public class CollidePoly {
         }
 
         ClipVertex incidentEdge[] = new ClipVertex[2];
-        FindIncidentEdge(incidentEdge, poly1, edge1, poly2);
+        findIncidentEdge(incidentEdge, poly1, edge1, poly2);
 
         int count1 = poly1.m_vertexCount;
         Vec2[] vert1s = poly1.m_vertices;
-        // int count2 = poly2.m_vertexCount;
-        // Vec2[] vert2s = poly2.m_vertices;
 
         Vec2 v11 = vert1s[edge1];
         Vec2 v12 = edge1 + 1 < count1 ? vert1s[edge1 + 1] : vert1s[0];
 
-        // Vec2 dv = v12.sub(v11);
         Vec2 sideNormal = poly1.m_R.mul(v12.sub(v11));
         sideNormal.normalize();
         Vec2 frontNormal = Vec2.cross(sideNormal, 1.0f);
@@ -307,7 +298,7 @@ public class CollidePoly {
         int np;
 
         // Clip to box side 1
-        np = ClipSegmentToLine(clipPoints1, incidentEdge, sideNormal.negate(),
+        np = clipSegmentToLine(clipPoints1, incidentEdge, sideNormal.negate(),
                 sideOffset1);
 
         if (np < 2) {
@@ -315,7 +306,7 @@ public class CollidePoly {
         }
 
         // Clip to negative box side 1
-        np = ClipSegmentToLine(clipPoints2, clipPoints1, sideNormal,
+        np = clipSegmentToLine(clipPoints2, clipPoints1, sideNormal,
                 sideOffset2);
 
         if (np < 2) {

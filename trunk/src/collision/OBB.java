@@ -5,7 +5,9 @@ import common.Mat22;
 
 public class OBB {
     public Mat22 R;
+
     public Vec2 center;
+
     public Vec2 extents;
 
     public OBB(Mat22 _R, Vec2 _center, Vec2 _extents) {
@@ -15,7 +17,7 @@ public class OBB {
     }
 
     public OBB(OBB copy) {
-        this(copy.R, copy.center, copy.extents);
+        this(copy.R.clone(), copy.center.clone(), copy.extents.clone());
     }
 
     public OBB() {
@@ -24,8 +26,8 @@ public class OBB {
         extents = new Vec2();
     }
 
-    public OBB clone(){
+    public OBB clone() {
         return new OBB(this);
     }
-    
+
 }

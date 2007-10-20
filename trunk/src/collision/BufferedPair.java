@@ -5,27 +5,26 @@ public class BufferedPair implements Comparable<BufferedPair> {
 
     int proxyId2;
 
-    private boolean Equals(BufferedPair pair1, BufferedPair pair2) {
-        return pair1.proxyId1 == pair2.proxyId1
-                && pair1.proxyId2 == pair2.proxyId2;
+    private boolean equals(BufferedPair other) {
+        return proxyId1 == other.proxyId1 && proxyId2 == other.proxyId2;
     }
 
-    private boolean minor(BufferedPair pair1, BufferedPair pair2) {
-        if (pair1.proxyId1 < pair2.proxyId1)
+    private boolean minor(BufferedPair other) {
+        if (proxyId1 < other.proxyId1)
             return true;
 
-        if (pair1.proxyId1 == pair2.proxyId1) {
-            return pair1.proxyId2 < pair2.proxyId2;
+        if (proxyId1 == other.proxyId1) {
+            return proxyId2 < other.proxyId2;
         }
 
         return false;
     }
 
     public int compareTo(BufferedPair p) {
-        if (minor(this, p)) {
+        if (minor(p)) {
             return -1;
         }
-        else if (Equals(this, p)) {
+        else if (equals(p)) {
             return 0;
         }
         else {
