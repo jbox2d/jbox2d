@@ -76,7 +76,7 @@ public class RevoluteJoint extends Joint {
     }
 
     @Override
-    public void PreSolve() {
+    public void preSolve() {
         Body b1 = m_body1;
         Body b2 = m_body2;
 
@@ -122,22 +122,22 @@ public class RevoluteJoint extends Joint {
         if (m_enableLimit) {
             float jointAngle = b2.m_rotation - b1.m_rotation - m_intialAngle;
             if (Math.abs(m_upperAngle - m_lowerAngle) < 2.0f * Settings.angularSlop) {
-                m_limitState = LimitState.equalLimits;
+                m_limitState = LimitState.EQUAL_LIMITS;
             }
             else if (jointAngle <= m_lowerAngle) {
-                if (m_limitState != LimitState.atLowerLimit) {
+                if (m_limitState != LimitState.AT_LOWER_LIMIT) {
                     m_limitImpulse = 0.0f;
                 }
-                m_limitState = LimitState.atLowerLimit;
+                m_limitState = LimitState.AT_LOWER_LIMIT;
             }
             else if (jointAngle >= m_upperAngle) {
-                if (m_limitState != LimitState.atUpperLimit) {
+                if (m_limitState != LimitState.AT_UPPER_LIMIT) {
                     m_limitImpulse = 0.0f;
                 }
-                m_limitState = LimitState.atUpperLimit;
+                m_limitState = LimitState.AT_UPPER_LIMIT;
             }
             else {
-                m_limitState = LimitState.inactiveLimit;
+                m_limitState = LimitState.INACTIVE_LIMIT;
                 m_limitImpulse = 0.0f;
             }
         }
@@ -158,7 +158,7 @@ public class RevoluteJoint extends Joint {
     }
 
     @Override
-    public void SolveVelocityConstraints(float dt) {
+    public void solveVelocityConstraints(float dt) {
         Body b1 = m_body1;
         Body b2 = m_body2;
 
@@ -183,7 +183,7 @@ public class RevoluteJoint extends Joint {
         b2.m_linearVelocity.addLocal(ptpImpulse.mul(b2.m_invMass));
         b2.m_angularVelocity += b2.m_invI * Vec2.cross(r2, ptpImpulse);
 
-        if (m_enableMotor && m_limitState != LimitState.equalLimits) {
+        if (m_enableMotor && m_limitState != LimitState.EQUAL_LIMITS) {
             float motorCdot = b2.m_angularVelocity - b1.m_angularVelocity
                     - m_motorSpeed;
             float motorImpulse = -m_motorMass * motorCdot;
@@ -195,19 +195,19 @@ public class RevoluteJoint extends Joint {
             b2.m_angularVelocity += b2.m_invI * motorImpulse;
         }
 
-        if (m_enableLimit && m_limitState != LimitState.inactiveLimit) {
+        if (m_enableLimit && m_limitState != LimitState.INACTIVE_LIMIT) {
             float limitCdot = b2.m_angularVelocity - b1.m_angularVelocity;
             float limitImpulse = -m_motorMass * limitCdot;
 
-            if (m_limitState == LimitState.equalLimits) {
+            if (m_limitState == LimitState.EQUAL_LIMITS) {
                 m_limitImpulse += limitImpulse;
             }
-            else if (m_limitState == LimitState.atLowerLimit) {
+            else if (m_limitState == LimitState.AT_LOWER_LIMIT) {
                 float oldLimitImpulse = m_limitImpulse;
                 m_limitImpulse = Math.max(m_limitImpulse + limitImpulse, 0.0f);
                 limitImpulse = m_limitImpulse - oldLimitImpulse;
             }
-            else if (m_limitState == LimitState.atUpperLimit) {
+            else if (m_limitState == LimitState.AT_UPPER_LIMIT) {
                 float oldLimitImpulse = m_limitImpulse;
                 m_limitImpulse = Math.min(m_limitImpulse + limitImpulse, 0.0f);
                 limitImpulse = m_limitImpulse - oldLimitImpulse;
@@ -219,7 +219,7 @@ public class RevoluteJoint extends Joint {
     }
 
     @Override
-    public boolean SolvePositionConstraints() {
+    public boolean solvePositionConstraints() {
         Body b1 = m_body1;
         Body b2 = m_body2;
 
@@ -240,22 +240,22 @@ public class RevoluteJoint extends Joint {
 
         b1.m_position.subLocal(impulse.mul(b1.m_invMass));
         b1.m_rotation -= b1.m_invI * Vec2.cross(r1, impulse);
-        b1.m_R.set(b1.m_rotation);
+        b1.m_R.setAngle(b1.m_rotation);
 
         b2.m_position.addLocal(impulse.mul(b2.m_invMass));
         b2.m_rotation += b2.m_invI * Vec2.cross(r2, impulse);
-        b2.m_R.set(b2.m_rotation);
+        b2.m_R.setAngle(b2.m_rotation);
 
         float positionError = ptpC.length();
 
         // Handle limits.
         float angularError = 0.0f;
 
-        if (m_enableLimit && m_limitState != LimitState.inactiveLimit) {
+        if (m_enableLimit && m_limitState != LimitState.INACTIVE_LIMIT) {
             float angle = b2.m_rotation - b1.m_rotation - m_intialAngle;
             float limitImpulse = 0.0f;
 
-            if (m_limitState == LimitState.equalLimits) {
+            if (m_limitState == LimitState.EQUAL_LIMITS) {
                 // Prevent large angular corrections
                 float limitC = MathUtils.clamp(angle,
                         -Settings.maxAngularCorrection,
@@ -263,7 +263,7 @@ public class RevoluteJoint extends Joint {
                 limitImpulse = -m_motorMass * limitC;
                 angularError = Math.abs(limitC);
             }
-            else if (m_limitState == LimitState.atLowerLimit) {
+            else if (m_limitState == LimitState.AT_LOWER_LIMIT) {
                 // Prevent large angular corrections
                 float limitC = MathUtils.clamp(angle - m_lowerAngle,
                         -Settings.maxAngularCorrection,
@@ -275,7 +275,7 @@ public class RevoluteJoint extends Joint {
                 limitImpulse = m_limitPositionImpulse - oldLimitImpulse;
                 angularError = Math.max(0.0f, -limitC);
             }
-            else if (m_limitState == LimitState.atUpperLimit) {
+            else if (m_limitState == LimitState.AT_UPPER_LIMIT) {
                 // Prevent large angular corrections
                 float limitC = MathUtils.clamp(angle - m_upperAngle,
                         -Settings.maxAngularCorrection,
@@ -289,9 +289,9 @@ public class RevoluteJoint extends Joint {
             }
 
             b1.m_rotation -= b1.m_invI * limitImpulse;
-            b1.m_R.set(b1.m_rotation);
+            b1.m_R.setAngle(b1.m_rotation);
             b2.m_rotation += b2.m_invI * limitImpulse;
-            b2.m_R.set(b2.m_rotation);
+            b2.m_R.setAngle(b2.m_rotation);
         }
 
         return positionError <= Settings.linearSlop
@@ -299,30 +299,30 @@ public class RevoluteJoint extends Joint {
     }
 
     @Override
-    public Vec2 GetAnchor1() {
+    public Vec2 getAnchor1() {
         Body b1 = m_body1;
         return b1.m_position.add(b1.m_R.mul(m_localAnchor1));
     }
 
     @Override
-    public Vec2 GetAnchor2() {
+    public Vec2 getAnchor2() {
         Body b2 = m_body2;
         return b2.m_position.add(b2.m_R.mul(m_localAnchor2));
     }
 
-    float GetJointAngle() {
+    float getJointAngle() {
         Body b1 = m_body1;
         Body b2 = m_body2;
         return b2.m_rotation - b1.m_rotation;
     }
 
-    float GetJointSpeed() {
+    float getJointSpeed() {
         Body b1 = m_body1;
         Body b2 = m_body2;
         return b2.m_angularVelocity - b1.m_angularVelocity;
     }
 
-    float GetMotorTorque(float invTimeStep) {
+    float getMotorTorque(float invTimeStep) {
         return m_motorImpulse * invTimeStep;
     }
 }

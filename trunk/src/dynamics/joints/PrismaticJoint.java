@@ -96,18 +96,18 @@ public class PrismaticJoint extends Joint {
     }
 
     @Override
-    public Vec2 GetAnchor1() {
+    public Vec2 getAnchor1() {
         Body b1 = m_body1;
         return b1.m_position.add(b1.m_R.mul(m_localAnchor1));
     }
 
     @Override
-    public Vec2 GetAnchor2() {
+    public Vec2 getAnchor2() {
         Body b2 = m_body2;
         return b2.m_position.add(b2.m_R.mul(m_localAnchor2));
     }
 
-    public void PreSolve() {
+    public void preSolve() {
         Body b1 = m_body1;
         Body b2 = m_body2;
 
@@ -153,22 +153,22 @@ public class PrismaticJoint extends Joint {
                 float jointTranslation = Vec2.dot(ax1, d);
 
                 if (Math.abs(m_upperTranslation - m_lowerTranslation) < 2.0f * Settings.linearSlop) {
-                    m_limitState = LimitState.equalLimits;
+                    m_limitState = LimitState.EQUAL_LIMITS;
                 }
                 else if (jointTranslation <= m_lowerTranslation) {
-                    if (m_limitState != LimitState.atLowerLimit) {
+                    if (m_limitState != LimitState.AT_LOWER_LIMIT) {
                         m_limitImpulse = 0.0f;
                     }
-                    m_limitState = LimitState.atLowerLimit;
+                    m_limitState = LimitState.AT_LOWER_LIMIT;
                 }
                 else if (jointTranslation >= m_upperTranslation) {
-                    if (m_limitState != LimitState.atUpperLimit) {
+                    if (m_limitState != LimitState.AT_UPPER_LIMIT) {
                         m_limitImpulse = 0.0f;
                     }
-                    m_limitState = LimitState.atUpperLimit;
+                    m_limitState = LimitState.AT_UPPER_LIMIT;
                 }
                 else {
-                    m_limitState = LimitState.inactiveLimit;
+                    m_limitState = LimitState.INACTIVE_LIMIT;
                     m_limitImpulse = 0.0f;
                 }
             }
@@ -207,7 +207,7 @@ public class PrismaticJoint extends Joint {
         m_limitPositionImpulse = 0.0f;
     }
 
-    public void SolveVelocityConstraints(float dt) {
+    public void solveVelocityConstraints(float dt) {
         Body b1 = m_body1;
         Body b2 = m_body2;
 
@@ -216,7 +216,7 @@ public class PrismaticJoint extends Joint {
 
         // Solve linear constraint.
         float linearCdot = m_linearJacobian
-                .Compute(b1.m_linearVelocity, b1.m_angularVelocity,
+                .compute(b1.m_linearVelocity, b1.m_angularVelocity,
                         b2.m_linearVelocity, b2.m_angularVelocity);
         float linearImpulse = -m_linearMass * linearCdot;
         m_linearImpulse += linearImpulse;
@@ -240,8 +240,8 @@ public class PrismaticJoint extends Joint {
         b2.m_angularVelocity += invI2 * angularImpulse;
 
         // Solve linear motor constraint.
-        if (m_enableMotor && m_limitState != LimitState.equalLimits) {
-            float motorCdot = m_motorJacobian.Compute(b1.m_linearVelocity,
+        if (m_enableMotor && m_limitState != LimitState.EQUAL_LIMITS) {
+            float motorCdot = m_motorJacobian.compute(b1.m_linearVelocity,
                     b1.m_angularVelocity, b2.m_linearVelocity,
                     b2.m_angularVelocity)
                     - m_motorSpeed;
@@ -263,21 +263,21 @@ public class PrismaticJoint extends Joint {
         }
 
         // Solve linear limit constraint.
-        if (m_enableLimit && m_limitState != LimitState.inactiveLimit) {
-            float limitCdot = m_motorJacobian.Compute(b1.m_linearVelocity,
+        if (m_enableLimit && m_limitState != LimitState.INACTIVE_LIMIT) {
+            float limitCdot = m_motorJacobian.compute(b1.m_linearVelocity,
                     b1.m_angularVelocity, b2.m_linearVelocity,
                     b2.m_angularVelocity);
             float limitImpulse = -m_motorMass * limitCdot;
 
-            if (m_limitState == LimitState.equalLimits) {
+            if (m_limitState == LimitState.EQUAL_LIMITS) {
                 m_limitImpulse += limitImpulse;
             }
-            else if (m_limitState == LimitState.atLowerLimit) {
+            else if (m_limitState == LimitState.AT_LOWER_LIMIT) {
                 float oldLimitImpulse = m_limitImpulse;
                 m_limitImpulse = Math.max(m_limitImpulse + limitImpulse, 0.0f);
                 limitImpulse = m_limitImpulse - oldLimitImpulse;
             }
-            else if (m_limitState == LimitState.atUpperLimit) {
+            else if (m_limitState == LimitState.AT_UPPER_LIMIT) {
                 float oldLimitImpulse = m_limitImpulse;
                 m_limitImpulse = Math.min(m_limitImpulse + limitImpulse, 0.0f);
                 limitImpulse = m_limitImpulse - oldLimitImpulse;
@@ -295,7 +295,7 @@ public class PrismaticJoint extends Joint {
         }
     }
 
-    public boolean SolvePositionConstraints() {
+    public boolean solvePositionConstraints() {
         Body b1 = m_body1;
         Body b2 = m_body2;
 
@@ -338,14 +338,14 @@ public class PrismaticJoint extends Joint {
         float angularImpulse = -m_angularMass * angularC;
 
         b1.m_rotation -= b1.m_invI * angularImpulse;
-        b1.m_R.set(b1.m_rotation);
+        b1.m_R.setAngle(b1.m_rotation);
         b2.m_rotation += b2.m_invI * angularImpulse;
-        b2.m_R.set(b2.m_rotation);
+        b2.m_R.setAngle(b2.m_rotation);
 
         float angularError = Math.abs(angularC);
 
         // Solve linear limit constraint.
-        if (m_enableLimit && m_limitState != LimitState.inactiveLimit) {
+        if (m_enableLimit && m_limitState != LimitState.INACTIVE_LIMIT) {
             Vec2 rr1 = b1.m_R.mul(m_localAnchor1);
             Vec2 rr2 = b2.m_R.mul(m_localAnchor2);
             Vec2 pp1 = b1.m_position.add(rr1);
@@ -356,7 +356,7 @@ public class PrismaticJoint extends Joint {
             float translation = Vec2.dot(ax1, dd);
             float limitImpulse = 0.0f;
 
-            if (m_limitState == LimitState.equalLimits) {
+            if (m_limitState == LimitState.EQUAL_LIMITS) {
                 // Prevent large angular corrections
                 float limitC = MathUtils.clamp(translation,
                         -Settings.maxLinearCorrection,
@@ -364,7 +364,7 @@ public class PrismaticJoint extends Joint {
                 limitImpulse = -m_motorMass * limitC;
                 positionError = Math.max(positionError, Math.abs(angularC));
             }
-            else if (m_limitState == LimitState.atLowerLimit) {
+            else if (m_limitState == LimitState.AT_LOWER_LIMIT) {
                 // Prevent large angular corrections
                 float limitC = MathUtils.clamp(
                         translation - m_lowerTranslation,
@@ -377,7 +377,7 @@ public class PrismaticJoint extends Joint {
                 limitImpulse = m_limitPositionImpulse - oldLimitImpulse;
                 positionError = Math.max(positionError, -limitC);
             }
-            else if (m_limitState == LimitState.atUpperLimit) {
+            else if (m_limitState == LimitState.AT_UPPER_LIMIT) {
                 // Prevent large angular corrections
                 float limitC = MathUtils.clamp(
                         translation - m_upperTranslation,
@@ -394,18 +394,18 @@ public class PrismaticJoint extends Joint {
             b1.m_position.addLocal(m_motorJacobian.linear1.mul(invMass1
                     * limitImpulse));
             b1.m_rotation += invI1 * limitImpulse * m_motorJacobian.angular1;
-            b1.m_R.set(b1.m_rotation);
+            b1.m_R.setAngle(b1.m_rotation);
             b2.m_position.addLocal(m_motorJacobian.linear2.mul(invMass2
                     * limitImpulse));
             b2.m_rotation += invI2 * limitImpulse * m_motorJacobian.angular2;
-            b2.m_R.set(b2.m_rotation);
+            b2.m_R.setAngle(b2.m_rotation);
         }
 
         return positionError <= Settings.linearSlop
                 && angularError <= Settings.angularSlop;
     }
 
-    float GetJointTranslation() {
+    float getJointTranslation() {
         Body b1 = m_body1;
         Body b2 = m_body2;
 
@@ -420,7 +420,7 @@ public class PrismaticJoint extends Joint {
         return translation;
     }
 
-    float GetJointSpeed() {
+    float getJointSpeed() {
         Body b1 = m_body1;
         Body b2 = m_body2;
 
@@ -442,7 +442,7 @@ public class PrismaticJoint extends Joint {
         return speed;
     }
 
-    float GetMotorForce(float invTimeStep) {
+    float getMotorForce(float invTimeStep) {
         return m_motorImpulse * invTimeStep;
     }
 }

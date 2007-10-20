@@ -34,7 +34,7 @@ public class PulleyJoint extends Joint {
     // 0 <= impulse
 
     // We need a minimum pulley length to help prevent one side going to zero.
-    public static final float minPulleyLength = Settings.lengthUnitsPerMeter;
+    public static final float MIN_PULLEY_LENGTH = Settings.lengthUnitsPerMeter;
 
     public Body m_ground;
 
@@ -96,26 +96,26 @@ public class PulleyJoint extends Joint {
         Vec2 d1 = def.groundPoint1.sub(def.anchorPoint1);
         Vec2 d2 = def.groundPoint2.sub(def.anchorPoint2);
 
-        float length1 = Math.max(0.5f * minPulleyLength, d1.length());
-        float length2 = Math.max(0.5f * minPulleyLength, d2.length());
+        float length1 = Math.max(0.5f * MIN_PULLEY_LENGTH, d1.length());
+        float length2 = Math.max(0.5f * MIN_PULLEY_LENGTH, d2.length());
 
         m_constant = length1 + m_ratio * length2;
 
         m_maxLength1 = MathUtils.clamp(def.maxLength1, length1, m_constant
-                - m_ratio * minPulleyLength);
+                - m_ratio * MIN_PULLEY_LENGTH);
         m_maxLength2 = MathUtils.clamp(def.maxLength2, length2,
-                (m_constant - minPulleyLength) / m_ratio);
+                (m_constant - MIN_PULLEY_LENGTH) / m_ratio);
 
         m_pulleyImpulse = 0.0f;
         m_limitImpulse1 = 0.0f;
         m_limitImpulse2 = 0.0f;
         m_u1 = new Vec2();
         m_u2 = new Vec2();
-        m_limitState1 = LimitState.inactiveLimit;
-        m_limitState2 = LimitState.inactiveLimit;
+        m_limitState1 = LimitState.INACTIVE_LIMIT;
+        m_limitState2 = LimitState.INACTIVE_LIMIT;
     }
 
-    public void PreSolve() {
+    public void preSolve() {
         Body b1 = m_body1;
         Body b2 = m_body2;
 
@@ -134,34 +134,38 @@ public class PulleyJoint extends Joint {
 
         float length1 = m_u1.length();
         float length2 = m_u2.length();
-        
-        //System.out.println(length1+" "+length2+" "+m_constant);
-        //System.out.println(m_maxLength1);
+
+        // System.out.println(length1+" "+length2+" "+m_constant);
+        // System.out.println(m_maxLength1);
         if (length1 > Settings.linearSlop) {
             m_u1.mulLocal(1.0f / length1);
-        } else {
+        }
+        else {
             m_u1.setZero();
         }
 
         if (length2 > Settings.linearSlop) {
             m_u2.mulLocal(1.0f / length2);
-        } else {
+        }
+        else {
             m_u2.setZero();
         }
 
         if (length1 < m_maxLength1) {
-            m_limitState1 = LimitState.inactiveLimit;
+            m_limitState1 = LimitState.INACTIVE_LIMIT;
             m_limitImpulse1 = 0.0f;
-        } else {
-            m_limitState1 = LimitState.atUpperLimit;
+        }
+        else {
+            m_limitState1 = LimitState.AT_UPPER_LIMIT;
             m_limitPositionImpulse1 = 0.0f;
         }
 
         if (length2 < m_maxLength2) {
-            m_limitState2 = LimitState.inactiveLimit;
+            m_limitState2 = LimitState.INACTIVE_LIMIT;
             m_limitImpulse2 = 0.0f;
-        } else {
-            m_limitState2 = LimitState.atUpperLimit;
+        }
+        else {
+            m_limitState2 = LimitState.AT_UPPER_LIMIT;
             m_limitPositionImpulse2 = 0.0f;
         }
 
@@ -188,8 +192,8 @@ public class PulleyJoint extends Joint {
         b2.m_angularVelocity += b2.m_invI * Vec2.cross(r2, P2);
     }
 
-    public void SolveVelocityConstraints(float dt) {
-        //if (true) return;
+    public void solveVelocityConstraints(float dt) {
+        // if (true) return;
         // NOT_USED(dt);
 
         Body b1 = m_body1;
@@ -214,10 +218,10 @@ public class PulleyJoint extends Joint {
             b1.m_angularVelocity += b1.m_invI * Vec2.cross(r1, P1);
             b2.m_linearVelocity.addLocal(P2.mul(b2.m_invMass));
             b2.m_angularVelocity += b2.m_invI * Vec2.cross(r2, P2);
-            //System.out.println(P1.mul(b1.m_invMass).y);
+            // System.out.println(P1.mul(b1.m_invMass).y);
         }
 
-        if (m_limitState1 == LimitState.atUpperLimit) {
+        if (m_limitState1 == LimitState.AT_UPPER_LIMIT) {
             Vec2 v1 = b1.m_linearVelocity.add(Vec2.cross(b1.m_angularVelocity,
                     r1));
             float Cdot = -Vec2.dot(m_u1, v1);
@@ -230,7 +234,7 @@ public class PulleyJoint extends Joint {
             b1.m_angularVelocity += b1.m_invI * Vec2.cross(r1, P1);
         }
 
-        if (m_limitState2 == LimitState.atUpperLimit) {
+        if (m_limitState2 == LimitState.AT_UPPER_LIMIT) {
             Vec2 v2 = b2.m_linearVelocity.add(Vec2.cross(b2.m_angularVelocity,
                     r2));
             float Cdot = -Vec2.dot(m_u2, v2);
@@ -242,12 +246,12 @@ public class PulleyJoint extends Joint {
             b2.m_linearVelocity.addLocal(P2.mul(b2.m_invMass));
             b2.m_angularVelocity += b2.m_invI * Vec2.cross(r2, P2);
         }
-        
-        //System.out.println(m_pulleyImpulse);
+
+        // System.out.println(m_pulleyImpulse);
     }
 
-    public boolean SolvePositionConstraints() {
-        //if (true) return false;
+    public boolean solvePositionConstraints() {
+        // if (true) return false;
         Body b1 = m_body1;
         Body b2 = m_body2;
 
@@ -298,11 +302,11 @@ public class PulleyJoint extends Joint {
             b2.m_position.addLocal(P2.mul(b2.m_invMass));
             b2.m_rotation += b2.m_invI * Vec2.cross(r2, P2);
 
-            b1.m_R.set(b1.m_rotation);
-            b2.m_R.set(b2.m_rotation);
+            b1.m_R.setAngle(b1.m_rotation);
+            b2.m_R.setAngle(b2.m_rotation);
         }
 
-        if (m_limitState1 == LimitState.atUpperLimit) {
+        if (m_limitState1 == LimitState.AT_UPPER_LIMIT) {
             Vec2 r1 = b1.m_R.mul(m_localAnchor1);
             Vec2 p1 = b1.m_position.add(r1);
 
@@ -329,10 +333,10 @@ public class PulleyJoint extends Joint {
             Vec2 P1 = m_u1.mul(-impulse);
             b1.m_position.addLocal(P1.mul(b1.m_invMass));
             b1.m_rotation += b1.m_invI * Vec2.cross(r1, P1);
-            b1.m_R.set(b1.m_rotation);
+            b1.m_R.setAngle(b1.m_rotation);
         }
 
-        if (m_limitState2 == LimitState.atUpperLimit) {
+        if (m_limitState2 == LimitState.AT_UPPER_LIMIT) {
             Vec2 r2 = b2.m_R.mul(m_localAnchor2);
             Vec2 p2 = b2.m_position.add(r2);
 
@@ -359,55 +363,55 @@ public class PulleyJoint extends Joint {
             Vec2 P2 = m_u2.mul(-impulse);
             b2.m_position.addLocal(P2.mul(b2.m_invMass));
             b2.m_rotation += b2.m_invI * Vec2.cross(r2, P2);
-            b2.m_R.set(b2.m_rotation);
+            b2.m_R.setAngle(b2.m_rotation);
         }
 
         return linearError < Settings.linearSlop;
     }
 
-    public Vec2 GetAnchor1() {
+    public Vec2 getAnchor1() {
         return m_body1.m_position.add(m_body1.m_R.mul(m_localAnchor1));
     }
 
-    public Vec2 GetAnchor2() {
+    public Vec2 getAnchor2() {
         return m_body2.m_position.add(m_body2.m_R.mul(m_localAnchor2));
     }
 
-    public Vec2 GetGroundPoint1() {
+    public Vec2 getGroundPoint1() {
         return m_ground.m_position.add(m_groundAnchor1);
     }
 
-    public Vec2 GetGroundPoint2() {
+    public Vec2 getGroundPoint2() {
         return m_ground.m_position.add(m_groundAnchor2);
     }
 
-    public Vec2 GetReactionForce(float invTimeStep) {
+    public Vec2 getReactionForce(float invTimeStep) {
         // NOT_USED(invTimeStep);
         Vec2 F = new Vec2(0.0f, 0.0f); // = (m_pulleyImpulse * invTimeStep) *
-                                        // m_u;
+        // m_u;
         return F;
     }
 
-    public float GetReactionTorque(float invTimeStep) {
+    public float getReactionTorque(float invTimeStep) {
         // NOT_USED(invTimeStep);
         return 0.0f;
     }
 
-    public float GetLength1() {
+    public float getLength1() {
         Vec2 p = m_body1.m_position.add(m_body1.m_R.mul(m_localAnchor1));
         Vec2 s = m_ground.m_position.add(m_groundAnchor1);
         Vec2 d = p.sub(s);
         return d.length();
     }
 
-    public float GetLength2() {
+    public float getLength2() {
         Vec2 p = m_body2.m_position.add(m_body2.m_R.mul(m_localAnchor2));
         Vec2 s = m_ground.m_position.add(m_groundAnchor2);
         Vec2 d = p.sub(s);
         return d.length();
     }
 
-    public float GetRatio() {
+    public float getRatio() {
         return m_ratio;
     }
 

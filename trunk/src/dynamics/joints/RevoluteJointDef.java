@@ -19,7 +19,7 @@ public class RevoluteJointDef extends JointDef {
     public boolean enableMotor;
 
     public RevoluteJointDef() {
-        type = JointType.revoluteJoint;
+        type = JointType.REVOLUTE_JOINT;
         anchorPoint = new Vec2(0.0f, 0.0f);
         lowerAngle = 0.0f;
         upperAngle = 0.0f;

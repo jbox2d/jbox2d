@@ -1,11 +1,5 @@
 package dynamics.joints;
 
 public enum JointType {
-    unknownJoint, 
-    revoluteJoint, 
-    prismaticJoint, 
-    distanceJoint, 
-    pulleyJoint, 
-    mouseJoint,
-    gearJoint
+    UNKNOWN_JOINT, REVOLUTE_JOINT, PRISMATIC_JOINT, DISTANCE_JOINT, PULLEY_JOINT, MOUSE_JOINT, GEAR_JOINT
 }

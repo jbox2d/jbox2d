@@ -49,23 +49,23 @@ public class MouseJoint extends Joint {
         m_impulse = 0.0f;
     }
 
-    public void SetTarget(Vec2 target) {
+    public void setTarget(Vec2 target) {
         m_body2.wakeUp();
         m_target = target;
     }
 
     @Override
-    public Vec2 GetAnchor1() {
+    public Vec2 getAnchor1() {
         return m_target;
     }
 
     @Override
-    public Vec2 GetAnchor2() {
+    public Vec2 getAnchor2() {
         return m_body2.m_position.add(m_body2.m_R.mul(m_localAnchor));
     }
 
     @Override
-    public void PreSolve() {
+    public void preSolve() {
         Body body = m_body2;
 
         // Compute the effective mass matrix.
@@ -98,12 +98,12 @@ public class MouseJoint extends Joint {
     }
 
     @Override
-    public boolean SolvePositionConstraints() {
+    public boolean solvePositionConstraints() {
         return true;
     }
 
     @Override
-    public void SolveVelocityConstraints(float dt) {
+    public void solveVelocityConstraints(float dt) {
         Body body = m_body2;
 
         Vec2 r = body.m_R.mul(m_localAnchor);

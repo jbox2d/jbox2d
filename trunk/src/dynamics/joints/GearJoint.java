@@ -4,48 +4,54 @@ import common.Vec2;
 import dynamics.Body;
 import common.Settings;
 
-public class GearJoint extends Joint{
+public class GearJoint extends Joint {
 
- // Gear Joint:
- // C0 = (coordinate1 + ratio * coordinate2)_initial
- // C = C0 - (cordinate1 + ratio * coordinate2) = 0
- // Cdot = -(Cdot1 + ratio * Cdot2)
- // J = -[J1 ratio * J2]
- // K = J * invM * JT
- //   = J1 * invM1 * J1T + ratio * ratio * J2 * invM2 * J2T
- //
- // Revolute:
- // coordinate = rotation
- // Cdot = angularVelocity
- // J = [0 0 1]
- // K = J * invM * JT = invI
- //
- // Prismatic:
- // coordinate = dot(p - pg, ug)
- // Cdot = dot(v + cross(w, r), ug)
- // J = [ug cross(r, ug)]
- // K = J * invM * JT = invMass + invI * cross(r, ug)^2
-    
+    // Gear Joint:
+    // C0 = (coordinate1 + ratio * coordinate2)_initial
+    // C = C0 - (cordinate1 + ratio * coordinate2) = 0
+    // Cdot = -(Cdot1 + ratio * Cdot2)
+    // J = -[J1 ratio * J2]
+    // K = J * invM * JT
+    // = J1 * invM1 * J1T + ratio * ratio * J2 * invM2 * J2T
+    //
+    // Revolute:
+    // coordinate = rotation
+    // Cdot = angularVelocity
+    // J = [0 0 1]
+    // K = J * invM * JT = invI
+    //
+    // Prismatic:
+    // coordinate = dot(p - pg, ug)
+    // Cdot = dot(v + cross(w, r), ug)
+    // J = [ug cross(r, ug)]
+    // K = J * invM * JT = invMass + invI * cross(r, ug)^2
+
     Body m_ground1;
+
     Body m_ground2;
 
     // One of these is NULL.
     RevoluteJoint m_revolute1;
+
     PrismaticJoint m_prismatic1;
 
     // One of these is NULL.
     RevoluteJoint m_revolute2;
+
     PrismaticJoint m_prismatic2;
 
     Vec2 m_groundAnchor1;
+
     Vec2 m_groundAnchor2;
 
     Vec2 m_localAnchor1;
+
     Vec2 m_localAnchor2;
 
     Jacobian m_J;
 
     float m_constant;
+
     float m_ratio;
 
     // Effective mass
@@ -53,16 +59,16 @@ public class GearJoint extends Joint{
 
     // Impulse for accumulation/warm starting.
     float m_impulse;
-    
+
     public GearJoint(GearJointDef def) {
         super(def);
-        
+
         m_J = new Jacobian();
-        
-        assert(def.joint1.m_type == JointType.revoluteJoint || def.joint1.m_type == JointType.prismaticJoint);
-        assert(def.joint2.m_type == JointType.revoluteJoint || def.joint2.m_type == JointType.prismaticJoint);
-        assert(def.joint1.m_body1.IsStatic());
-        assert(def.joint2.m_body1.IsStatic());
+
+        assert (def.joint1.m_type == JointType.REVOLUTE_JOINT || def.joint1.m_type == JointType.PRISMATIC_JOINT);
+        assert (def.joint2.m_type == JointType.REVOLUTE_JOINT || def.joint2.m_type == JointType.PRISMATIC_JOINT);
+        assert (def.joint1.m_body1.isStatic());
+        assert (def.joint2.m_body1.isStatic());
 
         m_revolute1 = null;
         m_prismatic1 = null;
@@ -73,30 +79,32 @@ public class GearJoint extends Joint{
 
         m_ground1 = def.joint1.m_body1;
         m_body1 = def.joint1.m_body2;
-        if (def.joint1.m_type == JointType.revoluteJoint) {
-            m_revolute1 = (RevoluteJoint)def.joint1;
+        if (def.joint1.m_type == JointType.REVOLUTE_JOINT) {
+            m_revolute1 = (RevoluteJoint) def.joint1;
             m_groundAnchor1 = m_revolute1.m_localAnchor1;
             m_localAnchor1 = m_revolute1.m_localAnchor2;
-            coordinate1 = m_revolute1.GetJointAngle();
-        } else {
-            m_prismatic1 = (PrismaticJoint)def.joint1;
+            coordinate1 = m_revolute1.getJointAngle();
+        }
+        else {
+            m_prismatic1 = (PrismaticJoint) def.joint1;
             m_groundAnchor1 = m_prismatic1.m_localAnchor1;
             m_localAnchor1 = m_prismatic1.m_localAnchor2;
-            coordinate1 = m_prismatic1.GetJointTranslation();
+            coordinate1 = m_prismatic1.getJointTranslation();
         }
 
         m_ground2 = def.joint2.m_body1;
         m_body2 = def.joint2.m_body2;
-        if (def.joint2.m_type == JointType.revoluteJoint) {
-            m_revolute2 = (RevoluteJoint)def.joint2;
+        if (def.joint2.m_type == JointType.REVOLUTE_JOINT) {
+            m_revolute2 = (RevoluteJoint) def.joint2;
             m_groundAnchor2 = m_revolute2.m_localAnchor1;
             m_localAnchor2 = m_revolute2.m_localAnchor2;
-            coordinate2 = m_revolute2.GetJointAngle();
-        } else {
-            m_prismatic2 = (PrismaticJoint)def.joint2;
+            coordinate2 = m_revolute2.getJointAngle();
+        }
+        else {
+            m_prismatic2 = (PrismaticJoint) def.joint2;
             m_groundAnchor2 = m_prismatic2.m_localAnchor1;
             m_localAnchor2 = m_prismatic2.m_localAnchor2;
-            coordinate2 = m_prismatic2.GetJointTranslation();
+            coordinate2 = m_prismatic2.getJointTranslation();
         }
 
         m_ratio = def.ratio;
@@ -105,8 +113,8 @@ public class GearJoint extends Joint{
 
         m_impulse = 0.0f;
     }
-    
-    public void PreSolve() {
+
+    public void preSolve() {
         Body g1 = m_ground1;
         Body g2 = m_ground2;
         Body b1 = m_body1;
@@ -118,7 +126,8 @@ public class GearJoint extends Joint{
         if (m_revolute1 != null) {
             m_J.angular1 = -1.0f;
             K += b1.m_invI;
-        } else {
+        }
+        else {
             Vec2 ug = g1.m_R.mul(m_prismatic1.m_localXAxis1);
             Vec2 r = b1.m_R.mul(m_localAnchor1);
             float crug = Vec2.cross(r, ug);
@@ -130,7 +139,8 @@ public class GearJoint extends Joint{
         if (m_revolute2 != null) {
             m_J.angular2 = -m_ratio;
             K += m_ratio * m_ratio * b2.m_invI;
-        } else {
+        }
+        else {
             Vec2 ug = g2.m_R.mul(m_prismatic2.m_localXAxis1);
             Vec2 r = b2.m_R.mul(m_localAnchor2);
             float crug = Vec2.cross(r, ug);
@@ -140,7 +150,7 @@ public class GearJoint extends Joint{
         }
 
         // Compute effective mass.
-        assert(K > 0.0f);
+        assert (K > 0.0f);
         m_mass = 1.0f / K;
 
         // Warm starting.
@@ -149,15 +159,15 @@ public class GearJoint extends Joint{
         b2.m_linearVelocity.add(m_J.linear2.mul(b2.m_invMass * m_impulse));
         b2.m_angularVelocity += b2.m_invI * m_impulse * m_J.angular2;
     }
-    
-    public void SolveVelocityConstraints(float dt) {
-        //NOT_USED(dt);
+
+    public void solveVelocityConstraints(float dt) {
+        // NOT_USED(dt);
 
         Body b1 = m_body1;
         Body b2 = m_body2;
 
-        float Cdot = m_J.Compute( b1.m_linearVelocity, b1.m_angularVelocity,
-                                    b2.m_linearVelocity, b2.m_angularVelocity);
+        float Cdot = m_J.compute(b1.m_linearVelocity, b1.m_angularVelocity,
+                b2.m_linearVelocity, b2.m_angularVelocity);
 
         float impulse = -m_mass * Cdot;
         m_impulse += impulse;
@@ -168,7 +178,7 @@ public class GearJoint extends Joint{
         b2.m_angularVelocity += b2.m_invI * impulse * m_J.angular2;
     }
 
-    public boolean SolvePositionConstraints() {
+    public boolean solvePositionConstraints() {
         float linearError = 0.0f;
 
         Body b1 = m_body1;
@@ -176,15 +186,17 @@ public class GearJoint extends Joint{
 
         float coordinate1, coordinate2;
         if (m_revolute1 != null) {
-            coordinate1 = m_revolute1.GetJointAngle();
-        } else {
-            coordinate1 = m_prismatic1.GetJointTranslation();
+            coordinate1 = m_revolute1.getJointAngle();
+        }
+        else {
+            coordinate1 = m_prismatic1.getJointTranslation();
         }
 
         if (m_revolute2 != null) {
-            coordinate2 = m_revolute2.GetJointAngle();
-        } else {
-            coordinate2 = m_prismatic2.GetJointTranslation();
+            coordinate2 = m_revolute2.getJointAngle();
+        }
+        else {
+            coordinate2 = m_prismatic2.getJointTranslation();
         }
 
         float C = m_constant - (coordinate1 + m_ratio * coordinate2);
@@ -195,33 +207,33 @@ public class GearJoint extends Joint{
         b1.m_rotation += b1.m_invI * impulse * m_J.angular1;
         b2.m_position.add(m_J.linear2.mul(b2.m_invMass * impulse));
         b2.m_rotation += b2.m_invI * impulse * m_J.angular2;
-        b1.m_R.set(b1.m_rotation);
-        b2.m_R.set(b2.m_rotation);
+        b1.m_R.setAngle(b1.m_rotation);
+        b2.m_R.setAngle(b2.m_rotation);
 
         return linearError < Settings.linearSlop;
     }
 
-    public Vec2 GetAnchor1() {
+    public Vec2 getAnchor1() {
         return (m_body1.m_position.add(m_body1.m_R.mul(m_localAnchor1)));
     }
 
-    public Vec2 GetAnchor2() {
+    public Vec2 getAnchor2() {
         return (m_body2.m_position.add(m_body2.m_R.mul(m_localAnchor2)));
     }
 
-    public Vec2 GetReactionForce(float invTimeStep) {
-        //NOT_USED(invTimeStep);
-        Vec2 F = new Vec2(0.0f, 0.0f); // = (m_pulleyImpulse * invTimeStep) * m_u;
+    public Vec2 getReactionForce(float invTimeStep) {
+        // NOT_USED(invTimeStep);
+        Vec2 F = new Vec2(0.0f, 0.0f);
+        // = (m_pulleyImpulse * invTimeStep) * m_u;
         return F;
     }
 
-    public float GetReactionTorque(float invTimeStep) {
-        //NOT_USED(invTimeStep);
+    public float getReactionTorque(float invTimeStep) {
+        // NOT_USED(invTimeStep);
         return 0.0f;
     }
 
-    public float GetRatio() {
+    public float getRatio() {
         return m_ratio;
     }
-    
 }
