@@ -154,9 +154,9 @@ public class GearJoint extends Joint {
         m_mass = 1.0f / K;
 
         // Warm starting.
-        b1.m_linearVelocity.add(m_J.linear1.mul(b1.m_invMass * m_impulse));
+        b1.m_linearVelocity.addLocal(m_J.linear1.mul(b1.m_invMass * m_impulse));
         b1.m_angularVelocity += b1.m_invI * m_impulse * m_J.angular1;
-        b2.m_linearVelocity.add(m_J.linear2.mul(b2.m_invMass * m_impulse));
+        b2.m_linearVelocity.addLocal(m_J.linear2.mul(b2.m_invMass * m_impulse));
         b2.m_angularVelocity += b2.m_invI * m_impulse * m_J.angular2;
     }
 
@@ -172,9 +172,9 @@ public class GearJoint extends Joint {
         float impulse = -m_mass * Cdot;
         m_impulse += impulse;
 
-        b1.m_linearVelocity.add(m_J.linear1.mul(b1.m_invMass * impulse));
+        b1.m_linearVelocity.addLocal(m_J.linear1.mul(b1.m_invMass * impulse));
         b1.m_angularVelocity += b1.m_invI * impulse * m_J.angular1;
-        b2.m_linearVelocity.add(m_J.linear2.mul(b2.m_invMass * impulse));
+        b2.m_linearVelocity.addLocal(m_J.linear2.mul(b2.m_invMass * impulse));
         b2.m_angularVelocity += b2.m_invI * impulse * m_J.angular2;
     }
 
@@ -203,9 +203,9 @@ public class GearJoint extends Joint {
 
         float impulse = -m_mass * C;
 
-        b1.m_position.add(m_J.linear1.mul(b1.m_invMass * impulse));
+        b1.m_position.addLocal(m_J.linear1.mul(b1.m_invMass * impulse));
         b1.m_rotation += b1.m_invI * impulse * m_J.angular1;
-        b2.m_position.add(m_J.linear2.mul(b2.m_invMass * impulse));
+        b2.m_position.addLocal(m_J.linear2.mul(b2.m_invMass * impulse));
         b2.m_rotation += b2.m_invI * impulse * m_J.angular2;
         b1.m_R.setAngle(b1.m_rotation);
         b2.m_R.setAngle(b2.m_rotation);
