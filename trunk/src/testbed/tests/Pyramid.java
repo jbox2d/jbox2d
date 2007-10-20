@@ -24,11 +24,12 @@ public class Pyramid extends PTest {
             BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
             bd.addShape(sd);
-            m_world.CreateBody(bd);
+            m_world.createBody(bd);
         }
 
         {
-            BoxDef sd = new BoxDef();float a = 0.5f;
+            BoxDef sd = new BoxDef();
+            float a = 0.5f;
             sd.extents = new Vec2(a, a);
             sd.density = 2.0f;
 
@@ -45,7 +46,7 @@ public class Pyramid extends PTest {
 
                 for (int j = i; j < 25; ++j) {
                     bd.position = y;
-                    m_world.CreateBody(bd);
+                    m_world.createBody(bd);
 
                     y.addLocal(deltaY);
                 }

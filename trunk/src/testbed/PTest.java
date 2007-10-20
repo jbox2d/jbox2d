@@ -5,14 +5,14 @@ import java.util.Random;
 
 import processing.core.PApplet;
 import collision.AABB;
+import collision.BoxDef;
 import collision.BroadPhase;
+import collision.CircleShape;
 import collision.Manifold;
 import collision.Pair;
 import collision.PolyShape;
 import collision.Proxy;
 import collision.Shape;
-import collision.ShapeDef;
-import collision.*;
 import collision.ShapeType;
 
 import common.Settings;
@@ -22,7 +22,11 @@ import dynamics.Body;
 import dynamics.BodyDef;
 import dynamics.World;
 import dynamics.contacts.Contact;
-import dynamics.joints.*;
+import dynamics.joints.Joint;
+import dynamics.joints.JointType;
+import dynamics.joints.MouseDef;
+import dynamics.joints.MouseJoint;
+import dynamics.joints.PulleyJoint;
 
 public abstract class PTest extends PApplet {
 
@@ -99,12 +103,12 @@ public abstract class PTest extends PApplet {
 
         // Query the world for overlapping shapes.
         int k_maxCount = 10;
-        Shape shapes[] = m_world.Query(aabb, k_maxCount);
+        Shape shapes[] = m_world.query(aabb, k_maxCount);
         Body body = null;
         for (int j = 0; j < shapes.length; j++) {
             Shape shape = shapes[j];
-            if (shape != null && !shape.m_body.IsStatic()) {
-                boolean inside = shape.TestPoint(p);
+            if (shape != null && !shape.m_body.isStatic()) {
+                boolean inside = shape.testPoint(p);
                 if (inside) {
                     body = shape.m_body;
                     break;
@@ -118,21 +122,21 @@ public abstract class PTest extends PApplet {
             md.body2 = body;
             md.target = p;
             md.motorForce = 400.0f * body.m_mass;
-            m_mouseJoint = (MouseJoint) m_world.CreateJoint(md);
+            m_mouseJoint = (MouseJoint) m_world.createJoint(md);
             body.wakeUp();
         }
     }
 
     void MouseUp() {
         if (m_mouseJoint != null) {
-            m_world.DestroyJoint(m_mouseJoint);
+            m_world.destroyJoint(m_mouseJoint);
             m_mouseJoint = null;
         }
     }
 
     void MouseMove(Vec2 p) {
         if (m_mouseJoint != null) {
-            m_mouseJoint.SetTarget(p);
+            m_mouseJoint.setTarget(p);
         }
     }
 
@@ -140,21 +144,21 @@ public abstract class PTest extends PApplet {
         if (m_bomb == null) {
             BoxDef sd = new BoxDef();
             float a = 0.5f;
-            //sd.type = ShapeType.BOX_SHAPE;
-            
+            // sd.type = ShapeType.BOX_SHAPE;
+
             sd.extents = new Vec2(a, a);
             sd.density = 20.0f;
 
             BodyDef bd = new BodyDef();
             bd.addShape(sd);
-            m_bomb = m_world.CreateBody(bd);
+            m_bomb = m_world.createBody(bd);
         }
 
         Random r = new Random();
 
         Vec2 position = new Vec2(r.nextFloat() * 30 - 15, 30.0f);
         float rotation = r.nextFloat() * 3 - 1.5f;
-        m_bomb.SetOriginPosition(position, rotation);
+        m_bomb.setOriginPosition(position, rotation);
         m_bomb.m_linearVelocity = position.mul(-1.0f);
         m_bomb.m_angularVelocity = r.nextFloat() * 40 - 20;
         m_bomb.wakeUp();
@@ -163,10 +167,10 @@ public abstract class PTest extends PApplet {
     void Step(TestSettings settings) {
         float timeStep = settings.hz > 0.0f ? 1.0f / settings.hz : 0.0f;
 
-        World.s_enableWarmStarting = settings.enableWarmStarting;
-        World.s_enablePositionCorrection = settings.enablePositionCorrection;
+        World.ENABLE_WARM_STARTING = settings.enableWarmStarting;
+        World.ENABLE_POSITION_CORRECTION = settings.enablePositionCorrection;
 
-        m_world.Step(timeStep, settings.iterationCount);
+        m_world.step(timeStep, settings.iterationCount);
 
         // m_world.m_broadPhase.Validate();
 
@@ -175,7 +179,7 @@ public abstract class PTest extends PApplet {
                 if (b.m_invMass == 0.0f) {
                     DrawShape(s, color(0.5f, 0.9f, 0.5f));
                 }
-                else if (b.IsSleeping()) {
+                else if (b.isSleeping()) {
                     DrawShape(s, color(0.5f, 0.5f, 0.9f));
                 }
                 else if (b == m_bomb) {
@@ -212,11 +216,11 @@ public abstract class PTest extends PApplet {
         DrawAABB(m_world.m_broadPhase.m_worldAABB, color(0, 255, 0));
         if (settings.drawAABBs) {
             BroadPhase bp = m_world.m_broadPhase;
-            Vec2 invQ = new Vec2(1.0f / bp.m_quantizationFactor.x,
-                    1.0f / bp.m_quantizationFactor.y);
+            Vec2 invQ = new Vec2(1.0f / bp.quantizationFactor.x,
+                    1.0f / bp.quantizationFactor.y);
             for (int i = 0; i < Settings.maxProxies; ++i) {
-                Proxy p = bp.m_proxyPool[i];
-                if (p.IsValid() == false) {
+                Proxy p = bp.proxyPool[i];
+                if (p.isValid() == false) {
                     continue;
                 }
 
@@ -266,12 +270,17 @@ public abstract class PTest extends PApplet {
             Vec2 v = poly.m_position.add(poly.m_R.mul(poly.m_vertices[0]));
             vertex(v.x, v.y);
             endShape();
-        } else if (shape.m_type == ShapeType.CIRCLE_SHAPE) {
+        }
+        else if (shape.m_type == ShapeType.CIRCLE_SHAPE) {
             CircleShape circle = (CircleShape) shape;
-            ellipse(circle.m_position.x,circle.m_position.y,circle.m_radius*2,circle.m_radius*2);
-            float xR = circle.m_radius*(float)Math.cos(shape.m_body.m_rotation);
-            float yR = circle.m_radius*(float)Math.sin(shape.m_body.m_rotation);
-            line(circle.m_position.x,circle.m_position.y,circle.m_position.x+xR,circle.m_position.y+yR);
+            ellipse(circle.m_position.x, circle.m_position.y,
+                    circle.m_radius * 2, circle.m_radius * 2);
+            float xR = circle.m_radius
+                    * (float) Math.cos(shape.m_body.m_rotation);
+            float yR = circle.m_radius
+                    * (float) Math.sin(shape.m_body.m_rotation);
+            line(circle.m_position.x, circle.m_position.y, circle.m_position.x
+                    + xR, circle.m_position.y + yR);
         }
     }
 
@@ -280,19 +289,21 @@ public abstract class PTest extends PApplet {
         Body b2 = joint.m_body2;
         Vec2 x1 = b1.m_position;
         Vec2 x2 = b2.m_position;
-        Vec2 p1 = joint.GetAnchor1();
-        Vec2 p2 = joint.GetAnchor2();
+        Vec2 p1 = joint.getAnchor1();
+        Vec2 p2 = joint.getAnchor2();
 
         stroke(0.5f, 0.8f, 0.8f);
         noFill();
 
-        if (joint.m_type == JointType.distanceJoint) {
+        if (joint.m_type == JointType.DISTANCE_JOINT) {
             line(p1.x, p1.y, p2.x, p2.y);
-        } else if (joint.m_type == JointType.pulleyJoint) {
+        }
+        else if (joint.m_type == JointType.PULLEY_JOINT) {
             PulleyJoint pj = (PulleyJoint) joint;
-            line (x1.x,x1.y,pj.m_groundAnchor1.x,pj.m_groundAnchor1.y);
-            line (x2.x,x2.y,pj.m_groundAnchor2.x,pj.m_groundAnchor2.y);
-        } else {
+            line(x1.x, x1.y, pj.m_groundAnchor1.x, pj.m_groundAnchor1.y);
+            line(x2.x, x2.y, pj.m_groundAnchor2.x, pj.m_groundAnchor2.y);
+        }
+        else {
             line(x1.x, x1.y, p1.x, p1.y);
             line(x2.x, x2.y, p2.x, p2.y);
         }
@@ -314,7 +325,7 @@ public abstract class PTest extends PApplet {
             for (int j = 0; j < m.pointCount; ++j) {
                 Vec2 v = m.points[j].position;
                 // g.fillOval((int) v.x, (int) v.y, 4, 4);
-                ellipse(v.x, v.y, 4f/scaleFactor, 4f/scaleFactor);
+                ellipse(v.x, v.y, 4f / scaleFactor, 4f / scaleFactor);
             }
         }
     }
@@ -337,14 +348,14 @@ public abstract class PTest extends PApplet {
         // g.setColor(new Color(0.9f, 0.9f, 0.3f));
         stroke(230, 230, 80);
         BroadPhase bp = m_world.m_broadPhase;
-        Vec2 invQ = new Vec2(1.0f / bp.m_quantizationFactor.x,
-                1.0f / bp.m_quantizationFactor.y);
-        for (int i = 0; i < bp.m_pairManager.m_pairCount; ++i) {
-            Pair pair = bp.m_pairManager.m_pairs[i];
+        Vec2 invQ = new Vec2(1.0f / bp.quantizationFactor.x,
+                1.0f / bp.quantizationFactor.y);
+        for (int i = 0; i < bp.pairManager.m_pairCount; ++i) {
+            Pair pair = bp.pairManager.m_pairs[i];
             int id1 = pair.proxyId1;
             int id2 = pair.proxyId2;
-            Proxy p1 = bp.m_proxyPool[id1];
-            Proxy p2 = bp.m_proxyPool[id2];
+            Proxy p1 = bp.proxyPool[id1];
+            Proxy p2 = bp.proxyPool[id2];
 
             AABB b1 = new AABB();
             AABB b2 = new AABB();
@@ -411,7 +422,7 @@ public abstract class PTest extends PApplet {
         if (key == 'c') {
             normals = !normals;
             contacts = !contacts;
-            //settings.drawNormals = normals;
+            // settings.drawNormals = normals;
             settings.drawContacts = contacts;
         }
         if (key == ' ') {
@@ -457,16 +468,16 @@ public abstract class PTest extends PApplet {
         addMouseWheelListener(new java.awt.event.MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 int notches = e.getWheelRotation();
-                Vec2 oldCenter = screenToWorld(width/2.0f,height/2.0f);
+                Vec2 oldCenter = screenToWorld(width / 2.0f, height / 2.0f);
                 if (notches < 0) {
                     scaleFactor = min(100f, scaleFactor * 1.05f);
                 }
                 else if (notches > 0) {
                     scaleFactor = max(.01f, scaleFactor / 1.05f);
                 }
-                Vec2 newCenter = screenToWorld(width/2.0f,height/2.0f);
-                transX -= (oldCenter.x-newCenter.x)*scaleFactor;
-                transY += (oldCenter.y-newCenter.y)*scaleFactor;
+                Vec2 newCenter = screenToWorld(width / 2.0f, height / 2.0f);
+                transX -= (oldCenter.x - newCenter.x) * scaleFactor;
+                transY += (oldCenter.y - newCenter.y) * scaleFactor;
             }
         });
 

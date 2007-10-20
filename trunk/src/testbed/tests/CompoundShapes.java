@@ -36,7 +36,7 @@ public class CompoundShapes extends PTest {
             BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
             bd.addShape(sd);
-            world.CreateBody(bd);
+            world.createBody(bd);
         }
 
         {
@@ -64,7 +64,7 @@ public class CompoundShapes extends PTest {
                 // bd.position=new Vec2(0.0f, 0.45f);
                 bd.rotation = (float) (r.nextFloat() * Math.PI * 4 - Math.PI * 2);
 
-                world.CreateBody(bd);
+                world.createBody(bd);
             }
         }
     }

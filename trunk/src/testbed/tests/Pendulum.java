@@ -27,7 +27,7 @@ public class Pendulum extends PTest {
             BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
             bd.addShape(sd);
-            ground = world.CreateBody(bd);
+            ground = world.createBody(bd);
         }
 
         {
@@ -45,12 +45,12 @@ public class Pendulum extends PTest {
             Body prevBody = ground;
             for (int i = 0; i < 30; ++i) {
                 bd.position = new Vec2(0.5f + i, y);
-                Body body = world.CreateBody(bd);
+                Body body = world.createBody(bd);
 
                 jd.anchorPoint = new Vec2(i, y);
                 jd.body1 = prevBody;
                 jd.body2 = body;
-                world.CreateJoint(jd);
+                world.createJoint(jd);
 
                 prevBody = body;
             }

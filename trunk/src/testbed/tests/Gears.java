@@ -2,21 +2,28 @@ package testbed.tests;
 
 import processing.core.PApplet;
 import testbed.PTest;
-import collision.*;
-
-import common.Vec2;
-
+import collision.BoxDef;
+import collision.CircleDef;
 import dynamics.Body;
 import dynamics.BodyDef;
 import dynamics.World;
-import dynamics.joints.*;
+import dynamics.joints.GearJoint;
+import dynamics.joints.GearJointDef;
+import dynamics.joints.PrismaticJoint;
+import dynamics.joints.PrismaticJointDef;
+import dynamics.joints.RevoluteJoint;
+import dynamics.joints.RevoluteJointDef;
 
 public class Gears extends PTest {
-    
+
     RevoluteJoint m_joint1;
+
     RevoluteJoint m_joint2;
+
     PrismaticJoint m_joint3;
+
     GearJoint m_joint4;
+
     GearJoint m_joint5;
 
     public Gears() {
@@ -33,7 +40,7 @@ public class Gears extends PTest {
             BodyDef bd = new BodyDef();
             bd.position.set(0.0f, -10.0f);
             bd.addShape(sd);
-            ground = world.CreateBody(bd);
+            ground = world.createBody(bd);
         }
 
         {
@@ -52,29 +59,29 @@ public class Gears extends PTest {
             BodyDef bd1 = new BodyDef();
             bd1.addShape(circle1);
             bd1.position.set(-3.0f, 12.0f);
-            Body body1 = world.CreateBody(bd1);
+            Body body1 = world.createBody(bd1);
 
             RevoluteJointDef jd1 = new RevoluteJointDef();
             jd1.anchorPoint = bd1.position;
             jd1.body1 = ground;
             jd1.body2 = body1;
-            m_joint1 = (RevoluteJoint)world.CreateJoint(jd1);
+            m_joint1 = (RevoluteJoint) world.createJoint(jd1);
 
             BodyDef bd2 = new BodyDef();
             bd2.addShape(circle2);
             bd2.position.set(0.0f, 12.0f);
-            Body body2 = world.CreateBody(bd2);
+            Body body2 = world.createBody(bd2);
 
             RevoluteJointDef jd2 = new RevoluteJointDef();
             jd2.body1 = ground;
             jd2.body2 = body2;
             jd2.anchorPoint = bd2.position;
-            m_joint2 = (RevoluteJoint)world.CreateJoint(jd2);
+            m_joint2 = (RevoluteJoint) world.createJoint(jd2);
 
             BodyDef bd3 = new BodyDef();
             bd3.addShape(box);
             bd3.position.set(2.5f, 12.0f);
-            Body body3 = world.CreateBody(bd3);
+            Body body3 = world.createBody(bd3);
 
             PrismaticJointDef jd3 = new PrismaticJointDef();
             jd3.body1 = ground;
@@ -85,7 +92,7 @@ public class Gears extends PTest {
             jd3.upperTranslation = 5.0f;
             jd3.enableLimit = true;
 
-            m_joint3 = (PrismaticJoint)world.CreateJoint(jd3);
+            m_joint3 = (PrismaticJoint) world.createJoint(jd3);
 
             GearJointDef jd4 = new GearJointDef();
             jd4.body1 = body1;
@@ -93,7 +100,7 @@ public class Gears extends PTest {
             jd4.joint1 = m_joint1;
             jd4.joint2 = m_joint2;
             jd4.ratio = circle2.radius / circle1.radius;
-            m_joint4 = (GearJoint)world.CreateJoint(jd4);
+            m_joint4 = (GearJoint) world.createJoint(jd4);
 
             GearJointDef jd5 = new GearJointDef();
             jd5.body1 = body2;
@@ -101,7 +108,7 @@ public class Gears extends PTest {
             jd5.joint1 = m_joint2;
             jd5.joint2 = m_joint3;
             jd5.ratio = -1.0f / circle2.radius;
-            m_joint5 = (GearJoint)m_world.CreateJoint(jd5);
+            m_joint5 = (GearJoint) m_world.createJoint(jd5);
         }
     }
 

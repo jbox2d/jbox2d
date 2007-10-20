@@ -15,8 +15,9 @@ import dynamics.joints.PrismaticJoint;
 import dynamics.joints.PrismaticJointDef;
 
 public class Pulleys extends PTest {
-    
+
     PulleyJoint m_joint1;
+
     PrismaticJoint m_joint2;
 
     public Pulleys() {
@@ -28,33 +29,33 @@ public class Pulleys extends PTest {
         Body ground = null;
         {
             BoxDef sd = new BoxDef();
-            sd.extents.set(50f,10f);
-            
+            sd.extents.set(50f, 10f);
+
             BodyDef bd = new BodyDef();
-            bd.position.set(0f,-10f);
+            bd.position.set(0f, -10f);
             bd.addShape(sd);
-            ground = world.CreateBody(bd);
-            
+            ground = world.createBody(bd);
+
         }
-        
+
         {
             float a = 2f;
             float y = 16f;
             float L = 12f;
-            
+
             BoxDef sd = new BoxDef();
-            sd.extents.set(2f*a,a);
+            sd.extents.set(2f * a, a);
             sd.density = 5f;
-            
+
             BodyDef bd = new BodyDef();
             bd.addShape(sd);
-            
-            bd.position.set(-10f,y);
-            Body body1 = world.CreateBody(bd);
-            
-            bd.position.set(10f,y);
-            Body body2 = world.CreateBody(bd);
-            
+
+            bd.position.set(-10f, y);
+            Body body1 = world.createBody(bd);
+
+            bd.position.set(10f, y);
+            Body body2 = world.createBody(bd);
+
             PulleyJointDef pulleyDef = new PulleyJointDef();
             pulleyDef.body1 = body1;
             pulleyDef.body2 = body2;
@@ -63,20 +64,20 @@ public class Pulleys extends PTest {
             pulleyDef.groundPoint1 = new Vec2(-10.0f, y + a + L);
             pulleyDef.groundPoint2 = new Vec2(10.0f, y + a + L);
             pulleyDef.ratio = 2.0f;
-             
+
             pulleyDef.maxLength1 = 28.0f;
             pulleyDef.maxLength2 = 12.0f;
-            
-            m_joint1 = (PulleyJoint)(world.CreateJoint(pulleyDef));
-            
+
+            m_joint1 = (PulleyJoint) (world.createJoint(pulleyDef));
+
             PrismaticJointDef prismDef = new PrismaticJointDef();
             prismDef.body1 = ground;
             prismDef.body2 = body2;
-            prismDef.axis.set(0f,1f);
-            prismDef.anchorPoint = body2.GetCenterPosition();
-            m_joint2 = (PrismaticJoint)(world.CreateJoint(prismDef));
+            prismDef.axis.set(0f, 1f);
+            prismDef.anchorPoint = body2.getCenterPosition();
+            m_joint2 = (PrismaticJoint) (world.createJoint(prismDef));
         }
-        
+
     }
 
     /**
