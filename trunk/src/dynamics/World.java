@@ -28,7 +28,7 @@ public class World {
     public int m_contactCount;
 
     public int m_jointCount;
-    
+
     public Body m_bodyDestroyList;
 
     public Vec2 m_gravity;
@@ -36,32 +36,32 @@ public class World {
     boolean m_doSleep;
 
     public Body m_groundBody;
-    
+
     public WorldListener m_listener;
 
-    public static boolean s_enablePositionCorrection;
+    public static boolean ENABLE_POSITION_CORRECTION;
 
-    public static boolean s_enableWarmStarting;
-    
-    public Body GetGroundBody() {
+    public static boolean ENABLE_WARM_STARTING;
+
+    public Body getGroundBody() {
         return m_groundBody;
     }
-    
-    public Body GetBodyList() {
+
+    public Body getBodyList() {
         return m_bodyList;
     }
-    
-    public Joint GetJointList() {
+
+    public Joint getJointList() {
         return m_jointList;
     }
-    
-    public Contact GetContactList() {
+
+    public Contact getContactList() {
         return m_contactList;
     }
 
     public World(AABB worldAABB, Vec2 gravity, boolean doSleep) {
         m_listener = null;
-        
+
         m_bodyList = null;
         m_contactList = null;
         m_jointList = null;
@@ -69,7 +69,7 @@ public class World {
         m_bodyCount = 0;
         m_contactCount = 0;
         m_jointCount = 0;
-        
+
         m_bodyDestroyList = null;
 
         m_doSleep = doSleep;
@@ -81,14 +81,14 @@ public class World {
         m_broadPhase = new BroadPhase(worldAABB, m_contactManager);
 
         BodyDef bd = new BodyDef();
-        m_groundBody = CreateBody(bd);
+        m_groundBody = createBody(bd);
     }
-    
-    public void SetListener(WorldListener listener) {
+
+    public void setListener(WorldListener listener) {
         m_listener = listener;
     }
 
-    public Body CreateBody(BodyDef description) {
+    public Body createBody(BodyDef description) {
         Body b = new Body(description, this);
         b.m_prev = null;
 
@@ -103,69 +103,69 @@ public class World {
     }
 
     // Body destruction is deferred to make contact processing more robust.
-    public void DestroyBody(Body b) {
-        if ( (b.m_flags & Body.e_destroyFlag) > 0) {
+    public void destroyBody(Body b) {
+        if ((b.m_flags & Body.e_destroyFlag) > 0) {
             return;
         }
-        
+
         // Remove from normal body list
         if (b.m_prev != null) {
             b.m_prev.m_next = b.m_next;
         }
-        
+
         if (b.m_next != null) {
             b.m_next.m_prev = b.m_prev;
         }
-        
+
         if (b == m_bodyList) {
             m_bodyList = b.m_next;
         }
-        
+
         b.m_flags |= Body.e_destroyFlag;
         assert (m_bodyCount > 0);
         --m_bodyCount;
-        
+
         // Add to the deferred destruction list.
         b.m_prev = null;
         b.m_next = m_bodyDestroyList;
         m_bodyDestroyList = b;
     }
-    
-    public void CleanBodyList() {
+
+    public void cleanBodyList() {
         m_contactManager.m_destroyImmediate = true;
-        
+
         Body b = m_bodyDestroyList;
-        
+
         while (b != null) {
-            assert ( (b.m_flags & Body.e_destroyFlag) != 0 );
-            
+            assert ((b.m_flags & Body.e_destroyFlag) != 0);
+
             // Preserve the next pointer.
             Body b0 = b;
             b = b.m_next;
-            
+
             // Delete the attached joints
             JointNode jn = b0.m_jointList;
             while (jn != null) {
                 JointNode jn0 = jn;
                 jn = jn.next;
-                
+
                 if (m_listener != null) {
-                    m_listener.NotifyJointDestroyed(jn0.joint);
+                    m_listener.notifyJointDestroyed(jn0.joint);
                 }
-                
-                DestroyJoint(jn0.joint);   
+
+                destroyJoint(jn0.joint);
             }
-            b0.Destructor();
+            b0.destructor();
         }
-        
+
         // Reset the list
         m_bodyDestroyList = null;
-        
+
         m_contactManager.m_destroyImmediate = false;
     }
 
-    public Joint CreateJoint(JointDef def) {
-        Joint j = Joint.Create(def);
+    public Joint createJoint(JointDef def) {
+        Joint j = Joint.create(def);
 
         // Connect to the world list.
         j.m_prev = null;
@@ -194,22 +194,23 @@ public class World {
             j.m_body2.m_jointList.prev = j.m_node2;
         }
         j.m_body2.m_jointList = j.m_node2;
-        
+
         // If the joint prevents collisions, then reset collision filtering
         if (def.collideConnected == false) {
             // Reset the proxies on the body with the minimum number of shapes.
-            Body b = def.body1.m_shapeCount < def.body2.m_shapeCount ? def.body1 : def.body2;
+            Body b = def.body1.m_shapeCount < def.body2.m_shapeCount ? def.body1
+                    : def.body2;
             for (Shape s = b.m_shapeList; s != null; s = s.m_next) {
-                s.ResetProxy(m_broadPhase);
+                s.resetProxy(m_broadPhase);
             }
         }
 
         return j;
     }
 
-    public void DestroyJoint(Joint j) {
+    public void destroyJoint(Joint j) {
         boolean collideConnected = j.m_collideConnected;
-        
+
         // Remove from the world.
         if (j.m_prev != null) {
             j.m_prev.m_next = j.m_next;
@@ -262,31 +263,31 @@ public class World {
 
         j.m_node2.prev = null;
         j.m_node2.next = null;
-        
-        Joint.Destroy(j);
+
+        Joint.destroy(j);
 
         assert m_jointCount > 0;
         --m_jointCount;
-        
+
         // If the joint prevents collisions, then reset collision filtering.
         if (collideConnected == false) {
             // Reset the proxies on the body with the minimum number of shapes.
             Body b = body1.m_shapeCount < body2.m_shapeCount ? body1 : body2;
             for (Shape s = b.m_shapeList; s != null; s = s.m_next) {
-                s.ResetProxy(m_broadPhase);
+                s.resetProxy(m_broadPhase);
             }
         }
     }
 
-    public void Step(float dt, int iterations) {
+    public void step(float dt, int iterations) {
         // Handle deferred contact destruction
-        m_contactManager.CleanContactList();
-        
+        m_contactManager.cleanContactList();
+
         // Handle deferred body destruction
-        CleanBodyList();
-        
+        cleanBodyList();
+
         // Create and/or update contacts.
-        m_contactManager.Collide();
+        m_contactManager.collide();
 
         // Size the island for the worst case.
         Island island = new Island(m_bodyCount, m_contactCount, m_jointCount);
@@ -306,12 +307,13 @@ public class World {
         int stackSize = m_bodyCount;
         Body[] stack = new Body[stackSize];
         for (Body seed = m_bodyList; seed != null; seed = seed.m_next) {
-            if ( (seed.m_flags & (Body.e_staticFlag | Body.e_islandFlag | Body.e_sleepFlag | Body.e_frozenFlag)) > 0) {
+            if ((seed.m_flags & (Body.e_staticFlag | Body.e_islandFlag
+                    | Body.e_sleepFlag | Body.e_frozenFlag)) > 0) {
                 continue;
             }
 
             // Reset island and stack.
-            island.Clear();
+            island.clear();
             int stackCount = 0;
             stack[stackCount++] = seed;
             seed.m_flags |= Body.e_islandFlag;
@@ -320,28 +322,28 @@ public class World {
             while (stackCount > 0) {
                 // Grab the next body off the stack and add it to the island.
                 Body b = stack[--stackCount];
-                island.Add(b);
+                island.add(b);
 
                 // Make sure the body is awake.
                 b.m_flags &= ~Body.e_sleepFlag;
 
                 // To keep islands as small as possible, we don't
                 // propagate islands across static bodies.
-                if ( (b.m_flags & Body.e_staticFlag) > 0) {
+                if ((b.m_flags & Body.e_staticFlag) > 0) {
                     continue;
                 }
 
                 // Search all contacts connected to this body.
                 for (ContactNode cn = b.m_contactList; cn != null; cn = cn.next) {
-                    if ( (cn.contact.m_flags & Contact.e_islandFlag) > 0) {
+                    if ((cn.contact.m_flags & Contact.e_islandFlag) > 0) {
                         continue;
                     }
 
-                    island.Add(cn.contact);
+                    island.add(cn.contact);
                     cn.contact.m_flags |= Contact.e_islandFlag;
 
                     Body other = cn.other;
-                    if ( (other.m_flags & Body.e_islandFlag) > 0) {
+                    if ((other.m_flags & Body.e_islandFlag) > 0) {
                         continue;
                     }
 
@@ -356,11 +358,11 @@ public class World {
                         continue;
                     }
 
-                    island.Add(jn.joint);
+                    island.add(jn.joint);
                     jn.joint.m_islandFlag = true;
 
                     Body other = jn.other;
-                    if ( (other.m_flags & Body.e_islandFlag) > 0) {
+                    if ((other.m_flags & Body.e_islandFlag) > 0) {
                         continue;
                     }
 
@@ -370,24 +372,25 @@ public class World {
                 }
             }
 
-            island.Solve(m_gravity, iterations, dt);
+            island.solve(m_gravity, iterations, dt);
             if (m_doSleep) {
-                island.UpdateSleep(dt);
+                island.updateSleep(dt);
             }
-            
+
             // Post solve cleanup
             for (int i = 0; i < island.m_bodyCount; ++i) {
                 // Allow static bodies to participate in other islands
                 Body b = island.m_bodies[i];
-                if ( (b.m_flags & Body.e_staticFlag) > 0 ) {
+                if ((b.m_flags & Body.e_staticFlag) > 0) {
                     b.m_flags &= ~Body.e_islandFlag;
                 }
-                
+
                 // Handle newly frozen bodies
-                if (b.IsFrozen() && m_listener != null) {
-                    BoundaryResponse response = m_listener.NotifyBoundaryViolated(b);
-                    if (response == BoundaryResponse.destroyBody) {
-                        DestroyBody(b);
+                if (b.isFrozen() && m_listener != null) {
+                    BoundaryResponse response = m_listener
+                            .notifyBoundaryViolated(b);
+                    if (response == BoundaryResponse.DESTROY_BODY) {
+                        destroyBody(b);
                         b = null;
                         island.m_bodies[i] = null;
                     }
@@ -395,11 +398,11 @@ public class World {
             }
         }
 
-        m_broadPhase.Flush();
+        m_broadPhase.flush();
     }
 
-    public Shape[] Query(AABB aabb, int maxCount) {
-        Object[] objs = m_broadPhase.Query(aabb, maxCount);
+    public Shape[] query(AABB aabb, int maxCount) {
+        Object[] objs = m_broadPhase.query(aabb, maxCount);
         Shape[] ret = new Shape[objs.length];
 
         System.arraycopy(objs, 0, ret, 0, objs.length);

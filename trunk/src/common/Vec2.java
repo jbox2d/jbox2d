@@ -22,7 +22,7 @@ public class Vec2 {
         this.x = x;
         this.y = y;
     }
-    
+
     public void set(Vec2 v) {
         this.x = v.x;
         this.y = v.y;
@@ -77,6 +77,7 @@ public class Vec2 {
         if (length < Settings.EPSILON) {
             return 0f;
         }
+
         float invLength = 1.0f / length;
         x *= invLength;
         y *= invLength;

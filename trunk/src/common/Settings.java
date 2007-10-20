@@ -8,7 +8,7 @@ public class Settings {
     /** A "close to zero" float epsilon value for use */
     public static final float EPSILON = 1.1920928955078125E-7f;
 
-    public static final float pi = 3.14159265359f;
+    public static final float pi = (float) Math.PI;
 
     // Define your unit system here. The default system is
     // meters-kilograms-seconds. For the tuning to work well,
@@ -35,11 +35,13 @@ public class Settings {
     public static final int maxProxies = 512; // this must be a power of two
 
     public static final int maxPairs = 8 * maxProxies; // this must be a
-                                                            // power of two
+
+    // power of two
 
     // Dynamics
     public static final float linearSlop = 0.005f * lengthUnitsPerMeter; // 0.5
-                                                                            // cm
+
+    // cm
 
     public static final float angularSlop = 2.0f / 180.0f * pi; // 2 degrees
 
@@ -47,21 +49,25 @@ public class Settings {
             / timeUnitsPerSecond; // 1 m/s
 
     public static final float maxLinearCorrection = 0.2f * lengthUnitsPerMeter; // 20
-                                                                                // cm
+
+    // cm
 
     public static final float maxAngularCorrection = 8.0f / 180.0f * pi; // 8
-                                                                            // degrees
+
+    // degrees
 
     public static final float contactBaumgarte = 0.2f;
 
     // Sleep
     public static final float timeToSleep = 0.5f * timeUnitsPerSecond; // half
-                                                                        // a
-                                                                        // second
+
+    // a
+    // second
 
     public static final float linearSleepTolerance = 0.01f
             * lengthUnitsPerMeter / timeUnitsPerSecond; // 1 cm/s
 
-    public static final float angularSleepTolerance = 0.5f / 180.0f / timeUnitsPerSecond; // 0.5 degrees/s
+    public static final float angularSleepTolerance = 0.5f / 180.0f / timeUnitsPerSecond; // 0.5
+    // degrees/s
 
 }

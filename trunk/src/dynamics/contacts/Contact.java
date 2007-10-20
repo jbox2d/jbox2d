@@ -9,7 +9,7 @@ import collision.ShapeType;
 import dynamics.World;
 
 public abstract class Contact {
-    public abstract void Evaluate();
+    public abstract void evaluate();
 
     public abstract List<Manifold> GetManifolds();
 
@@ -47,35 +47,63 @@ public abstract class Contact {
 
     public float m_restitution;
 
-    //public boolean m_islandFlag;
+    // public boolean m_islandFlag;
     public int m_flags;
 
     public static final int e_islandFlag = 0x0001;
+
     public static final int e_destroyFlag = 0x0002;
-    
+
     public int m_manifoldCount;
-    
-    public Contact GetNext() {
+
+    public Contact() {
+        m_node1 = new ContactNode();
+        m_node2 = new ContactNode();
+    }
+
+    public Contact(Shape s1, Shape s2) {
+        this();
+
+        m_flags = 0;
+
+        m_shape1 = s1;
+        m_shape2 = s2;
+
+        m_manifoldCount = 0;
+        GetManifolds().clear();
+
+        m_friction = (float) Math.sqrt(m_shape1.m_friction
+                * m_shape2.m_friction);
+        m_restitution = Math
+                .max(m_shape1.m_restitution, m_shape2.m_restitution);
+        m_world = s1.m_body.m_world;
+        m_prev = null;
+        m_next = null;
+    }
+
+    public Contact getNext() {
         return m_next;
     }
-    
-    public Shape GetShape1() {
+
+    public Shape getShape1() {
         return m_shape1;
     }
-    
-    public Shape GetShape2() {
+
+    public Shape getShape2() {
         return m_shape2;
     }
 
-    static void InitializeRegisters() {
+    static void initializeRegisters() {
         s_registers = new ArrayList<ContactRegister>();
-        AddType(new CircleContact(), ShapeType.CIRCLE_SHAPE, ShapeType.CIRCLE_SHAPE);
-        AddType(new PolyAndCircleContact(), ShapeType.POLY_SHAPE, ShapeType.CIRCLE_SHAPE);
-        AddType(new PolyContact(), ShapeType.POLY_SHAPE, ShapeType.POLY_SHAPE);
-        //AddType(new PolyContact(), ShapeType.BOX_SHAPE, ShapeType.BOX_SHAPE);
+        addType(new CircleContact(), ShapeType.CIRCLE_SHAPE,
+                ShapeType.CIRCLE_SHAPE);
+        addType(new PolyAndCircleContact(), ShapeType.POLY_SHAPE,
+                ShapeType.CIRCLE_SHAPE);
+        addType(new PolyContact(), ShapeType.POLY_SHAPE, ShapeType.POLY_SHAPE);
+        // AddType(new PolyContact(), ShapeType.BOX_SHAPE, ShapeType.BOX_SHAPE);
     }
 
-    static void AddType(ContactCreator createFcn, ShapeType type1,
+    static void addType(ContactCreator createFcn, ShapeType type1,
             ShapeType type2) {
         ContactRegister cr = new ContactRegister();
         cr.s1 = type1;
@@ -94,9 +122,9 @@ public abstract class Contact {
         }
     }
 
-    public static Contact Create(Shape shape1, Shape shape2) {
+    public static Contact createContact(Shape shape1, Shape shape2) {
         if (s_initialized == false) {
-            InitializeRegisters();
+            initializeRegisters();
             s_initialized = true;
         }
 
@@ -137,7 +165,7 @@ public abstract class Contact {
         return null;
     }
 
-    public static void Destroy(Contact contact) {
+    public static void destroy(Contact contact) {
         assert (s_initialized == true);
 
         if (contact.GetManifoldCount() > 0) {
@@ -146,30 +174,5 @@ public abstract class Contact {
         }
     }
 
-    public Contact() {
-        m_node1 = new ContactNode();
-        m_node2 = new ContactNode();
-    }
-
     public abstract Contact clone();
-
-    public Contact(Shape s1, Shape s2) {
-        this();
-        
-        m_flags = 0;
-
-        m_shape1 = s1;
-        m_shape2 = s2;
-        
-        m_manifoldCount = 0;
-        GetManifolds().clear();
-
-        m_friction = (float) Math.sqrt(m_shape1.m_friction
-                * m_shape2.m_friction);
-        m_restitution = Math
-                .max(m_shape1.m_restitution, m_shape2.m_restitution);
-        m_world = s1.m_body.m_world;
-        m_prev = null;
-        m_next = null;
-    }
 }

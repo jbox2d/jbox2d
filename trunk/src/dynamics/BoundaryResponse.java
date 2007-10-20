@@ -1,7 +1,5 @@
 package dynamics;
 
-
 enum BoundaryResponse {
-    freezeBody,
-    destroyBody;
+    FREEZE_BODY, DESTROY_BODY;
 }
