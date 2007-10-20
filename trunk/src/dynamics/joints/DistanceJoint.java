@@ -2,6 +2,7 @@ package dynamics.joints;
 
 import common.Settings;
 import common.Vec2;
+import dynamics.World;
 
 //C = norm(p2 - p1) - L
 //u = (p2 - p1) / norm(p2 - p1)
@@ -23,7 +24,7 @@ public class DistanceJoint extends Joint {
 
     float m_length;
 
-    public DistanceJoint(DistanceJointDescription description) {
+    public DistanceJoint(DistanceJointDef description) {
         super(description);
         m_localAnchor1 = m_body1.m_R.mulT(description.anchorPoint1
                 .sub(m_body1.m_position));
@@ -43,6 +44,15 @@ public class DistanceJoint extends Joint {
     @Override
     public Vec2 GetAnchor2() {
         return m_body2.m_position.add(m_body2.m_R.mul(m_localAnchor2));
+    }
+    
+    public Vec2 GetReactionForce(float invTimeStep) {
+        Vec2 F = m_u.mul(m_impulse*invTimeStep);
+        return F;
+    }
+    
+    public float GetReactionTorque(float invTimeStep) {
+        return 0.0f;
     }
 
     @Override
@@ -73,13 +83,18 @@ public class DistanceJoint extends Joint {
 
         m_mass = 1.0f / m_mass;
 
-        // Warm starting.
-        Vec2 p = m_u.mul(m_impulse);
+        if (World.s_enableWarmStarting) {
+            // Warm starting.
+            Vec2 p = m_u.mul(m_impulse);
 
-        m_body1.m_linearVelocity.subLocal(p.mul(m_body1.m_invMass));
-        m_body1.m_angularVelocity -= m_body1.m_invI * Vec2.cross(r1, p);
-        m_body2.m_linearVelocity.addLocal(p.mul(m_body2.m_invMass));
-        m_body2.m_angularVelocity += m_body2.m_invI * Vec2.cross(r2, p);
+            m_body1.m_linearVelocity.subLocal(p.mul(m_body1.m_invMass));
+            m_body1.m_angularVelocity -= m_body1.m_invI * Vec2.cross(r1, p);
+            m_body2.m_linearVelocity.addLocal(p.mul(m_body2.m_invMass));
+            m_body2.m_angularVelocity += m_body2.m_invI * Vec2.cross(r2, p);
+        }
+        else {
+            m_impulse = 0.0f;
+        }
     }
 
     @Override

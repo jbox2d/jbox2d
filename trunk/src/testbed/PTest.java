@@ -11,20 +11,18 @@ import collision.Pair;
 import collision.PolyShape;
 import collision.Proxy;
 import collision.Shape;
-import collision.ShapeDescription;
+import collision.ShapeDef;
+import collision.*;
 import collision.ShapeType;
 
 import common.Settings;
 import common.Vec2;
 
 import dynamics.Body;
-import dynamics.BodyDescription;
+import dynamics.BodyDef;
 import dynamics.World;
 import dynamics.contacts.Contact;
-import dynamics.joints.Joint;
-import dynamics.joints.JointType;
-import dynamics.joints.MouseDescription;
-import dynamics.joints.MouseJoint;
+import dynamics.joints.*;
 
 public abstract class PTest extends PApplet {
 
@@ -115,7 +113,7 @@ public abstract class PTest extends PApplet {
         }
 
         if (body != null) {
-            MouseDescription md = new MouseDescription();
+            MouseDef md = new MouseDef();
             md.body1 = m_world.m_groundBody;
             md.body2 = body;
             md.target = p;
@@ -140,13 +138,14 @@ public abstract class PTest extends PApplet {
 
     void LaunchBomb() {
         if (m_bomb == null) {
-            ShapeDescription sd = new ShapeDescription();
+            BoxDef sd = new BoxDef();
             float a = 0.5f;
-            sd.type = ShapeType.BOX_SHAPE;
-            sd.box.m_extents = new Vec2(a, a);
+            //sd.type = ShapeType.BOX_SHAPE;
+            
+            sd.extents = new Vec2(a, a);
             sd.density = 20.0f;
 
-            BodyDescription bd = new BodyDescription();
+            BodyDef bd = new BodyDef();
             bd.addShape(sd);
             m_bomb = m_world.CreateBody(bd);
         }
@@ -155,7 +154,7 @@ public abstract class PTest extends PApplet {
 
         Vec2 position = new Vec2(r.nextFloat() * 30 - 15, 30.0f);
         float rotation = r.nextFloat() * 3 - 1.5f;
-        m_bomb.SetRootPosition(position, rotation);
+        m_bomb.SetOriginPosition(position, rotation);
         m_bomb.m_linearVelocity = position.mul(-1.0f);
         m_bomb.m_angularVelocity = r.nextFloat() * 40 - 20;
         m_bomb.wakeUp();
@@ -176,7 +175,7 @@ public abstract class PTest extends PApplet {
                 if (b.m_invMass == 0.0f) {
                     DrawShape(s, color(0.5f, 0.9f, 0.5f));
                 }
-                else if (b.m_isSleeping) {
+                else if (b.IsSleeping()) {
                     DrawShape(s, color(0.5f, 0.5f, 0.9f));
                 }
                 else if (b == m_bomb) {
@@ -267,6 +266,12 @@ public abstract class PTest extends PApplet {
             Vec2 v = poly.m_position.add(poly.m_R.mul(poly.m_vertices[0]));
             vertex(v.x, v.y);
             endShape();
+        } else if (shape.m_type == ShapeType.CIRCLE_SHAPE) {
+            CircleShape circle = (CircleShape) shape;
+            ellipse(circle.m_position.x,circle.m_position.y,circle.m_radius*2,circle.m_radius*2);
+            float xR = circle.m_radius*(float)Math.cos(shape.m_body.m_rotation);
+            float yR = circle.m_radius*(float)Math.sin(shape.m_body.m_rotation);
+            line(circle.m_position.x,circle.m_position.y,circle.m_position.x+xR,circle.m_position.y+yR);
         }
     }
 
@@ -283,8 +288,11 @@ public abstract class PTest extends PApplet {
 
         if (joint.m_type == JointType.distanceJoint) {
             line(p1.x, p1.y, p2.x, p2.y);
-        }
-        else {
+        } else if (joint.m_type == JointType.pulleyJoint) {
+            PulleyJoint pj = (PulleyJoint) joint;
+            line (x1.x,x1.y,pj.m_groundAnchor1.x,pj.m_groundAnchor1.y);
+            line (x2.x,x2.y,pj.m_groundAnchor2.x,pj.m_groundAnchor2.y);
+        } else {
             line(x1.x, x1.y, p1.x, p1.y);
             line(x2.x, x2.y, p2.x, p2.y);
         }

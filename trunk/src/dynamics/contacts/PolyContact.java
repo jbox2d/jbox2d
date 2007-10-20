@@ -49,7 +49,7 @@ public class PolyContact extends Contact implements ContactCreator {
         newC.m_friction = this.m_friction;
         newC.m_restitution = this.m_restitution;
 
-        newC.m_islandFlag = this.m_islandFlag;
+        newC.m_flags = this.m_flags;
         return newC;
     }
 
@@ -70,9 +70,10 @@ public class PolyContact extends Contact implements ContactCreator {
 
     @Override
     public void Evaluate() {
-        // Manifold m0 = m_manifold;
-        Manifold m0 = new Manifold();
+        //Manifold m0 = m_manifold;
+        Manifold m0 = new Manifold(m_manifold);
         for (int k = 0; k < m_manifold.pointCount; k++) {
+            m0.points[k] = new ContactPoint(m_manifold.points[k]);
             m0.points[k].normalImpulse = m_manifold.points[k].normalImpulse;
             m0.points[k].tangentImpulse = m_manifold.points[k].tangentImpulse;
             m0.points[k].id.key = m_manifold.points[k].id.key;
@@ -83,7 +84,9 @@ public class PolyContact extends Contact implements ContactCreator {
                 (PolyShape) m_shape2);
 
         // Match contact ids to facilitate warm starting.
-        if (m_manifold.points.length > 0) {
+        // Watch out (Java note):
+        // m_manifold.pointCount != m_manifold.points.length!!!
+        if (m_manifold.pointCount > 0) {
             // Body b1 = m_shape1.m_body;
             // Body b2 = m_shape2.m_body;
 

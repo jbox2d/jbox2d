@@ -2,7 +2,7 @@ package dynamics.joints;
 
 import common.Vec2;
 
-public class PrismaticJointDescription extends JointDescription {
+public class PrismaticJointDef extends JointDef {
     public Vec2 anchorPoint;
 
     public Vec2 axis;
@@ -19,7 +19,7 @@ public class PrismaticJointDescription extends JointDescription {
 
     public boolean enableMotor;
 
-    public PrismaticJointDescription() {
+    public PrismaticJointDef() {
         type = JointType.prismaticJoint;
         anchorPoint = new Vec2(0.0f, 0.0f);
         axis = new Vec2(1.0f, 0.0f);

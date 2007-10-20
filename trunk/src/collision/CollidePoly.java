@@ -21,7 +21,7 @@ public class CollidePoly {
     }
 
     static int ClipSegmentToLine(ClipVertex vOut[], ClipVertex vIn[],
-            Vec2 normal, float offset, int clipEdge) {
+            Vec2 normal, float offset) {
         // Start with no output points
         int numOut = 0;
 
@@ -42,7 +42,12 @@ public class CollidePoly {
             // Find intersection point of edge and plane
             float interp = distance0 / (distance0 - distance1);
             vOut[numOut] = new ClipVertex();
-            vOut[numOut].v = vIn[0].v.add((vIn[1].v.sub(vIn[0].v)).mul(interp));
+            //ewj: vector already created in new ClipVertex()
+            //Math inlined to optimize - shouldn't change much.
+            //vOut[numOut].v = vIn[0].v.add((vIn[1].v.sub(vIn[0].v)).mul(interp));
+            vOut[numOut].v.x = vIn[0].v.x + interp * (vIn[1].v.x - vIn[0].v.x);
+            vOut[numOut].v.y = vIn[0].v.y + interp * (vIn[1].v.y - vIn[0].v.y);
+            
             if (distance0 > 0.0f) {
                 vOut[numOut].id = vIn[0].id;
             }
@@ -145,7 +150,7 @@ public class CollidePoly {
             bestSeparation = sNext;
         }
 
-        while (true) {
+        for ( ; ; ) {
             int edgeIndex;
             if (increment == -1)
                 edgeIndex = bestFaceIndex - 1 >= 0 ? bestFaceIndex - 1
@@ -236,6 +241,7 @@ public class CollidePoly {
     public static void b2CollidePoly(Manifold manif, PolyShape polyA,
             PolyShape polyB) {
         // ~84 vec2 creations in Pyramid test, per run
+        // (Some from called functions)
         // Runs ~625 times per step
         // 625 * 84 = 52,500, out of ~95,000 total creations
         // Probably worth optimizing...
@@ -295,9 +301,6 @@ public class CollidePoly {
         float sideOffset1 = -Vec2.dot(sideNormal, v11);
         float sideOffset2 = Vec2.dot(sideNormal, v12);
 
-        int sideEdge1 = edge1 - 1 >= 0 ? edge1 - 1 : count1 - 1;
-        int sideEdge2 = edge1 + 1 < count1 ? edge1 + 1 : 0;
-
         // Clip incident edge against extruded edge1 side edges.
         ClipVertex clipPoints1[] = new ClipVertex[2];
         ClipVertex clipPoints2[] = new ClipVertex[2];
@@ -305,7 +308,7 @@ public class CollidePoly {
 
         // Clip to box side 1
         np = ClipSegmentToLine(clipPoints1, incidentEdge, sideNormal.negate(),
-                sideOffset1, sideEdge1);
+                sideOffset1);
 
         if (np < 2) {
             return;
@@ -313,7 +316,7 @@ public class CollidePoly {
 
         // Clip to negative box side 1
         np = ClipSegmentToLine(clipPoints2, clipPoints1, sideNormal,
-                sideOffset2, sideEdge2);
+                sideOffset2);
 
         if (np < 2) {
             return;

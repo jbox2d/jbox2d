@@ -47,15 +47,32 @@ public abstract class Contact {
 
     public float m_restitution;
 
-    public boolean m_islandFlag;
+    //public boolean m_islandFlag;
+    public int m_flags;
 
+    public static final int e_islandFlag = 0x0001;
+    public static final int e_destroyFlag = 0x0002;
+    
     public int m_manifoldCount;
+    
+    public Contact GetNext() {
+        return m_next;
+    }
+    
+    public Shape GetShape1() {
+        return m_shape1;
+    }
+    
+    public Shape GetShape2() {
+        return m_shape2;
+    }
 
     static void InitializeRegisters() {
         s_registers = new ArrayList<ContactRegister>();
-
+        AddType(new CircleContact(), ShapeType.CIRCLE_SHAPE, ShapeType.CIRCLE_SHAPE);
+        AddType(new PolyAndCircleContact(), ShapeType.POLY_SHAPE, ShapeType.CIRCLE_SHAPE);
         AddType(new PolyContact(), ShapeType.POLY_SHAPE, ShapeType.POLY_SHAPE);
-        AddType(new PolyContact(), ShapeType.BOX_SHAPE, ShapeType.BOX_SHAPE);
+        //AddType(new PolyContact(), ShapeType.BOX_SHAPE, ShapeType.BOX_SHAPE);
     }
 
     static void AddType(ContactCreator createFcn, ShapeType type1,
@@ -138,30 +155,13 @@ public abstract class Contact {
 
     public Contact(Shape s1, Shape s2) {
         this();
+        
+        m_flags = 0;
 
-        // Get the shapes in a repeatable order.
-        if (s1.m_body.IsStatic()) {
-            assert s2.m_body.IsStatic() == false;
-            m_shape1 = s1;
-            m_shape2 = s2;
-        }
-        else if (s2.m_body.IsStatic()) {
-            assert s1.m_body.IsStatic() == false;
-            m_shape1 = s2;
-            m_shape2 = s1;
-            // } else if (s1 < s2) { //Java note: this was a pointer
-            // compare...darn
-        }
-        else if (s1.uid < s2.uid) {// replaced with unique id
-            m_shape1 = s1;
-            m_shape2 = s2;
-        }
-        else {
-            m_shape1 = s2;
-            m_shape2 = s1;
-        }
-
-        // m_manifoldCount = 0;
+        m_shape1 = s1;
+        m_shape2 = s2;
+        
+        m_manifoldCount = 0;
         GetManifolds().clear();
 
         m_friction = (float) Math.sqrt(m_shape1.m_friction

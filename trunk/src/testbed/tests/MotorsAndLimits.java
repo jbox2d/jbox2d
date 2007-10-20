@@ -2,17 +2,16 @@ package testbed.tests;
 
 import processing.core.PApplet;
 import testbed.PTest;
-import collision.ShapeDescription;
-import collision.ShapeType;
+import collision.BoxDef;
 
 import common.Vec2;
 
 import dynamics.Body;
-import dynamics.BodyDescription;
+import dynamics.BodyDef;
 import dynamics.World;
 import dynamics.joints.PrismaticJoint;
-import dynamics.joints.PrismaticJointDescription;
-import dynamics.joints.RevoluteDescription;
+import dynamics.joints.PrismaticJointDef;
+import dynamics.joints.RevoluteJointDef;
 import dynamics.joints.RevoluteJoint;
 
 public class MotorsAndLimits extends PTest {
@@ -30,25 +29,25 @@ public class MotorsAndLimits extends PTest {
     public void go(World world) {
         Body ground = null;
         {
-            ShapeDescription sd = new ShapeDescription(ShapeType.BOX_SHAPE);
-            sd.box.m_extents = new Vec2(50.0f, 10.0f);
+            BoxDef sd = new BoxDef();
+            sd.extents = new Vec2(50.0f, 10.0f);
 
-            BodyDescription bd = new BodyDescription();
+            BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
             bd.addShape(sd);
             ground = world.CreateBody(bd);
         }
 
         {
-            ShapeDescription sd = new ShapeDescription(ShapeType.BOX_SHAPE);
-            sd.box.m_extents = new Vec2(2.0f, 0.5f);
+            BoxDef sd = new BoxDef();
+            sd.extents = new Vec2(2.0f, 0.5f);
             sd.density = 5.0f;
             sd.friction = 0.05f;
 
-            BodyDescription bd = new BodyDescription();
+            BodyDef bd = new BodyDef();
             bd.addShape(sd);
 
-            RevoluteDescription rjd = new RevoluteDescription();
+            RevoluteJointDef rjd = new RevoluteJointDef();
 
             Body body = null;
             Body prevBody = ground;
@@ -90,7 +89,7 @@ public class MotorsAndLimits extends PTest {
             bd.rotation = (float) (0.5f * Math.PI);
             body = world.CreateBody(bd);
 
-            PrismaticJointDescription pjd = new PrismaticJointDescription();
+            PrismaticJointDef pjd = new PrismaticJointDef();
             pjd.anchorPoint = new Vec2(-10.0f, 10.0f);
             pjd.body1 = ground;
             pjd.body2 = body;

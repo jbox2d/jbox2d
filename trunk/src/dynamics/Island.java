@@ -66,10 +66,9 @@ public class Island {
             b.m_angularVelocity += dt * b.m_invI * b.m_torque;
         }
 
-        float inv_dt = dt > 0.0f ? 1.0f / dt : 0.0f;
+        //float inv_dt = dt > 0.0f ? 1.0f / dt : 0.0f;
 
-        ContactSolver contactSolver = new ContactSolver(m_contacts,
-                m_contactCount, inv_dt);
+        ContactSolver contactSolver = new ContactSolver(m_contacts, m_contactCount);
 
         // Pre-solve
         contactSolver.PreSolve();
@@ -90,6 +89,7 @@ public class Island {
         // Integrate positions.
         for (int i = 0; i < m_bodyCount; ++i) {
             Body b = m_bodies[i];
+            if (b.m_invMass == 0.0f) continue;
 
             b.m_position.addLocal(b.m_linearVelocity.mul(dt));
             b.m_rotation += dt * b.m_angularVelocity;
@@ -107,7 +107,8 @@ public class Island {
 
                 boolean jointsOkay = true;
                 for (int i = 0; i < m_jointCount; ++i) {
-                    jointsOkay &= m_joints[i].SolvePositionConstraints();
+                    boolean jointOkay = m_joints[i].SolvePositionConstraints();
+                    jointsOkay = jointsOkay && jointOkay;
                 }
 
                 if (contactsOkay && jointsOkay) {
@@ -122,6 +123,7 @@ public class Island {
         // Synchronize shapes and reset forces.
         for (int i = 0; i < m_bodyCount; ++i) {
             Body b = m_bodies[i];
+            if (b.m_invMass == 0.0f) continue;
             b.SynchronizeShapes();
             b.m_force.set(0.0f, 0.0f);
             b.m_torque = 0.0f;
@@ -143,12 +145,12 @@ public class Island {
                 continue;
             }
 
-            if (b.m_allowSleep == false) {
+            if ((b.m_flags & Body.e_allowSleepFlag) == 0) {
                 b.m_sleepTime = 0.0f;
                 minSleepTime = 0.0f;
             }
 
-            if (b.m_allowSleep == false
+            if ( ((b.m_flags & Body.e_allowSleepFlag) == 0)
                     || b.m_angularVelocity * b.m_angularVelocity > angTolSqr
                     || Vec2.dot(b.m_linearVelocity, b.m_linearVelocity) > linTolSqr) {
                 b.m_sleepTime = 0.0f;
@@ -163,7 +165,7 @@ public class Island {
         if (minSleepTime >= Settings.timeToSleep) {
             for (int i = 0; i < m_bodyCount; ++i) {
                 Body b = m_bodies[i];
-                b.m_isSleeping = true;
+                b.m_flags |= Body.e_sleepFlag;
             }
         }
     }
