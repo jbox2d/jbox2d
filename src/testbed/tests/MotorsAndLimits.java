@@ -35,7 +35,7 @@ public class MotorsAndLimits extends PTest {
             BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
             bd.addShape(sd);
-            ground = world.CreateBody(bd);
+            ground = world.createBody(bd);
         }
 
         {
@@ -54,7 +54,7 @@ public class MotorsAndLimits extends PTest {
             final float y = 8.0f;
 
             bd.position = new Vec2(3.0f, y);
-            body = world.CreateBody(bd);
+            body = world.createBody(bd);
 
             rjd.anchorPoint = new Vec2(0.0f, y);
             rjd.body1 = prevBody;
@@ -63,12 +63,12 @@ public class MotorsAndLimits extends PTest {
             rjd.motorTorque = 10000.0f;
             rjd.enableMotor = true;
 
-            m_joint1 = (RevoluteJoint) world.CreateJoint(rjd);
+            m_joint1 = (RevoluteJoint) world.createJoint(rjd);
 
             prevBody = body;
 
             bd.position = new Vec2(9.0f, y);
-            body = world.CreateBody(bd);
+            body = world.createBody(bd);
 
             rjd.anchorPoint = new Vec2(6.0f, y);
             rjd.body1 = prevBody;
@@ -83,11 +83,11 @@ public class MotorsAndLimits extends PTest {
             // rjd.maxAngle = 0.0f;
             rjd.enableLimit = true;
 
-            m_joint2 = (RevoluteJoint) world.CreateJoint(rjd);
+            m_joint2 = (RevoluteJoint) world.createJoint(rjd);
 
             bd.position = new Vec2(-10.0f, 10.0f);
             bd.rotation = (float) (0.5f * Math.PI);
-            body = world.CreateBody(bd);
+            body = world.createBody(bd);
 
             PrismaticJointDef pjd = new PrismaticJointDef();
             pjd.anchorPoint = new Vec2(-10.0f, 10.0f);
@@ -101,7 +101,7 @@ public class MotorsAndLimits extends PTest {
             pjd.upperTranslation = 20.0f;
             pjd.enableLimit = true;
 
-            m_joint3 = (PrismaticJoint) world.CreateJoint(pjd);
+            m_joint3 = (PrismaticJoint) world.createJoint(pjd);
         }
     }
 

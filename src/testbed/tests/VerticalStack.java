@@ -24,7 +24,7 @@ public class VerticalStack extends PTest {
             BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
             bd.addShape(sd);
-            world.CreateBody(bd);
+            world.createBody(bd);
         }
 
         {
@@ -44,7 +44,7 @@ public class VerticalStack extends PTest {
 
                 bd.position = new Vec2(0.0f, 0.752f + 1.54f * i);
 
-                m_world.CreateBody(bd);
+                m_world.createBody(bd);
             }
         }
     }

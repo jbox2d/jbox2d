@@ -24,7 +24,7 @@ public class VaryingFriction extends PTest {
             BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
             bd.addShape(sd);
-            world.CreateBody(bd);
+            world.createBody(bd);
         }
 
         {
@@ -35,7 +35,7 @@ public class VaryingFriction extends PTest {
             bd.position = new Vec2(-2.0f, 11.0f);
             bd.rotation = -0.25f;
             bd.addShape(sd);
-            world.CreateBody(bd);
+            world.createBody(bd);
         }
 
         {
@@ -45,7 +45,7 @@ public class VaryingFriction extends PTest {
             BodyDef bd = new BodyDef();
             bd.position = new Vec2(5.25f, 9.5f);
             bd.addShape(sd);
-            world.CreateBody(bd);
+            world.createBody(bd);
         }
 
         {
@@ -56,7 +56,7 @@ public class VaryingFriction extends PTest {
             bd.position = new Vec2(2.0f, 7.0f);
             bd.rotation = 0.25f;
             bd.addShape(sd);
-            world.CreateBody(bd);
+            world.createBody(bd);
         }
 
         {
@@ -66,7 +66,7 @@ public class VaryingFriction extends PTest {
             BodyDef bd = new BodyDef();
             bd.position = new Vec2(-5.25f, 5.5f);
             bd.addShape(sd);
-            world.CreateBody(bd);
+            world.createBody(bd);
         }
 
         {
@@ -77,7 +77,7 @@ public class VaryingFriction extends PTest {
             bd.position = new Vec2(-2.0f, 3.0f);
             bd.rotation = -0.25f;
             bd.addShape(sd);
-            world.CreateBody(bd);
+            world.createBody(bd);
         }
 
         {
@@ -93,7 +93,7 @@ public class VaryingFriction extends PTest {
             for (int i = 0; i < 5; ++i) {
                 sd.friction = friction[i];
                 bd.position = new Vec2(-7.5f + 2.0f * i, 14.0f);
-                world.CreateBody(bd);
+                world.createBody(bd);
             }
         }
     }

@@ -5,10 +5,9 @@ import java.util.Random;
 import processing.core.PApplet;
 import testbed.PTest;
 import collision.BoxDef;
-import collision.PolyDef;
 import collision.CircleDef;
+import collision.PolyDef;
 import collision.ShapeDef;
-import collision.ShapeType;
 
 import common.Vec2;
 
@@ -45,11 +44,11 @@ public class PolyShapes extends PTest {
             BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
             bd.addShape(sd);
-            world.CreateBody(bd);
+            world.createBody(bd);
         }
 
         sds[0] = new PolyDef();
-        PolyDef poly = (PolyDef)sds[0];
+        PolyDef poly = (PolyDef) sds[0];
         // sds[0].poly.m_vertexCount = 3;
         poly.vertices.add(new Vec2(-0.5f, 0.0f));
         poly.vertices.add(new Vec2(0.5f, 0.0f));
@@ -58,7 +57,7 @@ public class PolyShapes extends PTest {
         poly.friction = 0.3f;
 
         sds[1] = new PolyDef();
-        PolyDef poly2 = (PolyDef)sds[1];
+        PolyDef poly2 = (PolyDef) sds[1];
         // sds[1].poly.m_vertexCount = 3;
         poly2.vertices.add(new Vec2(-0.1f, 0.0f));
         poly2.vertices.add(new Vec2(0.1f, 0.0f));
@@ -67,14 +66,14 @@ public class PolyShapes extends PTest {
         poly2.friction = 0.3f;
 
         sds[2] = new CircleDef();
-        CircleDef circ = (CircleDef)sds[2];
+        CircleDef circ = (CircleDef) sds[2];
         // sds[2].poly.m_vertexCount = 8;
         circ.radius = .6f;
         circ.density = 1.0f;
         circ.friction = 0.3f;
 
         sds[3] = new PolyDef();
-        PolyDef poly3 = (PolyDef)sds[3];
+        PolyDef poly3 = (PolyDef) sds[3];
         // sds[3].poly.m_vertexCount = 4;
         poly3.vertices.add(new Vec2(-0.5f, 0.0f));
         poly3.vertices.add(new Vec2(0.5f, 0.0f));
@@ -89,7 +88,7 @@ public class PolyShapes extends PTest {
 
     void CreateBody(int index) {
         if (bodies[bodyIndex] != null) {
-            world.DestroyBody(bodies[bodyIndex]);
+            world.destroyBody(bodies[bodyIndex]);
             bodies[bodyIndex] = null;
         }
 
@@ -101,7 +100,7 @@ public class PolyShapes extends PTest {
         bd.position = new Vec2(x, 10.0f);
         bd.rotation = (float) (r.nextFloat() * Math.PI * 4 - Math.PI * 2);
 
-        bodies[bodyIndex] = world.CreateBody(bd);
+        bodies[bodyIndex] = world.createBody(bd);
         bodyIndex = (bodyIndex + 1) % bodies.length;
     }
 

@@ -32,7 +32,7 @@ public class Web extends PTest {
             BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
             bd.addShape(sd);
-            ground = m_world.CreateBody(bd);
+            ground = m_world.createBody(bd);
         }
 
         BoxDef sd = new BoxDef();
@@ -44,16 +44,16 @@ public class Web extends PTest {
         bd.addShape(sd);
 
         bd.position = new Vec2(-5.0f, 5.0f);
-        Body b1 = world.CreateBody(bd);
+        Body b1 = world.createBody(bd);
 
         bd.position = new Vec2(5.0f, 5.0f);
-        Body b2 = world.CreateBody(bd);
+        Body b2 = world.createBody(bd);
 
         bd.position = new Vec2(5.0f, 15.0f);
-        Body b3 = world.CreateBody(bd);
+        Body b3 = world.createBody(bd);
 
         bd.position = new Vec2(-5.0f, 15.0f);
-        Body b4 = world.CreateBody(bd);
+        Body b4 = world.createBody(bd);
 
         DistanceJointDef jd = new DistanceJointDef();
 
@@ -61,49 +61,49 @@ public class Web extends PTest {
         jd.body2 = b1;
         jd.anchorPoint1 = new Vec2(-10.0f, 0.0f);
         jd.anchorPoint2 = b1.m_position.add(new Vec2(-0.5f, -0.5f));
-        m_joints[0] = world.CreateJoint(jd);
+        m_joints[0] = world.createJoint(jd);
 
         jd.body1 = ground;
         jd.body2 = b2;
         jd.anchorPoint1 = new Vec2(10.0f, 0.0f);
         jd.anchorPoint2 = b2.m_position.add(new Vec2(0.5f, -0.5f));
-        m_joints[1] = world.CreateJoint(jd);
+        m_joints[1] = world.createJoint(jd);
 
         jd.body1 = ground;
         jd.body2 = b3;
         jd.anchorPoint1 = new Vec2(10.0f, 20.0f);
         jd.anchorPoint2 = b3.m_position.add(new Vec2(0.5f, 0.5f));
-        m_joints[2] = world.CreateJoint(jd);
+        m_joints[2] = world.createJoint(jd);
 
         jd.body1 = ground;
         jd.body2 = b4;
         jd.anchorPoint1 = new Vec2(-10.0f, 20.0f);
         jd.anchorPoint2 = b4.m_position.add(new Vec2(-0.5f, 0.5f));
-        m_joints[3] = world.CreateJoint(jd);
+        m_joints[3] = world.createJoint(jd);
 
         jd.body1 = b1;
         jd.body2 = b2;
         jd.anchorPoint1 = b1.m_position.add(new Vec2(0.5f, 0.0f));
         jd.anchorPoint2 = b2.m_position.add(new Vec2(-0.5f, 0.0f));
-        m_joints[4] = world.CreateJoint(jd);
+        m_joints[4] = world.createJoint(jd);
 
         jd.body1 = b2;
         jd.body2 = b3;
         jd.anchorPoint1 = b2.m_position.add(new Vec2(0.0f, 0.5f));
         jd.anchorPoint2 = b3.m_position.add(new Vec2(0.0f, -0.5f));
-        m_joints[5] = world.CreateJoint(jd);
+        m_joints[5] = world.createJoint(jd);
 
         jd.body1 = b3;
         jd.body2 = b4;
         jd.anchorPoint1 = b3.m_position.add(new Vec2(-0.5f, 0.0f));
         jd.anchorPoint2 = b4.m_position.add(new Vec2(0.5f, 0.0f));
-        m_joints[6] = world.CreateJoint(jd);
+        m_joints[6] = world.createJoint(jd);
 
         jd.body1 = b4;
         jd.body2 = b1;
         jd.anchorPoint1 = b4.m_position.add(new Vec2(0.0f, -0.5f));
         jd.anchorPoint2 = b1.m_position.add(new Vec2(0.0f, 0.5f));
-        m_joints[7] = world.CreateJoint(jd);
+        m_joints[7] = world.createJoint(jd);
     }
 
     /*

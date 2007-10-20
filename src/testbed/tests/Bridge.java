@@ -2,7 +2,7 @@ package testbed.tests;
 
 import processing.core.PApplet;
 import testbed.PTest;
-import collision.*;
+import collision.BoxDef;
 
 import common.Vec2;
 
@@ -24,7 +24,7 @@ public class Bridge extends PTest {
         BodyDef bd = new BodyDef();
         bd.position = new Vec2(0.0f, -10.0f);
         bd.addShape(sd);
-        Body ground = world.CreateBody(bd);
+        Body ground = world.createBody(bd);
 
         BoxDef sd2 = new BoxDef();
         sd2.extents = new Vec2(0.5f, 0.125f);
@@ -41,12 +41,12 @@ public class Bridge extends PTest {
         for (int i = 0; i < numPlanks; ++i) {
             bd2.position = new Vec2(-15.5f + 1.25f * i, 5.0f);
             // System.out.println("Creating plank "+i);
-            Body body = world.CreateBody(bd2);
+            Body body = world.createBody(bd2);
 
             jd.anchorPoint = new Vec2(-16.125f + 1.25f * i, 5.0f);
             jd.body1 = prevBody;
             jd.body2 = body;
-            world.CreateJoint(jd);
+            world.createJoint(jd);
 
             prevBody = body;
         }
@@ -54,7 +54,7 @@ public class Bridge extends PTest {
         jd.anchorPoint = new Vec2(-16.125f + 1.25f * numPlanks, 5.0f);
         jd.body1 = prevBody;
         jd.body2 = ground;
-        world.CreateJoint(jd);
+        world.createJoint(jd);
     }
 
     /**

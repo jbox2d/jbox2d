@@ -2,7 +2,7 @@ package testbed.tests;
 
 import processing.core.PApplet;
 import testbed.PTest;
-import collision.*;
+import collision.BoxDef;
 
 import common.Vec2;
 
@@ -27,7 +27,7 @@ public class Domino extends PTest {
             BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
             bd.addShape(sd);
-            world.CreateBody(bd);
+            world.createBody(bd);
         }
 
         { // Platforms
@@ -38,7 +38,7 @@ public class Domino extends PTest {
                 BodyDef bd = new BodyDef();
                 bd.position = new Vec2(0.0f, 5f + 5f * i);
                 bd.addShape(sd);
-                world.CreateBody(bd);
+                world.createBody(bd);
             }
         }
 
@@ -68,7 +68,7 @@ public class Domino extends PTest {
                     }
                     else
                         bd.rotation = 0f;
-                    world.CreateBody(bd);
+                    world.createBody(bd);
                 }
             }
         }

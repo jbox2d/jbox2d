@@ -25,11 +25,12 @@ public class VaryingRestitution extends PTest {
             BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
             bd.addShape(sd);
-            world.CreateBody(bd);
+            world.createBody(bd);
         }
 
         {
-            CircleDef sd = new CircleDef();;
+            CircleDef sd = new CircleDef();
+            ;
             // sd.poly.m_vertexCount = 8;
             sd.radius = .6f;
             sd.density = 5.0f;
@@ -43,7 +44,7 @@ public class VaryingRestitution extends PTest {
             for (int i = 0; i < restitution.length; ++i) {
                 sd.restitution = restitution[i];
                 bd.position = new Vec2(-10.0f + 3.0f * i, 10.0f);
-                m_world.CreateBody(bd);
+                m_world.createBody(bd);
             }
         }
     }
