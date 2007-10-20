@@ -2,13 +2,17 @@ package collision;
 
 public class Proxy {
     public int lowerBounds[];
+
     public int upperBounds[];
 
     int overlapCount;
+
     int timeStamp;
-    
+
     int categoryBits;
+
     int maskBits;
+
     int groupIndex;
 
     Object userData;
@@ -22,15 +26,15 @@ public class Proxy {
         timeStamp = 0;
     }
 
-    int GetNext() {
+    int getNext() {
         return lowerBounds[0];
     }
 
-    void SetNext(int next) {
+    void setNext(int next) {
         lowerBounds[0] = next;
     }
 
-    public boolean IsValid() {
+    public boolean isValid() {
         return overlapCount != BroadPhase.INVALID;
     }
 }

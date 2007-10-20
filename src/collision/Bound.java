@@ -25,11 +25,11 @@ public class Bound {
         stabbingCount = b.stabbingCount;
     }
 
-    boolean IsLower() {
+    boolean isLower() {
         return (value & 1) == 0;
     }
 
-    boolean IsUpper() {
+    boolean isUpper() {
         return (value & 1) == 1;
     }
 

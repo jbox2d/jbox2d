@@ -1,6 +1,5 @@
 package collision;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import common.Vec2;
@@ -9,21 +8,26 @@ public class ShapeDef {
     public ShapeType type;
 
     public Vec2 localPosition;
+
     public float localRotation;
 
     public float friction;
+
     public float restitution;
+
     public float density;
-    
+
     public Object userData;
-    
+
     public int categoryBits;
+
     public int maskBits;
+
     public int groupIndex;
 
     public ShapeDef() {
         // System.out.println("Unknown");
-        //this(ShapeType.UNKNOWN_SHAPE);
+        // this(ShapeType.UNKNOWN_SHAPE);
         type = ShapeType.UNKNOWN_SHAPE;
         userData = null;
         localPosition = new Vec2();
@@ -45,15 +49,14 @@ public class ShapeDef {
 
         switch (type) {
         case CIRCLE_SHAPE:
-            CircleDef circle = (CircleDef)this;
+            CircleDef circle = (CircleDef) this;
             massData.mass = (float) (density * Math.PI * circle.radius * circle.radius);
             massData.center.set(0.0f, 0.0f);
-            massData.I = 0.5f * (massData.mass) * circle.radius
-                    * circle.radius;
+            massData.I = 0.5f * (massData.mass) * circle.radius * circle.radius;
             break;
 
         case BOX_SHAPE:
-            BoxDef box = (BoxDef)this;
+            BoxDef box = (BoxDef) this;
             massData.mass = 4.0f * density * box.extents.x * box.extents.y;
             massData.center.set(0.0f, 0.0f);
             massData.I = massData.mass / 3.0f
@@ -61,8 +64,8 @@ public class ShapeDef {
             break;
 
         case POLY_SHAPE:
-            PolyDef poly = (PolyDef)this;
-            PolyMass(massData, poly.vertices, density);
+            PolyDef poly = (PolyDef) this;
+            polyMass(massData, poly.vertices, density);
             break;
 
         default:
@@ -73,7 +76,7 @@ public class ShapeDef {
         }
     }
 
-    private void PolyMass(MassData massData, List<Vec2> vs, float rho) {
+    private void polyMass(MassData massData, List<Vec2> vs, float rho) {
         int count = vs.size();
 
         assert count >= 3;
@@ -137,5 +140,4 @@ public class ShapeDef {
         I = rho * (I - area * Vec2.dot(center, center));
         massData.I = I;
     }
-
 }

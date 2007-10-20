@@ -1,20 +1,20 @@
 /*
-* Copyright (c) 2007 Erin Catto http://www.gphysics.com
-*
-* This software is provided 'as-is', without any express or implied
-* warranty.  In no event will the authors be held liable for any damages
-* arising from the use of this software.
-* Permission is granted to anyone to use this software for any purpose,
-* including commercial applications, and to alter it and redistribute it
-* freely, subject to the following restrictions:
-* 1. The origin of this software must not be misrepresented; you must not
-* claim that you wrote the original software. If you use this software
-* in a product, an acknowledgment in the product documentation would be
-* appreciated but is not required.
-* 2. Altered source versions must be plainly marked as such, and must not be
-* misrepresented as being the original software.
-* 3. This notice may not be removed or altered from any source distribution.
-*/
+ * Copyright (c) 2007 Erin Catto http://www.gphysics.com
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty.  In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ * 1. The origin of this software must not be misrepresented; you must not
+ * claim that you wrote the original software. If you use this software
+ * in a product, an acknowledgment in the product documentation would be
+ * appreciated but is not required.
+ * 2. Altered source versions must be plainly marked as such, and must not be
+ * misrepresented as being the original software.
+ * 3. This notice may not be removed or altered from any source distribution.
+ */
 
 package collision;
 
@@ -22,23 +22,25 @@ import common.Settings;
 import common.Vec2;
 
 public class CollideCircle {
-    
-    public static void b2CollideCircle(Manifold manifold, CircleShape circle1, CircleShape circle2){
+
+    public static void collideCircle(Manifold manifold, CircleShape circle1,
+            CircleShape circle2) {
         manifold.pointCount = 0;
 
         Vec2 d = circle2.m_position.sub(circle1.m_position);
         float distSqr = Vec2.dot(d, d);
         float radiusSum = circle1.m_radius + circle2.m_radius;
-        if (distSqr > radiusSum * radiusSum){
+        if (distSqr > radiusSum * radiusSum) {
             return;
         }
 
         float separation;
-        if (distSqr < Settings.EPSILON){
+        if (distSqr < Settings.EPSILON) {
             separation = -radiusSum;
             manifold.normal.set(0.0f, 1.0f);
-        } else{
-            float dist = (float)Math.sqrt(distSqr);
+        }
+        else {
+            float dist = (float) Math.sqrt(distSqr);
             separation = dist - radiusSum;
             float a = 1.0f / dist;
             manifold.normal.x = a * d.x;
@@ -48,10 +50,12 @@ public class CollideCircle {
         manifold.pointCount = 1;
         manifold.points[0].id.key = 0;
         manifold.points[0].separation = separation;
-        manifold.points[0].position = circle2.m_position.sub(manifold.normal.mul(circle2.m_radius));
+        manifold.points[0].position = circle2.m_position.sub(manifold.normal
+                .mul(circle2.m_radius));
     }
 
-    public static void b2CollidePolyAndCircle(Manifold manifold, PolyShape poly, CircleShape circle){
+    public static void collidePolyAndCircle(Manifold manifold, PolyShape poly,
+            CircleShape circle) {
         manifold.pointCount = 0;
 
         // Compute circle position in the frame of the polygon.
@@ -61,25 +65,27 @@ public class CollideCircle {
         int normalIndex = 0;
         float separation = -Float.MAX_VALUE;
         final float radius = circle.m_radius;
-        for (int i = 0; i < poly.m_vertexCount; ++i){
-            float s = Vec2.dot(poly.m_normals[i], xLocal.sub(poly.m_vertices[i]));
-            if (s > circle.m_radius){
+        for (int i = 0; i < poly.m_vertexCount; ++i) {
+            float s = Vec2.dot(poly.m_normals[i], xLocal
+                    .sub(poly.m_vertices[i]));
+            if (s > circle.m_radius) {
                 // Early out.
                 return;
             }
 
-            if (s > separation){
+            if (s > separation) {
                 normalIndex = i;
                 separation = s;
             }
         }
         // If the center is inside the polygon ...
         if (separation < Settings.EPSILON) {
-            //Java FIXME?: this reeks of needing initialization
+            // Java FIXME?: this reeks of needing initialization
             manifold.pointCount = 1;
             manifold.normal = poly.m_R.mul(poly.m_normals[normalIndex]);
             manifold.points[0].id.key = 0;
-            manifold.points[0].position = circle.m_position.sub(manifold.normal.mul(radius));
+            manifold.points[0].position = circle.m_position.sub(manifold.normal
+                    .mul(radius));
             manifold.points[0].separation = separation - radius;
             return;
         }
@@ -101,7 +107,8 @@ public class CollideCircle {
             manifold.pointCount = 1;
             manifold.normal = poly.m_R.mul(d);
             manifold.points[0].id.key = 0;
-            manifold.points[0].position = circle.m_position.sub(manifold.normal.mul(radius));
+            manifold.points[0].position = circle.m_position.sub(manifold.normal
+                    .mul(radius));
             manifold.points[0].separation = dist - radius;
             return;
         }
@@ -111,9 +118,11 @@ public class CollideCircle {
         Vec2 p = new Vec2();
         if (u <= 0.0f) {
             p.set(poly.m_vertices[vertIndex1]);
-        } else if (u >= length) {
+        }
+        else if (u >= length) {
             p.set(poly.m_vertices[vertIndex2]);
-        } else {
+        }
+        else {
             p.set(poly.m_vertices[vertIndex1]);
             p.x += u * e.x;
             p.y += u * e.y;
@@ -128,8 +137,8 @@ public class CollideCircle {
         manifold.pointCount = 1;
         manifold.normal = poly.m_R.mul(d);
         manifold.points[0].id.key = 0;
-        manifold.points[0].position = circle.m_position.sub(manifold.normal.mul(radius));
+        manifold.points[0].position = circle.m_position.sub(manifold.normal
+                .mul(radius));
         manifold.points[0].separation = dist - radius;
     }
-    
 }

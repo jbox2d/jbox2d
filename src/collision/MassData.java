@@ -13,5 +13,4 @@ public class MassData {
         mass = I = 0f;
         center = new Vec2();
     }
-
 }
