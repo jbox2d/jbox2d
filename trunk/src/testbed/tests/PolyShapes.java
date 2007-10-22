@@ -99,6 +99,9 @@ public class PolyShapes extends PTest {
         float x = r.nextFloat() * 4 - 2;
         bd.position = new Vec2(x, 10.0f);
         bd.rotation = (float) (r.nextFloat() * Math.PI * 4 - Math.PI * 2);
+        if (index == 2) {
+            bd.angularDamping = 0.02f;
+        }
 
         bodies[bodyIndex] = world.createBody(bd);
         bodyIndex = (bodyIndex + 1) % bodies.length;

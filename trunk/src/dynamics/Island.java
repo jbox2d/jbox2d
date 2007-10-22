@@ -54,7 +54,7 @@ public class Island {
         m_jointCount = 0;
     }
 
-    void solve(Vec2 gravity, int iterations, float dt) {
+    void solve(StepInfo step, Vec2 gravity) {
         for (int i = 0; i < m_bodyCount; ++i) {
             Body b = m_bodies[i];
 
@@ -62,9 +62,13 @@ public class Island {
                 continue;
             }
 
-            b.m_linearVelocity.addLocal((gravity
-                    .add(b.m_force.mul(b.m_invMass))).mul(dt));
-            b.m_angularVelocity += dt * b.m_invI * b.m_torque;
+            b.m_linearVelocity.addLocal(b.m_force.clone().mulLocal(b.m_invMass)
+                    .addLocal(gravity).mulLocal(step.dt));
+
+            b.m_angularVelocity += step.dt * b.m_invI * b.m_torque;
+
+            b.m_linearVelocity.mulLocal(b.m_linearDamping);
+            b.m_angularVelocity *= b.m_angularDamping;
         }
 
         // float inv_dt = dt > 0.0f ? 1.0f / dt : 0.0f;
@@ -80,11 +84,11 @@ public class Island {
         }
 
         // Solve velocity constraints.
-        for (int i = 0; i < iterations; ++i) {
+        for (int i = 0; i < step.iterations; ++i) {
             contactSolver.solveVelocityConstraints();
 
             for (int j = 0; j < m_jointCount; ++j) {
-                m_joints[j].solveVelocityConstraints(dt);
+                m_joints[j].solveVelocityConstraints(step);
             }
         }
 
@@ -95,8 +99,8 @@ public class Island {
                 continue;
             }
 
-            b.m_position.addLocal(b.m_linearVelocity.mul(dt));
-            b.m_rotation += dt * b.m_angularVelocity;
+            b.m_position.addLocal(b.m_linearVelocity.mul(step.dt));
+            b.m_rotation += step.dt * b.m_angularVelocity;
 
             b.m_R.setAngle(b.m_rotation);
         }
@@ -104,7 +108,7 @@ public class Island {
         // Solve position constraints.
         if (World.ENABLE_POSITION_CORRECTION) {
             // System.out.println("position correcting");
-            for (m_positionIterations = 0; m_positionIterations < iterations; ++m_positionIterations) {
+            for (m_positionIterations = 0; m_positionIterations < step.iterations; ++m_positionIterations) {
                 // System.out.println(m_positionIterations);
                 boolean contactsOkay = contactSolver
                         .solvePositionConstraints(Settings.contactBaumgarte);
@@ -139,9 +143,9 @@ public class Island {
     void updateSleep(float dt) {
         float minSleepTime = Float.MAX_VALUE;
 
-        float linTolSqr = Settings.linearSleepTolerance
+        final float linTolSqr = Settings.linearSleepTolerance
                 * Settings.linearSleepTolerance;
-        float angTolSqr = Settings.angularSleepTolerance
+        final float angTolSqr = Settings.angularSleepTolerance
                 * Settings.angularSleepTolerance;
 
         for (int i = 0; i < m_bodyCount; ++i) {

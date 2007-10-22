@@ -13,9 +13,13 @@ public class Mat22 {
     }
 
     public Mat22(Vec2 c1, Vec2 c2) {
-        // ewj: changed this to clone Vec2s for safety
         col1 = c1.clone();
         col2 = c2.clone();
+    }
+
+    public Mat22(float col1x, float col2x, float col1y, float col2y) {
+        col1 = new Vec2(col1x, col1y);
+        col2 = new Vec2(col2x, col2y);
     }
 
     public void set(Mat22 m) {

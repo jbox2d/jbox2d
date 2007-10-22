@@ -25,7 +25,7 @@ import dynamics.World;
 import dynamics.contacts.Contact;
 import dynamics.joints.Joint;
 import dynamics.joints.JointType;
-import dynamics.joints.MouseDef;
+import dynamics.joints.MouseJointDef;
 import dynamics.joints.MouseJoint;
 import dynamics.joints.PulleyJoint;
 
@@ -118,11 +118,11 @@ public abstract class PTest extends PApplet {
         }
 
         if (body != null) {
-            MouseDef md = new MouseDef();
+            MouseJointDef md = new MouseJointDef();
             md.body1 = m_world.m_groundBody;
             md.body2 = body;
             md.target = p;
-            md.motorForce = 400.0f * body.m_mass;
+            md.maxForce = 1000.0f * body.m_mass;
             m_mouseJoint = (MouseJoint) m_world.createJoint(md);
             body.wakeUp();
         }

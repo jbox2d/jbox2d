@@ -2,6 +2,7 @@ package dynamics.joints;
 
 import common.Vec2;
 import dynamics.Body;
+import dynamics.StepInfo;
 
 public abstract class Joint {
 
@@ -57,7 +58,7 @@ public abstract class Joint {
             joint = new DistanceJoint((DistanceJointDef) description);
         }
         else if (description.type == JointType.MOUSE_JOINT) {
-            joint = new MouseJoint((MouseDef) description);
+            joint = new MouseJoint((MouseJointDef) description);
         }
         else if (description.type == JointType.PRISMATIC_JOINT) {
             joint = new PrismaticJoint((PrismaticJointDef) description);
@@ -96,7 +97,7 @@ public abstract class Joint {
 
     public abstract void preSolve();
 
-    public abstract void solveVelocityConstraints(float dt);
+    public abstract void solveVelocityConstraints(StepInfo step);
 
     // This returns true if the position errors are within tolerance.
     public abstract boolean solvePositionConstraints();
