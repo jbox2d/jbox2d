@@ -19,6 +19,10 @@ public class BodyDef {
 
     public float angularVelocity;
 
+    public float linearDamping;
+
+    public float angularDamping;
+
     public boolean allowSleep;
 
     public boolean isSleeping;
@@ -32,6 +36,8 @@ public class BodyDef {
         rotation = 0.0f;
         linearVelocity = new Vec2(0.0f, 0.0f);
         angularVelocity = 0.0f;
+        linearDamping = 0.0f;
+        angularDamping = 0.0f;
         allowSleep = true;
         isSleeping = false;
         preventRotation = false;

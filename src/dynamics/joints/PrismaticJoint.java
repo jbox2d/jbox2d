@@ -4,6 +4,7 @@ import common.MathUtils;
 import common.Settings;
 import common.Vec2;
 import dynamics.Body;
+import dynamics.StepInfo;
 
 //Linear constraint (point-to-line)
 //d = p2 - p1 = x2 + r2 - x1 - r1
@@ -207,7 +208,7 @@ public class PrismaticJoint extends Joint {
         m_limitPositionImpulse = 0.0f;
     }
 
-    public void solveVelocityConstraints(float dt) {
+    public void solveVelocityConstraints(StepInfo step) {
         Body b1 = m_body1;
         Body b2 = m_body2;
 
@@ -247,8 +248,8 @@ public class PrismaticJoint extends Joint {
                     - m_motorSpeed;
             float motorImpulse = -m_motorMass * motorCdot;
             float oldMotorImpulse = m_motorImpulse;
-            m_motorImpulse = MathUtils.clamp(m_motorImpulse + motorImpulse, -dt
-                    * m_maxMotorForce, dt * m_maxMotorForce);
+            m_motorImpulse = MathUtils.clamp(m_motorImpulse + motorImpulse,
+                    -step.dt * m_maxMotorForce, step.dt * m_maxMotorForce);
             motorImpulse = m_motorImpulse - oldMotorImpulse;
 
             b1.m_linearVelocity.addLocal(m_motorJacobian.linear1.mul(invMass1

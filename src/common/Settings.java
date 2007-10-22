@@ -67,7 +67,7 @@ public class Settings {
     public static final float linearSleepTolerance = 0.01f
             * lengthUnitsPerMeter / timeUnitsPerSecond; // 1 cm/s
 
-    public static final float angularSleepTolerance = 0.5f / 180.0f / timeUnitsPerSecond; // 0.5
-    // degrees/s
+    // 2 degrees/s
+    public static final float angularSleepTolerance = 2.0f / 180.0f / timeUnitsPerSecond;
 
 }

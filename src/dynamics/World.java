@@ -280,6 +280,16 @@ public class World {
     }
 
     public void step(float dt, int iterations) {
+        StepInfo step = new StepInfo();
+        step.dt = dt;
+        step.iterations = iterations;
+        if (dt > 0.0f) {
+            step.inv_dt = 1.0f / dt;
+        }
+        else {
+            step.inv_dt = 0.0f;
+        }
+
         // Handle deferred contact destruction
         m_contactManager.cleanContactList();
 
@@ -372,7 +382,7 @@ public class World {
                 }
             }
 
-            island.solve(m_gravity, iterations, dt);
+            island.solve(step, m_gravity);
             if (m_doSleep) {
                 island.updateSleep(dt);
             }

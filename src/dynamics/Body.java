@@ -5,6 +5,7 @@ import collision.Shape;
 import collision.ShapeDef;
 
 import common.Mat22;
+import common.MathUtils;
 import common.Settings;
 import common.Vec2;
 
@@ -60,6 +61,10 @@ public class Body {
 
     public float m_I, m_invI;
 
+    public float m_linearDamping;
+
+    public float m_angularDamping;
+
     public float m_sleepTime;
 
     public Object m_userData;
@@ -72,6 +77,10 @@ public class Body {
         // m_linearVelocity = bd.linearVelocity.clone();
         // m_angularVelocity = bd.angularVelocity;
         m_world = world;
+
+        m_linearDamping = MathUtils.clamp(1.0f - bd.linearDamping, 0.0f, 1.0f);
+        m_angularDamping = MathUtils
+                .clamp(1.0f - bd.angularDamping, 0.0f, 1.0f);
 
         m_force = new Vec2(0.0f, 0.0f);
         m_torque = 0.0f;

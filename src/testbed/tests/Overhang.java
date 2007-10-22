@@ -38,14 +38,14 @@ public class Overhang extends PTest {
 
             BodyDef bd = new BodyDef();
             bd.addShape(sd);
-            
+
             int numSlats = 8;
             float lastCMX = 0.0f;
             float eps = 0.14f;
             for (int i = 0; i < numSlats; ++i) {
                 float newX = lastCMX + w - eps;
-                lastCMX = (i*lastCMX + newX)/(i+1);
-                bd.position = new Vec2(newX , .25f + 2*h * (numSlats - i - 1));
+                lastCMX = (i * lastCMX + newX) / (i + 1);
+                bd.position = new Vec2(newX, .25f + 2 * h * (numSlats - i - 1));
                 m_world.createBody(bd);
             }
 

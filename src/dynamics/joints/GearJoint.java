@@ -2,6 +2,7 @@ package dynamics.joints;
 
 import common.Vec2;
 import dynamics.Body;
+import dynamics.StepInfo;
 import common.Settings;
 
 public class GearJoint extends Joint {
@@ -160,9 +161,7 @@ public class GearJoint extends Joint {
         b2.m_angularVelocity += b2.m_invI * m_impulse * m_J.angular2;
     }
 
-    public void solveVelocityConstraints(float dt) {
-        // NOT_USED(dt);
-
+    public void solveVelocityConstraints(StepInfo step) {
         Body b1 = m_body1;
         Body b2 = m_body2;
 

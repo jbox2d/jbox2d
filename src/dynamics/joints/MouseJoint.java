@@ -1,21 +1,19 @@
 package dynamics.joints;
 
-import common.MathUtils;
+import common.Mat22;
 import common.Settings;
 import common.Vec2;
+
 import dynamics.Body;
+import dynamics.StepInfo;
 
 //p = attached point, m = mouse point
-//C = norm(p - m) - L
-//u = (p - m) / norm(p - m)
-//Cdot = dot(u, v + cross(w, r))
-//   = [u^T cross(r, u)^T] [v; w]
-//K = J * invM * JT
-//= [u^T cross(r, u)^T][invMass  0][u]
-//                     [0     invI][cross(r, u)]
-//= [u^T cross(r, u)^T][invMass*u]
-//                     [invI * cross(r, u)]
-//= invMass + invI * cross(r, u) * cross(r, u)
+//C = p - m
+//Cdot = v
+//   = v + cross(w, r)
+//J = [I r_skew]
+//Identity used:
+//w k % (rx i + ry j) = w * (-ry i + rx j)
 
 public class MouseJoint extends Joint {
 
@@ -23,30 +21,41 @@ public class MouseJoint extends Joint {
 
     public Vec2 m_target;
 
-    Vec2 m_u;
+    Vec2 m_impulse;
 
-    float m_positionError;
+    Mat22 m_ptpMass; // effective mass for point-to-point constraint.
 
-    float m_impulse;
+    Vec2 m_C; // position error
 
-    float m_mEff; // effective mass
+    float m_maxForce;
 
-    float m_motorForce;
+    float m_beta; // bias factor
 
-    float m_length;
+    float m_gamma; // softness
 
-    float m_beta;
-
-    public MouseJoint(MouseDef description) {
-        super(description);
-        m_target = description.target;
+    public MouseJoint(MouseJointDef def) {
+        super(def);
+        m_target = def.target;
         m_localAnchor = m_body2.m_R.mulT(m_target.sub(m_body2.m_position));
 
-        m_motorForce = description.motorForce;
-        m_length = description.length;
-        m_beta = description.beta;
+        m_maxForce = def.maxForce;
+        m_impulse = new Vec2();
 
-        m_impulse = 0.0f;
+        float mass = m_body2.m_mass;
+
+        // Frequency
+        float omega = 2.0f * Settings.pi * def.frequencyHz;
+
+        // Damping coefficient
+        float d = 2.0f * mass * def.dampingRatio * omega;
+
+        // Spring stiffness
+        float k = mass * omega * omega;
+
+        // magic formulas
+        m_gamma = 1.0f / (d + def.timeStep * k);
+        m_beta = def.timeStep * k / (d + def.timeStep * k);
+
     }
 
     public void setTarget(Vec2 target) {
@@ -66,35 +75,39 @@ public class MouseJoint extends Joint {
 
     @Override
     public void preSolve() {
-        Body body = m_body2;
+        Body b = m_body2;
 
         // Compute the effective mass matrix.
-        Vec2 r = body.m_R.mul(m_localAnchor);
-        // m_u = body.m_position.add(r).sub(m_target);
-        m_u = body.m_position.clone().addLocal(r).subLocal(m_target);
+        Vec2 r = b.m_R.mul(m_localAnchor);
 
-        // Handle singularity.
-        float length = m_u.length();
-        if (length > Settings.EPSILON) {
-            m_u.mulLocal(1.0f / length);
-        }
-        else {
-            m_u.set(0.0f, 1.0f);
-        }
+        // K = [(1/m1 + 1/m2) * eye(2) - skew(r1) * invI1 * skew(r1) - skew(r2)
+        // * invI2 * skew(r2)]
+        // = [1/m1+1/m2 0 ] + invI1 * [r1.y*r1.y -r1.x*r1.y] + invI2 *
+        // [r1.y*r1.y -r1.x*r1.y]
+        // [ 0 1/m1+1/m2] [-r1.x*r1.y r1.x*r1.x] [-r1.x*r1.y r1.x*r1.x]
+        float invMass = b.m_invMass;
+        float invI = b.m_invI;
 
-        m_positionError = length - m_length;
+        Mat22 K1 = new Mat22(invMass, 0.0f, 0.0f, invMass);
 
-        float cru = Vec2.cross(r, m_u);
-        m_mEff = body.m_invMass + body.m_invI * cru * cru;
+        Mat22 K2 = new Mat22(invI * r.y * r.y, -invI * r.x * r.y, -invI * r.x
+                * r.y, invI * r.x * r.x);
 
-        assert m_mEff > Settings.EPSILON;
+        Mat22 K = K1.add(K2);
+        K.col1.x += m_gamma;
+        K.col2.y += m_gamma;
 
-        m_mEff = 1.0f / m_mEff;
+        m_ptpMass = K.invert();
+
+        m_C = b.m_position.clone().addLocal(r).subLocal(m_target);
+
+        // Cheat with some damping
+        b.m_angularVelocity *= 0.98f;
 
         // Warm starting.
-        Vec2 P = m_u.mul(m_impulse);
-        body.m_linearVelocity.addLocal(P.mul(body.m_invMass));
-        body.m_angularVelocity += body.m_invI * Vec2.cross(r, P);
+        Vec2 P = m_impulse.clone();
+        b.m_linearVelocity.addLocal(P.mul(invMass));
+        b.m_angularVelocity += invI * Vec2.cross(r, P);
     }
 
     @Override
@@ -103,23 +116,36 @@ public class MouseJoint extends Joint {
     }
 
     @Override
-    public void solveVelocityConstraints(float dt) {
+    public void solveVelocityConstraints(StepInfo step) {
         Body body = m_body2;
 
         Vec2 r = body.m_R.mul(m_localAnchor);
 
-        // Cdot = dot(u, v + cross(w, r))
-        float Cdot = Vec2.dot(m_u, body.m_linearVelocity.add(Vec2.cross(
-                body.m_angularVelocity, r)));
-        float impulse = -m_mEff * (Cdot + m_beta / dt * m_positionError);
+        // Cdot = v + cross(w, r)
+        Vec2 Cdot = body.m_linearVelocity.add(Vec2.cross(
+                body.m_angularVelocity, r));
 
-        float oldImpulse = m_impulse;
-        m_impulse = MathUtils.clamp(m_impulse + impulse, -dt * m_motorForce,
-                0.0f);
-        impulse = m_impulse - oldImpulse;
+        // Vec2 impulse = m_ptpMass.mul(
+        // Cdot.add(m_C.mul(m_beta * step.inv_dt).add(
+        // m_impulse.mul(m_gamma)))).negate();
 
-        Vec2 p = m_u.mul(impulse);
-        body.m_linearVelocity.addLocal(p.mul(body.m_invMass));
-        body.m_angularVelocity += body.m_invI * Vec2.cross(r, p);
+        Vec2 impulse = m_ptpMass.mul(
+                m_C.clone().mulLocal(m_beta * step.inv_dt).addLocal(
+                        m_impulse.mul(m_gamma)).addLocal(Cdot)).negateLocal();
+
+        Vec2 oldImpulse = m_impulse;
+        m_impulse.addLocal(impulse);
+        float length = m_impulse.length();
+        if (length > step.dt * m_maxForce) {
+            m_impulse.mulLocal(step.dt * m_maxForce / length);
+        }
+        impulse = m_impulse.sub(oldImpulse);
+
+        body.m_linearVelocity.addLocal(impulse.mul(body.m_invMass));
+        body.m_angularVelocity += body.m_invI * Vec2.cross(r, impulse);
+    }
+
+    Vec2 getReactionForce(float invTimeStep) {
+        return m_impulse.mul(invTimeStep);
     }
 }

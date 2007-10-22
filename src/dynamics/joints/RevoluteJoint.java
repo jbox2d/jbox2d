@@ -5,6 +5,7 @@ import common.Settings;
 import common.Vec2;
 import common.Mat22;
 import dynamics.Body;
+import dynamics.StepInfo;
 
 //Point-to-point constraint
 //C = p2 - p1
@@ -158,7 +159,7 @@ public class RevoluteJoint extends Joint {
     }
 
     @Override
-    public void solveVelocityConstraints(float dt) {
+    public void solveVelocityConstraints(StepInfo step) {
         Body b1 = m_body1;
         Body b2 = m_body2;
 
@@ -188,8 +189,8 @@ public class RevoluteJoint extends Joint {
                     - m_motorSpeed;
             float motorImpulse = -m_motorMass * motorCdot;
             float oldMotorImpulse = m_motorImpulse;
-            m_motorImpulse = MathUtils.clamp(m_motorImpulse + motorImpulse, -dt
-                    * m_maxMotorTorque, dt * m_maxMotorTorque);
+            m_motorImpulse = MathUtils.clamp(m_motorImpulse + motorImpulse,
+                    -step.dt * m_maxMotorTorque, step.dt * m_maxMotorTorque);
             motorImpulse = m_motorImpulse - oldMotorImpulse;
             b1.m_angularVelocity -= b1.m_invI * motorImpulse;
             b2.m_angularVelocity += b2.m_invI * motorImpulse;

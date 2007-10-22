@@ -83,7 +83,10 @@ public class CollideCircle {
             // Java FIXME?: this reeks of needing initialization
             manifold.pointCount = 1;
             manifold.normal = poly.m_R.mul(poly.m_normals[normalIndex]);
-            manifold.points[0].id.key = 0;
+            manifold.points[0].id.features.incidentEdge = normalIndex;
+            manifold.points[0].id.features.incidentVertex = Collision.NULL_FEATURE;
+            manifold.points[0].id.features.referenceFace = Collision.NULL_FEATURE;
+            manifold.points[0].id.features.flip = 0;
             manifold.points[0].position = circle.m_position.sub(manifold.normal
                     .mul(radius));
             manifold.points[0].separation = separation - radius;
@@ -106,7 +109,10 @@ public class CollideCircle {
 
             manifold.pointCount = 1;
             manifold.normal = poly.m_R.mul(d);
-            manifold.points[0].id.key = 0;
+            manifold.points[0].id.features.incidentEdge = Collision.NULL_FEATURE;
+            manifold.points[0].id.features.incidentVertex = vertIndex1;
+            manifold.points[0].id.features.referenceFace = Collision.NULL_FEATURE;
+            manifold.points[0].id.features.flip = 0;
             manifold.points[0].position = circle.m_position.sub(manifold.normal
                     .mul(radius));
             manifold.points[0].separation = dist - radius;
@@ -136,7 +142,7 @@ public class CollideCircle {
 
         manifold.pointCount = 1;
         manifold.normal = poly.m_R.mul(d);
-        manifold.points[0].id.key = 0;
+        // manifold.points[0].id.key = 0;
         manifold.points[0].position = circle.m_position.sub(manifold.normal
                 .mul(radius));
         manifold.points[0].separation = dist - radius;

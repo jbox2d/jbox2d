@@ -2,6 +2,7 @@ package dynamics.joints;
 
 import common.Settings;
 import dynamics.Body;
+import dynamics.StepInfo;
 import common.Vec2;
 import common.MathUtils;
 
@@ -192,10 +193,7 @@ public class PulleyJoint extends Joint {
         b2.m_angularVelocity += b2.m_invI * Vec2.cross(r2, P2);
     }
 
-    public void solveVelocityConstraints(float dt) {
-        // if (true) return;
-        // NOT_USED(dt);
-
+    public void solveVelocityConstraints(StepInfo step) {
         Body b1 = m_body1;
         Body b2 = m_body2;
 

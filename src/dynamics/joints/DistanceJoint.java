@@ -2,6 +2,7 @@ package dynamics.joints;
 
 import common.Settings;
 import common.Vec2;
+import dynamics.StepInfo;
 import dynamics.World;
 
 //C = norm(p2 - p1) - L
@@ -122,7 +123,7 @@ public class DistanceJoint extends Joint {
     }
 
     @Override
-    public void solveVelocityConstraints(float dt) {
+    public void solveVelocityConstraints(StepInfo step) {
         Vec2 r1 = m_body1.m_R.mul(m_localAnchor1);
         Vec2 r2 = m_body2.m_R.mul(m_localAnchor2);
 
