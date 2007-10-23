@@ -70,7 +70,7 @@ public class MouseJoint extends Joint {
 
     @Override
     public Vec2 getAnchor2() {
-        return m_body2.m_position.add(m_body2.m_R.mul(m_localAnchor));
+        return m_body2.m_R.mul(m_localAnchor).addLocal(m_body2.m_position);
     }
 
     @Override

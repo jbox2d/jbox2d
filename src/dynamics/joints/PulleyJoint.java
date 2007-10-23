@@ -368,11 +368,11 @@ public class PulleyJoint extends Joint {
     }
 
     public Vec2 getAnchor1() {
-        return m_body1.m_position.add(m_body1.m_R.mul(m_localAnchor1));
+        return m_body1.m_R.mul(m_localAnchor1).addLocal(m_body1.m_position);
     }
 
     public Vec2 getAnchor2() {
-        return m_body2.m_position.add(m_body2.m_R.mul(m_localAnchor2));
+        return m_body2.m_R.mul(m_localAnchor2).addLocal(m_body2.m_position);
     }
 
     public Vec2 getGroundPoint1() {
@@ -396,14 +396,14 @@ public class PulleyJoint extends Joint {
     }
 
     public float getLength1() {
-        Vec2 p = m_body1.m_position.add(m_body1.m_R.mul(m_localAnchor1));
+        Vec2 p = m_body1.m_R.mul(m_localAnchor1).addLocal(m_body1.m_position);
         Vec2 s = m_ground.m_position.add(m_groundAnchor1);
         Vec2 d = p.sub(s);
         return d.length();
     }
 
     public float getLength2() {
-        Vec2 p = m_body2.m_position.add(m_body2.m_R.mul(m_localAnchor2));
+        Vec2 p = m_body2.m_R.mul(m_localAnchor2).addLocal(m_body2.m_position);
         Vec2 s = m_ground.m_position.add(m_groundAnchor2);
         Vec2 d = p.sub(s);
         return d.length();

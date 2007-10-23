@@ -175,7 +175,7 @@ public class RevoluteJoint extends Joint {
                 Vec2.cross(b2.m_angularVelocity, r2)).subLocal(
                 b1.m_linearVelocity).sub(Vec2.cross(b1.m_angularVelocity, r1));
 
-        Vec2 ptpImpulse = m_ptpMass.mul(ptpCdot).negate();
+        Vec2 ptpImpulse = m_ptpMass.mul(ptpCdot).negateLocal();
         m_ptpImpulse.addLocal(ptpImpulse);
 
         b1.m_linearVelocity.subLocal(ptpImpulse.mul(b1.m_invMass));
@@ -237,7 +237,7 @@ public class RevoluteJoint extends Joint {
                 Settings.maxLinearCorrection);
         ptpC = MathUtils.clamp(ptpC, dpMax.negate(), dpMax);
 
-        Vec2 impulse = m_ptpMass.mul(ptpC).negate();
+        Vec2 impulse = m_ptpMass.mul(ptpC).negateLocal();
 
         b1.m_position.subLocal(impulse.mul(b1.m_invMass));
         b1.m_rotation -= b1.m_invI * Vec2.cross(r1, impulse);
@@ -302,13 +302,13 @@ public class RevoluteJoint extends Joint {
     @Override
     public Vec2 getAnchor1() {
         Body b1 = m_body1;
-        return b1.m_position.add(b1.m_R.mul(m_localAnchor1));
+        return b1.m_R.mul(m_localAnchor1).addLocal(b1.m_position);
     }
 
     @Override
     public Vec2 getAnchor2() {
         Body b2 = m_body2;
-        return b2.m_position.add(b2.m_R.mul(m_localAnchor2));
+        return b2.m_R.mul(m_localAnchor2).addLocal(b2.m_position);
     }
 
     float getJointAngle() {

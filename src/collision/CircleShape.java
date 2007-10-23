@@ -19,7 +19,7 @@ public class CircleShape extends Shape {
         m_type = ShapeType.CIRCLE_SHAPE;
         m_radius = circle.radius;
         m_R = m_body.m_R.clone();
-        m_position = m_body.m_position.add(m_body.m_R.mul(m_localPosition));
+        m_position = m_body.m_R.mul(m_localPosition).addLocal(m_body.m_position);
 
         AABB aabb = new AABB(new Vec2(m_position.x - m_radius, m_position.y
                 - m_radius), new Vec2(m_position.x + m_radius, m_position.y
@@ -42,7 +42,7 @@ public class CircleShape extends Shape {
 
     public void synchronize(Vec2 position, Mat22 R) {
         m_R.set(R);
-        m_position = position.add(R.mul(m_localPosition));
+        m_position = R.mul(m_localPosition).addLocal(position);
 
         if (m_proxyId == PairManager.NULL_PROXY) {
             return;

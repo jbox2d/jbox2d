@@ -32,10 +32,10 @@ public class PolyShape extends Shape {
             BoxDef box = (BoxDef) def;
             m_vertexCount = 4;
             Vec2 h = box.extents.clone();
-            m_vertices[0] = localPosition.add(localR.mul(new Vec2(h.x, h.y)));
-            m_vertices[1] = localPosition.add(localR.mul(new Vec2(-h.x, h.y)));
-            m_vertices[2] = localPosition.add(localR.mul(new Vec2(-h.x, -h.y)));
-            m_vertices[3] = localPosition.add(localR.mul(new Vec2(h.x, -h.y)));
+            m_vertices[0] = localR.mul(new Vec2(h.x, h.y)).addLocal(localPosition);
+            m_vertices[1] = localR.mul(new Vec2(-h.x, h.y)).addLocal(localPosition);
+            m_vertices[2] = localR.mul(new Vec2(-h.x, -h.y)).addLocal(localPosition);
+            m_vertices[3] = localR.mul(new Vec2(h.x, -h.y)).addLocal(localPosition);
         }
         else {
             PolyDef poly = (PolyDef) def;
@@ -43,8 +43,8 @@ public class PolyShape extends Shape {
             // b2Assert(3 <= m_vertexCount && m_vertexCount <=
             // b2_maxPolyVertices);
             for (int i = 0; i < m_vertexCount; ++i) {
-                m_vertices[i] = localPosition.add(localR.mul(poly.vertices
-                        .get(i)));
+                m_vertices[i] = localR.mul(poly.vertices
+                        .get(i)).addLocal(localPosition);
             }
 
         }
@@ -84,7 +84,7 @@ public class PolyShape extends Shape {
         Mat22 R = m_R.mul(m_localOBB.R);
         Mat22 absR = R.abs();
         Vec2 h = absR.mul(m_localOBB.extents);
-        Vec2 position = m_position.add(m_R.mul(m_localOBB.center));
+        Vec2 position = m_R.mul(m_localOBB.center).addLocal(m_position);
         AABB aabb = new AABB();
         aabb.minVertex.x = position.x - h.x;
         aabb.minVertex.y = position.y - h.y;
@@ -117,7 +117,7 @@ public class PolyShape extends Shape {
         Mat22 obbR = m_R.mul(m_localOBB.R);
         Mat22 absR = obbR.abs();
         Vec2 h = absR.mul(m_localOBB.extents);
-        Vec2 center = m_position.add(m_R.mul(m_localOBB.center));
+        Vec2 center = m_R.mul(m_localOBB.center).addLocal(m_position);
         AABB aabb = new AABB();
         aabb.minVertex.x = center.x - h.x;
         aabb.minVertex.y = center.y - h.y;
@@ -165,7 +165,7 @@ public class PolyShape extends Shape {
         Mat22 R = m_R.mul(m_localOBB.R);
         Mat22 absR = R.abs();
         Vec2 h = absR.mul(m_localOBB.extents);
-        Vec2 position = m_position.add(m_R.mul(m_localOBB.center));
+        Vec2 position = m_R.mul(m_localOBB.center).addLocal(m_position);
         AABB aabb = new AABB();
         aabb.minVertex.x = position.x - h.x;
         aabb.minVertex.y = position.y - h.y;

@@ -1,5 +1,6 @@
 package collision;
 
+import common.Mat22;
 import common.Settings;
 import common.Vec2;
 
@@ -65,7 +66,9 @@ public class CollidePoly {
         // Get the normal of edge1.
         Vec2 normalLocal1 = Vec2.cross(vert1s[vertexIndex12]
                 .sub(vert1s[vertexIndex11]), 1.0f);
+
         normalLocal1.normalize();
+
         Vec2 normal = poly1.m_R.mul(normalLocal1);
         Vec2 normalLocal2 = poly2.m_R.mulT(normal);
 
@@ -80,8 +83,8 @@ public class CollidePoly {
             }
         }
 
-        Vec2 v1 = poly1.m_position.add(poly1.m_R.mul(vert1s[vertexIndex11]));
-        Vec2 v2 = poly2.m_position.add(poly2.m_R.mul(vert2s[vertexIndex2]));
+        Vec2 v1 = poly1.m_R.mul(vert1s[vertexIndex11]).addLocal(poly1.m_position);
+        Vec2 v2 = poly2.m_R.mul(vert2s[vertexIndex2]).addLocal(poly2.m_position);
         float separation = Vec2.dot(v2.sub(v1), normal);
         return separation;
     }
@@ -208,12 +211,12 @@ public class CollidePoly {
         c[0] = new ClipVertex();
         c[1] = new ClipVertex();
 
-        c[0].v = poly2.m_position.add(poly2.m_R.mul(vert2s[vertex21]));
+        c[0].v = poly2.m_R.mul(vert2s[vertex21]).addLocal(poly2.m_position);
         c[0].id.features.referenceFace = edge1;
         c[0].id.features.incidentEdge = vertex21;
         c[0].id.features.incidentVertex = vertex21;
 
-        c[1].v = poly2.m_position.add(poly2.m_R.mul(vert2s[vertex22]));
+        c[1].v = poly2.m_R.mul(vert2s[vertex22]).addLocal(poly2.m_position);
         c[1].id.features.referenceFace = edge1;
         c[1].id.features.incidentEdge = vertex21;
         c[1].id.features.incidentVertex = vertex22;
@@ -281,8 +284,8 @@ public class CollidePoly {
         sideNormal.normalize();
         Vec2 frontNormal = Vec2.cross(sideNormal, 1.0f);
 
-        v11 = poly1.m_position.add(poly1.m_R.mul(v11));
-        v12 = poly1.m_position.add(poly1.m_R.mul(v12));
+        v11 = poly1.m_R.mul(v11).addLocal(poly1.m_position);
+        v12 = poly1.m_R.mul(v12).addLocal(poly1.m_position);
 
         float frontOffset = Vec2.dot(frontNormal, v11);
         float sideOffset1 = -Vec2.dot(sideNormal, v11);
