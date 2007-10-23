@@ -181,7 +181,7 @@ public class Body {
     // necessarily coincide with the center of mass. It depends on how the
     // shapes are created.
     public Vec2 getOriginPosition() {
-        return (m_position.sub(m_R.mul(m_center)));
+        return m_position.sub(m_R.mul(m_center));
     }
 
     public Vec2 getCenterPosition() {
@@ -245,7 +245,7 @@ public class Body {
     }
 
     public Vec2 getWorldPoint(Vec2 localPoint) {
-        return m_position.add(m_R.mul(localPoint));
+        return m_R.mul(localPoint).addLocal(m_position);
     }
 
     public Vec2 getWorldVector(Vec2 localVector) {
@@ -318,7 +318,7 @@ public class Body {
 
         m_rotation = rotation;
         m_R.setAngle(m_rotation);
-        m_position = position.add(m_R.mul(m_center));
+        m_position = m_R.mul(m_center).addLocal(position);
 
         for (Shape s = m_shapeList; s != null; s = s.m_next) {
             s.synchronize(m_position, m_R);

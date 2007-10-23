@@ -39,12 +39,12 @@ public class DistanceJoint extends Joint {
 
     @Override
     public Vec2 getAnchor1() {
-        return m_body1.m_position.add(m_body1.m_R.mul(m_localAnchor1));
+        return m_body1.m_R.mul(m_localAnchor1).addLocal(m_body1.m_position);
     }
 
     @Override
     public Vec2 getAnchor2() {
-        return m_body2.m_position.add(m_body2.m_R.mul(m_localAnchor2));
+        return m_body2.m_R.mul(m_localAnchor2).addLocal(m_body2.m_position);
     }
 
     public Vec2 getReactionForce(float invTimeStep) {

@@ -270,10 +270,11 @@ public abstract class PTest extends PApplet {
 
             beginShape(POLYGON);
             for (int i = 0; i < poly.m_vertexCount; ++i) {
-                Vec2 v = poly.m_position.add(poly.m_R.mul(poly.m_vertices[i]));
+                Vec2 v = poly.m_R.mul(poly.m_vertices[i]).addLocal(
+                        poly.m_position);
                 vertex(v.x, v.y);
             }
-            Vec2 v = poly.m_position.add(poly.m_R.mul(poly.m_vertices[0]));
+            Vec2 v = poly.m_R.mul(poly.m_vertices[0]).addLocal(poly.m_position);
             vertex(v.x, v.y);
             endShape();
         }
@@ -398,7 +399,8 @@ public abstract class PTest extends PApplet {
 
     void drawMouseJoint() {
         Body body = m_mouseJoint.m_body2;
-        Vec2 p1 = body.m_position.add(body.m_R.mul(m_mouseJoint.m_localAnchor));
+        Vec2 p1 = body.m_R.mul(m_mouseJoint.m_localAnchor).addLocal(
+                body.m_position);
         Vec2 p2 = m_mouseJoint.m_target;
 
         fill(0, 255, 0);
