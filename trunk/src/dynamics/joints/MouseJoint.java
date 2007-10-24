@@ -133,7 +133,7 @@ public class MouseJoint extends Joint {
                 m_C.clone().mulLocal(m_beta * step.inv_dt).addLocal(
                         m_impulse.mul(m_gamma)).addLocal(Cdot)).negateLocal();
 
-        Vec2 oldImpulse = m_impulse;
+        Vec2 oldImpulse = m_impulse.clone();
         m_impulse.addLocal(impulse);
         float length = m_impulse.length();
         if (length > step.dt * m_maxForce) {
