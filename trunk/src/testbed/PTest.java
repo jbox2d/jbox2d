@@ -115,7 +115,7 @@ public abstract class PTest extends PApplet {
         setupWorld();
 
         m_textLine = 30;
-        System.out.println("Constructing PTest");
+        //System.out.println("Constructing PTest");
     }
 
     void MouseDown(Vec2 p) {
