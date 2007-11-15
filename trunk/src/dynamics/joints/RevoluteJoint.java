@@ -66,9 +66,9 @@ public class RevoluteJoint extends Joint {
 
     float m_upperAngle;
 
-    float m_maxMotorTorque;
+    public float m_maxMotorTorque;
 
-    float m_motorSpeed;
+    public float m_motorSpeed;
 
     public boolean m_enableLimit;
 

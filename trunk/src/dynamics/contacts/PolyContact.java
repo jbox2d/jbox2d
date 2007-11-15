@@ -98,7 +98,9 @@ public class PolyContact extends Contact implements ContactCreator {
             m0.points[k] = new ContactPoint(m_manifold.points[k]);
             m0.points[k].normalImpulse = m_manifold.points[k].normalImpulse;
             m0.points[k].tangentImpulse = m_manifold.points[k].tangentImpulse;
-            m0.points[k].id.key = m_manifold.points[k].id.key;
+            //m0.points[k].id.key = m_manifold.points[k].id.key;
+            m0.points[k].id.features.set(m_manifold.points[k].id.features);
+            //System.out.println(m_manifold.points[k].id.key);
         }
         m0.pointCount = m_manifold.pointCount;
 
@@ -130,7 +132,8 @@ public class PolyContact extends Contact implements ContactCreator {
                     ContactPoint cp0 = m0.points[j];
                     ContactID id0 = new ContactID(cp0.id);
 
-                    if (id0.key == id.key) {
+                    if (id0.features.isEqual(id.features)){
+                    //if (id0.key == id.key) {
                         match[j] = true;
                         m_manifold.points[i].normalImpulse = m0.points[j].normalImpulse;
                         m_manifold.points[i].tangentImpulse = m0.points[j].tangentImpulse;

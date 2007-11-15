@@ -48,7 +48,7 @@ public class CollideCircle {
         }
 
         manifold.pointCount = 1;
-        manifold.points[0].id.key = 0;
+        //manifold.points[0].id.key = 0;
         manifold.points[0].separation = separation;
         manifold.points[0].position = circle2.m_position.sub(manifold.normal
                 .mul(circle2.m_radius));
