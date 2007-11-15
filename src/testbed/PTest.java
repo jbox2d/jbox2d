@@ -52,6 +52,8 @@ import dynamics.joints.MouseJoint;
 import dynamics.joints.PulleyJoint;
 
 public abstract class PTest extends PApplet {
+    
+    public Body followedBody;
 
     public boolean[] keyDown;
 
@@ -313,7 +315,7 @@ public abstract class PTest extends PApplet {
         }
     }
 
-    void DrawJoint(Joint joint) {
+    public void DrawJoint(Joint joint) {
         Body b1 = joint.m_body1;
         Body b2 = joint.m_body2;
         Vec2 x1 = b1.m_position;
@@ -550,9 +552,25 @@ public abstract class PTest extends PApplet {
 
         checkKeys();
 
+        float initFollowX = 0f;
+        float initFollowY = 0f;
+        if (followedBody != null) {
+            Vec2 a = worldToScreen(followedBody.m_position.x,followedBody.m_position.y);
+            initFollowX = a.x;
+            initFollowY = a.y;
+        }
+        
+        frame();
+        
         debugCount = 0;
         // update data model
         Step(settings);
+        
+        if (followedBody != null) {
+            Vec2 a = worldToScreen(followedBody.m_position.x,followedBody.m_position.y);
+            transX += initFollowX - a.x;
+            transY += initFollowY - a.y;
+        }
 
         if (keyDown['d']) {
             System.out.println(debugCount);
@@ -569,11 +587,32 @@ public abstract class PTest extends PApplet {
         pmousePressed = mousePressed;
     }
 
+    protected void frame() {
+        //Stub method - override to add behavior per-frame
+    }
+    
+    /**
+     * Sets the camera to pan along with a body.
+     * Still allows user to set relative camera position and scale.
+     * @param b
+     */
+    public void setFollowed(Body b){
+        followedBody = b;
+    }
+
     protected Vec2 screenToWorld(float x, float y) {
         float wX = map(x - (transX - width / 2.0f), 0f, width, -width
                 / (2.0f * scaleFactor), width / (2.0f * scaleFactor));
         float wY = map(y - (transY - height / 2.0f), height, 0f, -height
                 / (2.0f * scaleFactor), height / (2.0f * scaleFactor));
+        return new Vec2(wX, wY);
+    }
+    
+    protected Vec2 worldToScreen(float x, float y) {
+        float wX = map(x, -width / (2.0f * scaleFactor), width / (2.0f * scaleFactor),
+                0f, width) + (transX - width / 2.0f);
+        float wY = map(y, -height / (2.0f * scaleFactor), height / (2.0f * scaleFactor),
+                height, 0f) + (transY - height / 2.0f);
         return new Vec2(wX, wY);
     }
 
@@ -596,6 +635,7 @@ public abstract class PTest extends PApplet {
                 100f)), new Vec2(0.0f, -10.0f), true);
         m_bomb = null;
         m_mouseJoint = null;
+        followedBody = null;
     }
 
     /**
