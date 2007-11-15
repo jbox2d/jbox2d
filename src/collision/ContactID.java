@@ -22,13 +22,23 @@
  */
 package collision;
 
+//FIXME: In the C++ version, this class is a union of
+//the key and the features, meaning not that it contains
+//both separately, but that the same data can be accessed
+//as either.  The key there is 32 bit, and each member of
+//features is 8 bits.
+//
+//We need to figure out if this is a problem or not, because
+//I have a feeling that as of right now, key is never being
+//set properly.  Initial examination seems to show that key is
+//always zero.
 public class ContactID {
     public int key;
 
     // UNION
-    Features features;
+    public Features features;
 
-    class Features {
+    public class Features {
         public int referenceFace;
 
         public int incidentEdge;
@@ -46,6 +56,20 @@ public class ContactID {
             incidentEdge = f.incidentEdge;
             incidentVertex = f.incidentVertex;
             flip = f.flip;
+        }
+        
+        public void set(Features f){
+            referenceFace = f.referenceFace;
+            incidentEdge = f.incidentEdge;
+            incidentVertex = f.incidentVertex;
+            flip = f.flip;
+        }
+        
+        public boolean isEqual(Features f){
+            return (referenceFace==f.referenceFace && 
+                    incidentEdge==f.incidentEdge &&
+                    incidentVertex==f.incidentVertex &&
+                    flip==f.flip);
         }
 
     }

@@ -73,11 +73,11 @@ public class PrismaticJoint extends Joint {
 
     float m_limitPositionImpulse;
 
-    float m_lowerTranslation;
+    public float m_lowerTranslation;
 
-    float m_upperTranslation;
+    public float m_upperTranslation;
 
-    float m_maxMotorForce;
+    public float m_maxMotorForce;
 
     public float m_motorSpeed;
 
