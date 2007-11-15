@@ -40,7 +40,8 @@
  * they have gone to sleep.
  * Make sure that something is actually happening for most of the simulation!
  * 
- * Sample results: 
+ * Sample results on my PowerBook G4 (1.5 GHz, 512 MB RAM)
+ * Using Nov. 15 2007 SVN codebase
  * WASHING_MACHINE test
  * 2000 frames, 10 tests.
  * 37981407000 - 52.6573436313194 FPS
@@ -79,10 +80,10 @@ public class TimingTest extends PApplet {
     
     public int frames = 2000;
     public int iters = 10;
-    public TestSelection testToTime = TestSelection.WASHING_MACHINE;
+    public TestSelection testToTime = TestSelection.CIRCLES;
     
     public enum TestSelection{
-        WASHING_MACHINE, COMPOUND_SHAPES, DOMINO, PYRAMID
+        WASHING_MACHINE, COMPOUND_SHAPES, DOMINO, PYRAMID, CIRCLES
     }
     
     static public void main(String args[]) {
@@ -194,6 +195,10 @@ public class TimingTest extends PApplet {
                 case PYRAMID:
                     Pyramid p = new Pyramid();
                     p.go(m_world);
+                    break;
+                case CIRCLES:
+                    Circles c = new Circles();
+                    c.go(m_world);
                     break;
             }
             
