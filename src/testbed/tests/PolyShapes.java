@@ -50,12 +50,14 @@ public class PolyShapes extends PTest {
     public PolyShapes() {
         super("PolyShapes");
 
-        bodies = new Body[256];
-        sds = new ShapeDef[4];
     }
 
     @Override
     public void go(World world) {
+
+        bodies = new Body[256];
+        sds = new ShapeDef[4];
+        
         this.world = world;
         // Ground body
         {
