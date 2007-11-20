@@ -285,7 +285,7 @@ public abstract class PTest extends PApplet {
         }
     }
 
-    void DrawShape(Shape shape, int c) {
+    public void DrawShape(Shape shape, int c) {
         stroke(c);
         noFill();
         if (shape.m_type == ShapeType.POLY_SHAPE
@@ -624,7 +624,7 @@ public abstract class PTest extends PApplet {
      * Initialise the demo - clear the world
      */
     public final void initDemo() {
-        // XXX m_world.clear();
+        //XXX m_world.clear();
         setupWorld();
         System.out.println("Initialising:" + getTitle());
         init(m_world);
@@ -639,7 +639,7 @@ public abstract class PTest extends PApplet {
     }
 
     /**
-     * Should be implemented by the demo, add the bodies/joints to the world.
+     * go(World) should be implemented by the demo, add the bodies/joints to the world.
      * 
      * @param world
      *            The world in which the simulation is going to run
