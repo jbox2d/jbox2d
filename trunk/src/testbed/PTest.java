@@ -463,6 +463,9 @@ public abstract class PTest extends PApplet {
             // settings.drawNormals = normals;
             settings.drawContacts = contacts;
         }
+        if (key == 'b') {
+            settings.drawAABBs = !settings.drawAABBs;
+        }
         if (key == ' ') {
             LaunchBomb();
         }
