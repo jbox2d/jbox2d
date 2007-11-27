@@ -296,6 +296,7 @@ public class CollidePoly {
         findIncidentEdge(incidentEdge, poly1, edge1, poly2);
 
         int count1 = poly1.m_vertexCount;
+
         Vec2[] vert1s = poly1.m_vertices;
 
         Vec2 v11 = vert1s[edge1];
