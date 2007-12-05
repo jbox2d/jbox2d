@@ -22,7 +22,9 @@
  */
 package dynamics;
 
-public class StepInfo {
+//Updated to rev. 56 of b2World.cpp/.h
+
+public class TimeStep {
     public float dt; // time step
 
     public float inv_dt; // inverse time step (0 if dt == 0).

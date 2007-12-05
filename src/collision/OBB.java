@@ -25,6 +25,8 @@ package collision;
 import common.Vec2;
 import common.Mat22;
 
+//Updated to rev 56 of b2Collision.h
+
 public class OBB {
     public Mat22 R;
 

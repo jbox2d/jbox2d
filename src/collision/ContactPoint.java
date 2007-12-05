@@ -24,6 +24,8 @@ package collision;
 
 import common.Vec2;
 
+//Updated to rev 56 of b2Collision.h
+
 public class ContactPoint {
     public Vec2 position;
 

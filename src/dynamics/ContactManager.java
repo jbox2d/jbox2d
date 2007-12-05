@@ -27,6 +27,8 @@ import collision.Shape;
 import dynamics.contacts.Contact;
 import dynamics.contacts.NullContact;
 
+//Updated to rev 56 of b2ContactManager.cpp/.h
+
 public class ContactManager extends PairCallback {
     World m_world;
 
@@ -53,6 +55,10 @@ public class ContactManager extends PairCallback {
         }
 
         if (shape1.m_body == shape2.m_body) {
+            return m_nullContact;
+        }
+        
+        if (m_world.m_filter != null && m_world.m_filter.shouldCollide(shape1, shape2) == false) {
             return m_nullContact;
         }
 

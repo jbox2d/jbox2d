@@ -98,9 +98,18 @@ public abstract class Contact {
                 * m_shape2.m_friction);
         m_restitution = Math
                 .max(m_shape1.m_restitution, m_shape2.m_restitution);
-        m_world = s1.m_body.m_world;
+        //m_world = s1.m_body.m_world;
         m_prev = null;
         m_next = null;
+        m_node1.contact = null;
+        m_node1.prev = null;
+        m_node1.next = null;
+        m_node1.other = null;
+        
+        m_node2.contact = null;
+        m_node2.prev = null;
+        m_node2.next = null;
+        m_node2.other = null;
     }
 
     public Contact getNext() {
@@ -125,7 +134,7 @@ public abstract class Contact {
         // AddType(new PolyContact(), ShapeType.BOX_SHAPE, ShapeType.BOX_SHAPE);
     }
 
-    static void addType(ContactCreator createFcn, ShapeType type1,
+    static void addType(ContactCreateFcn createFcn, ShapeType type1,
             ShapeType type2) {
         ContactRegister cr = new ContactRegister();
         cr.s1 = type1;

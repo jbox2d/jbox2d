@@ -31,7 +31,7 @@ import collision.ShapeType;
 import collision.CollideCircle;
 import collision.CircleShape;
 
-public class CircleContact extends Contact implements ContactCreator {
+public class CircleContact extends Contact implements ContactCreateFcn {
 
     Manifold m_manifold;
 
@@ -69,7 +69,7 @@ public class CircleContact extends Contact implements ContactCreator {
 
     public void evaluate() {
         CollideCircle.collideCircle(m_manifold, (CircleShape) m_shape1,
-                (CircleShape) m_shape2);
+                (CircleShape) m_shape2, false);
 
         if (m_manifold.pointCount > 0) {
             m_manifoldCount = 1;

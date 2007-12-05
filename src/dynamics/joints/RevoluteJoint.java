@@ -27,7 +27,10 @@ import common.Settings;
 import common.Vec2;
 import common.Mat22;
 import dynamics.Body;
-import dynamics.StepInfo;
+import dynamics.TimeStep;
+import dynamics.World;
+
+//Updated to rev. 56 of b2RevoluteJoint.cpp/.h
 
 //Point-to-point constraint
 //C = p2 - p1
@@ -99,7 +102,7 @@ public class RevoluteJoint extends Joint {
     }
 
     @Override
-    public void preSolve() {
+    public void prepareVelocitySolver() {
         Body b1 = m_body1;
         Body b2 = m_body2;
 
@@ -168,20 +171,24 @@ public class RevoluteJoint extends Joint {
             m_limitImpulse = 0.0f;
         }
 
-        // Warm starting.
-        b1.m_linearVelocity.subLocal(m_ptpImpulse.mul(invMass1));
-        b1.m_angularVelocity -= invI1
-                * (Vec2.cross(r1, m_ptpImpulse) + m_motorImpulse + m_limitImpulse);
+        if (World.ENABLE_WARM_STARTING) {
+            b1.m_linearVelocity.subLocal(m_ptpImpulse.mul(invMass1));
+            b1.m_angularVelocity -= invI1
+                    * (Vec2.cross(r1, m_ptpImpulse) + m_motorImpulse + m_limitImpulse);
 
-        b2.m_linearVelocity.addLocal(m_ptpImpulse.mul(invMass2));
-        b2.m_angularVelocity += invI2
-                * (Vec2.cross(r2, m_ptpImpulse) + m_motorImpulse + m_limitImpulse);
-
+            b2.m_linearVelocity.addLocal(m_ptpImpulse.mul(invMass2));
+            b2.m_angularVelocity += invI2
+                    * (Vec2.cross(r2, m_ptpImpulse) + m_motorImpulse + m_limitImpulse);
+        } else {
+            m_ptpImpulse.setZero();
+            m_motorImpulse = 0.0f;
+            m_limitImpulse = 0.0f;
+        }
         m_limitPositionImpulse = 0.0f;
     }
 
     @Override
-    public void solveVelocityConstraints(StepInfo step) {
+    public void solveVelocityConstraints(TimeStep step) {
         Body b1 = m_body1;
         Body b2 = m_body2;
 
@@ -245,6 +252,8 @@ public class RevoluteJoint extends Joint {
     public boolean solvePositionConstraints() {
         Body b1 = m_body1;
         Body b2 = m_body2;
+        
+        float positionError = 0f;
 
         // Solve point-to-point position error.
         Vec2 r1 = b1.m_R.mul(m_localAnchor1);
@@ -253,13 +262,33 @@ public class RevoluteJoint extends Joint {
         Vec2 p1 = b1.m_position.add(r1);
         Vec2 p2 = b2.m_position.add(r2);
         Vec2 ptpC = p2.sub(p1);
+        
+        positionError = ptpC.length();
 
         // Prevent overly large corrections.
-        Vec2 dpMax = new Vec2(Settings.maxLinearCorrection,
-                Settings.maxLinearCorrection);
-        ptpC = MathUtils.clamp(ptpC, dpMax.negate(), dpMax);
+//        Vec2 dpMax = new Vec2(Settings.maxLinearCorrection,
+//                Settings.maxLinearCorrection);
+//        ptpC = MathUtils.clamp(ptpC, dpMax.negate(), dpMax);
 
-        Vec2 impulse = m_ptpMass.mul(ptpC).negateLocal();
+        //Vec2 impulse = m_ptpMass.mul(ptpC).negateLocal();
+
+        float invMass1 = b1.m_invMass, invMass2 = b2.m_invMass;
+        float invI1 = b1.m_invI, invI2 = b2.m_invI;
+
+        Mat22 K1 = new Mat22();
+        K1.col1.x = invMass1 + invMass2;    K1.col2.x = 0.0f;
+        K1.col1.y = 0.0f;                   K1.col2.y = invMass1 + invMass2;
+        
+        Mat22 K2 = new Mat22();
+        K2.col1.x =  invI1 * r1.y * r1.y;   K2.col2.x = -invI1 * r1.x * r1.y;
+        K2.col1.y = -invI1 * r1.x * r1.y;   K2.col2.y =  invI1 * r1.x * r1.x;
+
+        Mat22 K3 = new Mat22();
+        K3.col1.x =  invI2 * r2.y * r2.y;   K3.col2.x = -invI2 * r2.x * r2.y;
+        K3.col1.y = -invI2 * r2.x * r2.y;   K3.col2.y =  invI2 * r2.x * r2.x;
+
+        Mat22 K = K1.add(K2).add(K3);
+        Vec2 impulse = K.solve(ptpC.negate());
 
         b1.m_position.subLocal(impulse.mul(b1.m_invMass));
         b1.m_rotation -= b1.m_invI * Vec2.cross(r1, impulse);
@@ -269,7 +298,7 @@ public class RevoluteJoint extends Joint {
         b2.m_rotation += b2.m_invI * Vec2.cross(r2, impulse);
         b2.m_R.setAngle(b2.m_rotation);
 
-        float positionError = ptpC.length();
+        //float positionError = ptpC.length();
 
         // Handle limits.
         float angularError = 0.0f;
@@ -288,27 +317,28 @@ public class RevoluteJoint extends Joint {
             }
             else if (m_limitState == LimitState.AT_LOWER_LIMIT) {
                 // Prevent large angular corrections
-                float limitC = MathUtils.clamp(angle - m_lowerAngle,
-                        -Settings.maxAngularCorrection,
-                        Settings.maxAngularCorrection);
-                limitImpulse = -m_motorMass * (limitC + Settings.angularSlop);
+                float limitC = angle - m_lowerAngle;
+                angularError = Math.max(0.0f, -limitC);
+
+                // Prevent large angular corrections and allow some slop.
+                limitC = MathUtils.clamp(limitC + Settings.angularSlop, -Settings.maxAngularCorrection, 0.0f);
+                limitImpulse = -m_motorMass * limitC;
                 float oldLimitImpulse = m_limitPositionImpulse;
                 m_limitPositionImpulse = Math.max(m_limitPositionImpulse
                         + limitImpulse, 0.0f);
                 limitImpulse = m_limitPositionImpulse - oldLimitImpulse;
-                angularError = Math.max(0.0f, -limitC);
             }
             else if (m_limitState == LimitState.AT_UPPER_LIMIT) {
-                // Prevent large angular corrections
-                float limitC = MathUtils.clamp(angle - m_upperAngle,
-                        -Settings.maxAngularCorrection,
-                        Settings.maxAngularCorrection);
-                limitImpulse = -m_motorMass * (limitC - Settings.angularSlop);
+                float limitC = angle - m_upperAngle;
+                angularError = Math.max(0.0f, limitC);
+
+                // Prevent large angular corrections and allow some slop.
+                limitC = MathUtils.clamp(limitC - Settings.angularSlop, 0.0f, Settings.maxAngularCorrection);
+                limitImpulse = -m_motorMass * limitC;
                 float oldLimitImpulse = m_limitPositionImpulse;
                 m_limitPositionImpulse = Math.min(m_limitPositionImpulse
                         + limitImpulse, 0.0f);
                 limitImpulse = m_limitPositionImpulse - oldLimitImpulse;
-                angularError = Math.max(0.0f, limitC);
             }
 
             b1.m_rotation -= b1.m_invI * limitImpulse;

@@ -22,6 +22,8 @@
  */
 package collision;
 
+//Updated to rev 56 of b2Shape.cpp/.h
+
 import common.Vec2;
 import java.util.ArrayList;
 import java.util.List;

@@ -27,6 +27,8 @@ import common.Vec2;
 
 import dynamics.Body;
 
+//Updated through rev. 56 of b2Shape.cpp/.h
+
 public abstract class Shape {
     public int uid; // unique id for shape for sorting
 
@@ -36,7 +38,7 @@ public abstract class Shape {
 
     public Body m_body;
 
-    int m_proxyId;
+    //int m_proxyId;
 
     // Position in world
     public Vec2 m_position;
@@ -57,20 +59,30 @@ public abstract class Shape {
     public Shape m_next;
 
     public Object m_userData;
+    
+    public float m_maxRadius;
+    
+    public int m_proxyId;
+    public int m_categoryBits;
+    public int m_maskBits;
+    public int m_groupIndex;
 
-    public Shape(ShapeDef description, Body body, Vec2 center) {
-        m_localPosition = new Vec2();// description.localPosition.sub(center);
-        // m_localRotation = description.localRotation;
-        m_friction = description.friction;
-        m_restitution = description.restitution;
+    public Shape(ShapeDef def, Body body) {
+        m_localPosition = new Vec2();
+        m_friction = def.friction;
+        m_restitution = def.restitution;
         m_body = body;
 
-        m_position = new Vec2();// m_body.m_position.add(m_body.m_R.mul(m_localPosition));
-        // m_rotation = m_body.m_rotation + m_localRotation;
-        m_R = new Mat22();// (m_rotation);
+        m_position = new Vec2();
+        m_R = new Mat22();
 
         m_proxyId = PairManager.NULL_PROXY;
         uid = uidcount++;
+        
+        m_maxRadius = 0f;
+        m_categoryBits = def.categoryBits;
+        m_maskBits = def.maskBits;
+        m_groupIndex = def.groupIndex;
     }
 
     public Vec2 getPosition() {
@@ -96,13 +108,19 @@ public abstract class Shape {
     public Shape getNext() {
         return m_next;
     }
+    
+    public float getMaxRadius() {
+        return m_maxRadius;
+    }
 
     // public abstract void UpdateProxy();
-    public abstract void synchronize(Vec2 position, Mat22 R);
+    public abstract void synchronize(Vec2 position1, Mat22 R1, Vec2 position2, Mat22 R2);
 
     public abstract void resetProxy(BroadPhase broadPhase);
 
     public abstract boolean testPoint(Vec2 p);
+    
+    public abstract void quickSync(Vec2 position, Mat22 R);
 
     public static Shape create(ShapeDef description, Body body, Vec2 center) {
 
@@ -115,10 +133,22 @@ public abstract class Shape {
         }
         return null;
     }
+    
+    public void destroy() {
+        destructor();
+    }
 
     public void destructor() {
         if (m_proxyId != PairManager.NULL_PROXY) {
             m_body.m_world.m_broadPhase.destroyProxy(m_proxyId);
         }
     }
+    
+    public void destroyProxy() {
+        if (m_proxyId != PairManager.NULL_PROXY) {
+            m_body.m_world.m_broadPhase.destroyProxy(m_proxyId);
+            m_proxyId = PairManager.NULL_PROXY;
+        }
+    }
+    
 }

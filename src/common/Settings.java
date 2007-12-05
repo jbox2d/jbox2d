@@ -22,6 +22,8 @@
  */
 package common;
 
+//Updated to rev. 55 of b2Settings.cpp/.h
+
 public class Settings {
     // Global tuning constants based on MKS units.
 

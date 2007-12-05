@@ -30,28 +30,30 @@ import dynamics.contacts.Contact;
 import dynamics.contacts.ContactSolver;
 import dynamics.joints.Joint;
 
+//Updated to rev. 46 of b2Island.cpp/.h
+
 public class Island {
-    Body[] m_bodies;
+    public Body[] m_bodies;
 
-    Contact[] m_contacts;
+    public Contact[] m_contacts;
 
-    Joint[] m_joints;
+    public Joint[] m_joints;
 
-    int m_bodyCount;
+    public int m_bodyCount;
 
-    int m_jointCount;
+    public int m_jointCount;
 
-    int m_contactCount;
+    public int m_contactCount;
 
-    int m_bodyCapacity;
+    public int m_bodyCapacity;
 
-    int m_contactCapacity;
+    public int m_contactCapacity;
 
-    int m_jointCapacity;
+    public int m_jointCapacity;
 
-    int m_positionIterations;
+    public static int m_positionIterationCount = 0;
 
-    float m_positionError;
+    public float m_positionError;
 
     public Island(int bodyCapacity, int contactCapacity, int jointCapacity) {
         m_bodyCapacity = bodyCapacity;
@@ -76,7 +78,7 @@ public class Island {
         m_jointCount = 0;
     }
 
-    void solve(StepInfo step, Vec2 gravity) {
+    void solve(TimeStep step, Vec2 gravity) {
         for (int i = 0; i < m_bodyCount; ++i) {
             Body b = m_bodies[i];
 
@@ -84,16 +86,25 @@ public class Island {
                 continue;
             }
 
-            b.m_linearVelocity.addLocal(b.m_force.clone().mulLocal(b.m_invMass)
-                    .addLocal(gravity).mulLocal(step.dt));
-
+//            b.m_linearVelocity.addLocal(b.m_force.clone().mulLocal(b.m_invMass)
+//                    .addLocal(gravity).mulLocal(step.dt));
+//
+//            b.m_angularVelocity += step.dt * b.m_invI * b.m_torque;
+//
+//            b.m_linearVelocity.mulLocal(b.m_linearDamping);
+//            b.m_angularVelocity *= b.m_angularDamping;
+//            
+            b.m_linearVelocity.x += step.dt * (gravity.x + b.m_invMass * b.m_force.x);
+            b.m_linearVelocity.y += step.dt * (gravity.y + b.m_invMass * b.m_force.y);
             b.m_angularVelocity += step.dt * b.m_invI * b.m_torque;
 
             b.m_linearVelocity.mulLocal(b.m_linearDamping);
             b.m_angularVelocity *= b.m_angularDamping;
-        }
 
-        // float inv_dt = dt > 0.0f ? 1.0f / dt : 0.0f;
+            // Store positions for conservative advancement.
+            b.m_position0.set(b.m_position);
+            b.m_rotation0 = b.m_rotation;
+        }
 
         ContactSolver contactSolver = new ContactSolver(m_contacts,
                 m_contactCount);
@@ -102,7 +113,7 @@ public class Island {
         contactSolver.preSolve();
 
         for (int i = 0; i < m_jointCount; ++i) {
-            m_joints[i].preSolve();
+            m_joints[i].prepareVelocitySolver();
         }
 
         // Solve velocity constraints.
@@ -126,11 +137,15 @@ public class Island {
 
             b.m_R.setAngle(b.m_rotation);
         }
+        
+        for (int i = 0; i < m_jointCount; ++i) {
+            m_joints[i].preparePositionSolver();
+        }
 
         // Solve position constraints.
         if (World.ENABLE_POSITION_CORRECTION) {
             // System.out.println("position correcting");
-            for (m_positionIterations = 0; m_positionIterations < step.iterations; ++m_positionIterations) {
+            for (m_positionIterationCount = 0; m_positionIterationCount < step.iterations; ++m_positionIterationCount) {
                 // System.out.println(m_positionIterations);
                 boolean contactsOkay = contactSolver
                         .solvePositionConstraints(Settings.contactBaumgarte);
@@ -155,6 +170,7 @@ public class Island {
             Body b = m_bodies[i];
             if (b.m_invMass == 0.0f)
                 continue;
+            b.m_R.setAngle(b.m_rotation);
             b.synchronizeShapes();
             b.m_force.set(0.0f, 0.0f);
             b.m_torque = 0.0f;

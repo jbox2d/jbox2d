@@ -22,10 +22,11 @@
  */
 package dynamics.joints;
 
-import common.Settings;
-import common.Vec2;
-import dynamics.StepInfo;
+import common.*;
+import dynamics.TimeStep;
 import dynamics.World;
+
+//Updated to rev 56 of b2DistanceJoint.cpp/.h
 
 //C = norm(p2 - p1) - L
 //u = (p2 - p1) / norm(p2 - p1)
@@ -79,7 +80,7 @@ public class DistanceJoint extends Joint {
     }
 
     @Override
-    public void preSolve() {
+    public void prepareVelocitySolver() {
         // Compute the effective mass matrix.
         Vec2 r1 = m_body1.m_R.mul(m_localAnchor1);
         Vec2 r2 = m_body2.m_R.mul(m_localAnchor2);
@@ -128,9 +129,17 @@ public class DistanceJoint extends Joint {
         Vec2 d = m_body2.m_position.clone().addLocal(r2).subLocal(
                 m_body1.m_position).subLocal(r1);
 
-        float c = d.length() - m_length;
-        float impulse = -m_mass * c;
+        //float c = d.length() - m_length;
+        //float impulse = -m_mass * c;
 
+        //Vec2 P = m_u.mul(impulse);
+        
+        float length = d.normalize();
+        float C = length - m_length;
+        C = MathUtils.clamp(C, -Settings.maxLinearCorrection, Settings.maxLinearCorrection);
+
+        float impulse = -m_mass * C;
+        m_u = d;
         Vec2 P = m_u.mul(impulse);
 
         m_body1.m_position.subLocal(P.mul(m_body1.m_invMass));
@@ -141,11 +150,11 @@ public class DistanceJoint extends Joint {
         m_body1.m_R.setAngle(m_body1.m_rotation);
         m_body2.m_R.setAngle(m_body2.m_rotation);
 
-        return Math.abs(c) < Settings.linearSlop;
+        return Math.abs(C) < Settings.linearSlop;
     }
 
     @Override
-    public void solveVelocityConstraints(StepInfo step) {
+    public void solveVelocityConstraints(TimeStep step) {
         Vec2 r1 = m_body1.m_R.mul(m_localAnchor1);
         Vec2 r2 = m_body2.m_R.mul(m_localAnchor2);
 

@@ -24,6 +24,6 @@ package dynamics.contacts;
 
 import collision.Shape;
 
-public interface ContactCreator {
+public interface ContactCreateFcn {
     Contact create(Shape s1, Shape s2);
 }

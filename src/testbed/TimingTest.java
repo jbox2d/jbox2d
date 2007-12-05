@@ -78,9 +78,9 @@ import testbed.tests.*;
 
 public class TimingTest extends PApplet {
     
-    public int frames = 2000;
+    public int frames = 500;
     public int iters = 10;
-    public TestSelection testToTime = TestSelection.CIRCLES;
+    public TestSelection testToTime = TestSelection.WASHING_MACHINE;
     
     public enum TestSelection{
         WASHING_MACHINE, COMPOUND_SHAPES, DOMINO, PYRAMID, CIRCLES

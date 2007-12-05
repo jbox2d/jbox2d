@@ -26,7 +26,10 @@ import common.MathUtils;
 import common.Settings;
 import common.Vec2;
 import dynamics.Body;
-import dynamics.StepInfo;
+import dynamics.TimeStep;
+import dynamics.World;
+
+//Updated to rev 56 of b2PrismaticJoint.cpp/.h
 
 //Linear constraint (point-to-line)
 //d = p2 - p1 = x2 + r2 - x1 - r1
@@ -130,7 +133,7 @@ public class PrismaticJoint extends Joint {
         return b2.m_R.mul(m_localAnchor2).addLocal(b2.m_position);
     }
 
-    public void preSolve() {
+    public void prepareVelocitySolver() {
         Body b1 = m_body1;
         Body b2 = m_body2;
 
@@ -205,32 +208,36 @@ public class PrismaticJoint extends Joint {
             m_limitImpulse = 0.0f;
         }
 
-        // Warm starting.
-        // Vec2 P1 = m_linearJacobian.linear1.mul(m_linearImpulse).add(
-        // m_motorJacobian.linear1.mul(m_motorImpulse + m_limitImpulse));
-        // Vec2 P2 = m_linearJacobian.linear2.mul(m_linearImpulse).add(
-        // m_motorJacobian.linear2.mul(m_motorImpulse + m_limitImpulse));
-        Vec2 P1 = m_linearJacobian.linear1.mul(m_linearImpulse).addLocal(
-                m_motorJacobian.linear1.mul(m_motorImpulse + m_limitImpulse));
-        Vec2 P2 = m_linearJacobian.linear2.mul(m_linearImpulse).addLocal(
-                m_motorJacobian.linear2.mul(m_motorImpulse + m_limitImpulse));
-        float L1 = m_linearImpulse * m_linearJacobian.angular1
-                - m_angularImpulse + (m_motorImpulse + m_limitImpulse)
-                * m_motorJacobian.angular1;
-        float L2 = m_linearImpulse * m_linearJacobian.angular2
-                + m_angularImpulse + (m_motorImpulse + m_limitImpulse)
-                * m_motorJacobian.angular2;
+        if (World.ENABLE_WARM_STARTING){
 
-        b1.m_linearVelocity.addLocal(P1.mul(invMass1));
-        b1.m_angularVelocity += invI1 * L1;
+            Vec2 P1 = m_linearJacobian.linear1.mul(m_linearImpulse).addLocal(
+                    m_motorJacobian.linear1.mul(m_motorImpulse + m_limitImpulse));
+            Vec2 P2 = m_linearJacobian.linear2.mul(m_linearImpulse).addLocal(
+                    m_motorJacobian.linear2.mul(m_motorImpulse + m_limitImpulse));
+            float L1 = m_linearImpulse * m_linearJacobian.angular1
+                    - m_angularImpulse + (m_motorImpulse + m_limitImpulse)
+                    * m_motorJacobian.angular1;
+            float L2 = m_linearImpulse * m_linearJacobian.angular2
+                    + m_angularImpulse + (m_motorImpulse + m_limitImpulse)
+                    * m_motorJacobian.angular2;
 
-        b2.m_linearVelocity.addLocal(P2.mul(invMass2));
-        b2.m_angularVelocity += invI2 * L2;
+            b1.m_linearVelocity.addLocal(P1.mul(invMass1));
+            b1.m_angularVelocity += invI1 * L1;
 
+            b2.m_linearVelocity.addLocal(P2.mul(invMass2));
+            b2.m_angularVelocity += invI2 * L2;   
+        } else {
+            m_linearImpulse = 0.0f;
+            m_angularImpulse = 0.0f;
+            m_limitImpulse = 0.0f;
+            m_motorImpulse = 0.0f;
+        }
+        
         m_limitPositionImpulse = 0.0f;
+        
     }
 
-    public void solveVelocityConstraints(StepInfo step) {
+    public void solveVelocityConstraints(TimeStep step) {
         Body b1 = m_body1;
         Body b2 = m_body2;
 
@@ -336,8 +343,8 @@ public class PrismaticJoint extends Joint {
         float linearC = Vec2.dot(ay1, d);
         // Prevent overly large corrections.
         linearC = MathUtils.clamp(linearC,
-                (float) -Settings.maxLinearCorrection,
-                (float) Settings.maxLinearCorrection);
+                 -Settings.maxLinearCorrection,
+                 Settings.maxLinearCorrection);
 
         float linearImpulse = -m_linearMass * linearC;
 
@@ -356,8 +363,8 @@ public class PrismaticJoint extends Joint {
         float angularC = b2.m_rotation - b1.m_rotation - m_initialAngle;
         // Prevent overly large corrections.
         angularC = MathUtils.clamp(angularC,
-                (float) -Settings.maxAngularCorrection,
-                (float) Settings.maxAngularCorrection);
+                 -Settings.maxAngularCorrection,
+                 Settings.maxAngularCorrection);
         float angularImpulse = -m_angularMass * angularC;
 
         b1.m_rotation -= b1.m_invI * angularImpulse;
@@ -388,30 +395,29 @@ public class PrismaticJoint extends Joint {
                 positionError = Math.max(positionError, Math.abs(angularC));
             }
             else if (m_limitState == LimitState.AT_LOWER_LIMIT) {
-                // Prevent large angular corrections
-                float limitC = MathUtils.clamp(
-                        translation - m_lowerTranslation,
-                        -Settings.maxLinearCorrection,
-                        Settings.maxLinearCorrection);
-                limitImpulse = -m_motorMass * (limitC + Settings.linearSlop);
+                float limitC = translation - m_lowerTranslation;
+                positionError = Math.max(positionError, -limitC);
+
+                // Prevent large linear corrections and allow some slop.
+                limitC = MathUtils.clamp(limitC + Settings.linearSlop, -Settings.maxLinearCorrection, 0.0f);
+                limitImpulse = -m_motorMass * limitC;
+                
                 float oldLimitImpulse = m_limitPositionImpulse;
                 m_limitPositionImpulse = Math.max(m_limitPositionImpulse
                         + limitImpulse, 0.0f);
                 limitImpulse = m_limitPositionImpulse - oldLimitImpulse;
-                positionError = Math.max(positionError, -limitC);
-            }
+                }
             else if (m_limitState == LimitState.AT_UPPER_LIMIT) {
-                // Prevent large angular corrections
-                float limitC = MathUtils.clamp(
-                        translation - m_upperTranslation,
-                        -Settings.maxLinearCorrection,
-                        Settings.maxLinearCorrection);
-                limitImpulse = -m_motorMass * (limitC - Settings.linearSlop);
+                float limitC = translation - m_upperTranslation;
+                positionError = Math.max(positionError, limitC);
+
+                // Prevent large linear corrections and allow some slop.
+                limitC = MathUtils.clamp(limitC - Settings.linearSlop, 0.0f, Settings.maxLinearCorrection);
+                limitImpulse = -m_motorMass * limitC;
                 float oldLimitImpulse = m_limitPositionImpulse;
                 m_limitPositionImpulse = Math.min(m_limitPositionImpulse
                         + limitImpulse, 0.0f);
                 limitImpulse = m_limitPositionImpulse - oldLimitImpulse;
-                positionError = Math.max(positionError, limitC);
             }
 
             b1.m_position.addLocal(m_motorJacobian.linear1.mul(invMass1

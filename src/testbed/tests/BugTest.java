@@ -12,6 +12,8 @@ import dynamics.World;
 import dynamics.joints.*;
 
 public class BugTest extends PTest {
+    
+    public Body body;
 
     public BugTest() {
         super("BugTest");
@@ -19,57 +21,50 @@ public class BugTest extends PTest {
 
     public void go(World world) {
         {        
-            {
-                BoxDef sd = new BoxDef();
-                sd.extents = new Vec2(50.0f, 10.0f);
-    
-                BodyDef bd = new BodyDef();
-                bd.position = new Vec2(0.0f, -10.0f);
-                bd.addShape(sd);
-                world.createBody(bd);
-            }
-            CircleDef sd1 = new CircleDef();
-            sd1.radius = 0.5f;
-            sd1.density = 2.0f;
-            sd1.friction = 5.0f;
 
-            BodyDef w1 = new BodyDef();
-            w1.addShape(sd1);
-            w1.position.set(-0.75f, 20.0f);
-            Body b1 = m_world.createBody(w1);
+            // Define the ground box shape.
+            BoxDef groundBoxDef = new BoxDef();
 
-            w1.position.set(0.75f, 20.0f);
-            Body b2 = m_world.createBody(w1);
+            // The extents are the half-widths of the box.
+            groundBoxDef.extents.set(50.0f, 10.0f);
 
-            w1.position.set(0.0f, 20.6f);
-            Body b3 = m_world.createBody(w1);
+            // Set the density of the ground box to zero. This will
+            // make the ground body static (fixed).
+            groundBoxDef.density = 0.0f;
 
-            DistanceJointDef jointDef = new DistanceJointDef();
-            jointDef.collideConnected = true;
-            jointDef.body1 = b1;
-            jointDef.body2 = b2;
-            jointDef.anchorPoint1 = b1.getCenterPosition();//.add(new Vec2(.1f,.1f));
-            jointDef.anchorPoint2 = b2.getCenterPosition();//.add(new Vec2(3f,0f));
+            // Define the ground body.
+            BodyDef groundBodyDef = new BodyDef();
+            groundBodyDef.position.set(0.0f, -10.0f);
 
-            m_world.createJoint(jointDef);
+            // Part of a body's def is its list of shapes.
+            groundBodyDef.addShape(groundBoxDef);
 
-            RevoluteJointDef revoluteDef = new RevoluteJointDef();
-            revoluteDef.collideConnected = false;
-            revoluteDef.body1 = b3;
-            revoluteDef.body2 = b1;
-            revoluteDef.anchorPoint = b1.getCenterPosition();
+            // Call the body factory which allocates memory for the ground body
+            // from a pool and creates the ground box shape (also from a pool).
+            // The body is also added to the world.
+            world.createBody(groundBodyDef);
 
-            m_world.createJoint(revoluteDef);
+            // Define another box shape for our dynamic body.
+            BoxDef boxDef = new BoxDef();
+            boxDef.extents.set(1.0f, 1.0f);
 
-            revoluteDef.body2 = b2;
-            revoluteDef.enableMotor = false;
-            revoluteDef.motorSpeed = 20.0f;
-            revoluteDef.motorTorque = 1000.0f;
+            // Set the box density to be non-zero, so it will be dynamic.
+            boxDef.density = 1.0f;
 
-            revoluteDef.anchorPoint = b2.getCenterPosition();
+            // Override the default friction.
+            boxDef.friction = 0.3f;
 
-            m_world.createJoint(revoluteDef);
+            // Define the dynamic body. We set its position,
+            // add the box shape, and call the body factory.
+            BodyDef bodyDef = new BodyDef();
+            bodyDef.position.set(0.0f, 4.0f);
+            bodyDef.addShape(boxDef);
+            body = world.createBody(bodyDef);
          }
+    }
+    
+    public void frame() {
+        println(body.m_position.y);
     }
 
     /**

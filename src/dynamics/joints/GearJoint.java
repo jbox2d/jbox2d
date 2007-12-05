@@ -24,8 +24,10 @@ package dynamics.joints;
 
 import common.Vec2;
 import dynamics.Body;
-import dynamics.StepInfo;
+import dynamics.TimeStep;
 import common.Settings;
+
+//Updated to rev 56 of b2GearJoint.cpp/.h
 
 public class GearJoint extends Joint {
 
@@ -137,7 +139,7 @@ public class GearJoint extends Joint {
         m_impulse = 0.0f;
     }
 
-    public void preSolve() {
+    public void prepareVelocitySolver() {
         Body g1 = m_ground1;
         Body g2 = m_ground2;
         Body b1 = m_body1;
@@ -183,7 +185,7 @@ public class GearJoint extends Joint {
         b2.m_angularVelocity += b2.m_invI * m_impulse * m_J.angular2;
     }
 
-    public void solveVelocityConstraints(StepInfo step) {
+    public void solveVelocityConstraints(TimeStep step) {
         Body b1 = m_body1;
         Body b2 = m_body2;
 
