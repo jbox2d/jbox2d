@@ -25,6 +25,8 @@ package collision;
 import common.Settings;
 import common.Vec2;
 
+//Updated to rev 56 of b2Collision.h
+
 public class Manifold {
     public ContactPoint[] points;
 

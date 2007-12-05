@@ -32,7 +32,7 @@ import collision.PolyShape;
 import collision.Shape;
 import collision.ShapeType;
 
-class PolyAndCircleContact extends Contact implements ContactCreator {
+class PolyAndCircleContact extends Contact implements ContactCreateFcn {
 
     Manifold m_manifold;
 
@@ -95,7 +95,7 @@ class PolyAndCircleContact extends Contact implements ContactCreator {
     public void evaluate() {
         // System.out.println("PolyAndCircleContact.Evaluate()");
         CollideCircle.collidePolyAndCircle(m_manifold, (PolyShape) m_shape1,
-                (CircleShape) m_shape2);
+                (CircleShape) m_shape2, false);
 
         if (m_manifold.pointCount > 0) {
             m_manifoldCount = 1;

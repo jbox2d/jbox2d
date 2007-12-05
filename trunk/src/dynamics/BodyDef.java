@@ -22,6 +22,8 @@
  */
 package dynamics;
 
+//Updated to rev. 56 of b2Body.h
+
 import collision.ShapeDef;
 
 import common.Settings;

@@ -22,12 +22,14 @@
  */
 package collision;
 
+//Updated to rev 56 of b2PairManager.h
+
 public class Pair implements Comparable<Pair> {
     private static final int PAIR_BUFFERED = 0x0001;
 
     private static final int PAIR_REMOVED = 0x0002;
 
-    private static final int PAIR_RECEIVED = 0x0004;
+    private static final int PAIR_FINAL = 0x0004;
 
     public Object userData;
 
@@ -36,6 +38,8 @@ public class Pair implements Comparable<Pair> {
     public int proxyId2;
 
     public int status;
+    
+    public int next;
 
     public Pair() {
 
@@ -75,12 +79,12 @@ public class Pair implements Comparable<Pair> {
         return (status & PAIR_REMOVED) == PAIR_REMOVED;
     }
 
-    public void setReceived() {
-        status |= PAIR_RECEIVED;
+    public void setFinal() {
+        status |= PAIR_FINAL;
     }
 
-    public boolean isReceived() {
-        return (status & PAIR_RECEIVED) == PAIR_RECEIVED;
+    public boolean isFinal() {
+        return (status & PAIR_FINAL) == PAIR_FINAL;
     }
 
     public int compareTo(Pair p) {

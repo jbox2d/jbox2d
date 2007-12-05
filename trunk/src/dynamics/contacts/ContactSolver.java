@@ -35,6 +35,8 @@ import collision.Manifold;
 import dynamics.Body;
 import dynamics.World;
 
+//Updated to rev 51 of b2ContactSolver.cpp/.h
+
 public class ContactSolver {
     List<ContactConstraint> m_constraints;
 
@@ -125,17 +127,27 @@ public class ContactSolver {
                     assert (kTangent > Settings.EPSILON);
                     ccp.tangentMass = 1.0f / kTangent;
 
+//                    // Setup a velocity bias for restitution.
+//                    // float vRel = Vec2.dot(c.normal, v2.add(Vec2.cross(w2,
+//                    // r2)).sub(v1).sub(Vec2.cross(w1, r1)));
+//                    float vRel = Vec2.dot(c.normal, v2.clone().addLocal(
+//                            Vec2.cross(w2, r2)).subLocal(v1).subLocal(
+//                            Vec2.cross(w1, r1)));
+//                    if (vRel < -Settings.velocityThreshold) {
+//                        ccp.velocityBias = -c.restitution * vRel;
+//                    }
+//                    else {
+//                        ccp.velocityBias = 0.0f;
+//                    }
                     // Setup a velocity bias for restitution.
-                    // float vRel = Vec2.dot(c.normal, v2.add(Vec2.cross(w2,
-                    // r2)).sub(v1).sub(Vec2.cross(w1, r1)));
-                    float vRel = Vec2.dot(c.normal, v2.clone().addLocal(
-                            Vec2.cross(w2, r2)).subLocal(v1).subLocal(
-                            Vec2.cross(w1, r1)));
-                    if (vRel < -Settings.velocityThreshold) {
-                        ccp.velocityBias = -c.restitution * vRel;
+                    ccp.velocityBias = 0.0f;
+                    if (ccp.separation > 0.0f) {
+                        ccp.velocityBias = -60.0f * ccp.separation; // TODO_ERIN b2TimeStep
                     }
-                    else {
-                        ccp.velocityBias = 0.0f;
+                    Vec2 buffer = Vec2.cross(w2, r2).subLocal(Vec2.cross(w1, r1)).addLocal(v2).subLocal(v1);
+                    float vRel = Vec2.dot(c.normal, buffer);
+                    if (vRel < -Settings.velocityThreshold) {
+                        ccp.velocityBias += -c.restitution * vRel;
                     }
                 }
 

@@ -22,6 +22,7 @@
  */
 package collision;
 
+//Updated to rev 56 of b2Collision.h
 public class Collision {
     public static final int NULL_FEATURE = Integer.MAX_VALUE;
 }

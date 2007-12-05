@@ -27,7 +27,9 @@ import common.Settings;
 import common.Vec2;
 
 import dynamics.Body;
-import dynamics.StepInfo;
+import dynamics.TimeStep;
+
+//Updated to rev 56 of b2MouseJoint.cpp/.h
 
 //p = attached point, m = mouse point
 //C = p - m
@@ -96,7 +98,7 @@ public class MouseJoint extends Joint {
     }
 
     @Override
-    public void preSolve() {
+    public void prepareVelocitySolver() {
         Body b = m_body2;
 
         // Compute the effective mass matrix.
@@ -138,7 +140,7 @@ public class MouseJoint extends Joint {
     }
 
     @Override
-    public void solveVelocityConstraints(StepInfo step) {
+    public void solveVelocityConstraints(TimeStep step) {
         Body body = m_body2;
 
         Vec2 r = body.m_R.mul(m_localAnchor);

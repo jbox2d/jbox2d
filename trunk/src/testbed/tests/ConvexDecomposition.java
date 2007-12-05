@@ -89,13 +89,14 @@ public class ConvexDecomposition extends PTest {
         for (int i=0; i<x.length; i++){
             x[i] -= 5f;
             y[i] -= 6f;
-            x[i] *= 3f;
-            y[i] *= 3f;
+            x[i] += random(-.01f, .01f);
+            y[i] += random(-.01f, .01f);
+            x[i] *= .3f;
+            y[i] *= .3f;
         }
         pgon = new Polygon(x,y);
         
         bodyIndex = 0;
-        // memset(bodies, 0, sizeof(bodies));
     }
     
     void CreateBody() {

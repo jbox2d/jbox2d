@@ -24,7 +24,7 @@ package collision;
 
 import java.util.List;
 
-import common.Vec2;
+import common.*;
 
 public class ShapeDef {
     public ShapeType type;
@@ -155,11 +155,59 @@ public class ShapeDef {
         massData.mass = rho * area;
 
         // Center of mass
+        assert(area > Settings.EPSILON);
         center.mulLocal(1.0f / area);
         massData.center = center;
 
         // Inertia tensor relative to the center.
         I = rho * (I - area * Vec2.dot(center, center));
         massData.I = I;
+    }
+    
+    public static Vec2 polyCentroid(List<Vec2> vs, int count) {
+        assert(count >= 3);
+
+        Vec2 c = new Vec2();
+        float area = 0.0f;
+
+        // pRef is the reference point for forming triangles.
+        // It's location doesn't change the result (except for rounding error).
+        Vec2 pRef = new Vec2();
+//    #if 0
+//        // This code would put the reference point inside the polygon.
+//        for (int32 i = 0; i < count; ++i)
+//        {
+//            pRef += vs[i];
+//        }
+//        pRef *= 1.0f / count;
+//    #endif
+
+        final float inv3 = 1.0f / 3.0f;
+
+        for (int i = 0; i < count; ++i) {
+            // Triangle vertices.
+            Vec2 p1 = pRef;
+            Vec2 p2 = vs.get(i);
+            Vec2 p3 = i + 1 < count ? vs.get(i+1) : vs.get(0);
+
+            Vec2 e1 = p2.sub(p1);
+            Vec2 e2 = p3.sub(p1);
+
+            float D = Vec2.cross(e1, e2);
+
+            float triangleArea = 0.5f * D;
+            area += triangleArea;
+
+            // Area weighted centroid
+            //c += triangleArea * inv3 * (p1 + p2 + p3);
+            c.x += triangleArea * inv3 * (p1.x + p2.x + p3.x);
+            c.y += triangleArea * inv3 * (p1.y + p2.y + p3.y);
+            
+        }
+
+        // Centroid
+        assert(area > Settings.EPSILON);
+        c.mulLocal(1.0f / area);
+        return c;
     }
 }

@@ -16,6 +16,8 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
+//Updated to rev 52 of b2CollideCircle.cpp
+
 package collision;
 
 import common.Settings;
@@ -24,13 +26,13 @@ import common.Vec2;
 public class CollideCircle {
 
     public static void collideCircle(Manifold manifold, CircleShape circle1,
-            CircleShape circle2) {
+            CircleShape circle2, boolean conservative) {
         manifold.pointCount = 0;
 
         Vec2 d = circle2.m_position.sub(circle1.m_position);
         float distSqr = Vec2.dot(d, d);
         float radiusSum = circle1.m_radius + circle2.m_radius;
-        if (distSqr > radiusSum * radiusSum) {
+        if (distSqr > radiusSum * radiusSum && conservative == false) {
             return;
         }
 
@@ -55,7 +57,7 @@ public class CollideCircle {
     }
 
     public static void collidePolyAndCircle(Manifold manifold, PolyShape poly,
-            CircleShape circle) {
+            CircleShape circle, boolean conservative) {
         manifold.pointCount = 0;
 
         // Compute circle position in the frame of the polygon.
@@ -95,7 +97,7 @@ public class CollideCircle {
 
         // Project the circle center onto the edge segment.
         int vertIndex1 = normalIndex;
-        int vertIndex2 = poly.m_next[vertIndex1];
+        int vertIndex2 = vertIndex1 + 1 < poly.m_vertexCount ? vertIndex1 + 1 : 0;
         Vec2 e = poly.m_vertices[vertIndex2].sub(poly.m_vertices[vertIndex1]);
         float length = e.normalize();
 
@@ -121,17 +123,24 @@ public class CollideCircle {
 
         // Project the center onto the edge.
         float u = Vec2.dot(xLocal.sub(poly.m_vertices[vertIndex1]), e);
+        manifold.points[0].id.features.incidentEdge = Collision.NULL_FEATURE;
+        manifold.points[0].id.features.incidentVertex = Collision.NULL_FEATURE;
+        manifold.points[0].id.features.referenceFace = Collision.NULL_FEATURE;
+        manifold.points[0].id.features.flip = 0;
         Vec2 p = new Vec2();
         if (u <= 0.0f) {
             p.set(poly.m_vertices[vertIndex1]);
+            manifold.points[0].id.features.incidentVertex = vertIndex1;
         }
         else if (u >= length) {
             p.set(poly.m_vertices[vertIndex2]);
+            manifold.points[0].id.features.incidentVertex = vertIndex2;
         }
         else {
             p.set(poly.m_vertices[vertIndex1]);
             p.x += u * e.x;
             p.y += u * e.y;
+            manifold.points[0].id.features.incidentEdge = vertIndex1;
         }
 
         Vec2 d = xLocal.sub(p);

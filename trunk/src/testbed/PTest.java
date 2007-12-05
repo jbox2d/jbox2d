@@ -79,9 +79,6 @@ public abstract class PTest extends PApplet {
     /** The title of the current demo */
     protected String title;
 
-    /** True if the simulation is running */
-    private boolean running = true;
-
     /** True if we should reset the demo on the next loop */
     protected boolean needsReset;
 
@@ -199,9 +196,9 @@ public abstract class PTest extends PApplet {
 
         World.ENABLE_WARM_STARTING = settings.enableWarmStarting;
         World.ENABLE_POSITION_CORRECTION = settings.enablePositionCorrection;
-
+        //println("pre");
         m_world.step(timeStep, settings.iterationCount);
-
+        //println("post");
         // m_world.m_broadPhase.Validate();
 
         for (Body b = m_world.m_bodyList; b != null; b = b.m_next) {
@@ -246,10 +243,10 @@ public abstract class PTest extends PApplet {
         DrawAABB(m_world.m_broadPhase.m_worldAABB, color(0, 255, 0));
         if (settings.drawAABBs) {
             BroadPhase bp = m_world.m_broadPhase;
-            Vec2 invQ = new Vec2(1.0f / bp.quantizationFactor.x,
-                    1.0f / bp.quantizationFactor.y);
+            Vec2 invQ = new Vec2(1.0f / bp.m_quantizationFactor.x,
+                    1.0f / bp.m_quantizationFactor.y);
             for (int i = 0; i < Settings.maxProxies; ++i) {
-                Proxy p = bp.proxyPool[i];
+                Proxy p = bp.m_proxyPool[i];
                 if (p.isValid() == false) {
                     continue;
                 }
@@ -385,14 +382,15 @@ public abstract class PTest extends PApplet {
         // g.setColor(new Color(0.9f, 0.9f, 0.3f));
         stroke(230, 230, 80);
         BroadPhase bp = m_world.m_broadPhase;
-        Vec2 invQ = new Vec2(1.0f / bp.quantizationFactor.x,
-                1.0f / bp.quantizationFactor.y);
-        for (int i = 0; i < bp.pairManager.m_pairCount; ++i) {
-            Pair pair = bp.pairManager.m_pairs[i];
+        Vec2 invQ = new Vec2(1.0f / bp.m_quantizationFactor.x,
+                1.0f / bp.m_quantizationFactor.y);
+        for (int i = 0; i < bp.m_pairManager.m_pairCount; ++i) {
+            Pair pair = bp.m_pairManager.m_pairs[i];
             int id1 = pair.proxyId1;
             int id2 = pair.proxyId2;
-            Proxy p1 = bp.proxyPool[id1];
-            Proxy p2 = bp.proxyPool[id2];
+            if (id1 > bp.m_proxyPool.length || id2 > bp.m_proxyPool.length) continue;
+            Proxy p1 = bp.m_proxyPool[id1];
+            Proxy p2 = bp.m_proxyPool[id2];
 
             AABB b1 = new AABB();
             AABB b2 = new AABB();
@@ -448,10 +446,8 @@ public abstract class PTest extends PApplet {
     }
 
     /**
-     * Notification that a key was pressed
+     * Notification that a key was typed.
      * 
-     * @param c
-     *            The character of key hit
      */
     public void keyTyped() {
         if (key == 'r') {
@@ -511,10 +507,10 @@ public abstract class PTest extends PApplet {
                 int notches = e.getWheelRotation();
                 Vec2 oldCenter = screenToWorld(width / 2.0f, height / 2.0f);
                 if (notches < 0) {
-                    scaleFactor = min(100f, scaleFactor * 1.05f);
+                    scaleFactor = min(500f, scaleFactor * 1.05f);
                 }
                 else if (notches > 0) {
-                    scaleFactor = max(.01f, scaleFactor / 1.05f);
+                    scaleFactor = max(.05f, scaleFactor / 1.05f);
                 }
                 Vec2 newCenter = screenToWorld(width / 2.0f, height / 2.0f);
                 transX -= (oldCenter.x - newCenter.x) * scaleFactor;
@@ -532,8 +528,10 @@ public abstract class PTest extends PApplet {
         scale(scaleFactor, -scaleFactor);
         strokeWeight(1.2f / scaleFactor);
 
+        //Handle mouse dragging stuff
+        //Left mouse attaches mouse joint to object.
+        //Right mouse drags canvas.
         mouseWorld = screenToWorld(mouseX, mouseY);
-        // System.out.println(mouseButton);
         if (mouseButton == LEFT) {
             if (mousePressed && !pmousePressed) {
                 MouseDown(mouseWorld);
@@ -567,7 +565,9 @@ public abstract class PTest extends PApplet {
         
         debugCount = 0;
         // update data model
+        //println("prestep");
         Step(settings);
+        //println("poststep");
         
         if (followedBody != null) {
             Vec2 a = worldToScreen(followedBody.m_position.x,followedBody.m_position.y);
@@ -590,8 +590,12 @@ public abstract class PTest extends PApplet {
         pmousePressed = mousePressed;
     }
 
+    /**
+     * Stub method - override to add behavior per-frame.
+     * Called immediately before physics step - keyboard
+     * is already checked when called.
+     */
     protected void frame() {
-        //Stub method - override to add behavior per-frame
     }
     
     /**

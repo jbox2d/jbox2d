@@ -130,4 +130,15 @@ public class Mat22 {
     public Mat22 add(Mat22 B) {
         return new Mat22(col1.add(B.col1), col2.add(B.col2));
     }
+    
+    // Solve A * x = b
+    public Vec2 solve(Vec2 b) {
+        float a11 = col1.x, a12 = col2.x, a21 = col1.y, a22 = col2.y;
+        float det = a11 * a22 - a12 * a21;
+        assert(det != 0.0f);
+        det = 1.0f / det;
+        Vec2 x = new Vec2( det * (a22 * b.x - a12 * b.y),
+                           det * (a11 * b.y - a21 * b.x) );
+        return x;
+    }
 }

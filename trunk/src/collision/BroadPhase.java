@@ -22,6 +22,8 @@
  */
 package collision;
 
+//Version note: moving from b2BroadPhase.h/.cpp rev 23 -> 56
+
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -41,36 +43,46 @@ import common.Vec2;
 // - no broadphase is perfect and neither is this one: it is not great for
 // huge worlds (use a multi-SAP instead), it is not great for large objects.
 
+class BoundValues {
+    public int[] lowerValues;
+    public int[] upperValues;
+    
+    public BoundValues() {
+        lowerValues = new int[2];
+        upperValues = new int[2];
+    }
+}
+
 public class BroadPhase {
     public static final int INVALID = Integer.MAX_VALUE;
 
     public static final int NULL_EDGE = Integer.MAX_VALUE;
 
-    public PairManager pairManager;
+    public PairManager m_pairManager;
 
-    public Proxy proxyPool[];
+    public Proxy m_proxyPool[];
 
-    int freeProxy;
+    int m_freeProxy;
 
     BufferedPair pairBuffer[];
 
-    int pairBufferCount;
+    int m_pairBufferCount;
 
     public Bound m_bounds[][];
 
-    PairCallback pairCallback;
+    //PairCallback pairCallback;
 
-    int queryResults[];
+    int m_queryResults[];
 
-    int queryResultCount;
+    int m_queryResultCount;
 
     public AABB m_worldAABB;
 
-    public Vec2 quantizationFactor;
+    public Vec2 m_quantizationFactor;
 
-    public int proxyCount;
+    public int m_proxyCount;
 
-    int timeStamp;
+    int m_timeStamp;
 
     private static final boolean debugPrint = false;
 
@@ -88,12 +100,12 @@ public class BroadPhase {
         if (debugPrint) {
             System.out.println("BroadPhase()");
         }
-
+        
         // array initialization
-        proxyPool = new Proxy[Settings.maxProxies];
+        m_proxyPool = new Proxy[Settings.maxProxies];
         pairBuffer = new BufferedPair[Settings.maxPairs];
         m_bounds = new Bound[2][2 * Settings.maxProxies];
-        queryResults = new int[Settings.maxProxies];
+        m_queryResults = new int[Settings.maxProxies];
 
         for (int i = 0; i < 2 * Settings.maxProxies; i++) {
             m_bounds[0][i] = new Bound();
@@ -104,71 +116,108 @@ public class BroadPhase {
             pairBuffer[i] = new BufferedPair();
         }
 
-        pairManager = new PairManager();
-
+        m_pairManager = new PairManager();
+        m_pairManager.initialize(this, callback);
+        
         assert worldAABB.isValid();
 
         m_worldAABB = new AABB(worldAABB);
-        pairCallback = callback;
-        proxyCount = 0;
+        m_proxyCount = 0;
 
         Vec2 d = worldAABB.maxVertex.sub(worldAABB.minVertex);
-        quantizationFactor = new Vec2(Integer.MAX_VALUE / d.x,
+        m_quantizationFactor = new Vec2(Integer.MAX_VALUE / d.x,
                 Integer.MAX_VALUE / d.y);
 
         for (int i = 0; i < Settings.maxProxies - 1; ++i) {
-            proxyPool[i] = new Proxy();
-            proxyPool[i].setNext(i + 1);
-            proxyPool[i].timeStamp = 0;
-            proxyPool[i].overlapCount = INVALID;
-            proxyPool[i].userData = null;
+            m_proxyPool[i] = new Proxy();
+            m_proxyPool[i].setNext(i + 1);
+            m_proxyPool[i].timeStamp = 0;
+            m_proxyPool[i].overlapCount = INVALID;
+            m_proxyPool[i].userData = null;
         }
 
-        proxyPool[Settings.maxProxies - 1] = new Proxy();
-        proxyPool[Settings.maxProxies - 1].setNext(PairManager.NULL_PROXY);
-        proxyPool[Settings.maxProxies - 1].timeStamp = 0;
-        proxyPool[Settings.maxProxies - 1].overlapCount = INVALID;
-        proxyPool[Settings.maxProxies - 1].userData = null;
-        freeProxy = 0;
+        m_proxyPool[Settings.maxProxies - 1] = new Proxy();
+        m_proxyPool[Settings.maxProxies - 1].setNext(PairManager.NULL_PROXY);
+        m_proxyPool[Settings.maxProxies - 1].timeStamp = 0;
+        m_proxyPool[Settings.maxProxies - 1].overlapCount = INVALID;
+        m_proxyPool[Settings.maxProxies - 1].userData = null;
+        m_freeProxy = 0;
 
-        pairBufferCount = 0;
-
-        timeStamp = 1;
-        queryResultCount = 0;
+        m_timeStamp = 1;
+        m_queryResultCount = 0;
     }
+    
+ // This one is only used for validation.
+    protected boolean testOverlap(Proxy p1, Proxy p2) {
+        for (int axis = 0; axis < 2; ++axis)
+        {
+            Bound[] bounds = m_bounds[axis];
 
-    boolean shouldCollide(int id1, int id2) {
-        assert (id1 < Settings.maxProxies);
-        assert (id2 < Settings.maxProxies);
-        Proxy p1 = proxyPool[id1];
-        Proxy p2 = proxyPool[id2];
+            assert(p1.lowerBounds[axis] < 2 * m_proxyCount);
+            assert(p1.upperBounds[axis] < 2 * m_proxyCount);
+            assert(p2.lowerBounds[axis] < 2 * m_proxyCount);
+            assert(p2.upperBounds[axis] < 2 * m_proxyCount);
 
-        if (p1.groupIndex == p2.groupIndex && p1.groupIndex != 0) {
-            return p1.groupIndex > 0;
+            if (bounds[p1.lowerBounds[axis]].value > bounds[p2.upperBounds[axis]].value)
+                return false;
+
+            if (bounds[p1.upperBounds[axis]].value < bounds[p2.lowerBounds[axis]].value)
+                return false;
         }
 
-        return (p1.maskBits & p2.categoryBits) != 0
-                && (p1.categoryBits & p2.maskBits) != 0;
+        return true;
     }
+
+    private boolean testOverlap(BoundValues b, Proxy p) {
+        for (int axis = 0; axis < 2; ++axis)
+        {
+            Bound[] bounds = m_bounds[axis];
+
+            assert(p.lowerBounds[axis] < 2 * m_proxyCount);
+            assert(p.upperBounds[axis] < 2 * m_proxyCount);
+
+            if (b.lowerValues[axis] > bounds[p.upperBounds[axis]].value)
+                return false;
+
+            if (b.upperValues[axis] < bounds[p.lowerBounds[axis]].value)
+                return false;
+        }
+
+        return true;
+    }
+
+//    boolean shouldCollide(int id1, int id2) {
+//        assert (id1 < Settings.maxProxies);
+//        assert (id2 < Settings.maxProxies);
+//        Proxy p1 = m_proxyPool[id1];
+//        Proxy p2 = m_proxyPool[id2];
+//
+//        if (p1.groupIndex == p2.groupIndex && p1.groupIndex != 0) {
+//            return p1.groupIndex > 0;
+//        }
+//
+//        return (p1.maskBits & p2.categoryBits) != 0
+//                && (p1.categoryBits & p2.maskBits) != 0;
+//    }
 
     public Proxy getProxy(int proxyId) {
         if (proxyId == PairManager.NULL_PROXY
-                || (proxyPool[proxyId].isValid() == false)) {
+                || (m_proxyPool[proxyId].isValid() == false)) {
             return null;
         }
         else {
-            return proxyPool[proxyId];
+            return m_proxyPool[proxyId];
         }
     }
 
     // Create and destroy proxies. These call Flush first.
-    int CreateProxy(AABB aabb, int groupIndex, int categoryBits, int maskBits,
+    int CreateProxy(AABB aabb, //int groupIndex, int categoryBits, int maskBits,
             Object userData) {
         if (debugPrint) {
             System.out.println("CreateProxy()");
         }
-
-        if (freeProxy == PairManager.NULL_PROXY) {
+/*
+        if (m_freeProxy == PairManager.NULL_PROXY) {
             assert false : "m_freeProxy == NULL_PROXY error";
 
             return PairManager.NULL_PROXY;
@@ -176,24 +225,26 @@ public class BroadPhase {
 
         // Flush the pair buffer
         flush();
-
-        int proxyId = freeProxy;
-        Proxy proxy = proxyPool[proxyId];
-        freeProxy = proxy.getNext();
+*/
+        assert(m_proxyCount < Settings.maxProxies);
+        assert(m_freeProxy != PairManager.NULL_PROXY);
+        
+        int proxyId = m_freeProxy;
+        Proxy proxy = m_proxyPool[proxyId];
+        m_freeProxy = proxy.getNext();
 
         proxy.overlapCount = 0;
-        proxy.groupIndex = groupIndex;
-        proxy.categoryBits = categoryBits;
-        proxy.maskBits = maskBits;
         proxy.userData = userData;
+//        proxy.groupIndex = groupIndex;
+//        proxy.categoryBits = categoryBits;
+//        proxy.maskBits = maskBits;
+        
+        //assert m_proxyCount < Settings.maxProxies;
 
-        assert proxyCount < Settings.maxProxies;
-
-        int edgeCount = 2 * proxyCount;
+        int boundCount = 2 * m_proxyCount;
 
         int lowerValues[] = new int[2];
         int upperValues[] = new int[2];
-
         computeBounds(lowerValues, upperValues, aabb);
 
         for (int axis = 0; axis < 2; ++axis) {
@@ -201,23 +252,18 @@ public class BroadPhase {
             int[] indexes = new int[2];
 
             query(indexes, lowerValues[axis], upperValues[axis], bounds,
-                    edgeCount, axis);
+                    boundCount, axis);
             int lowerIndex = indexes[0];
             int upperIndex = indexes[1];
+
             // System.out.println(edgeCount + ", "+lowerValues[axis] + ",
             // "+upperValues[axis]);
             // memmove(bounds[upperIndex + 2], bounds[upperIndex],
             // (edgeCount - upperIndex) * sizeof(b2Bound));
 
-            // Ah, so this is the big bad bug that's been holding this back:
-            // System.arraycopy makes a shallow copy of the objects, unlike
-            // memmove.
-            // This means that we have to do copy objects by hand to get the
-            // true deep copy that we desire...this will be a speed hit, no
-            // doubt.
             System.arraycopy(m_bounds[axis], upperIndex, m_bounds[axis],
-                    upperIndex + 2, edgeCount - upperIndex);
-            for (int i = 0; i < edgeCount - upperIndex; i++) {
+                    upperIndex + 2, boundCount - upperIndex);
+            for (int i = 0; i < boundCount - upperIndex; i++) {
                 m_bounds[axis][upperIndex + 2 + i] = new Bound(
                         m_bounds[axis][upperIndex + 2 + i]);
             }
@@ -261,8 +307,8 @@ public class BroadPhase {
             }
 
             // Adjust the all the affected bound indices.
-            for (int index = lowerIndex; index < edgeCount + 2; ++index) {
-                Proxy proxyn = proxyPool[bounds[index].proxyId];
+            for (int index = lowerIndex; index < boundCount + 2; ++index) {
+                Proxy proxyn = m_proxyPool[bounds[index].proxyId];
                 if (bounds[index].isLower()) {
                     proxyn.lowerBounds[axis] = index;
                 }
@@ -272,52 +318,37 @@ public class BroadPhase {
             }
         }
 
-        ++proxyCount;
+        ++m_proxyCount;
 
-        assert queryResultCount < Settings.maxProxies;
+        assert m_queryResultCount < Settings.maxProxies;
+        // Create pairs if the AABB is in range.
+        for (int i = 0; i < m_queryResultCount; ++i) {
+            assert(m_queryResults[i] < Settings.maxProxies);
+            assert(m_proxyPool[m_queryResults[i]].isValid());
 
-        for (int i = 0; i < queryResultCount; ++i) {
-
-            if (shouldCollide(proxyId, queryResults[i]) == false) {
-                continue;
-            }
-
-            Pair pair = pairManager.add(proxyId, queryResults[i]);
-            if (pair == null) {
-                continue;
-            }
-
-            // The Add command may return an old pair, which should not
-            // happen here.
-            assert (pair.isReceived() == false);
-            pair.userData = pairCallback.pairAdded(proxy.userData,
-                    proxyPool[queryResults[i]].userData);
-            pair.setReceived();
+            m_pairManager.addBufferedPair(proxyId, m_queryResults[i]);
         }
 
-        // #if defined(_DEBUG) && B2BP_VALIDATE == 1
-        // Validate();
-        // #endif
+        m_pairManager.commit();
+
+        if (s_validate)
+        {
+            validate();
+        }
 
         // Prepare for next query.
-        queryResultCount = 0;
-
+        m_queryResultCount = 0;
         incrementTimeStamp();
 
         return proxyId;
     }
 
     public void destroyProxy(int proxyId) {
-        if (proxyId == PairManager.NULL_PROXY) {
-            assert (false);
-            return;
-        }
+        assert(0 < m_proxyCount && m_proxyCount <= Settings.maxProxies);
+        Proxy proxy = m_proxyPool[proxyId];
+        assert(proxy.isValid());
 
-        // Flush the pair buffer.
-        flush();
-
-        Proxy proxy = proxyPool[proxyId];
-        int edgeCount = 2 * proxyCount;
+        int boundCount = 2 * m_proxyCount;
 
         for (int axis = 0; axis < 2; ++axis) {
             Bound[] bounds = m_bounds[axis];
@@ -340,15 +371,15 @@ public class BroadPhase {
             // memmove(bounds + upperIndex-1, bounds + upperIndex + 1,
             // (edgeCount - upperIndex - 1) * sizeof(b2Bound));
             System.arraycopy(m_bounds[axis], upperIndex + 1, m_bounds[axis],
-                    upperIndex - 1, edgeCount - upperIndex - 1);
-            for (int i = 0; i < edgeCount - upperIndex - 1; i++) {
+                    upperIndex - 1, boundCount - upperIndex - 1);
+            for (int i = 0; i < boundCount - upperIndex - 1; i++) {
                 m_bounds[axis][upperIndex - 1 + i] = new Bound(
                         m_bounds[axis][upperIndex - 1 + i]);
             }
 
             // Fix bound indices.
-            for (int index = lowerIndex; index < edgeCount - 2; ++index) {
-                Proxy proxyn = proxyPool[bounds[index].proxyId];
+            for (int index = lowerIndex; index < boundCount - 2; ++index) {
+                Proxy proxyn = m_proxyPool[bounds[index].proxyId];
                 if (bounds[index].isLower()) {
                     proxyn.lowerBounds[axis] = index;
                 }
@@ -365,39 +396,39 @@ public class BroadPhase {
             // Query for pairs to be removed. lowerIndex and upperIndex are not
             // needed.
             int[] ignored = new int[2];
-            query(ignored, lowerValue, upperValue, bounds, edgeCount - 2, axis);
+            query(ignored, lowerValue, upperValue, bounds, boundCount - 2, axis);
         }
 
-        assert (queryResultCount < Settings.maxProxies);
+        assert (m_queryResultCount < Settings.maxProxies);
 
-        for (int i = 0; i < queryResultCount; ++i) {
-            assert (proxy.isValid() && proxyPool[queryResults[i]].isValid());
-
-            Proxy other = proxyPool[queryResults[i]];
-            Object pairUserData = pairManager.remove(proxyId, queryResults[i]);
-            pairCallback.pairRemoved(proxy.userData, other.userData,
-                    pairUserData);
+        for (int i = 0; i < m_queryResultCount; ++i) {
+            assert(m_proxyPool[m_queryResults[i]].isValid());
+            m_pairManager.removeBufferedPair(proxyId, m_queryResults[i]);
         }
+        
+        m_pairManager.commit();
 
         // Prepare for next query.
-        queryResultCount = 0;
+        m_queryResultCount = 0;
         incrementTimeStamp();
 
-        // Invalidate the proxy.
+        // Return the proxy to the pool.
         proxy.userData = null;
         proxy.overlapCount = BroadPhase.INVALID;
+        proxy.lowerBounds[0] = BroadPhase.INVALID;
+        proxy.lowerBounds[1] = BroadPhase.INVALID;
+        proxy.upperBounds[0] = BroadPhase.INVALID;
+        proxy.upperBounds[1] = BroadPhase.INVALID;
+
 
         // Return the proxy to the pool.
-        proxy.setNext(freeProxy);
-        freeProxy = proxyId;
-        --proxyCount;
+        proxy.setNext(m_freeProxy);
+        m_freeProxy = proxyId;
+        --m_proxyCount;
 
-        // #if defined(_DEBUG)
-        // if (s_validate)
-        // {
-        // Validate();
-        // }
-        // #endif
+         if (s_validate) {
+             validate();
+         }
     }
 
     // Call MoveProxy as many times as you like, then when you are done
@@ -413,12 +444,20 @@ public class BroadPhase {
 
         assert (aabb.isValid()) : "invalid AABB";
 
-        int edgeCount = 2 * proxyCount;
+        int boundCount = 2 * m_proxyCount;
 
-        Proxy proxy = proxyPool[proxyId];
-        int lowerValues[] = new int[2];
-        int upperValues[] = new int[2];
-        computeBounds(lowerValues, upperValues, aabb);
+        Proxy proxy = m_proxyPool[proxyId];
+        
+        //Get new bound values
+        BoundValues newValues = new BoundValues();
+        computeBounds(newValues.lowerValues, newValues.upperValues, aabb);
+        
+        //Get old bound values
+        BoundValues oldValues = new BoundValues();
+        for (int axis = 0; axis < 2; ++axis) {
+            oldValues.lowerValues[axis] = m_bounds[axis][proxy.lowerBounds[axis]].value;
+            oldValues.upperValues[axis] = m_bounds[axis][proxy.upperBounds[axis]].value;
+        }
 
         for (int axis = 0; axis < 2; ++axis) {
             Bound[] bounds = m_bounds[axis];
@@ -426,8 +465,8 @@ public class BroadPhase {
             int lowerIndex = proxy.lowerBounds[axis];
             int upperIndex = proxy.upperBounds[axis];
 
-            int lowerValue = lowerValues[axis];
-            int upperValue = upperValues[axis];
+            int lowerValue = newValues.lowerValues[axis];
+            int upperValue = newValues.upperValues[axis];
 
             int deltaLower = lowerValue - bounds[lowerIndex].value;
             int deltaUpper = upperValue - bounds[upperIndex].value;
@@ -444,16 +483,16 @@ public class BroadPhase {
                 int index = lowerIndex;
                 while (index > 0 && lowerValue < bounds[index - 1].value) {
                     Bound bound = bounds[index];
-                    Bound prevEdge = bounds[index - 1];
+                    Bound prevBound = bounds[index - 1];
 
-                    int prevProxyId = prevEdge.proxyId;
-                    Proxy prevProxy = proxyPool[prevEdge.proxyId];
+                    int prevProxyId = prevBound.proxyId;
+                    Proxy prevProxy = m_proxyPool[prevBound.proxyId];
 
-                    ++prevEdge.stabbingCount;
+                    ++prevBound.stabbingCount;
 
-                    if (prevEdge.isUpper() == true) {
-                        if (testOverlap(proxy, prevProxy)) {
-                            addBufferedPair(proxyId, prevProxyId);
+                    if (prevBound.isUpper() == true) {
+                        if (testOverlap(newValues, prevProxy)) {
+                            m_pairManager.addBufferedPair(proxyId, prevProxyId);
                         }
 
                         ++prevProxy.upperBounds[axis];
@@ -468,8 +507,8 @@ public class BroadPhase {
 
                     // b2Swap(*bound, *prevEdge);
                     Bound tmp = new Bound(bound);
-                    bound.set(prevEdge);
-                    prevEdge.set(tmp);
+                    bound.set(prevBound);
+                    prevBound.set(tmp);
                     --index;
                 }
             }
@@ -477,18 +516,18 @@ public class BroadPhase {
             // Should we move the upper bound up?
             if (deltaUpper > 0) {
                 int index = upperIndex;
-                while (index < edgeCount - 1
+                while (index < boundCount - 1
                         && bounds[index + 1].value <= upperValue) {
                     Bound bound = bounds[index];
-                    Bound nextEdge = bounds[index + 1];
-                    int nextProxyId = nextEdge.proxyId;
-                    Proxy nextProxy = proxyPool[nextProxyId];
+                    Bound nextBound = bounds[index + 1];
+                    int nextProxyId = nextBound.proxyId;
+                    Proxy nextProxy = m_proxyPool[nextProxyId];
 
-                    ++nextEdge.stabbingCount;
+                    ++nextBound.stabbingCount;
 
-                    if (nextEdge.isLower() == true) {
-                        if (testOverlap(proxy, nextProxy)) {
-                            addBufferedPair(proxyId, nextProxyId);
+                    if (nextBound.isLower() == true) {
+                        if (testOverlap(newValues, nextProxy)) {
+                            m_pairManager.addBufferedPair(proxyId, nextProxyId);
                         }
 
                         --nextProxy.lowerBounds[axis];
@@ -504,8 +543,8 @@ public class BroadPhase {
                     // wasn't actually swapping! bounds[index] and
                     // bounds[index+1] need to be swapped by VALUE
                     Bound tmp = new Bound(bound);
-                    bound.set(nextEdge);
-                    nextEdge.set(tmp);
+                    bound.set(nextBound);
+                    nextBound.set(tmp);
                     ++index;
                 }
             }
@@ -517,18 +556,20 @@ public class BroadPhase {
             // Should we move the lower bound up?
             if (deltaLower > 0) {
                 int index = lowerIndex;
-                while (index < edgeCount - 1
+                while (index < boundCount - 1
                         && bounds[index + 1].value <= lowerValue) {
                     Bound bound = bounds[index];
-                    Bound nextEdge = bounds[index + 1];
+                    Bound nextBound = bounds[index + 1];
 
-                    int nextProxyId = nextEdge.proxyId;
-                    Proxy nextProxy = proxyPool[nextProxyId];
+                    int nextProxyId = nextBound.proxyId;
+                    Proxy nextProxy = m_proxyPool[nextProxyId];
 
-                    --nextEdge.stabbingCount;
+                    --nextBound.stabbingCount;
 
-                    if (nextEdge.isUpper()) {
-                        removeBufferedPair(proxyId, nextProxyId);
+                    if (nextBound.isUpper()) {
+                        if (testOverlap(oldValues,nextProxy)) {
+                            m_pairManager.removeBufferedPair(proxyId, nextProxyId);
+                        }
 
                         --nextProxy.upperBounds[axis];
                         --bound.stabbingCount;
@@ -544,8 +585,8 @@ public class BroadPhase {
                     // bound = nextEdge;
                     // nextEdge = tmp;
                     Bound tmp = new Bound(bound);
-                    bound.set(nextEdge);
-                    nextEdge.set(tmp);
+                    bound.set(nextBound);
+                    nextBound.set(tmp);
                     ++index;
                 }
             }
@@ -555,15 +596,17 @@ public class BroadPhase {
                 int index = upperIndex;
                 while (index > 0 && upperValue < bounds[index - 1].value) {
                     Bound bound = bounds[index];
-                    Bound prevEdge = bounds[index - 1];
+                    Bound prevBound = bounds[index - 1];
 
-                    int prevProxyId = prevEdge.proxyId;
-                    Proxy prevProxy = proxyPool[prevProxyId];
+                    int prevProxyId = prevBound.proxyId;
+                    Proxy prevProxy = m_proxyPool[prevProxyId];
 
-                    --prevEdge.stabbingCount;
+                    --prevBound.stabbingCount;
 
-                    if (prevEdge.isLower() == true) {
-                        removeBufferedPair(proxyId, prevProxyId);
+                    if (prevBound.isLower() == true) {
+                        if (testOverlap(oldValues, prevProxy)) {
+                            m_pairManager.removeBufferedPair(proxyId, prevProxyId);
+                        }
 
                         ++prevProxy.lowerBounds[axis];
                         --bound.stabbingCount;
@@ -579,68 +622,23 @@ public class BroadPhase {
                     // bound = prevEdge;
                     // prevEdge = tmp;
                     Bound tmp = new Bound(bound);
-                    bound.set(prevEdge);
-                    prevEdge.set(tmp);
+                    bound.set(prevBound);
+                    prevBound.set(tmp);
                     --index;
                 }
             }
         }
 
-        // #if defined(_DEBUG) && B2BP_VALIDATE == 1
-        // Validate();
-        // #endif
+        if (s_validate) {
+            validate();
+        }
+    }
+    
+    public void commit() {
+        m_pairManager.commit();
     }
 
-    public void flush() {
-        // Pair[] pairs = m_pairManager.GetPairs();
-        int removeCount = 0;
 
-        for (int i = 0; i < pairBufferCount; ++i) {
-            Pair pair = pairManager.find(pairBuffer[i].proxyId1,
-                    pairBuffer[i].proxyId2);
-            assert (pair.isBuffered());
-
-            Proxy proxy1 = proxyPool[pair.proxyId1];
-            Proxy proxy2 = proxyPool[pair.proxyId2];
-
-            assert (proxy1.isValid());
-            assert (proxy2.isValid());
-
-            // boolean overlap = TestOverlap(proxy1, proxy2);
-
-            if (pair.isRemoved()) {
-                assert (testOverlap(proxy1, proxy2) == false);
-
-                if (pair.userData != null) {
-                    pairCallback.pairRemoved(proxy1.userData, proxy2.userData,
-                            pair.userData);
-                }
-
-                // Store the ids so we can actually remove the pair below.
-                pairBuffer[removeCount].proxyId1 = pair.proxyId1;
-                pairBuffer[removeCount].proxyId2 = pair.proxyId2;
-                ++removeCount;
-            }
-            else {
-                assert (testOverlap(proxy1, proxy2) == true);
-                pair.clearBuffered();
-
-                if (pair.isReceived() == false) {
-                    pair.userData = pairCallback.pairAdded(proxy1.userData,
-                            proxy2.userData);
-                    pair.setReceived();
-                }
-
-            }
-        }
-
-        for (int i = 0; i < removeCount; ++i) {
-            pairManager.remove(pairBuffer[i].proxyId1, pairBuffer[i].proxyId2);
-        }
-
-        pairBufferCount = 0;
-
-    }
 
     // Query an AABB for overlapping proxies, returns the user data and
     // the count, up to the supplied maximum count.
@@ -656,24 +654,24 @@ public class BroadPhase {
         int indexes[] = new int[2]; // lowerIndex, upperIndex;
 
         query(indexes, lowerValues[0], upperValues[0], m_bounds[0],
-                2 * proxyCount, 0);
+                2 * m_proxyCount, 0);
         query(indexes, lowerValues[1], upperValues[1], m_bounds[1],
-                2 * proxyCount, 1);
+                2 * m_proxyCount, 1);
 
-        assert queryResultCount < Settings.maxProxies;
+        assert m_queryResultCount < Settings.maxProxies;
 
         Object[] results = new Object[maxCount];
 
         int count = 0;
-        for (int i = 0; i < queryResultCount && count < maxCount; ++i, ++count) {
-            assert queryResults[i] < Settings.maxProxies;
-            Proxy proxy = proxyPool[queryResults[i]];
+        for (int i = 0; i < m_queryResultCount && count < maxCount; ++i, ++count) {
+            assert m_queryResults[i] < Settings.maxProxies;
+            Proxy proxy = m_proxyPool[m_queryResults[i]];
             proxy.isValid();
             results[i] = proxy.userData;
         }
 
         // Prepare for next query.
-        queryResultCount = 0;
+        m_queryResultCount = 0;
         incrementTimeStamp();
 
         return results;
@@ -687,31 +685,23 @@ public class BroadPhase {
         for (int axis = 0; axis < 2; ++axis) {
             Bound[] bounds = m_bounds[axis];
 
-            int pointCount = 2 * proxyCount;
+            int boundCount = 2 * m_proxyCount;
             int stabbingCount = 0;
 
-            for (int i = 0; i < pointCount; ++i) {
+            for (int i = 0; i < boundCount; ++i) {
                 Bound bound = bounds[i];
-                if (i > 0) {
-                    Bound prevEdge = bounds[i - 1];
-                    assert prevEdge.value <= bound.value;
-                }
+                assert(i == 0 || bounds[i-1].value <= bound.value);
+                assert(bound.proxyId != PairManager.NULL_PROXY);
+                assert(m_proxyPool[bound.proxyId].isValid());
 
-                int proxyId = bound.proxyId;
-
-                assert proxyId != PairManager.NULL_PROXY;
-
-                Proxy proxy = proxyPool[bound.proxyId];
-
-                assert (proxy.isValid());
 
                 if (bound.isLower() == true) {
-                    assert (proxy.lowerBounds[axis] == i) : (proxy.lowerBounds[axis]
+                    assert (m_proxyPool[bound.proxyId].lowerBounds[axis] == i) : (m_proxyPool[bound.proxyId].lowerBounds[axis]
                             + " not " + i);
                     ++stabbingCount;
                 }
                 else {
-                    assert (proxy.upperBounds[axis] == i);
+                    assert (m_proxyPool[bound.proxyId].upperBounds[axis] == i);
                     --stabbingCount;
                 }
 
@@ -719,98 +709,16 @@ public class BroadPhase {
             }
         }
 
-        Pair[] pairs = pairManager.getPairs();
-        int pairCount = pairManager.getCount();
-        assert (pairBufferCount <= pairCount);
-
-        // this compiles, quite inefficient, but compiles!
-        Arrays.sort(pairBuffer, 0, pairBufferCount);
-
-        for (int i = 0; i < pairBufferCount; ++i) {
-            if (i > 0) {
-                assert (!pairBuffer[i].equals(pairBuffer[i - 1]));
-            }
-
-            Pair pair = pairManager.find(pairBuffer[i].proxyId1,
-                    pairBuffer[i].proxyId2);
-            assert (pair.isBuffered());
-
-            Proxy proxy1 = proxyPool[pair.proxyId1];
-            Proxy proxy2 = proxyPool[pair.proxyId2];
-
-            assert (proxy1.isValid() == true);
-            assert (proxy2.isValid() == true);
-
-            boolean overlap = testOverlap(proxy1, proxy2);
-
-            if (pair.isRemoved() == true) {
-                assert (overlap == false);
-            }
-            else {
-                assert (overlap == true);
-            }
-        }
-
-        for (int i = 0; i < pairCount; ++i) {
-            Pair pair = pairs[i];
-
-            Proxy proxy1 = proxyPool[pair.proxyId1];
-            Proxy proxy2 = proxyPool[pair.proxyId2];
-
-            assert (proxy1.isValid() == true);
-            assert (proxy2.isValid() == true);
-
-            boolean overlap = testOverlap(proxy1, proxy2);
-
-            if (pair.isBuffered()) {
-                if (pair.isRemoved() == true) {
-                    assert (overlap == false);
-                }
-                else {
-                    assert (overlap == true);
-                }
-            }
-            else {
-                assert (overlap == true);
-            }
-        }
     }
 
-    void validatePairs() {
-        if (debugPrint) {
-            System.out.println("ValidatePairs()");
-        }
-
-        int pairCount = pairManager.getCount();
-        assert (pairBufferCount <= pairCount);
-
-        // this compiles, quite inefficient, but compiles!
-        Collections.sort(Arrays.asList(pairBuffer));
-
-        for (int i = 0; i < pairBufferCount; ++i) {
-            if (i > 0) {
-                // assert (BufferedPair.Equals(m_pairBuffer[i],
-                // m_pairBuffer[i - 1]) == false);
-                assert (!pairBuffer[i].equals(pairBuffer[i - 1]));
-            }
-
-            Pair pair = pairManager.find(pairBuffer[i].proxyId1,
-                    pairBuffer[i].proxyId2);
-            assert (pair.isBuffered());
-
-            Proxy proxy1 = proxyPool[pair.proxyId1];
-            Proxy proxy2 = proxyPool[pair.proxyId2];
-
-            assert (proxy1.isValid() == true);
-            assert (proxy2.isValid() == true);
-        }
-    }
 
     private void computeBounds(int[] lowerValues, int[] upperValues, AABB aabb) {
         if (debugPrint) {
             System.out.println("ComputeBounds()");
         }
-
+        assert(aabb.maxVertex.x > aabb.minVertex.x);
+        assert(aabb.maxVertex.y > aabb.minVertex.y);
+        
         Vec2 minVertex = MathUtils.clamp(aabb.minVertex, m_worldAABB.minVertex,
                 m_worldAABB.maxVertex);
         Vec2 maxVertex = MathUtils.clamp(aabb.maxVertex, m_worldAABB.minVertex,
@@ -823,129 +731,29 @@ public class BroadPhase {
         // sorting of
         // lower/upper bounds that would have equal values.
         // TODO_ERIN implement fast float to int conversion.
-        lowerValues[0] = (int) (quantizationFactor.x * (minVertex.x - m_worldAABB.minVertex.x))
+        lowerValues[0] = (int) (m_quantizationFactor.x * (minVertex.x - m_worldAABB.minVertex.x))
                 & (Integer.MAX_VALUE - 1);
-        // System.out.println( (m_quantizationFactor.x * (minVertex.x -
-        // m_worldAABB.minVertex.x))+"..."+lowerValues[0]);
-        upperValues[0] = (int) (quantizationFactor.x * (maxVertex.x - m_worldAABB.minVertex.x)) | 1;
-        // System.out.println( (m_quantizationFactor.x * (maxVertex.x -
-        // m_worldAABB.minVertex.x))+"..."+upperValues[0]);
+        upperValues[0] = (int) (m_quantizationFactor.x * (maxVertex.x - m_worldAABB.minVertex.x)) | 1;
 
-        lowerValues[1] = (int) (quantizationFactor.y * (minVertex.y - m_worldAABB.minVertex.y))
+        lowerValues[1] = (int) (m_quantizationFactor.y * (minVertex.y - m_worldAABB.minVertex.y))
                 & (Integer.MAX_VALUE - 1);
-        upperValues[1] = (int) (quantizationFactor.y * (maxVertex.y - m_worldAABB.minVertex.y)) | 1;
+        upperValues[1] = (int) (m_quantizationFactor.y * (maxVertex.y - m_worldAABB.minVertex.y)) | 1;
     }
 
-    private void addBufferedPair(int id1, int id2) {
-        if (debugPrint) {
-            System.out.println("AddPair()");
-        }
-
-        assert (proxyPool[id1].isValid() && proxyPool[id2].isValid());
-
-        if (shouldCollide(id1, id2) == false) {
-            return;
-        }
-
-        Pair pair = pairManager.add(id1, id2);
-
-        if (pair == null) {
-            return;
-        }
-
-        // If this pair is not in the pair buffer ...
-        if (pair.isBuffered() == false) {
-            // This must be a new pair.
-            assert (pair.isReceived() == false);
-
-            // If there is room in the pair buffer ...
-            if (pairBufferCount < Settings.maxPairs) {
-                // Add it to the pair buffer.
-                pair.setBuffered();
-                pairBuffer[pairBufferCount] = new BufferedPair();
-                pairBuffer[pairBufferCount].proxyId1 = pair.proxyId1;
-                pairBuffer[pairBufferCount].proxyId2 = pair.proxyId2;
-                ++pairBufferCount;
-            }
-
-            assert (pairBufferCount <= pairManager.getCount());
-        }
-
-        // Confirm this pair for the subsequent call to Flush.
-        pair.clearRemoved();
-
-        // #if defined(_DEBUG) && B2BP_VALIDATE == 1
-        // ValidatePairs();
-        // #endif
-
-    }
-
-    private void removeBufferedPair(int id1, int id2) {
-        if (debugPrint) {
-            System.out.println("RemovePair()");
-        }
-
-        assert (proxyPool[id1].isValid() && proxyPool[id2].isValid());
-
-        Pair pair = pairManager.find(id1, id2);
-
-        if (pair == null) {
-            return;
-        }
-
-        // If this pair is not in the pair buffer ...
-        if (pair.isBuffered() == false) {
-            // This must be an old pair.
-            assert (pair.isReceived());
-
-            if (pairBufferCount < Settings.maxPairs) {
-                pair.setBuffered();
-                pairBuffer[pairBufferCount].proxyId1 = pair.proxyId1;
-                pairBuffer[pairBufferCount].proxyId2 = pair.proxyId2;
-                ++pairBufferCount;
-            }
-
-            assert (pairBufferCount <= pairManager.getCount());
-        }
-
-        pair.setRemoved();
-
-        // #if defined(_DEBUG) && B2BP_VALIDATE == 1
-        // ValidatePairs();
-        // #endif
-
-    }
-
-    private boolean testOverlap(Proxy p1, Proxy p2) {
-        if (debugPrint) {
-            System.out.println("TestOverlap()");
-        }
-
-        for (int axis = 0; axis < 2; ++axis) {
-            Bound[] bounds = m_bounds[axis];
-
-            if (bounds[p1.lowerBounds[axis]].value > bounds[p2.upperBounds[axis]].value)
-                return false;
-
-            if (bounds[p1.upperBounds[axis]].value < bounds[p2.lowerBounds[axis]].value)
-                return false;
-        }
-
-        return true;
-    }
+ 
 
     /**
      * @param results
      *            out variable
      */
     private void query(int[] results, int lowerValue, int upperValue,
-            Bound[] bounds, int edgeCount, int axis) {
+            Bound[] bounds, int boundCount, int axis) {
         if (debugPrint) {
             System.out.println("Query(6 args)");
         }
 
-        int lowerQuery = binarySearch(bounds, edgeCount, lowerValue);
-        int upperQuery = binarySearch(bounds, edgeCount, upperValue);
+        int lowerQuery = binarySearch(bounds, boundCount, lowerValue);
+        int upperQuery = binarySearch(bounds, boundCount, upperValue);
 
         // Easy case: lowerQuery <= lowerIndex(i) < upperQuery
         // Solution: search query range for min bounds.
@@ -963,7 +771,7 @@ public class BroadPhase {
             while (s != 0) {
                 assert (i >= 0) : ("i = " + i + "; s = " + s);
                 if (bounds[i].isLower()) {
-                    Proxy proxy = proxyPool[bounds[i].proxyId];
+                    Proxy proxy = m_proxyPool[bounds[i].proxyId];
                     if (lowerQuery <= proxy.upperBounds[axis]) {
                         incrementOverlapCount(bounds[i].proxyId);
                         --s;
@@ -982,16 +790,16 @@ public class BroadPhase {
             System.out.println("IncrementOverlapCount()");
         }
 
-        Proxy proxy = proxyPool[proxyId];
-        if (proxy.timeStamp < timeStamp) {
-            proxy.timeStamp = timeStamp;
+        Proxy proxy = m_proxyPool[proxyId];
+        if (proxy.timeStamp < m_timeStamp) {
+            proxy.timeStamp = m_timeStamp;
             proxy.overlapCount = 1;
         }
         else {
             proxy.overlapCount = 2;
-            assert queryResultCount < Settings.maxProxies;
-            queryResults[queryResultCount] = proxyId;
-            ++queryResultCount;
+            assert m_queryResultCount < Settings.maxProxies;
+            m_queryResults[m_queryResultCount] = proxyId;
+            ++m_queryResultCount;
         }
     }
 
@@ -1000,14 +808,14 @@ public class BroadPhase {
             System.out.println("IncrementTimeStamp()");
         }
 
-        if (timeStamp == Integer.MAX_VALUE) {
+        if (m_timeStamp == Integer.MAX_VALUE) {
             for (int i = 0; i < Settings.maxProxies; ++i) {
-                proxyPool[i].timeStamp = 0;
+                m_proxyPool[i].timeStamp = 0;
             }
-            timeStamp = 1;
+            m_timeStamp = 1;
         }
         else {
-            ++timeStamp;
+            ++m_timeStamp;
         }
     }
 

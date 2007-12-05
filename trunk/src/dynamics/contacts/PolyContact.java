@@ -33,7 +33,7 @@ import collision.PolyShape;
 import collision.Shape;
 import collision.ShapeType;
 
-public class PolyContact extends Contact implements ContactCreator {
+public class PolyContact extends Contact implements ContactCreateFcn {
 
     Manifold m_manifold;
 
@@ -105,7 +105,7 @@ public class PolyContact extends Contact implements ContactCreator {
         m0.pointCount = m_manifold.pointCount;
 
         CollidePoly.collidePoly(m_manifold, (PolyShape) m_shape1,
-                (PolyShape) m_shape2);
+                (PolyShape) m_shape2, false);
 
         // Match contact ids to facilitate warm starting.
         // Watch out (Java note):

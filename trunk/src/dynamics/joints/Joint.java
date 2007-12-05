@@ -24,7 +24,9 @@ package dynamics.joints;
 
 import common.Vec2;
 import dynamics.Body;
-import dynamics.StepInfo;
+import dynamics.TimeStep;
+
+//Updated to rev 56 of b2Joint.cpp/.h
 
 public abstract class Joint {
 
@@ -117,10 +119,14 @@ public abstract class Joint {
         return m_userData;
     }
 
-    public abstract void preSolve();
+    public abstract void prepareVelocitySolver();
 
-    public abstract void solveVelocityConstraints(StepInfo step);
+    public abstract void solveVelocityConstraints(TimeStep step);
 
+    public void preparePositionSolver() {
+        return;
+    }
+    
     // This returns true if the position errors are within tolerance.
     public abstract boolean solvePositionConstraints();
 

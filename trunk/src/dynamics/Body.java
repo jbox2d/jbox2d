@@ -34,6 +34,8 @@ import common.Vec2;
 import dynamics.contacts.ContactNode;
 import dynamics.joints.JointNode;
 
+//Updated to rev. 54 of b2Body.cpp/.h
+
 public class Body {
     public static final int e_staticFlag = 0x0001;
 
@@ -90,14 +92,18 @@ public class Body {
     public float m_sleepTime;
 
     public Object m_userData;
+    
+    //Conservative advancement data
+    public Vec2 m_position0;
+    public float m_rotation0;
 
     public Body(BodyDef bd, World world) {
         m_flags = 0;
         m_position = bd.position.clone();
         m_rotation = bd.rotation;
         m_R = new Mat22(m_rotation);
-        // m_linearVelocity = bd.linearVelocity.clone();
-        // m_angularVelocity = bd.angularVelocity;
+        m_position0 = m_position.clone();
+        m_rotation0 = m_rotation;
         m_world = world;
 
         m_linearDamping = MathUtils.clamp(1.0f - bd.linearDamping, 0.0f, 1.0f);
@@ -343,10 +349,10 @@ public class Body {
         m_position = m_R.mul(m_center).addLocal(position);
 
         for (Shape s = m_shapeList; s != null; s = s.m_next) {
-            s.synchronize(m_position, m_R);
+            s.synchronize(m_position, m_R, m_position, m_R);
         }
 
-        m_world.m_broadPhase.flush();
+        m_world.m_broadPhase.commit();
     }
 
     public void setCenterPosition(Vec2 position, float rotation) {
@@ -359,15 +365,22 @@ public class Body {
         m_position = position.clone();
 
         for (Shape s = m_shapeList; s != null; s = s.m_next) {
-            s.synchronize(m_position, m_R);
+            s.synchronize(m_position, m_R, m_position, m_R);
         }
 
-        m_world.m_broadPhase.flush();
+        m_world.m_broadPhase.commit();
     }
 
     void synchronizeShapes() {
+        Mat22 R0 = new Mat22(m_rotation0);
         for (Shape s = m_shapeList; s != null; s = s.m_next) {
-            s.synchronize(m_position, m_R);
+            s.synchronize(m_position0, R0, m_position, m_R);
+        }
+    }
+    
+    public void quickSyncShapes() {
+        for (Shape s = m_shapeList; s != null; s = s.m_next) {
+            s.quickSync(m_position, m_R);
         }
     }
 
@@ -375,6 +388,9 @@ public class Body {
         m_flags |= e_frozenFlag;
         m_linearVelocity.setZero();
         m_angularVelocity = 0.0f;
+        for (Shape s = m_shapeList; s != null; s = s.m_next) {
+            s.destroyProxy();
+        }
     }
 
     public void wakeUp() {

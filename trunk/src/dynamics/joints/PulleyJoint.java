@@ -24,9 +24,11 @@ package dynamics.joints;
 
 import common.Settings;
 import dynamics.Body;
-import dynamics.StepInfo;
+import dynamics.TimeStep;
 import common.Vec2;
 import common.MathUtils;
+
+//Updated to rev. 56 of b2PulleyJoint.cpp/.h
 
 public class PulleyJoint extends Joint {
     // The pulley joint is connected to two bodies and two fixed ground points.
@@ -138,7 +140,7 @@ public class PulleyJoint extends Joint {
         m_limitState2 = LimitState.INACTIVE_LIMIT;
     }
 
-    public void preSolve() {
+    public void prepareVelocitySolver() {
         Body b1 = m_body1;
         Body b2 = m_body2;
 
@@ -215,7 +217,7 @@ public class PulleyJoint extends Joint {
         b2.m_angularVelocity += b2.m_invI * Vec2.cross(r2, P2);
     }
 
-    public void solveVelocityConstraints(StepInfo step) {
+    public void solveVelocityConstraints(TimeStep step) {
         Body b1 = m_body1;
         Body b2 = m_body2;
 

@@ -22,6 +22,8 @@
  */
 package collision;
 
+//Updated to rev 56 of b2Collision.h
+
 //FIXME: In the C++ version, this class is a union of
 //the key and the features, meaning not that it contains
 //both separately, but that the same data can be accessed
@@ -31,7 +33,7 @@ package collision;
 //We need to figure out if this is a problem or not, because
 //I have a feeling that as of right now, key is never being
 //set properly.  Initial examination seems to show that key is
-//always zero.
+//always zero. [hacked around for the moment]
 public class ContactID {
     public int key;
 

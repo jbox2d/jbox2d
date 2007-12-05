@@ -20,6 +20,8 @@
  * misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  */
+
+//Updated to rev 55 of b2CollidePoly.cpp 
 package collision;
 
 import common.Settings;
@@ -75,22 +77,13 @@ public class CollidePoly {
     }
 
     static float edgeSeparation(PolyShape poly1, int edge1, PolyShape poly2) {
-        int count1 = poly1.m_vertexCount;
         Vec2[] vert1s = poly1.m_vertices;
         int count2 = poly2.m_vertexCount;
         Vec2[] vert2s = poly2.m_vertices;
 
-        // Get the vertices associated with edge1.
-        int vertexIndex11 = edge1;
-        int vertexIndex12 = edge1 + 1 == count1 ? 0 : edge1 + 1;
-
-        // Get the normal of edge1.
-        Vec2 normalLocal1 = Vec2.cross(vert1s[vertexIndex12]
-                .sub(vert1s[vertexIndex11]), 1.0f);
-
-        normalLocal1.normalize();
-
-        Vec2 normal = poly1.m_R.mul(normalLocal1);
+     // Convert normal from into poly2's frame.
+        assert(edge1 < poly1.m_vertexCount);
+        Vec2 normal = poly1.m_R.mul(poly1.m_normals[edge1]);
         Vec2 normalLocal2 = poly2.m_R.mulT(normal);
 
         // Find support vertex on poly2 for -normal.
@@ -104,7 +97,7 @@ public class CollidePoly {
             }
         }
 
-        Vec2 v1 = poly1.m_R.mul(vert1s[vertexIndex11]).addLocal(poly1.m_position);
+        Vec2 v1 = poly1.m_R.mul(vert1s[edge1]).addLocal(poly1.m_position);
         Vec2 v2 = poly2.m_R.mul(vert2s[vertexIndex2]).addLocal(poly2.m_position);
         float separation = Vec2.dot(v2.sub(v1), normal);
         return separation;
@@ -112,82 +105,88 @@ public class CollidePoly {
 
     // Find the max separation between poly1 and poly2 using face normals
     // from poly1.
-    static MaxSeparation findMaxSeparation(PolyShape poly1, PolyShape poly2) {
+    static MaxSeparation findMaxSeparation(PolyShape poly1, PolyShape poly2, boolean conservative) {
         MaxSeparation separation = new MaxSeparation();
 
         int count1 = poly1.m_vertexCount;
-        Vec2[] vert1s = poly1.m_vertices;
-
+        
         // Vector pointing from the origin of poly1 to the origin of poly2.
         Vec2 d = poly2.m_position.sub(poly1.m_position);
         Vec2 dLocal1 = poly1.m_R.mulT(d);
 
         // Get support vertex as a hint for our search
-        int vertexIndex1 = 0;
+        int edge = 0;
         float maxDot = -Float.MAX_VALUE;
         for (int i = 0; i < count1; ++i) {
-            float dot = Vec2.dot(vert1s[i], dLocal1);
+            float dot = Vec2.dot(poly1.m_normals[i], dLocal1);
             if (dot > maxDot) {
                 maxDot = dot;
-                vertexIndex1 = i;
+                edge = i;
             }
         }
 
-        // Check the separation for the edges straddling the vertex.
-        int prevFaceIndex = vertexIndex1 - 1 >= 0 ? vertexIndex1 - 1
-                : count1 - 1;
-        float sPrev = edgeSeparation(poly1, prevFaceIndex, poly2);
-        if (sPrev > 0.0f) {
+        // Get the separation for the edge normal.
+        float s = edgeSeparation(poly1, edge, poly2);
+        if (s > 0.0f && conservative == false){
+            separation.bestSeparation = s;
+            return separation;
+        }
+
+        // Check the separation for the neighboring edges.
+        int prevEdge = edge - 1 >= 0 ? edge - 1 : count1 - 1;
+        float sPrev = edgeSeparation(poly1, prevEdge, poly2);
+        if (sPrev > 0.0f && conservative == false) {
             separation.bestSeparation = sPrev;
             return separation;
         }
 
-        int nextFaceIndex = vertexIndex1;
-        float sNext = edgeSeparation(poly1, nextFaceIndex, poly2);
-        if (sNext > 0.0f) {
+        int nextEdge = edge + 1 < count1 ? edge + 1 : 0;
+        float sNext = edgeSeparation(poly1, nextEdge, poly2);
+        if (sNext > 0.0f && conservative == false){
             separation.bestSeparation = sNext;
             return separation;
         }
 
         // Find the best edge and the search direction.
-        int bestFaceIndex;
+        int bestEdge;
         float bestSeparation;
         int increment;
-        if (sPrev > sNext) {
+        if (sPrev > s && sPrev > sNext) {
             increment = -1;
-            bestFaceIndex = prevFaceIndex;
+            bestEdge = prevEdge;
             bestSeparation = sPrev;
         }
-        else {
+        else if (sNext > s){
             increment = 1;
-            bestFaceIndex = nextFaceIndex;
+            bestEdge = nextEdge;
             bestSeparation = sNext;
+        } else {
+            separation.bestFaceIndex = edge;
+            separation.bestSeparation = s;
+            return separation;
         }
 
         while (true) {
-            int edgeIndex;
             if (increment == -1)
-                edgeIndex = bestFaceIndex - 1 >= 0 ? bestFaceIndex - 1
-                        : count1 - 1;
+                edge = bestEdge - 1 >= 0 ? bestEdge - 1 : count1 - 1;
             else
-                edgeIndex = bestFaceIndex + 1 < count1 ? bestFaceIndex + 1 : 0;
+                edge = bestEdge + 1 < count1 ? bestEdge + 1 : 0;
 
-            float sep = edgeSeparation(poly1, edgeIndex, poly2);
-            if (sep > 0.0f) {
-                separation.bestSeparation = sep;
+            s = edgeSeparation(poly1, edge, poly2);
+            if (s > 0.0f && conservative == false) {
+                separation.bestSeparation = s;
                 return separation;
             }
 
-            if (sep > bestSeparation) {
-                bestFaceIndex = edgeIndex;
-                bestSeparation = sep;
-            }
-            else {
+            if (s > bestSeparation){
+                bestEdge = edge;
+                bestSeparation = s;
+            } else {
                 break;
             }
         }
 
-        separation.bestFaceIndex = bestFaceIndex;
+        separation.bestFaceIndex = bestEdge;
         separation.bestSeparation = bestSeparation;
 
         return separation;
@@ -253,20 +252,20 @@ public class CollidePoly {
 
     // The normal points from 1 to 2
     public static void collidePoly(Manifold manif, PolyShape polyA,
-            PolyShape polyB) {
+            PolyShape polyB, boolean conservative) {
         // ~84 vec2 creations in Pyramid test, per run
         // (Some from called functions)
         // Runs ~625 times per step
         // 625 * 84 = 52,500, out of ~95,000 total creations
         // TODO Probably worth optimizing...
         manif.pointCount = 0; // Fixed a problem with contacts
-        MaxSeparation sepA = findMaxSeparation(polyA, polyB);
-        if (sepA.bestSeparation > 0.0f) {
+        MaxSeparation sepA = findMaxSeparation(polyA, polyB, conservative);
+        if (sepA.bestSeparation > 0.0f && conservative == false) {
             return;
         }
 
-        MaxSeparation sepB = findMaxSeparation(polyB, polyA);
-        if (sepB.bestSeparation > 0.0f) {
+        MaxSeparation sepB = findMaxSeparation(polyB, polyA, conservative);
+        if (sepB.bestSeparation > 0.0f && conservative == false) {
             return;
         }
 
@@ -342,7 +341,7 @@ public class CollidePoly {
             float separation = Vec2.dot(frontNormal, clipPoints2[i].v)
                     - frontOffset;
 
-            if (separation <= 0.0f) {
+            if (separation <= 0.0f && conservative == false) {
                 ContactPoint cp = manif.points[pointCount];
                 cp.separation = separation;
                 cp.position = clipPoints2[i].v.clone();

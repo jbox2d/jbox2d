@@ -33,6 +33,9 @@ import dynamics.contacts.ContactNode;
 import dynamics.joints.Joint;
 import dynamics.joints.JointDef;
 import dynamics.joints.JointNode;
+import dynamics.CollisionFilter;
+
+//Updated to rev 56 of b2World.cpp/.h
 
 public class World {
     public BroadPhase m_broadPhase;
@@ -55,11 +58,15 @@ public class World {
 
     public Vec2 m_gravity;
 
-    boolean m_doSleep;
+    public boolean m_allowSleep;
 
     public Body m_groundBody;
 
     public WorldListener m_listener;
+    
+    public CollisionFilter m_filter;
+    
+    public int m_positionIterationCount;
 
     public static boolean ENABLE_POSITION_CORRECTION;
 
@@ -83,6 +90,7 @@ public class World {
 
     public World(AABB worldAABB, Vec2 gravity, boolean doSleep) {
         m_listener = null;
+        m_filter = CollisionFilter.DEFAULT_FILTER;
 
         m_bodyList = null;
         m_contactList = null;
@@ -94,7 +102,7 @@ public class World {
 
         m_bodyDestroyList = null;
 
-        m_doSleep = doSleep;
+        m_allowSleep = doSleep;
 
         m_gravity = gravity;
 
@@ -109,7 +117,11 @@ public class World {
     public void setListener(WorldListener listener) {
         m_listener = listener;
     }
-
+    
+    public void setFilter(CollisionFilter filter) {
+        m_filter = filter;
+    }
+    
     public Body createBody(BodyDef description) {
         Body b = new Body(description, this);
         b.m_prev = null;
@@ -302,7 +314,7 @@ public class World {
     }
 
     public void step(float dt, int iterations) {
-        StepInfo step = new StepInfo();
+        TimeStep step = new TimeStep();
         step.dt = dt;
         step.iterations = iterations;
         if (dt > 0.0f) {
@@ -318,7 +330,7 @@ public class World {
         // Handle deferred body destruction
         cleanBodyList();
 
-        // Create and/or update contacts.
+        // Update contacts.
         m_contactManager.collide();
 
         // Size the island for the worst case.
@@ -405,7 +417,10 @@ public class World {
             }
 
             island.solve(step, m_gravity);
-            if (m_doSleep) {
+            
+            m_positionIterationCount = Math.max(m_positionIterationCount, island.m_positionIterationCount); 
+            
+            if (m_allowSleep) {
                 island.updateSleep(dt);
             }
 
@@ -430,7 +445,26 @@ public class World {
             }
         }
 
-        m_broadPhase.flush();
+        m_broadPhase.commit();
+        
+        
+//        #if 0
+//        for (b2Contact* c = m_contactList; c; c = c->GetNext())
+//        {
+//            b2Shape* shape1 = c->GetShape1();
+//            b2Shape* shape2 = c->GetShape2();
+//            b2Body* body1 = shape1->GetBody();
+//            b2Body* body2 = shape2->GetBody();
+//
+//            if (body1->IsSleeping() && body2->IsSleeping())
+//            {
+//                continue;
+//            }
+//
+//            b2Conservative(shape1, shape2);
+//        }
+//    #endif
+        
     }
 
     public Shape[] query(AABB aabb, int maxCount) {

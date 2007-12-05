@@ -22,6 +22,8 @@
  */
 package collision;
 
+//Updated to rev 56 of b2PairManager.h
+
 public class BufferedPair implements Comparable<BufferedPair> {
     int proxyId1;
 

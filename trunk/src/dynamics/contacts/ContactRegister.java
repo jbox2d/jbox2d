@@ -27,7 +27,7 @@ import collision.ShapeType;
 public class ContactRegister {
     ShapeType s1, s2;
 
-    ContactCreator createFcn;
+    ContactCreateFcn createFcn;
 
     boolean primary;
 }
