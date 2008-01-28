@@ -25,8 +25,11 @@ package testbed;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.Random;
+import java.util.ArrayList;
 
 import processing.core.PApplet;
+import processing.core.PImage;
+
 import collision.AABB;
 import collision.BoxDef;
 import collision.BroadPhase;
@@ -95,6 +98,8 @@ public abstract class PTest extends PApplet {
     protected Body m_bomb;
 
     protected MouseJoint m_mouseJoint;
+    
+    public ArrayList<BoundImage> boundImages = new ArrayList<BoundImage>();
 
     public PTest() {
         this("JBox2D test");
@@ -217,6 +222,15 @@ public abstract class PTest extends PApplet {
 
                 }
             }
+            if (settings.drawCM) {
+                noFill();
+                stroke(0,0,250);
+                ellipse(b.m_position.x, b.m_position.y, 2f/scaleFactor, 2f/scaleFactor);
+            }
+        }
+        
+        for (BoundImage b:boundImages) {
+            b.draw();
         }
 
         for (Joint j = m_world.m_jointList; j != null; j = j.m_next) {
@@ -281,7 +295,70 @@ public abstract class PTest extends PApplet {
             drawMouseJoint();
         }
     }
+    
+//    public void DrawImage(PImage p, Vec2[] localPoints, Vec2[] texCoords, Body b) {
+//        if (localPoints.length != 4 || texCoords.length != 4) assert false;
+//        beginShape(POLYGON);
+//        texture(p);
+//        noStroke();
+//        fill(255);
+//        for (int i=0; i < 4; ++i) {
+//            Vec2 worldPt = b.getWorldPoint(localPoints[i]);
+//            println(worldPt.x + " " +worldPt.y);
+//            vertex(worldPt.x, worldPt.y, texCoords[i].x, texCoords[i].y);
+//        }
+//        endShape();
+//    }
 
+    /**
+     * Draws an image on a body.
+     * 
+     * First image is centered on body center, then
+     * localScale is applied, then localOffset, and
+     * lastly localRotation (all rel. to body center).
+     * 
+     * Thus localOffset should be specified in body
+     * units to the scaled image.  For instance, if
+     * you want a MxN image to have its corner
+     * at body center and be scaled by S, use a localOffset
+     * of (M*S/2, N*S/2) and a localScale of S.
+     * 
+     */
+    public void bindImage(PImage p, Vec2 localOffset, float localRotation, float localScale, Body b) {
+        boundImages.add(new BoundImage(p, localOffset, localRotation, localScale, b));
+    }
+    
+    
+    class BoundImage{
+        private PImage image;
+        private float halfImageWidth;
+        private float halfImageHeight;
+        public Body body;
+        public Vec2 localOffset;
+        public float localRotation;
+        public float localScale;
+        
+        public BoundImage(PImage _image, Vec2 _localOffset, float _localRotation, float _localScale, Body _body) {
+            image = _image;
+            localOffset = _localOffset.clone();
+            localRotation = _localRotation;
+            localScale = _localScale;
+            body = _body;
+            halfImageWidth = image.width / 2f;
+            halfImageHeight = image.height / 2f;
+        }
+        
+        public void draw() {
+            pushMatrix();
+            translate(body.m_position.x, body.m_position.y);
+            rotate(body.m_rotation+localRotation);
+            translate(localOffset.x, localOffset.y);
+            scale(localScale);
+            image(image, -halfImageWidth, -halfImageHeight);
+            popMatrix();
+        }
+    }
+    
     public void DrawShape(Shape shape, int c) {
         stroke(c);
         noFill();
@@ -517,10 +594,16 @@ public abstract class PTest extends PApplet {
                 transY += (oldCenter.y - newCenter.y) * scaleFactor;
             }
         });
+        
+        postSetup();
 
     }
 
     static public int debugCount;
+    
+    public void postSetup() {
+        
+    }
 
     public void draw() {
         background(255);
@@ -561,13 +644,15 @@ public abstract class PTest extends PApplet {
             initFollowY = a.y;
         }
         
-        frame();
+        preStep();
         
         debugCount = 0;
         // update data model
         //println("prestep");
         Step(settings);
         //println("poststep");
+        
+        postStep();
         
         if (followedBody != null) {
             Vec2 a = worldToScreen(followedBody.m_position.x,followedBody.m_position.y);
@@ -595,7 +680,14 @@ public abstract class PTest extends PApplet {
      * Called immediately before physics step - keyboard
      * is already checked when called.
      */
-    protected void frame() {
+    protected void preStep() {
+    }
+    
+    /**
+     * Called immediately after physics step.
+     */
+    protected void postStep() {
+        
     }
     
     /**
@@ -642,6 +734,7 @@ public abstract class PTest extends PApplet {
                 100f)), new Vec2(0.0f, -10.0f), true);
         m_bomb = null;
         m_mouseJoint = null;
+        boundImages.clear();
         followedBody = null;
     }
 

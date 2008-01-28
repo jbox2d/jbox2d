@@ -36,6 +36,8 @@ public class TestSettings {
     public boolean drawAABBs;
 
     public boolean drawPairs;
+    
+    public boolean drawCM;
 
     public boolean enableWarmStarting;
 
@@ -49,6 +51,7 @@ public class TestSettings {
         drawImpulses = false;
         drawAABBs = false;
         drawPairs = false;
+        drawCM = true;
         enableWarmStarting = true;
         enablePositionCorrection = true;
     }

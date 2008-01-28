@@ -77,6 +77,7 @@ public class CollidePoly {
     }
 
     static float edgeSeparation(PolyShape poly1, int edge1, PolyShape poly2) {
+        
         Vec2[] vert1s = poly1.m_vertices;
         int count2 = poly2.m_vertexCount;
         Vec2[] vert2s = poly2.m_vertices;
@@ -99,7 +100,7 @@ public class CollidePoly {
 
         Vec2 v1 = poly1.m_R.mul(vert1s[edge1]).addLocal(poly1.m_position);
         Vec2 v2 = poly2.m_R.mul(vert2s[vertexIndex2]).addLocal(poly2.m_position);
-        float separation = Vec2.dot(v2.sub(v1), normal);
+        float separation = Vec2.dot(v2.subLocal(v1), normal);
         return separation;
     }
 
@@ -258,6 +259,8 @@ public class CollidePoly {
         // Runs ~625 times per step
         // 625 * 84 = 52,500, out of ~95,000 total creations
         // TODO Probably worth optimizing...
+        // Runs ~1000 times per step in DominoTower test
+        //testbed.PTest.debugCount++;
         manif.pointCount = 0; // Fixed a problem with contacts
         MaxSeparation sepA = findMaxSeparation(polyA, polyB, conservative);
         if (sepA.bestSeparation > 0.0f && conservative == false) {

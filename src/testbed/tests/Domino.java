@@ -37,9 +37,6 @@ public class Domino extends PTest {
         super("Domino");
     }
 
-    public void makeDomino(float x, float y) {
-    }
-
     @Override
     public void go(World world) {
         { // Floor

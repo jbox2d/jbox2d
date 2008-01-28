@@ -180,7 +180,7 @@ public class Smasher extends PTest {
     }
 
     @Override
-    protected void frame() {
+    protected void preStep() {
         
     }
 

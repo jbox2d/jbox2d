@@ -80,10 +80,10 @@ public class TimingTest extends PApplet {
     
     public int frames = 500;
     public int iters = 10;
-    public TestSelection testToTime = TestSelection.WASHING_MACHINE;
+    public TestSelection testToTime = TestSelection.DOMINO_TOWER;
     
     public enum TestSelection{
-        WASHING_MACHINE, COMPOUND_SHAPES, DOMINO, PYRAMID, CIRCLES
+        WASHING_MACHINE, COMPOUND_SHAPES, DOMINO, PYRAMID, CIRCLES, DOMINO_TOWER
     }
     
     static public void main(String args[]) {
@@ -199,6 +199,10 @@ public class TimingTest extends PApplet {
                 case CIRCLES:
                     Circles c = new Circles();
                     c.go(m_world);
+                    break;
+                case DOMINO_TOWER:
+                    DominoTower dp = new DominoTower();
+                    dp.go(m_world);
                     break;
             }
             

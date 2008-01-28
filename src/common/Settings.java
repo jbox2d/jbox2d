@@ -56,7 +56,7 @@ public class Settings {
 
     public static final int maxPolyVertices = 8;
 
-    public static final int maxProxies = 512; // this must be a power of two
+    public static final int maxProxies = 2048; // this must be a power of two
 
     public static final int maxPairs = 8 * maxProxies; // this must be a
 

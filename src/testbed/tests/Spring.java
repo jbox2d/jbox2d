@@ -73,7 +73,7 @@ public class Spring extends PTest {
         }
     }
     
-    public void frame() {
+    public void preStep() {
         final float dist = (float)Math.sqrt(13.0);
         addSpringForce(bodyA, bodyB, 500, 10f, 4.0f);
         addSpringForce(bodyB, bodyC, 500, 10f, dist);

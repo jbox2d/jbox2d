@@ -10,21 +10,24 @@ import common.Vec2;
 import dynamics.Body;
 import dynamics.BodyDef;
 import dynamics.World;
-import dynamics.joints.*;
 
-public class BugTest extends PTest {
+//Assumes a .png file named "noise.png" has been added to the build path
+
+public class SpriteBinding extends PTest {
     
     public Vec2[] localCoords;
     public Vec2[] texCoords;
     public PImage myImage;
     
-    public Body missile;
+    public Body body;
 
-    public BugTest() {
-        super("BugTest");
+    public SpriteBinding() {
+        super("SpriteBinding");
     }
 
     public void go(World world) {
+        int numBoxes = 25; //number of boxes per row
+        Body[] boxes = new Body[3*numBoxes];
         {        
 
             // Define the ground box shape.
@@ -51,60 +54,54 @@ public class BugTest extends PTest {
 
             // Define another box shape for our dynamic body.
             BoxDef boxDef = new BoxDef();
-            boxDef.extents.set(1.0f, 5.0f);
+            boxDef.extents.set(1.0f, 1.0f);
 
             // Set the box density to be non-zero, so it will be dynamic.
             boxDef.density = 1.0f;
 
             // Override the default friction.
-            boxDef.friction = 25.3f;
-            boxDef.restitution = 0.0f;
+            boxDef.friction = 0.3f;
             
+            // Make them bouncy
+            boxDef.restitution = 0.6f;
 
             // Define the dynamic body. We set its position,
             // add the box shape, and call the body factory.
-            BodyDef bodyDef = new BodyDef();
-            bodyDef.position.set(0.0f, 4.0f);
-            bodyDef.addShape(boxDef);
-            missile = world.createBody(bodyDef);
+            for (int i=0; i<numBoxes; ++i) {
+                for (int j=0; j<3; ++j) {
+                    BodyDef bodyDef = new BodyDef();
+                    bodyDef.position.set(-numBoxes + i*2.5f + (j%2)*.5f, 4.0f + j*4f);
+                    bodyDef.addShape(boxDef);
+                    boxes[i + numBoxes*j] = world.createBody(bodyDef);
+                }
+            }
             
          }
         
+        // Load the image from a file
+        myImage = loadImage("noise.png");
+        
+        // Zero offset (center image on center of object)
+        Vec2 localOffset = new Vec2(0f, 0f);
+        
+        // Scale image to fit box width
+        float scale = 2.0f / myImage.width;
+        
+        // Zero rotation relative to box
+        float rot = 0f;
+        
+        // Bind images to boxes
+        for (int i=0; i<boxes.length; ++i) {
+            bindImage(myImage, localOffset, rot, scale, boxes[i]);   
+        }
         //textureMode(NORMALIZED);
     }
     
-    protected void preStep() {
-        
-           float velocityAngle;
-           Vec2 velocity;
-           float torque;
-           float torqueFactor = -100.1f;
-           float torqueDamping = -torqueFactor;
-           
-           velocity = missile.getLinearVelocity();
-           float absVel = velocity.length();
-           
-           velocityAngle = (float) (Math.atan2( velocity.y, velocity.x ) - (Math.PI / 2));
-           float angVelDelta =  missile.m_rotation - velocityAngle;
-           
-           //Constrain to -PI -> PI
-           while (angVelDelta > Math.PI){
-               angVelDelta -= 2*Math.PI;
-           }
-           while (angVelDelta < -Math.PI){
-               angVelDelta += 2*Math.PI;
-           }
-           
-           torque = absVel* torqueFactor * (angVelDelta) - absVel*missile.m_angularVelocity * torqueDamping;
-           missile.applyTorque(torque);
-           //missile.m_rotation = velocityAngle;
-        
-    }
 
     /**
      * Entry point
      */
     public static void main(String[] argv) {
-        PApplet.main(new String[] { "testbed.tests.BugTest" });
+        PApplet.main(new String[] { "testbed.tests.SpriteBinding" });
     }
 }
