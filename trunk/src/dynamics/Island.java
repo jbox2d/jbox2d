@@ -132,7 +132,9 @@ public class Island {
                 continue;
             }
 
-            b.m_position.addLocal(b.m_linearVelocity.mul(step.dt));
+            //b.m_position.addLocal(b.m_linearVelocity.mul(step.dt));
+            b.m_position.x += b.m_linearVelocity.x*step.dt;
+            b.m_position.y += b.m_linearVelocity.y*step.dt;
             b.m_rotation += step.dt * b.m_angularVelocity;
 
             b.m_R.setAngle(b.m_rotation);
