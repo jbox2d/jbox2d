@@ -571,10 +571,10 @@ public abstract class PTest extends PApplet {
             newKeyDown[i] = false;
         }
         System.out.println("Setting up graphics, performing initialization");
-        size(500, 500);
+        size(500, 500, P3D);
         frameRate(60);
         initDemo();
-        smooth();
+        //smooth();
         transX = width / 2.0f;
         transY = height / 2.0f;
         pmousePressed = false;
