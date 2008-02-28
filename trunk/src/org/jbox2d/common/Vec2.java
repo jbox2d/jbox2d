@@ -129,6 +129,11 @@ public class Vec2 {
     /*
      * Static
      */
+    
+    public static Vec2 abs(Vec2 a) {
+    	return new Vec2(Math.abs(a.x), Math.abs(a.y));
+    }
+    
     public static float dot(Vec2 a, Vec2 b) {
         return a.x * b.x + a.y * b.y;
     }
