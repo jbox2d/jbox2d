@@ -27,9 +27,9 @@ import java.util.List;
 
 import org.jbox2d.collision.CollidePoly;
 import org.jbox2d.collision.ContactID;
-import org.jbox2d.collision.ContactPoint;
+import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.collision.Manifold;
-import org.jbox2d.collision.PolyShape;
+import org.jbox2d.collision.PolygonShape;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.collision.ShapeType;
 
@@ -96,17 +96,17 @@ public class PolyContact extends Contact implements ContactCreateFcn {
         // Manifold m0 = m_manifold;
         Manifold m0 = new Manifold(m_manifold);
         for (int k = 0; k < m_manifold.pointCount; k++) {
-            m0.points[k] = new ContactPoint(m_manifold.points[k]);
-            m0.points[k].normalImpulse = m_manifold.points[k].normalImpulse;
-            m0.points[k].tangentImpulse = m_manifold.points[k].tangentImpulse;
+            m0.points[k] = new ManifoldPoint(m_manifold.points[k]);
+            m0.points[k].normalForce = m_manifold.points[k].normalForce;
+            m0.points[k].tangentForce = m_manifold.points[k].tangentForce;
             //m0.points[k].id.key = m_manifold.points[k].id.key;
             m0.points[k].id.features.set(m_manifold.points[k].id.features);
             //System.out.println(m_manifold.points[k].id.key);
         }
         m0.pointCount = m_manifold.pointCount;
 
-        CollidePoly.collidePoly(m_manifold, (PolyShape) m_shape1,
-                (PolyShape) m_shape2, false);
+        CollidePoly.collidePoly(m_manifold, (PolygonShape) m_shape1,
+                (PolygonShape) m_shape2, false);
 
         // Match contact ids to facilitate warm starting.
         // Watch out (Java note):
@@ -120,9 +120,9 @@ public class PolyContact extends Contact implements ContactCreateFcn {
             // Match old contact ids to new contact ids and copy the
             // stored impulses to warm start the solver.
             for (int i = 0; i < m_manifold.points.length; ++i) {
-                ContactPoint cp = m_manifold.points[i];
-                cp.normalImpulse = 0.0f;
-                cp.tangentImpulse = 0.0f;
+                ManifoldPoint cp = m_manifold.points[i];
+                cp.normalForce = 0.0f;
+                cp.tangentForce = 0.0f;
                 ContactID id = cp.id;
 
                 for (int j = 0; j < m0.points.length; ++j) {
@@ -130,14 +130,14 @@ public class PolyContact extends Contact implements ContactCreateFcn {
                         continue;
                     }
 
-                    ContactPoint cp0 = m0.points[j];
+                    ManifoldPoint cp0 = m0.points[j];
                     ContactID id0 = new ContactID(cp0.id);
 
                     if (id0.features.isEqual(id.features)){
                     //if (id0.key == id.key) {
                         match[j] = true;
-                        m_manifold.points[i].normalImpulse = m0.points[j].normalImpulse;
-                        m_manifold.points[i].tangentImpulse = m0.points[j].tangentImpulse;
+                        m_manifold.points[i].normalForce = m0.points[j].normalForce;
+                        m_manifold.points[i].tangentForce = m0.points[j].tangentForce;
                         break;
                     }
                 }

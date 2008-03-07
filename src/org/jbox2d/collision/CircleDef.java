@@ -22,12 +22,16 @@
  */
 package org.jbox2d.collision;
 
+import org.jbox2d.common.*;
+//updated to rev 108 of b2CircleShape.h/.cpp
 public class CircleDef extends ShapeDef {
 
     public float radius;
+    public Vec2 localPosition;
 
     public CircleDef() {
         type = ShapeType.CIRCLE_SHAPE;
-        radius = 1.0f;
+		localPosition = new Vec2(0.0f, 0.0f);
+		radius = 1.0f;
     }
 }

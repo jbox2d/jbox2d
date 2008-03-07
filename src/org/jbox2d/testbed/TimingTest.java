@@ -61,10 +61,9 @@
  */
 package org.jbox2d.testbed;
 
-
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.CircleShape;
-import org.jbox2d.collision.PolyShape;
+import org.jbox2d.collision.PolygonShape;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.collision.ShapeType;
 import org.jbox2d.common.Vec2;
@@ -75,13 +74,11 @@ import org.jbox2d.testbed.tests.*;
 import processing.core.PApplet;
 
 
-
-
 public class TimingTest extends PApplet {
     
     public int frames = 500;
-    public int iters = 10;
-    public TestSelection testToTime = TestSelection.DOMINO_TOWER;
+    public int iters = 100;
+    public TestSelection testToTime = TestSelection.CIRCLES;
     
     public enum TestSelection{
         WASHING_MACHINE, COMPOUND_SHAPES, DOMINO, PYRAMID, CIRCLES, DOMINO_TOWER
@@ -139,7 +136,7 @@ public class TimingTest extends PApplet {
         noFill();
         if (shape.m_type == ShapeType.POLY_SHAPE
                 || shape.m_type == ShapeType.BOX_SHAPE) {
-            PolyShape poly = (PolyShape) shape;
+            PolygonShape poly = (PolygonShape) shape;
 
             beginShape(POLYGON);
             for (int i = 0; i < poly.m_vertexCount; ++i) {

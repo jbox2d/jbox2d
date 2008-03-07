@@ -24,34 +24,36 @@ package org.jbox2d.collision;
 
 import org.jbox2d.common.Vec2;
 
-//Updated to rev 56 of b2Collision.h
+//Updated to rev 108 of b2Collision.h
 
 public class AABB {
-    public Vec2 minVertex, maxVertex;
+    public Vec2 lowerBound, upperBound;
 
     public AABB(Vec2 minVertex, Vec2 maxVertex) {
-        this.minVertex = minVertex.clone(); // clone to be safe
-        this.maxVertex = maxVertex.clone();
+        this.lowerBound = minVertex.clone(); // clone to be safe
+        this.upperBound = maxVertex.clone();
     }
 
     public AABB(AABB copy) {
-        this(copy.minVertex.clone(), copy.maxVertex.clone());
+        this(copy.lowerBound.clone(), copy.upperBound.clone());
     }
 
     public AABB() {
-        minVertex = new Vec2();
-        maxVertex = new Vec2();
+        lowerBound = new Vec2();
+        upperBound = new Vec2();
     }
 
+    // Verify that the bounds are sorted.
     boolean isValid() {
-        Vec2 d = maxVertex.sub(minVertex);
-        return d.x >= 0.0f && d.y >= 0 && minVertex.isValid()
-                && maxVertex.isValid();
+        Vec2 d = upperBound.sub(lowerBound);
+    	boolean valid = (d.x >= 0.0f && d.y >= 0);
+    	valid = valid && lowerBound.isValid() && upperBound.isValid();
+    	return valid;
     }
 
     boolean testOverlap(AABB box) {
-        Vec2 d1 = box.minVertex.sub(maxVertex);
-        Vec2 d2 = minVertex.sub(box.maxVertex);
+        Vec2 d1 = box.lowerBound.sub(upperBound);
+        Vec2 d2 = lowerBound.sub(box.upperBound);
 
         if (d1.x > 0.0f || d1.y > 0.0f || d2.x > 0.0f || d2.y > 0.0f) {
             return false;

@@ -21,11 +21,12 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-//Updated to rev 55 of b2CollidePoly.cpp 
+
 package org.jbox2d.collision;
 
-import org.jbox2d.common.Settings;
-import org.jbox2d.common.Vec2;
+import org.jbox2d.common.*;
+
+//Updated to rev 55->108 of b2CollidePoly.cpp 
 
 public class CollidePoly {
     static class ClipVertex {
@@ -76,46 +77,47 @@ public class CollidePoly {
         return numOut;
     }
 
-    static float edgeSeparation(PolyShape poly1, int edge1, PolyShape poly2) {
+    static float edgeSeparation(PolygonShape poly1, XForm xf1,
+    							int edge1, 
+    							PolygonShape poly2, XForm xf2) {
         
-        Vec2[] vert1s = poly1.m_vertices;
-        int count2 = poly2.m_vertexCount;
-        Vec2[] vert2s = poly2.m_vertices;
+        assert(0 <= edge1 && edge1 < poly1.m_vertexCount);
 
-     // Convert normal from into poly2's frame.
-        assert(edge1 < poly1.m_vertexCount);
-        Vec2 normal = poly1.m_R.mul(poly1.m_normals[edge1]);
-        Vec2 normalLocal2 = poly2.m_R.mulT(normal);
+    	// Convert normal from poly1's frame into poly2's frame.
+    	Vec2 normal1World = Mat22.mul(xf1.R, poly1.m_normals[edge1]);
+    	Vec2 normal1 = Mat22.mulT(xf2.R, normal1World);
 
         // Find support vertex on poly2 for -normal.
-        int vertexIndex2 = 0;
+        int index = 0;
         float minDot = Float.MAX_VALUE;
-        for (int i = 0; i < count2; ++i) {
-            float dot = Vec2.dot(vert2s[i], normalLocal2);
+        for (int i = 0; i < poly2.m_vertexCount; ++i) {
+            float dot = Vec2.dot(poly2.m_vertices[i], normal1);
             if (dot < minDot) {
                 minDot = dot;
-                vertexIndex2 = i;
+                index = i;
             }
         }
 
-        Vec2 v1 = poly1.m_R.mul(vert1s[edge1]).addLocal(poly1.m_position);
-        Vec2 v2 = poly2.m_R.mul(vert2s[vertexIndex2]).addLocal(poly2.m_position);
-        float separation = Vec2.dot(v2.subLocal(v1), normal);
+    	Vec2 v1 = XForm.mul(xf1, poly1.m_vertices[edge1]);
+    	Vec2 v2 = XForm.mul(xf2, poly2.m_vertices[index]);
+    	float separation = Vec2.dot(v2.sub(v1), normal1World);
+        
         return separation;
     }
 
     // Find the max separation between poly1 and poly2 using face normals
     // from poly1.
-    static MaxSeparation findMaxSeparation(PolyShape poly1, PolyShape poly2, boolean conservative) {
+    static MaxSeparation findMaxSeparation(PolygonShape poly1, XForm xf1,
+    									   PolygonShape poly2, XForm xf2) {
         MaxSeparation separation = new MaxSeparation();
 
         int count1 = poly1.m_vertexCount;
         
-        // Vector pointing from the origin of poly1 to the origin of poly2.
-        Vec2 d = poly2.m_position.sub(poly1.m_position);
-        Vec2 dLocal1 = poly1.m_R.mulT(d);
+        // Vector pointing from the centroid of poly1 to the centroid of poly2.
+    	Vec2 d = XForm.mul(xf2, poly2.m_centroid).subLocal(XForm.mul(xf1, poly1.m_centroid));
+    	Vec2 dLocal1 = Mat22.mulT(xf1.R, d);
 
-        // Get support vertex as a hint for our search
+    	// Find edge normal on poly1 that has the largest projection onto d.
         int edge = 0;
         float maxDot = -Float.MAX_VALUE;
         for (int i = 0; i < count1; ++i) {
@@ -127,23 +129,23 @@ public class CollidePoly {
         }
 
         // Get the separation for the edge normal.
-        float s = edgeSeparation(poly1, edge, poly2);
-        if (s > 0.0f && conservative == false){
+        float s = edgeSeparation(poly1, xf1, edge, poly2, xf2);
+        if (s > 0.0f){
             separation.bestSeparation = s;
             return separation;
         }
 
-        // Check the separation for the neighboring edges.
+        // Check the separation for the previous edge normal.
         int prevEdge = edge - 1 >= 0 ? edge - 1 : count1 - 1;
-        float sPrev = edgeSeparation(poly1, prevEdge, poly2);
-        if (sPrev > 0.0f && conservative == false) {
+        float sPrev = edgeSeparation(poly1, xf1, prevEdge, poly2, xf2);
+        if (sPrev > 0.0f) {
             separation.bestSeparation = sPrev;
             return separation;
         }
 
         int nextEdge = edge + 1 < count1 ? edge + 1 : 0;
-        float sNext = edgeSeparation(poly1, nextEdge, poly2);
-        if (sNext > 0.0f && conservative == false){
+        float sNext = edgeSeparation(poly1, xf1, nextEdge, poly2, xf2);
+        if (sNext > 0.0f){
             separation.bestSeparation = sNext;
             return separation;
         }
@@ -167,14 +169,15 @@ public class CollidePoly {
             return separation;
         }
 
+        // Perform a local search for the best edge normal.
         while (true) {
             if (increment == -1)
                 edge = bestEdge - 1 >= 0 ? bestEdge - 1 : count1 - 1;
             else
                 edge = bestEdge + 1 < count1 ? bestEdge + 1 : 0;
 
-            s = edgeSeparation(poly1, edge, poly2);
-            if (s > 0.0f && conservative == false) {
+            s = edgeSeparation(poly1, xf1, edge, poly2, xf2);
+            if (s > 0.0f) {
                 separation.bestSeparation = s;
                 return separation;
             }
@@ -193,54 +196,45 @@ public class CollidePoly {
         return separation;
     }
 
-    static void findIncidentEdge(ClipVertex c[], PolyShape poly1, int edge1,
-            PolyShape poly2) {
-        int count1 = poly1.m_vertexCount;
-        Vec2[] vert1s = poly1.m_vertices;
-        int count2 = poly2.m_vertexCount;
-        Vec2[] vert2s = poly2.m_vertices;
+    static void findIncidentEdge(ClipVertex c[], 
+    							 PolygonShape poly1, XForm xf1, int edge1,
+    							 PolygonShape poly2, XForm xf2) {
+    	
+    	assert(0 <= edge1 && edge1 < poly1.m_vertexCount);
 
-        // Get the vertices associated with edge1.
-        int vertex11 = edge1;
-        int vertex12 = edge1 + 1 == count1 ? 0 : edge1 + 1;
+    	// Get the normal of the reference edge in poly2's frame.
+    	Vec2 normal1 = Mat22.mulT(xf2.R, Mat22.mul(xf1.R, poly1.m_normals[edge1]));
 
-        // Get the normal of edge1.
-        Vec2 normal1Local1 = Vec2.cross(vert1s[vertex12].sub(vert1s[vertex11]),
-                1.0f);
-        normal1Local1.normalize();
-        Vec2 normal1 = poly1.m_R.mul(normal1Local1);
-        Vec2 normal1Local2 = poly2.m_R.mulT(normal1);
+    	// Find the incident edge on poly2.
+    	int index = 0;
+    	float minDot = Float.MAX_VALUE;
+    	for (int i = 0; i < poly2.m_vertexCount; ++i) {
+    		float dot = Vec2.dot(normal1, poly2.m_normals[i]);
+    		if (dot < minDot) {
+    			minDot = dot;
+    			index = i;
+    		}
+    	}
 
-        // Find the incident edge on poly2.
-        int vertex21 = 0, vertex22 = 0;
-        float minDot = Float.MAX_VALUE;
-        for (int i = 0; i < count2; ++i) {
-            int i1 = i;
-            int i2 = i + 1 < count2 ? i + 1 : 0;
+    	// Build the clip vertices for the incident edge.
+    	int i1 = index;
+    	int i2 = i1 + 1 < poly2.m_vertexCount ? i1 + 1 : 0;
+    	
+    	c[0] = new ClipVertex();
+    	c[1] = new ClipVertex();
 
-            Vec2 normal2Local2 = Vec2.cross(vert2s[i2].sub(vert2s[i1]), 1.0f);
-            normal2Local2.normalize();
-            float dot = Vec2.dot(normal2Local2, normal1Local2);
-            if (dot < minDot) {
-                minDot = dot;
-                vertex21 = i1;
-                vertex22 = i2;
-            }
-        }
+    	c[0].v = XForm.mul(xf2, poly2.m_vertices[i1]);
+    	c[0].id.features.referenceFace = edge1;
+    	c[0].id.features.incidentEdge = i1;
+    	c[0].id.features.incidentVertex = 0;
+    	
+    	
 
-        // Build the clip vertices for the incident edge.
-        c[0] = new ClipVertex();
-        c[1] = new ClipVertex();
-
-        c[0].v = poly2.m_R.mul(vert2s[vertex21]).addLocal(poly2.m_position);
-        c[0].id.features.referenceFace = edge1;
-        c[0].id.features.incidentEdge = vertex21;
-        c[0].id.features.incidentVertex = vertex21;
-
-        c[1].v = poly2.m_R.mul(vert2s[vertex22]).addLocal(poly2.m_position);
-        c[1].id.features.referenceFace = edge1;
-        c[1].id.features.incidentEdge = vertex21;
-        c[1].id.features.incidentVertex = vertex22;
+    	c[1].v = XForm.mul(xf2, poly2.m_vertices[i2]);
+    	c[1].id.features.referenceFace = edge1;
+    	c[1].id.features.incidentEdge = i2;
+    	c[1].id.features.incidentVertex = 1;
+    	
     }
 
     // Find edge normal of max separation on A - return if separating axis is
@@ -252,28 +246,25 @@ public class CollidePoly {
     // Clip
 
     // The normal points from 1 to 2
-    public static void collidePoly(Manifold manif, PolyShape polyA,
-            PolyShape polyB, boolean conservative) {
-        // ~84 vec2 creations in Pyramid test, per run
-        // (Some from called functions)
-        // Runs ~625 times per step
-        // 625 * 84 = 52,500, out of ~95,000 total creations
-        // TODO Probably worth optimizing...
-        // Runs ~1000 times per step in DominoTower test
+    public static void collidePoly(Manifold manif, 
+    		PolygonShape polyA, XForm xfA,
+            PolygonShape polyB, XForm xfB) {
+
         //testbed.PTest.debugCount++;
         manif.pointCount = 0; // Fixed a problem with contacts
-        MaxSeparation sepA = findMaxSeparation(polyA, polyB, conservative);
-        if (sepA.bestSeparation > 0.0f && conservative == false) {
+        MaxSeparation sepA = findMaxSeparation(polyA, xfA, polyB, xfB);
+        if (sepA.bestSeparation > 0.0f) {
             return;
         }
 
-        MaxSeparation sepB = findMaxSeparation(polyB, polyA, conservative);
-        if (sepB.bestSeparation > 0.0f && conservative == false) {
+        MaxSeparation sepB = findMaxSeparation(polyB, xfA, polyA, xfB);
+        if (sepB.bestSeparation > 0.0f) {
             return;
         }
 
-        PolyShape poly1; // reference poly
-        PolyShape poly2; // incident poly
+        PolygonShape poly1; // reference poly
+        PolygonShape poly2; // incident poly
+        XForm xf1, xf2;
         int edge1; // reference edge
         byte flip;
         float k_relativeTol = 0.98f;
@@ -284,18 +275,22 @@ public class CollidePoly {
                 + k_absoluteTol) {
             poly1 = polyB;
             poly2 = polyA;
+            xf1 = xfB;
+    		xf2 = xfA;
             edge1 = sepB.bestFaceIndex;
             flip = 1;
         }
         else {
             poly1 = polyA;
             poly2 = polyB;
+            xf1 = xfA;
+    		xf2 = xfB;
             edge1 = sepA.bestFaceIndex;
             flip = 0;
         }
 
         ClipVertex incidentEdge[] = new ClipVertex[2];
-        findIncidentEdge(incidentEdge, poly1, edge1, poly2);
+        findIncidentEdge(incidentEdge, poly1, xf1, edge1, poly2, xf2);
 
         int count1 = poly1.m_vertexCount;
 
@@ -304,12 +299,12 @@ public class CollidePoly {
         Vec2 v11 = vert1s[edge1];
         Vec2 v12 = edge1 + 1 < count1 ? vert1s[edge1 + 1] : vert1s[0];
 
-        Vec2 sideNormal = poly1.m_R.mul(v12.sub(v11));
+        Vec2 sideNormal = Mat22.mul(xf1.R, v12.sub(v11));
         sideNormal.normalize();
         Vec2 frontNormal = Vec2.cross(sideNormal, 1.0f);
 
-        v11 = poly1.m_R.mul(v11).addLocal(poly1.m_position);
-        v12 = poly1.m_R.mul(v12).addLocal(poly1.m_position);
+        v11 = XForm.mul(xf1, v11);
+    	v12 = XForm.mul(xf1, v12);
 
         float frontOffset = Vec2.dot(frontNormal, v11);
         float sideOffset1 = -Vec2.dot(sideNormal, v11);
@@ -344,10 +339,11 @@ public class CollidePoly {
             float separation = Vec2.dot(frontNormal, clipPoints2[i].v)
                     - frontOffset;
 
-            if (separation <= 0.0f && conservative == false) {
-                ContactPoint cp = manif.points[pointCount];
+            if (separation <= 0.0f) {
+                ManifoldPoint cp = manif.points[pointCount];
                 cp.separation = separation;
-                cp.position = clipPoints2[i].v.clone();
+                cp.localPoint1 = XForm.mulT(xfA, clipPoints2[i].v);
+    			cp.localPoint2 = XForm.mulT(xfB, clipPoints2[i].v);
                 cp.id = new ContactID(clipPoints2[i].id);
                 cp.id.features.flip = flip;
                 ++pointCount;

@@ -23,19 +23,39 @@
 package org.jbox2d.collision;
 
 //Updated to rev 56 of b2Shape.cpp/.h
+// -> rev 97 of b2PolygonShape.cpp/.h
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jbox2d.common.Vec2;
+import org.jbox2d.common.*;
 
-public class PolyDef extends ShapeDef {
+public class PolygonDef extends ShapeDef {
 
     public List<Vec2> vertices;
 
-    public PolyDef() {
+    public PolygonDef() {
         type = ShapeType.POLY_SHAPE;
         vertices = new ArrayList<Vec2>();
+    }
+    
+    public void setAsBox(float hx, float hy) {
+    	vertices.clear();
+    	vertices.add(new Vec2(-hx, -hy));
+    	vertices.add(new Vec2(hx, -hy));
+    	vertices.add(new Vec2(hx, hy));
+    	vertices.add(new Vec2(-hx, hy));
+    }
+
+    public void setAsBox(float hx, float hy, Vec2 center, float angle) {
+    	setAsBox(hx, hy);
+    	XForm xf = new XForm();
+    	xf.position = center;
+    	xf.R.set(angle);
+
+    	for (int i = 0; i < vertices.size(); ++i) {
+    		vertices.get(i).set(XForm.mul(xf, vertices.get(i)));
+    	}
     }
 
     public int vertexCount() {

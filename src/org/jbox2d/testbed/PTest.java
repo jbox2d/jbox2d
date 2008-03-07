@@ -33,7 +33,7 @@ import org.jbox2d.collision.BroadPhase;
 import org.jbox2d.collision.CircleShape;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.Pair;
-import org.jbox2d.collision.PolyShape;
+import org.jbox2d.collision.PolygonShape;
 import org.jbox2d.collision.Proxy;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.collision.ShapeType;
@@ -267,13 +267,13 @@ public abstract class PTest extends PApplet {
                 }
 
                 AABB b = new AABB();
-                b.minVertex.x = bp.m_worldAABB.minVertex.x + invQ.x
+                b.lowerBound.x = bp.m_worldAABB.lowerBound.x + invQ.x
                         * bp.m_bounds[0][p.lowerBounds[0]].value;
-                b.minVertex.y = bp.m_worldAABB.minVertex.y + invQ.y
+                b.lowerBound.y = bp.m_worldAABB.lowerBound.y + invQ.y
                         * bp.m_bounds[1][p.lowerBounds[1]].value;
-                b.maxVertex.x = bp.m_worldAABB.minVertex.x + invQ.x
+                b.upperBound.x = bp.m_worldAABB.lowerBound.x + invQ.x
                         * bp.m_bounds[0][p.upperBounds[0]].value;
-                b.maxVertex.y = bp.m_worldAABB.minVertex.y + invQ.y
+                b.upperBound.y = bp.m_worldAABB.lowerBound.y + invQ.y
                         * bp.m_bounds[1][p.upperBounds[1]].value;
 
                 DrawAABB(b, color(255, 150, 150));
@@ -365,7 +365,7 @@ public abstract class PTest extends PApplet {
         noFill();
         if (shape.m_type == ShapeType.POLY_SHAPE
                 || shape.m_type == ShapeType.BOX_SHAPE) {
-            PolyShape poly = (PolyShape) shape;
+            PolygonShape poly = (PolygonShape) shape;
 
             beginShape(POLYGON);
             for (int i = 0; i < poly.m_vertexCount; ++i) {
@@ -424,9 +424,9 @@ public abstract class PTest extends PApplet {
     void DrawAABB(AABB aabb, int c) {
         stroke(c);
         noFill();
-        rect(aabb.minVertex.x, aabb.minVertex.y,
-                (aabb.maxVertex.x - aabb.minVertex.x),
-                (aabb.maxVertex.y - aabb.minVertex.y));
+        rect(aabb.lowerBound.x, aabb.lowerBound.y,
+                (aabb.upperBound.x - aabb.lowerBound.x),
+                (aabb.upperBound.y - aabb.lowerBound.y));
     }
 
     void drawContact(Contact c) {
@@ -448,7 +448,7 @@ public abstract class PTest extends PApplet {
         for (Manifold m : c.GetManifolds()) {
             for (int j = 0; j < m.pointCount; ++j) {
                 Vec2 v1 = m.points[j].position;
-                Vec2 v2 = v1.add(m.normal.mul(m.points[j].normalImpulse));
+                Vec2 v2 = v1.add(m.normal.mul(m.points[j].normalForce));
 
                 // g.drawLine((int) v1.x, (int) v1.y, (int) v2.x, (int) v2.y);
                 line(v1.x, v1.y, v2.x, v2.y);
@@ -472,25 +472,25 @@ public abstract class PTest extends PApplet {
 
             AABB b1 = new AABB();
             AABB b2 = new AABB();
-            b1.minVertex.x = bp.m_worldAABB.minVertex.x + invQ.x
+            b1.lowerBound.x = bp.m_worldAABB.lowerBound.x + invQ.x
                     * bp.m_bounds[0][p1.lowerBounds[0]].value;
-            b1.minVertex.y = bp.m_worldAABB.minVertex.y + invQ.y
+            b1.lowerBound.y = bp.m_worldAABB.lowerBound.y + invQ.y
                     * bp.m_bounds[1][p1.lowerBounds[1]].value;
-            b1.maxVertex.x = bp.m_worldAABB.minVertex.x + invQ.x
+            b1.upperBound.x = bp.m_worldAABB.lowerBound.x + invQ.x
                     * bp.m_bounds[0][p1.upperBounds[0]].value;
-            b1.maxVertex.y = bp.m_worldAABB.minVertex.y + invQ.y
+            b1.upperBound.y = bp.m_worldAABB.lowerBound.y + invQ.y
                     * bp.m_bounds[1][p1.upperBounds[1]].value;
-            b2.minVertex.x = bp.m_worldAABB.minVertex.x + invQ.x
+            b2.lowerBound.x = bp.m_worldAABB.lowerBound.x + invQ.x
                     * bp.m_bounds[0][p2.lowerBounds[0]].value;
-            b2.minVertex.y = bp.m_worldAABB.minVertex.y + invQ.y
+            b2.lowerBound.y = bp.m_worldAABB.lowerBound.y + invQ.y
                     * bp.m_bounds[1][p2.lowerBounds[1]].value;
-            b2.maxVertex.x = bp.m_worldAABB.minVertex.x + invQ.x
+            b2.upperBound.x = bp.m_worldAABB.lowerBound.x + invQ.x
                     * bp.m_bounds[0][p2.upperBounds[0]].value;
-            b2.maxVertex.y = bp.m_worldAABB.minVertex.y + invQ.y
+            b2.upperBound.y = bp.m_worldAABB.lowerBound.y + invQ.y
                     * bp.m_bounds[1][p2.upperBounds[1]].value;
 
-            Vec2 x1 = b1.minVertex.add(b1.maxVertex).mul(0.5f);
-            Vec2 x2 = b2.minVertex.add(b2.maxVertex).mul(0.5f);
+            Vec2 x1 = b1.lowerBound.add(b1.upperBound).mul(0.5f);
+            Vec2 x2 = b2.lowerBound.add(b2.upperBound).mul(0.5f);
 
             // g.drawLine((int) x1.x, (int) x1.y, (int) x2.x, (int) x2.y);
             line(x1.x, x1.y, x2.x, x2.y);

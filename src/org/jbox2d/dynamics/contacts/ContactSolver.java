@@ -25,7 +25,7 @@ package org.jbox2d.dynamics.contacts;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jbox2d.collision.ContactPoint;
+import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
@@ -91,11 +91,11 @@ public class ContactSolver {
                 c.restitution = restitution;
 
                 for (int k = 0; k < c.pointCount; ++k) {
-                    ContactPoint cp = manifold.points[k];
+                    ManifoldPoint cp = manifold.points[k];
                     ContactConstraintPoint ccp = c.points[k];
 
-                    ccp.normalImpulse = cp.normalImpulse;
-                    ccp.tangentImpulse = cp.tangentImpulse;
+                    ccp.normalImpulse = cp.normalForce;
+                    ccp.tangentImpulse = cp.tangentForce;
                     ccp.separation = cp.separation;
 
                     Vec2 r1 = cp.position.sub(b1.m_position);
@@ -440,8 +440,8 @@ public class ContactSolver {
             Manifold m = c.manifold;
 
             for (int j = 0; j < c.pointCount; ++j) {
-                m.points[j].normalImpulse = c.points[j].normalImpulse;
-                m.points[j].tangentImpulse = c.points[j].tangentImpulse;
+                m.points[j].normalForce = c.points[j].normalImpulse;
+                m.points[j].tangentForce = c.points[j].tangentImpulse;
             }
         }
     }

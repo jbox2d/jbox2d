@@ -54,6 +54,12 @@ public class Mat22 {
     public Mat22 clone() {
         return new Mat22(this.col1.clone(), this.col2.clone());
     }
+    
+    public void set(float angle) {
+		float c = (float)Math.cos(angle), s = (float)Math.sin(angle);
+		col1.x = c; col2.x = -s;
+		col1.y = s; col2.y = c;
+	}
 
     public void setIdentity() {
         col1.x = 1.0f;
@@ -101,6 +107,10 @@ public class Mat22 {
     public Mat22 abs() {
         return new Mat22(col1.abs(), col2.abs());
     }
+    
+    public static Mat22 abs(Mat22 R) {
+    	return R.abs();
+    }
 
     public Vec2 mul(Vec2 v) {
         return new Vec2(col1.x * v.x + col2.x * v.y, col1.y * v.x + col2.y
@@ -140,5 +150,21 @@ public class Mat22 {
         Vec2 x = new Vec2( det * (a22 * b.x - a12 * b.y),
                            det * (a11 * b.y - a21 * b.x) );
         return x;
+    }
+    
+    public static Vec2 mul(Mat22 R, Vec2 v) {
+    	return R.mul(v);
+    }
+    
+    public static Mat22 mul(Mat22 A, Mat22 B){
+    	return A.mul(B);
+    }
+   
+    public static Vec2 mulT(Mat22 R, Vec2 v) {
+    	return R.mulT(v);
+    }
+    
+    public static Mat22 mulT(Mat22 A, Mat22 B){
+    	return A.mulT(B);
     }
 }

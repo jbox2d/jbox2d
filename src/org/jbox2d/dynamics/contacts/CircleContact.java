@@ -60,8 +60,8 @@ public class CircleContact extends Contact implements ContactCreateFcn {
         assert (m_shape1.m_type == ShapeType.CIRCLE_SHAPE);
         assert (m_shape2.m_type == ShapeType.CIRCLE_SHAPE);
         m_manifold.pointCount = 0;
-        m_manifold.points[0].normalImpulse = 0.0f;
-        m_manifold.points[0].tangentImpulse = 0.0f;
+        m_manifold.points[0].normalForce = 0.0f;
+        m_manifold.points[0].tangentForce = 0.0f;
     }
 
     public void Destructor() {

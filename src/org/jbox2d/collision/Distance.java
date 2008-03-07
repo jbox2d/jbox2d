@@ -23,6 +23,8 @@ package org.jbox2d.collision;
 //#include "Shapes/b2PolygonShape.h"
 import org.jbox2d.common.*;
 
+//updated to rev 108 of b2Distance.cpp
+
 public class Distance{
 	public static int g_GJK_Iterations = 0;
 
@@ -157,28 +159,25 @@ public class Distance{
 	}
 
 	
-	//Java note: this appears to just be the polygon-polygon
-	//collision code, so I'm translating it to Java as such.
-	//In the C++ it was templatized, so we may need to do the
-	//same if it is actually used for anything else.
+	//Java note: templatized in C++, I used an interface instead
 	public static float DistanceGeneric(Vec2 x1, Vec2 x2,
-						  PolyShape shape1, XForm xf1,
-						  PolyShape shape2, XForm xf2) {
+						  SupportsGenericDistance shape1, XForm xf1,
+						  SupportsGenericDistance shape2, XForm xf2) {
 		Vec2 p1s[] = new Vec2[3];
 		Vec2 p2s[] = new Vec2[3];
 		Vec2 points[] = new Vec2[3];
 		int pointCount = 0;
 
-		x1.set(shape1.GetFirstVertex(xf1));
-		x2.set(shape2.GetFirstVertex(xf2));
+		x1.set(shape1.getFirstVertex(xf1));
+		x2.set(shape2.getFirstVertex(xf2));
 
 		float vSqr = 0.0f;
 		int maxIterations = 20;
 		for (int iter = 0; iter < maxIterations; ++iter) {
 			Vec2 v = x2.sub(x1);
-			Vec2 w1 = shape1.Support(xf1, v);
+			Vec2 w1 = shape1.support(xf1, v);
 			v.negateLocal();
-			Vec2 w2 = shape2.Support(xf2, v);
+			Vec2 w2 = shape2.support(xf2, v);
 			v.negateLocal();
 
 			vSqr = Vec2.dot(v, v);
@@ -191,7 +190,7 @@ public class Distance{
 					x2.set(w2);
 				}
 				g_GJK_Iterations = iter;
-				return Math.sqrt(vSqr);
+				return (float)Math.sqrt(vSqr);
 			}
 
 			switch (pointCount) {
@@ -235,12 +234,12 @@ public class Distance{
 				v.set(x2.x - x1.x, x2.y - x1.y);// x2 - x1
 				vSqr = Vec2.dot(v, v);
 
-				return Math.sqrt(vSqr);
+				return (float)Math.sqrt(vSqr);
 			}
 		}
 
 		g_GJK_Iterations = maxIterations;
-		return Math.sqrt(vSqr);
+		return (float)Math.sqrt(vSqr);
 	}
 
 	protected static float DistanceCC(
@@ -277,23 +276,7 @@ public class Distance{
 		return 0.0f;
 	}
 
-	// This is used for polygon-vs-circle distance.
-	class Point {
-		public Vec2 p;
-		
-		public Point(Vec2 _p) {
-			p = _p.clone();
-		}
-		
-		public Vec2 Support(XForm xf, Vec2 v) {
-			return p;
-		}
 
-		public Vec2 GetFirstVertex(XForm xf) {
-			return p;
-		}
-		
-	}
 
 	// GJK is more robust with polygon-vs-point than polygon-vs-circle.
 	// So we convert polygon-vs-circle to polygon-vs-point.
@@ -301,8 +284,8 @@ public class Distance{
 		Vec2 x1, Vec2 x2,
 		PolygonShape polygon, XForm xf1,
 		CircleShape circle,   XForm xf2) {
-		Point point;
-		point.p = b2Mul(xf2, circle.m_localPosition);
+		Point point = new Point(new Vec2(0.0f, 0.0f));
+		point.p = XForm.mul(xf2, circle.m_localPosition);
 
 		float distance = DistanceGeneric(x1, x2, polygon, xf1, point, XForm.identity);
 
@@ -322,7 +305,7 @@ public class Distance{
 		return distance;
 	}
 
-	public static float b2Distance(Vec2 x1, Vec2 x2,
+	public static float distance(Vec2 x1, Vec2 x2,
 					 Shape shape1, XForm xf1,
 					 Shape shape2, XForm xf2) {
 		
@@ -348,4 +331,22 @@ public class Distance{
 		return 0.0f;
 	}
 
+}
+
+// This is used for polygon-vs-circle distance.
+class Point implements SupportsGenericDistance{
+	public Vec2 p;
+	
+	public Point(Vec2 _p) {
+		p = _p.clone();
+	}
+	
+	public Vec2 support(XForm xf, Vec2 v) {
+		return p;
+	}
+
+	public Vec2 getFirstVertex(XForm xf) {
+		return p;
+	}
+	
 }
