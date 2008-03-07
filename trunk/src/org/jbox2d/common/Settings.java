@@ -54,7 +54,7 @@ public class Settings {
 
     public static final int maxShapesPerBody = 64;
 
-    public static final int maxPolyVertices = 8;
+    public static final int maxPolygonVertices = 8;
 
     public static final int maxProxies = 2048; // this must be a power of two
 
@@ -93,5 +93,7 @@ public class Settings {
 
     // 2 degrees/s
     public static final float angularSleepTolerance = 2.0f / 180.0f / timeUnitsPerSecond;
+    
+    public static final float toiSlop = 8.0f * linearSlop;
 
 }

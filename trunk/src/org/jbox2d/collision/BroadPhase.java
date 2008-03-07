@@ -22,7 +22,7 @@
  */
 package org.jbox2d.collision;
 
-//Version note: moving from b2BroadPhase.h/.cpp rev 23 -> 56
+//Version: b2BroadPhase.h/.cpp rev 108
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,6 +31,12 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 
+/*
+This broad phase uses the Sweep and Prune algorithm as described in:
+Collision Detection in Interactive 3D Environments by Gino van den Bergen
+Also, some ideas, such as using integral values for fast compares comes from
+Bullet (http:/www.bulletphysics.com).
+*/
 
 // Notes:
 // - we use bound arrays instead of linked lists for cache coherence.
@@ -125,7 +131,7 @@ public class BroadPhase {
         m_worldAABB = new AABB(worldAABB);
         m_proxyCount = 0;
 
-        Vec2 d = worldAABB.maxVertex.sub(worldAABB.minVertex);
+        Vec2 d = worldAABB.upperBound.sub(worldAABB.lowerBound);
         m_quantizationFactor = new Vec2(Integer.MAX_VALUE / d.x,
                 Integer.MAX_VALUE / d.y);
 
@@ -212,7 +218,7 @@ public class BroadPhase {
     }
 
     // Create and destroy proxies. These call Flush first.
-    int CreateProxy(AABB aabb, //int groupIndex, int categoryBits, int maskBits,
+    int createProxy(AABB aabb, //int groupIndex, int categoryBits, int maskBits,
             Object userData) {
         if (debugPrint) {
             System.out.println("CreateProxy()");
@@ -717,13 +723,13 @@ public class BroadPhase {
         if (debugPrint) {
             System.out.println("ComputeBounds()");
         }
-        assert(aabb.maxVertex.x > aabb.minVertex.x);
-        assert(aabb.maxVertex.y > aabb.minVertex.y);
+        assert(aabb.upperBound.x > aabb.lowerBound.x);
+        assert(aabb.upperBound.y > aabb.lowerBound.y);
         
-        Vec2 minVertex = MathUtils.clamp(aabb.minVertex, m_worldAABB.minVertex,
-                m_worldAABB.maxVertex);
-        Vec2 maxVertex = MathUtils.clamp(aabb.maxVertex, m_worldAABB.minVertex,
-                m_worldAABB.maxVertex);
+        Vec2 minVertex = MathUtils.clamp(aabb.lowerBound, m_worldAABB.lowerBound,
+                m_worldAABB.upperBound);
+        Vec2 maxVertex = MathUtils.clamp(aabb.upperBound, m_worldAABB.lowerBound,
+                m_worldAABB.upperBound);
 
         // System.out.printf("minV = %f %f, maxV = %f %f
         // \n",aabb.minVertex.x,aabb.minVertex.y,aabb.maxVertex.x,aabb.maxVertex.y);
@@ -732,13 +738,13 @@ public class BroadPhase {
         // sorting of
         // lower/upper bounds that would have equal values.
         // TODO_ERIN implement fast float to int conversion.
-        lowerValues[0] = (int) (m_quantizationFactor.x * (minVertex.x - m_worldAABB.minVertex.x))
+        lowerValues[0] = (int) (m_quantizationFactor.x * (minVertex.x - m_worldAABB.lowerBound.x))
                 & (Integer.MAX_VALUE - 1);
-        upperValues[0] = (int) (m_quantizationFactor.x * (maxVertex.x - m_worldAABB.minVertex.x)) | 1;
+        upperValues[0] = (int) (m_quantizationFactor.x * (maxVertex.x - m_worldAABB.lowerBound.x)) | 1;
 
-        lowerValues[1] = (int) (m_quantizationFactor.y * (minVertex.y - m_worldAABB.minVertex.y))
+        lowerValues[1] = (int) (m_quantizationFactor.y * (minVertex.y - m_worldAABB.lowerBound.y))
                 & (Integer.MAX_VALUE - 1);
-        upperValues[1] = (int) (m_quantizationFactor.y * (maxVertex.y - m_worldAABB.minVertex.y)) | 1;
+        upperValues[1] = (int) (m_quantizationFactor.y * (maxVertex.y - m_worldAABB.lowerBound.y)) | 1;
     }
 
  
@@ -845,8 +851,8 @@ public class BroadPhase {
     }
 
     public boolean inRange(AABB aabb) {
-        Vec2 d = Vec2.max(aabb.minVertex.sub(m_worldAABB.maxVertex),
-                m_worldAABB.minVertex.sub(aabb.maxVertex));
+        Vec2 d = Vec2.max(aabb.lowerBound.sub(m_worldAABB.upperBound),
+                m_worldAABB.lowerBound.sub(aabb.upperBound));
         return (Math.max(d.x, d.y) < 0.0f);
     }
 }

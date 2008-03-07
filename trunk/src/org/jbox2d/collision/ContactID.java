@@ -32,7 +32,7 @@ package org.jbox2d.collision;
 //
 //We need to figure out if this is a problem or not, because
 //I have a feeling that as of right now, key is never being
-//set properly.  Initial examination seems to show that key is
+//set anyways.  Initial examination seems to show that key is
 //always zero. [hacked around for the moment]
 public class ContactID {
     public int key;

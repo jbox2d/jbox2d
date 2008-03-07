@@ -25,385 +25,620 @@ package org.jbox2d.dynamics;
 import org.jbox2d.collision.MassData;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.collision.ShapeDef;
-import org.jbox2d.common.Mat22;
-import org.jbox2d.common.MathUtils;
-import org.jbox2d.common.Settings;
-import org.jbox2d.common.Vec2;
+import org.jbox2d.common.*;
 import org.jbox2d.dynamics.contacts.ContactNode;
 import org.jbox2d.dynamics.joints.JointNode;
 
-
-
-//Updated to rev. 54 of b2Body.cpp/.h
+// Updated to rev. 54->118 of b2Body.cpp/.h
+// Rewritten for rev. 118 (too many changes, needed reorganization for maintainability)
 
 public class Body {
-    public static final int e_staticFlag = 0x0001;
-
-    public static final int e_frozenFlag = 0x0002;
-
-    public static final int e_islandFlag = 0x0004;
-
-    public static final int e_sleepFlag = 0x0008;
-
-    public static final int e_allowSleepFlag = 0x0010;
-
-    public static final int e_destroyFlag = 0x0020;
-
-    public int m_flags;
-
-    public Vec2 m_position; // center of mass position
-
-    public float m_rotation;
-
-    public Mat22 m_R;
-
-    public Vec2 m_linearVelocity;
-
-    public float m_angularVelocity;
-
-    public Vec2 m_force;
-
-    public float m_torque;
-
-    public Vec2 m_center; // local vector from client origin to center of mass
-
-    public World m_world;
-
-    public Body m_prev;
-
-    public Body m_next;
-
-    public Shape m_shapeList;
-
-    public int m_shapeCount;
-
-    public JointNode m_jointList;
-
-    public ContactNode m_contactList;
-
-    public float m_mass, m_invMass;
-
-    public float m_I, m_invI;
-
-    public float m_linearDamping;
-
-    public float m_angularDamping;
-
-    public float m_sleepTime;
-
-    public Object m_userData;
-    
-    //Conservative advancement data
-    public Vec2 m_position0;
-    public float m_rotation0;
-
-    public Body(BodyDef bd, World world) {
-        m_flags = 0;
-        m_position = bd.position.clone();
-        m_rotation = bd.rotation;
-        m_R = new Mat22(m_rotation);
-        m_position0 = m_position.clone();
-        m_rotation0 = m_rotation;
-        m_world = world;
-
-        m_linearDamping = MathUtils.clamp(1.0f - bd.linearDamping, 0.0f, 1.0f);
-        m_angularDamping = MathUtils
-                .clamp(1.0f - bd.angularDamping, 0.0f, 1.0f);
-
-        m_force = new Vec2(0.0f, 0.0f);
-        m_torque = 0.0f;
-
-        m_mass = 0.0f;
-
-        MassData massDatas[] = new MassData[Settings.maxShapesPerBody];
-
-        // Compute the shape mass properties, the bodies total mass and COM.
-        m_shapeCount = 0;
-        m_center = new Vec2(0.0f, 0.0f);
-
-        for (int i = 0; i < Settings.maxShapesPerBody; ++i) {
-            ShapeDef sd = bd.shapes[i];
-            if (sd == null) {
-                break;
-            }
-            massDatas[i] = new MassData();
-            MassData massData = massDatas[i];
-            sd.computeMass(massData);
-            m_mass += massData.mass;
-            m_center.addLocal(sd.localPosition.clone()
-                    .addLocal(massData.center).mulLocal(massData.mass));
-            ++m_shapeCount;
-        }
-
-        // Compute center of mass, and shift the origin to the COM.
-        if (m_mass > 0.0f) {
-            m_center.mulLocal(1.0f / m_mass);
-            m_position.addLocal(m_R.mul(m_center));
-        }
-        else {
-            m_flags |= e_staticFlag;
-        }
-
-        // Compute the moment of inertia.
-        m_I = 0.0f;
-        for (int i = 0; i < m_shapeCount; ++i) {
-            ShapeDef sd = bd.shapes[i];
-            MassData massData = massDatas[i];
-            m_I += massData.I;
-            Vec2 r = sd.localPosition.clone().addLocal(massData.center)
-                    .subLocal(m_center);
-            m_I += massData.mass * Vec2.dot(r, r);
-        }
-
-        if (m_mass > 0.0f) {
-            m_invMass = 1.0f / m_mass;
-        }
-        else {
-            m_invMass = 0.0f;
-        }
-
-        if (m_I > 0.0f && bd.preventRotation == false) {
-            m_invI = 1.0f / m_I;
-        }
-        else {
-            m_I = 0.0f;
-            m_invI = 0.0f;
-        }
-
-        // Compute the center of mass velocity.
-        m_linearVelocity = bd.linearVelocity.add(Vec2.cross(bd.angularVelocity,
-                m_center));
-        m_angularVelocity = bd.angularVelocity;
-
-        m_jointList = null;
-        m_contactList = null;
-        m_prev = null;
-        m_next = null;
-
-        // Create the shapes.
-        m_shapeList = null;
-        for (int i = 0; i < m_shapeCount; ++i) {
-            ShapeDef sd = bd.shapes[i];
-            Shape shape = Shape.create(sd, this, m_center);
-            shape.m_next = m_shapeList;
-            m_shapeList = shape;
-        }
-
-        m_sleepTime = 0.0f;
-        if (bd.allowSleep) {
-            m_flags |= e_allowSleepFlag;
-        }
-        if (bd.isSleeping) {
-            m_flags |= e_sleepFlag;
-        }
-
-        if (((m_flags & e_sleepFlag) > 0) || m_invMass == 0.0f) {
-            m_linearVelocity.set(0.0f, 0.0f);
-            m_angularVelocity = 0.0f;
-        }
-
-        m_userData = bd.userData;
-    }
-
-    // Get the position of the body's origin. The body's origin does not
-    // necessarily coincide with the center of mass. It depends on how the
-    // shapes are created.
-    public Vec2 getOriginPosition() {
-        return m_position.sub(m_R.mul(m_center));
-    }
-
-    public Vec2 getCenterPosition() {
-        return m_position;
-    }
-
-    // Get the rotation in radians.
-    public float getRotation() {
-        return m_rotation;
-    }
-
-    public Mat22 getRotationMatrix() {
-        return m_R;
-    }
-
-    public void setLinearVelocity(Vec2 v) {
-        m_linearVelocity.set(v);
-    }
-
-    public Vec2 getLinearVelocity() {
-        return m_linearVelocity;
-    }
-
-    public void setAngularVelocity(float w) {
-        m_angularVelocity = w;
-    }
-
-    public float getAngularVelocity() {
-        return m_angularVelocity;
-    }
-
-    public void applyForce(Vec2 force, Vec2 point) {
-        if (isSleeping() == false) {
-            m_force.x += force.x;
-            m_force.y += force.y;
-            m_torque += Vec2.cross(point.sub(m_position), force);
-        }
-    }
-
-    public void applyTorque(float torque) {
-        if (isSleeping() == false) {
-            m_torque += torque;
-        }
-    }
-
-    public void applyImpulse(Vec2 impulse, Vec2 point) {
-        if (isSleeping() == false) {
-            m_linearVelocity.x += m_invMass * impulse.x;
-            m_linearVelocity.y += m_invMass * impulse.y;
-            m_angularVelocity += m_invI
-                    * Vec2.cross(point.sub(m_position), impulse);
-        }
-    }
-
-    public float getMass() {
-        return m_mass;
-    }
-
-    public float getInertia() {
-        return m_I;
-    }
-
-    public Vec2 getWorldPoint(Vec2 localPoint) {
-        return m_R.mul(localPoint).addLocal(m_position);
-    }
-
-    public Vec2 getWorldVector(Vec2 localVector) {
-        return m_R.mul(localVector);
-    }
-
-    public Vec2 getLocalPoint(Vec2 worldPoint) {
-        return m_R.mulT(worldPoint.sub(m_position));
-    }
-
-    public Vec2 getLocalVector(Vec2 worldVector) {
-        return m_R.mulT(worldVector);
-    }
-
-    public boolean isStatic() {
-        return (m_flags & e_staticFlag) == e_staticFlag;
-    }
-
-    public boolean isFrozen() {
-        return (m_flags & e_frozenFlag) == e_frozenFlag;
-    }
-
-    public boolean isSleeping() {
-        return (m_flags & e_sleepFlag) == e_sleepFlag;
-    }
-
-    public void allowSleeping(boolean flag) {
-        if (flag) {
-            m_flags |= e_allowSleepFlag;
-        }
-        else {
-            m_flags &= ~e_allowSleepFlag;
-            wakeUp();
-        }
-    }
-
-    public Shape getShapeList() {
-        return m_shapeList;
-    }
-
-    public ContactNode getContactList() {
-        return m_contactList;
-    }
-
-    public JointNode getJointList() {
-        return m_jointList;
-    }
-
-    public Body getNext() {
-        return m_next;
-    }
-
-    public Object getUserData() {
-        return m_userData;
-    }
-
-    public void destructor() {
-        Shape s = m_shapeList;
-        while (s != null) {
-            Shape s0 = s;
-            s = s.m_next;
-            s0.destructor();
-        }
-    }
-
-    public void setOriginPosition(Vec2 position, float rotation) {
-        if (isFrozen()) {
-            return;
-        }
-
-        m_rotation = rotation;
-        m_R.setAngle(m_rotation);
-        m_position = m_R.mul(m_center).addLocal(position);
-
-        for (Shape s = m_shapeList; s != null; s = s.m_next) {
-            s.synchronize(m_position, m_R, m_position, m_R);
-        }
-
-        m_world.m_broadPhase.commit();
-    }
-
-    public void setCenterPosition(Vec2 position, float rotation) {
-        if (isFrozen()) {
-            return;
-        }
-
-        m_rotation = rotation;
-        m_R.setAngle(m_rotation);
-        m_position = position.clone();
-
-        for (Shape s = m_shapeList; s != null; s = s.m_next) {
-            s.synchronize(m_position, m_R, m_position, m_R);
-        }
-
-        m_world.m_broadPhase.commit();
-    }
-
-    void synchronizeShapes() {
-        Mat22 R0 = new Mat22(m_rotation0);
-        for (Shape s = m_shapeList; s != null; s = s.m_next) {
-            s.synchronize(m_position0, R0, m_position, m_R);
-        }
-    }
-    
-    public void quickSyncShapes() {
-        for (Shape s = m_shapeList; s != null; s = s.m_next) {
-            s.quickSync(m_position, m_R);
-        }
-    }
-
-    public void freeze() {
-        m_flags |= e_frozenFlag;
-        m_linearVelocity.setZero();
-        m_angularVelocity = 0.0f;
-        for (Shape s = m_shapeList; s != null; s = s.m_next) {
-            s.destroyProxy();
-        }
-    }
-
-    public void wakeUp() {
-        m_flags &= ~e_sleepFlag;
-        m_sleepTime = 0.0f;
-    }
-
-    public boolean isConnected(Body other) {
-        for (JointNode jn = m_jointList; jn != null; jn = jn.next) {
-            if (jn.other == other)
-                return jn.joint.m_collideConnected == false;
-        }
-
-        return false;
-    }
+	
+	//m_flags
+	public static final int e_frozenFlag = 0x0002;
+	public static final int e_islandFlag = 0x0004;
+	public static final int e_sleepFlag = 0x0008;
+	public static final int e_allowSleepFlag = 0x0010;
+	public static final int e_bulletFlag = 0x0020;
+	public static final int e_fixedRotationFlag = 0x0040;
+	public int m_flags;
+
+	//m_type
+	public static final int e_staticType = 0;
+	public static final int e_dynamicType = 1;
+	public static final int e_maxTypes = 2;
+	public int m_type;
+	
+	public XForm m_xf; // the body origin transform
+	
+	public Sweep m_sweep; // the swept motion for CCD 
+	
+	public Vec2 m_linearVelocity;
+	public float m_angularVelocity;
+	
+	public Vec2 m_force;
+	public float m_torque;
+
+	public World m_world;
+	public Body m_prev;
+	public Body m_next;
+
+	public Shape m_shapeList;
+	public int m_shapeCount;
+
+	public JointNode m_jointList;
+	public ContactNode m_contactList;
+
+	public float m_mass, m_invMass;
+	public float m_I, m_invI;
+
+	public float m_linearDamping;
+	public float m_angularDamping;
+
+	public float m_sleepTime;
+
+	public Object m_userData;
+
+	public Body(BodyDef bd, int type, World world) {
+		assert(world.m_lock == false);
+		assert(type < e_maxTypes);
+		
+		m_flags = 0;
+		
+		if (bd.isBullet) m_flags |= e_bulletFlag;
+		if (bd.fixedRotation) m_flags |= e_fixedRotationFlag;
+		if (bd.allowSleep) m_flags |= e_allowSleepFlag;
+		if (bd.isSleeping) m_flags |= e_sleepFlag;
+		
+		m_type = type;
+		
+		m_world = world;
+		
+		m_xf = new XForm();
+		m_xf.position.set(bd.position);
+		m_xf.R.set(bd.angle);
+		
+		m_sweep = new Sweep();
+		m_sweep.localCenter.set(bd.massData.center);
+		m_sweep.t0 = 1.0f;
+		m_sweep.a0 = m_sweep.a = bd.angle;
+		m_sweep.c.set(XForm.mul(m_xf, m_sweep.localCenter));
+		m_sweep.c0.set(m_sweep.c);
+		
+		m_jointList = null;
+		m_contactList = null;
+		m_prev = null;
+		m_next = null;
+		
+		m_linearDamping = bd.linearDamping;
+		m_angularDamping = bd.angularDamping;
+		
+		m_force = new Vec2(0.0f, 0.0f);
+		m_torque = 0.0f;
+		
+		m_linearVelocity = new Vec2(0.0f, 0.0f);
+		m_angularVelocity = 0.0f;
+		
+		m_sleepTime = 0.0f;
+		
+		m_mass = 0.0f;
+		m_invMass = 0.0f;
+		m_I = 0.0f;
+		m_invI = 0.0f;
+		
+		if (m_type == e_dynamicType) {
+			m_mass = bd.massData.mass;
+		}
+		
+		if (m_mass > 0.0f) {
+			m_invMass = 1.0f / m_mass;
+		}
+		
+		if ((m_flags & Body.e_fixedRotationFlag) == 0 &&
+				m_type == e_dynamicType) {
+			m_I = bd.massData.I;
+		}
+		
+		if (m_I > 0.0f) {
+			m_invI = 1.0f / m_I;
+		}
+		
+		m_userData = bd.userData;
+		
+		m_shapeList = null;
+		m_shapeCount = 0;
+		
+	}
+
+	/// Creates a shape and attach it to this body.
+	/// @param shapeDef the shape definition.
+	/// @warning This function is locked during callbacks.
+	public Shape createShape(ShapeDef def){
+		assert(m_world.m_lock == false);
+
+		if (m_world.m_lock == true){
+			return null;
+		}
+
+		Shape s = Shape.create(def);
+
+		s.m_next = m_shapeList;
+		m_shapeList = s;
+		++m_shapeCount;
+
+		s.m_body = this;
+
+		// Add the shape to the world's broad-phase.
+		s.createProxy(m_world.m_broadPhase, m_xf);
+
+		// Compute the sweep radius for CCD.
+		s.updateSweepRadius(m_sweep.localCenter);
+
+		return s;
+	}
+	
+	/// Destroy a shape. This removes the shape from the broad-phase and
+	/// therefore destroys any contacts associated with this shape. All shapes
+	/// attached to a body are implicitly destroyed when the body is destroyed.
+	/// @param shape the shape to be removed.
+	/// @warning This function is locked during callbacks.
+	public void destroyShape(Shape s){
+		assert(m_world.m_lock == false);
+		if (m_world.m_lock == true) {
+			return;
+		}
+
+		assert(s.m_body == this);
+		s.destroyProxy(m_world.m_broadPhase);
+
+		assert(m_shapeCount > 0);
+		
+		// Remove s from linked list, fix up connections
+		// TODO: verify that this works right
+		Shape node = m_shapeList;
+		Shape prevNode = null;
+		boolean found = false;
+		while (node != null) {
+			if (node == s) {
+				if (prevNode == null) {
+					m_shapeList = s.m_next;
+					found = true;
+					break;
+				} else {
+					prevNode.m_next = s.m_next;
+					found = true;
+					break;
+				}
+			}
+			prevNode = node;
+			node = node.m_next;
+		}
+		/*
+		Shape** node = &m_shapeList;
+		boolean found = false;
+		while (*node != NULL)
+		{
+			if (*node == s)
+			{
+				*node = s->m_next;
+				found = true;
+				break;
+			}
+
+			node = &(*node)->m_next;
+		}
+		*/
+
+		// You tried to remove a shape that is not attached to this body.
+		assert(found);
+
+		s.m_body = null;
+		s.m_next = null;
+
+		--m_shapeCount;
+		Shape.destroy(s);
+	}
+	
+	/// Set the mass properties. Note that this changes the center of mass position.
+	/// If you are not sure how to compute mass properties, use SetMassFromShapes.
+	/// The inertia tensor is assumed to be relative to the center of mass.
+	/// @param massData the mass properties.
+	public void setMass(MassData massData){
+		assert(m_world.m_lock == false);
+		if (m_world.m_lock == true) return;
+		
+		if (m_type == e_staticType) return;
+		
+		m_mass = 0.0f;
+		m_invMass = 0.0f;
+		m_I = 0.0f;
+		m_invI = 0.0f;
+		
+		m_mass = massData.mass;
+		
+		if (m_mass > 0.0f) {
+			m_invMass = 1.0f / m_mass;
+		}
+		
+		if ((m_flags & Body.e_fixedRotationFlag) == 0) {
+			m_I = massData.I;
+		}
+		
+		if (m_I > 0.0f) {
+			m_invI = 1.0f / m_I;
+		}
+		
+		// Move center of mass.
+		m_sweep.localCenter = massData.center;
+		m_sweep.c.set(XForm.mul(m_xf, m_sweep.localCenter));
+		m_sweep.c0.set(m_sweep.c);
+		
+		// Update the sweep radii of all child shapes
+		for (Shape s = m_shapeList; s != null; s = s.m_next) {
+			s.updateSweepRadius(m_sweep.localCenter);
+		}
+	}
+
+	/// Compute the mass properties from the attached shapes. You typically call this
+	/// after adding all the shapes. If you add or remove shapes later, you may want
+	/// to call this again. Note that this changes the center of mass position.
+	public void setMassFromShapes(){
+		assert(m_world.m_lock == false);
+		if (m_world.m_lock == true) return;
+		if (m_type == e_staticType) return;
+		
+		// Compute mass data from shapes.  Each shape has its own density.
+		m_mass = 0.0f;
+		m_invMass = 0.0f;
+		m_I = 0.0f;
+		m_invI = 0.0f;
+		
+		Vec2 center = new Vec2(0.0f, 0.0f);
+		for (Shape s = m_shapeList; s != null; s = s.m_next) {
+			MassData massData = new MassData();
+			s.computeMass(massData);
+			m_mass += massData.mass;
+			center.x += massData.mass * massData.center.x;
+			center.y += massData.mass * massData.center.y;
+			m_I += massData.I;
+		}
+		
+		// Compute center of mass, and shift the origin to the COM
+		if (m_mass > 0.0f) {
+			m_invMass = 1.0f / m_mass;
+			center.x *= m_invMass;
+			center.y *= m_invMass;
+		} else {
+			m_invMass = 0.0f;
+			m_invI = 0.0f;
+		}
+		
+		if (m_I > 0.0f && (m_flags & e_fixedRotationFlag) == 0) {
+			// Center the inertia about the center of mass
+			m_I -= m_mass * Vec2.dot(center, center);
+			assert(m_I > 0.0f);
+			m_invI = 1.0f / m_I;
+		} else {
+			m_I = 0.0f;
+			m_invI = 0.0f;
+		}
+		
+		// Move center of mass
+		m_sweep.localCenter.set(center);
+		m_sweep.c.set(XForm.mul(m_xf, m_sweep.localCenter));
+		m_sweep.c0.set(m_sweep.c);
+		
+		// Update the sweep radii of all child shapes
+		for (Shape s = m_shapeList; s != null; s = s.m_next) {
+			s.updateSweepRadius(m_sweep.localCenter);
+		}
+	}
+	
+	/// Set the position of the body's origin and rotation (radians).
+	/// This breaks any contacts and wakes the other bodies.
+	/// @param position the new world position of the body's origin (not necessarily
+	/// the center of mass).
+	/// @param angle the new world rotation angle of the body in radians.
+	/// @return false if the movement put a shape outside the world. In this case the
+	/// body is automatically frozen.
+	public boolean setXForm(Vec2 position, float angle){
+		assert(m_world.m_lock == false);
+		if (m_world.m_lock == true) return true;
+		if (isFrozen())	return false;
+
+		m_xf.R.set(angle);
+		m_xf.position.set(position);
+
+		m_sweep.c.set(XForm.mul(m_xf, m_sweep.localCenter));
+		m_sweep.c0.set(m_sweep.c);
+		m_sweep.a0 = m_sweep.a = angle;
+
+		boolean freeze = false;
+
+		for (Shape s = m_shapeList; s != null; s = s.m_next) {
+			boolean inRange = s.synchronize(m_world.m_broadPhase, m_xf, m_xf);
+
+			if (inRange == false) {
+				freeze = true;
+				break;
+			}
+		}
+
+		if (freeze == true) {
+			m_flags |= e_frozenFlag;
+			m_linearVelocity.setZero();
+			m_angularVelocity = 0.0f;
+			for (Shape s = m_shapeList; s != null; s = s.m_next) {
+				s.destroyProxy(m_world.m_broadPhase);
+			}
+
+			// Failure
+			return false;
+		}
+
+		// Success
+		m_world.m_broadPhase.commit();
+
+		return true;
+	}
+	
+	/// Get the body transform for the body's origin.
+	/// @return the world transform of the body's origin.
+	public XForm getXForm(){
+		return m_xf;
+	}
+
+	/// Get the world body origin position.
+	/// @return the world position of the body's origin.
+	public Vec2 getPosition(){
+		return m_xf.position;
+	}
+
+	/// Get the angle in radians.
+	/// @return the current world rotation angle in radians.
+	public float getAngle(){
+		return m_sweep.a;
+	}
+
+	/// Get the world position of the center of mass.
+	public Vec2 getWorldCenter(){
+		return m_sweep.c;
+	}
+
+	/// Get the local position of the center of mass.
+	public Vec2 getLocalCenter(){
+		return m_sweep.localCenter;
+	}
+
+	/// Set the linear velocity of the center of mass.
+	/// @param v the new linear velocity of the center of mass.
+	public void setLinearVelocity(Vec2 v){
+		m_linearVelocity.set(v);
+	}
+
+	/// Get the linear velocity of the center of mass.
+	/// @return the linear velocity of the center of mass.
+	public Vec2 getLinearVelocity(){
+		//FIXME?: C++ version returns const vector, should we copy?
+		return m_linearVelocity;
+	}
+
+	/// Set the angular velocity.
+	/// @param omega the new angular velocity in radians/second.
+	public void setAngularVelocity(float omega){
+		m_angularVelocity = omega;
+	}
+
+	/// Get the angular velocity.
+	/// @return the angular velocity in radians/second.
+	public float getAngularVelocity(){
+		return m_angularVelocity;
+	}
+
+	/// Apply a force at a world point. If the force is not
+	/// applied at the center of mass, it will generate a torque and
+	/// affect the angular velocity. This wakes up the body.
+	/// @param force the world force vector, usually in Newtons (N).
+	/// @param point the world position of the point of application.
+	public void applyForce(Vec2 force, Vec2 point){
+		if (isSleeping()) wakeUp();
+		m_force.addLocal(force);
+		m_torque += Vec2.cross(point.sub(m_sweep.c), force);
+	}
+
+	/// Apply a torque. This affects the angular velocity
+	/// without affecting the linear velocity of the center of mass.
+	/// This wakes up the body.
+	/// @param torque about the z-axis (out of the screen), usually in N-m.
+	public void applyTorque(float torque){
+		if (isSleeping()) wakeUp();
+		m_torque += torque;
+	}
+
+	/// Apply an impulse at a point. This immediately modifies the velocity.
+	/// It also modifies the angular velocity if the point of application
+	/// is not at the center of mass. This wakes up the body.
+	/// @param impulse the world impulse vector, usually in N-seconds or kg-m/s.
+	/// @param point the world position of the point of application.
+	public void applyImpulse(Vec2 impulse, Vec2 point){
+		if (isSleeping()) wakeUp();
+		m_linearVelocity.x += m_invMass * impulse.x;
+		m_linearVelocity.y += m_invMass * impulse.y;
+		m_angularVelocity += m_invI * Vec2.cross(point.sub(m_sweep.c), impulse);
+	}
+
+	/// Get the total mass of the body.
+	/// @return the mass, usually in kilograms (kg).
+	public float getMass(){
+		return m_mass;
+	}
+
+	/// Get the central rotational inertia of the body.
+	/// @return the rotational inertia, usually in kg-m^2.
+	public float getInertia(){
+		return m_I;
+	}
+
+	/// Get the world coordinates of a point given the local coordinates.
+	/// @param localPoint a point on the body measured relative the the body's origin.
+	/// @return the same point expressed in world coordinates.
+	public Vec2 getWorldPoint(Vec2 localPoint){
+		return XForm.mul(m_xf, localPoint);
+	}
+
+	/// Get the world coordinates of a vector given the local coordinates.
+	/// @param localVector a vector fixed in the body.
+	/// @return the same vector expressed in world coordinates.
+	public Vec2 getWorldVector(Vec2 localVector){
+		return Mat22.mul(m_xf.R, localVector);
+	}
+
+	/// Gets a local point relative to the body's origin given a world point.
+	/// @param a point in world coordinates.
+	/// @return the corresponding local point relative to the body's origin.
+	public Vec2 getLocalPoint(Vec2 worldPoint){
+		return XForm.mulT(m_xf, worldPoint);
+	}
+
+	/// Gets a local vector given a world vector.
+	/// @param a vector in world coordinates.
+	/// @return the corresponding local vector.
+	public Vec2 getLocalVector(Vec2 worldVector){
+		return Mat22.mulT(m_xf.R, worldVector);
+	}
+
+	/// Is this body treated like a bullet for continuous collision detection?
+	public boolean isBullet(){
+		return (m_flags & e_bulletFlag) == e_bulletFlag;
+	}
+
+	/// Should this body be treated like a bullet for continuous collision detection?
+	public void setBullet(boolean flag){
+		if (flag) {
+			m_flags |= e_bulletFlag;
+		} else {
+			m_flags &= ~e_bulletFlag;
+		}
+	}
+
+	/// Is this body static (immovable)?
+	public boolean isStatic(){
+		return m_type == e_staticType;
+	}
+
+	/// Is this body dynamic (movable)?
+	public boolean isDynamic(){
+		return m_type == e_dynamicType;
+	}
+
+	/// Is this body frozen?
+	public boolean isFrozen(){
+		return (m_flags & e_frozenFlag) == e_frozenFlag;
+	}
+
+	/// Is this body sleeping (not simulating).
+	public boolean isSleeping(){
+		return (m_flags & e_sleepFlag) == e_sleepFlag;
+	}
+
+	/// You can disable sleeping on this body.
+	public void allowSleeping(boolean flag){
+		if (flag) {
+			m_flags |= e_allowSleepFlag;
+		} else {
+			m_flags &= ~e_allowSleepFlag;
+			wakeUp();
+		}
+	}
+
+	/// Wake up this body so it will begin simulating.
+	public void wakeUp(){
+		m_flags &= ~e_sleepFlag;
+		m_sleepTime = 0.0f;
+	}
+
+	/// Get the list of all shapes attached to this body.
+	/// [returns first shape in linked list]
+	public Shape getShapeList(){
+		return m_shapeList;
+	}
+
+	/// Get the list of all joints attached to this body.
+	public JointEdge getJointList(){
+		return m_jointList;
+	}
+
+	/// Get the list of all contacts attached to this body.
+	public ContactEdge getContactList(){
+		return m_contactList;
+	}
+
+	/// Get the next body in the world's body list.
+	public Body getNext(){
+		return m_next;
+	}
+
+	/// Get the user data pointer that was provided in the body definition.
+	public Object getUserData(){
+		return m_userData;
+	}
+	
+	/* INTERNALS BELOW */
+
+	public void computeMass(){
+		
+	}
+
+	public boolean synchronizeShapes(){
+		XForm xf1 = new XForm();
+		xf1.R.set(m_sweep.a0);
+		xf1.position.set(m_sweep.c0.sub(Mat22.mul(xf1.R, m_sweep.localCenter)));
+		
+		boolean inRange = true;
+		for (Shape s = m_shapeList; s != null; s = s.m_next) {
+			inRange = s.synchronize(m_world.m_broadPhase, xf1, m_xf);
+			if (inRange == false) break;
+		}
+		
+		if (inRange == false) {
+			m_flags |= e_frozenFlag;
+			m_linearVelocity.setZero();
+			m_angularVelocity = 0.0f;
+			for (Shape s = m_shapeList; s != null; s = s.m_next) {
+				s.destroyProxy(m_world.m_broadPhase);
+			}
+			
+			// Failure
+			return false;
+		}
+		
+		// Success
+		return true;
+	}
+
+	public void synchronizeTransform(){
+		m_xf.R.set(m_sweep.a);
+		m_xf.position.set(m_sweep.c.sub(Mat22.mul(m_xf.R,m_sweep.localCenter)));
+	}
+
+	// This is used to prevent connected bodies from colliding.
+	// It may lie, depending on the collideConnected flag.
+	public boolean isConnected(Body other){
+		for (JointEdge jn = m_jointList; jn != null; jn = jn.next) {
+			if (jn.other == other) {
+				return (jn.joint.m_collideConnected == false);
+			}
+		}
+		return false;
+	}
+
+	public void advance(float t){
+		// Advance to the new safe time
+		m_sweep.advance(t);
+		m_sweep.c = m_sweep.c0;
+		m_sweep.a = m_sweep.a0;
+		synchronizeTransform();
+	}
+	
 }
+

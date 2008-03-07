@@ -35,9 +35,12 @@ import org.jbox2d.dynamics.joints.JointNode;
 
 
 
-//Updated to rev 56 of b2World.cpp/.h
+//Updated to rev 56->118 of b2World.cpp/.h
+[CURRENTLY WORKING ON THIS FILE]
 
 public class World {
+	public boolean m_lock;
+	
     public BroadPhase m_broadPhase;
 
     ContactManager m_contactManager;
@@ -72,6 +75,15 @@ public class World {
 
     public static boolean ENABLE_WARM_STARTING;
 
+    public static boolean ENABLE_TOI;
+    
+	public DestructionListener m_destructionListener;
+	public BoundaryListener m_boundaryListener;
+	public ContactFilter m_contactFilter;
+	public ContactListener m_contactListener;
+	public DebugDraw m_debugDraw;
+
+
     public Body getGroundBody() {
         return m_groundBody;
     }
@@ -88,7 +100,11 @@ public class World {
         return m_contactList;
     }
 
-    public World(AABB worldAABB, Vec2 gravity, boolean doSleep) {
+    /// Construct a world object.
+	/// @param worldAABB a bounding box that completely encompasses all your shapes.
+	/// @param gravity the world gravity vector.
+	/// @param doSleep improve performance by not simulating inactive bodies.
+	public World(AABB worldAABB, Vec2 gravity, boolean doSleep) {
         m_listener = null;
         m_filter = CollisionFilter.DEFAULT_FILTER;
 
@@ -316,7 +332,7 @@ public class World {
     public void step(float dt, int iterations) {
         TimeStep step = new TimeStep();
         step.dt = dt;
-        step.iterations = iterations;
+        step.maxIterations = iterations;
         if (dt > 0.0f) {
             step.inv_dt = 1.0f / dt;
         }
@@ -475,4 +491,92 @@ public class World {
 
         return ret;
     }
+    
+    
+  /// Register a destruction listener.
+	public void setListener(DestructionListener listener);
+
+	/// Register a broad-phase boundary listener.
+	public void setListener(BoundaryListener listener);
+
+	/// Register a contact filter to provide specific control over collision.
+	/// Otherwise the default filter is used (b2_defaultFilter).
+	public void setFilter(ContactFilter filter);
+
+	/// Register a contact event listener
+	public void setListener(ContactListener listener);
+
+	/// Register a routine for debug drawing. The debug draw functions are called
+	/// inside the b2World::Step method, so make sure your renderer is ready to
+	/// consume draw commands when you call Step().
+	public void SetDebugDraw(DebugDraw debugDraw);
+
+	/// Create a static rigid body given a definition. No reference to the definition
+	/// is retained.
+	/// @warning This function is locked during callbacks.
+	public Body createStaticBody(BodyDef def);
+
+	/// Create a dynamic rigid body given a definition. No reference to the definition
+	/// is retained.
+	/// @warning This function is locked during callbacks.
+	public Body createDynamicBody(BodyDef def);
+
+	/// Destroy a rigid body given a definition. No reference to the definition
+	/// is retained. This function is locked during callbacks.
+	/// @warning This automatically deletes all associated shapes and joints.
+	/// @warning This function is locked during callbacks.
+	public void destroyBody(Body body);
+
+	/// Create a joint to constrain bodies together. No reference to the definition
+	/// is retained. This may cause the connected bodies to cease colliding.
+	/// @warning This function is locked during callbacks.
+	public Joint createJoint(JointDef def);
+
+	/// Destroy a joint. This may cause the connected bodies to begin colliding.
+	/// @warning This function is locked during callbacks.
+	public void destroyJoint(Joint joint);
+
+	/// The world provides a single static ground body with no collision shapes.
+	/// You can use this to simplify the creation of joints and static shapes.
+	public Body getGroundBody();
+
+	/// Take a time step. This performs collision detection, integration,
+	/// and constraint solution.
+	/// @param timeStep the amount of time to simulate, this should not vary.
+	/// @param iterations the number of iterations to be used by the constraint solver.
+	public void step(float timeStep, int iterations);
+
+	/// Query the world for all shapes that potentially overlap the
+	/// provided AABB. You provide a shape pointer buffer of specified
+	/// size. The number of shapes found is returned.
+	/// @param aabb the query box.
+	/// @param maxCount the capacity of the shapes array.
+	/// @return array of shapes overlapped, up to maxCount in length
+	public Shape[] query(AABB aabb, int maxCount);
+
+	/// Get the world body list. With the returned body, use b2Body::GetNext to get
+	/// the next body in the world list. A NULL body indicates the end of the list.
+	/// @return the head of the world body list.
+	public Body getBodyList();
+
+	/// Get the world joint list. With the returned joint, use b2Joint::GetNext to get
+	/// the next joint in the world list. A NULL joint indicates the end of the list.
+	/// @return the head of the world joint list.
+	public Joint GetJointList();
+
+	//--------------- Internals Below -------------------
+	// Internal yet public to make life easier.
+	
+	// Java note: sorry, guys, we have to keep this stuff public until
+	// the C++ version does otherwise so that we can maintain the engine...
+
+	public void solve(TimeStep step);
+	public void solveTOI(TimeStep step);
+
+	public void drawJoint(Joint joint);
+	public void drawShape(Shape shape, XForm xf, Color color, boolean core);
+	public void drawDebugData();
+
+
+    
 }

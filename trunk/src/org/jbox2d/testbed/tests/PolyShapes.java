@@ -26,7 +26,7 @@ import java.util.Random;
 
 import org.jbox2d.collision.BoxDef;
 import org.jbox2d.collision.CircleDef;
-import org.jbox2d.collision.PolyDef;
+import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.collision.ShapeDef;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -72,8 +72,8 @@ public class PolyShapes extends PTest {
             world.createBody(bd);
         }
 
-        sds[0] = new PolyDef();
-        PolyDef poly = (PolyDef) sds[0];
+        sds[0] = new PolygonDef();
+        PolygonDef poly = (PolygonDef) sds[0];
         // sds[0].poly.m_vertexCount = 3;
         poly.vertices.add(new Vec2(-0.5f, 0.0f));
         poly.vertices.add(new Vec2(0.5f, 0.0f));
@@ -81,8 +81,8 @@ public class PolyShapes extends PTest {
         poly.density = 1.0f;
         poly.friction = 0.3f;
 
-        sds[1] = new PolyDef();
-        PolyDef poly2 = (PolyDef) sds[1];
+        sds[1] = new PolygonDef();
+        PolygonDef poly2 = (PolygonDef) sds[1];
         // sds[1].poly.m_vertexCount = 3;
         poly2.vertices.add(new Vec2(-0.1f, 0.0f));
         poly2.vertices.add(new Vec2(0.1f, 0.0f));
@@ -97,8 +97,8 @@ public class PolyShapes extends PTest {
         circ.density = 1.0f;
         circ.friction = 0.3f;
 
-        sds[3] = new PolyDef();
-        PolyDef poly3 = (PolyDef) sds[3];
+        sds[3] = new PolygonDef();
+        PolygonDef poly3 = (PolygonDef) sds[3];
         // sds[3].poly.m_vertexCount = 4;
         poly3.vertices.add(new Vec2(-0.5f, 0.0f));
         poly3.vertices.add(new Vec2(0.5f, 0.0f));

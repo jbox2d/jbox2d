@@ -24,56 +24,66 @@ package org.jbox2d.dynamics;
 
 //Updated to rev. 56 of b2Body.h
 
-import org.jbox2d.collision.ShapeDef;
-import org.jbox2d.common.Settings;
+import org.jbox2d.collision.MassData;
 import org.jbox2d.common.Vec2;
 
 
 public class BodyDef {
-
+	
+	/// You can use this to initialized the mass properties of the body.
+	/// If you prefer, you can set the mass properties after the shapes
+	/// have been added using b2Body::SetMassFromShapes.
+	public MassData massData;
+	
+	/// Use this to store application specific body data
     public Object userData;
 
-    public ShapeDef[] shapes;
-
+    /// The world position of the body.  Avoid creating bodies at the origin
+    /// since this can lead to many overlapping shapes.
     public Vec2 position;
+    
+    /// The world angle of the body in radians.
+    public float angle;
 
-    public float rotation;
+	/// Linear damping is use to reduce the linear velocity. The damping parameter
+	/// can be larger than 1.0f but the damping effect becomes sensitive to the
+	/// time step when the damping parameter is large.
+	public float linearDamping;
 
-    public Vec2 linearVelocity;
-
-    public float angularVelocity;
-
-    public float linearDamping;
-
-    public float angularDamping;
-
+	/// Angular damping is use to reduce the angular velocity. The damping parameter
+	/// can be larger than 1.0f but the damping effect becomes sensitive to the
+	/// time step when the damping parameter is large.
+	public float angularDamping;
+	
+	/// Set this flag to false if this body should never fall asleep.  Note that
+	/// this increases CPU usage.
     public boolean allowSleep;
 
+    /// Is this body initially sleeping?
     public boolean isSleeping;
+    
+    /// Should this body be prevented from rotating?  Useful for characters.
+    public boolean fixedRotation;
 
-    public boolean preventRotation;
+	/// Is this a fast moving body that should be prevented from tunneling through
+	/// other moving bodies? Note that all bodies are prevented from tunneling through
+	/// static bodies.
+	/// @warning You should use this flag sparingly since it increases processing time.
+	public boolean isBullet;
 
-    public BodyDef() {
+	public BodyDef() {
+        massData.center = new Vec2(0.0f, 0.0f);
+        massData.mass = 0.0f;
+        massData.I = 0.0f;
         userData = null;
-        shapes = new ShapeDef[Settings.maxShapesPerBody];
         position = new Vec2(0.0f, 0.0f);
-        rotation = 0.0f;
-        linearVelocity = new Vec2(0.0f, 0.0f);
-        angularVelocity = 0.0f;
+        angle = 0.0f;
         linearDamping = 0.0f;
         angularDamping = 0.0f;
         allowSleep = true;
         isSleeping = false;
-        preventRotation = false;
+        fixedRotation = false;
+        isBullet = false;
     }
 
-    public void addShape(ShapeDef shape) {
-        for (int i = 0; i < Settings.maxShapesPerBody; ++i) {
-            if (shapes[i] == null) {
-                shapes[i] = shape;
-                // System.out.println(shape.type);
-                break;
-            }
-        }
-    }
 }

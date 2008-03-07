@@ -25,26 +25,26 @@ package org.jbox2d.collision;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 
-//Updated to rev 56 of b2Collision.h
+//Updated to rev 56->108 of b2Collision.h
 
 public class Manifold {
-    public ContactPoint[] points;
+    public ManifoldPoint[] points;
 
     public Vec2 normal;
 
     public int pointCount;
 
     public Manifold() {
-        points = new ContactPoint[Settings.maxManifoldPoints];
+        points = new ManifoldPoint[Settings.maxManifoldPoints];
         for (int i = 0; i < Settings.maxManifoldPoints; i++) {
-            points[i] = new ContactPoint();
+            points[i] = new ManifoldPoint();
         }
         normal = new Vec2();
         pointCount = 0;
     }
 
     public Manifold(Manifold other) {
-        points = new ContactPoint[Settings.maxManifoldPoints];
+        points = new ManifoldPoint[Settings.maxManifoldPoints];
         // FIXME? Need to check how C++ handles an implicit
         // copy of a Manifold, by copying the points array
         // or merely passing a pointer to it.

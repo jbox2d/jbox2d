@@ -26,8 +26,8 @@ import java.util.Random;
 
 import org.jbox2d.collision.BoxDef;
 import org.jbox2d.collision.CircleShape;
-import org.jbox2d.collision.PolyDef;
-import org.jbox2d.collision.PolyShape;
+import org.jbox2d.collision.PolygonDef;
+import org.jbox2d.collision.PolygonShape;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.collision.ShapeType;
 import org.jbox2d.common.Vec2;
@@ -48,7 +48,7 @@ public class ConvexDecomposition extends PTest {
 
     Body bodies[];
 
-    PolyDef polyprot; //PolyDef prototype
+    PolygonDef polyprot; //PolyDef prototype
     
     Polygon pgon;
 
@@ -63,7 +63,7 @@ public class ConvexDecomposition extends PTest {
     @Override
     public void go(World world) {
         bodies = new Body[256];
-        polyprot = new PolyDef();
+        polyprot = new PolygonDef();
         this.world = world;
         
         // Ground body
@@ -79,7 +79,7 @@ public class ConvexDecomposition extends PTest {
         }
 
         //Create prototype polydef
-        polyprot = new PolyDef();
+        polyprot = new PolygonDef();
         polyprot.density = 1.0f;
         polyprot.friction = 0.3f;
         polyprot.restitution = 0.2f;
@@ -131,7 +131,7 @@ public class ConvexDecomposition extends PTest {
         fill(c);
         if (shape.m_type == ShapeType.POLY_SHAPE
                 || shape.m_type == ShapeType.BOX_SHAPE) {
-            PolyShape poly = (PolyShape) shape;
+            PolygonShape poly = (PolygonShape) shape;
 
             beginShape(POLYGON);
             for (int i = 0; i < poly.m_vertexCount; ++i) {

@@ -93,6 +93,10 @@ public class Vec2 {
     public float length() {
         return (float) Math.sqrt(x * x + y * y);
     }
+    
+    public float lengthSquared() {
+    	return (x*x + y*y);
+    }
 
     public float normalize() {
         float length = length();

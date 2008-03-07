@@ -117,7 +117,7 @@ public class Island {
         }
 
         // Solve velocity constraints.
-        for (int i = 0; i < step.iterations; ++i) {
+        for (int i = 0; i < step.maxIterations; ++i) {
             contactSolver.solveVelocityConstraints();
 
             for (int j = 0; j < m_jointCount; ++j) {
@@ -147,7 +147,7 @@ public class Island {
         // Solve position constraints.
         if (World.ENABLE_POSITION_CORRECTION) {
             // System.out.println("position correcting");
-            for (m_positionIterationCount = 0; m_positionIterationCount < step.iterations; ++m_positionIterationCount) {
+            for (m_positionIterationCount = 0; m_positionIterationCount < step.maxIterations; ++m_positionIterationCount) {
                 // System.out.println(m_positionIterations);
                 boolean contactsOkay = contactSolver
                         .solvePositionConstraints(Settings.contactBaumgarte);

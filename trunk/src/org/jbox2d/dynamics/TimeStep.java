@@ -29,5 +29,5 @@ public class TimeStep {
 
     public float inv_dt; // inverse time step (0 if dt == 0).
 
-    public int iterations;
+    public int maxIterations;
 }

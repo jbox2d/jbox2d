@@ -1,13 +1,13 @@
 package org.jbox2d.util.nonconvex;
 
-import org.jbox2d.collision.PolyDef;
+import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyDef;
 
 
 public class Polygon {
 
-    public static int maxVerticesPerPolygon = org.jbox2d.common.Settings.maxPolyVertices;
+    public static int maxVerticesPerPolygon = org.jbox2d.common.Settings.maxPolygonVertices;
 
     public float[] x;
 
@@ -170,7 +170,7 @@ public class Polygon {
     /*
      * Adds this polygon to a PolyDef.
      */
-    public void addTo(PolyDef pd) {
+    public void addTo(PolygonDef pd) {
         Vec2[] vecs = getVertexVecs();
         for (int i = 0; i < vecs.length; ++i) {
             pd.vertices.add(vecs[i]);
@@ -433,10 +433,10 @@ public class Polygon {
      * This is the simplest method to add a complicated polygon to a body.
      */
     public static void decomposeConvexAndAddTo(Polygon p, BodyDef bd,
-            PolyDef prototype) {
+            PolygonDef prototype) {
         Polygon[] decomposed = decomposeConvex(p);
         for (int i = 0; i < decomposed.length; ++i) {
-            PolyDef toAdd = new PolyDef();
+            PolygonDef toAdd = new PolygonDef();
 
             // This would be better wrapped up as a clone() method
             // in the PolyDef class in case it changes...

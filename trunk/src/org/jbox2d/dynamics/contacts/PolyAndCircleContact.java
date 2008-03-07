@@ -28,7 +28,7 @@ import java.util.List;
 import org.jbox2d.collision.CircleShape;
 import org.jbox2d.collision.CollideCircle;
 import org.jbox2d.collision.Manifold;
-import org.jbox2d.collision.PolyShape;
+import org.jbox2d.collision.PolygonShape;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.collision.ShapeType;
 
@@ -95,7 +95,7 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
 
     public void evaluate() {
         // System.out.println("PolyAndCircleContact.Evaluate()");
-        CollideCircle.collidePolyAndCircle(m_manifold, (PolyShape) m_shape1,
+        CollideCircle.collidePolyAndCircle(m_manifold, (PolygonShape) m_shape1,
                 (CircleShape) m_shape2, false);
 
         if (m_manifold.pointCount > 0) {

@@ -1,0 +1,6 @@
+Todo:
+
+[ ] Convert Box2d doc format to Javadoc
+[ ] Optimize
+[ ] Slick example
+[ ] Java2d example
