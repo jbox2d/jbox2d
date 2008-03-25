@@ -26,11 +26,11 @@ import org.jbox2d.collision.MassData;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.collision.ShapeDef;
 import org.jbox2d.common.*;
-import org.jbox2d.dynamics.contacts.ContactNode;
-import org.jbox2d.dynamics.joints.JointNode;
+import org.jbox2d.dynamics.contacts.ContactEdge;
+import org.jbox2d.dynamics.joints.JointEdge;
 
 // Updated to rev. 54->118 of b2Body.cpp/.h
-// Rewritten for rev. 118 (too many changes, needed reorganization for maintainability)
+// Rewritten completely for rev. 118 (too many changes, needed reorganization for maintainability)
 
 public class Body {
 	
@@ -66,8 +66,8 @@ public class Body {
 	public Shape m_shapeList;
 	public int m_shapeCount;
 
-	public JointNode m_jointList;
-	public ContactNode m_contactList;
+	public JointEdge m_jointList;
+	public ContactEdge m_contactList;
 
 	public float m_mass, m_invMass;
 	public float m_I, m_invI;
@@ -95,6 +95,7 @@ public class Body {
 		m_world = world;
 		
 		m_xf = new XForm();
+		
 		m_xf.position.set(bd.position);
 		m_xf.R.set(bd.angle);
 		

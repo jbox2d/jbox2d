@@ -194,7 +194,7 @@ public abstract class Shape {
             return new CircleShape(def);
         }
         else if (def.type == ShapeType.BOX_SHAPE
-                || def.type == ShapeType.POLY_SHAPE) {
+                || def.type == ShapeType.POLYGON_SHAPE) {
             return new PolygonShape(def);
         }
         assert false;

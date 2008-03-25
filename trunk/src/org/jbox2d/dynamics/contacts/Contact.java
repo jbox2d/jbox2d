@@ -28,23 +28,19 @@ import java.util.List;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.collision.ShapeType;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.ContactListener;
 import org.jbox2d.dynamics.World;
 
 
 public abstract class Contact {
-    public abstract void evaluate();
 
-    public abstract List<Manifold> GetManifolds();
+	public static final int e_nonSolidFlag	= 0x0001;
+	public static final int e_slowFlag		= 0x0002;
+	public static final int e_islandFlag	= 0x0004;
+	public static final int e_toiFlag		= 0x0008;
 
-    public int GetManifoldCount() {
-        /*
-         * List<Manifold> m = GetManifolds(); if (m == null) return 0; else
-         * return GetManifolds().size();
-         */
-        return m_manifoldCount;
-    }
-
-    static List<ContactRegister> s_registers;
+	static List<ContactRegister> s_registers;
 
     static boolean s_initialized;
 
@@ -53,47 +49,66 @@ public abstract class Contact {
 
     // World pool and list pointers.
     public Contact m_prev;
-
     public Contact m_next;
 
     // Nodes for connecting bodies.
-    public ContactNode m_node1;
-
-    public ContactNode m_node2;
+    public ContactEdge m_node1;
+    public ContactEdge m_node2;
 
     public Shape m_shape1;
-
     public Shape m_shape2;
 
     // Combined friction
     public float m_friction;
-
     public float m_restitution;
 
     // public boolean m_islandFlag;
     public int m_flags;
-
-    public static final int e_islandFlag = 0x0001;
-
-    public static final int e_destroyFlag = 0x0002;
-
     public int m_manifoldCount;
+    
+    public float m_toi;
+	
+    public abstract void evaluate(ContactListener listener);
+    
+	/// Get the manifold array.
+    public abstract List<Manifold> getManifolds();
 
+    /// Get the number of manifolds. This is 0 or 1 between convex shapes.
+	/// This may be greater than 1 for convex-vs-concave shapes. Each
+	/// manifold holds up to two contact points with a shared contact normal.
+    public int getManifoldCount() {
+        /*
+         * List<Manifold> m = GetManifolds(); if (m == null) return 0; else
+         * return GetManifolds().size();
+         */
+        return m_manifoldCount;
+    }
+    
+    public boolean isSolid() {
+    	return (m_flags & e_nonSolidFlag) == 0;
+    }
+	
+    
+	
     public Contact() {
-        m_node1 = new ContactNode();
-        m_node2 = new ContactNode();
+        m_node1 = new ContactEdge();
+        m_node2 = new ContactEdge();
     }
 
     public Contact(Shape s1, Shape s2) {
         this();
 
         m_flags = 0;
-
+        
+        if (s1.isSensor() || s2.isSensor()) {
+    		m_flags |= e_nonSolidFlag;
+    	}
+        
         m_shape1 = s1;
         m_shape2 = s2;
 
         m_manifoldCount = 0;
-        GetManifolds().clear();
+        getManifolds().clear();
 
         m_friction = (float) Math.sqrt(m_shape1.m_friction
                 * m_shape2.m_friction);
@@ -129,9 +144,9 @@ public abstract class Contact {
         s_registers = new ArrayList<ContactRegister>();
         addType(new CircleContact(), ShapeType.CIRCLE_SHAPE,
                 ShapeType.CIRCLE_SHAPE);
-        addType(new PolyAndCircleContact(), ShapeType.POLY_SHAPE,
+        addType(new PolyAndCircleContact(), ShapeType.POLYGON_SHAPE,
                 ShapeType.CIRCLE_SHAPE);
-        addType(new PolyContact(), ShapeType.POLY_SHAPE, ShapeType.POLY_SHAPE);
+        addType(new PolyContact(), ShapeType.POLYGON_SHAPE, ShapeType.POLYGON_SHAPE);
         // AddType(new PolyContact(), ShapeType.BOX_SHAPE, ShapeType.BOX_SHAPE);
     }
 
@@ -154,6 +169,10 @@ public abstract class Contact {
         }
     }
 
+    /* Java note:
+     * This function is called "create" in C++ version.
+     * Doing this in Java causes problems, so leave it as is.
+     */
     public static Contact createContact(Shape shape1, Shape shape2) {
         if (s_initialized == false) {
             initializeRegisters();
@@ -174,8 +193,8 @@ public abstract class Contact {
             }
             else {
                 Contact c = register.createFcn.create(shape2, shape1);
-                for (int i = 0; i < c.GetManifoldCount(); ++i) {
-                    Manifold m = c.GetManifolds().get(i);
+                for (int i = 0; i < c.getManifoldCount(); ++i) {
+                    Manifold m = c.getManifolds().get(i);
                     m.normal.negateLocal();
                 }
                 return c;
@@ -200,10 +219,31 @@ public abstract class Contact {
     public static void destroy(Contact contact) {
         assert (s_initialized == true);
 
-        if (contact.GetManifoldCount() > 0) {
-            contact.m_shape1.m_body.wakeUp();
-            contact.m_shape2.m_body.wakeUp();
+        if (contact.getManifoldCount() > 0) {
+            contact.getShape1().getBody().wakeUp();
+            contact.getShape2().getBody().wakeUp();
         }
+    }
+    
+    public void update(ContactListener listener) {
+    	int oldCount = getManifoldCount();
+    	evaluate(listener);
+    	int newCount = getManifoldCount();
+
+    	Body body1 = m_shape1.getBody();
+    	Body body2 = m_shape2.getBody();
+    	
+    	if (newCount == 0 && oldCount > 0) {
+    		body1.wakeUp();
+    		body2.wakeUp();
+    	}
+
+    	// Slow contacts don't generate TOI events.
+    	if (body1.isStatic() || body1.isBullet() || body2.isStatic() || body2.isBullet()) {
+    		m_flags &= ~e_slowFlag;
+    	} else {
+    		m_flags |= e_slowFlag;
+    	}
     }
 
     public abstract Contact clone();

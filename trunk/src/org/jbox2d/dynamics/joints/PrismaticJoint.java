@@ -22,6 +22,7 @@
  */
 package org.jbox2d.dynamics.joints;
 
+import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
@@ -30,7 +31,7 @@ import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.World;
 
 
-//Updated to rev 56 of b2PrismaticJoint.cpp/.h
+//Updated to rev 56->130 of b2PrismaticJoint.cpp/.h
 
 //Linear constraint (point-to-line)
 //d = p2 - p1 = x2 + r2 - x1 - r1
@@ -44,111 +45,87 @@ import org.jbox2d.dynamics.World;
 //Cdot = w2 - w1
 //J = [0 0 -1 0 0 1]
 
+/// A prismatic joint. This joint provides one degree of freedom: translation
+/// along an axis fixed in body1. Relative rotation is prevented. You can
+/// use a joint limit to restrict the range of motion and a joint motor to
+/// drive the motion or to model joint friction.
+
 public class PrismaticJoint extends Joint {
 
-    Vec2 m_localAnchor1;
+	public Vec2 m_localAnchor1;
+	public Vec2 m_localAnchor2;
+	public Vec2 m_localXAxis1;
+	public Vec2 m_localYAxis1;
+	public float m_refAngle;
 
-    Vec2 m_localAnchor2;
+	public Jacobian m_linearJacobian;
+	public float m_linearMass;				// effective mass for point-to-line constraint.
+	public float m_force;
+	
+	public float m_angularMass;			// effective mass for angular constraint.
+	public float m_torque;
 
-    Vec2 m_localXAxis1;
+	public Jacobian m_motorJacobian;
+	public float m_motorMass;			// effective mass for motor/limit translational constraint.
+	public float m_motorForce;
+	public float m_limitForce;
+	public float m_limitPositionImpulse;
 
-    Vec2 m_localYAxis1;
+	public float m_lowerTranslation;
+	public float m_upperTranslation;
+	public float m_maxMotorForce;
+	public float m_motorSpeed;
+	
+	public boolean m_enableLimit;
+	public boolean m_enableMotor;
+	public LimitState m_limitState;
 
-    float m_initialAngle;
+    public PrismaticJoint(PrismaticJointDef def) {
+        super(def);
+        m_localAnchor1 = def.localAnchor1.clone();
+    	m_localAnchor2 = def.localAnchor2.clone();
+    	m_localXAxis1 = def.localAxis1.clone();
+    	m_localYAxis1 = Vec2.cross(1.0f, m_localXAxis1);
+    	m_refAngle = def.referenceAngle;
 
-    Jacobian m_linearJacobian;
+    	m_linearJacobian = new Jacobian();
+    	m_linearJacobian.setZero();
+    	m_linearMass = 0.0f;
+    	m_force = 0.0f;
 
-    float m_linearMass; // effective mass for point-to-line constraint.
+    	m_angularMass = 0.0f;
+    	m_torque = 0.0f;
 
-    float m_linearImpulse;
+    	m_motorJacobian = new Jacobian();
+    	m_motorJacobian.setZero();
+    	m_motorMass = 0.0f;
+    	m_motorForce = 0.0f;
+    	m_limitForce = 0.0f;
+    	m_limitPositionImpulse = 0.0f;
 
-    float m_angularMass; // effective mass for angular constraint.
-
-    float m_angularImpulse;
-
-    Jacobian m_motorJacobian;
-
-    float m_motorMass; // effective mass for motor/limit translational
-
-    // constraint.
-    float m_motorImpulse;
-
-    float m_limitImpulse;
-
-    float m_limitPositionImpulse;
-
-    public float m_lowerTranslation;
-
-    public float m_upperTranslation;
-
-    public float m_maxMotorForce;
-
-    public float m_motorSpeed;
-
-    public boolean m_enableLimit;
-
-    public boolean m_enableMotor;
-
-    LimitState m_limitState;
-
-    public PrismaticJoint(PrismaticJointDef description) {
-        super(description);
-        m_localAnchor1 = m_body1.m_R.mulT(description.anchorPoint
-                .sub(m_body1.m_position));
-        m_localAnchor2 = m_body2.m_R.mulT(description.anchorPoint
-                .sub(m_body2.m_position));
-        m_localXAxis1 = m_body1.m_R.mulT(description.axis);
-        m_localYAxis1 = Vec2.cross(1.0f, m_localXAxis1);
-        m_initialAngle = m_body2.m_rotation - m_body1.m_rotation;
-
-        m_linearJacobian = new Jacobian();
-        m_linearMass = 0.0f;
-        m_linearImpulse = 0.0f;
-
-        m_angularMass = 0.0f;
-        m_angularImpulse = 0.0f;
-
-        m_motorJacobian = new Jacobian();
-        m_motorMass = 0.0f;
-        m_motorImpulse = 0.0f;
-        m_limitImpulse = 0.0f;
-        m_limitPositionImpulse = 0.0f;
-
-        m_lowerTranslation = description.lowerTranslation;
-        m_upperTranslation = description.upperTranslation;
-        m_maxMotorForce = description.motorForce;
-        m_motorSpeed = description.motorSpeed;
-        m_enableLimit = description.enableLimit;
-        m_enableMotor = description.enableMotor;
+    	m_lowerTranslation = def.lowerTranslation;
+    	m_upperTranslation = def.upperTranslation;
+    	m_maxMotorForce = def.maxMotorForce;
+    	m_motorSpeed = def.motorSpeed;
+    	m_enableLimit = def.enableLimit;
+    	m_enableMotor = def.enableMotor;
     }
 
-    @Override
-    public Vec2 getAnchor1() {
-        Body b1 = m_body1;
-        return b1.m_R.mul(m_localAnchor1).addLocal(b1.m_position);
-    }
-
-    @Override
-    public Vec2 getAnchor2() {
-        Body b2 = m_body2;
-        return b2.m_R.mul(m_localAnchor2).addLocal(b2.m_position);
-    }
-
-    public void prepareVelocitySolver() {
+    public void initVelocityConstraints(TimeStep step) {
         Body b1 = m_body1;
         Body b2 = m_body2;
 
         // Compute the effective masses.
-        Vec2 r1 = b1.m_R.mul(m_localAnchor1);
-        Vec2 r2 = b2.m_R.mul(m_localAnchor2);
+        Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
+    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
 
         float invMass1 = b1.m_invMass, invMass2 = b2.m_invMass;
         float invI1 = b1.m_invI, invI2 = b2.m_invI;
 
         // Compute point to line constraint effective mass.
         // J = [-ay1 -cross(d+r1,ay1) ay1 cross(r2,ay1)]
-        Vec2 ay1 = b1.m_R.mul(m_localYAxis1);
-        Vec2 e = b2.m_position.clone().addLocal(r2).subLocal(b1.m_position);
+        Vec2 ay1 = Mat22.mul(b1.m_xf.R, m_localYAxis1);
+    	Vec2 e = b2.m_sweep.c.add(r2).subLocal(b1.m_sweep.c);	// e = d + r1
 
         m_linearJacobian.set(ay1.negate(), -Vec2.cross(e, ay1), ay1, Vec2
                 .cross(r2, ay1));
@@ -161,12 +138,16 @@ public class PrismaticJoint extends Joint {
         m_linearMass = 1.0f / m_linearMass;
 
         // Compute angular constraint effective mass.
-        m_angularMass = 1.0f / (invI1 + invI2);
+        m_angularMass = invI1 + invI2;
+    	if (m_angularMass > Settings.EPSILON) {
+    		m_angularMass = 1.0f / m_angularMass;
+    	}
 
         // Compute motor and limit terms.
         if (m_enableLimit || m_enableMotor) {
             // The motor and limit share a Jacobian and effective mass.
-            Vec2 ax1 = b1.m_R.mul(m_localXAxis1);
+        	Vec2 ax1 = Mat22.mul(b1.m_xf.R, m_localXAxis1);
+    		
             m_motorJacobian.set(ax1.negate(), -Vec2.cross(e, ax1), ax1, Vec2
                     .cross(r2, ax1));
             m_motorMass = invMass1 + invI1 * m_motorJacobian.angular1
@@ -184,54 +165,51 @@ public class PrismaticJoint extends Joint {
                 }
                 else if (jointTranslation <= m_lowerTranslation) {
                     if (m_limitState != LimitState.AT_LOWER_LIMIT) {
-                        m_limitImpulse = 0.0f;
+                        m_limitForce = 0.0f;
                     }
                     m_limitState = LimitState.AT_LOWER_LIMIT;
                 }
                 else if (jointTranslation >= m_upperTranslation) {
                     if (m_limitState != LimitState.AT_UPPER_LIMIT) {
-                        m_limitImpulse = 0.0f;
+                        m_limitForce = 0.0f;
                     }
                     m_limitState = LimitState.AT_UPPER_LIMIT;
                 }
                 else {
                     m_limitState = LimitState.INACTIVE_LIMIT;
-                    m_limitImpulse = 0.0f;
+                    m_limitForce = 0.0f;
                 }
             }
         }
 
         if (m_enableMotor == false) {
-            m_motorImpulse = 0.0f;
+            m_motorForce = 0.0f;
         }
 
         if (m_enableLimit == false) {
-            m_limitImpulse = 0.0f;
+            m_limitForce = 0.0f;
         }
 
         if (World.ENABLE_WARM_STARTING){
+    		Vec2 P1 = new Vec2( step.dt * (m_force * m_linearJacobian.linear1.x + (m_motorForce + m_limitForce) * m_motorJacobian.linear1.x),
+    							step.dt * (m_force * m_linearJacobian.linear1.y + (m_motorForce + m_limitForce) * m_motorJacobian.linear1.y) );
+    		Vec2 P2 = new Vec2( step.dt * (m_force * m_linearJacobian.linear2.x + (m_motorForce + m_limitForce) * m_motorJacobian.linear2.x),
+    							step.dt * (m_force * m_linearJacobian.linear2.y + (m_motorForce + m_limitForce) * m_motorJacobian.linear2.y) );
+    		float L1 = step.dt * (m_force * m_linearJacobian.angular1 - m_torque + (m_motorForce + m_limitForce) * m_motorJacobian.angular1);
+    		float L2 = step.dt * (m_force * m_linearJacobian.angular2 + m_torque + (m_motorForce + m_limitForce) * m_motorJacobian.angular2);
 
-            Vec2 P1 = m_linearJacobian.linear1.mul(m_linearImpulse).addLocal(
-                    m_motorJacobian.linear1.mul(m_motorImpulse + m_limitImpulse));
-            Vec2 P2 = m_linearJacobian.linear2.mul(m_linearImpulse).addLocal(
-                    m_motorJacobian.linear2.mul(m_motorImpulse + m_limitImpulse));
-            float L1 = m_linearImpulse * m_linearJacobian.angular1
-                    - m_angularImpulse + (m_motorImpulse + m_limitImpulse)
-                    * m_motorJacobian.angular1;
-            float L2 = m_linearImpulse * m_linearJacobian.angular2
-                    + m_angularImpulse + (m_motorImpulse + m_limitImpulse)
-                    * m_motorJacobian.angular2;
+    		b1.m_linearVelocity.x += invMass1 * P1.x;
+    		b1.m_linearVelocity.y += invMass1 * P1.y;
+    		b1.m_angularVelocity += invI1 * L1;
 
-            b1.m_linearVelocity.addLocal(P1.mul(invMass1));
-            b1.m_angularVelocity += invI1 * L1;
-
-            b2.m_linearVelocity.addLocal(P2.mul(invMass2));
-            b2.m_angularVelocity += invI2 * L2;   
+    		b2.m_linearVelocity.x += invMass2 * P2.x;
+    		b2.m_linearVelocity.y += invMass2 * P2.y;
+    		b2.m_angularVelocity += invI2 * L2;  
         } else {
-            m_linearImpulse = 0.0f;
-            m_angularImpulse = 0.0f;
-            m_limitImpulse = 0.0f;
-            m_motorImpulse = 0.0f;
+        	m_force = 0.0f;
+    		m_torque = 0.0f;
+    		m_limitForce = 0.0f;
+    		m_motorForce = 0.0f;
         }
         
         m_limitPositionImpulse = 0.0f;
@@ -249,230 +227,286 @@ public class PrismaticJoint extends Joint {
         float linearCdot = m_linearJacobian
                 .compute(b1.m_linearVelocity, b1.m_angularVelocity,
                         b2.m_linearVelocity, b2.m_angularVelocity);
-        float linearImpulse = -m_linearMass * linearCdot;
-        m_linearImpulse += linearImpulse;
+        float force = -step.inv_dt * m_linearMass * linearCdot;
+        m_force += force;
 
-        b1.m_linearVelocity.addLocal(m_linearJacobian.linear1.mul(invMass1
-                * linearImpulse));
-        b1.m_angularVelocity += invI1 * linearImpulse
-                * m_linearJacobian.angular1;
+        float P = step.dt * force;
+    	b1.m_linearVelocity.x += (invMass1 * P) * m_linearJacobian.linear1.x;
+    	b1.m_linearVelocity.y += (invMass1 * P) * m_linearJacobian.linear1.y;
+    	b1.m_angularVelocity += invI1 * P * m_linearJacobian.angular1;
 
-        b2.m_linearVelocity.addLocal(m_linearJacobian.linear2.mul(invMass2
-                * linearImpulse));
-        b2.m_angularVelocity += invI2 * linearImpulse
-                * m_linearJacobian.angular2;
+    	b2.m_linearVelocity.x += (invMass2 * P) * m_linearJacobian.linear2.x;
+    	b2.m_linearVelocity.y += (invMass2 * P) * m_linearJacobian.linear2.y;
+    	b2.m_angularVelocity += invI2 * P * m_linearJacobian.angular2;
 
-        // Solve angular constraint.
-        float angularCdot = b2.m_angularVelocity - b1.m_angularVelocity;
-        float angularImpulse = -m_angularMass * angularCdot;
-        m_angularImpulse += angularImpulse;
+    	// Solve angular constraint.
+    	float angularCdot = b2.m_angularVelocity - b1.m_angularVelocity;
+    	float torque = -step.inv_dt * m_angularMass * angularCdot;
+    	m_torque += torque;
 
-        b1.m_angularVelocity -= invI1 * angularImpulse;
-        b2.m_angularVelocity += invI2 * angularImpulse;
+    	float L = step.dt * torque;
+    	b1.m_angularVelocity -= invI1 * L;
+    	b2.m_angularVelocity += invI2 * L;
 
-        // Solve linear motor constraint.
-        if (m_enableMotor && m_limitState != LimitState.EQUAL_LIMITS) {
-            float motorCdot = m_motorJacobian.compute(b1.m_linearVelocity,
-                    b1.m_angularVelocity, b2.m_linearVelocity,
-                    b2.m_angularVelocity)
-                    - m_motorSpeed;
-            float motorImpulse = -m_motorMass * motorCdot;
-            float oldMotorImpulse = m_motorImpulse;
-            m_motorImpulse = MathUtils.clamp(m_motorImpulse + motorImpulse,
-                    -step.dt * m_maxMotorForce, step.dt * m_maxMotorForce);
-            motorImpulse = m_motorImpulse - oldMotorImpulse;
+    	// Solve linear motor constraint.
+    	if (m_enableMotor && m_limitState != LimitState.EQUAL_LIMITS) {
+    		float motorCdot = m_motorJacobian.compute(b1.m_linearVelocity, b1.m_angularVelocity, b2.m_linearVelocity, b2.m_angularVelocity) - m_motorSpeed;
+    		float motorForce = -step.inv_dt * m_motorMass * motorCdot;
+    		float oldMotorForce = m_motorForce;
+    		m_motorForce = MathUtils.clamp(m_motorForce + motorForce, -m_maxMotorForce, m_maxMotorForce);
+    		motorForce = m_motorForce - oldMotorForce;
 
-            b1.m_linearVelocity.addLocal(m_motorJacobian.linear1.mul(invMass1
-                    * motorImpulse));
-            b1.m_angularVelocity += invI1 * motorImpulse
-                    * m_motorJacobian.angular1;
+    		float P2 = step.dt * motorForce;
+    		b1.m_linearVelocity.x += (invMass1 * P2) * m_motorJacobian.linear1.x;
+    		b1.m_linearVelocity.y += (invMass1 * P2) * m_motorJacobian.linear1.y;
+    		b1.m_angularVelocity += invI1 * P2 * m_motorJacobian.angular1;
 
-            b2.m_linearVelocity.addLocal(m_motorJacobian.linear2.mul(invMass2
-                    * motorImpulse));
-            b2.m_angularVelocity += invI2 * motorImpulse
-                    * m_motorJacobian.angular2;
-        }
+    		b2.m_linearVelocity.x += (invMass2 * P2) * m_motorJacobian.linear2.x;
+    		b2.m_linearVelocity.y += (invMass2 * P2) * m_motorJacobian.linear2.y;
+    		b2.m_angularVelocity += invI2 * P2 * m_motorJacobian.angular2;
+    	}
 
-        // Solve linear limit constraint.
-        if (m_enableLimit && m_limitState != LimitState.INACTIVE_LIMIT) {
-            float limitCdot = m_motorJacobian.compute(b1.m_linearVelocity,
-                    b1.m_angularVelocity, b2.m_linearVelocity,
-                    b2.m_angularVelocity);
-            float limitImpulse = -m_motorMass * limitCdot;
+    	// Solve linear limit constraint.
+    	if (m_enableLimit && m_limitState != LimitState.INACTIVE_LIMIT) {
+    		float limitCdot = m_motorJacobian.compute(b1.m_linearVelocity, b1.m_angularVelocity, b2.m_linearVelocity, b2.m_angularVelocity);
+    		float limitForce = -step.inv_dt * m_motorMass * limitCdot;
 
-            if (m_limitState == LimitState.EQUAL_LIMITS) {
-                m_limitImpulse += limitImpulse;
-            }
-            else if (m_limitState == LimitState.AT_LOWER_LIMIT) {
-                float oldLimitImpulse = m_limitImpulse;
-                m_limitImpulse = Math.max(m_limitImpulse + limitImpulse, 0.0f);
-                limitImpulse = m_limitImpulse - oldLimitImpulse;
-            }
-            else if (m_limitState == LimitState.AT_UPPER_LIMIT) {
-                float oldLimitImpulse = m_limitImpulse;
-                m_limitImpulse = Math.min(m_limitImpulse + limitImpulse, 0.0f);
-                limitImpulse = m_limitImpulse - oldLimitImpulse;
-            }
+    		if (m_limitState == LimitState.EQUAL_LIMITS) {
+    			m_limitForce += limitForce;
+    		} else if (m_limitState == LimitState.AT_LOWER_LIMIT) {
+    			float oldLimitForce = m_limitForce;
+    			m_limitForce = Math.max(m_limitForce + limitForce, 0.0f);
+    			limitForce = m_limitForce - oldLimitForce;
+    		} else if (m_limitState == LimitState.AT_UPPER_LIMIT) {
+    			float oldLimitForce = m_limitForce;
+    			m_limitForce = Math.min(m_limitForce + limitForce, 0.0f);
+    			limitForce = m_limitForce - oldLimitForce;
+    		}
 
-            b1.m_linearVelocity.addLocal(m_motorJacobian.linear1.mul(invMass1
-                    * limitImpulse));
-            b1.m_angularVelocity += invI1 * limitImpulse
-                    * m_motorJacobian.angular1;
+    		float P2 = step.dt * limitForce;
 
-            b2.m_linearVelocity.addLocal(m_motorJacobian.linear2.mul(invMass2
-                    * limitImpulse));
-            b2.m_angularVelocity += invI2 * limitImpulse
-                    * m_motorJacobian.angular2;
-        }
+    		b1.m_linearVelocity.x += (invMass1 * P2) * m_motorJacobian.linear1.x;
+    		b1.m_linearVelocity.y += (invMass1 * P2) * m_motorJacobian.linear1.y;
+    		b1.m_angularVelocity += invI1 * P2 * m_motorJacobian.angular1;
+
+    		b2.m_linearVelocity.x += (invMass2 * P2) * m_motorJacobian.linear2.x;
+    		b2.m_linearVelocity.y += (invMass2 * P2) * m_motorJacobian.linear2.y;
+    		b2.m_angularVelocity += invI2 * P2 * m_motorJacobian.angular2;
+    	}
     }
 
     public boolean solvePositionConstraints() {
-        Body b1 = m_body1;
-        Body b2 = m_body2;
+    	Body b1 = m_body1;
+    	Body b2 = m_body2;
 
-        float invMass1 = b1.m_invMass, invMass2 = b2.m_invMass;
-        float invI1 = b1.m_invI, invI2 = b2.m_invI;
+    	float invMass1 = b1.m_invMass, invMass2 = b2.m_invMass;
+    	float invI1 = b1.m_invI, invI2 = b2.m_invI;
 
-        Vec2 r1 = b1.m_R.mul(m_localAnchor1);
-        Vec2 r2 = b2.m_R.mul(m_localAnchor2);
-        Vec2 p1 = b1.m_position.add(r1);
-        Vec2 p2 = b2.m_position.add(r2);
-        Vec2 d = p2.sub(p1);
-        Vec2 ay1 = b1.m_R.mul(m_localYAxis1);
+    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
+    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
+    	Vec2 p1 = b1.m_sweep.c.add(r1);
+    	Vec2 p2 = b2.m_sweep.c.add(r2);
+    	Vec2 d = p2.sub(p1);
+    	Vec2 ay1 = Mat22.mul(b1.m_xf.R, m_localYAxis1);
 
-        // Solve linear (point-to-line) constraint.
-        float linearC = Vec2.dot(ay1, d);
-        // Prevent overly large corrections.
-        linearC = MathUtils.clamp(linearC,
-                 -Settings.maxLinearCorrection,
-                 Settings.maxLinearCorrection);
+    	// Solve linear (point-to-line) constraint.
+    	float linearC = Vec2.dot(ay1, d);
+    	// Prevent overly large corrections.
+    	linearC = MathUtils.clamp(linearC, -Settings.maxLinearCorrection, Settings.maxLinearCorrection);
+    	float linearImpulse = -m_linearMass * linearC;
 
-        float linearImpulse = -m_linearMass * linearC;
+    	b1.m_sweep.c.x += (invMass1 * linearImpulse) * m_linearJacobian.linear1.x;
+    	b1.m_sweep.c.y += (invMass1 * linearImpulse) * m_linearJacobian.linear1.y;
+    	b1.m_sweep.a += invI1 * linearImpulse * m_linearJacobian.angular1;
+    	//b1.SynchronizeTransform(); // updated by angular constraint
+    	b2.m_sweep.c.x += (invMass2 * linearImpulse) * m_linearJacobian.linear2.x;
+    	b2.m_sweep.c.y += (invMass2 * linearImpulse) * m_linearJacobian.linear2.y;
+    	b2.m_sweep.a += invI2 * linearImpulse * m_linearJacobian.angular2;
+    	//b2.SynchronizeTransform(); // updated by angular constraint
 
-        b1.m_position.addLocal(m_linearJacobian.linear1.mul(invMass1
-                * linearImpulse));
-        b1.m_rotation += invI1 * linearImpulse * m_linearJacobian.angular1;
-        // b1.m_R.Set(b1.m_rotation); // updated by angular constraint
-        b2.m_position.addLocal(m_linearJacobian.linear2.mul(invMass2
-                * linearImpulse));
-        b2.m_rotation += invI2 * linearImpulse * m_linearJacobian.angular2;
-        // b2.m_R.Set(b2.m_rotation); // updated by angular constraint
+    	float positionError = Math.abs(linearC);
 
-        float positionError = Math.abs(linearC);
+    	// Solve angular constraint.
+    	float angularC = b2.m_sweep.a - b1.m_sweep.a - m_refAngle;
+    	// Prevent overly large corrections.
+    	angularC = MathUtils.clamp(angularC, -Settings.maxAngularCorrection, Settings.maxAngularCorrection);
+    	float angularImpulse = -m_angularMass * angularC;
 
-        // Solve angular constraint.
-        float angularC = b2.m_rotation - b1.m_rotation - m_initialAngle;
-        // Prevent overly large corrections.
-        angularC = MathUtils.clamp(angularC,
-                 -Settings.maxAngularCorrection,
-                 Settings.maxAngularCorrection);
-        float angularImpulse = -m_angularMass * angularC;
+    	b1.m_sweep.a -= b1.m_invI * angularImpulse;
+    	b2.m_sweep.a += b2.m_invI * angularImpulse;
 
-        b1.m_rotation -= b1.m_invI * angularImpulse;
-        b1.m_R.setAngle(b1.m_rotation);
-        b2.m_rotation += b2.m_invI * angularImpulse;
-        b2.m_R.setAngle(b2.m_rotation);
+    	b1.synchronizeTransform();
+    	b2.synchronizeTransform();
 
-        float angularError = Math.abs(angularC);
+    	float angularError = Math.abs(angularC);
 
-        // Solve linear limit constraint.
-        if (m_enableLimit && m_limitState != LimitState.INACTIVE_LIMIT) {
-            Vec2 rr1 = b1.m_R.mul(m_localAnchor1);
-            Vec2 rr2 = b2.m_R.mul(m_localAnchor2);
-            Vec2 pp1 = b1.m_position.add(rr1);
-            Vec2 pp2 = b2.m_position.add(rr2);
-            Vec2 dd = pp2.sub(pp1);
-            Vec2 ax1 = b1.m_R.mul(m_localXAxis1);
+    	// Solve linear limit constraint.
+    	if (m_enableLimit && m_limitState != LimitState.INACTIVE_LIMIT)
+    	{
+    		Vec2 r1z = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
+    		Vec2 r2z = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
+    		Vec2 p1z = b1.m_sweep.c.add(r1z);
+    		Vec2 p2z = b2.m_sweep.c.add(r2z);
+    		Vec2 dz = p2z.sub(p1z);
+    		Vec2 ax1 = Mat22.mul(b1.m_xf.R, m_localXAxis1);
 
-            float translation = Vec2.dot(ax1, dd);
-            float limitImpulse = 0.0f;
+    		float translation = Vec2.dot(ax1, dz);
+    		float limitImpulse = 0.0f;
 
-            if (m_limitState == LimitState.EQUAL_LIMITS) {
-                // Prevent large angular corrections
-                float limitC = MathUtils.clamp(translation,
-                        -Settings.maxLinearCorrection,
-                        Settings.maxLinearCorrection);
-                limitImpulse = -m_motorMass * limitC;
-                positionError = Math.max(positionError, Math.abs(angularC));
-            }
-            else if (m_limitState == LimitState.AT_LOWER_LIMIT) {
-                float limitC = translation - m_lowerTranslation;
-                positionError = Math.max(positionError, -limitC);
+    		if (m_limitState == LimitState.EQUAL_LIMITS) {
+    			// Prevent large angular corrections
+    			float limitC = MathUtils.clamp(translation, -Settings.maxLinearCorrection, Settings.maxLinearCorrection);
+    			limitImpulse = -m_motorMass * limitC;
+    			positionError = Math.max(positionError, Math.abs(angularC));
+    		} else if (m_limitState == LimitState.AT_LOWER_LIMIT) {
+    			float limitC = translation - m_lowerTranslation;
+    			positionError = Math.max(positionError, -limitC);
 
-                // Prevent large linear corrections and allow some slop.
-                limitC = MathUtils.clamp(limitC + Settings.linearSlop, -Settings.maxLinearCorrection, 0.0f);
-                limitImpulse = -m_motorMass * limitC;
-                
-                float oldLimitImpulse = m_limitPositionImpulse;
-                m_limitPositionImpulse = Math.max(m_limitPositionImpulse
-                        + limitImpulse, 0.0f);
-                limitImpulse = m_limitPositionImpulse - oldLimitImpulse;
-                }
-            else if (m_limitState == LimitState.AT_UPPER_LIMIT) {
-                float limitC = translation - m_upperTranslation;
-                positionError = Math.max(positionError, limitC);
+    			// Prevent large linear corrections and allow some slop.
+    			limitC = MathUtils.clamp(limitC + Settings.linearSlop, -Settings.maxLinearCorrection, 0.0f);
+    			limitImpulse = -m_motorMass * limitC;
+    			float oldLimitImpulse = m_limitPositionImpulse;
+    			m_limitPositionImpulse = Math.max(m_limitPositionImpulse + limitImpulse, 0.0f);
+    			limitImpulse = m_limitPositionImpulse - oldLimitImpulse;
+    		} else if (m_limitState == LimitState.AT_UPPER_LIMIT) {
+    			float limitC = translation - m_upperTranslation;
+    			positionError = Math.max(positionError, limitC);
 
-                // Prevent large linear corrections and allow some slop.
-                limitC = MathUtils.clamp(limitC - Settings.linearSlop, 0.0f, Settings.maxLinearCorrection);
-                limitImpulse = -m_motorMass * limitC;
-                float oldLimitImpulse = m_limitPositionImpulse;
-                m_limitPositionImpulse = Math.min(m_limitPositionImpulse
-                        + limitImpulse, 0.0f);
-                limitImpulse = m_limitPositionImpulse - oldLimitImpulse;
-            }
+    			// Prevent large linear corrections and allow some slop.
+    			limitC = MathUtils.clamp(limitC - Settings.linearSlop, 0.0f, Settings.maxLinearCorrection);
+    			limitImpulse = -m_motorMass * limitC;
+    			float oldLimitImpulse = m_limitPositionImpulse;
+    			m_limitPositionImpulse = Math.min(m_limitPositionImpulse + limitImpulse, 0.0f);
+    			limitImpulse = m_limitPositionImpulse - oldLimitImpulse;
+    		}
 
-            b1.m_position.addLocal(m_motorJacobian.linear1.mul(invMass1
-                    * limitImpulse));
-            b1.m_rotation += invI1 * limitImpulse * m_motorJacobian.angular1;
-            b1.m_R.setAngle(b1.m_rotation);
-            b2.m_position.addLocal(m_motorJacobian.linear2.mul(invMass2
-                    * limitImpulse));
-            b2.m_rotation += invI2 * limitImpulse * m_motorJacobian.angular2;
-            b2.m_R.setAngle(b2.m_rotation);
-        }
+    		b1.m_sweep.c.x += (invMass1 * limitImpulse) * m_motorJacobian.linear1.x;
+    		b1.m_sweep.c.y += (invMass1 * limitImpulse) * m_motorJacobian.linear1.y;
+    		b1.m_sweep.a += invI1 * limitImpulse * m_motorJacobian.angular1;
+    		b2.m_sweep.c.x += (invMass2 * limitImpulse) * m_motorJacobian.linear2.x;
+    		b2.m_sweep.c.y += (invMass2 * limitImpulse) * m_motorJacobian.linear2.y;
+    		b2.m_sweep.a += invI2 * limitImpulse * m_motorJacobian.angular2;
 
-        return positionError <= Settings.linearSlop
-                && angularError <= Settings.angularSlop;
+    		b1.synchronizeTransform();
+    		b2.synchronizeTransform();
+    	}
+
+    	return positionError <= Settings.linearSlop && angularError <= Settings.angularSlop;
     }
 
-    float getJointTranslation() {
-        Body b1 = m_body1;
-        Body b2 = m_body2;
 
-        Vec2 r1 = b1.m_R.mul(m_localAnchor1);
-        Vec2 r2 = b2.m_R.mul(m_localAnchor2);
-        Vec2 p1 = b1.m_position.add(r1);
-        Vec2 p2 = b2.m_position.add(r2);
-        Vec2 d = p2.sub(p1);
-        Vec2 ax1 = b1.m_R.mul(m_localXAxis1);
-
-        float translation = Vec2.dot(ax1, d);
-        return translation;
+    @Override
+    public Vec2 getAnchor1() {
+    	return m_body1.getWorldPoint(m_localAnchor1);
     }
 
-    float getJointSpeed() {
-        Body b1 = m_body1;
-        Body b2 = m_body2;
-
-        Vec2 r1 = b1.m_R.mul(m_localAnchor1);
-        Vec2 r2 = b2.m_R.mul(m_localAnchor2);
-        Vec2 p1 = b1.m_position.add(r1);
-        Vec2 p2 = b2.m_position.add(r2);
-        Vec2 d = p2.sub(p1);
-        Vec2 ax1 = b1.m_R.mul(m_localXAxis1);
-
-        Vec2 v1 = b1.m_linearVelocity;
-        Vec2 v2 = b2.m_linearVelocity;
-        float w1 = b1.m_angularVelocity;
-        float w2 = b2.m_angularVelocity;
-
-        float speed = Vec2.dot(d, Vec2.cross(w1, ax1))
-                + Vec2.dot(ax1, v2.add(Vec2.cross(w2, r2)).sub(v1).sub(
-                        Vec2.cross(w1, r1)));
-        return speed;
+    @Override
+    public Vec2 getAnchor2() {
+    	return m_body2.getWorldPoint(m_localAnchor2);
     }
 
-    float getMotorForce(float invTimeStep) {
-        return m_motorImpulse * invTimeStep;
+    /// Get the current joint translation, usually in meters.
+    public float getJointTranslation() {
+    	Body b1 = m_body1;
+    	Body b2 = m_body2;
+
+    	Vec2 p1 = b1.getWorldPoint(m_localAnchor1);
+    	Vec2 p2 = b2.getWorldPoint(m_localAnchor2);
+    	Vec2 d = p2.sub(p1);
+    	Vec2 axis = b1.getWorldVector(m_localXAxis1);
+
+    	float translation = Vec2.dot(d, axis);
+    	return translation;
+    }
+
+    /// Get the current joint translation speed, usually in meters per second.
+	public float getJointSpeed() {
+    	Body b1 = m_body1;
+    	Body b2 = m_body2;
+
+    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
+    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
+    	Vec2 p1 = b1.m_sweep.c.add(r1);
+    	Vec2 p2 = b2.m_sweep.c.add(r2);
+    	Vec2 d = p2.sub(p1);
+    	Vec2 axis = b1.getWorldVector(m_localXAxis1);
+
+    	Vec2 v1 = b1.m_linearVelocity;
+    	Vec2 v2 = b2.m_linearVelocity;
+    	float w1 = b1.m_angularVelocity;
+    	float w2 = b2.m_angularVelocity;
+
+    	float speed = Vec2.dot(d, Vec2.cross(w1, axis)) + Vec2.dot(axis, v2.add(Vec2.cross(w2, r2)).subLocal(v1).subLocal(Vec2.cross(w1, r1)));
+    	return speed;
+    }
+
+	
+    public float getReactionTorque() {
+    	return m_torque;
+    }
+    
+    public Vec2 getReactionForce() {
+    	Vec2 ax1 = Mat22.mul(m_body1.m_xf.R, m_localXAxis1);
+    	Vec2 ay1 = Mat22.mul(m_body1.m_xf.R, m_localYAxis1);
+
+    	return new Vec2(m_limitForce * ax1.x + m_force * ay1.x, 
+    					m_limitForce * ax1.y + m_force * ay1.y);
+    }
+    
+    /// Is the joint limit enabled?
+    public boolean isLimitEnabled() {
+    	return m_enableLimit;
+    }
+
+    /// Enable/disable the joint limit.
+    public void enableLimit(boolean flag) {
+    	m_enableLimit = flag;
+    }
+
+    /// Get the lower joint limit, usually in meters.
+    public float getLowerLimit() {
+    	return m_lowerTranslation;
+    }
+
+    /// Get the upper joint limit, usually in meters.
+    public float getUpperLimit() {
+    	return m_upperTranslation;
+    }
+
+    /// Set the joint limits, usually in meters.
+    public void setLimits(float lower, float upper) {
+    	assert(lower <= upper);
+    	m_lowerTranslation = lower;
+    	m_upperTranslation = upper;
+    }
+
+    /// Is the joint motor enabled?
+    public boolean isMotorEnabled() {
+    	return m_enableMotor;
+    }
+
+    /// Enable/disable the joint motor.
+    public void enableMotor(boolean flag) {
+    	m_enableMotor = flag;
+    }
+
+	/// Set the motor speed, usually in meters per second.
+    public void setMotorSpeed(float speed) {
+    	m_motorSpeed = speed;
+    }
+
+	/// Get the motor speed, usually in meters per second.
+    public float getMotorSpeed() {
+    	return m_motorSpeed;
+    }
+    
+    /// Set the maximum motor torque, usually in N.
+    public void setMaxMotorForce(float force) {
+    	m_maxMotorForce = force;
+    }
+    
+    /// Get the current motor torque, usually in N.
+    public float getMotorForce() {
+    	return m_motorForce;
     }
 }

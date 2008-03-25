@@ -25,9 +25,9 @@ package org.jbox2d.dynamics.contacts;
 import org.jbox2d.collision.ShapeType;
 
 public class ContactRegister {
-    ShapeType s1, s2;
+    public ShapeType s1, s2;
 
-    ContactCreateFcn createFcn;
+    public ContactCreateFcn createFcn;
 
-    boolean primary;
+    public boolean primary;
 }

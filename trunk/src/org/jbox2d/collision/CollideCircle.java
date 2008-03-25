@@ -54,11 +54,12 @@ public class CollideCircle {
         }
 
         manifold.pointCount = 1;
-        //manifold.points[0].id.key = 0; //XXX: why did we comment this out?  still there in C++ version...
+        //manifold.points[0].id.key = 0;
+        manifold.points[0].id.zero(); //use this instead of zeroing through key
         manifold.points[0].separation = separation;
 
     	p1.addLocal(manifold.normal.mul(circle1.m_radius));
-    	p2.addLocal(manifold.normal.mul(circle2.m_radius));
+    	p2.subLocal(manifold.normal.mul(circle2.m_radius));
 
     	Vec2 p = new Vec2(0.5f * (p1.x + p2.x), 0.5f * (p1.y + p2.y));
 
@@ -67,7 +68,7 @@ public class CollideCircle {
 
     }
 
-    public static void collidePolyAndCircle(Manifold manifold, 
+    public static void collidePolygonAndCircle(Manifold manifold, 
     		PolygonShape polygon, XForm xf1,
             CircleShape circle, XForm xf2) {
     	

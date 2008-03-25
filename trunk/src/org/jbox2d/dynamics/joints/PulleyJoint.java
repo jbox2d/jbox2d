@@ -22,14 +22,16 @@
  */
 package org.jbox2d.dynamics.joints;
 
+import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
+import org.jbox2d.dynamics.World;
 
 
-//Updated to rev. 56 of b2PulleyJoint.cpp/.h
+//Updated to rev. 56->130 of b2PulleyJoint.cpp/.h
 
 public class PulleyJoint extends Joint {
     // The pulley joint is connected to two bodies and two fixed ground points.
@@ -60,382 +62,369 @@ public class PulleyJoint extends Joint {
     // 0 <= impulse
 
     // We need a minimum pulley length to help prevent one side going to zero.
-    public static final float MIN_PULLEY_LENGTH = Settings.lengthUnitsPerMeter;
+    public static final float MIN_PULLEY_LENGTH = 2.0f;//Settings.lengthUnitsPerMeter;
 
     public Body m_ground;
+	public Vec2 m_groundAnchor1;
+	public Vec2 m_groundAnchor2;
+	public Vec2 m_localAnchor1;
+	public Vec2 m_localAnchor2;
 
-    public Vec2 m_groundAnchor1;
+	public Vec2 m_u1;
+	public Vec2 m_u2;
+	
+	public float m_constant;
+	public float m_ratio;
+	
+	public float m_maxLength1;
+	public float m_maxLength2;
 
-    public Vec2 m_groundAnchor2;
+	// Effective masses
+	public float m_pulleyMass;
+	public float m_limitMass1;
+	public float m_limitMass2;
 
-    public Vec2 m_localAnchor1;
+	// Impulses for accumulation/warm starting.
+	public float m_force;
+	public float m_limitForce1;
+	public float m_limitForce2;
 
-    public Vec2 m_localAnchor2;
+	// Position impulses for accumulation.
+	public float m_positionImpulse;
+	public float m_limitPositionImpulse1;
+	public float m_limitPositionImpulse2;
 
-    public Vec2 m_u1;
-
-    public Vec2 m_u2;
-
-    public float m_constant;
-
-    public float m_ratio;
-
-    public float m_maxLength1;
-
-    public float m_maxLength2;
-
-    // Effective masses
-    public float m_pulleyMass;
-
-    public float m_limitMass1;
-
-    public float m_limitMass2;
-
-    // Impulses for accumulation/warm starting.
-    public float m_pulleyImpulse;
-
-    public float m_limitImpulse1;
-
-    public float m_limitImpulse2;
-
-    // Position impulses for accumulation.
-    public float m_limitPositionImpulse1;
-
-    public float m_limitPositionImpulse2;
-
-    public LimitState m_limitState1;
-
-    public LimitState m_limitState2;
+	public LimitState m_state;
+	public LimitState m_limitState1;
+	public LimitState m_limitState2;
 
     public PulleyJoint(PulleyJointDef def) {
         super(def);
         m_ground = m_body1.m_world.m_groundBody;
-        m_groundAnchor1 = def.groundPoint1.sub(m_ground.m_position);
-        m_groundAnchor2 = def.groundPoint2.sub(m_ground.m_position);
-        m_localAnchor1 = m_body1.m_R.mulT(def.anchorPoint1
-                .sub(m_body1.m_position));
-        m_localAnchor2 = m_body2.m_R.mulT(def.anchorPoint2
-                .sub(m_body2.m_position));
+    	m_groundAnchor1 = def.groundAnchor1.sub(m_ground.m_xf.position);
+    	m_groundAnchor2 = def.groundAnchor2.sub(m_ground.m_xf.position);
+    	m_localAnchor1 = def.localAnchor1.clone();
+    	m_localAnchor2 = def.localAnchor2.clone();
+    	m_u1 = new Vec2();
+    	m_u2 = new Vec2();
 
-        m_ratio = def.ratio;
+    	assert(def.ratio != 0.0f);
+    	m_ratio = def.ratio;
 
-        Vec2 d1 = def.groundPoint1.sub(def.anchorPoint1);
-        Vec2 d2 = def.groundPoint2.sub(def.anchorPoint2);
+    	m_constant = def.length1 + m_ratio * def.length2;
 
-        float length1 = Math.max(0.5f * MIN_PULLEY_LENGTH, d1.length());
-        float length2 = Math.max(0.5f * MIN_PULLEY_LENGTH, d2.length());
+    	m_maxLength1 = Math.min(def.maxLength1, m_constant - m_ratio * MIN_PULLEY_LENGTH);
+    	m_maxLength2 = Math.min(def.maxLength2, (m_constant - MIN_PULLEY_LENGTH) / m_ratio);
 
-        m_constant = length1 + m_ratio * length2;
-
-        m_maxLength1 = MathUtils.clamp(def.maxLength1, length1, m_constant
-                - m_ratio * MIN_PULLEY_LENGTH);
-        m_maxLength2 = MathUtils.clamp(def.maxLength2, length2,
-                (m_constant - MIN_PULLEY_LENGTH) / m_ratio);
-
-        m_pulleyImpulse = 0.0f;
-        m_limitImpulse1 = 0.0f;
-        m_limitImpulse2 = 0.0f;
-        m_u1 = new Vec2();
-        m_u2 = new Vec2();
-        m_limitState1 = LimitState.INACTIVE_LIMIT;
-        m_limitState2 = LimitState.INACTIVE_LIMIT;
+    	m_force = 0.0f;
+    	m_limitForce1 = 0.0f;
+    	m_limitForce2 = 0.0f;
     }
 
-    public void prepareVelocitySolver() {
-        Body b1 = m_body1;
-        Body b2 = m_body2;
+    public void initVelocityConstraints(TimeStep step) {
+    	Body b1 = m_body1;
+    	Body b2 = m_body2;
 
-        Vec2 r1 = b1.m_R.mul(m_localAnchor1);
-        Vec2 r2 = b2.m_R.mul(m_localAnchor2);
+    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
+    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
 
-        Vec2 p1 = b1.m_position.add(r1);
-        Vec2 p2 = b2.m_position.add(r2);
+    	Vec2 p1 = b1.m_sweep.c.add(r1);
+    	Vec2 p2 = b2.m_sweep.c.add(r2);
 
-        Vec2 s1 = m_ground.m_position.add(m_groundAnchor1);
-        Vec2 s2 = m_ground.m_position.add(m_groundAnchor2);
+    	Vec2 s1 = m_ground.m_xf.position.add(m_groundAnchor1);
+    	Vec2 s2 = m_ground.m_xf.position.add(m_groundAnchor2);
 
-        // Get the pulley axes.
-        m_u1 = p1.sub(s1);
-        m_u2 = p2.sub(s2);
+    	// Get the pulley axes.
+    	m_u1 = p1.sub(s1);
+    	m_u2 = p2.sub(s2);
 
-        float length1 = m_u1.length();
-        float length2 = m_u2.length();
+    	float length1 = m_u1.length();
+    	float length2 = m_u2.length();
 
-        // System.out.println(length1+" "+length2+" "+m_constant);
-        // System.out.println(m_maxLength1);
-        if (length1 > Settings.linearSlop) {
-            m_u1.mulLocal(1.0f / length1);
-        }
-        else {
-            m_u1.setZero();
-        }
+    	if (length1 > Settings.linearSlop) {
+    		m_u1.mulLocal(1.0f / length1);
+    	} else {
+    		m_u1.setZero();
+    	}
 
-        if (length2 > Settings.linearSlop) {
-            m_u2.mulLocal(1.0f / length2);
-        }
-        else {
-            m_u2.setZero();
-        }
+    	if (length2 > Settings.linearSlop) {
+    		m_u2.mulLocal(1.0f / length2);
+    	} else {
+    		m_u2.setZero();
+    	}
 
-        if (length1 < m_maxLength1) {
-            m_limitState1 = LimitState.INACTIVE_LIMIT;
-            m_limitImpulse1 = 0.0f;
-        }
-        else {
-            m_limitState1 = LimitState.AT_UPPER_LIMIT;
-            m_limitPositionImpulse1 = 0.0f;
-        }
+    	float C = m_constant - length1 - m_ratio * length2;
+    	if (C > 0.0f) {
+    		m_state = LimitState.INACTIVE_LIMIT;
+    		m_force = 0.0f;
+    	} else {
+    		m_state = LimitState.AT_UPPER_LIMIT;
+    		m_positionImpulse = 0.0f;
+    	}
 
-        if (length2 < m_maxLength2) {
-            m_limitState2 = LimitState.INACTIVE_LIMIT;
-            m_limitImpulse2 = 0.0f;
-        }
-        else {
-            m_limitState2 = LimitState.AT_UPPER_LIMIT;
-            m_limitPositionImpulse2 = 0.0f;
-        }
+    	if (length1 < m_maxLength1) {
+    		m_limitState1 = LimitState.INACTIVE_LIMIT;
+    		m_limitForce1 = 0.0f;
+    	} else {
+    		m_limitState1 = LimitState.AT_UPPER_LIMIT;
+    		m_limitPositionImpulse1 = 0.0f;
+    	}
 
-        // Compute effective mass.
-        float cr1u1 = Vec2.cross(r1, m_u1);
-        float cr2u2 = Vec2.cross(r2, m_u2);
+    	if (length2 < m_maxLength2) {
+    		m_limitState2 = LimitState.INACTIVE_LIMIT;
+    		m_limitForce2 = 0.0f;
+    	} else {
+    		m_limitState2 = LimitState.AT_UPPER_LIMIT;
+    		m_limitPositionImpulse2 = 0.0f;
+    	}
 
-        m_limitMass1 = b1.m_invMass + b1.m_invI * cr1u1 * cr1u1;
-        m_limitMass2 = b2.m_invMass + b2.m_invI * cr2u2 * cr2u2;
-        m_pulleyMass = m_limitMass1 + m_ratio * m_ratio * m_limitMass2;
-        assert (m_limitMass1 > Settings.EPSILON);
-        assert (m_limitMass2 > Settings.EPSILON);
-        assert (m_pulleyMass > Settings.EPSILON);
-        m_limitMass1 = 1.0f / m_limitMass1;
-        m_limitMass2 = 1.0f / m_limitMass2;
-        m_pulleyMass = 1.0f / m_pulleyMass;
+    	// Compute effective mass.
+    	float cr1u1 = Vec2.cross(r1, m_u1);
+    	float cr2u2 = Vec2.cross(r2, m_u2);
 
-        // Warm starting.
-        Vec2 P1 = m_u1.mul(-m_pulleyImpulse - m_limitImpulse1);
-        Vec2 P2 = m_u2.mul(-m_ratio * m_pulleyImpulse - m_limitImpulse2);
-        b1.m_linearVelocity.addLocal(P1.mul(b1.m_invMass));
-        b1.m_angularVelocity += b1.m_invI * Vec2.cross(r1, P1);
-        b2.m_linearVelocity.addLocal(P2.mul(b2.m_invMass));
-        b2.m_angularVelocity += b2.m_invI * Vec2.cross(r2, P2);
+    	m_limitMass1 = b1.m_invMass + b1.m_invI * cr1u1 * cr1u1;
+    	m_limitMass2 = b2.m_invMass + b2.m_invI * cr2u2 * cr2u2;
+    	m_pulleyMass = m_limitMass1 + m_ratio * m_ratio * m_limitMass2;
+    	assert(m_limitMass1 > Settings.EPSILON);
+    	assert(m_limitMass2 > Settings.EPSILON);
+    	assert(m_pulleyMass > Settings.EPSILON);
+    	m_limitMass1 = 1.0f / m_limitMass1;
+    	m_limitMass2 = 1.0f / m_limitMass2;
+    	m_pulleyMass = 1.0f / m_pulleyMass;
+
+    	if (World.ENABLE_WARM_STARTING) {
+    		// Warm starting.
+    		Vec2 P1 = m_u1.mul(step.dt * (-m_force - m_limitForce1));
+    		Vec2 P2 = m_u2.mul(step.dt * (-m_ratio * m_force - m_limitForce2));
+    		b1.m_linearVelocity.addLocal(P1.mul(b1.m_invMass));
+    		b1.m_angularVelocity += b1.m_invI * Vec2.cross(r1, P1);
+    		b2.m_linearVelocity.addLocal(P2.mul(b2.m_invMass));
+    		b2.m_angularVelocity += b2.m_invI * Vec2.cross(r2, P2);
+    	} else {
+    		m_force = 0.0f;
+    		m_limitForce1 = 0.0f;
+    		m_limitForce2 = 0.0f;
+    	}
     }
 
     public void solveVelocityConstraints(TimeStep step) {
-        Body b1 = m_body1;
-        Body b2 = m_body2;
+    	Body b1 = m_body1;
+    	Body b2 = m_body2;
 
-        Vec2 r1 = b1.m_R.mul(m_localAnchor1);
-        Vec2 r2 = b2.m_R.mul(m_localAnchor2);
+    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
+    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
 
-        {
-            Vec2 v1 = b1.m_linearVelocity.add(Vec2.cross(b1.m_angularVelocity,
-                    r1));
-            Vec2 v2 = b2.m_linearVelocity.add(Vec2.cross(b2.m_angularVelocity,
-                    r2));
+    	if (m_state == LimitState.AT_UPPER_LIMIT) {
+    		Vec2 v1 = b1.m_linearVelocity.add(Vec2.cross(b1.m_angularVelocity, r1));
+    		Vec2 v2 = b2.m_linearVelocity.add(Vec2.cross(b2.m_angularVelocity, r2));
 
-            float Cdot = -Vec2.dot(m_u1, v1) - m_ratio * Vec2.dot(m_u2, v2);
-            float impulse = -m_pulleyMass * Cdot;
-            m_pulleyImpulse += impulse;
+    		float Cdot = -Vec2.dot(m_u1, v1) - m_ratio * Vec2.dot(m_u2, v2);
+    		float force = -step.inv_dt * m_pulleyMass * Cdot;
+    		float oldForce = m_force;
+    		m_force = Math.max(0.0f, m_force + force);
+    		force = m_force - oldForce;
 
-            Vec2 P1 = m_u1.mul(-impulse);
-            Vec2 P2 = m_u2.mul(-m_ratio * impulse);
-            b1.m_linearVelocity.addLocal(P1.mul(b1.m_invMass));
-            b1.m_angularVelocity += b1.m_invI * Vec2.cross(r1, P1);
-            b2.m_linearVelocity.addLocal(P2.mul(b2.m_invMass));
-            b2.m_angularVelocity += b2.m_invI * Vec2.cross(r2, P2);
-            // System.out.println(P1.mul(b1.m_invMass).y);
-        }
+    		Vec2 P1 = m_u1.mul(-step.dt * force);
+    		Vec2 P2 = m_u2.mul(-step.dt * m_ratio * force);
+    		b1.m_linearVelocity.x += b1.m_invMass * P1.x;
+    		b1.m_linearVelocity.y += b1.m_invMass * P1.y;
+    		b1.m_angularVelocity += b1.m_invI * Vec2.cross(r1, P1);
+    		b2.m_linearVelocity.x += b2.m_invMass * P2.x;
+    		b2.m_linearVelocity.y += b2.m_invMass * P2.y;
+    		b2.m_angularVelocity += b2.m_invI * Vec2.cross(r2, P2);
+    	}
 
-        if (m_limitState1 == LimitState.AT_UPPER_LIMIT) {
-            Vec2 v1 = b1.m_linearVelocity.add(Vec2.cross(b1.m_angularVelocity,
-                    r1));
-            float Cdot = -Vec2.dot(m_u1, v1);
-            float impulse = -m_limitMass1 * Cdot;
-            float oldLimitImpulse = m_limitImpulse1;
-            m_limitImpulse1 = Math.max(0.0f, m_limitImpulse1 + impulse);
-            impulse = m_limitImpulse1 - oldLimitImpulse;
-            Vec2 P1 = m_u1.mul(-impulse);
-            b1.m_linearVelocity.addLocal(P1.mul(b1.m_invMass));
-            b1.m_angularVelocity += b1.m_invI * Vec2.cross(r1, P1);
-        }
+    	if (m_limitState1 == LimitState.AT_UPPER_LIMIT) {
+    		Vec2 v1 = b1.m_linearVelocity.add(Vec2.cross(b1.m_angularVelocity, r1));
 
-        if (m_limitState2 == LimitState.AT_UPPER_LIMIT) {
-            Vec2 v2 = b2.m_linearVelocity.add(Vec2.cross(b2.m_angularVelocity,
-                    r2));
-            float Cdot = -Vec2.dot(m_u2, v2);
-            float impulse = -m_limitMass2 * Cdot;
-            float oldLimitImpulse = m_limitImpulse2;
-            m_limitImpulse2 = Math.max(0.0f, m_limitImpulse2 + impulse);
-            impulse = m_limitImpulse2 - oldLimitImpulse;
-            Vec2 P2 = m_u2.mul(-impulse);
-            b2.m_linearVelocity.addLocal(P2.mul(b2.m_invMass));
-            b2.m_angularVelocity += b2.m_invI * Vec2.cross(r2, P2);
-        }
+    		float Cdot = -Vec2.dot(m_u1, v1);
+    		float force = -step.inv_dt * m_limitMass1 * Cdot;
+    		float oldForce = m_limitForce1;
+    		m_limitForce1 = Math.max(0.0f, m_limitForce1 + force);
+    		force = m_limitForce1 - oldForce;
 
-        // System.out.println(m_pulleyImpulse);
+    		Vec2 P1 = m_u1.mul(-step.dt * force);
+    		b1.m_linearVelocity.x += b1.m_invMass * P1.x;
+    		b1.m_linearVelocity.y += b1.m_invMass * P1.y;
+    		b1.m_angularVelocity += b1.m_invI * Vec2.cross(r1, P1);
+    	}
+
+    	if (m_limitState2 == LimitState.AT_UPPER_LIMIT) {
+    		Vec2 v2 = b2.m_linearVelocity.add(Vec2.cross(b2.m_angularVelocity, r2));
+
+    		float Cdot = -Vec2.dot(m_u2, v2);
+    		float force = -step.inv_dt * m_limitMass2 * Cdot;
+    		float oldForce = m_limitForce2;
+    		m_limitForce2 = Math.max(0.0f, m_limitForce2 + force);
+    		force = m_limitForce2 - oldForce;
+
+    		Vec2 P2 = m_u2.mul(-step.dt * force);
+    		b2.m_linearVelocity.x += b2.m_invMass * P2.x;
+    		b2.m_linearVelocity.y += b2.m_invMass * P2.y;
+    		b2.m_angularVelocity += b2.m_invI * Vec2.cross(r2, P2);
+    	}
     }
 
     public boolean solvePositionConstraints() {
-        // if (true) return false;
-        Body b1 = m_body1;
-        Body b2 = m_body2;
+    	Body b1 = m_body1;
+    	Body b2 = m_body2;
 
-        Vec2 s1 = m_ground.m_position.add(m_groundAnchor1);
-        Vec2 s2 = m_ground.m_position.add(m_groundAnchor2);
+    	Vec2 s1 = m_ground.m_xf.position.add(m_groundAnchor1);
+    	Vec2 s2 = m_ground.m_xf.position.add(m_groundAnchor2);
 
-        float linearError = 0.0f;
+    	float linearError = 0.0f;
 
-        {
-            Vec2 r1 = b1.m_R.mul(m_localAnchor1);
-            Vec2 r2 = b2.m_R.mul(m_localAnchor2);
+    	if (m_state == LimitState.AT_UPPER_LIMIT) {
+    		Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
+    		Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
 
-            Vec2 p1 = b1.m_position.add(r1);
-            Vec2 p2 = b2.m_position.add(r2);
+    		Vec2 p1 = b1.m_sweep.c.add(r1);
+    		Vec2 p2 = b2.m_sweep.c.add(r2);
 
-            // Get the pulley axes.
-            m_u1 = p1.sub(s1);
-            m_u2 = p2.sub(s2);
+    		// Get the pulley axes.
+    		m_u1.set(p1.x - s1.x,p1.y - s1.y);
+    		m_u2.set(p2.x - s2.x,p2.y - s2.y);
 
-            float length1 = m_u1.length();
-            float length2 = m_u2.length();
+    		float length1 = m_u1.length();
+    		float length2 = m_u2.length();
 
-            if (length1 > Settings.linearSlop) {
-                m_u1.mulLocal(1.0f / length1);
-            }
-            else {
-                m_u1.setZero();
-            }
+    		if (length1 > Settings.linearSlop) {
+    			m_u1.mulLocal(1.0f / length1);
+    		} else {
+    			m_u1.setZero();
+    		}
 
-            if (length2 > Settings.linearSlop) {
-                m_u2.mulLocal(1.0f / length2);
-            }
-            else {
-                m_u2.setZero();
-            }
+    		if (length2 > Settings.linearSlop) {
+    			m_u2.mulLocal(1.0f / length2);
+    		} else {
+    			m_u2.setZero();
+    		}
 
-            float C = m_constant - length1 - m_ratio * length2;
-            linearError = Math.max(linearError, Math.abs(C));
-            C = MathUtils.clamp(C, -Settings.maxLinearCorrection,
-                    Settings.maxLinearCorrection);
-            float impulse = -m_pulleyMass * C;
+    		float C = m_constant - length1 - m_ratio * length2;
+    		linearError = Math.max(linearError, -C);
 
-            Vec2 P1 = m_u1.mul(-impulse);
-            Vec2 P2 = m_u2.mul(-m_ratio * impulse);
+    		C = MathUtils.clamp(C + Settings.linearSlop, -Settings.maxLinearCorrection, 0.0f);
+    		float impulse = -m_pulleyMass * C;
+    		float oldImpulse = m_positionImpulse;
+    		m_positionImpulse = Math.max(0.0f, m_positionImpulse + impulse);
+    		impulse = m_positionImpulse - oldImpulse;
 
-            b1.m_position.addLocal(P1.mul(b1.m_invMass));
-            b1.m_rotation += b1.m_invI * Vec2.cross(r1, P1);
-            b2.m_position.addLocal(P2.mul(b2.m_invMass));
-            b2.m_rotation += b2.m_invI * Vec2.cross(r2, P2);
+    		Vec2 P1 = m_u1.mul(-impulse);
+    		Vec2 P2 = m_u2.mul(-m_ratio * impulse);
 
-            b1.m_R.setAngle(b1.m_rotation);
-            b2.m_R.setAngle(b2.m_rotation);
-        }
+    		b1.m_sweep.c.x += b1.m_invMass * P1.x;
+    		b1.m_sweep.c.y += b1.m_invMass * P1.y;
+    		b1.m_sweep.a += b1.m_invI * Vec2.cross(r1, P1);
+    		b2.m_sweep.c.x += b2.m_invMass * P2.x;
+    		b2.m_sweep.c.y += b2.m_invMass * P2.y;
+    		b2.m_sweep.a += b2.m_invI * Vec2.cross(r2, P2);
 
-        if (m_limitState1 == LimitState.AT_UPPER_LIMIT) {
-            Vec2 r1 = b1.m_R.mul(m_localAnchor1);
-            Vec2 p1 = b1.m_position.add(r1);
+    		b1.synchronizeTransform();
+    		b2.synchronizeTransform();
+    	}
 
-            m_u1 = p1.sub(s1);
-            float length1 = m_u1.length();
+    	if (m_limitState1 == LimitState.AT_UPPER_LIMIT) {
+    		Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
+    		Vec2 p1 = b1.m_sweep.c.add(r1);
 
-            if (length1 > Settings.linearSlop) {
-                m_u1.mulLocal(1.0f / length1);
-            }
-            else {
-                m_u1.setZero();
-            }
+    		m_u1.set(p1.x - s1.x, p1.y - s1.y);
+    		float length1 = m_u1.length();
 
-            float C = m_maxLength1 - length1;
-            linearError = Math.max(linearError, -C);
-            C = MathUtils.clamp(C + Settings.linearSlop,
-                    -Settings.maxLinearCorrection, 0.0f);
-            float impulse = -m_limitMass1 * C;
-            float oldLimitPositionImpulse = m_limitPositionImpulse1;
-            m_limitPositionImpulse1 = Math.max(0.0f, m_limitPositionImpulse1
-                    + impulse);
-            impulse = m_limitPositionImpulse1 - oldLimitPositionImpulse;
+    		if (length1 > Settings.linearSlop) {
+    			m_u1.mulLocal(1.0f / length1);
+    		} else {
+    			m_u1.setZero();
+    		}
 
-            Vec2 P1 = m_u1.mul(-impulse);
-            b1.m_position.addLocal(P1.mul(b1.m_invMass));
-            b1.m_rotation += b1.m_invI * Vec2.cross(r1, P1);
-            b1.m_R.setAngle(b1.m_rotation);
-        }
+    		float C = m_maxLength1 - length1;
+    		linearError = Math.max(linearError, -C);
+    		C = MathUtils.clamp(C + Settings.linearSlop, -Settings.maxLinearCorrection, 0.0f);
+    		float impulse = -m_limitMass1 * C;
+    		float oldLimitPositionImpulse = m_limitPositionImpulse1;
+    		m_limitPositionImpulse1 = Math.max(0.0f, m_limitPositionImpulse1 + impulse);
+    		impulse = m_limitPositionImpulse1 - oldLimitPositionImpulse;
 
-        if (m_limitState2 == LimitState.AT_UPPER_LIMIT) {
-            Vec2 r2 = b2.m_R.mul(m_localAnchor2);
-            Vec2 p2 = b2.m_position.add(r2);
+    		Vec2 P1 = m_u1.mul(-impulse);
+    		b1.m_sweep.c.x += b1.m_invMass * P1.x;
+    		b1.m_sweep.c.y += b1.m_invMass * P1.y;
+    		b1.m_sweep.a += b1.m_invI * Vec2.cross(r1, P1);
 
-            m_u2 = p2.sub(s2);
-            float length2 = m_u2.length();
+    		b1.synchronizeTransform();
+    	}
 
-            if (length2 > Settings.linearSlop) {
-                m_u2.mulLocal(1.0f / length2);
-            }
-            else {
-                m_u2.setZero();
-            }
+    	if (m_limitState2 == LimitState.AT_UPPER_LIMIT) {
+    		Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
+    		Vec2 p2 = b2.m_sweep.c.add(r2);
 
-            float C = m_maxLength2 - length2;
-            linearError = Math.max(linearError, -C);
-            C = MathUtils.clamp(C + Settings.linearSlop,
-                    -Settings.maxLinearCorrection, 0.0f);
-            float impulse = -m_limitMass2 * C;
-            float oldLimitPositionImpulse = m_limitPositionImpulse2;
-            m_limitPositionImpulse2 = Math.max(0.0f, m_limitPositionImpulse2
-                    + impulse);
-            impulse = m_limitPositionImpulse2 - oldLimitPositionImpulse;
+    		m_u2.set(p2.x - s2.x, p2.y - s2.y);
+    		float length2 = m_u2.length();
 
-            Vec2 P2 = m_u2.mul(-impulse);
-            b2.m_position.addLocal(P2.mul(b2.m_invMass));
-            b2.m_rotation += b2.m_invI * Vec2.cross(r2, P2);
-            b2.m_R.setAngle(b2.m_rotation);
-        }
+    		if (length2 > Settings.linearSlop) {
+    			m_u2.mulLocal(1.0f / length2);
+    		} else {
+    			m_u2.setZero();
+    		}
 
-        return linearError < Settings.linearSlop;
+    		float C = m_maxLength2 - length2;
+    		linearError = Math.max(linearError, -C);
+    		C = MathUtils.clamp(C + Settings.linearSlop, -Settings.maxLinearCorrection, 0.0f);
+    		float impulse = -m_limitMass2 * C;
+    		float oldLimitPositionImpulse = m_limitPositionImpulse2;
+    		m_limitPositionImpulse2 = Math.max(0.0f, m_limitPositionImpulse2 + impulse);
+    		impulse = m_limitPositionImpulse2 - oldLimitPositionImpulse;
+
+    		Vec2 P2 = m_u2.mul(-impulse);
+    		b2.m_sweep.c.x += b2.m_invMass * P2.x;
+    		b2.m_sweep.c.y += b2.m_invMass * P2.y;
+    		b2.m_sweep.a += b2.m_invI * Vec2.cross(r2, P2);
+
+    		b2.synchronizeTransform();
+    	}
+
+    	return linearError < Settings.linearSlop;
     }
 
     public Vec2 getAnchor1() {
-        return m_body1.m_R.mul(m_localAnchor1).addLocal(m_body1.m_position);
+    	return m_body1.getWorldPoint(m_localAnchor1);
     }
 
     public Vec2 getAnchor2() {
-        return m_body2.m_R.mul(m_localAnchor2).addLocal(m_body2.m_position);
+    	return m_body2.getWorldPoint(m_localAnchor2);
     }
 
-    public Vec2 getGroundPoint1() {
-        return m_ground.m_position.add(m_groundAnchor1);
+    public Vec2 getReactionForce() {
+    	Vec2 F = m_u2.mul(m_force);
+    	return F;
     }
 
-    public Vec2 getGroundPoint2() {
-        return m_ground.m_position.add(m_groundAnchor2);
+    public float getReactionTorque() {
+    	return 0.0f;
     }
 
-    public Vec2 getReactionForce(float invTimeStep) {
-        // NOT_USED(invTimeStep);
-        Vec2 F = new Vec2(0.0f, 0.0f); // = (m_pulleyImpulse * invTimeStep) *
-        // m_u;
-        return F;
+    public Vec2 getGroundAnchor1() {
+    	return m_ground.m_xf.position.add(m_groundAnchor1);
     }
 
-    public float getReactionTorque(float invTimeStep) {
-        // NOT_USED(invTimeStep);
-        return 0.0f;
+    public Vec2 getGroundAnchor2() {
+    	return m_ground.m_xf.position.add(m_groundAnchor2);
     }
 
     public float getLength1() {
-        Vec2 p = m_body1.m_R.mul(m_localAnchor1).addLocal(m_body1.m_position);
-        Vec2 s = m_ground.m_position.add(m_groundAnchor1);
-        Vec2 d = p.sub(s);
-        return d.length();
+    	Vec2 p = m_body1.getWorldPoint(m_localAnchor1);
+    	Vec2 s = m_ground.m_xf.position.add(m_groundAnchor1);
+    	Vec2 d = p.subLocal(s);
+    	return d.length();
     }
 
     public float getLength2() {
-        Vec2 p = m_body2.m_R.mul(m_localAnchor2).addLocal(m_body2.m_position);
-        Vec2 s = m_ground.m_position.add(m_groundAnchor2);
-        Vec2 d = p.sub(s);
-        return d.length();
+    	Vec2 p = m_body2.getWorldPoint(m_localAnchor2);
+    	Vec2 s = m_ground.m_xf.position.add(m_groundAnchor2);
+    	Vec2 d = p.subLocal(s);
+    	return d.length();
     }
 
     public float getRatio() {
-        return m_ratio;
+    	return m_ratio;
     }
 
 }

@@ -23,31 +23,70 @@
 package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
 
+//Updated to rev. 56->108 of b2RevoluteJoint.cpp/.h
+
+/// Revolute joint definition. This requires defining an
+/// anchor point where the bodies are joined. The definition
+/// uses local anchor points so that the initial configuration
+/// can violate the constraint slightly. You also need to
+/// specify the initial relative angle for joint limits. This
+/// helps when saving and loading a game.
+/// The local anchor points are measured from the body's origin
+/// rather than the center of mass because:
+/// 1. you might not know where the center of mass will be.
+/// 2. if you add/remove shapes from a body and recompute the mass,
+///    the joints will be broken.
 public class RevoluteJointDef extends JointDef {
+	public RevoluteJointDef() {
+		type = JointType.REVOLUTE_JOINT;
+		localAnchor1 = new Vec2(0.0f, 0.0f);
+		localAnchor2 = new Vec2(0.0f, 0.0f);
+		referenceAngle = 0.0f;
+		lowerAngle = 0.0f;
+		upperAngle = 0.0f;
+		maxMotorTorque = 0.0f;
+		motorSpeed = 0.0f;
+		enableLimit = false;
+		enableMotor = false;
+	}
 
-    public Vec2 anchorPoint;
+	/// Initialize the bodies, anchors, and reference angle using the world
+	/// anchor.
+	public void initialize(Body b1, Body b2, Vec2 anchor) {
+		body1 = b1;
+		body2 = b2;
+		localAnchor1 = body1.getLocalPoint(anchor);
+		localAnchor2 = body2.getLocalPoint(anchor);
+		referenceAngle = body2.getAngle() - body1.getAngle();
+	}
 
-    public float lowerAngle;
+	/// The local anchor point relative to body1's origin.
+	public Vec2 localAnchor1;
 
-    public float upperAngle;
+	/// The local anchor point relative to body2's origin.
+	public Vec2 localAnchor2;
 
-    public float motorTorque;
+	/// The body2 angle minus body1 angle in the reference state (radians).
+	public float referenceAngle;
 
-    public float motorSpeed;
+	/// A flag to enable joint limits.
+	public boolean enableLimit;
 
-    public boolean enableLimit;
+	/// The lower angle for the joint limit (radians).
+	public float lowerAngle;
 
-    public boolean enableMotor;
+	/// The upper angle for the joint limit (radians).
+	public float upperAngle;
 
-    public RevoluteJointDef() {
-        type = JointType.REVOLUTE_JOINT;
-        anchorPoint = new Vec2(0.0f, 0.0f);
-        lowerAngle = 0.0f;
-        upperAngle = 0.0f;
-        motorTorque = 0.0f;
-        motorSpeed = 0.0f;
-        enableLimit = false;
-        enableMotor = false;
-    }
+	/// A flag to enable the joint motor.
+	public boolean enableMotor;
+
+	/// The desired motor speed. Usually in radians per second.
+	public float motorSpeed;
+
+	/// The maximum motor torque used to achieve the desired motor speed.
+	/// Usually in N-m.
+	public float maxMotorTorque;
 }

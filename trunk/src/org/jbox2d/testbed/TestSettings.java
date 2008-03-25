@@ -27,21 +27,27 @@ public class TestSettings {
 
     public int iterationCount;
 
-    public boolean drawStats;
-
-    public boolean drawContacts;
-
-    public boolean drawImpulses;
-
-    public boolean drawAABBs;
-
-    public boolean drawPairs;
-    
-    public boolean drawCM;
-
     public boolean enableWarmStarting;
-
     public boolean enablePositionCorrection;
+    public boolean enableTOI;
+
+	public boolean pause;
+	public boolean singleStep;
+
+	public boolean drawShapes;
+	public boolean drawJoints;
+	public boolean drawCoreShapes;
+	public boolean drawOBBs;
+	public boolean drawCOMs;
+    public boolean drawStats;
+    public boolean drawContacts;
+    public boolean drawImpulses;
+    public boolean drawAABBs;
+    public boolean drawPairs;
+	public boolean drawContactPoints;
+	public boolean drawContactNormals;
+	public boolean drawContactForces;
+	public boolean drawFrictionForces;
 
     public TestSettings() {
         hz = 60;
@@ -49,10 +55,21 @@ public class TestSettings {
         drawStats = false;
         drawContacts = false;
         drawImpulses = false;
-        drawAABBs = false;
+        drawAABBs = true;
         drawPairs = false;
-        drawCM = true;
+        drawShapes = true;
+        drawJoints = true;
+        drawCoreShapes = false;
+        drawContactPoints = true;
+        drawContactNormals = true;
+        drawContactForces = true;
+        drawFrictionForces = false;
+        drawOBBs = false;
+        drawCOMs = false;
         enableWarmStarting = true;
         enablePositionCorrection = true;
+        enableTOI = true;
+        pause = false;
+        singleStep = false;
     }
 }

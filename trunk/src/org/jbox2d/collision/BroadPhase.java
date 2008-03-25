@@ -676,12 +676,15 @@ public class BroadPhase {
             proxy.isValid();
             results[i] = proxy.userData;
         }
+        
+        Object[] copy = new Object[count];
+        System.arraycopy(results,0,copy,0,count);
 
         // Prepare for next query.
         m_queryResultCount = 0;
         incrementTimeStamp();
 
-        return results;
+        return copy;//results;
     }
 
     public void validate() {

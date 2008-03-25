@@ -27,9 +27,15 @@ import java.util.List;
 
 import org.jbox2d.collision.CircleShape;
 import org.jbox2d.collision.CollideCircle;
+import org.jbox2d.collision.Collision;
+import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.Manifold;
+import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.collision.ShapeType;
+import org.jbox2d.common.XForm;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.ContactListener;
 
 
 public class CircleContact extends Contact implements ContactCreateFcn {
@@ -68,20 +74,51 @@ public class CircleContact extends Contact implements ContactCreateFcn {
 
     }
 
-    public void evaluate() {
-        CollideCircle.collideCircle(m_manifold, (CircleShape) m_shape1,
-                (CircleShape) m_shape2, false);
+    public void evaluate(ContactListener listener) {
+        //CollideCircle.collideCircle(m_manifold, (CircleShape) m_shape1,
+        //        (CircleShape) m_shape2, false);
+        Body b1 = m_shape1.m_body;
+    	Body b2 = m_shape2.m_body;
+
+    	Manifold m0 = new Manifold(m_manifold);
+        for (int k = 0; k < m_manifold.pointCount; k++) {
+            m0.points[k] = new ManifoldPoint(m_manifold.points[k]);
+            m0.points[k].normalForce = m_manifold.points[k].normalForce;
+            m0.points[k].tangentForce = m_manifold.points[k].tangentForce;
+            //m0.points[k].id.key = m_manifold.points[k].id.key;
+            m0.points[k].id.features.set(m_manifold.points[k].id.features);
+            //System.out.println(m_manifold.points[k].id.key);
+        }
+    	
+    	CollideCircle.collideCircle(m_manifold, (CircleShape)m_shape1, b1.m_xf, (CircleShape)m_shape2, b2.m_xf);
 
         if (m_manifold.pointCount > 0) {
             m_manifoldCount = 1;
+            if (m0.pointCount == 0) {
+    			m_manifold.points[0].id.features.flip |= Collision.NEW_POINT;
+    		} else {
+    			m_manifold.points[0].id.features.flip &= ~Collision.NEW_POINT;
+    		}
         }
         else {
             m_manifoldCount = 0;
+    		if (m0.pointCount > 0 && (listener != null)) {
+    			ContactPoint cp = new ContactPoint();
+    			cp.shape1 = m_shape1;
+    			cp.shape2 = m_shape2;
+    			cp.normal.set(m0.normal);
+    			cp.position = XForm.mul(b1.m_xf, m0.points[0].localPoint1);
+    			cp.separation = m0.points[0].separation;
+    			cp.normalForce = m0.points[0].normalForce;
+    			cp.tangentForce = m0.points[0].tangentForce;
+    			cp.id = new ContactID(m0.points[0].id);
+    			listener.remove(cp);
+    		}
         }
     }
 
     @Override
-    public List<Manifold> GetManifolds() {
+    public List<Manifold> getManifolds() {
         List<Manifold> ret = new ArrayList<Manifold>(1);
         if (m_manifold != null) {
             ret.add(m_manifold);

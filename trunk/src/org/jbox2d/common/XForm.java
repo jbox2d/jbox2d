@@ -27,6 +27,11 @@ public class XForm {
 		position = _position.clone();
 		R = _R.clone();
 	}
+	
+	public void set(XForm xf) {
+		position.set(xf.position);
+		R.set(xf.R);
+	}
 
 	/// Set this to the identity transform.
 	public void setIdentity(){

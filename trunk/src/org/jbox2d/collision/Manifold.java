@@ -49,9 +49,9 @@ public class Manifold {
         // copy of a Manifold, by copying the points array
         // or merely passing a pointer to it.
         System.arraycopy(other.points, 0, points, 0, other.points.length);
-        // points = new ContactPoint[other.points.length];
+        // points = new ManifoldPoint[other.points.length];
         // for (int i=0; i<other.points.length; i++){
-        // points[i] = new ContactPoint(other.points[i]);
+        //   points[i] = new ManifoldPoint(other.points[i]);
         // }
         normal = other.normal.clone();
         pointCount = other.pointCount;// points.length;

@@ -25,5 +25,5 @@ package org.jbox2d.dynamics.contacts;
 import org.jbox2d.collision.Shape;
 
 public interface ContactCreateFcn {
-    Contact create(Shape s1, Shape s2);
+    public Contact create(Shape s1, Shape s2);
 }

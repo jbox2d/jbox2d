@@ -166,6 +166,13 @@ public class Distance{
 		Vec2 p1s[] = new Vec2[3];
 		Vec2 p2s[] = new Vec2[3];
 		Vec2 points[] = new Vec2[3];
+		
+		for (int i=0; i<3; ++i) {
+			p1s[i] = new Vec2();
+			p2s[i] = new Vec2();
+			points[i] = new Vec2();
+		}
+		
 		int pointCount = 0;
 
 		x1.set(shape1.getFirstVertex(xf1));
@@ -316,15 +323,15 @@ public class Distance{
 			return DistanceCC(x1, x2, (CircleShape)shape1, xf1, (CircleShape)shape2, xf2);
 		}
 		
-		if (type1 == ShapeType.POLY_SHAPE && type2 == ShapeType.CIRCLE_SHAPE) {
+		if (type1 == ShapeType.POLYGON_SHAPE && type2 == ShapeType.CIRCLE_SHAPE) {
 			return DistancePC(x1, x2, (PolygonShape)shape1, xf1, (CircleShape)shape2, xf2);
 		}
 
-		if (type1 == ShapeType.CIRCLE_SHAPE && type2 == ShapeType.POLY_SHAPE) {
+		if (type1 == ShapeType.CIRCLE_SHAPE && type2 == ShapeType.POLYGON_SHAPE) {
 			return DistancePC(x2, x1, (PolygonShape)shape2, xf2, (CircleShape)shape1, xf1);
 		}
 
-		if (type1 == ShapeType.POLY_SHAPE && type2 == ShapeType.POLY_SHAPE) {
+		if (type1 == ShapeType.POLYGON_SHAPE && type2 == ShapeType.POLYGON_SHAPE) {
 			return DistanceGeneric(x1, x2, (PolygonShape)shape1, xf1, (PolygonShape)shape2, xf2);
 		}
 

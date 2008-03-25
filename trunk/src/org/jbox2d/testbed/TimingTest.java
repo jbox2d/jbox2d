@@ -134,7 +134,7 @@ public class TimingTest extends PApplet {
     void DrawShape(Shape shape, int c) {
         stroke(c);
         noFill();
-        if (shape.m_type == ShapeType.POLY_SHAPE
+        if (shape.m_type == ShapeType.POLYGON_SHAPE
                 || shape.m_type == ShapeType.BOX_SHAPE) {
             PolygonShape poly = (PolygonShape) shape;
 

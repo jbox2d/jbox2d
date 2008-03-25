@@ -20,32 +20,42 @@
  * misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  */
+
+// Updated to rev 89 of b2ContactSolver.h/.cpp
 package org.jbox2d.dynamics.contacts;
 
 import org.jbox2d.common.Vec2;
 
 public class ContactConstraintPoint {
-    Vec2 localAnchor1;
+    public Vec2 localAnchor1;
 
-    Vec2 localAnchor2;
+    public Vec2 localAnchor2;
+    
+    public Vec2 r1;
+    
+    public Vec2 r2;
 
-    float normalImpulse;
+    public float normalForce;
 
-    float tangentImpulse;
+    public float tangentForce;
 
-    float positionImpulse;
+    public float positionImpulse;
 
-    float normalMass;
+    public float normalMass;
 
-    float tangentMass;
+    public float tangentMass;
+    
+    public float equalizedMass;
 
-    float separation;
+    public float separation;
 
-    float velocityBias;
+    public float velocityBias;
 
     public ContactConstraintPoint() {
         // Probably unnecessary to init
         localAnchor1 = new Vec2();
         localAnchor2 = new Vec2();
+        r1 = new Vec2();
+        r2 = new Vec2();
     }
 }
