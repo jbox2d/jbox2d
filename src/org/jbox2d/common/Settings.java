@@ -95,5 +95,18 @@ public class Settings {
     public static final float angularSleepTolerance = 2.0f / 180.0f / timeUnitsPerSecond;
     
     public static final float toiSlop = 8.0f * linearSlop;
+    
+  /// The maximum linear velocity of a body. This limit is very large and is used
+  /// to prevent numerical problems. You shouldn't need to adjust this.
+  public static final float maxLinearVelocity = 200.0f;
+  public static final float maxLinearVelocitySquared = maxLinearVelocity * maxLinearVelocity;
+
+  /// The maximum angular velocity of a body. This limit is very large and is used
+  /// to prevent numerical problems. You shouldn't need to adjust this.
+  public static final float maxAngularVelocity = 250.0f;
+  public static final float maxAngularVelocitySquared = maxAngularVelocity * maxAngularVelocity;
+
+  public static int maxTOIContactsPerIsland = 32;
+
 
 }

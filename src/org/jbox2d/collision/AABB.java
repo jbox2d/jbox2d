@@ -44,14 +44,14 @@ public class AABB {
     }
 
     // Verify that the bounds are sorted.
-    boolean isValid() {
+    public boolean isValid() {
         Vec2 d = upperBound.sub(lowerBound);
     	boolean valid = (d.x >= 0.0f && d.y >= 0);
     	valid = valid && lowerBound.isValid() && upperBound.isValid();
     	return valid;
     }
 
-    boolean testOverlap(AABB box) {
+    public boolean testOverlap(AABB box) {
         Vec2 d1 = box.lowerBound.sub(upperBound);
         Vec2 d2 = lowerBound.sub(box.upperBound);
 

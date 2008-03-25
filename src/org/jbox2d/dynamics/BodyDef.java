@@ -22,7 +22,7 @@
  */
 package org.jbox2d.dynamics;
 
-//Updated to rev. 56 of b2Body.h
+//Updated to rev. 56->118 of b2Body.h
 
 import org.jbox2d.collision.MassData;
 import org.jbox2d.common.Vec2;
@@ -72,6 +72,7 @@ public class BodyDef {
 	public boolean isBullet;
 
 	public BodyDef() {
+		massData = new MassData();
         massData.center = new Vec2(0.0f, 0.0f);
         massData.mass = 0.0f;
         massData.I = 0.0f;

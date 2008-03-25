@@ -8,7 +8,7 @@ public class TOI {
 	// This algorithm uses conservative advancement to compute the time of
 	// impact (TOI) of two shapes.
 	// Refs: Bullet, Young Kim
-	public static float TimeOfImpact(Shape shape1, Sweep sweep1,
+	public static float timeOfImpact(Shape shape1, Sweep sweep1,
 						   			 Shape shape2, Sweep sweep2) {
 		
 		float r1 = shape1.getSweepRadius();

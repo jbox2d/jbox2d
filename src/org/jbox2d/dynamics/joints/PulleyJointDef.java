@@ -44,33 +44,74 @@
  */
 package org.jbox2d.dynamics.joints;
 
+import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+
+// Updated to rev 130 of b2PulleyJoint.cpp/.h
 
 public class PulleyJointDef extends JointDef {
 
-    public Vec2 groundPoint1;
+	public PulleyJointDef() {
+		type = JointType.PULLEY_JOINT;
+		groundAnchor1 = new Vec2(-1.0f, 1.0f);
+		groundAnchor2 = new Vec2(1.0f, 1.0f);
+		localAnchor1 = new Vec2(-1.0f, 0.0f);
+		localAnchor2 = new Vec2(1.0f, 0.0f);
+		length1 = 0.0f;
+		maxLength1 = 0.0f;
+		length2 = 0.0f;
+		maxLength2 = 0.0f;
+		ratio = 1.0f;
+		collideConnected = true;
+	}
 
-    public Vec2 groundPoint2;
+	/// Initialize the bodies, anchors, lengths, max lengths, and ratio using the world anchors.
+	void initialize(Body b1, Body b2,
+					Vec2 ga1, Vec2 ga2,
+					Vec2 anchor1, Vec2 anchor2,
+					float r){
+		body1 = b1;
+		body2 = b2;
+		groundAnchor1 = ga1;
+		groundAnchor2 = ga2;
+		localAnchor1 = body1.getLocalPoint(anchor1);
+		localAnchor2 = body2.getLocalPoint(anchor2);
+		Vec2 d1 = anchor1.sub(ga1);
+		length1 = d1.length();
+		Vec2 d2 = anchor2.sub(ga2);
+		length2 = d2.length();
+		ratio = r;
+		assert(ratio > Settings.EPSILON);
+		float C = length1 + ratio * length2;
+		maxLength1 = C - ratio * PulleyJoint.MIN_PULLEY_LENGTH;
+		maxLength2 = (C - PulleyJoint.MIN_PULLEY_LENGTH) / ratio;
+	}
+	
+	/// The first ground anchor in world coordinates. This point never moves.
+	public Vec2 groundAnchor1;
 
-    public Vec2 anchorPoint1;
+	/// The second ground anchor in world coordinates. This point never moves.
+	public Vec2 groundAnchor2;
 
-    public Vec2 anchorPoint2;
+	/// The local anchor point relative to body1's origin.
+	public Vec2 localAnchor1;
 
-    public float maxLength1;
+	/// The local anchor point relative to body2's origin.
+	public Vec2 localAnchor2;
 
-    public float maxLength2;
+	/// The a reference length for the segment attached to body1.
+	public float length1;
 
-    public float ratio;
+	/// The maximum length of the segment attached to body1.
+	public float maxLength1;
 
-    public PulleyJointDef() {
-        type = JointType.PULLEY_JOINT;
-        groundPoint1 = new Vec2(-1.0f, 1.0f);
-        groundPoint2 = new Vec2(1.0f, 1.0f);
-        anchorPoint1 = new Vec2(-1.0f, 0.0f);
-        anchorPoint2 = new Vec2(1.0f, 0.0f);
-        maxLength1 = 0.5f * PulleyJoint.MIN_PULLEY_LENGTH;
-        maxLength2 = 0.5f * PulleyJoint.MIN_PULLEY_LENGTH;
-        ratio = 1.0f;
-        collideConnected = true;
-    }
+	/// The a reference length for the segment attached to body2.
+	public float length2;
+
+	/// The maximum length of the segment attached to body2.
+	public float maxLength2;
+
+	/// The pulley ratio, used to simulate a block-and-tackle.
+	public float ratio;
 }

@@ -27,10 +27,16 @@ import java.util.List;
 
 import org.jbox2d.collision.CircleShape;
 import org.jbox2d.collision.CollideCircle;
+import org.jbox2d.collision.Collision;
+import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.Manifold;
+import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.collision.PolygonShape;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.collision.ShapeType;
+import org.jbox2d.common.XForm;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.ContactListener;
 
 
 class PolyAndCircleContact extends Contact implements ContactCreateFcn {
@@ -39,15 +45,14 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
 
     public PolyAndCircleContact(Shape s1, Shape s2) {
         super(s1, s2);
-        assert (m_shape1.m_type == ShapeType.POLY_SHAPE);
+        assert (m_shape1.m_type == ShapeType.POLYGON_SHAPE);
         assert (m_shape2.m_type == ShapeType.CIRCLE_SHAPE);
         m_manifold = new Manifold();
         m_manifoldCount = 0;
         // These should not be necessary, manifold was
         // just created...
-        // m_manifold.pointCount = 0;
-        // m_manifold.points[0].normalImpulse = 0.0f;
-        // m_manifold.points[0].tangentImpulse = 0.0f;
+        //m_manifold.points[0].normalForce = 0.0f;
+    	//m_manifold.points[0].tangentForce = 0.0f;
     }
 
     public PolyAndCircleContact() {
@@ -85,7 +90,7 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
     }
 
     @Override
-    public List<Manifold> GetManifolds() {
+    public List<Manifold> getManifolds() {
         List<Manifold> ret = new ArrayList<Manifold>(1);
         if (m_manifold != null) {
             ret.add(m_manifold);
@@ -93,16 +98,46 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
         return ret;
     }
 
-    public void evaluate() {
-        // System.out.println("PolyAndCircleContact.Evaluate()");
-        CollideCircle.collidePolyAndCircle(m_manifold, (PolygonShape) m_shape1,
-                (CircleShape) m_shape2, false);
+    public void evaluate(ContactListener listener) {
+    	
+    	Body b1 = m_shape1.getBody();
+    	Body b2 = m_shape2.getBody();
 
-        if (m_manifold.pointCount > 0) {
-            m_manifoldCount = 1;
+    	//memcpy(&m0, &m_manifold, sizeof(b2Manifold));
+    	Manifold m0 = new Manifold(m_manifold);
+        for (int k = 0; k < m_manifold.pointCount; k++) {
+            m0.points[k] = new ManifoldPoint(m_manifold.points[k]);
+            m0.points[k].normalForce = m_manifold.points[k].normalForce;
+            m0.points[k].tangentForce = m_manifold.points[k].tangentForce;
+            //m0.points[k].id.key = m_manifold.points[k].id.key;
+            m0.points[k].id.features.set(m_manifold.points[k].id.features);
+            //System.out.println(m_manifold.points[k].id.key);
         }
-        else {
-            m_manifoldCount = 0;
-        }
+    	
+    	CollideCircle.collidePolygonAndCircle(m_manifold, (PolygonShape)m_shape1, b1.m_xf, (CircleShape)m_shape2, b2.m_xf);
+
+    	if (m_manifold.pointCount > 0) {
+    		m_manifoldCount = 1;
+    		if (m0.pointCount == 0) {
+    			m_manifold.points[0].id.features.flip |= Collision.NEW_POINT;
+    		} else {
+    			m_manifold.points[0].id.features.flip &= ~Collision.NEW_POINT;
+    		}
+    	} else {
+    		m_manifoldCount = 0;
+    		if (m0.pointCount > 0 && (listener != null)) {
+    			ContactPoint cp = new ContactPoint();
+    			cp.shape1 = m_shape1;
+    			cp.shape2 = m_shape2;
+    			cp.normal = m0.normal;
+    			cp.position = XForm.mul(b1.m_xf, m0.points[0].localPoint1);
+    			cp.separation = m0.points[0].separation;
+    			cp.normalForce = m0.points[0].normalForce;
+    			cp.tangentForce = m0.points[0].tangentForce;
+    			cp.id = new ContactID(m0.points[0].id);
+    			listener.remove(cp);
+    		}
+    	}
+    	
     }
 }

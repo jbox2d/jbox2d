@@ -35,7 +35,7 @@ public class PolygonDef extends ShapeDef {
     public List<Vec2> vertices;
 
     public PolygonDef() {
-        type = ShapeType.POLY_SHAPE;
+        type = ShapeType.POLYGON_SHAPE;
         vertices = new ArrayList<Vec2>();
     }
     
@@ -50,7 +50,7 @@ public class PolygonDef extends ShapeDef {
     public void setAsBox(float hx, float hy, Vec2 center, float angle) {
     	setAsBox(hx, hy);
     	XForm xf = new XForm();
-    	xf.position = center;
+    	xf.position.set(center);
     	xf.R.set(angle);
 
     	for (int i = 0; i < vertices.size(); ++i) {

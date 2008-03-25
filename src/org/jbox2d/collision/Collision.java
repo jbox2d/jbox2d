@@ -25,4 +25,6 @@ package org.jbox2d.collision;
 //Updated to rev 56 of b2Collision.h
 public class Collision {
     public static final int NULL_FEATURE = Integer.MAX_VALUE;
+    public static final int NEW_POINT = 0x02;
+    public static final int OLD_POINT = 0x04;
 }

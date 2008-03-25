@@ -363,7 +363,7 @@ public abstract class PTest extends PApplet {
     public void DrawShape(Shape shape, int c) {
         stroke(c);
         noFill();
-        if (shape.m_type == ShapeType.POLY_SHAPE
+        if (shape.m_type == ShapeType.POLYGON_SHAPE
                 || shape.m_type == ShapeType.BOX_SHAPE) {
             PolygonShape poly = (PolygonShape) shape;
 
@@ -433,7 +433,7 @@ public abstract class PTest extends PApplet {
         // g.setColor(new Color(1.0f, 0.0f, 0.0f));
         fill(255, 0, 0);
         noStroke();
-        for (Manifold m : c.GetManifolds()) {
+        for (Manifold m : c.getManifolds()) {
             for (int j = 0; j < m.pointCount; ++j) {
                 Vec2 v = m.points[j].position;
                 // g.fillOval((int) v.x, (int) v.y, 4, 4);
@@ -445,7 +445,7 @@ public abstract class PTest extends PApplet {
     void drawImpulse(Contact c) {
         // g.setColor(new Color(0.9f, 0.9f, 0.3f));
         stroke(230, 230, 80);
-        for (Manifold m : c.GetManifolds()) {
+        for (Manifold m : c.getManifolds()) {
             for (int j = 0; j < m.pointCount; ++j) {
                 Vec2 v1 = m.points[j].position;
                 Vec2 v2 = v1.add(m.normal.mul(m.points[j].normalForce));

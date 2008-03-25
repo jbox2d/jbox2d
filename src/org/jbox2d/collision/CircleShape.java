@@ -118,80 +118,19 @@ public class CircleShape extends Shape {
 
     	aabb.lowerBound.set(lower.x - m_radius, lower.y - m_radius);
     	aabb.upperBound.set(upper.x + m_radius, upper.y + m_radius);
+    	//System.out.println("Circle swept AABB: " + aabb.lowerBound + " " + aabb.upperBound);
+    	//System.out.println("Transforms: "+transform1.position+ " " + transform2.position+"\n");
+    	
     }
 
     public void computeMass(MassData massData) {
     	massData.mass = m_density * (float)Math.PI * m_radius * m_radius;
-    	massData.center = m_localPosition;
+    	massData.center = m_localPosition.clone();
 
     	// inertia about the local origin
     	massData.I = massData.mass * (0.5f * m_radius * m_radius + Vec2.dot(m_localPosition, m_localPosition));
     }
-    
-    //I think all this has been moved to the Shape superclass
-/*
-    public void synchronize(Vec2 position1, Mat22 R1, Vec2 position2, Mat22 R2) {
-        m_R.set(R2);
-        m_position = m_R.mul(m_localPosition).addLocal(position2);
 
-        if (m_proxyId == PairManager.NULL_PROXY) {
-            return;
-        }
-
-        // Compute an AABB that covers the swept shape (may miss some rotation effect).
-        Vec2 p1 = R1.mul(m_localPosition).addLocal(position1);
-        Vec2 lower = Vec2.min(p1, m_position);
-        Vec2 upper = Vec2.max(p1, m_position);
-
-        AABB aabb = new AABB();
-        aabb.lowerBound.set(lower.x - m_radius, lower.y - m_radius);
-        aabb.upperBound.set(upper.x + m_radius, upper.y + m_radius);
-
-        BroadPhase broadPhase = m_body.m_world.m_broadPhase;
-        if (broadPhase.inRange(aabb)) {
-            broadPhase.moveProxy(m_proxyId, aabb);
-        } else {
-            m_body.freeze();
-        }
-    }
-    
-    public void quickSync(Vec2 position, Mat22 R) {
-        m_R = R.clone();
-        m_position = R.mul(m_localPosition).addLocal(position); 
-    }
-
-    public Vec2 support(Vec2 d) {
-        Vec2 u = d.clone();
-        u.normalize();
-        float r = Math.max(0.0f, m_radius - 2.0f * Settings.linearSlop);
-        return u.mulLocal(r).addLocal(m_position); 
-    }
-
-
-    public void resetProxy(BroadPhase broadPhase) {
-        if (m_proxyId == PairManager.NULL_PROXY) {
-            return;
-        }
-
-        //Proxy proxy = broadPhase.getProxy(m_proxyId); //don't bother
-
-        broadPhase.destroyProxy(m_proxyId);
-        //proxy = null; //totally ineffective, but harmless...
-
-        AABB aabb = new AABB();
-        aabb.lowerBound.set(m_position.x - m_radius, m_position.y - m_radius);
-        aabb.upperBound.set(m_position.x + m_radius, m_position.y + m_radius);
-
-        if (broadPhase.inRange(aabb)) {
-            m_proxyId = broadPhase.CreateProxy(aabb, this);
-        } else {
-            m_proxyId = PairManager.NULL_PROXY;
-        }
-
-        if (m_proxyId == PairManager.NULL_PROXY) {
-            m_body.freeze();
-        }
-    }*/
     
     public float getRadius() {
     	return m_radius;

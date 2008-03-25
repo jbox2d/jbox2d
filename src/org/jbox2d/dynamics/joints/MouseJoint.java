@@ -25,11 +25,12 @@ package org.jbox2d.dynamics.joints;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
 
 
-//Updated to rev 56 of b2MouseJoint.cpp/.h
+//Updated to rev 56->130 of b2MouseJoint.cpp/.h
 
 //p = attached point, m = mouse point
 //C = p - m
@@ -45,25 +46,29 @@ public class MouseJoint extends Joint {
 
     public Vec2 m_target;
 
-    Vec2 m_impulse;
+    public Vec2 m_force;
 
-    Mat22 m_ptpMass; // effective mass for point-to-point constraint.
+    public Mat22 m_mass; // effective mass for point-to-point constraint.
 
-    Vec2 m_C; // position error
+    public Vec2 m_C; // position error
 
-    float m_maxForce;
+    public float m_maxForce;
 
-    float m_beta; // bias factor
+    public float m_beta; // bias factor
 
-    float m_gamma; // softness
+    public float m_gamma; // softness
 
     public MouseJoint(MouseJointDef def) {
         super(def);
+
+        m_force = new Vec2();
+        m_target = new Vec2();
+        m_C = new Vec2();
+        m_mass = new Mat22();
         m_target = def.target;
-        m_localAnchor = m_body2.m_R.mulT(m_target.sub(m_body2.m_position));
+        m_localAnchor = XForm.mulT(m_body2.m_xf, m_target);
 
         m_maxForce = def.maxForce;
-        m_impulse = new Vec2();
 
         float mass = m_body2.m_mass;
 
@@ -82,8 +87,9 @@ public class MouseJoint extends Joint {
 
     }
 
+    /// Use this to update the target point.
     public void setTarget(Vec2 target) {
-        m_body2.wakeUp();
+        if (m_body2.isSleeping()) m_body2.wakeUp();
         m_target = target;
     }
 
@@ -94,15 +100,15 @@ public class MouseJoint extends Joint {
 
     @Override
     public Vec2 getAnchor2() {
-        return m_body2.m_R.mul(m_localAnchor).addLocal(m_body2.m_position);
+    	return m_body2.getWorldPoint(m_localAnchor);
     }
 
     @Override
-    public void prepareVelocitySolver() {
+    public void initVelocityConstraints(TimeStep step) {
         Body b = m_body2;
 
-        // Compute the effective mass matrix.
-        Vec2 r = b.m_R.mul(m_localAnchor);
+     // Compute the effective mass matrix.
+    	Vec2 r = Mat22.mul(b.m_xf.R, m_localAnchor.sub(b.getLocalCenter()));
 
         // K = [(1/m1 + 1/m2) * eye(2) - skew(r1) * invI1 * skew(r1) - skew(r2)
         // * invI2 * skew(r2)]
@@ -121,17 +127,20 @@ public class MouseJoint extends Joint {
         K.col1.x += m_gamma;
         K.col2.y += m_gamma;
 
-        m_ptpMass = K.invert();
+        m_mass.set(K);
+        m_mass = m_mass.invert();
 
-        m_C = b.m_position.clone().addLocal(r).subLocal(m_target);
+        m_C.set(b.m_sweep.c.x + r.x - m_target.x, b.m_sweep.c.y + r.y - m_target.y);
 
         // Cheat with some damping
         b.m_angularVelocity *= 0.98f;
 
         // Warm starting.
-        Vec2 P = m_impulse.clone();
-        b.m_linearVelocity.addLocal(P.mul(invMass));
-        b.m_angularVelocity += invI * Vec2.cross(r, P);
+    	float Px = step.dt * m_force.x;
+    	float Py = step.dt * m_force.y;
+    	b.m_linearVelocity.x += invMass * Px;
+    	b.m_linearVelocity.y += invMass * Py;
+    	b.m_angularVelocity += invI * (r.x*Py-r.y*Px);
     }
 
     @Override
@@ -141,35 +150,39 @@ public class MouseJoint extends Joint {
 
     @Override
     public void solveVelocityConstraints(TimeStep step) {
-        Body body = m_body2;
+    	Body b = m_body2;
 
-        Vec2 r = body.m_R.mul(m_localAnchor);
+    	Vec2 r = Mat22.mul(b.m_xf.R, m_localAnchor.sub(b.getLocalCenter()));
 
-        // Cdot = v + cross(w, r)
-        Vec2 Cdot = body.m_linearVelocity.add(Vec2.cross(
-                body.m_angularVelocity, r));
+    	// Cdot = v + cross(w, r)
+    	Vec2 Cdot = b.m_linearVelocity.add(Vec2.cross(b.m_angularVelocity, r));
 
-        // Vec2 impulse = m_ptpMass.mul(
-        // Cdot.add(m_C.mul(m_beta * step.inv_dt).add(
-        // m_impulse.mul(m_gamma)))).negate();
+    	//Vec2 force = -step.inv_dt * Mat22.mul(m_mass, Cdot + (m_beta * step.inv_dt) * m_C + m_gamma * step.dt * m_force);
+    	Vec2 force = new Vec2( Cdot.x + (m_beta*step.inv_dt)*m_C.x + m_gamma * step.dt * m_force.x, 
+    						   Cdot.y + (m_beta*step.inv_dt)*m_C.y + m_gamma * step.dt * m_force.y );
+    	force = Mat22.mul(m_mass,force);
+    	force.mulLocal(-step.inv_dt);
 
-        Vec2 impulse = m_ptpMass.mul(
-                m_C.clone().mulLocal(m_beta * step.inv_dt).addLocal(
-                        m_impulse.mul(m_gamma)).addLocal(Cdot)).negateLocal();
+    	Vec2 oldForce = m_force.clone();
+    	m_force.addLocal(force);
+    	float forceMagnitude = m_force.length();
+    	if (forceMagnitude > m_maxForce) {
+    		m_force.mulLocal(m_maxForce / forceMagnitude);
+    	}
+    	force.set(m_force.x - oldForce.x, m_force.y - oldForce.y);
 
-        Vec2 oldImpulse = m_impulse.clone();
-        m_impulse.addLocal(impulse);
-        float length = m_impulse.length();
-        if (length > step.dt * m_maxForce) {
-            m_impulse.mulLocal(step.dt * m_maxForce / length);
-        }
-        impulse = m_impulse.sub(oldImpulse);
-
-        body.m_linearVelocity.addLocal(impulse.mul(body.m_invMass));
-        body.m_angularVelocity += body.m_invI * Vec2.cross(r, impulse);
+    	Vec2 P = new Vec2(step.dt * force.x, step.dt * force.y);
+    	b.m_linearVelocity.addLocal(P.mul(b.m_invMass));
+    	b.m_angularVelocity += b.m_invI * Vec2.cross(r, P);
     }
 
-    Vec2 getReactionForce(float invTimeStep) {
-        return m_impulse.mul(invTimeStep);
+    @Override
+    public Vec2 getReactionForce() {
+        return m_force;
     }
+
+	@Override
+	public float getReactionTorque() {
+		return 0.0f;
+	}
 }

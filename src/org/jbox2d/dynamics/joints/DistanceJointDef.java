@@ -23,15 +23,35 @@
 package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+
+//Updated to rev 56->130 of b2DistanceJoint.cpp/.h
 
 public class DistanceJointDef extends JointDef {
-    public Vec2 anchorPoint1;
-
-    public Vec2 anchorPoint2;
-
-    public DistanceJointDef() {
-        type = JointType.DISTANCE_JOINT;
-        anchorPoint1 = new Vec2(0.0f, 0.0f);
-        anchorPoint2 = new Vec2(0.0f, 0.0f);
-    }
+	/// The local anchor point relative to body1's origin.
+	public Vec2 localAnchor1;
+	
+	/// The local anchor point relative to body2's origin.
+	public Vec2 localAnchor2;
+	
+	/// The equilibrium length between the anchor points.
+	public float length;
+    
+	public DistanceJointDef() {
+		type = JointType.DISTANCE_JOINT;
+		localAnchor1 = new Vec2(0.0f, 0.0f);
+		localAnchor2 = new Vec2(0.0f, 0.0f);
+		length = 1.0f;
+	}
+	
+	/// Initialize the bodies, anchors, and length using the world
+	/// anchors.
+    public void initialize(Body b1, Body b2, Vec2 anchor1, Vec2 anchor2) {	
+    	body1 = b1;
+    	body2 = b2;
+    	localAnchor1 = body1.getLocalPoint(anchor1);
+    	localAnchor2 = body2.getLocalPoint(anchor2);
+    	Vec2 d = anchor2.sub(anchor1);
+		length = d.length();
+	}
 }

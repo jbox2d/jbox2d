@@ -25,12 +25,13 @@ package org.jbox2d.dynamics.contacts;
 import java.util.List;
 
 import org.jbox2d.collision.Manifold;
+import org.jbox2d.dynamics.ContactListener;
 
 
 public class NullContact extends Contact {
 
     @Override
-    public void evaluate() {
+    public void evaluate(ContactListener cl) {
     }
 
     public NullContact() {
@@ -42,7 +43,7 @@ public class NullContact extends Contact {
     }
 
     @Override
-    public List<Manifold> GetManifolds() {
+    public List<Manifold> getManifolds() {
         System.out.println("NullContact.GetManifolds()");
         return null;
     }

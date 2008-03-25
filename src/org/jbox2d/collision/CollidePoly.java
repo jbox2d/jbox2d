@@ -51,10 +51,14 @@ public class CollidePoly {
 
         // If the points are behind the plane
         if (distance0 <= 0.0f) {
-            vOut[numOut++] = vIn[0];
+            vOut[numOut] = new ClipVertex();
+            vOut[numOut].id = new ContactID(vIn[0].id);
+            vOut[numOut++].v = vIn[0].v.clone();
         }
         if (distance1 <= 0.0f) {
-            vOut[numOut++] = vIn[1];
+            vOut[numOut] = new ClipVertex();
+            vOut[numOut].id = new ContactID(vIn[1].id);
+            vOut[numOut++].v = vIn[1].v.clone();
         }
 
         // If the points are on different sides of the plane
@@ -66,10 +70,10 @@ public class CollidePoly {
             vOut[numOut].v.y = vIn[0].v.y + interp * (vIn[1].v.y - vIn[0].v.y);
 
             if (distance0 > 0.0f) {
-                vOut[numOut].id = vIn[0].id;
+                vOut[numOut].id = new ContactID(vIn[0].id);
             }
             else {
-                vOut[numOut].id = vIn[1].id;
+                vOut[numOut].id = new ContactID(vIn[1].id);
             }
             ++numOut;
         }
@@ -257,14 +261,15 @@ public class CollidePoly {
             return;
         }
 
-        MaxSeparation sepB = findMaxSeparation(polyB, xfA, polyA, xfB);
+        MaxSeparation sepB = findMaxSeparation(polyB, xfB, polyA, xfA);
         if (sepB.bestSeparation > 0.0f) {
             return;
         }
 
         PolygonShape poly1; // reference poly
         PolygonShape poly2; // incident poly
-        XForm xf1, xf2;
+        XForm xf1 = new XForm();
+        XForm xf2 = new XForm();
         int edge1; // reference edge
         byte flip;
         float k_relativeTol = 0.98f;
@@ -275,16 +280,16 @@ public class CollidePoly {
                 + k_absoluteTol) {
             poly1 = polyB;
             poly2 = polyA;
-            xf1 = xfB;
-    		xf2 = xfA;
+            xf1.set(xfB);
+    		xf2.set(xfA);
             edge1 = sepB.bestFaceIndex;
             flip = 1;
         }
         else {
             poly1 = polyA;
             poly2 = polyB;
-            xf1 = xfA;
-    		xf2 = xfB;
+            xf1.set(xfA);
+    		xf2.set(xfB);
             edge1 = sepA.bestFaceIndex;
             flip = 0;
         }
@@ -293,7 +298,6 @@ public class CollidePoly {
         findIncidentEdge(incidentEdge, poly1, xf1, edge1, poly2, xf2);
 
         int count1 = poly1.m_vertexCount;
-
         Vec2[] vert1s = poly1.m_vertices;
 
         Vec2 v11 = vert1s[edge1];
@@ -316,8 +320,7 @@ public class CollidePoly {
         int np;
 
         // Clip to box side 1
-        np = clipSegmentToLine(clipPoints1, incidentEdge, sideNormal.negate(),
-                sideOffset1);
+        np = clipSegmentToLine(clipPoints1, incidentEdge, sideNormal.negate(), sideOffset1);
 
         if (np < 2) {
             return;
@@ -332,7 +335,7 @@ public class CollidePoly {
         }
 
         // Now clipPoints2 contains the clipped points.
-        manif.normal = flip != 0 ? frontNormal.negate() : frontNormal.clone();
+        manif.normal = (flip != 0) ? frontNormal.negate() : frontNormal.clone();
 
         int pointCount = 0;
         for (int i = 0; i < Settings.maxManifoldPoints; ++i) {

@@ -75,6 +75,14 @@ public class ContactID {
         }
 
     }
+    
+    public void zero() {
+    	key = 0;
+    	features.flip = 0;
+    	features.incidentEdge = 0;
+    	features.incidentVertex = 0;
+    	features.referenceFace = 0;
+    }
 
     public ContactID() {
         key = 0;

@@ -20,6 +20,9 @@
  * misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  */
+
+//Updated to rev 89 of b2ContactSolver.h/.cpp
+
 package org.jbox2d.dynamics.contacts;
 
 import org.jbox2d.collision.Manifold;
@@ -29,21 +32,21 @@ import org.jbox2d.dynamics.Body;
 
 
 public class ContactConstraint {
-    ContactConstraintPoint points[];
+    public ContactConstraintPoint points[];
 
-    Vec2 normal;
+    public Vec2 normal;
 
-    Manifold manifold;
+    public Manifold manifold;
 
-    Body body1;
+    public Body body1;
 
-    Body body2;
+    public Body body2;
 
-    float friction;
+    public float friction;
 
-    float restitution;
+    public float restitution;
 
-    int pointCount;
+    public int pointCount;
 
     public ContactConstraint() {
         points = new ContactConstraintPoint[Settings.maxManifoldPoints];

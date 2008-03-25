@@ -24,12 +24,12 @@ package org.jbox2d.dynamics.contacts;
 
 import org.jbox2d.dynamics.Body;
 
-public class ContactNode {
+public class ContactEdge {
     public Body other;
 
     public Contact contact;
 
-    public ContactNode prev;
+    public ContactEdge prev;
 
-    public ContactNode next;
+    public ContactEdge next;
 }

@@ -30,6 +30,8 @@ import org.jbox2d.common.*;
 //Updated to rev 56 of b2Shape.cpp/.h
 
 public class PolygonShape extends Shape implements SupportsGenericDistance{
+    // Dump lots of debug information
+	private static boolean m_debug = true;
     
 	// Local position of the shape centroid in parent body frame.
     public Vec2 m_centroid;
@@ -44,24 +46,23 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
     public PolygonShape(ShapeDef def) {
     	super(def);
     	
-    	assert(def.type == ShapeType.POLY_SHAPE);
-    	m_type = ShapeType.POLY_SHAPE;
+    	assert(def.type == ShapeType.POLYGON_SHAPE);
+    	m_type = ShapeType.POLYGON_SHAPE;
     	PolygonDef poly = (PolygonDef)def;
+
+    	m_vertexCount = poly.vertexCount();
+    	m_vertices = new Vec2[m_vertexCount];
+    	m_normals = new Vec2[m_vertexCount];
+    	m_coreVertices = new Vec2[m_vertexCount];
     	
-    	//m_vertices = new Vec2[Settings.maxPolyVertices];
-        //m_normals = new Vec2[Settings.maxPolyVertices];
-        //m_coreVertices = new Vec2[Settings.maxPolyVertices];
-    	m_vertices = new Vec2[poly.vertexCount()];
-    	m_normals = new Vec2[poly.vertexCount()];
-    	m_coreVertices = new Vec2[poly.vertexCount()];
+    	m_obb = new OBB();
 
     	// Get the vertices transformed into the body frame.
-    	m_vertexCount = poly.vertexCount();
     	assert(3 <= m_vertexCount && m_vertexCount <= Settings.maxPolygonVertices);
 
     	// Copy vertices.
     	for (int i = 0; i < m_vertexCount; ++i) {
-    		m_vertices[i].set(poly.vertices.get(i));
+    		m_vertices[i] = poly.vertices.get(i).clone();
     	}	
 
     	// Compute normals. Ensure the edges have non-zero length.
@@ -140,6 +141,24 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
     		A.col1.y = n2.x; A.col2.y = n2.y;
     		m_coreVertices[i] = A.solve(d).addLocal(m_centroid);
     	}
+    	
+    	if (m_debug) {
+    		System.out.println("\nDumping polygon shape...");
+    		System.out.println("Vertices: ");
+    		for (int i=0; i<m_vertexCount; ++i) {
+    			System.out.println(m_vertices[i]);
+    		}
+    		System.out.println("Core Vertices: ");
+    		for (int i=0; i<m_vertexCount; ++i) {
+    			System.out.println(m_coreVertices[i]);
+    		}
+    		System.out.println("Normals: ");
+    		for (int i=0; i<m_vertexCount; ++i) {
+    			System.out.println(m_normals[i]);
+    		}
+    		System.out.println("Centroid: "+m_centroid);
+    		
+    	}
     }
     
     public void updateSweepRadius(Vec2 center) {
@@ -155,8 +174,18 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
     public boolean testPoint(XForm xf, Vec2 p) {
     	Vec2 pLocal = Mat22.mulT(xf.R, p.sub(xf.position));
 
+    	if (m_debug) {
+    		System.out.println("--testPoint debug--");
+    		System.out.println("Vertices: ");
+    		for (int i=0; i < m_vertexCount; ++i) {
+    			System.out.println(m_vertices[i]);
+    		}
+    		System.out.println("pLocal: "+pLocal);
+    	}
+    	
     	for (int i = 0; i < m_vertexCount; ++i) {
-    		float dot = Vec2.dot(m_normals[i], pLocal.subLocal(m_vertices[i]));
+    		float dot = Vec2.dot(m_normals[i], pLocal.sub(m_vertices[i]));
+    		
     		if (dot > 0.0f) {
     			return false;
     		}
@@ -343,12 +372,14 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 	}
 	
 	public void computeSweptAABB(AABB aabb, XForm transform1, XForm transform2) {
+		
 		AABB aabb1 = new AABB();
 		AABB aabb2 = new AABB();
 		computeAABB(aabb1, transform1);
 		computeAABB(aabb2, transform2);
 		aabb.lowerBound = Vec2.min(aabb1.lowerBound, aabb2.lowerBound);
 		aabb.upperBound = Vec2.max(aabb1.upperBound, aabb2.upperBound);
+		//System.out.println("poly sweepaabb: "+aabb.lowerBound+" "+aabb.upperBound);
 	}
 	
 	public void computeMass(MassData massData) {
@@ -423,9 +454,9 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		assert(area > Settings.EPSILON);
 		center.mulLocal(1.0f / area);
 		massData.center = center.clone();
-
+		
 		// Inertia tensor relative to the local origin.
-		massData.I *= m_density;
+		massData.I = I*m_density;
 	}
 	
 	public Vec2 getFirstVertex(XForm xf) {

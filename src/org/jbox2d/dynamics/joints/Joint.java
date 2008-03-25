@@ -27,7 +27,7 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
 
 
-//Updated to rev 56 of b2Joint.cpp/.h
+//Updated to rev 56->97 of b2Joint.cpp/.h
 
 public abstract class Joint {
 
@@ -37,9 +37,9 @@ public abstract class Joint {
 
     public Joint m_next;
 
-    public JointNode m_node1;
+    public JointEdge m_node1;
 
-    public JointNode m_node2;
+    public JointEdge m_node2;
 
     public Body m_body1;
 
@@ -55,8 +55,8 @@ public abstract class Joint {
         m_type = description.type;
         m_prev = null;
         m_next = null;
-        m_node1 = new JointNode();
-        m_node2 = new JointNode();
+        m_node1 = new JointEdge();
+        m_node2 = new JointEdge();
         m_body1 = description.body1;
         m_body2 = description.body2;
         m_collideConnected = description.collideConnected;
@@ -104,34 +104,53 @@ public abstract class Joint {
         return joint;
     }
 
+    /// Get the type of the concrete joint.
+    public JointType getType() {
+    	return m_type;
+    }
+    
+	/// Get the first body attached to this joint.
     public Body getBody1() {
         return m_body1;
     }
-
+    
+	/// Get the second body attached to this joint.
     public Body getBody2() {
         return m_body2;
     }
 
+    
+  /// Get the anchor point on body1 in world coordinates.
+	public abstract Vec2 getAnchor1();
+
+	/// Get the anchor point on body2 in world coordinates.
+	public abstract Vec2 getAnchor2();
+	
+    /// Get the reaction force on body2 at the joint anchor.
+	public abstract Vec2 getReactionForce();
+
+	/// Get the reaction torque on body2.
+	public abstract float getReactionTorque();
+    
+    /// Get the next joint the world joint list.
     public Joint getNext() {
         return m_next;
     }
-
-    public Object GetUserData() {
+    
+    /// Get the user data pointer.
+    public Object getUserData() {
         return m_userData;
     }
 
-    public abstract void prepareVelocitySolver();
+    public abstract void initVelocityConstraints(TimeStep step);
 
     public abstract void solveVelocityConstraints(TimeStep step);
 
-    public void preparePositionSolver() {
+    public void initPositionConstraints() {
         return;
     }
     
     // This returns true if the position errors are within tolerance.
     public abstract boolean solvePositionConstraints();
 
-    public abstract Vec2 getAnchor1();
-
-    public abstract Vec2 getAnchor2();
 }

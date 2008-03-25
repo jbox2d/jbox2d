@@ -29,11 +29,11 @@ import org.jbox2d.common.Settings;
 
 public class PairManager {
 
-    static final int NULL_PAIR = Integer.MAX_VALUE;
+    public static final int NULL_PAIR = Integer.MAX_VALUE;
 
     static final int NULL_PROXY = Integer.MAX_VALUE;
 
-    static final int TABLE_CAPACITY = Settings.maxPairs; // must be a power
+    public static final int TABLE_CAPACITY = Settings.maxPairs; // must be a power
 
     // of two
     static final int TABLE_MASK = TABLE_CAPACITY - 1;
@@ -42,7 +42,7 @@ public class PairManager {
 
     public int m_pairCount;
 
-    int m_hashTable[];
+    public int m_hashTable[];
 
     //int m_next[];
     

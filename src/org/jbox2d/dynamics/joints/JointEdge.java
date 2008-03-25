@@ -24,12 +24,12 @@ package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.dynamics.Body;
 
-public class JointNode {
+public class JointEdge {
     public Body other;
 
     public Joint joint;
 
-    public JointNode prev;
+    public JointEdge prev;
 
-    public JointNode next;
+    public JointEdge next;
 }

@@ -22,17 +22,27 @@
  */
 package org.jbox2d.dynamics.joints;
 
+//Updated to rev. 97 of b2GearJoint.cpp/.h
+
+/// Gear joint definition. This definition requires two existing
+/// revolute or prismatic joints (any combination will work).
+/// The provided joints must attach a dynamic body to a static body.
 public class GearJointDef extends JointDef {
-    public Joint joint1;
+	/// The first revolute/prismatic joint attached to the gear joint.
+	Joint joint1;
 
-    public Joint joint2;
+	/// The second revolute/prismatic joint attached to the gear joint.
+	Joint joint2;
 
-    public float ratio;
-
-    public GearJointDef() {
-        type = JointType.GEAR_JOINT;
-        joint1 = null;
-        joint2 = null;
-        ratio = 1.0f;
-    }
+	/// The gear ratio.
+	/// @see b2GearJoint for explanation.
+	float ratio;
+	
+	public GearJointDef() {
+		type = JointType.GEAR_JOINT;
+		joint1 = null;
+		joint2 = null;
+		ratio = 1.0f;
+	}
+	
 }

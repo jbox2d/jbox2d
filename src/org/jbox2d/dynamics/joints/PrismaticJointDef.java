@@ -23,33 +23,63 @@
 package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+
+//Updated to rev 56->130 of b2PrismaticJoint.cpp/.h
 
 public class PrismaticJointDef extends JointDef {
-    public Vec2 anchorPoint;
+	public PrismaticJointDef() {
+		type = JointType.PRISMATIC_JOINT;
+		localAnchor1 = new Vec2();
+		localAnchor2 = new Vec2();
+		localAxis1 = new Vec2();
+		referenceAngle = 0.0f;
+		enableLimit = false;
+		lowerTranslation = 0.0f;
+		upperTranslation = 0.0f;
+		enableMotor = false;
+		maxMotorForce = 0.0f;
+		motorSpeed = 0.0f;
+	}
 
-    public Vec2 axis;
+	/// Initialize the bodies, anchors, axis, and reference angle using the world
+	/// anchor and world axis.
+	void Initialize(Body b1, Body b2, Vec2 anchor, Vec2 axis) {
+		body1 = b1;
+		body2 = b2;
+		localAnchor1 = body1.getLocalPoint(anchor);
+		localAnchor2 = body2.getLocalPoint(anchor);
+		localAxis1 = body1.getLocalVector(axis);
+		referenceAngle = body2.getAngle() - body1.getAngle();
+	}
 
-    public float lowerTranslation;
+	/// The local anchor point relative to body1's origin.
+	public Vec2 localAnchor1;
 
-    public float upperTranslation;
+	/// The local anchor point relative to body2's origin.
+	public Vec2 localAnchor2;
 
-    public float motorForce;
+	/// The local translation axis in body1.
+	public Vec2 localAxis1;
 
-    public float motorSpeed;
+	/// The constrained angle between the bodies: body2_angle - body1_angle.
+	public float referenceAngle;
 
-    public boolean enableLimit;
+	/// Enable/disable the joint limit.
+	public boolean enableLimit;
 
-    public boolean enableMotor;
+	/// The lower translation limit, usually in meters.
+	public float lowerTranslation;
 
-    public PrismaticJointDef() {
-        type = JointType.PRISMATIC_JOINT;
-        anchorPoint = new Vec2(0.0f, 0.0f);
-        axis = new Vec2(1.0f, 0.0f);
-        lowerTranslation = 0.0f;
-        upperTranslation = 0.0f;
-        motorForce = 0.0f;
-        motorSpeed = 0.0f;
-        enableLimit = false;
-        enableMotor = false;
-    }
+	/// The upper translation limit, usually in meters.
+	public float upperTranslation;
+
+	/// Enable/disable the joint motor.
+	public boolean enableMotor;
+
+	/// The maximum motor torque, usually in N-m.
+	public float maxMotorForce;
+
+	/// The desired motor speed in radians per second.
+	public float motorSpeed;
 }

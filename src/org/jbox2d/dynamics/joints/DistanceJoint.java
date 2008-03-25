@@ -23,11 +23,12 @@
 package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.common.*;
+import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.World;
 
 
-//Updated to rev 56 of b2DistanceJoint.cpp/.h
+//Updated to rev 56->130 of b2DistanceJoint.cpp/.h
 
 //C = norm(p2 - p1) - L
 //u = (p2 - p1) / norm(p2 - p1)
@@ -36,143 +37,141 @@ import org.jbox2d.dynamics.World;
 //K = J * invM * JT
 //= invMass1 + invI1 * cross(r1, u)^2 + invMass2 + invI2 * cross(r2, u)^2
 
+/// A distance joint constrains two points on two bodies
+/// to remain at a fixed distance from each other. You can view
+/// this as a massless, rigid rod.
+
 public class DistanceJoint extends Joint {
-    Vec2 m_localAnchor1;
+    
+    public Vec2 m_localAnchor1;
+    public Vec2 m_localAnchor2;
+	public Vec2 m_u;
+	public float m_force;
+	public float m_mass;		// effective mass for the constraint.
+	public float m_length;
 
-    Vec2 m_localAnchor2;
-
-    Vec2 m_u;
-
-    float m_impulse;
-
-    float m_mass; // effective mass for the constraint.
-
-    float m_length;
-
-    public DistanceJoint(DistanceJointDef description) {
-        super(description);
-        m_localAnchor1 = m_body1.m_R.mulT(description.anchorPoint1
-                .sub(m_body1.m_position));
-        m_localAnchor2 = m_body2.m_R.mulT(description.anchorPoint2
-                .sub(m_body2.m_position));
-
-        m_length = description.anchorPoint2.sub(description.anchorPoint1)
-                .length();
-        m_impulse = 0.0f;
+    public DistanceJoint(DistanceJointDef def) {
+        super(def);
+        m_localAnchor1 = def.localAnchor1;
+        m_localAnchor2 = def.localAnchor2;
+        m_length = def.length;
+        m_force = 0.0f;
     }
 
     @Override
     public Vec2 getAnchor1() {
-        return m_body1.m_R.mul(m_localAnchor1).addLocal(m_body1.m_position);
+    	return m_body1.getWorldPoint(m_localAnchor1);
     }
 
     @Override
     public Vec2 getAnchor2() {
-        return m_body2.m_R.mul(m_localAnchor2).addLocal(m_body2.m_position);
+        return m_body2.getWorldPoint(m_localAnchor2);
     }
 
-    public Vec2 getReactionForce(float invTimeStep) {
-        Vec2 F = m_u.mul(m_impulse * invTimeStep);
-        return F;
+    public Vec2 getReactionForce() {
+    	return new Vec2(m_force * m_u.x, m_force * m_u.y);
     }
 
-    public float getReactionTorque(float invTimeStep) {
+    public float getReactionTorque() {
         return 0.0f;
     }
 
     @Override
-    public void prepareVelocitySolver() {
-        // Compute the effective mass matrix.
-        Vec2 r1 = m_body1.m_R.mul(m_localAnchor1);
-        Vec2 r2 = m_body2.m_R.mul(m_localAnchor2);
+    public void initVelocityConstraints(TimeStep step) {
+    	//TODO: fully inline temp Vec2 ops
+    	Body b1 = m_body1;
+    	Body b2 = m_body2;
 
-        // m_u = m_body2.m_position.add(r2).sub(m_body1.m_position).sub(r1);
-        m_u = m_body2.m_position.clone().addLocal(r2).subLocal(
-                m_body1.m_position).subLocal(r1);
+    	// Compute the effective mass matrix.
+    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
+    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
+    	m_u.x = b2.m_sweep.c.x + r2.x - b1.m_sweep.c.x - r1.x;
+    	m_u.y = b2.m_sweep.c.y + r2.y - b1.m_sweep.c.y - r1.y;
 
-        // Handle singularity.
-        float length = m_u.length();
-        if (length > Settings.linearSlop) {
-            m_u.mulLocal(1.0f / length);
-        }
-        else {
-            m_u.set(0.0f, 0.0f);
-        }
+    	// Handle singularity.
+    	float length = m_u.length();
+    	if (length > Settings.linearSlop) {
+    		m_u.x *= 1.0f / length;
+    		m_u.y *= 1.0f / length;
+    	} else {
+    		m_u.set(0.0f, 0.0f);
+    	}
 
-        float cr1u = Vec2.cross(r1, m_u);
-        float cr2u = Vec2.cross(r2, m_u);
-        m_mass = m_body1.m_invMass + m_body1.m_invI * cr1u * cr1u
-                + m_body2.m_invMass + m_body2.m_invI * cr2u * cr2u;
+    	float cr1u = Vec2.cross(r1, m_u);
+    	float cr2u = Vec2.cross(r2, m_u);
+    	m_mass = b1.m_invMass + b1.m_invI * cr1u * cr1u + b2.m_invMass + b2.m_invI * cr2u * cr2u;
+    	assert(m_mass > Settings.EPSILON);
+    	m_mass = 1.0f / m_mass;
 
-        assert m_mass > Settings.EPSILON;
-
-        m_mass = 1.0f / m_mass;
-
-        if (World.ENABLE_WARM_STARTING) {
-            // Warm starting.
-            Vec2 p = m_u.mul(m_impulse);
-
-            m_body1.m_linearVelocity.subLocal(p.mul(m_body1.m_invMass));
-            m_body1.m_angularVelocity -= m_body1.m_invI * Vec2.cross(r1, p);
-            m_body2.m_linearVelocity.addLocal(p.mul(m_body2.m_invMass));
-            m_body2.m_angularVelocity += m_body2.m_invI * Vec2.cross(r2, p);
-        }
-        else {
-            m_impulse = 0.0f;
-        }
+    	if (World.ENABLE_WARM_STARTING) {
+    		float Px = step.dt * m_force * m_u.x;
+    		float Py = step.dt * m_force * m_u.y;
+    		b1.m_linearVelocity.x -= b1.m_invMass * Px;
+    		b1.m_linearVelocity.y -= b1.m_invMass * Py;
+    		b1.m_angularVelocity -= b1.m_invI * (r1.x*Py-r1.y*Px);//b2Cross(r1, P);
+    		b2.m_linearVelocity.x += b2.m_invMass * Px;
+    		b2.m_linearVelocity.y += b2.m_invMass * Py;
+    		b2.m_angularVelocity += b2.m_invI * (r2.x*Py-r2.y*Px);//b2Cross(r2, P);
+    	} else {
+    		m_force = 0.0f;
+    	}
     }
 
     @Override
     public boolean solvePositionConstraints() {
-        Vec2 r1 = m_body1.m_R.mul(m_localAnchor1);
-        Vec2 r2 = m_body2.m_R.mul(m_localAnchor2);
-        // Vec2 d = m_body2.m_position.add(r2).sub(m_body1.m_position).sub(r1);
-        Vec2 d = m_body2.m_position.clone().addLocal(r2).subLocal(
-                m_body1.m_position).subLocal(r1);
+    	Body b1 = m_body1;
+    	Body b2 = m_body2;
 
-        //float c = d.length() - m_length;
-        //float impulse = -m_mass * c;
+    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
+    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
 
-        //Vec2 P = m_u.mul(impulse);
-        
-        float length = d.normalize();
-        float C = length - m_length;
-        C = MathUtils.clamp(C, -Settings.maxLinearCorrection, Settings.maxLinearCorrection);
+    	Vec2 d = new Vec2(b2.m_sweep.c.x + r2.x - b1.m_sweep.c.x - r1.x,
+    					  b2.m_sweep.c.y + r2.y - b1.m_sweep.c.y - r1.y);
 
-        float impulse = -m_mass * C;
-        m_u = d;
-        Vec2 P = m_u.mul(impulse);
+    	float length = d.normalize();
+    	float C = length - m_length;
+    	C = MathUtils.clamp(C, -Settings.maxLinearCorrection, Settings.maxLinearCorrection);
 
-        m_body1.m_position.subLocal(P.mul(m_body1.m_invMass));
-        m_body1.m_rotation -= m_body1.m_invI * Vec2.cross(r1, P);
-        m_body2.m_position.addLocal(P.mul(m_body2.m_invMass));
-        m_body2.m_rotation += m_body2.m_invI * Vec2.cross(r2, P);
+    	float impulse = -m_mass * C;
+    	m_u = d;
+    	float Px = impulse * m_u.x;
+    	float Py = impulse * m_u.y;
 
-        m_body1.m_R.setAngle(m_body1.m_rotation);
-        m_body2.m_R.setAngle(m_body2.m_rotation);
+    	b1.m_sweep.c.x -= b1.m_invMass * Px;
+    	b1.m_sweep.c.y -= b1.m_invMass * Py;
+    	b1.m_sweep.a -= b1.m_invI * (r1.x*Py-r1.y*Px);//b2Cross(r1, P);
+    	b2.m_sweep.c.x += b2.m_invMass * Px;
+    	b2.m_sweep.c.y += b2.m_invMass * Py;
+    	b2.m_sweep.a += b2.m_invI * (r2.x*Py-r2.y*Px);//b2Cross(r2, P);
 
-        return Math.abs(C) < Settings.linearSlop;
+    	b1.synchronizeTransform();
+    	b2.synchronizeTransform();
+
+    	return Math.abs(C) < Settings.linearSlop;
     }
 
     @Override
     public void solveVelocityConstraints(TimeStep step) {
-        Vec2 r1 = m_body1.m_R.mul(m_localAnchor1);
-        Vec2 r2 = m_body2.m_R.mul(m_localAnchor2);
+    	Body b1 = m_body1;
+    	Body b2 = m_body2;
 
-        // Cdot = dot(u, v + cross(w, r))
-        Vec2 v1 = m_body1.m_linearVelocity.add(Vec2.cross(
-                m_body1.m_angularVelocity, r1));
-        Vec2 v2 = m_body2.m_linearVelocity.add(Vec2.cross(
-                m_body2.m_angularVelocity, r2));
-        float Cdot = Vec2.dot(m_u, v2.sub(v1));
-        float impulse = -m_mass * Cdot;
-        m_impulse += impulse;
+    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
+    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
 
-        Vec2 p = m_u.mul(impulse);
+    	// Cdot = dot(u, v + cross(w, r))
+    	Vec2 v1 = b1.m_linearVelocity.add(Vec2.cross(b1.m_angularVelocity, r1));
+    	Vec2 v2 = b2.m_linearVelocity.add(Vec2.cross(b2.m_angularVelocity, r2));
+    	float Cdot = Vec2.dot(m_u, v2.subLocal(v1));
+    	float force = -step.inv_dt * m_mass * Cdot;
+    	m_force += force;
 
-        m_body1.m_linearVelocity.subLocal(p.mul(m_body1.m_invMass));
-        m_body1.m_angularVelocity -= m_body1.m_invI * Vec2.cross(r1, p);
-        m_body2.m_linearVelocity.addLocal(p.mul(m_body2.m_invMass));
-        m_body2.m_angularVelocity += m_body2.m_invI * Vec2.cross(r2, p);
+    	float Px = step.dt * force * m_u.x;
+    	float Py = step.dt * force * m_u.y;
+    	b1.m_linearVelocity.x -= b1.m_invMass * Px;
+    	b1.m_linearVelocity.y -= b1.m_invMass * Py;
+    	b1.m_angularVelocity -= b1.m_invI * (r1.x*Py - r1.y*Px);//b2Cross(r1, P);
+    	b2.m_linearVelocity.x += b2.m_invMass * Px;
+    	b2.m_linearVelocity.y += b2.m_invMass * Py;
+    	b2.m_angularVelocity += b2.m_invI * (r2.x*Py - r2.y*Px);//b2Cross(r2, P);
     }
 }

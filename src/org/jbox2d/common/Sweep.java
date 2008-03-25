@@ -20,8 +20,9 @@ public class Sweep {
 	// / Get the interpolated transform at a specific time.
 	// / @param t the normalized time in [0,1].
 	public void getXForm(XForm xf, float t) {
-		if (xf == null)
-			xf = new XForm();
+		assert(xf != null);
+		//if (xf == null)
+		//	xf = new XForm();
 		// center = p + R * localCenter
 		if (1.0f - t0 > Settings.EPSILON) {
 			float alpha = (t - t0) / (1.0f - t0);
