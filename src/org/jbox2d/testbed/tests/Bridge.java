@@ -22,7 +22,6 @@
  */
 package org.jbox2d.testbed.tests;
 
-import org.jbox2d.collision.BoxDef;
 import org.jbox2d.collision.CircleDef;
 import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.common.Vec2;
@@ -31,7 +30,6 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jbox2d.testbed.AbstractExample;
-import org.jbox2d.testbed.PTest;
 import org.jbox2d.testbed.TestbedMain;
 
 import processing.core.PApplet;
@@ -48,17 +46,17 @@ public class Bridge extends AbstractExample {
     	Body ground = null;
 		{
 			PolygonDef sd = new PolygonDef();
-			sd.setAsBox(50.0f, 10.0f);
+			sd.setAsBox(50.0f, 0.2f);
 
 			BodyDef bd = new BodyDef();
-			bd.position.set(0.0f, -10.0f);
+			bd.position.set(0.0f, 0.0f);
 			ground = m_world.createStaticBody(bd);
 			ground.createShape(sd);
 		}
 
 		{
 			PolygonDef sd = new PolygonDef();
-			sd.setAsBox(0.5f, 0.125f);
+			sd.setAsBox(0.65f, 0.125f);
 			sd.density = 20.0f;
 			sd.friction = 0.2f;
 
@@ -88,7 +86,7 @@ public class Bridge extends AbstractExample {
 			pd2.setAsBox(1.0f,1.0f);
 			pd2.density = 5.0f;
 			pd2.friction = 0.2f;
-			pd2.restitution = 0.0f;
+			pd2.restitution = 0.1f;
 			BodyDef bd2 = new BodyDef();
 			bd2.position.set(0.0f, 10.0f);
 			Body body2 = m_world.createDynamicBody(bd2);

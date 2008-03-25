@@ -53,9 +53,7 @@ public class TestSettings {
         hz = 60;
         iterationCount = 10;
         drawStats = false;
-        drawContacts = false;
-        drawImpulses = false;
-        drawAABBs = true;
+        drawAABBs = false;
         drawPairs = false;
         drawShapes = true;
         drawJoints = true;

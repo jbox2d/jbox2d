@@ -627,6 +627,7 @@ public class Body {
 	public boolean isConnected(Body other){
 		for (JointEdge jn = m_jointList; jn != null; jn = jn.next) {
 			if (jn.other == other) {
+				//System.out.println("connected");
 				return (jn.joint.m_collideConnected == false);
 			}
 		}
@@ -636,7 +637,7 @@ public class Body {
 	public void advance(float t){
 		// Advance to the new safe time
 		m_sweep.advance(t);
-		m_sweep.c = m_sweep.c0;
+		m_sweep.c.set(m_sweep.c0);
 		m_sweep.a = m_sweep.a0;
 		synchronizeTransform();
 	}

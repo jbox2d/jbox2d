@@ -41,7 +41,8 @@ public class TOI {
 
 			// Get the distance between shapes.
 			distance = Distance.distance(p1, p2, shape1, xf1, shape2, xf2);
-
+			//System.out.println(distance);
+			
 			if (iter == 0) {
 				// Compute a reasonable target distance to give some breathing room
 				// for conservative advancement.
