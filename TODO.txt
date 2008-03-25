@@ -1,6 +1,14 @@
 Todo:
 
+[ ] Fix swept AABB bug, get CCD working right
 [ ] Convert Box2d doc format to Javadoc
-[ ] Optimize
+[ ] Optimize 
+	- Vec2 creations are still pretty nuts
+		- Fix regressions from 1.4.3 due to upstream changes
+		- Check object pool stack performance vs. inlined floats
+		- At least clear out the hot spots - contacts, then joints, then others
+	- Trig function calls should be replaced with lookup table
 [ ] Slick example
 [ ] Java2d example
+
+
