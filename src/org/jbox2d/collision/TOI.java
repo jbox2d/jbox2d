@@ -1,6 +1,9 @@
 package org.jbox2d.collision;
 
+import javax.vecmath.Color3f;
+
 import org.jbox2d.common.*;
+import org.jbox2d.testbed.ProcessingDebugDraw;
 
 //updated to rev 108 of b2TimeOfImpact.cpp
 
@@ -54,6 +57,7 @@ public class TOI {
 			}
 
 			if (distance - targetDistance < 0.05f * Settings.toiSlop || iter == k_maxIterations) {
+				//if (distance-targetDistance < 0) System.out.println("dist error: "+ (distance-targetDistance) + " toiSlop: "+Settings.toiSlop + " iter: "+iter);
 				break;
 			}
 

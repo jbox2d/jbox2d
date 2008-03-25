@@ -24,6 +24,13 @@ package org.jbox2d.common;
 
 public class Mat22 {
     public Vec2 col1, col2;
+    
+    public String toString() {
+    	String s = "";
+    	s += "["+col1.x+","+col2.x+"]\n";
+    	s += "["+col1.y+","+col2.y+"]";
+    	return s;
+    }
 
     public Mat22() {
         this(new Vec2(), new Vec2());

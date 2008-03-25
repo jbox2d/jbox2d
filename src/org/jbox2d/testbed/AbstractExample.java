@@ -28,12 +28,13 @@ public abstract class AbstractExample {
     public boolean[] keyDown = new boolean[255];
     public boolean[] newKeyDown = new boolean[255];
 
-    public Vec2 mouseScreen; // screen coordinates of mouse
-    public Vec2 mouseWorld; // world coordinates of mouse
+    public Vec2 mouseScreen = new Vec2(); // screen coordinates of mouse
+    public Vec2 mouseWorld = new Vec2(); // world coordinates of mouse
+    public Vec2 pmouseScreen = new Vec2();
     public boolean pmousePressed; // was mouse pressed last frame?
     protected boolean needsReset = true;//True if we should reset the demo on the next loop
-    //protected boolean normals = false;// True if we should render normals
-    //protected boolean contacts = false;// True if we should render contact points
+    protected Vec2 bombSpawnPoint;
+    protected boolean bombSpawning;
     protected int m_textLine;
     protected int m_pointCount;
     protected ContactPoint[] m_points;
@@ -79,6 +80,7 @@ public abstract class AbstractExample {
 		settings = new TestSettings();
 		mouseScreen = new Vec2(parent.mouseX, parent.mouseY);
 		mouseWorld = new Vec2();
+		pmouseScreen = new Vec2(mouseScreen.x,mouseScreen.y);
 		pmousePressed = false;
 		m_worldAABB = new AABB();
 		m_worldAABB.lowerBound = new Vec2(-200.0f, -100.0f);
@@ -89,6 +91,8 @@ public abstract class AbstractExample {
 		
 		m_bomb = null;
 		m_mouseJoint = null;
+		bombSpawnPoint = null;
+		bombSpawning = false;
 		
 		m_points = new ContactPoint[k_maxContactPoints];
 		for (int i=0; i<m_points.length; ++i) {
@@ -108,6 +112,8 @@ public abstract class AbstractExample {
 	}
 	
 	public void step() {
+		mouseWorld.set(m_debugDraw.screenToWorld(mouseScreen));
+		//System.out.println(mouseWorld);
 		float timeStep = settings.hz > 0.0f ? 1.0f / settings.hz : 0.0f;
 
 		if (settings.pause) {
@@ -121,6 +127,7 @@ public abstract class AbstractExample {
 			m_textLine += 15;
 		}
 
+		m_debugDraw.setFlags(0);
 		if (settings.drawShapes) m_debugDraw.appendFlags(DebugDraw.e_shapeBit);
 		if (settings.drawJoints) m_debugDraw.appendFlags(DebugDraw.e_jointBit);
 		if (settings.drawCoreShapes) m_debugDraw.appendFlags(DebugDraw.e_coreShapeBit);
@@ -171,7 +178,12 @@ public abstract class AbstractExample {
 			Vec2 p1 = body.getWorldPoint(m_mouseJoint.m_localAnchor);
 			Vec2 p2 = m_mouseJoint.m_target;
 
-			m_debugDraw.drawSegment(p1, p2, new Color3f(1.0f,1.0f,1.0f));
+			m_debugDraw.drawSegment(p1, p2, new Color3f(255.0f,255.0f,255.0f));
+		}
+		
+		if (bombSpawning) {
+			m_debugDraw.drawSolidCircle(bombSpawnPoint, 0.3f, new Vec2(1.0f,0.0f),new Color3f(255f*0.5f,255f*0.5f,255f*0.5f));
+			m_debugDraw.drawSegment(bombSpawnPoint, mouseWorld, new Color3f(55f*0.5f,55f*0.5f,255f*0.5f));
 		}
 
 		if (settings.drawContactPoints) {
@@ -192,7 +204,7 @@ public abstract class AbstractExample {
 				} else {
 					// Remove
 					//System.out.println("Remove");
-					m_debugDraw.drawPoint(point.position, 10.0f, new Color3f(155f, 155*0.3f, 155*0.3f));
+					m_debugDraw.drawPoint(point.position, 10.0f, new Color3f(155f, 0.0f, 0.0f));
 				}
 
 				if (settings.drawContactNormals) {
@@ -216,9 +228,21 @@ public abstract class AbstractExample {
 				}
 			}
 		}
+		
+		for (int i = 0; i < newKeyDown.length; i++) {
+            newKeyDown[i] = false;
+        }
+		pmouseScreen.set(mouseScreen);
 	}
 
+	//Space launches a bomb from a random default position
     public void launchBomb() {
+    	Vec2 pos = new Vec2(parent.random(-15.0f, 15.0f), 30.0f);
+    	Vec2 vel = pos.mul(-5.0f);
+    	launchBomb(pos, vel);
+    }
+    	
+    public void launchBomb(Vec2 position, Vec2 velocity) {
     	if (m_bomb != null) {
     		m_world.destroyBody(m_bomb);
     		m_bomb = null;
@@ -226,10 +250,10 @@ public abstract class AbstractExample {
 
     	BodyDef bd = new BodyDef();
     	bd.allowSleep = true;
-    	bd.position = new Vec2(parent.random(-15.0f, 15.0f), 30.0f);
+    	bd.position = position.clone();
     	bd.isBullet = true;
     	m_bomb = m_world.createDynamicBody(bd);
-    	m_bomb.setLinearVelocity(bd.position.mul(-5.0f));
+    	m_bomb.setLinearVelocity(velocity);
 
     	CircleDef sd = new CircleDef();
     	sd.radius = 0.3f;
@@ -240,19 +264,19 @@ public abstract class AbstractExample {
     	m_bomb.setMassFromShapes();
     }
     
-    public void keyTyped(int key) {
-        if (key == 'r') {
-            needsReset = true;
-        }
-        if (key == 'c') {
-        	settings.drawContactPoints = !settings.drawContactPoints;
-        }
-        if (key == 'b') {
-            settings.drawAABBs = !settings.drawAABBs;
-        }
-        if (key == ' ') {
-            launchBomb();
-        }
+    //Shift+drag "slingshots" a bomb from any point using these functions
+    public void spawnBomb(Vec2 worldPt) {
+    	bombSpawnPoint = worldPt.clone();
+    	bombSpawning = true;
+    }
+    
+    public void completeBombSpawn() {
+    	final float multiplier = 30.0f;
+    	Vec2 mouseW = m_debugDraw.screenToWorld(mouseScreen);
+    	Vec2 vel = bombSpawnPoint.sub(mouseW);
+    	vel.mulLocal(multiplier);
+    	launchBomb(bombSpawnPoint,vel);
+    	bombSpawning = false;
     }
     
     public void keyPressed(int key) {
@@ -270,6 +294,12 @@ public abstract class AbstractExample {
     }
     
     public void mouseDown(Vec2 p) {
+    	
+    	if (parent.shiftKey) {
+    		spawnBomb(m_debugDraw.screenToWorld(p));
+    		return;
+    	}
+    	
     	p = m_debugDraw.screenToWorld(p);
     	
     	assert m_mouseJoint == null;
@@ -311,13 +341,18 @@ public abstract class AbstractExample {
             m_world.destroyJoint(m_mouseJoint);
             m_mouseJoint = null;
         }
+        if (bombSpawning) {
+        	completeBombSpawn();
+        }
     }
 
     public void mouseMove(Vec2 p) {
+    	mouseScreen.set(p);
         if (m_mouseJoint != null) {
             m_mouseJoint.setTarget(m_debugDraw.screenToWorld(p));
         }
     }
+    
 	
     /** Stub method for concrete examples to override if desired.
      *  Called when a joint is implicitly destroyed due to body

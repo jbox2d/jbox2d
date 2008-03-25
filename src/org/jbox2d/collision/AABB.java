@@ -28,6 +28,11 @@ import org.jbox2d.common.Vec2;
 
 public class AABB {
     public Vec2 lowerBound, upperBound;
+    
+    public String toString() {
+    	String s = ""+lowerBound+" -> "+upperBound;
+    	return s;
+    }
 
     public AABB(Vec2 minVertex, Vec2 maxVertex) {
         this.lowerBound = minVertex.clone(); // clone to be safe
