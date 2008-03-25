@@ -223,16 +223,7 @@ public class BroadPhase {
         if (debugPrint) {
             System.out.println("CreateProxy()");
         }
-/*
-        if (m_freeProxy == PairManager.NULL_PROXY) {
-            assert false : "m_freeProxy == NULL_PROXY error";
-
-            return PairManager.NULL_PROXY;
-        }
-
-        // Flush the pair buffer
-        flush();
-*/
+        
         assert(m_proxyCount < Settings.maxProxies);
         assert(m_freeProxy != PairManager.NULL_PROXY);
         

@@ -36,7 +36,7 @@ public class Distance{
 	protected static int ProcessTwo(Vec2 x1, Vec2 x2, Vec2[] p1s, Vec2[] p2s, Vec2[] points) {
 		// If in point[1] region
 		Vec2 r = new Vec2(-points[1].x,-points[1].y);
-		Vec2 d = new Vec2(points[0].x - points[1].x,points[0].x - points[1].y);
+		Vec2 d = new Vec2(points[0].x - points[1].x,points[0].y - points[1].y);
 		float length = d.normalize();
 		float lambda = Vec2.dot(r, d);
 		if (lambda <= 0.0f || length < Settings.EPSILON) {
@@ -101,7 +101,7 @@ public class Distance{
 
 		// In edge bc region?
 		float va = n * Vec2.cross(b, c);
-		if (va <= 0.0f && un >= 0.0f && ud >= 0.0f){
+		if (va <= 0.0f && un >= 0.0f && ud >= 0.0f && (un+ud) > 0.0f){
 			assert(un + ud > 0.0f);
 			float lambda = un / (un + ud);
 			x1.set( p1s[1].x + lambda * (p1s[2].x - p1s[1].x),
@@ -116,7 +116,7 @@ public class Distance{
 
 		// In edge ac region?
 		float vb = n * Vec2.cross(c, a);
-		if (vb <= 0.0f && tn >= 0.0f && td >= 0.0f) {
+		if (vb <= 0.0f && tn >= 0.0f && td >= 0.0f && (tn+td) > 0.0f) {
 			assert(tn + td > 0.0f);
 			float lambda = tn / (tn + td);
 			x1.set( p1s[0].x + lambda * (p1s[2].x - p1s[0].x),
@@ -146,7 +146,8 @@ public class Distance{
 	protected static boolean InPoints(Vec2 w, Vec2[] points, int pointCount) {
 		float k_tolerance = 100.0f * Settings.EPSILON;
 		for (int i = 0; i < pointCount; ++i) {
-			Vec2 d = new Vec2( Math.abs(w.x-points[i].x), Math.abs(w.y-points[i].y));//Vec2.abs(w - points[i]);
+			Vec2 d =Vec2.abs(w.sub(points[i])); 
+//				new Vec2( Math.abs(w.x-points[i].x), Math.abs(w.y-points[i].y));//Vec2.abs(w - points[i]);
 			Vec2 m = Vec2.max(Vec2.abs(w), Vec2.abs(points[i]));
 			
 			if (d.x < k_tolerance * (m.x + 1.0f) &&
@@ -183,9 +184,7 @@ public class Distance{
 		for (int iter = 0; iter < maxIterations; ++iter) {
 			Vec2 v = x2.sub(x1);
 			Vec2 w1 = shape1.support(xf1, v);
-			v.negateLocal();
-			Vec2 w2 = shape2.support(xf2, v);
-			v.negateLocal();
+			Vec2 w2 = shape2.support(xf2, v.negate());
 
 			vSqr = Vec2.dot(v, v);
 			Vec2 w = w2.sub(w1);
@@ -229,6 +228,7 @@ public class Distance{
 			if (pointCount == 3) {
 				g_GJK_Iterations = iter;
 				return 0.0f;
+				//
 			}
 
 			float maxSqr = -Float.MAX_VALUE;// -FLT_MAX;
@@ -242,11 +242,13 @@ public class Distance{
 				vSqr = Vec2.dot(v, v);
 
 				return (float)Math.sqrt(vSqr);
+				//
 			}
 		}
 
 		g_GJK_Iterations = maxIterations;
 		return (float)Math.sqrt(vSqr);
+		//
 	}
 
 	protected static float DistanceCC(

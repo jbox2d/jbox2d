@@ -28,7 +28,6 @@ import java.util.Random;
 import java.util.ArrayList;
 
 import org.jbox2d.collision.AABB;
-import org.jbox2d.collision.BoxDef;
 import org.jbox2d.collision.BroadPhase;
 import org.jbox2d.collision.CircleShape;
 import org.jbox2d.collision.Manifold;
@@ -49,7 +48,6 @@ import org.jbox2d.dynamics.joints.JointType;
 import org.jbox2d.dynamics.joints.MouseJoint;
 import org.jbox2d.dynamics.joints.MouseJointDef;
 import org.jbox2d.dynamics.joints.PulleyJoint;
-import org.jbox2d.testbed.PTest.BoundImage;
 import org.jbox2d.testbed.tests.Bridge;
 
 import processing.core.PApplet;
@@ -65,6 +63,27 @@ public class TestbedMain extends PApplet {
     public TestbedMain() {
     	super();
     	g = new ProcessingDebugDraw(this);
+    	
+    	//Set up the mouse wheel listener to control zoom
+    	addMouseWheelListener(new MouseWheelListener() {
+            public void mouseWheelMoved(MouseWheelEvent e) {
+            	if (currentTest != null) {
+            		ProcessingDebugDraw d = (ProcessingDebugDraw)(currentTest.m_debugDraw);
+            		int notches = e.getWheelRotation();
+                	Vec2 oldCenter = d.screenToWorld(width / 2.0f, height / 2.0f);
+                	if (notches < 0) {
+                		d.scaleFactor = min(300f, d.scaleFactor * 1.05f);
+                	}
+                	else if (notches > 0) {
+                		d.scaleFactor = max(.02f, d.scaleFactor / 1.05f);
+                	}
+                	Vec2 newCenter = d.screenToWorld(width / 2.0f, height / 2.0f);
+                	d.transX -= (oldCenter.x - newCenter.x) * d.scaleFactor;
+                	d.transY -= (oldCenter.y - newCenter.y) * d.scaleFactor;
+            	}
+            }
+        });
+    	
     }
     
     public void setup() {
@@ -86,6 +105,29 @@ public class TestbedMain extends PApplet {
     		currentTest.initialize();
     	}
     	currentTest.step();
+    	
+    	handleCanvasDrag();
+
+        pmousePressed = mousePressed;
+    }
+    
+    Vec2 mouseWorld = new Vec2();
+    boolean pmousePressed = false;
+    
+    public void handleCanvasDrag() {
+    	//Handle mouse dragging stuff
+        //Left mouse attaches mouse joint to object.
+        //Right mouse drags canvas.
+    	ProcessingDebugDraw d = (ProcessingDebugDraw)(currentTest.m_debugDraw);
+		
+        mouseWorld = d.screenToWorld(mouseX, mouseY);
+        if (mouseButton == RIGHT) {
+            if (mousePressed) {
+                d.transX += mouseX - pmouseX;
+                d.transY -= mouseY - pmouseY;
+            }
+        }
+    
     }
     
     public void mousePressed() {
@@ -115,6 +157,8 @@ public class TestbedMain extends PApplet {
     		currentTest.settings.singleStep = true;
     		currentTest.settings.pause = true;
     	}
+    	if (key == 'c') currentTest.settings.drawContactPoints = !currentTest.settings.drawContactPoints;
+    	if (key == 'b') currentTest.settings.drawAABBs = !currentTest.settings.drawAABBs;
     }
     
     static public void registerExample(AbstractExample test) {

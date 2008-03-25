@@ -20,7 +20,6 @@ import org.jbox2d.dynamics.contacts.ContactPoint;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.MouseJoint;
 import org.jbox2d.dynamics.joints.MouseJointDef;
-import org.jbox2d.testbed.PTest.BoundImage;
 
 public abstract class AbstractExample {
 	public TestbedMain parent;    //controller applet/app
@@ -48,7 +47,7 @@ public abstract class AbstractExample {
 	protected BoundaryListener m_boundaryListener;
 	protected ContactListener m_contactListener;
 	
-    protected ArrayList<BoundImage> boundImages = new ArrayList<BoundImage>();
+    //protected ArrayList<BoundImage> boundImages = new ArrayList<BoundImage>();
 	
     /**
      * @return Title of example

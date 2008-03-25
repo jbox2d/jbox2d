@@ -351,20 +351,14 @@ public class ContactSolver {
     		for (int j = 0; j < c.pointCount; ++j) {
     			ContactConstraintPoint ccp = c.points[j];
 
-    			float vx = ccp.localAnchor1.x-b1.getLocalCenter().x;
-            	float vy = ccp.localAnchor1.y-b1.getLocalCenter().y;
-				float r1x = b1.m_xf.R.col1.x * vx + b1.m_xf.R.col2.x * vy;
-				float r1y = b1.m_xf.R.col1.y * vx + b1.m_xf.R.col2.y * vy;
-            	vx = ccp.localAnchor2.x-b2.getLocalCenter().x;
-            	vy = ccp.localAnchor2.y-b2.getLocalCenter().y;
-            	float r2x = b2.m_xf.R.col1.x * vx + b2.m_xf.R.col2.x * vy;
-            	float r2y = b2.m_xf.R.col1.y * vx + b2.m_xf.R.col2.y * vy;
+    			Vec2 r1 = Mat22.mul(b1.m_xf.R, ccp.localAnchor1.sub(b1.getLocalCenter()));
+    			Vec2 r2 = Mat22.mul(b2.m_xf.R, ccp.localAnchor2.sub(b2.getLocalCenter()));
     			
     			//Vec2 p1 = b1.m_sweep.c + r1;
     			//Vec2 p2 = b2.m_sweep.c + r2;
     			//Vec2 dp = p2 - p1;
-    			float dpx = b2.m_sweep.c.x + r2x - b1.m_sweep.c.x - r1x;
-    			float dpy = b2.m_sweep.c.y + r2y - b1.m_sweep.c.y - r1y;
+    			float dpx = b2.m_sweep.c.x + r2.x - b1.m_sweep.c.x - r1.x;
+    			float dpy = b2.m_sweep.c.y + r2.y - b1.m_sweep.c.y - r1.y;
     			
 
     			// Approximate the current separation.
@@ -389,12 +383,12 @@ public class ContactSolver {
 
     			b1.m_sweep.c.x -= invMass1 * impulsex;
     			b1.m_sweep.c.y -= invMass1 * impulsey;
-    			b1.m_sweep.a -= invI1 * (r1x*impulsey - r1y*impulsex);//b2Cross(r1, impulse);
+    			b1.m_sweep.a -= invI1 * (r1.x*impulsey - r1.y*impulsex);//b2Cross(r1, impulse);
     			b1.synchronizeTransform();
 
     			b2.m_sweep.c.x += invMass2 * impulsex;
     			b2.m_sweep.c.y += invMass2 * impulsey;
-    			b2.m_sweep.a += invI2 * (r2x*impulsey - r2y*impulsex);//b2Cross(r2, impulse);
+    			b2.m_sweep.a += invI2 * (r2.x*impulsey - r2.y*impulsex);//b2Cross(r2, impulse);
     			b2.synchronizeTransform();
     		}
     	}

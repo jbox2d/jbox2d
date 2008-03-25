@@ -35,7 +35,7 @@ public class AABB {
     }
 
     public AABB(AABB copy) {
-        this(copy.lowerBound.clone(), copy.upperBound.clone());
+        this(copy.lowerBound, copy.upperBound); // relies on cloning in AABB(Vec2, Vec2) constructor
     }
 
     public AABB() {

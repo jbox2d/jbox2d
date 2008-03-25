@@ -652,11 +652,10 @@ public class World {
     				// Compute the time of impact.
     				toi = TOI.timeOfImpact(c.m_shape1, b1.m_sweep, c.m_shape2, b2.m_sweep);
     				assert(0.0f <= toi && toi <= 1.0f);
-
+    				
     				if (toi > 0.0f && toi < 1.0f) {
     					toi = Math.min((1.0f - toi) * t0 + toi, 1.0f);
     				}
-
 
     				c.m_toi = toi;
     				c.m_flags |= Contact.e_toiFlag;

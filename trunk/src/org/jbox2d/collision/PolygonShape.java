@@ -27,11 +27,11 @@ import java.util.List;
 import org.jbox2d.common.*;
 
 
-//Updated to rev 56 of b2Shape.cpp/.h
+//Updated to rev 56->132 of b2Shape.cpp/.h / b2PolygonShape.cpp/.h
 
 public class PolygonShape extends Shape implements SupportsGenericDistance{
     // Dump lots of debug information
-	private static boolean m_debug = true;
+	private static boolean m_debug = false;
     
 	// Local position of the shape centroid in parent body frame.
     public Vec2 m_centroid;

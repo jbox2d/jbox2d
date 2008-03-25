@@ -68,6 +68,10 @@ public class ContactManager extends PairCallback {
             return m_nullContact;
         }
         
+        if (body2.isConnected(body1)) {
+    		return m_nullContact;
+    	}
+        
         if (m_world.m_contactFilter != null && m_world.m_contactFilter.shouldCollide(shape1, shape2) == false){
             return m_nullContact;
         }
