@@ -561,7 +561,7 @@ public class World {
     		}
         }
 
-        m_broadPhase.commit();
+        //m_broadPhase.commit();
         
         // Synchronize shapes, check for out of range bodies.
     	for (Body b = m_bodyList; b != null; b = b.getNext()) {
@@ -599,13 +599,16 @@ public class World {
     	Body[] stack = new Body[stackSize];
 
     	for (Body b = m_bodyList; b != null; b = b.m_next) {
-    		b.m_flags &= Body.e_islandFlag;
+    		b.m_flags &= ~Body.e_islandFlag;
     		b.m_sweep.t0 = 0.0f;
     	}
-
+    	int ccount = 0;
     	for (Contact c = m_contactList; c != null; c = c.m_next) {
     		// Invalidate TOI
+    		++ccount;
+
     		c.m_flags &= ~(Contact.e_toiFlag | Contact.e_islandFlag);
+    		
     	}
 
     	// Find TOI events and solve them.
@@ -620,7 +623,6 @@ public class World {
     			}
 
     			// TODO_ERIN keep a counter on the contact, only respond to M TOIs per contact.
-
     			float toi = 1.0f;
     			if ((c.m_flags & Contact.e_toiFlag) != 0) {
     				// This contact has a valid cached TOI.
@@ -651,6 +653,7 @@ public class World {
 
     				// Compute the time of impact.
     				toi = TOI.timeOfImpact(c.m_shape1, b1.m_sweep, c.m_shape2, b2.m_sweep);
+
     				assert(0.0f <= toi && toi <= 1.0f);
     				
     				if (toi > 0.0f && toi < 1.0f) {
@@ -666,6 +669,8 @@ public class World {
     				minContact = c;
     				minTOI = toi;
     			}
+
+        		
     		}
 
     		if (minContact == null || 1.0f - 100.0f * Settings.EPSILON < minTOI) {
@@ -680,6 +685,7 @@ public class World {
     		Body b2 = s2.getBody();
     		b1.advance(minTOI);
     		b2.advance(minTOI);
+    		//System.out.println("Advancing by "+minTOI);
 
     		// The TOI contact likely has some new contact points.
     		minContact.update(m_contactListener);
@@ -755,6 +761,7 @@ public class World {
     				assert(stackCount < stackSize);
     				stack[stackCount++] = other;
     				other.m_flags |= Body.e_islandFlag;
+
     			}
     		}
 
@@ -801,6 +808,7 @@ public class World {
     			// Allow contacts to participate in future TOI islands.
     			Contact c = island.m_contacts[i];
     			c.m_flags &= ~(Contact.e_toiFlag | Contact.e_islandFlag);
+
     		}
 
     		// Commit shape proxy movements to the broad-phase so that new contacts are created.
@@ -943,7 +951,7 @@ public class World {
 
     				Vec2 x1 = new Vec2(0.5f * (b1.lowerBound.x + b1.upperBound.x),
     								   0.5f * (b1.lowerBound.y + b1.upperBound.y));
-    				Vec2 x2 = new Vec2(0.5f * (b2.lowerBound.x + b2.upperBound.y),
+    				Vec2 x2 = new Vec2(0.5f * (b2.lowerBound.x + b2.upperBound.x),
     								   0.5f * (b2.lowerBound.y + b2.upperBound.y));
 
     				m_debugDraw.drawSegment(x1, x2, color);

@@ -18,7 +18,7 @@ import processing.core.PFont;
  * @author ewjordan
  */
 public class ProcessingDebugDraw extends DebugDraw {
-	
+	public static ProcessingDebugDraw screen; //static rendering context for debug drawing from within other code
 	public PApplet g;
 	public PFont m_font;
 	public float fontHeight;
@@ -29,12 +29,13 @@ public class ProcessingDebugDraw extends DebugDraw {
     public float yFlip = -1.0f; //flip y coordinate
     
     public void setCamera(float x, float y, float scale) {
-    	transX = x;
-    	transY = y;
+    	transX = PApplet.map(x,0.0f,1.0f,g.width*.5f,g.width*.5f+scale);
+    	transY = PApplet.map(y,0.0f,yFlip*1.0f,g.height*.5f,g.height*.5f+scale);
     	scaleFactor = scale;
     }
 	
 	public ProcessingDebugDraw(PApplet pApplet) {
+		screen = this;
 		g = pApplet;
 		//m_font = g.loadFont("CourierNew36.vlw");
 		//g.textFont(m_font, 36);
@@ -218,7 +219,7 @@ public class ProcessingDebugDraw extends DebugDraw {
 		g.colorMode(PApplet.NORMALIZED);
 		float k_segments = 5.0f;
 		float k_increment = 2.0f * (float)Math.PI / k_segments;
-		float k_radius = 2.0f;
+		float k_radius = 3.0f;
 		float theta = 0.0f;
 		g.fill(color.x, color.y, color.z);
 		g.noStroke();

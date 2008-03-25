@@ -46,4 +46,11 @@ public class XForm {
 	public static Vec2 mulT(XForm T, Vec2 v){
 		return T.R.mulT(v.sub(T.position));
 	}
+	
+	public String toString() {
+		String s = "XForm:\n";
+		s += "Position: "+position + "\n";
+		s += "R: \n"+R+"\n";
+		return s;
+	}
 }

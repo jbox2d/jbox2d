@@ -49,6 +49,7 @@ import org.jbox2d.dynamics.joints.MouseJoint;
 import org.jbox2d.dynamics.joints.MouseJointDef;
 import org.jbox2d.dynamics.joints.PulleyJoint;
 import org.jbox2d.testbed.tests.Bridge;
+import org.jbox2d.testbed.tests.CCDTest;
 
 import processing.core.PApplet;
 import processing.core.PImage;
@@ -57,6 +58,8 @@ public class TestbedMain extends PApplet {
 	static private ArrayList<AbstractExample> tests = new ArrayList<AbstractExample>(0);
 	static private AbstractExample currentTest = null;
 	static private int currentTestIndex = 0;
+	
+	public boolean shiftKey = false;
 	
     public DebugDraw g;
 
@@ -89,8 +92,10 @@ public class TestbedMain extends PApplet {
     public void setup() {
     	size(640,480);
     	smooth();
-    	AbstractExample ex0 = new Bridge(this);
+    	AbstractExample ex0 = new CCDTest(this);
+    	AbstractExample ex1 = new Bridge(this);
     	registerExample(ex0);
+    	registerExample(ex1);
     }
     
     public void draw() {
@@ -150,6 +155,9 @@ public class TestbedMain extends PApplet {
     }
     
     public void keyPressed() {
+    	if (keyCode == PApplet.SHIFT) {
+            shiftKey = true;
+        }
     	if (currentTest == null) return;
     	if (key == 'r') currentTest.needsReset = true;
     	if (key == ' ') currentTest.launchBomb();
@@ -159,6 +167,16 @@ public class TestbedMain extends PApplet {
     	}
     	if (key == 'c') currentTest.settings.drawContactPoints = !currentTest.settings.drawContactPoints;
     	if (key == 'b') currentTest.settings.drawAABBs = !currentTest.settings.drawAABBs;
+    		
+    	currentTest.keyPressed(key);
+    }
+    
+    public void keyReleased() {
+    	if (keyCode == PApplet.SHIFT) {
+            shiftKey = false;
+        }
+    	if (currentTest == null) return;
+    	currentTest.keyReleased(key);
     }
     
     static public void registerExample(AbstractExample test) {

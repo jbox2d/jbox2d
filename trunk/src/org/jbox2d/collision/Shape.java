@@ -159,7 +159,10 @@ public abstract class Shape {
     	// Compute an AABB that covers the swept shape (may miss some rotation effect).
     	AABB aabb = new AABB();
     	computeSweptAABB(aabb, transform1, transform2);
-
+    	//if (this.getType() == ShapeType.CIRCLE_SHAPE){
+    	//	System.out.println("Sweeping: "+transform1+" " +transform2);
+    	//	System.out.println("Resulting AABB: "+aabb);
+    	//}
     	if (broadPhase.inRange(aabb)) {
     		broadPhase.moveProxy(m_proxyId, aabb);
     		return true;
