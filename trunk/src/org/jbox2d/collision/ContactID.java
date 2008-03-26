@@ -73,6 +73,11 @@ public class ContactID {
                     incidentVertex==f.incidentVertex &&
                     flip==f.flip);
         }
+        
+        public String toString() {
+        	String s = "Features: (" + this.flip + " ," + this.incidentEdge + " ," + this.incidentVertex + " ," + this.referenceFace + ")";
+        	return s;
+        }
 
     }
     

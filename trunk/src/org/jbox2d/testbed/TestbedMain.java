@@ -106,7 +106,7 @@ public class TestbedMain extends PApplet {
     		currentTest = tests.get(currentTestIndex);
     	}
     	if (currentTest.needsReset) {
-    		System.out.println("reset");
+    		System.out.println("Resetting "+currentTest.getName());
     		currentTest.initialize();
     	}
     	currentTest.step();

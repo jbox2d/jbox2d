@@ -53,6 +53,7 @@ public class ContactConstraint {
         for (int i = 0; i < Settings.maxManifoldPoints; i++) {
             points[i] = new ContactConstraintPoint();
         }
+        pointCount = 0;
         normal = new Vec2();
         manifold = new Manifold();
     }

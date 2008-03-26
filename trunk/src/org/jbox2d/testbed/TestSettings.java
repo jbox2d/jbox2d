@@ -51,16 +51,16 @@ public class TestSettings {
 
     public TestSettings() {
         hz = 60;
-        iterationCount = 10;
-        drawStats = false;
+        iterationCount = 20;
+        drawStats = true;
         drawAABBs = false;
         drawPairs = false;
         drawShapes = true;
         drawJoints = true;
         drawCoreShapes = false;
-        drawContactPoints = true;
-        drawContactNormals = true;
-        drawContactForces = true;
+        drawContactPoints = false;
+        drawContactNormals = false;
+        drawContactForces = false;
         drawFrictionForces = false;
         drawOBBs = false;
         drawCOMs = false;

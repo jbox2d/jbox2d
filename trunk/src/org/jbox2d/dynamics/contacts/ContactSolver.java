@@ -94,6 +94,7 @@ public class ContactSolver {
                 c.manifold = manifold; //no copy here!
                 c.normal = normal.clone();
                 c.pointCount = manifold.pointCount;
+                
                 c.friction = friction;
                 c.restitution = restitution;
 
@@ -148,8 +149,9 @@ public class ContactSolver {
                     Vec2 buffer = Vec2.cross(w2, ccp.r2).subLocal(Vec2.cross(w1, ccp.r1)).addLocal(v2).subLocal(v1);
                     float vRel = Vec2.dot(c.normal, buffer);
                     if (vRel < -Settings.velocityThreshold) {
-                        ccp.velocityBias += -c.restitution * vRel;
+                    	ccp.velocityBias += -c.restitution * vRel;
                     }
+                    
                 }
 
                 ++count;
@@ -292,7 +294,7 @@ public class ContactSolver {
                 float lambda = m_step.inv_dt * ccp.tangentMass * (-vt);
 
                 // b2Clamp the accumulated force
-                float maxFriction = c.friction * ccp.normalForce;
+                float maxFriction = friction * ccp.normalForce;
                 float newForce = MathUtils.clamp(ccp.tangentForce + lambda,-maxFriction, maxFriction);
                 lambda = newForce - ccp.tangentForce;
 

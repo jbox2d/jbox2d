@@ -386,13 +386,15 @@ public class Body {
 	/// Get the body transform for the body's origin.
 	/// @return the world transform of the body's origin.
 	public XForm getXForm(){
-		return m_xf;
+		XForm xf = new XForm();
+		xf.set(m_xf);
+		return xf;
 	}
 
 	/// Get the world body origin position.
 	/// @return the world position of the body's origin.
 	public Vec2 getPosition(){
-		return m_xf.position;
+		return m_xf.position.clone();
 	}
 
 	/// Get the angle in radians.
@@ -403,12 +405,12 @@ public class Body {
 
 	/// Get the world position of the center of mass.
 	public Vec2 getWorldCenter(){
-		return m_sweep.c;
+		return m_sweep.c.clone();
 	}
 
 	/// Get the local position of the center of mass.
 	public Vec2 getLocalCenter(){
-		return m_sweep.localCenter;
+		return m_sweep.localCenter.clone();
 	}
 
 	/// Set the linear velocity of the center of mass.

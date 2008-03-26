@@ -112,6 +112,7 @@ public abstract class AbstractExample {
 	}
 	
 	public void step() {
+		m_textLine = 15;
 		mouseWorld.set(m_debugDraw.screenToWorld(mouseScreen));
 		//System.out.println(mouseWorld);
 		float timeStep = settings.hz > 0.0f ? 1.0f / settings.hz : 0.0f;
