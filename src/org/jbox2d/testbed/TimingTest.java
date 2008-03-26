@@ -2,7 +2,7 @@
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
  * JBox2D homepage: http://jbox2d.sourceforge.net/ 
- * Box2D homepage: http://www.gphysics.com
+ * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -20,6 +20,7 @@
  * misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  */
+
 
 /*
  * TimingTest.java
@@ -132,33 +133,7 @@ public class TimingTest extends PApplet {
     }
     
     void DrawShape(Shape shape, int c) {
-        stroke(c);
-        noFill();
-        if (shape.m_type == ShapeType.POLYGON_SHAPE
-                || shape.m_type == ShapeType.BOX_SHAPE) {
-            PolygonShape poly = (PolygonShape) shape;
-
-            beginShape(POLYGON);
-            for (int i = 0; i < poly.m_vertexCount; ++i) {
-                Vec2 v = poly.m_R.mul(poly.m_vertices[i]).addLocal(
-                        poly.m_position);
-                vertex(v.x, v.y);
-            }
-            Vec2 v = poly.m_R.mul(poly.m_vertices[0]).addLocal(poly.m_position);
-            vertex(v.x, v.y);
-            endShape();
-        }
-        else if (shape.m_type == ShapeType.CIRCLE_SHAPE) {
-            CircleShape circle = (CircleShape) shape;
-            ellipse(circle.m_position.x, circle.m_position.y,
-                    circle.m_radius * 2, circle.m_radius * 2);
-            float xR = circle.m_radius
-                    * (float) Math.cos(shape.m_body.m_rotation);
-            float yR = circle.m_radius
-                    * (float) Math.sin(shape.m_body.m_rotation);
-            line(circle.m_position.x, circle.m_position.y, circle.m_position.x
-                    + xR, circle.m_position.y + yR);
-        }
+        //UPDATE FOR 2.0!!!
     }
 
 
