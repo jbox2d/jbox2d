@@ -67,9 +67,22 @@ public abstract class AbstractExample {
     protected TestSettings settings;
 	protected AABB m_worldAABB;
 	
+	public float memFree = 0;
+	
 	protected DestructionListener m_destructionListener;
 	protected BoundaryListener m_boundaryListener;
 	protected ContactListener m_contactListener;
+	
+	public static Color3f white = new Color3f(255.0f,255.0f,255.0f);
+	public static Color3f black = new Color3f(0.0f*255.0f,0.0f*255.0f,0.0f*255.0f);
+	public static Color3f gray = new Color3f(0.5f*255.0f,0.5f*255.0f,0.5f*255.0f);
+	public static Color3f red = new Color3f(255.0f,0.0f,0.0f);
+	public static Color3f green = new Color3f(0.0f,255.0f,0.0f);
+	public static Color3f blue= new Color3f(0.0f,0.0f,255.0f);
+	
+	public float cachedCamX, cachedCamY, cachedCamScale;
+	public boolean hasCachedCamera = false;
+	
 	
     //protected ArrayList<BoundImage> boundImages = new ArrayList<BoundImage>();
 	
@@ -95,7 +108,7 @@ public abstract class AbstractExample {
 	
 	public void initialize() {
 		needsReset = false;
-		m_textLine = 30;
+		m_textLine = 15;
 		for (int i=0; i<255; ++i) {
 			keyDown[i] = false;
 			newKeyDown[i] = false;
@@ -131,15 +144,23 @@ public abstract class AbstractExample {
 		m_world.setListener(m_boundaryListener);
 		m_world.setListener(m_contactListener);
 		m_world.setDebugDraw(parent.g);
+		if (hasCachedCamera) {
+			m_debugDraw.setCamera(cachedCamX,cachedCamY,cachedCamScale);
+		} else {
+			m_debugDraw.setCamera(0.0f, 0.0f, 20.0f);
+			hasCachedCamera = true;
+			cachedCamX = 0.0f;
+			cachedCamY = 10.0f;
+			cachedCamScale = 20.0f;
+		}
 		create();
 	}
 	
 	public void step() {
-		m_textLine = 15;
 		mouseWorld.set(m_debugDraw.screenToWorld(mouseScreen));
 		//System.out.println(mouseWorld);
 		float timeStep = settings.hz > 0.0f ? 1.0f / settings.hz : 0.0f;
-
+		
 		if (settings.pause) {
 			if (settings.singleStep) {
 				settings.singleStep = false;
@@ -147,7 +168,7 @@ public abstract class AbstractExample {
 				timeStep = 0.0f;
 			}
 
-			//m_debugDraw.drawString(5, m_textLine, "****PAUSED****", new Color3f(1.0f,1.0f,1.0f));
+			m_debugDraw.drawString(5, m_textLine, "****PAUSED****", white);
 			m_textLine += 15;
 		}
 
@@ -176,7 +197,6 @@ public abstract class AbstractExample {
 		}
 
 		if (settings.drawStats) {
-			Color3f white = new Color3f(1.0f, 1.0f, 1.0f);
 			m_debugDraw.drawString(5, m_textLine, "proxies(max) = "+m_world.m_broadPhase.m_proxyCount+
 					"("+Settings.maxProxies+"), pairs(max) = "+m_world.m_broadPhase.m_pairManager.m_pairCount+
 					"("+Settings.maxPairs+")", white);
@@ -190,10 +210,10 @@ public abstract class AbstractExample {
 			m_textLine += 15;
 
 			long memTot = Runtime.getRuntime().totalMemory();
-			long memFree =  Runtime.getRuntime().freeMemory();
+			memFree = (memFree * .9f + .1f * Runtime.getRuntime().freeMemory());
 			m_debugDraw.drawString(5, m_textLine, "total memory: "+memTot, white);
 			m_textLine += 15;
-			m_debugDraw.drawString(5, m_textLine, "free memory: "+memFree, white);
+			m_debugDraw.drawString(5, m_textLine, "Average free memory: "+(long)memFree, white);
 			m_textLine += 15;
 		}
 
@@ -257,6 +277,7 @@ public abstract class AbstractExample {
             newKeyDown[i] = false;
         }
 		pmouseScreen.set(mouseScreen);
+		
 	}
 
 	//Space launches a bomb from a random default position
@@ -377,6 +398,20 @@ public abstract class AbstractExample {
         }
     }
     
+    /**
+     * Sets the camera target and scale.
+     * 
+     * @param x World x coordinate of camera focus
+     * @param y World y coordinate of camera focus
+     * @param scale Size in screen units (usually pixels) of one world unit (meter)
+     */
+    public void setCamera(float x, float y, float scale) {
+    	m_debugDraw.setCamera(x, y, scale);
+    	hasCachedCamera = true;
+    	cachedCamX = x;
+    	cachedCamY = y;
+    	cachedCamScale = scale;
+    }
 	
     /** Stub method for concrete examples to override if desired.
      *  Called when a joint is implicitly destroyed due to body
