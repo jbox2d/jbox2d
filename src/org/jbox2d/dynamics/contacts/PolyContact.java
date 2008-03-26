@@ -79,6 +79,7 @@ public class PolyContact extends Contact implements ContactCreateFcn {
         newC.m_restitution = this.m_restitution;
 
         newC.m_flags = this.m_flags;
+        
         return newC;
     }
 
@@ -96,6 +97,13 @@ public class PolyContact extends Contact implements ContactCreateFcn {
     public Contact create(Shape shape1, Shape shape2) {
         return new PolyContact(shape1, shape2);
     }
+    
+    public void dumpManifoldPoints() {
+    	for (int i=0; i<m_manifold.pointCount; ++i) {
+    		ManifoldPoint mp = m_manifold.points[i];
+    		System.out.println("Manifold point dump: "+mp.normalForce+" "+mp.tangentForce);
+    	}
+    }
 
     @Override
     public void evaluate(ContactListener listener) {
@@ -103,6 +111,7 @@ public class PolyContact extends Contact implements ContactCreateFcn {
     	Body b2 = m_shape2.getBody();
         // Manifold m0 = m_manifold;
         Manifold m0 = new Manifold(m_manifold);
+        //This next stuff might be unnecessary now
         for (int k = 0; k < m_manifold.pointCount; k++) {
             m0.points[k] = new ManifoldPoint(m_manifold.points[k]);
             m0.points[k].normalForce = m_manifold.points[k].normalForce;
@@ -110,7 +119,7 @@ public class PolyContact extends Contact implements ContactCreateFcn {
             m0.points[k].separation = m_manifold.points[k].separation;
             //m0.points[k].id.key = m_manifold.points[k].id.key;
             m0.points[k].id.features.set(m_manifold.points[k].id.features);
-            //System.out.println(m_manifold.points[k].id.key);
+            //System.out.println(m_manifold.points[k].normalForce);
         }
         m0.pointCount = m_manifold.pointCount;
 
@@ -121,27 +130,24 @@ public class PolyContact extends Contact implements ContactCreateFcn {
         // m_manifold.pointCount != m_manifold.points.length!!!
         boolean match[] = new boolean[] { false, false };
         if (m_manifold.pointCount > 0) {
-            // Body b1 = m_shape1.m_body;
-            // Body b2 = m_shape2.m_body;
-
-
             // Match old contact ids to new contact ids and copy the
             // stored impulses to warm start the solver.
             for (int i = 0; i < m_manifold.pointCount; ++i) {//m_manifold.points.length; ++i) {
-            	ManifoldPoint cp = new ManifoldPoint(m_manifold.points[i]);
+            	ManifoldPoint cp = m_manifold.points[i];
     			cp.normalForce = 0.0f;
     			cp.tangentForce = 0.0f;
     			boolean matched = false;
                 ContactID id = new ContactID(cp.id);
 
-                for (int j = 0; j < m0.points.length; ++j) {
+                for (int j = 0; j < m0.pointCount; ++j) {
                     if (match[j] == true) {
                         continue;
                     }
 
                     ManifoldPoint cp0 = m0.points[j];
                     ContactID id0 = new ContactID(cp0.id);
-                    id0.features.flip &= Collision.NEW_POINT;
+                    id0.features.flip &= ~Collision.NEW_POINT;
+                    
                     if (id0.features.isEqual(id.features)){
                     //if (id0.key == id.key) { //must use isEqual in Java, as id.key is simulating a union
                         match[j] = true;

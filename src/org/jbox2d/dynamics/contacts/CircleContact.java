@@ -33,6 +33,7 @@ import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.collision.ShapeType;
+import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.ContactListener;
@@ -68,6 +69,8 @@ public class CircleContact extends Contact implements ContactCreateFcn {
         m_manifold.pointCount = 0;
         m_manifold.points[0].normalForce = 0.0f;
         m_manifold.points[0].tangentForce = 0.0f;
+        m_manifold.points[0].localPoint1 = new Vec2();
+        m_manifold.points[0].localPoint2 = new Vec2();
     }
 
     public void Destructor() {
@@ -85,10 +88,12 @@ public class CircleContact extends Contact implements ContactCreateFcn {
             m0.points[k] = new ManifoldPoint(m_manifold.points[k]);
             m0.points[k].normalForce = m_manifold.points[k].normalForce;
             m0.points[k].tangentForce = m_manifold.points[k].tangentForce;
+            m0.points[k].separation = m_manifold.points[k].separation;
             //m0.points[k].id.key = m_manifold.points[k].id.key;
             m0.points[k].id.features.set(m_manifold.points[k].id.features);
             //System.out.println(m_manifold.points[k].id.key);
         }
+        m0.pointCount = m_manifold.pointCount;
     	
     	CollideCircle.collideCircle(m_manifold, (CircleShape)m_shape1, b1.m_xf, (CircleShape)m_shape2, b2.m_xf);
 

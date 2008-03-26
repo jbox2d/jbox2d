@@ -109,10 +109,12 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
             m0.points[k] = new ManifoldPoint(m_manifold.points[k]);
             m0.points[k].normalForce = m_manifold.points[k].normalForce;
             m0.points[k].tangentForce = m_manifold.points[k].tangentForce;
+            m0.points[k].separation = m_manifold.points[k].separation;
             //m0.points[k].id.key = m_manifold.points[k].id.key;
             m0.points[k].id.features.set(m_manifold.points[k].id.features);
             //System.out.println(m_manifold.points[k].id.key);
         }
+        m0.pointCount = m_manifold.pointCount;
     	
     	CollideCircle.collidePolygonAndCircle(m_manifold, (PolygonShape)m_shape1, b1.m_xf, (CircleShape)m_shape2, b2.m_xf);
 

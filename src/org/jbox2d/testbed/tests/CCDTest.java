@@ -74,15 +74,15 @@ public class CCDTest extends AbstractExample {
 
 		for (int i = 0; i < 10; ++i) {
 			BodyDef bd = new BodyDef();
-			bd.position.set(0.0f, 15.2f + i);
-			bd.isBullet = true;
+			bd.position.set(0.0f, 15.0f + i);
+			//bd.isBullet = true;
 			Body body = m_world.createDynamicBody(bd);
 			body.setAngularVelocity(parent.random(-50.0f, 50.0f));
 
 			CircleDef sd = new CircleDef();
 			sd.radius = 0.25f;
 			sd.density = 1.0f;
-			sd.restitution = 0.0f;
+			//sd.restitution = 0.0f;
 			body.createShape(sd);
 			body.setMassFromShapes();
 		}

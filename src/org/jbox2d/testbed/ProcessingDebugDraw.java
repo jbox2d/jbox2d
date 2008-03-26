@@ -37,9 +37,9 @@ public class ProcessingDebugDraw extends DebugDraw {
 	public ProcessingDebugDraw(PApplet pApplet) {
 		screen = this;
 		g = pApplet;
-		//m_font = g.loadFont("CourierNew36.vlw");
-		//g.textFont(m_font, 36);
-		fontHeight = 36.0f;
+		m_font = g.loadFont("LucidaGrande-Bold-14.vlw");
+		fontHeight = 14.0f;
+
 	}
 	
 	public Vec2 worldToScreen(Vec2 world) {
@@ -188,28 +188,35 @@ public class ProcessingDebugDraw extends DebugDraw {
 		float k_axisScale = 0.4f;
 		g.beginShape(PApplet.LINES);
 		
+		Vec2 p1world = worldToScreen(p1);
 		g.stroke(1.0f, 0.0f, 0.0f);
-		g.vertex(p1.x, p1.y);
+		g.vertex(p1world.x, p1world.y);
 		p2.x = p1.x + k_axisScale * xf.R.col1.x;
 		p2.y = p1.y + k_axisScale * xf.R.col1.y;
-		g.vertex(p2.x, p2.y);
+		Vec2 p2world = worldToScreen(p2);
+		g.vertex(p2world.x, p2world.y);
 
 		g.stroke(0.0f, 1.0f, 0.0f);
-		g.vertex(p1.x, p1.y);
+		g.vertex(p1world.x, p1world.y);
 		p2.x = p1.x + k_axisScale * xf.R.col2.x;
 		p2.y = p1.x + k_axisScale * xf.R.col2.y;
+		p2world = worldToScreen(p2);
 		g.vertex(p2.x, p2.y);
 
 		g.endShape();
 
 	}
-
+	
+	private static boolean firstTime = true;
 	@Override
 	public void drawString(float x, float y, String s, Color3f color) {
+		//g.textFont(m_font, 36);
+		//if (true) return;
 		g.colorMode(PApplet.NORMALIZED);
-		g.textMode(PApplet.SCREEN);
-		g.fill(color.x,color.y,color.z);
-		g.textFont(m_font);
+		
+		if (firstTime) {g.textFont(m_font);g.textMode(PApplet.SCREEN);firstTime = false;}
+		//g.fill(color.x,color.y,color.z);
+		g.fill(255.0f);
 		g.text(s, x, y);
 	}
 
