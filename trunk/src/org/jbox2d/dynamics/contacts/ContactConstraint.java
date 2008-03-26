@@ -2,7 +2,7 @@
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
  * JBox2D homepage: http://jbox2d.sourceforge.net/ 
- * Box2D homepage: http://www.gphysics.com
+ * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages

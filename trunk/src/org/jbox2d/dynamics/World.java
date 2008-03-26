@@ -2,7 +2,7 @@
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
  * JBox2D homepage: http://jbox2d.sourceforge.net/ 
- * Box2D homepage: http://www.gphysics.com
+ * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -20,6 +20,7 @@
  * misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  */
+
 package org.jbox2d.dynamics;
 
 import javax.vecmath.Color3f;
@@ -85,29 +86,37 @@ public class World {
 	public ContactListener m_contactListener;
 	public DebugDraw m_debugDraw;
 
-	/// The world provides a single static ground body with no collision shapes.
-	/// You can use this to simplify the creation of joints and static shapes.
+	/** The world provides a single static ground body with no collision shapes.
+	 *	You can use this to simplify the creation of joints and static shapes.
+	 */
 	public Body getGroundBody() {
         return m_groundBody;
     }
-	/// Get the world body list. With the returned body, use b2Body::GetNext to get
-	/// the next body in the world list. A NULL body indicates the end of the list.
-	/// @return the head of the world body list.
+	
+	/**
+	 * Get the world body list. With the returned body, use Body.getNext() to get
+	 * the next body in the world list. A NULL body indicates the end of the list.
+	 * @return the head of the world body list.
+	 */
     public Body getBodyList() {
         return m_bodyList;
     }
 
-    /// Get the world joint list. With the returned joint, use b2Joint::GetNext to get
-	/// the next joint in the world list. A NULL joint indicates the end of the list.
-	/// @return the head of the world joint list.
-	public Joint getJointList() {
+    /**
+     * Get the world joint list. With the returned joint, use Joint.getNext() to get
+     * the next joint in the world list. A NULL joint indicates the end of the list.
+	 * @return the head of the world joint list.
+	 */
+    public Joint getJointList() {
         return m_jointList;
     }
 
-    /// Construct a world object.
-	/// @param worldAABB a bounding box that completely encompasses all your shapes.
-	/// @param gravity the world gravity vector.
-	/// @param doSleep improve performance by not simulating inactive bodies.
+    /**
+     * Construct a world object.
+     * @param worldAABB a bounding box that completely encompasses all your shapes.
+	 * @param gravity the world gravity vector.
+	 * @param doSleep improve performance by not simulating inactive bodies.
+     */
 	public World(AABB worldAABB, Vec2 gravity, boolean doSleep) {
 		m_destructionListener = null;
 		m_boundaryListener = null;
@@ -137,37 +146,43 @@ public class World {
         m_groundBody = createStaticBody(bd);
     }
 
-	/// Register a destruction listener.
+	/** Register a destruction listener. */
     public void setListener(DestructionListener listener) {
         m_destructionListener = listener;
     }
     
-    /// Register a broad-phase boundary listener.
+    /** Register a broad-phase boundary listener. */
     public void setListener(BoundaryListener listener) {
     	m_boundaryListener = listener;
     }
 
-    /// Register a contact filter to provide specific control over collision.
-	/// Otherwise the default filter is used (b2_defaultFilter).
+    /**
+     *  Register a contact filter to provide specific control over collision.
+	 *  Otherwise the default filter is used (b2_defaultFilter).
+     */
     public void setFilter(ContactFilter filter) {
     	m_contactFilter = filter;
     }
 
-    /// Register a contact event listener
+    /** Register a contact event listener */
     public void setListener(ContactListener listener) {
     	m_contactListener = listener;
     }
     
-	/// Register a routine for debug drawing. The debug draw functions are called
-	/// inside the b2World::Step method, so make sure your renderer is ready to
-	/// consume draw commands when you call Step().
+    /**
+	 * Register a routine for debug drawing. The debug draw functions are called
+	 * inside the World.step() method, so make sure your renderer is ready to
+	 * consume draw commands when you call step().
+	 */
     public void setDebugDraw(DebugDraw debugDraw) {
     	m_debugDraw = debugDraw;
     }
     
-	/// Create a static rigid body given a definition. No reference to the definition
-	/// is retained.
-	/// @warning This function is locked during callbacks.
+	/**
+	 * Create a static rigid body given a definition. No reference to the definition
+	 * is retained.
+ 	 * <BR><em>Warning</em>: This function is locked during callbacks.
+ 	 */
 	public Body createStaticBody(BodyDef def) {
     	assert(m_lock == false);
     	if (m_lock == true) {
@@ -188,9 +203,11 @@ public class World {
     	return b;
     }
 	
-	/// Create a dynamic rigid body given a definition. No reference to the definition
-	/// is retained.
-	/// @warning This function is locked during callbacks.
+	/** 
+	 * Create a dynamic rigid body given a definition. No reference to the definition
+	 * is retained.
+	 * <BR><em>Warning</em>: This function is locked during callbacks.
+	 */
 	public Body createDynamicBody(BodyDef def) {
 		assert(m_lock == false);
 		if (m_lock == true) {
@@ -211,10 +228,12 @@ public class World {
 		return b;
 	}
     
-	/// Destroy a rigid body given a definition. No reference to the definition
-	/// is retained. This function is locked during callbacks.
-	/// @warning This automatically deletes all associated shapes and joints.
-	/// @warning This function is locked during callbacks.
+	/**
+	 * Destroy a rigid body given a definition. No reference to the definition
+	 * is retained. This function is locked during callbacks.
+	 * <BR><em>Warning</em>: This automatically deletes all associated shapes and joints.
+	 * <BR><em>Warning</em>: This function is locked during callbacks.
+	 */
 	public void destroyBody(Body b) {
 		assert(m_bodyCount > 0);
 		assert(m_lock == false);
@@ -267,9 +286,11 @@ public class World {
 		//b->~b2Body();
 	}
 	
-	/// Create a joint to constrain bodies together. No reference to the definition
-	/// is retained. This may cause the connected bodies to cease colliding.
-	/// @warning This function is locked during callbacks.
+	/**
+	 * Create a joint to constrain bodies together. No reference to the definition
+	 * is retained. This may cause the connected bodies to cease colliding.
+	 * <BR><em>Warning</em> This function is locked during callbacks.
+	 */
     public Joint createJoint(JointDef def) {
     	assert(m_lock == false);
     	
@@ -316,8 +337,10 @@ public class World {
         return j;
     }
     
-	/// Destroy a joint. This may cause the connected bodies to begin colliding.
-	/// @warning This function is locked during callbacks.
+	/**
+	 * Destroy a joint. This may cause the connected bodies to begin colliding.
+	 * <BR><em>Warning</em>: This function is locked during callbacks.
+	 */
 	public void destroyJoint(Joint j) {
     	assert(m_lock == false);
     	
@@ -391,10 +414,12 @@ public class World {
         }
     }
 	
-	/// Take a time step. This performs collision detection, integration,
-	/// and constraint solution.
-	/// @param timeStep the amount of time to simulate, this should not vary.
-	/// @param iterations the number of iterations to be used by the constraint solver.
+	/**
+	 * Take a time step. This performs collision detection, integration,
+	 * and constraint solution.
+	 * @param timeStep the amount of time to simulate, this should not vary.
+	 * @param iterations the number of iterations to be used by the constraint solver.
+	 */
     public void step(float dt, int iterations) {
     	m_lock = true;
 
@@ -426,16 +451,17 @@ public class World {
     	m_lock = false;
     }
 	
-	/// Query the world for all shapes that potentially overlap the
-	/// provided AABB up to max count.
-	/// The number of shapes found is returned.
-	/// @param aabb the query box.
-	/// @param maxCount the capacity of the shapes array.
-	/// @return array of shapes overlapped, up to maxCount in length
+	/**
+	 * Query the world for all shapes that potentially overlap the
+	 * provided AABB up to max count.
+	 * The number of shapes found is returned.
+	 * @param aabb the query box.
+	 * @param maxCount the capacity of the shapes array.
+	 * @return array of shapes overlapped, up to maxCount in length
+	 */
     public Shape[] query(AABB aabb, int maxCount) {
         Object[] objs = m_broadPhase.query(aabb, maxCount);
         Shape[] ret = new Shape[objs.length];
-
         System.arraycopy(objs, 0, ret, 0, objs.length);
         //for (int i=0; i<ret.length; ++i) {
         //	ret[i] = (Shape)(objs[i]);
@@ -451,6 +477,7 @@ public class World {
 	// Java note: sorry, guys, we have to keep this stuff public until
 	// the C++ version does otherwise so that we can maintain the engine...
     
+    /** For internal use */
     public void solve(TimeStep step) {
     	m_positionIterationCount = 0;
     	
@@ -591,7 +618,7 @@ public class World {
     }
     
     
-    // Find TOI contacts and solve them.
+    /** For internal use: find TOI contacts and solve them. */
     public void solveTOI(TimeStep step) {
     	// Reserve an island and a stack for TOI island solution.
     	Island island = new Island(m_bodyCount, Settings.maxTOIContactsPerIsland, 0, m_contactListener);
@@ -818,7 +845,7 @@ public class World {
 
     }
 
-
+    /** For internal use */
     public void drawShape(Shape shape, XForm xf, Color3f color, boolean core) {
     	Color3f coreColor = new Color3f(255f*0.9f, 255f*0.6f, 255f*0.6f);
 
@@ -858,7 +885,8 @@ public class World {
     		
     	}
     }
-
+    
+    /** For internal use */
     public void drawJoint(Joint joint) {
     	Body b1 = joint.getBody1();
     	Body b2 = joint.getBody2();
@@ -891,6 +919,7 @@ public class World {
     	}
     }
 
+    /** For internal use */
     public void drawDebugData() {
     	if (m_debugDraw == null) {
     		return;

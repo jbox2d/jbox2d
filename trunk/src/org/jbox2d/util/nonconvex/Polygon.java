@@ -4,7 +4,12 @@ import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyDef;
 
-
+/**
+ * This code is very old and doesn't work anymore.
+ * Will be updated for 2.0 soon...
+ * 
+ * @author ewjordan
+ */
 public class Polygon {
 
     public static int maxVerticesPerPolygon = org.jbox2d.common.Settings.maxPolygonVertices;
@@ -16,7 +21,7 @@ public class Polygon {
     public int nVertices;
 
     public Polygon(float[] _x, float[] _y) {
-        nVertices = _x.length;
+    	nVertices = _x.length;
         // println("length "+nVertices);
         x = new float[nVertices];
         y = new float[nVertices];
