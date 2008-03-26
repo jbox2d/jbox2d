@@ -43,11 +43,11 @@ public class CCDTest extends AbstractExample {
 	public void create() {
 		
 		if (firstTime) {
-			m_debugDraw.setCamera(0f, 20f, 20f);
+			setCamera(0f, 20f, 20f);
 			firstTime = false;
 		}
 		
-		final float k_restitution = 1.0f;
+		final float k_restitution = 1.4f;
 
 		{
 			BodyDef bd = new BodyDef();

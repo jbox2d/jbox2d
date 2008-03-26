@@ -37,12 +37,18 @@ import processing.core.PApplet;
 
 
 public class Bridge extends AbstractExample {
-
+	private boolean firstTime = true;
+	
     public Bridge(TestbedMain _parent) {
 		super(_parent);
 	}
 
 	public void create() {
+		if (firstTime) {
+			setCamera(0.0f,10.0f,20.0f);
+			firstTime = false;
+		}
+		
     	Body ground = null;
 		{
 			PolygonDef sd = new PolygonDef();

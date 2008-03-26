@@ -49,7 +49,7 @@ public class ProcessingDebugDraw extends DebugDraw {
     public float yFlip = -1.0f; //flip y coordinate
     
     public void setCamera(float x, float y, float scale) {
-    	transX = PApplet.map(x,0.0f,1.0f,g.width*.5f,g.width*.5f+scale);
+    	transX = PApplet.map(x,0.0f,-1.0f,g.width*.5f,g.width*.5f+scale);
     	transY = PApplet.map(y,0.0f,yFlip*1.0f,g.height*.5f,g.height*.5f+scale);
     	scaleFactor = scale;
     }
@@ -235,8 +235,8 @@ public class ProcessingDebugDraw extends DebugDraw {
 		g.colorMode(PApplet.NORMALIZED);
 		
 		if (firstTime) {g.textFont(m_font);g.textMode(PApplet.SCREEN);firstTime = false;}
-		//g.fill(color.x,color.y,color.z);
-		g.fill(255.0f);
+		g.fill(color.x,color.y,color.z);
+		//g.fill(255.0f);
 		g.text(s, x, y);
 	}
 

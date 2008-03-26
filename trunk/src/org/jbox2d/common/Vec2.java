@@ -24,6 +24,9 @@
 package org.jbox2d.common;
 
 public class Vec2 {
+	final static public boolean watchCreations = true;
+	static public int creationCount = 0;
+	
     public float x, y;
 
     public Vec2() {
@@ -31,6 +34,7 @@ public class Vec2 {
     }
 
     public Vec2(float x, float y) {
+    	if (watchCreations) ++creationCount;
         this.x = x;
         this.y = y;
         // testbed.PTest.debugCount++;
