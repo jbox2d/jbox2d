@@ -369,7 +369,7 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		Vec2 h = Mat22.mul(absR, m_obb.extents);
 		Vec2 position = xf.position.add(Mat22.mul(xf.R, m_obb.center));
 		aabb.lowerBound = position.sub(h);
-		aabb.upperBound = position.addLocal(h);//save a Vec2 creation, reuse temp
+		aabb.upperBound = position.add(h);//save a Vec2 creation, reuse temp
 	}
 	
 	public void computeSweptAABB(AABB aabb, XForm transform1, XForm transform2) {

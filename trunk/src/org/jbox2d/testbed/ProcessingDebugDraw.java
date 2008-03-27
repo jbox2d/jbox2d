@@ -204,10 +204,9 @@ public class ProcessingDebugDraw extends DebugDraw {
 	@Override
 	public void drawXForm(XForm xf) {
 		g.colorMode(PApplet.NORMALIZED);
-		Vec2 p1 = xf.position, p2 = new Vec2();
+		Vec2 p1 = xf.position.clone(), p2 = new Vec2();
 		float k_axisScale = 0.4f;
 		g.beginShape(PApplet.LINES);
-		
 		Vec2 p1world = worldToScreen(p1);
 		g.stroke(1.0f, 0.0f, 0.0f);
 		g.vertex(p1world.x, p1world.y);

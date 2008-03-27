@@ -1,111 +1,118 @@
+/*
+ * JBox2D - A Java Port of Erin Catto's Box2D
+ * 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * Box2D homepage: http://www.box2d.org
+ * 
+ * This software is provided 'as-is', without any express or implied
+ * warranty.  In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ * 
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ * 
+ * 1. The origin of this software must not be misrepresented; you must not
+ * claim that you wrote the original software. If you use this software
+ * in a product, an acknowledgment in the product documentation would be
+ * appreciated but is not required.
+ * 2. Altered source versions must be plainly marked as such, and must not be
+ * misrepresented as being the original software.
+ * 3. This notice may not be removed or altered from any source distribution.
+ */
+
 package org.jbox2d.testbed.tests;
 
-import org.jbox2d.collision.*;
+import org.jbox2d.collision.CircleDef;
+import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
-import org.jbox2d.dynamics.World;
-import org.jbox2d.dynamics.joints.*;
-import org.jbox2d.testbed.PTest;
+import org.jbox2d.testbed.AbstractExample;
+import org.jbox2d.testbed.TestbedMain;
 
-import processing.core.PApplet;
-import processing.core.PImage;
+public class BugTest extends AbstractExample {
+	private boolean firstTime;
+	
+	public BugTest(TestbedMain _parent) {
+		super(_parent);
+		firstTime = true;
+	}
+	
+	@Override
+	public void create() {
+		
+		if (firstTime) {
+			setCamera(0f, 20f, 20f);
+			firstTime = false;
+		}
+		
+		final float k_restitution = 1.4f;
+		this.settings.pause = true;
+		{
+			BodyDef bd = new BodyDef();
+			bd.position.set(0.0f, 20.0f);
+			Body body = m_world.createStaticBody(bd);
 
+			PolygonDef sd = new PolygonDef();
+			sd.density = 0.0f;
+			sd.restitution = k_restitution;
 
+			sd.setAsBox(0.1f, 10.0f, new Vec2(-10.0f, 0.0f), 0.0f);
+			body.createShape(sd);
 
-public class BugTest extends PTest {
-    
-    public Vec2[] localCoords;
-    public Vec2[] texCoords;
-    public PImage myImage;
-    
-    public Body missile;
+			sd.setAsBox(0.1f, 10.0f, new Vec2(10.0f, 0.0f), 0.0f);
+			body.createShape(sd);
 
-    public BugTest() {
-        super("BugTest");
-    }
+			sd.setAsBox(0.1f, 10.0f,new Vec2(0.0f, -10.0f), 0.5f * 3.1415f);
+			body.createShape(sd);
 
-    public void go(World world) {
-        {        
+			sd.setAsBox(0.1f, 10.0f, new Vec2(0.0f, 10.0f), -0.5f * 3.1415f);
+			body.createShape(sd);
+		}
 
-            // Define the ground box shape.
-            BoxDef groundBoxDef = new BoxDef();
+		{
+			PolygonDef sd_bottom = new PolygonDef();
+			sd_bottom.setAsBox( 1.5f, 0.15f );
+			sd_bottom.density = 4.0f;
+			sd_bottom.restitution = 1.0f;
 
-            // The extents are the half-widths of the box.
-            groundBoxDef.extents.set(50.0f, 10.0f);
+			PolygonDef sd_left = new PolygonDef();
+			sd_left.setAsBox(0.15f, 2.7f, new Vec2(-1.45f, 2.35f), 0.2f);
+			sd_left.density = 4.0f;
 
-            // Set the density of the ground box to zero. This will
-            // make the ground body static (fixed).
-            groundBoxDef.density = 0.0f;
+			PolygonDef sd_right = new PolygonDef();
+			sd_right.setAsBox(0.15f, 2.7f, new Vec2(1.45f, 2.35f), -0.2f);
+			sd_right.density = 4.0f;
 
-            // Define the ground body.
-            BodyDef groundBodyDef = new BodyDef();
-            groundBodyDef.position.set(0.0f, -10.0f);
+			BodyDef bd = new BodyDef();
+			bd.position.set( 0.0f, 12.0f );
+			bd.isBullet = true;
+			Body body = m_world.createDynamicBody(bd);
+			body.createShape(sd_bottom);
+			//body.createShape(sd_left);
+			//body.createShape(sd_right);
+			body.setMassFromShapes();
+			
+			CircleDef cd = new CircleDef();
+			cd.radius = 0.5f;
+			cd.density = 40.0f;
+			BodyDef bd2 = new BodyDef();
+			bd2.position.set(0.0f,14.0f);
+			//bd2.linearVelocity.Set(0.1f,-100.0f);
+			bd2.isBullet = true;
+			Body myBod = m_world.createDynamicBody(bd2);
+			myBod.createShape(cd);
+			myBod.setLinearVelocity(new Vec2(0.1f,-100.0f));
+			myBod.setMassFromShapes();
+			
+		}
 
-            // Part of a body's def is its list of shapes.
-            groundBodyDef.addShape(groundBoxDef);
+	}
 
-            // Call the body factory which allocates memory for the ground body
-            // from a pool and creates the ground box shape (also from a pool).
-            // The body is also added to the world.
-            world.createBody(groundBodyDef);
+	@Override
+	public String getName() {
+		return "Bug Test";
+	}
 
-            // Define another box shape for our dynamic body.
-            BoxDef boxDef = new BoxDef();
-            boxDef.extents.set(1.0f, 5.0f);
-
-            // Set the box density to be non-zero, so it will be dynamic.
-            boxDef.density = 1.0f;
-
-            // Override the default friction.
-            boxDef.friction = 25.3f;
-            boxDef.restitution = 0.0f;
-            
-
-            // Define the dynamic body. We set its position,
-            // add the box shape, and call the body factory.
-            BodyDef bodyDef = new BodyDef();
-            bodyDef.position.set(0.0f, 4.0f);
-            bodyDef.addShape(boxDef);
-            missile = world.createBody(bodyDef);
-            
-         }
-        
-        //textureMode(NORMALIZED);
-    }
-    
-    protected void preStep() {
-        
-           float velocityAngle;
-           Vec2 velocity;
-           float torque;
-           float torqueFactor = -100.1f;
-           float torqueDamping = -torqueFactor;
-           
-           velocity = missile.getLinearVelocity();
-           float absVel = velocity.length();
-           
-           velocityAngle = (float) (Math.atan2( velocity.y, velocity.x ) - (Math.PI / 2));
-           float angVelDelta =  missile.m_rotation - velocityAngle;
-           
-           //Constrain to -PI -> PI
-           while (angVelDelta > Math.PI){
-               angVelDelta -= 2*Math.PI;
-           }
-           while (angVelDelta < -Math.PI){
-               angVelDelta += 2*Math.PI;
-           }
-           
-           torque = absVel* torqueFactor * (angVelDelta) - absVel*missile.m_angularVelocity * torqueDamping;
-           missile.applyTorque(torque);
-           //missile.m_rotation = velocityAngle;
-        
-    }
-
-    /**
-     * Entry point
-     */
-    public static void main(String[] argv) {
-        PApplet.main(new String[] { "org.jbox2d.testbed.tests.BugTest" });
-    }
 }
