@@ -33,8 +33,6 @@ import org.jbox2d.testbed.TestbedMain;
 import processing.core.PApplet;
 
 
-
-
 public class CompoundShapes extends AbstractExample {
 
 	private boolean firstTime = true;
