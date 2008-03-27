@@ -1,6 +1,7 @@
 Todo:
 
-[ ] Fix swept AABB bug, get CCD working right
+[ ] Finish testbed update
+[ ] Finish bringing examples over to 2.0
 [ ] Convert Box2d doc format to Javadoc
 [ ] Optimize 
 	- Vec2 creations are still pretty nuts
@@ -11,4 +12,6 @@ Todo:
 [ ] Slick example
 [ ] Java2d example
 
+Done:
 
+[x] Fix swept AABB bug, get CCD working right
