@@ -15,51 +15,58 @@ import org.jbox2d.dynamics.joints.PrismaticJoint;
 import org.jbox2d.dynamics.joints.PrismaticJointDef;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
-import org.jbox2d.testbed.PTest;
+import org.jbox2d.testbed.AbstractExample;
+import org.jbox2d.testbed.TestbedMain;
 
 import processing.core.*;
 
-
-
-public class Circles extends PTest {
-
-    public Circles() {
-        super("Circles");
+public class Circles extends AbstractExample {
+	private boolean firstTime = true;
+	
+    public Circles(TestbedMain parent) {
+        super(parent);
     }
 
-    public void go(World world) {
-        Body ground = null;
+    public void create() {
+    	if (firstTime) {
+			setCamera(0f, 20f, 5f);
+			firstTime = false;
+		}
+    	
+        Body ground = m_world.getGroundBody();
         Body leftWall = null;
         Body rightWall = null;
         {
             // Ground
-            BoxDef sd = new BoxDef();
-            sd.extents = new Vec2(50.0f, 10.0f);
+            PolygonDef sd = new PolygonDef();
+            sd.setAsBox(50.0f, 10.0f);
             sd.friction = 1.0f;
             BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
-            bd.addShape(sd);
-            ground = world.createBody(bd);
+            m_world.createStaticBody(bd).createShape(sd);
+            
             
             // Walls
-            sd.extents = new Vec2(3.0f,50.0f);
+            sd.setAsBox(3.0f,50.0f);
             bd = new BodyDef();
-            bd.addShape(sd);
             bd.position = new Vec2(53.0f,25.0f);
-            rightWall = world.createBody(bd);
+            rightWall = m_world.createStaticBody(bd);
+            rightWall.createShape(sd);
             bd.position = new Vec2(-53.0f,25.0f);
-            leftWall = world.createBody(bd);
+            leftWall = m_world.createStaticBody(bd);
+            leftWall.createShape(sd);
             
             // Corners 
             bd = new BodyDef();
-            sd.extents = new Vec2(20.0f,3.0f);
-            bd.addShape(sd);
-            bd.rotation = (float)(-Math.PI/4.0);
+            sd.setAsBox(20.0f,3.0f);
+            bd.angle = (float)(-Math.PI/4.0);
             bd.position = new Vec2(-40f,0.0f);
-            world.createBody(bd);
-            bd.rotation = (float)(Math.PI/4.0);
+            Body myBod = m_world.createStaticBody(bd);
+            myBod.createShape(sd);
+            bd.angle = (float)(Math.PI/4.0);
             bd.position = new Vec2(40f,0.0f);
-            world.createBody(bd);
+            myBod = m_world.createStaticBody(bd);
+            myBod.createShape(sd);
             
         }
         
@@ -68,6 +75,8 @@ public class Circles extends PTest {
         BodyDef bd = new BodyDef();
         int numPieces = 5;
         float radius = 6f;
+        bd.position = new Vec2(0.0f,10.0f);
+        Body body = m_world.createDynamicBody(bd);
         for (int i=0; i<numPieces; i++) {
             cd = new CircleDef();
             cd.radius = 1.2f;
@@ -77,20 +86,16 @@ public class Circles extends PTest {
             float xPos = radius * (float)Math.cos(2f*Math.PI * (i / (float)(numPieces)));
             float yPos = radius * (float)Math.sin(2f*Math.PI * (i / (float)(numPieces)));
             cd.localPosition = new Vec2(xPos,yPos);
-            bd.addShape(cd);   
+            body.createShape(cd);   
         }
-        
-        bd.position = new Vec2(0.0f,10.0f);
-        Body body = world.createBody(bd);
+        body.setMassFromShapes();
 
         RevoluteJointDef rjd = new RevoluteJointDef();
-        rjd.anchorPoint = body.m_position.clone();
-        rjd.body1 = ground;
-        rjd.body2 = body;
+        rjd.initialize(body,ground,body.getPosition());
         rjd.motorSpeed = (float) Math.PI;
-        rjd.motorTorque = 1000000.0f;
+        rjd.maxMotorTorque = 1000000.0f;
         rjd.enableMotor = true;
-        world.createJoint(rjd);
+        m_world.createJoint(rjd);
         
         {
             int loadSize = 45;
@@ -105,9 +110,11 @@ public class Circles extends PTest {
                     circ.restitution = 0.5f;
                     float xPos = -45f + 2*i;
                     float yPos = 50f+j;
-                    bod.addShape(circ);
                     bod.position = new Vec2(xPos,yPos);
-                    world.createBody(bod);
+                    Body myBody = m_world.createDynamicBody(bod);
+                    myBody.createShape(circ);
+                    myBody.setMassFromShapes();
+                    
                 }
             }
             
@@ -116,12 +123,7 @@ public class Circles extends PTest {
 
     }
 
-
-    /**
-     * Entry point
-     */
-    public static void main(String[] argv) {
-        PApplet.main(new String[] { "org.jbox2d.testbed.tests.Circles" });
-
+    public String getName() {
+    	return "Circle Stress Test";
     }
 }

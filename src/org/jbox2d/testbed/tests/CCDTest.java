@@ -32,11 +32,10 @@ import org.jbox2d.testbed.AbstractExample;
 import org.jbox2d.testbed.TestbedMain;
 
 public class CCDTest extends AbstractExample {
-	private boolean firstTime;
+	private boolean firstTime = true;
 	
 	public CCDTest(TestbedMain _parent) {
 		super(_parent);
-		firstTime = true;
 	}
 	
 	@Override
@@ -97,15 +96,16 @@ public class CCDTest extends AbstractExample {
 
 		for (int i = 0; i < 10; ++i) {
 			BodyDef bd = new BodyDef();
-			bd.position.set(0.0f, 15.0f + i);
-			//bd.isBullet = true;
+			bd.position.set(0.0f, 15.5f + i);
+			bd.isBullet = true;
 			Body body = m_world.createDynamicBody(bd);
 			body.setAngularVelocity(parent.random(-50.0f, 50.0f));
 
 			CircleDef sd = new CircleDef();
 			sd.radius = 0.25f;
 			sd.density = 1.0f;
-			//sd.restitution = 0.0f;
+			sd.restitution = 0.0f;
+			sd.friction = 0.05f;
 			body.createShape(sd);
 			body.setMassFromShapes();
 		}

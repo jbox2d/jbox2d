@@ -104,6 +104,7 @@ public abstract class AbstractExample {
 		parent = _parent;
 		m_debugDraw = parent.g;
 		needsReset = true;
+		
 	}
 	
 	public void initialize() {
@@ -153,10 +154,17 @@ public abstract class AbstractExample {
 			cachedCamY = 10.0f;
 			cachedCamScale = 20.0f;
 		}
+		
+		for (int i=0; i<newKeyDown.length; ++i) {
+			keyDown[i] = false;
+			newKeyDown[i] = false;
+		}
+		
 		create();
 	}
 	
 	public void step() {
+		preStep();
 		mouseWorld.set(m_debugDraw.screenToWorld(mouseScreen));
 		//System.out.println(mouseWorld);
 		float timeStep = settings.hz > 0.0f ? 1.0f / settings.hz : 0.0f;
@@ -273,10 +281,22 @@ public abstract class AbstractExample {
 			}
 		}
 		
-		for (int i = 0; i < newKeyDown.length; i++) {
-            newKeyDown[i] = false;
-        }
 		pmouseScreen.set(mouseScreen);
+		postStep();
+
+		//Should reset newKeyDown after postStep in case it needs to be used there
+		for (int i=0; i<newKeyDown.length; ++i) {
+			newKeyDown[i] = false;
+		}
+	}
+	
+	/** Stub for overloading in examples - called before physics step */
+	public void preStep() {
+		
+	}
+	
+	/** Stub for overloading in examples - called after physics step */
+	public void postStep() {
 		
 	}
 
@@ -304,9 +324,18 @@ public abstract class AbstractExample {
     	sd.radius = 0.3f;
     	sd.density = 20.0f;
     	sd.restitution = 0.1f;
-    	m_bomb.createShape(sd);
-    	
-    	m_bomb.setMassFromShapes();
+
+    	Vec2 minV = position.sub(new Vec2(0.3f,0.3f));
+    	Vec2 maxV = position.add(new Vec2(0.3f,0.3f));
+    	AABB aabb = new AABB(minV, maxV);
+    	boolean inRange = m_world.m_broadPhase.inRange(aabb);
+
+    	if (inRange) {
+    		m_bomb.createShape(sd);
+    		m_bomb.setMassFromShapes();
+    	} else {
+    		System.out.println("Bomb not created - out of world AABB");
+    	}
     }
     
     //Shift+drag "slingshots" a bomb from any point using these functions
@@ -326,8 +355,8 @@ public abstract class AbstractExample {
     
     public void keyPressed(int key) {
         if (key >= 0 && key < 255) {
-            if (!keyDown[key])
-                newKeyDown[key] = true;
+        	//System.out.println(key + " "+keyDown[key]);
+            if (!keyDown[key]) newKeyDown[key] = true;
             keyDown[key] = true;
         }
     }

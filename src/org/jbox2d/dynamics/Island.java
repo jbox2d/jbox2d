@@ -81,7 +81,7 @@ public class Island {
 
     void add(Contact contact) {
         assert (m_contactCount < m_contactCapacity);
-        m_contacts[m_contactCount++] = contact.clone();
+        m_contacts[m_contactCount++] = contact; //no clone, botches CCD if cloned!
     }
 
     void add(Joint joint) {
@@ -281,7 +281,7 @@ public class Island {
 
     		if (b.isStatic())
     			continue;
-
+    		//System.out.println("(Island::SolveTOI 1) :"+b.m_sweep);
     		// Store positions for continuous collision.
     		b.m_sweep.c0.set(b.m_sweep.c);
     		b.m_sweep.a0 = b.m_sweep.a;
@@ -291,9 +291,11 @@ public class Island {
     		b.m_sweep.c.y += subStep.dt * b.m_linearVelocity.y;
     		b.m_sweep.a += subStep.dt * b.m_angularVelocity;
 
+    		//System.out.println("(Island::SolveTOI 2) :"+b.m_sweep);
     		// Compute new transform
     		b.synchronizeTransform();
 
+    		//	System.out.println("(Island::SolveTOI 3) :"+b.m_sweep);
     		// Note: shapes are synchronized later.
     	}
 

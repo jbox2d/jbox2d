@@ -49,10 +49,7 @@ import org.jbox2d.dynamics.joints.JointType;
 import org.jbox2d.dynamics.joints.MouseJoint;
 import org.jbox2d.dynamics.joints.MouseJointDef;
 import org.jbox2d.dynamics.joints.PulleyJoint;
-import org.jbox2d.testbed.tests.Bridge;
-import org.jbox2d.testbed.tests.CCDTest;
-import org.jbox2d.testbed.tests.Chain;
-import org.jbox2d.testbed.tests.DistanceTest;
+import org.jbox2d.testbed.tests.*;
 
 import processing.core.PApplet;
 import processing.core.PImage;
@@ -103,6 +100,10 @@ public class TestbedMain extends PApplet {
     	//smooth();
     	
     	/* Register the examples */
+    	//registerExample(new BugTest(this));
+    	registerExample(new Circles(this));
+    	registerExample(new VerticalStack(this));
+    	registerExample(new CompoundShapes(this));
     	registerExample(new Chain(this));
     	registerExample(new Bridge(this));
     	registerExample(new CCDTest(this));

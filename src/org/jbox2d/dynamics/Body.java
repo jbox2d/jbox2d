@@ -296,7 +296,7 @@ public class Body {
 		}
 		
 		// Move center of mass.
-		m_sweep.localCenter = massData.center;
+		m_sweep.localCenter.set(massData.center);
 		m_sweep.c.set(XForm.mul(m_xf, m_sweep.localCenter));
 		m_sweep.c0.set(m_sweep.c);
 		
@@ -463,7 +463,7 @@ public class Body {
 	 * @return the linear velocity of the center of mass.
 	 */
 	public Vec2 getLinearVelocity(){
-		return m_linearVelocity;
+		return m_linearVelocity.clone();
 	}
 
 	/**
@@ -698,6 +698,7 @@ public class Body {
 	public void synchronizeTransform(){
 		m_xf.R.set(m_sweep.a);
 		m_xf.position.set(m_sweep.c.sub(Mat22.mul(m_xf.R,m_sweep.localCenter)));
+		//System.out.println(m_xf);
 	}
 
 	/**

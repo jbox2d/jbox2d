@@ -211,22 +211,22 @@ public class ContactSolver {
             Body b2 = c.body2;
             float w1 = b1.m_angularVelocity;
             float w2 = b2.m_angularVelocity;
-            Vec2 v1 = b1.m_linearVelocity;
-            Vec2 v2 = b2.m_linearVelocity;
+            Vec2 v1 = b1.m_linearVelocity.clone();
+            Vec2 v2 = b2.m_linearVelocity.clone();
             float invMass1 = b1.m_invMass;
             float invI1 = b1.m_invI;
             float invMass2 = b2.m_invMass;
             float invI2 = b2.m_invI;
-            Vec2 normal = c.normal;
+            Vec2 normal = c.normal.clone();
             Vec2 tangent = Vec2.cross(normal, 1.0f);
             float friction = c.friction;
             
-            //final boolean DEFERRED_UPDATE = true;
+            //final boolean DEFERRED_UPDATE = false;
             //if (DEFERRED_UPDATE) {
-            		Vec2 b1_linearVelocity = b1.m_linearVelocity.clone();
-            		float b1_angularVelocity = b1.m_angularVelocity;
-            		Vec2 b2_linearVelocity = b2.m_linearVelocity.clone();
-            		float b2_angularVelocity = b2.m_angularVelocity;
+//            		Vec2 b1_linearVelocity = b1.m_linearVelocity.clone();
+//            		float b1_angularVelocity = b1.m_angularVelocity;
+//            		Vec2 b2_linearVelocity = b2.m_linearVelocity.clone();
+//            		float b2_angularVelocity = b2.m_angularVelocity;
             //}
             
             // Solver normal constraints
@@ -250,34 +250,24 @@ public class ContactSolver {
     			// Apply contact impulse
     			Vec2 P = new Vec2(m_step.dt * lambda * normal.x, m_step.dt * lambda * normal.y);
     			
-    			//if(DEFERRED_UPDATE) {
-    				b1_linearVelocity.x -= invMass1 * P.x;
-    				b1_linearVelocity.y -= invMass1 * P.y;
-    				//b1_angularVelocity -= invI1 * b2Cross(r1, P);
-    				b1_angularVelocity -= invI1 * (ccp.r1.x*P.y - ccp.r1.y*P.x);
-
-    				b2_linearVelocity.x += invMass2 * P.x;
-    				b2_linearVelocity.y += invMass2 * P.y;
-    				//b2_angularVelocity += invI2 * b2Cross(r2, P);
-    				b2_angularVelocity += invI2 * (ccp.r2.x*P.y - ccp.r2.y*P.x);
-    				
-    			//} else {
-    			//	b1->m_linearVelocity -= invMass1 * P;
-    			//	b1->m_angularVelocity -= invI1 * b2Cross(r1, P);
-    			//
-    			//	b2->m_linearVelocity += invMass2 * P;
-    			//	b2->m_angularVelocity += invI2 * b2Cross(r2, P);
-    			//}
+    			v1.x -= invMass1*P.x;
+    			v1.y -= invMass1*P.y;
+    			w1 -= invI1 * Vec2.cross(ccp.r1,P);
+    			
+    			v2.x += invMass2*P.x;
+    			v2.y += invMass2*P.y;
+    			w2 += invI2 * Vec2.cross(ccp.r2,P);
+    			
     			ccp.normalForce = newForce;
     
             }
             
-            //#ifdef DEFERRED_UPDATE
-    		b1.m_linearVelocity = b1_linearVelocity;
-    		b1.m_angularVelocity = b1_angularVelocity;
-    		b2.m_linearVelocity = b2_linearVelocity;
-    		b2.m_angularVelocity = b2_angularVelocity;
-    		// #endif
+//            //#ifdef DEFERRED_UPDATE
+//    		b1.m_linearVelocity = b1_linearVelocity;
+//    		b1.m_angularVelocity = b1_angularVelocity;
+//    		b2.m_linearVelocity = b2_linearVelocity;
+//    		b2.m_angularVelocity = b2_angularVelocity;
+//    		// #endif
 
             // Solver tangent constraints
     		 for (int j=0; j<c.pointCount; ++j) {
@@ -306,19 +296,23 @@ public class ContactSolver {
                 float py = tangent.y * lambda;
 
                 // b1.m_linearVelocity.subLocal(P.mul(invMass1));
-                b1.m_linearVelocity.x -= px * invMass1;
-                b1.m_linearVelocity.y -= py * invMass1;
+                v1.x -= px * invMass1;
+                v1.y -= py * invMass1;
                 // b1.m_angularVelocity -= invI1 * Vec2.cross(r1, P);
-                b1.m_angularVelocity -= invI1 * (ccp.r1.x * py - ccp.r1.y * px);
+                w1 -= invI1 * (ccp.r1.x * py - ccp.r1.y * px);
 
                 // b2.m_linearVelocity.addLocal(P.mul(invMass2));
-                b2.m_linearVelocity.x += px * invMass2;
-                b2.m_linearVelocity.y += py * invMass2;
+                v2.x += px * invMass2;
+                v2.y += py * invMass2;
                 // b2.m_angularVelocity += invI2 * Vec2.cross(r2, P);
-                b2.m_angularVelocity += invI2 * (ccp.r2.x * py - ccp.r2.y * px);
+                w2 += invI2 * (ccp.r2.x * py - ccp.r2.y * px);
 
                 ccp.tangentForce = newForce;
             }
+    		 b1.m_linearVelocity.set(v1);
+    		 b1.m_angularVelocity = w1;
+    		 b2.m_linearVelocity.set(v2);
+    		 b2.m_angularVelocity = w2;
         }
     }
 

@@ -583,7 +583,7 @@ public class World {
     			// Allow static bodies to participate in other islands.
     			Body b = island.m_bodies[i];
     			if (b.isStatic()) {
-    				b.m_flags &= Body.e_islandFlag;
+    				b.m_flags &= ~Body.e_islandFlag;
     			}
     		}
         }
@@ -629,13 +629,10 @@ public class World {
     		b.m_flags &= ~Body.e_islandFlag;
     		b.m_sweep.t0 = 0.0f;
     	}
-    	int ccount = 0;
+
     	for (Contact c = m_contactList; c != null; c = c.m_next) {
     		// Invalidate TOI
-    		++ccount;
-
     		c.m_flags &= ~(Contact.e_toiFlag | Contact.e_islandFlag);
-    		
     	}
 
     	// Find TOI events and solve them.
@@ -675,12 +672,10 @@ public class World {
     					t0 = b1.m_sweep.t0;
     					b2.m_sweep.advance(t0);
     				}
-
     				assert(t0 < 1.0f);
 
     				// Compute the time of impact.
     				toi = TOI.timeOfImpact(c.m_shape1, b1.m_sweep, c.m_shape2, b2.m_sweep);
-
     				assert(0.0f <= toi && toi <= 1.0f);
     				
     				if (toi > 0.0f && toi < 1.0f) {
@@ -712,7 +707,6 @@ public class World {
     		Body b2 = s2.getBody();
     		b1.advance(minTOI);
     		b2.advance(minTOI);
-    		//System.out.println("Advancing by "+minTOI);
 
     		// The TOI contact likely has some new contact points.
     		minContact.update(m_contactListener);
@@ -770,7 +764,6 @@ public class World {
 
     				island.add(cn.contact);
     				cn.contact.m_flags |= Contact.e_islandFlag;
-
     				// Update other body.
     				Body other = cn.other;
 
@@ -799,7 +792,7 @@ public class World {
     		subStep.maxIterations = step.maxIterations;
 
     		island.solveTOI(subStep);
-
+    		
     		// Post solve cleanup.
     		for (int i = 0; i < island.m_bodyCount; ++i) {
     			// Allow bodies to participate in future TOI islands.
@@ -833,9 +826,9 @@ public class World {
 
     		for (int i = 0; i < island.m_contactCount; ++i) {
     			// Allow contacts to participate in future TOI islands.
+
     			Contact c = island.m_contacts[i];
     			c.m_flags &= ~(Contact.e_toiFlag | Contact.e_islandFlag);
-
     		}
 
     		// Commit shape proxy movements to the broad-phase so that new contacts are created.

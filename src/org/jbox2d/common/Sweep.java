@@ -42,6 +42,14 @@ public class Sweep {
 	public float a0, a; 
 	/** Time interval = [t0,1], where t0 is in [0,1] */
 	public float t0;
+	
+	public String toString() {
+		String s = "Sweep:\nlocalCenter: "+localCenter+"\n";
+		s += "c0: "+c0+", c: "+c+"\n";
+		s += "a0: "+a0+", a: "+a+"\n";
+		s += "t0: "+t0+"\n";
+		return s;
+	}
 
 	public Sweep() {
 		localCenter = new Vec2();

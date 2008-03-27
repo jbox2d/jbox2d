@@ -57,6 +57,7 @@ public class DistanceJoint extends Joint {
         m_localAnchor2 = def.localAnchor2;
         m_length = def.length;
         m_force = 0.0f;
+        m_u = new Vec2();
     }
 
     @Override
