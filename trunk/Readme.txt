@@ -2,6 +2,8 @@
 JBox2d README
 -------------
 
+[This is an SVN pre-2.0 release version.  Try running org.jbox2d.testbed.TestbedMain.java to see the demos]
+
 JBox2d (http://www.sf.net/projects/jbox2d) is a Java port of Box2d (http://www.box2d.org), a 2D rigid body physics engine written in C++.
 Box2d is maintained by Erin Catto.
 JBox2d is maintained by quixote_arg and ewjordan.

@@ -24,7 +24,7 @@
 package org.jbox2d.testbed;
 
 public class TestSettings {
-    public float hz;
+    public int hz;
 
     public int iterationCount;
 

@@ -57,7 +57,7 @@ public class ProcessingDebugDraw extends DebugDraw {
 	public ProcessingDebugDraw(PApplet pApplet) {
 		screen = this;
 		g = pApplet;
-		m_font = g.loadFont("LucidaGrande-Bold-14.vlw");
+		m_font = g.createFont("LucidaGrande-Bold",12);//-Bold-14.vlw");
 		fontHeight = 14.0f;
 
 	}

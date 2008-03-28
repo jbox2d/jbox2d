@@ -95,6 +95,10 @@ public class VerticalStack extends AbstractExample {
 		}
     }
     
+    public String getExampleInstructions() {
+    	return "Press ; to shoot sideways bullet\n";
+    }
+    
     public void postStep() {
     	if (newKeyDown[';']) {
     		launchBomb(new Vec2(-40.0f,parent.random(1.0f,10.0f)),new Vec2(200.0f,parent.random(-5.0f,5.0f)));

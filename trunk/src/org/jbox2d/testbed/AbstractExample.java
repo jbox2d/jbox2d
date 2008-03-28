@@ -50,6 +50,13 @@ public abstract class AbstractExample {
 	public Body followedBody = null; //camera follows motion of this body
     public boolean[] keyDown = new boolean[255];
     public boolean[] newKeyDown = new boolean[255];
+    
+    
+    static public String instructionString = "Press left/right to change test\n" +
+    										 "Use the mouse to drag objects\n" +
+    										 "Shift+drag to slingshot bomb\n" +
+    										 "Press 'o' to toggle options panel\n";
+    										
 
     public Vec2 mouseScreen = new Vec2(); // screen coordinates of mouse
     public Vec2 mouseWorld = new Vec2(); // world coordinates of mouse
@@ -83,8 +90,27 @@ public abstract class AbstractExample {
 	public float cachedCamX, cachedCamY, cachedCamScale;
 	public boolean hasCachedCamera = false;
 	
+	static public int textLineHeight = 12;
 	
     //protected ArrayList<BoundImage> boundImages = new ArrayList<BoundImage>();
+	
+	/**
+	 * Prints default instructions + specific example instructions.
+	 * To add instructions to your example, override getExampleInstructions()
+	 */
+	public void printInstructions() {
+		String fullString = instructionString + getExampleInstructions();
+		String[] instructionLines = fullString.split("\n");
+		int currentLine = parent.height - instructionLines.length*textLineHeight;
+		for (int i=0; i<instructionLines.length; ++i) {
+			m_debugDraw.drawString(5, currentLine, instructionLines[i], white);
+			currentLine += textLineHeight;
+		}
+	}
+	
+	public String getExampleInstructions() {
+		return "";
+	}
 	
     /**
      * @return Title of example
@@ -148,11 +174,11 @@ public abstract class AbstractExample {
 		if (hasCachedCamera) {
 			m_debugDraw.setCamera(cachedCamX,cachedCamY,cachedCamScale);
 		} else {
-			m_debugDraw.setCamera(0.0f, 0.0f, 20.0f);
+			m_debugDraw.setCamera(0.0f, 10.0f, 10.0f);
 			hasCachedCamera = true;
 			cachedCamX = 0.0f;
 			cachedCamY = 10.0f;
-			cachedCamScale = 20.0f;
+			cachedCamScale = 10.0f;
 		}
 		
 		for (int i=0; i<newKeyDown.length; ++i) {
@@ -166,7 +192,7 @@ public abstract class AbstractExample {
 	public void step() {
 		preStep();
 		mouseWorld.set(m_debugDraw.screenToWorld(mouseScreen));
-		//System.out.println(mouseWorld);
+		
 		float timeStep = settings.hz > 0.0f ? 1.0f / settings.hz : 0.0f;
 		
 		if (settings.pause) {
@@ -176,8 +202,8 @@ public abstract class AbstractExample {
 				timeStep = 0.0f;
 			}
 
-			m_debugDraw.drawString(5, m_textLine, "****PAUSED****", white);
-			m_textLine += 15;
+			m_debugDraw.drawString(5, m_textLine, "****PAUSED - press '+' to take a single step, 'p' to unpause****", white);
+			m_textLine += textLineHeight;
 		}
 
 		m_debugDraw.setFlags(0);
@@ -208,21 +234,21 @@ public abstract class AbstractExample {
 			m_debugDraw.drawString(5, m_textLine, "proxies(max) = "+m_world.m_broadPhase.m_proxyCount+
 					"("+Settings.maxProxies+"), pairs(max) = "+m_world.m_broadPhase.m_pairManager.m_pairCount+
 					"("+Settings.maxPairs+")", white);
-			m_textLine += 15;
+			m_textLine += textLineHeight;
 
 			m_debugDraw.drawString(5, m_textLine, "bodies/contacts/joints = "+
 				m_world.m_bodyCount+"/"+m_world.m_contactCount+"/"+m_world.m_jointCount, white);
-			m_textLine += 15;
+			m_textLine += textLineHeight;
 
 			m_debugDraw.drawString(5, m_textLine, "position iterations = "+m_world.m_positionIterationCount, white);
-			m_textLine += 15;
+			m_textLine += textLineHeight;
 
 			long memTot = Runtime.getRuntime().totalMemory();
 			memFree = (memFree * .9f + .1f * Runtime.getRuntime().freeMemory());
 			m_debugDraw.drawString(5, m_textLine, "total memory: "+memTot, white);
-			m_textLine += 15;
+			m_textLine += textLineHeight;
 			m_debugDraw.drawString(5, m_textLine, "Average free memory: "+(long)memFree, white);
-			m_textLine += 15;
+			m_textLine += textLineHeight;
 		}
 
 		if (m_mouseJoint != null) {
@@ -280,6 +306,8 @@ public abstract class AbstractExample {
 				}
 			}
 		}
+		
+		printInstructions();
 		
 		pmouseScreen.set(mouseScreen);
 		postStep();
