@@ -114,7 +114,6 @@ public class CCDTest extends AbstractExample {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "Continuous Collision Test";
 	}
 

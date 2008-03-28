@@ -56,21 +56,24 @@ import processing.core.PImage;
 
 public class TestbedMain extends PApplet {
 	/** The examples */
-	static private ArrayList<AbstractExample> tests = new ArrayList<AbstractExample>(0);
+	static protected ArrayList<AbstractExample> tests = new ArrayList<AbstractExample>(0);
 	/** Currently running example */
-	static private AbstractExample currentTest = null;
+	static protected AbstractExample currentTest = null;
 	/** 
 	 * Index of current example in tests array.
 	 * Assumes that the array structure does not change,
 	 * though it's safe to add things on to the end. 
 	 */
-	static private int currentTestIndex = 0;
+	static protected int currentTestIndex = 0;
+	static protected boolean handleOptions = false;
 	
 	// Little bit of input stuff
 	// TODO ewjordan: refactor into an input handler class
 	public boolean shiftKey = false;
     Vec2 mouseWorld = new Vec2();
     boolean pmousePressed = false;
+    
+    public TestbedOptions options;
     
     // Processing handles fps pinning, but we
     // report fps on our own just to be sure.
@@ -141,53 +144,64 @@ public class TestbedMain extends PApplet {
     	}
     	nanoStart = System.nanoTime();
     	
+    	options = new TestbedOptions(this);
     }
     
     public void draw() {
-    	background(0);
-    	Vec2.creationCount = 0;
- 		
-    	/* Make sure we've got a valid test to run and reset it if needed */
-    	if (currentTest == null) {
-    		currentTestIndex = 0;
-    		currentTest = tests.get(currentTestIndex);
-    		nanoStart = System.nanoTime();
-    		frameCount = 0;
-    	}
-    	if (currentTest.needsReset) {
-    		//System.out.println("Resetting "+currentTest.getName());
-    		currentTest.initialize();
-    		nanoStart = System.nanoTime();
-    		frameCount = 0;
-    	}
-    	currentTest.m_textLine = 15;
-    	g.drawString(5, currentTest.m_textLine, currentTest.getName(),AbstractExample.white);
-    	currentTest.m_textLine += 30;
-    	
-    	/* Take our time step (drawing is done here, too) */
-    	currentTest.step();
-    	
-    	/* If the user wants to move the canvas, do it */
-    	handleCanvasDrag();
 
-    	/* Store whether the mouse was pressed this step */
-        pmousePressed = mousePressed;
-        
-        /* ==== Vec2 creation and FPS reporting ==== */
-        g.drawString(5, currentTest.m_textLine, "Vec2 creations/frame: "+Vec2.creationCount, AbstractExample.white);
-        currentTest.m_textLine += 15;
-        
-        for (int i=0; i<fpsAverageCount-1; ++i) {
-        	nanos[i] = nanos[i+1];
-        }
-        nanos[fpsAverageCount-1] = System.nanoTime();
-        float averagedFPS = (float) ( (fpsAverageCount-1) * 1000000000.0 / (nanos[fpsAverageCount-1]-nanos[0]));
-        ++frameCount;
-        float totalFPS = (float) (frameCount * 1000000000 / (1.0*(System.nanoTime()-nanoStart)));        
-        g.drawString(5, currentTest.m_textLine, "Average FPS ("+fpsAverageCount+" frames): "+averagedFPS, AbstractExample.white);
-        currentTest.m_textLine += 15;
-        g.drawString(5, currentTest.m_textLine, "Average FPS (entire test): "+totalFPS, AbstractExample.white);
-        currentTest.m_textLine += 15;
+    	if (handleOptions) {
+    		options.handleOptions();
+    	} else{
+    		background(0);
+    		Vec2.creationCount = 0;
+
+    		/* Make sure we've got a valid test to run and reset it if needed */
+    		if (currentTest == null) {
+    			currentTestIndex = 0;
+    			currentTest = tests.get(currentTestIndex);
+    			nanoStart = System.nanoTime();
+    			frameCount = 0;
+    		}
+    		if (currentTest.needsReset) {
+    			//System.out.println("Resetting "+currentTest.getName());
+    			currentTest.initialize();
+    			nanoStart = System.nanoTime();
+    			frameCount = 0;
+    		}
+    		currentTest.m_textLine = AbstractExample.textLineHeight;
+    		g.drawString(5, currentTest.m_textLine, currentTest.getName(),AbstractExample.white);
+    		currentTest.m_textLine += 2*AbstractExample.textLineHeight;
+
+    		/* Take our time step (drawing is done here, too) */
+    		currentTest.step();
+
+    		/* If the user wants to move the canvas, do it */
+    		handleCanvasDrag();
+
+
+    		/* ==== Vec2 creation and FPS reporting ==== */
+    		if (currentTest.settings.drawStats) {
+    			g.drawString(5, currentTest.m_textLine, "Vec2 creations/frame: "+Vec2.creationCount, AbstractExample.white);
+    			currentTest.m_textLine += AbstractExample.textLineHeight;
+    		}
+
+    		for (int i=0; i<fpsAverageCount-1; ++i) {
+    			nanos[i] = nanos[i+1];
+    		}
+    		nanos[fpsAverageCount-1] = System.nanoTime();
+    		float averagedFPS = (float) ( (fpsAverageCount-1) * 1000000000.0 / (nanos[fpsAverageCount-1]-nanos[0]));
+    		++frameCount;
+    		float totalFPS = (float) (frameCount * 1000000000 / (1.0*(System.nanoTime()-nanoStart)));        
+    		if (currentTest.settings.drawStats) {
+    			g.drawString(5, currentTest.m_textLine, "Average FPS ("+fpsAverageCount+" frames): "+averagedFPS, AbstractExample.white);
+    			currentTest.m_textLine += AbstractExample.textLineHeight;
+    			g.drawString(5, currentTest.m_textLine, "Average FPS (entire test): "+totalFPS, AbstractExample.white);
+    			currentTest.m_textLine += AbstractExample.textLineHeight;
+    		}
+    	}
+
+		/* Store whether the mouse was pressed this step */
+		pmousePressed = mousePressed;
     }
     
     
@@ -230,20 +244,26 @@ public class TestbedMain extends PApplet {
     }
     
     public void keyPressed() {
+    	if (key=='o') {
+    		handleOptions = !handleOptions;
+    		if (handleOptions) options.initialize(currentTest);
+    	}
+    	
     	if (keyCode == PApplet.SHIFT) {
             shiftKey = true;
         }
+    	if (handleOptions) return;
     	if (keyCode == PApplet.RIGHT) {
     		++currentTestIndex;
     		if (currentTestIndex >= tests.size()) currentTestIndex = 0;
-    		System.out.println(currentTestIndex);
+    		//System.out.println(currentTestIndex);
     		currentTest = tests.get(currentTestIndex);
     		currentTest.needsReset = true;
     		return;
     	} else if (keyCode == PApplet.LEFT) {
     		--currentTestIndex;
     		if (currentTestIndex < 0) currentTestIndex = tests.size()-1;
-    		System.out.println(currentTestIndex);
+    		//System.out.println(currentTestIndex);
     		currentTest = tests.get(currentTestIndex);
     		currentTest.needsReset = true;
     		return;
@@ -252,9 +272,12 @@ public class TestbedMain extends PApplet {
     	if (key == 'r') currentTest.needsReset = true;
     	if (key == ' ') currentTest.launchBomb();
     	if (key == 'p') {
-    		currentTest.settings.singleStep = true;
-    		currentTest.settings.pause = true;
+    		currentTest.settings.pause = !currentTest.settings.pause;
     	}
+    	if (key == '+' && currentTest.settings.pause) {
+        	currentTest.settings.singleStep = true;
+        }
+    	if (key == 's') currentTest.settings.drawStats = !currentTest.settings.drawStats;
     	if (key == 'c') currentTest.settings.drawContactPoints = !currentTest.settings.drawContactPoints;
     	if (key == 'b') currentTest.settings.drawAABBs = !currentTest.settings.drawAABBs;
     		
