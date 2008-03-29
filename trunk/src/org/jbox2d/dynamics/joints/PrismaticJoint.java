@@ -46,11 +46,12 @@ import org.jbox2d.dynamics.World;
 //Cdot = w2 - w1
 //J = [0 0 -1 0 0 1]
 
-/// A prismatic joint. This joint provides one degree of freedom: translation
-/// along an axis fixed in body1. Relative rotation is prevented. You can
-/// use a joint limit to restrict the range of motion and a joint motor to
-/// drive the motion or to model joint friction.
-
+/**
+ * A prismatic joint. This joint provides one degree of freedom: translation
+ * along an axis fixed in body1. Relative rotation is prevented. You can
+ * use a joint limit to restrict the range of motion and a joint motor to
+ * drive the motion or to model joint friction.
+ */
 public class PrismaticJoint extends Joint {
 
 	public Vec2 m_localAnchor1;
@@ -454,59 +455,59 @@ public class PrismaticJoint extends Joint {
     					m_limitForce * ax1.y + m_force * ay1.y);
     }
     
-    /// Is the joint limit enabled?
+    /** Is the joint limit enabled? */
     public boolean isLimitEnabled() {
     	return m_enableLimit;
     }
 
-    /// Enable/disable the joint limit.
+    /** Enable/disable the joint limit. */
     public void enableLimit(boolean flag) {
     	m_enableLimit = flag;
     }
 
-    /// Get the lower joint limit, usually in meters.
+    /** Get the lower joint limit, usually in meters. */
     public float getLowerLimit() {
     	return m_lowerTranslation;
     }
 
-    /// Get the upper joint limit, usually in meters.
+    /** Get the upper joint limit, usually in meters. */
     public float getUpperLimit() {
     	return m_upperTranslation;
     }
 
-    /// Set the joint limits, usually in meters.
+    /** Set the joint limits, usually in meters. */
     public void setLimits(float lower, float upper) {
     	assert(lower <= upper);
     	m_lowerTranslation = lower;
     	m_upperTranslation = upper;
     }
 
-    /// Is the joint motor enabled?
+    /** Is the joint motor enabled? */
     public boolean isMotorEnabled() {
     	return m_enableMotor;
     }
 
-    /// Enable/disable the joint motor.
+    /** Enable/disable the joint motor. */
     public void enableMotor(boolean flag) {
     	m_enableMotor = flag;
     }
 
-	/// Set the motor speed, usually in meters per second.
+	/** Set the motor speed, usually in meters per second. */
     public void setMotorSpeed(float speed) {
     	m_motorSpeed = speed;
     }
 
-	/// Get the motor speed, usually in meters per second.
+	/** Get the motor speed, usually in meters per second. */
     public float getMotorSpeed() {
     	return m_motorSpeed;
     }
     
-    /// Set the maximum motor torque, usually in N.
+    /** Set the maximum motor torque, usually in N. */
     public void setMaxMotorForce(float force) {
     	m_maxMotorForce = force;
     }
     
-    /// Get the current motor torque, usually in N.
+    /** Get the current motor torque, usually in N. */
     public float getMotorForce() {
     	return m_motorForce;
     }

@@ -1,0 +1,6 @@
+org.jbox2d.collision
+org.jbox2d.common
+org.jbox2d.dynamics
+org.jbox2d.dynamics.contacts
+org.jbox2d.dynamics.joints
+org.jbox2d.testbed

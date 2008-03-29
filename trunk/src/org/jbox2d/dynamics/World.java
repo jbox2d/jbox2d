@@ -417,7 +417,7 @@ public class World {
 	/**
 	 * Take a time step. This performs collision detection, integration,
 	 * and constraint solution.
-	 * @param timeStep the amount of time to simulate, this should not vary.
+	 * @param dt the amount of time to simulate, this should not vary.
 	 * @param iterations the number of iterations to be used by the constraint solver.
 	 */
     public void step(float dt, int iterations) {
@@ -983,10 +983,12 @@ public class World {
     		}
     	}
 
+
+		BroadPhase bp = m_broadPhase;
+		Vec2 worldLower = bp.m_worldAABB.lowerBound;
+		Vec2 worldUpper = bp.m_worldAABB.upperBound;
+		
     	if ( (flags & DebugDraw.e_aabbBit) != 0) {
-    		BroadPhase bp = m_broadPhase;
-    		Vec2 worldLower = bp.m_worldAABB.lowerBound;
-    		Vec2 worldUpper = bp.m_worldAABB.upperBound;
 
     		Vec2 invQ = new Vec2();
     		invQ.set(1.0f / bp.m_quantizationFactor.x, 1.0f / bp.m_quantizationFactor.y);
@@ -1012,13 +1014,15 @@ public class World {
     			m_debugDraw.drawPolygon(vs, 4, color);
     		}
 
-    		Vec2[] vs = new Vec2[4];
-    		vs[0]= new Vec2(worldLower.x, worldLower.y);
-    		vs[1]= new Vec2(worldUpper.x, worldLower.y);
-    		vs[2]= new Vec2(worldUpper.x, worldUpper.y);
-    		vs[3]= new Vec2(worldLower.x, worldUpper.y);
-    		m_debugDraw.drawPolygon(vs, 4, new Color3f(0.3f, 0.9f, 0.9f));
+    		
     	}
+    	
+    	Vec2[] vsw = new Vec2[4];
+		vsw[0]= new Vec2(worldLower.x, worldLower.y);
+		vsw[1]= new Vec2(worldUpper.x, worldLower.y);
+		vsw[2]= new Vec2(worldUpper.x, worldUpper.y);
+		vsw[3]= new Vec2(worldLower.x, worldUpper.y);
+		m_debugDraw.drawPolygon(vsw, 4, new Color3f(255.0f*0.3f, 255.0f*0.9f, 255.0f*0.9f));
 
     	if ( (flags & DebugDraw.e_obbBit) != 0) {
     		Color3f color = new Color3f(0.5f, 0.3f, 0.5f);

@@ -45,39 +45,60 @@ import org.jbox2d.dynamics.joints.MouseJoint;
 import org.jbox2d.dynamics.joints.MouseJointDef;
 
 public abstract class AbstractExample {
-	public TestbedMain parent;    //controller applet/app
+	/** The controller that the AbstractExample runs in */
+	public TestbedMain parent;
+	/** Used for drawing */
 	public DebugDraw m_debugDraw;
-	public Body followedBody = null; //camera follows motion of this body
+	//public Body followedBody = null; //camera follows motion of this body
+	/** Array of key states, by char value.  Does not include arrows or modifier keys. */
     public boolean[] keyDown = new boolean[255];
+    /** Same as keyDown, but true only if the key was newly pressed this frame. */
     public boolean[] newKeyDown = new boolean[255];
     
-    
+    /** General instructions that apply to all tests. */
     static public String instructionString = "Press left/right to change test\n" +
     										 "Use the mouse to drag objects\n" +
     										 "Shift+drag to slingshot bomb\n" +
     										 "Press 'o' to toggle options panel\n";
     										
-
-    public Vec2 mouseScreen = new Vec2(); // screen coordinates of mouse
-    public Vec2 mouseWorld = new Vec2(); // world coordinates of mouse
+    /** Screen coordinates of mouse */
+    public Vec2 mouseScreen = new Vec2();
+    /** World coordinates of mouse */
+    public Vec2 mouseWorld = new Vec2();
+    /** Screen coordinates of mouse on last frame */
     public Vec2 pmouseScreen = new Vec2();
-    public boolean pmousePressed; // was mouse pressed last frame?
-    protected boolean needsReset = true;//True if we should reset the demo on the next loop
+    /** Was the mouse pressed last frame?  True if either right or left button was down. */
+    public boolean pmousePressed;
+    /** True if we should reset the demo for the next frame. */
+    protected boolean needsReset = true;
+    /** The point at which we will place a bomb when completeBombSpawn() is called. */
     protected Vec2 bombSpawnPoint;
+    /** True if a bomb has started spawning but has not been created yet. */
     protected boolean bombSpawning;
+    /** Y-pixel value that marks bottom of text to be drawn. */
     protected int m_textLine;
+    /** Number of active points in m_points array. */
     protected int m_pointCount;
+    /** Array of contact points - use m_pointCount to get number of active elements.  */
     protected ContactPoint[] m_points;
+    /** The world object this example uses. */
     protected World m_world;
+    /** The bomb body.  May be null if no bomb is active. */
     protected Body m_bomb;
+    /** Mouse joint.  May be null if mouse is not attached to anything. */
     protected MouseJoint m_mouseJoint;
+    /** Settings for this example.  This is stored and reloaded when the example restarts or we come back from another example. */ 
     protected TestSettings settings;
+    /** The bounding box for the world.  If the defaults do not work for you, overload createWorld() and set the AABB appropriately there. */
 	protected AABB m_worldAABB;
-	
+	/** The exponentially smoothed amount of free memory available to the JVM. */ 
 	public float memFree = 0;
 	
+	/** Listener for body and joint destructions. */
 	protected DestructionListener m_destructionListener;
+	/** Listener for world AABB violations. */
 	protected BoundaryListener m_boundaryListener;
+	/** Listener for contact events. */
 	protected ContactListener m_contactListener;
 	
 	public static Color3f white = new Color3f(255.0f,255.0f,255.0f);
@@ -87,9 +108,12 @@ public abstract class AbstractExample {
 	public static Color3f green = new Color3f(0.0f,255.0f,0.0f);
 	public static Color3f blue= new Color3f(0.0f,0.0f,255.0f);
 	
+	/** Saved camera variable so that camera stays put between reloads of example. */
 	public float cachedCamX, cachedCamY, cachedCamScale;
+	/** Have the cachedCam* variables been set for this example? */
 	public boolean hasCachedCamera = false;
 	
+	/** Height of font used to draw text. */
 	static public int textLineHeight = 12;
 	
     //protected ArrayList<BoundImage> boundImages = new ArrayList<BoundImage>();
@@ -108,31 +132,65 @@ public abstract class AbstractExample {
 		}
 	}
 	
+	/** 
+	 * Returns a string containing example instructions.
+	 * Overload within an example to provide special instructions
+	 * or information. 
+	 * @return A string containing example instructions
+	 */
 	public String getExampleInstructions() {
 		return "";
 	}
 	
     /**
-     * @return Title of example
+     * @return Title of example.
      */
 	abstract public String getName();
     
 	/**
 	 * Create the world geometry for each test.
-	 * Any custom initialization for a test can usually go here.
+	 * Any custom initialization for a test should go here.
 	 * 
 	 * Called immediately after initialize(), which handles
-	 * generic test initialization.
+	 * generic test initialization and should usually not be overloaded.
 	 */
 	abstract public void create();
 	
+	/**
+	 * Instantiate the test.
+	 * @param _parent The controller that this test is run from.
+	 */
 	public AbstractExample(TestbedMain _parent) {
 		parent = _parent;
 		m_debugDraw = parent.g;
 		needsReset = true;
-		
 	}
 	
+	/** Overload this if you need to create a different world AABB or gravity vector */
+	public void createWorld() {
+		m_worldAABB = new AABB();
+		m_worldAABB.lowerBound = new Vec2(-200.0f, -100.0f);
+		m_worldAABB.upperBound = new Vec2(200.0f, 200.0f);
+		Vec2 gravity = new Vec2(0.0f, -10.0f);
+		boolean doSleep = true;
+		m_world = new World(m_worldAABB, gravity, doSleep);
+	}
+	
+	/**
+	 * Should not usually be overloaded.
+	 * Performs initialization tasks common to most examples:
+	 * <BR>
+	 * <UL>
+	 * <LI>Resets input state
+	 * <LI>Initializes member variables
+	 * <LI>Sets test settings
+	 * <LI>Creates world, gravity and AABB by calling createWorld() - overload that if you are unhappy with defaults
+	 * <LI>Sets up and attaches listeners
+	 * <LI>Sets up drawing
+	 * <LI>Sets camera to default or saved state
+	 * <LI>Calls create() to set up test
+	 * </UL>
+	 */
 	public void initialize() {
 		needsReset = false;
 		m_textLine = 15;
@@ -145,12 +203,8 @@ public abstract class AbstractExample {
 		mouseWorld = new Vec2();
 		pmouseScreen = new Vec2(mouseScreen.x,mouseScreen.y);
 		pmousePressed = false;
-		m_worldAABB = new AABB();
-		m_worldAABB.lowerBound = new Vec2(-200.0f, -100.0f);
-		m_worldAABB.upperBound = new Vec2(200.0f, 200.0f);
-		Vec2 gravity = new Vec2(0.0f, -10.0f);
-		boolean doSleep = true;
-		m_world = new World(m_worldAABB, gravity, doSleep);
+		
+		createWorld();
 		
 		m_bomb = null;
 		m_mouseJoint = null;
@@ -181,14 +235,14 @@ public abstract class AbstractExample {
 			cachedCamScale = 10.0f;
 		}
 		
-		for (int i=0; i<newKeyDown.length; ++i) {
-			keyDown[i] = false;
-			newKeyDown[i] = false;
-		}
-		
 		create();
 	}
 	
+	/**
+	 * Take a physics step.  This is the guts of the simulation loop.
+	 * When creating your own game, the most important thing to have
+	 * in your step method is the m_world.step() call.
+	 */
 	public void step() {
 		preStep();
 		mouseWorld.set(m_debugDraw.screenToWorld(mouseScreen));
@@ -223,7 +277,8 @@ public abstract class AbstractExample {
 		
 		m_world.step(timeStep, settings.iterationCount);
 
-		m_world.m_broadPhase.validate();
+		//Optional validation of broadphase - asserts if there is an error
+		//m_world.m_broadPhase.validate();
 
 		if (m_bomb != null && m_bomb.isFrozen()) {
 			m_world.destroyBody(m_bomb);
@@ -274,15 +329,15 @@ public abstract class AbstractExample {
 				if (point.state == 0) {
 					// Add
 					//System.out.println("Add");
-					m_debugDraw.drawPoint(point.position, 10.0f, new Color3f(255.0f, 150.0f, 150.0f));
+					m_debugDraw.drawPoint(point.position, 0.3f, new Color3f(255.0f, 150.0f, 150.0f));
 				} else if (point.state == 1) {
 					// Persist
 					//System.out.println("Persist");
-					m_debugDraw.drawPoint(point.position, 5.0f, new Color3f(255.0f, 0.0f, 0.0f));
+					m_debugDraw.drawPoint(point.position, 0.1f, new Color3f(255.0f, 0.0f, 0.0f));
 				} else {
 					// Remove
 					//System.out.println("Remove");
-					m_debugDraw.drawPoint(point.position, 10.0f, new Color3f(155f, 0.0f, 0.0f));
+					m_debugDraw.drawPoint(point.position, 0.5f, new Color3f(0.0f, 155.0f, 155.0f));
 				}
 
 				if (settings.drawContactNormals) {
@@ -318,23 +373,28 @@ public abstract class AbstractExample {
 		}
 	}
 	
-	/** Stub for overloading in examples - called before physics step */
+	/** Stub for overloading in examples - called before physics step. */
 	public void preStep() {
 		
 	}
 	
-	/** Stub for overloading in examples - called after physics step */
+	/** Stub for overloading in examples - called after physics step. */
 	public void postStep() {
 		
 	}
 
-	//Space launches a bomb from a random default position
+	/** Space launches a bomb from a random default position. */
     public void launchBomb() {
     	Vec2 pos = new Vec2(parent.random(-15.0f, 15.0f), 30.0f);
     	Vec2 vel = pos.mul(-5.0f);
     	launchBomb(pos, vel);
     }
     	
+    /** 
+     * Launch bomb from a specific position with a given velocity.
+     * @param position Position to launch bomb from.
+     * @param velocity Velocity to launch bomb with.
+     */
     public void launchBomb(Vec2 position, Vec2 velocity) {
     	if (m_bomb != null) {
     		m_world.destroyBody(m_bomb);
@@ -367,12 +427,21 @@ public abstract class AbstractExample {
     }
     
     //Shift+drag "slingshots" a bomb from any point using these functions
+    /**
+     * Begins spawning a bomb, spawn finishes and bomb is created upon calling completeBombSpawn().
+     * When a bomb is spawning, it is not an active body but its position is stored so it may be
+     * drawn.
+     */
     public void spawnBomb(Vec2 worldPt) {
     	bombSpawnPoint = worldPt.clone();
     	bombSpawning = true;
     }
     
+    /**
+     * Creates and launches a bomb using the current bomb and mouse locations to "slingshot" it.
+     */
     public void completeBombSpawn() {
+    	if (!bombSpawning) return;
     	final float multiplier = 30.0f;
     	Vec2 mouseW = m_debugDraw.screenToWorld(mouseScreen);
     	Vec2 vel = bombSpawnPoint.sub(mouseW);
@@ -381,6 +450,10 @@ public abstract class AbstractExample {
     	bombSpawning = false;
     }
     
+    /**
+     * Set keyDown and newKeyDown arrays when we get a keypress.
+     * @param key The key pressed.
+     */
     public void keyPressed(int key) {
         if (key >= 0 && key < 255) {
         	//System.out.println(key + " "+keyDown[key]);
@@ -388,13 +461,21 @@ public abstract class AbstractExample {
             keyDown[key] = true;
         }
     }
-
+    
+    /**
+     * Set keyDown array when we get a key release.
+     * @param key The key released.
+     */
     public void keyReleased(int key) {
         if (key >= 0 && key < 255) {
             keyDown[key] = false;
         }
     }
     
+    /**
+     * Handle mouseDown events.
+     * @param p The screen location that the mouse is down at.
+     */
     public void mouseDown(Vec2 p) {
     	
     	if (parent.shiftKey) {
@@ -438,6 +519,9 @@ public abstract class AbstractExample {
         }
     }
 
+    /**
+     * Handle mouseUp events.
+     */
     public void mouseUp() {
         if (m_mouseJoint != null) {
             m_world.destroyJoint(m_mouseJoint);
@@ -448,6 +532,10 @@ public abstract class AbstractExample {
         }
     }
 
+    /**
+     * Handle mouseMove events (TestbedMain also sends mouseDragged events here)
+     * @param p The new mouse location (screen coordinates)
+     */
     public void mouseMove(Vec2 p) {
     	mouseScreen.set(p);
         if (m_mouseJoint != null) {
@@ -527,7 +615,8 @@ public abstract class AbstractExample {
     	public AbstractExample test;
     }
 
-    static final int k_maxContactPoints = 2048; //max # contacts to store
+    /** Max number of contact points to store */
+    static final int k_maxContactPoints = 2048; 
 
     /**
      * Stores contact points away for inspection, as with CCD
@@ -588,8 +677,8 @@ public abstract class AbstractExample {
     }
 
     /**
-     * Holder for contact information.
-     * Different from org.jbox2d.dynamics.contacts.ContactPoint
+     * Holder for storing contact information.
+     * Not the same as org.jbox2d.dynamics.contacts.ContactPoint
      */
     class ContactPoint {
     	public Shape shape1;

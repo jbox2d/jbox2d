@@ -1,0 +1,14 @@
+A little overdramatic, I know.
+
+Seriously, though, if you use pixel units, this engine will probably suck, and you'll get all sorts of jitter and stuff.  Please, please, PLEASE, factor in a scaling factor, or (better) a camera class that transforms your physics data before you draw it.  Your physics objects should always be roughly between .1 and 10 world-units, which using pixel scale is far too small.  Things will NOT work well at the 100-500 unit range, as the engine is not tuned for such large numbers.
+
+The org.jbox2d.dynamics.DebugDraw class has the following stub methods:
+	setCamera(float x, float y, float scale)
+	screenToWorld(float screenx, float screeny)
+	worldToScreen(float worldx, float worldy)
+	
+Overloading these in your implementation and using the results of worldToScreen() when you draw will make your life much easier, and will also mean you don't submit a bug report to me, which makes mine easier.
+
+org.jbox2d.testbed.ProcessingDebugDraw implements DebugDraw in this way, if you don't know what to do you might start looking at that to see.
+
+You are warned!

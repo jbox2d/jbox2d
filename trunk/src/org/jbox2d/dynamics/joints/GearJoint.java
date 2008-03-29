@@ -33,15 +33,17 @@ import org.jbox2d.dynamics.World;
 
 //Updated to rev 56->97 of b2GearJoint.cpp/.h
 
-/// A gear joint is used to connect two joints together. Either joint
-/// can be a revolute or prismatic joint. You specify a gear ratio
-/// to bind the motions together:
-/// coordinate1 + ratio * coordinate2 = constant
-/// The ratio can be negative or positive. If one joint is a revolute joint
-/// and the other joint is a prismatic joint, then the ratio will have units
-/// of length or units of 1/length.
-/// @warning The revolute and prismatic joints must be attached to
-/// fixed bodies (which must be body1 on those joints).
+/**
+ * A gear joint is used to connect two joints together. Either joint
+ * can be a revolute or prismatic joint. You specify a gear ratio
+ * to bind the motions together:
+ * coordinate1 + ratio * coordinate2 = constant
+ * The ratio can be negative or positive. If one joint is a revolute joint
+ * and the other joint is a prismatic joint, then the ratio will have units
+ * of length or units of 1/length.
+ * <BR><em>Warning</em>: The revolute and prismatic joints must be attached to
+ * fixed bodies (which must be body1 on those joints).
+ */
 public class GearJoint extends Joint {
 
     // Gear Joint:
@@ -86,10 +88,10 @@ public class GearJoint extends Joint {
 	public float m_constant;
 	public float m_ratio;
 
-	// Effective mass
+	/** Effective mass */
 	float m_mass;
 
-	// Impulse for accumulation/warm starting.
+	/** Force for accumulation/warm starting. */
 	float m_force;
 
     public GearJoint(GearJointDef def) {

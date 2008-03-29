@@ -28,14 +28,19 @@ import org.jbox2d.dynamics.Body;
 
 //Updated to rev 56->130 of b2DistanceJoint.cpp/.h
 
+/**
+ * Definition for a distance joint.  A distance joint
+ * keeps two points on two bodies at a constant distance
+ * from each other.
+ */
 public class DistanceJointDef extends JointDef {
-	/// The local anchor point relative to body1's origin.
+	/** The local anchor point relative to body1's origin. */
 	public Vec2 localAnchor1;
 	
-	/// The local anchor point relative to body2's origin.
+	/** The local anchor point relative to body2's origin. */
 	public Vec2 localAnchor2;
 	
-	/// The equilibrium length between the anchor points.
+	/** The equilibrium length between the anchor points. */
 	public float length;
     
 	public DistanceJointDef() {
@@ -45,8 +50,10 @@ public class DistanceJointDef extends JointDef {
 		length = 1.0f;
 	}
 	
-	/// Initialize the bodies, anchors, and length using the world
-	/// anchors.
+	/**
+	 * Initialize the bodies, anchors, and length using the world
+	 * anchors.
+	 */
     public void initialize(Body b1, Body b2, Vec2 anchor1, Vec2 anchor2) {	
     	body1 = b1;
     	body2 = b2;

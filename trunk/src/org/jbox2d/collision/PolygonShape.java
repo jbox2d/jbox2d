@@ -34,14 +34,19 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
     // Dump lots of debug information
 	private static boolean m_debug = false;
     
-	// Local position of the shape centroid in parent body frame.
+	/** Local position of the shape centroid in parent body frame. */
     public Vec2 m_centroid;
     
+    /** The oriented bounding box of the shape. */
     public OBB m_obb;
 
+    /** The vertices of the shape.  Note: use getVertexCount(), not m_vertices.length, to get number of active vertices. */
     public Vec2 m_vertices[];
+    /** The normals of the shape.  Note: use getVertexCount(), not m_normals.length, to get number of active normals. */
     public Vec2 m_normals[];
+    /** The normals of the shape.  Note: use getVertexCount(), not m_coreVertices.length, to get number of active vertices. */
     public Vec2 m_coreVertices[];
+    /** Number of active vertices in the shape. */
     public int m_vertexCount;
     
     public PolygonShape(ShapeDef def) {
@@ -76,40 +81,36 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
     		m_normals[i].normalize();
     	}
 
-    	//DEBUG code removed for Java port - FIXME?
-    	//Might want to add a final static Settings.DEBUG
-//    	#ifdef _DEBUG
-//    	// Ensure the polygon is convex.
-//    	for (int32 i = 0; i < m_vertexCount; ++i)
-//    	{
-//    		for (int32 j = 0; j < m_vertexCount; ++j)
-//    		{
-//    			// Don't check vertices on the current edge.
-//    			if (j == i || j == (i + 1) % m_vertexCount)
-//    			{
-//    				continue;
-//    			}	
-//    			
-//    			// Your polygon is non-convex (it has an indentation).
-//    			// Or your polygon is too skinny.
-//    			float32 s = b2Dot(m_normals[i], m_vertices[j] - m_vertices[i]);
-//    			b2Assert(s < -b2_linearSlop);
-//    		}
-//    	}
-//
-//    	// Ensure the polygon is counter-clockwise.
-//    	for (int32 i = 1; i < m_vertexCount; ++i)
-//    	{
-//    		float32 cross = b2Cross(m_normals[i-1], m_normals[i]);
-//
-//    		// Keep asinf happy.
-//    		cross = b2Clamp(cross, -1.0f, 1.0f);
-//
-//    		// You have consecutive edges that are almost parallel on your polygon.
-//    		float32 angle = asinf(cross);
-//    		b2Assert(angle > b2_angularSlop);
-//    	}
-//    	#endif
+	    if (m_debug) {
+	    	// Ensure the polygon is convex.
+	    	for (int i = 0; i < m_vertexCount; ++i) {
+	    		for (int j = 0; j < m_vertexCount; ++j) {
+	    			// Don't check vertices on the current edge.
+	    			if (j == i || j == (i + 1) % m_vertexCount)
+	    			{
+	    				continue;
+	    			}	
+	    			
+	    			// Your polygon is non-convex (it has an indentation).
+	    			// Or your polygon is too skinny.
+	    			float s = Vec2.dot(m_normals[i], m_vertices[j].sub(m_vertices[i]));
+	    			assert(s < -Settings.linearSlop);
+	    		}
+	    	}
+	
+	    	// Ensure the polygon is counter-clockwise.
+	    	for (int i = 1; i < m_vertexCount; ++i) {
+	    		float cross = Vec2.cross(m_normals[i-1], m_normals[i]);
+	
+	    		// Keep asinf happy.
+	    		cross = MathUtils.clamp(cross, -1.0f, 1.0f);
+	
+	    		// You have consecutive edges that are almost parallel on your polygon.
+	    		float angle = (float)Math.asin(cross);
+	    		assert(angle > Settings.angularSlop);
+	    	}
+	    	//#endif
+    	}
 
     	// Compute the polygon centroid.
     	m_centroid = computeCentroid(poly.vertices);
@@ -268,8 +269,6 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 
         return XForm.mul(xf, m_coreVertices[bestIndex]); 
     }
-
-
 
 	public static Vec2 computeCentroid(List<Vec2> vs) {
 			int count = vs.size();

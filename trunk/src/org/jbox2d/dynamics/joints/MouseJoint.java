@@ -88,7 +88,7 @@ public class MouseJoint extends Joint {
 
     }
 
-    /// Use this to update the target point.
+    /** Use this to update the target point. */
     public void setTarget(Vec2 target) {
         if (m_body2.isSleeping()) m_body2.wakeUp();
         m_target = target;

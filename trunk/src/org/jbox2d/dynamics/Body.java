@@ -174,7 +174,7 @@ public class Body {
 	/**
 	 *  Creates a shape and attach it to this body.
 	 * <BR><em>Warning</em>: This function is locked during callbacks.
-	 * @param shapeDef the shape definition.
+	 * @param def the shape definition.
 	 */
 	public Shape createShape(ShapeDef def){
 		assert(m_world.m_lock == false);
@@ -205,7 +205,7 @@ public class Body {
 	 * therefore destroys any contacts associated with this shape. All shapes
 	 * attached to a body are implicitly destroyed when the body is destroyed.
 	 * <BR><em>Warning</em>: This function is locked during callbacks.
-	 * @param shape the shape to be removed.
+	 * @param s the shape to be removed.
 	 */
 	public void destroyShape(Shape s){
 		assert(m_world.m_lock == false);
@@ -556,7 +556,7 @@ public class Body {
 
 	/**
 	 * Gets a local point relative to the body's origin given a world point.
-	 * @param a point in world coordinates.
+	 * @param worldPoint a point in world coordinates.
 	 * @return the corresponding local point relative to the body's origin.
 	 */
 	public Vec2 getLocalPoint(Vec2 worldPoint){
@@ -565,7 +565,7 @@ public class Body {
 
 	/** 
 	 * Gets a local vector given a world vector.
-	 * @param a vector in world coordinates.
+	 * @param worldVector a vector in world coordinates.
 	 * @return the corresponding local vector.
 	 */
 	public Vec2 getLocalVector(Vec2 worldVector){

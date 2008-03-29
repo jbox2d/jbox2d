@@ -45,7 +45,7 @@ public class PrismaticJointDef extends JointDef {
 
 	/// Initialize the bodies, anchors, axis, and reference angle using the world
 	/// anchor and world axis.
-	void Initialize(Body b1, Body b2, Vec2 anchor, Vec2 axis) {
+	public void initialize(Body b1, Body b2, Vec2 anchor, Vec2 axis) {
 		body1 = b1;
 		body2 = b2;
 		localAnchor1 = body1.getLocalPoint(anchor);
