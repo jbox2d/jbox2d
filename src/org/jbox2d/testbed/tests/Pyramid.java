@@ -22,24 +22,24 @@
  */
 package org.jbox2d.testbed.tests;
 
-import org.jbox2d.collision.BoxDef;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
-import org.jbox2d.testbed.PTest;
+import org.jbox2d.testbed.TestbedMain;
 
 import processing.core.PApplet;
 
 
 
-public class Pyramid extends PTest {
-
-    public Pyramid() {
-        super("Pyramid");
+public class Pyramid extends AbstractExample {
+	private boolean firstTime = true;
+	
+    public Pyramid(TestbedMain t) {
+        super(t);
     }
 
     @Override
-    public void go(World world) {
+    public void create()) {
         {
             BoxDef sd = new BoxDef();
             sd.extents = new Vec2(50.0f, 10.0f);
@@ -79,10 +79,4 @@ public class Pyramid extends PTest {
         }
     }
 
-    /**
-     * Entry point
-     */
-    public static void main(String[] argv) {
-        PApplet.main(new String[] { "org.jbox2d.testbed.tests.Pyramid" });
-    }
 }

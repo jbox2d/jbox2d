@@ -25,37 +25,16 @@ package org.jbox2d.testbed;
 
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.util.Random;
 import java.util.ArrayList;
 
-import org.jbox2d.collision.AABB;
-import org.jbox2d.collision.BroadPhase;
-import org.jbox2d.collision.CircleShape;
-import org.jbox2d.collision.Manifold;
-import org.jbox2d.collision.Pair;
-import org.jbox2d.collision.PolygonShape;
-import org.jbox2d.collision.Proxy;
-import org.jbox2d.collision.Shape;
-import org.jbox2d.collision.ShapeType;
-import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.DebugDraw;
-import org.jbox2d.dynamics.World;
-import org.jbox2d.dynamics.contacts.Contact;
-import org.jbox2d.dynamics.joints.Joint;
-import org.jbox2d.dynamics.joints.JointType;
-import org.jbox2d.dynamics.joints.MouseJoint;
-import org.jbox2d.dynamics.joints.MouseJointDef;
-import org.jbox2d.dynamics.joints.PulleyJoint;
 import org.jbox2d.testbed.tests.*;
 
 import processing.core.PApplet;
-import processing.core.PImage;
 
 public class TestbedMain extends PApplet {
-	/** The examples */
+	/** The list of registered examples */
 	static protected ArrayList<AbstractExample> tests = new ArrayList<AbstractExample>(0);
 	/** Currently running example */
 	static protected AbstractExample currentTest = null;
@@ -65,26 +44,36 @@ public class TestbedMain extends PApplet {
 	 * though it's safe to add things on to the end. 
 	 */
 	static protected int currentTestIndex = 0;
+	/** Is the options window open? */
 	static protected boolean handleOptions = false;
 	
 	// Little bit of input stuff
 	// TODO ewjordan: refactor into an input handler class
+	/** Is the shift key held? */
 	public boolean shiftKey = false;
-    Vec2 mouseWorld = new Vec2();
+    
+	/** Was the mouse down last frame? */
     boolean pmousePressed = false;
     
+    /** Our options handler - displays GUI and sets TestSettings for currentTest. */
     public TestbedOptions options;
     
     // Processing handles fps pinning, but we
     // report fps on our own just to be sure.
-    final static float targetFPS = 60.0f;
-    final int fpsAverageCount = 100; 
-    long[] nanos;
-    long nanoStart; //
-    double fps = targetFPS;
     
+    /** FPS that we want to achieve */
+    final static float targetFPS = 60.0f;
+    /** Number of frames to average over when computing real FPS */
+    final int fpsAverageCount = 100; 
+    /** Array of timings */
+    long[] nanos;
+    /** When we started the nanotimer */
+    long nanoStart; //
+    
+    /** Number of frames since we started this example. */
     long frameCount = 0;
     
+    /** Drawing handler to use. */
     public DebugDraw g;
 
     /** Constructor - real initialization happens in setup() function */
@@ -92,6 +81,12 @@ public class TestbedMain extends PApplet {
     	super();
     }
     
+    /**
+     * Called once upon program initialization (by Processing).
+     * Here we set up graphics, set the framerate, register
+     * all the testbed examples, set up a mousewheel listener,
+     * and set up the frame rate timer.
+     */
     public void setup() {
     	/* On newer machines especially, the default JAVA2D renderer
     	 * is slow as hell and tends to drop frames.  I have no idea
@@ -104,9 +99,12 @@ public class TestbedMain extends PApplet {
     	
     	/* Register the examples */
     	//registerExample(new BugTest(this));
-    	registerExample(new Circles(this));
+    	registerExample(new Gears(this));
+    	registerExample(new DominoTower(this));
+    	registerExample(new Domino(this));
     	registerExample(new VerticalStack(this));
     	registerExample(new CompoundShapes(this));
+    	registerExample(new Circles(this));
     	registerExample(new Chain(this));
     	registerExample(new Bridge(this));
     	registerExample(new CCDTest(this));
@@ -147,6 +145,13 @@ public class TestbedMain extends PApplet {
     	options = new TestbedOptions(this);
     }
     
+    /**
+     * This is the main looping function, and is called targetFPS times per second.
+     * In the testbed, Processing takes care of the timing of these calls for us,
+     * but in your own game you will likely need to handle that yourself.  This function
+     * also keeps detailed track of the current FPS and Vec2 creations for optimization
+     * purposes.
+     */
     public void draw() {
 
     	if (handleOptions) {
@@ -164,7 +169,9 @@ public class TestbedMain extends PApplet {
     		}
     		if (currentTest.needsReset) {
     			//System.out.println("Resetting "+currentTest.getName());
+    			TestSettings s = currentTest.settings; //copy settings
     			currentTest.initialize();
+    			if (s != null) currentTest.settings = s;
     			nanoStart = System.nanoTime();
     			frameCount = 0;
     		}
@@ -204,14 +211,16 @@ public class TestbedMain extends PApplet {
 		pmousePressed = mousePressed;
     }
     
-    
+    /**
+     * Allows the world to be dragged with a right-click.
+     */
     public void handleCanvasDrag() {
     	//Handle mouse dragging stuff
         //Left mouse attaches mouse joint to object.
         //Right mouse drags canvas.
     	ProcessingDebugDraw d = (ProcessingDebugDraw)(currentTest.m_debugDraw);
 		
-        mouseWorld = d.screenToWorld(mouseX, mouseY);
+        //Vec2 mouseWorld = d.screenToWorld(mouseX, mouseY);
         if (mouseButton == RIGHT) {
             if (mousePressed) {
                 d.transX += mouseX - pmouseX;
@@ -224,25 +233,33 @@ public class TestbedMain extends PApplet {
     
     }
     
+    /** Dispatch mousePressed events to the current test. */
     public void mousePressed() {
     	if (currentTest == null) return;
     	currentTest.mouseDown(new Vec2(mouseX,mouseY));
     }
     
+    /** Dispatch mouseReleased events to the current test. */
     public void mouseReleased() {
     	if (currentTest == null) return;
     	currentTest.mouseUp();
     }
     
+    /** Dispatch mouseMoved events to the current test. */
     public void mouseMoved() {
     	if (currentTest == null) return;
     	currentTest.mouseMove(new Vec2(mouseX,mouseY));
     }
     
+    /** Dispatch mouseDragged events to the current test. */
     public void mouseDragged() {
     	mouseMoved();
     }
     
+    /**
+     * Apply keyboard shortcuts, do keypress handling, and then
+     * send the key event to the current test if appropriate.
+     */
     public void keyPressed() {
     	if (key=='o') {
     		handleOptions = !handleOptions;
@@ -284,6 +301,7 @@ public class TestbedMain extends PApplet {
     	currentTest.keyPressed(key);
     }
     
+    /** Handle keyReleased events and pass them on to currentTest. */
     public void keyReleased() {
     	if (keyCode == PApplet.SHIFT) {
             shiftKey = false;
@@ -292,10 +310,12 @@ public class TestbedMain extends PApplet {
     	currentTest.keyReleased(key);
     }
     
+    /** Register an AbstractExample to the current list of examples. */
     static public void registerExample(AbstractExample test) {
     	tests.add(test);
     }
 
+    /** Start PApplet as a Java program (can also be run as an applet). */
     static public void main(String args[]) {
         PApplet.main(new String[] { "org.jbox2d.testbed.TestbedMain" });
     }

@@ -183,7 +183,19 @@ public class Distance{
 	}
 
 	
-	//Java note: templatized in C++, I used an interface instead
+	/**
+	 * Distance between any two objects that implement SupportsGenericDistance.
+	 * Note that x1 and x2 are passed so that they may store results - they must
+	 * be instantiated before being passed, and the contents will be lost.
+	 * 
+	 * @param x1 Set to closest point on shape1 (result parameter)
+	 * @param x2 Set to closest point on shape2 (result parameter)
+	 * @param shape1 Shape to test
+	 * @param xf1 Transform of shape1
+	 * @param shape2 Shape to test
+	 * @param xf2 Transform of shape2
+	 * @return
+	 */
 	public static float DistanceGeneric(Vec2 x1, Vec2 x2,
 						  SupportsGenericDistance shape1, XForm xf1,
 						  SupportsGenericDistance shape2, XForm xf2) {
@@ -309,7 +321,6 @@ public class Distance{
 	}
 
 
-
 	// GJK is more robust with polygon-vs-point than polygon-vs-circle.
 	// So we convert polygon-vs-circle to polygon-vs-point.
 	protected static float DistancePC(
@@ -337,6 +348,19 @@ public class Distance{
 		return distance;
 	}
 
+	/** 
+	 * Find the closest distance between shapes shape1 and shape2, 
+	 * and load the closest points into x1 and x2.
+	 * Note that x1 and x2 are passed so that they may store results - they must
+	 * be instantiated before being passed, and the contents will be lost.
+	 * 
+	 * @param x1 Closest point on shape1 is put here (result parameter)
+	 * @param x2 Closest point on shape2 is put here (result parameter)
+	 * @param shape1 First shape to test
+	 * @param xf1 Transform of first shape
+	 * @param shape2 Second shape to test
+	 * @param xf2 Transform of second shape
+	 */
 	public static float distance(Vec2 x1, Vec2 x2,
 					 Shape shape1, XForm xf1,
 					 Shape shape2, XForm xf2) {

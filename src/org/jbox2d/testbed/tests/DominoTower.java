@@ -22,78 +22,83 @@
  */
 package org.jbox2d.testbed.tests;
 
-import org.jbox2d.collision.BoxDef;
+import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
-import org.jbox2d.testbed.PTest;
-
-import processing.core.PApplet;
-
+import org.jbox2d.testbed.AbstractExample;
+import org.jbox2d.testbed.TestbedMain;
 
 
-public class DominoTower extends PTest {
-
+public class DominoTower extends AbstractExample {
+	private boolean firstTime = true;
     final float dwidth = .20f;
     final float dheight = 1.0f;
     float ddensity;// = 10f;
     final float dfriction = 0.1f;
     int baseCount = 25;
     
-    public DominoTower() {
-        super("DominoTower");
+    public DominoTower(TestbedMain _parent) {
+        super(_parent);
     }
 
     public void makeDomino(float x, float y, boolean horizontal, World world) {
 
-        BoxDef sd = new BoxDef();
-        sd.extents = new Vec2(.5f*dwidth, .5f*dheight);
+    	PolygonDef sd = new PolygonDef();
+        sd.setAsBox(.5f*dwidth, .5f*dheight);
         sd.density = ddensity;
         BodyDef bd = new BodyDef();
         sd.friction = dfriction;
         sd.restitution = 0.65f;
-        bd.addShape(sd);
         bd.position = new Vec2(x, y);
-        bd.rotation = horizontal? (float)(Math.PI/2.0):0f;
-        world.createBody(bd);
-    }
-    
-    public void postSetup() {
-        transY += 100f;
-        settings.hz = 120.0f;
+        bd.angle = horizontal? (float)(Math.PI/2.0):0f;
+        Body myBody = world.createDynamicBody(bd);
+        myBody.createShape(sd);
+        myBody.setMassFromShapes();
     }
 
     @Override
-    public void go(World world) {
+    public void create() {
+    	if (firstTime) {
+			setCamera(0f, 12f, 10f);
+			firstTime = false;
+	    	settings.hz = 120;
+		}
+    	
         { // Floor
-            BoxDef sd = new BoxDef();
-            sd.extents = new Vec2(50.0f, 10.0f);
+            PolygonDef sd = new PolygonDef();
+            sd.setAsBox(50.0f, 10.0f);
 
             BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
-            bd.addShape(sd);
-            world.createBody(bd);
+            m_world.createStaticBody(bd).createShape(sd);
         }
         
         {
             ddensity = 10f;
             //Make bullet
-            BoxDef sd = new BoxDef();
-            sd.extents = new Vec2(.7f, .7f);
+            PolygonDef sd = new PolygonDef();
+            sd.setAsBox(.7f, .7f);
             sd.density = 35f;
             BodyDef bd = new BodyDef();
             sd.friction = 0f;
             sd.restitution = 0.85f;
-            bd.addShape(sd);
+            bd.isBullet = true;
+            //bd.addShape(sd);
             bd.position = new Vec2(30f, 50f);
-            bd.linearVelocity = new Vec2(-25f, -25f);
-            bd.angularVelocity = 6.7f;
-            world.createBody(bd);
+            Body b = m_world.createDynamicBody(bd);
+            b.createShape(sd);
+            b.setLinearVelocity(new Vec2(-25f,-25f));
+            b.setAngularVelocity(6.7f);
+            b.setMassFromShapes();
             sd.density = 25f;
             bd.position = new Vec2(-30, 25f);
-            bd.linearVelocity = new Vec2(35f, -10f);
-            bd.angularVelocity = -8.3f;
-            world.createBody(bd);
+            b = m_world.createDynamicBody(bd);
+            b.createShape(sd);
+            b.setLinearVelocity(new Vec2(35f, -10f));
+            b.setAngularVelocity(-8.3f);
+            b.setMassFromShapes();
         }
 
         { 
@@ -101,8 +106,8 @@ public class DominoTower extends PTest {
             //Make base
             for (int i=0; i<baseCount; ++i) {
                 float currX = i*1.5f*dheight - (1.5f*dheight*baseCount/2f);
-                makeDomino(currX, dheight/2.0f, false, world);
-                makeDomino(currX, dheight+dwidth/2.0f, true, world);
+                makeDomino(currX, dheight/2.0f, false, m_world);
+                makeDomino(currX, dheight+dwidth/2.0f, true, m_world);
             }
             //Make 'I's
             for (int j=1; j<baseCount; ++j) {
@@ -113,21 +118,21 @@ public class DominoTower extends PTest {
                     float currX = i*1.5f*dheight - (1.5f*dheight*(baseCount-j)/2f);// + random(-.05f, .05f);
                     ddensity *= 2.5f;
                     if (i==0) {
-                        makeDomino(currX - (1.25f*dheight) + .5f*dwidth, currY-dwidth, false, world);
+                        makeDomino(currX - (1.25f*dheight) + .5f*dwidth, currY-dwidth, false, m_world);
                     }
                     if (i==baseCount-j-1) {
-                        if (j != 1) makeDomino(currX + (1.25f*dheight) - .5f*dwidth, currY-dwidth, false, world);
+                        if (j != 1) makeDomino(currX + (1.25f*dheight) - .5f*dwidth, currY-dwidth, false, m_world);
                     }
                     ddensity /= 2.5f;
-                    makeDomino(currX, currY, false, world);
-                    makeDomino(currX, currY+.5f*(dwidth+dheight), true, world);
-                    makeDomino(currX, currY-.5f*(dwidth+dheight), true, world);
+                    makeDomino(currX, currY, false, m_world);
+                    makeDomino(currX, currY+.5f*(dwidth+dheight), true, m_world);
+                    makeDomino(currX, currY-.5f*(dwidth+dheight), true, m_world);
                 }
             }
         }
     }
 
-    public static void main(String[] args) {
-        PApplet.main(new String[] { "org.jbox2d.testbed.tests.DominoTower" });
+    public String getName() {
+    	return "Domino Tower Stress Test";
     }
 }

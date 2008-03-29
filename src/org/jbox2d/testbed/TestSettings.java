@@ -41,7 +41,6 @@ public class TestSettings {
 	public boolean drawOBBs;
 	public boolean drawCOMs;
     public boolean drawStats;
-    public boolean drawContacts;
     public boolean drawImpulses;
     public boolean drawAABBs;
     public boolean drawPairs;

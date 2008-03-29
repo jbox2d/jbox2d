@@ -23,7 +23,12 @@
 
 package org.jbox2d.common;
 
+/**
+ * A few math methods that don't fit very well anywhere else.
+ * 
+ */
 public class MathUtils {
+	/** Returns the closest value to 'a' that is in between 'low' and 'high' */
     public static final float clamp(float a, float low, float high) {
         return Math.max(low, Math.min(a, high));
     }
@@ -32,14 +37,16 @@ public class MathUtils {
         return Vec2.max(low, Vec2.min(a, high));
     }
 
-    // "Next Largest Power of 2
-    // Given a binary integer value x, the next largest power of 2 can be
-    // computed by a SWAR algorithm
-    // that recursively "folds" the upper bits into the lower bits. This process
-    // yields a bit vector with
-    // the same most significant 1 as x, but all 1's below it. Adding 1 to that
-    // value yields the next
-    // largest power of 2. For a 32-bit value:"
+    /**
+     * Next Largest Power of 2:
+     * Given a binary integer value x, the next largest power of 2 can be
+     * computed by a SWAR algorithm
+     * that recursively "folds" the upper bits into the lower bits. This process
+     * yields a bit vector with
+     * the same most significant 1 as x, but all 1's below it. Adding 1 to that
+     * value yields the next
+     * largest power of 2.
+     */
     public static final int nextPowerOfTwo(int x) {
         x |= (x >> 1);
         x |= (x >> 2);

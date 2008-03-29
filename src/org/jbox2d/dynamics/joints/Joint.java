@@ -105,40 +105,40 @@ public abstract class Joint {
         return joint;
     }
 
-    /// Get the type of the concrete joint.
+    /** Get the type of the concrete joint. */
     public JointType getType() {
     	return m_type;
     }
     
-	/// Get the first body attached to this joint.
+	/** Get the first body attached to this joint. */
     public Body getBody1() {
         return m_body1;
     }
     
-	/// Get the second body attached to this joint.
+	/** Get the second body attached to this joint. */
     public Body getBody2() {
         return m_body2;
     }
 
     
-  /// Get the anchor point on body1 in world coordinates.
+    /** Get the anchor point on body1 in world coordinates. */
 	public abstract Vec2 getAnchor1();
 
-	/// Get the anchor point on body2 in world coordinates.
+	/** Get the anchor point on body2 in world coordinates. */
 	public abstract Vec2 getAnchor2();
 	
-    /// Get the reaction force on body2 at the joint anchor.
+    /** Get the reaction force on body2 at the joint anchor. */
 	public abstract Vec2 getReactionForce();
 
-	/// Get the reaction torque on body2.
+	/** Get the reaction torque on body2. */
 	public abstract float getReactionTorque();
     
-    /// Get the next joint the world joint list.
+    /** Get the next joint the world joint list. */
     public Joint getNext() {
         return m_next;
     }
     
-    /// Get the user data pointer.
+    /** Get the user data pointer. */
     public Object getUserData() {
         return m_userData;
     }
@@ -151,7 +151,7 @@ public abstract class Joint {
         return;
     }
     
-    // This returns true if the position errors are within tolerance.
+    /** This returns true if the position errors are within tolerance. */
     public abstract boolean solvePositionConstraints();
 
 }
