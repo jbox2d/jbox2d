@@ -104,7 +104,7 @@ public class TestbedOptions {
 		p.fill(20,20,110,255);
 		p.stroke(255);
 		p.rect(borderWidth,borderWidth,p.width-2*borderWidth,p.height-2*borderWidth);
-		ProcessingDebugDraw g = (ProcessingDebugDraw)(TestbedMain.currentTest.m_debugDraw);
+		ProcessingDebugDraw g = (ProcessingDebugDraw)(p.currentTest.m_debugDraw);
 		g.drawString(borderWidth+padding, borderWidth+padding+AbstractExample.textLineHeight, titleString, new Color3f(255,255,255));
 		for (int i=0; i<checkBoxes.size(); ++i) {
 			checkBoxes.get(i).process();
@@ -137,7 +137,7 @@ public class TestbedOptions {
 				// Change the value and set the field
 				try{
 					value = !value;
-					attachedValue.setBoolean(TestbedMain.currentTest.settings, value);
+					attachedValue.setBoolean(p.currentTest.settings, value);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -162,7 +162,7 @@ public class TestbedOptions {
 				p.noStroke();
 				p.ellipse(position.x+checkboxSize*.5f, position.y+checkboxSize*.5f, checkboxSize*.7f, checkboxSize*.7f);
 			}
-			ProcessingDebugDraw g = (ProcessingDebugDraw)(TestbedMain.currentTest.m_debugDraw);
+			ProcessingDebugDraw g = (ProcessingDebugDraw)(p.currentTest.m_debugDraw);
 			int lineHeight = AbstractExample.textLineHeight;
 			g.drawString((int)(position.x + checkboxSize + padding*2), (int)(position.y + .5f*(checkboxSize+lineHeight)), label, new Color3f(255,255,255));
 		}
@@ -192,7 +192,7 @@ public class TestbedOptions {
 				// Change the value and set the field
 				try{
 					value = PApplet.floor(PApplet.map(p.mouseX, position.x, position.x+width, minValue, maxValue));
-					attachedValue.setInt(TestbedMain.currentTest.settings, value);
+					attachedValue.setInt(p.currentTest.settings, value);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -215,7 +215,7 @@ public class TestbedOptions {
 			p.ellipse(PApplet.map(value,minValue,maxValue,position.x,position.x+width),
 					  position.y + checkboxSize*.5f, .7f*checkboxSize, .7f*checkboxSize);
 			
-			ProcessingDebugDraw g = (ProcessingDebugDraw)(TestbedMain.currentTest.m_debugDraw);
+			ProcessingDebugDraw g = (ProcessingDebugDraw)(p.currentTest.m_debugDraw);
 			int lineHeight = AbstractExample.textLineHeight;
 			g.drawString( (position.x + padding), (position.y + (checkboxSize+lineHeight)), label+": "+value, new Color3f(255,255,255));
 		}

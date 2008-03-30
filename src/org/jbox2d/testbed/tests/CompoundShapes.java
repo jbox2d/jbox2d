@@ -36,14 +36,25 @@ import processing.core.PApplet;
 public class CompoundShapes extends AbstractExample {
 
 	private boolean firstTime = true;
+	private final int stackHeight = 100;
 	
 	public CompoundShapes(TestbedMain _parent) {
 		super(_parent);
 	}
+	
+	// Default world AABB is too small, make a bigger one
+	public void createWorld() {
+		m_worldAABB = new AABB();
+		m_worldAABB.lowerBound = new Vec2(-200.0f, -100.0f);
+		m_worldAABB.upperBound = new Vec2(200.0f, 500.0f);
+		Vec2 gravity = new Vec2(0.0f, -10.0f);
+		boolean doSleep = true;
+		m_world = new World(m_worldAABB, gravity, doSleep);
+	}
 
     public void create() {
     	if (firstTime) {
-			setCamera(0f, 10f, 20f);
+			setCamera(0f, 10f, 15f);
 			firstTime = false;
 		}
     	
@@ -68,7 +79,7 @@ public class CompoundShapes extends AbstractExample {
 			sd2.localPosition.set(0.5f, 0.5f);
 			sd2.density = 0.0f; // massless
 
-			for (int i = 0; i < 10; ++i)
+			for (int i = 0; i < stackHeight; ++i)
 			{
 				float x = parent.random(-0.1f, 0.1f);
 				BodyDef bd = new BodyDef();
@@ -90,7 +101,7 @@ public class CompoundShapes extends AbstractExample {
 			sd2.setAsBox(0.25f, 0.5f, new Vec2(0.0f, -0.5f), 0.5f * 3.1415f);
 			sd2.density = 2.0f;
 
-			for (int i = 0; i < 10; ++i)
+			for (int i = 0; i < stackHeight; ++i)
 			{
 				float x = parent.random(-0.1f, 0.1f);
 				BodyDef bd = new BodyDef();
@@ -124,7 +135,7 @@ public class CompoundShapes extends AbstractExample {
 			sd2.vertices.add(XForm.mul(xf2, new Vec2(0.0f, 0.5f)));
 			sd2.density = 2.0f;
 
-			for (int i = 0; i < 10; ++i)
+			for (int i = 0; i < stackHeight; ++i)
 			{
 				float x = parent.random(-0.1f, 0.1f);
 				BodyDef bd = new BodyDef();

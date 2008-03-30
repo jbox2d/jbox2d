@@ -33,19 +33,39 @@ import org.jbox2d.testbed.tests.*;
 
 import processing.core.PApplet;
 
+/**
+ * TestbedMain is the holder PApplet for the entire testbed.
+ * It has first stab at input events, and delegates them out
+ * to the appropriate handlers if necessary.  It handles the
+ * list of tests to run, and starts them as needed.
+ * <BR><BR>For applet safety, no variables are static, because
+ * in the browser a page reload does <em>not</em> reset static
+ * variables (even though the applet may get restarted otherwise).
+ * From a design perspective this is not ideal, but hey - this
+ * is just a demo, anyways, let's not get too bent out of
+ * shape over it.
+ * <BR><BR>In the future, other classes should be checked to
+ * make sure this odd static variable behavior is not causing
+ * memory leaks in the browser.
+ * 
+ * @author ewjordan
+ *
+ */
 public class TestbedMain extends PApplet {
+	/** I let Eclipse generate this to shut it up about its warnings. */
+	private static final long serialVersionUID = 1712524774634907635L;
 	/** The list of registered examples */
-	static protected ArrayList<AbstractExample> tests = new ArrayList<AbstractExample>(0);
+	protected ArrayList<AbstractExample> tests = new ArrayList<AbstractExample>(0);
 	/** Currently running example */
-	static protected AbstractExample currentTest = null;
+	protected AbstractExample currentTest = null;
 	/** 
 	 * Index of current example in tests array.
 	 * Assumes that the array structure does not change,
 	 * though it's safe to add things on to the end. 
 	 */
-	static protected int currentTestIndex = 0;
+	protected int currentTestIndex = 0;
 	/** Is the options window open? */
-	static protected boolean handleOptions = false;
+	protected boolean handleOptions = false;
 	
 	// Little bit of input stuff
 	// TODO ewjordan: refactor into an input handler class
@@ -96,19 +116,27 @@ public class TestbedMain extends PApplet {
     	frameRate(targetFPS);
     	g = new ProcessingDebugDraw(this);
     	//smooth();
-    	
+    	for (int i=0; i<1000; ++i) {
+    		this.requestFocus();
+    	}
     	/* Register the examples */
-    	//registerExample(new BugTest(this));
-    	registerExample(new Gears(this));
-    	registerExample(new DominoTower(this));
-    	registerExample(new Domino(this));
+    	// Simple functionality examples
     	registerExample(new VerticalStack(this));
+    	registerExample(new Domino(this));
     	registerExample(new CompoundShapes(this));
-    	registerExample(new Circles(this));
     	registerExample(new Chain(this));
     	registerExample(new Bridge(this));
+    	registerExample(new Gears(this));
+    	
+    	// Stress tests
+    	registerExample(new Pyramid(this));
+    	registerExample(new DominoTower(this));
+    	registerExample(new Circles(this));
+    	
+    	// Bug tests
     	registerExample(new CCDTest(this));
     	registerExample(new DistanceTest(this));
+    	//registerExample(new BugTest(this));
 
     	//Set up the mouse wheel listener to control zooming
     	addMouseWheelListener(new MouseWheelListener() {
@@ -311,7 +339,7 @@ public class TestbedMain extends PApplet {
     }
     
     /** Register an AbstractExample to the current list of examples. */
-    static public void registerExample(AbstractExample test) {
+    public void registerExample(AbstractExample test) {
     	tests.add(test);
     }
 

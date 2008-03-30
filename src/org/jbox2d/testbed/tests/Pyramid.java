@@ -22,9 +22,12 @@
  */
 package org.jbox2d.testbed.tests;
 
+import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.testbed.AbstractExample;
 import org.jbox2d.testbed.TestbedMain;
 
 import processing.core.PApplet;
@@ -37,46 +40,57 @@ public class Pyramid extends AbstractExample {
     public Pyramid(TestbedMain t) {
         super(t);
     }
+    
+    public String getName() {
+    	return "Pyramid Stress Test";
+    }
 
     @Override
-    public void create()) {
-        {
-            BoxDef sd = new BoxDef();
-            sd.extents = new Vec2(50.0f, 10.0f);
+    public void create() {
+    	if (firstTime) {
+			setCamera(2f, 12f, 10f);
+			firstTime = false;
+		}
+    	
+    	{
+			PolygonDef sd = new PolygonDef();
+			sd.setAsBox(50.0f, 10.0f);
 
-            BodyDef bd = new BodyDef();
-            bd.position = new Vec2(0.0f, -10.0f);
-            bd.addShape(sd);
-            m_world.createBody(bd);
-        }
+			BodyDef bd = new BodyDef();
+			bd.position.set(0.0f, -10.0f);
+			Body ground = m_world.createStaticBody(bd);
+			ground.createShape(sd);
+		}
 
-        {
-            BoxDef sd = new BoxDef();
-            float a = 0.5f;
-            sd.extents = new Vec2(a, a);
-            sd.density = 2.0f;
+		{
+			PolygonDef sd = new PolygonDef();
+			float a = 0.5f;
+			sd.setAsBox(a, a);
+			sd.density = 5.0f;
+			sd.restitution = 0.0f;
+			sd.friction = 0.9f;
 
-            BodyDef bd = new BodyDef();
-            bd.addShape(sd);
+			Vec2 x = new Vec2(-10.0f, 0.75f);
+			Vec2 y = new Vec2();
+			Vec2 deltaX = new Vec2(0.5625f, 2.0f);
+			Vec2 deltaY = new Vec2(1.125f, 0.0f);
 
-            Vec2 x = new Vec2(-10.0f, 0.75f);
-            Vec2 y;
-            Vec2 deltaX = new Vec2(0.5625f, 2.0f);
-            Vec2 deltaY = new Vec2(1.125f, 0.0f);
+			for (int i = 0; i < 25; ++i) {
+				y.set(x);
 
-            for (int i = 0; i < 25; ++i) {
-                y = x.clone();
+				for (int j = i; j < 25; ++j) {
+					BodyDef bd = new BodyDef();
+					bd.position.set(y);
+					Body body = m_world.createDynamicBody(bd);
+					body.createShape(sd);
+					body.setMassFromShapes();
 
-                for (int j = i; j < 25; ++j) {
-                    bd.position = y;
-                    m_world.createBody(bd);
+					y.addLocal(deltaY);
+				}
 
-                    y.addLocal(deltaY);
-                }
-
-                x.addLocal(deltaX);
-            }
-        }
+				x.addLocal(deltaX);
+			}
+		}
     }
 
 }
