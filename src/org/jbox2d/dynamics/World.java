@@ -23,7 +23,7 @@
 
 package org.jbox2d.dynamics;
 
-import javax.vecmath.Color3f;
+import org.jbox2d.common.Color3f;
 
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.BroadPhase;
