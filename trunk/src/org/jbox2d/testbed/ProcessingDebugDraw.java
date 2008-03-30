@@ -23,8 +23,8 @@
 
 package org.jbox2d.testbed;
 
-import javax.vecmath.Color3f;
 
+import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.DebugDraw;
@@ -91,7 +91,6 @@ public class ProcessingDebugDraw extends DebugDraw {
 	public void drawCircle(Vec2 center, float radius, Color3f color) {
 		center = worldToScreen(center);
 		radius *= scaleFactor;
-		g.colorMode(PApplet.NORMALIZED);
 		g.noFill();
 		float k_segments = 16.0f;
 		float k_increment = 2.0f * (float)Math.PI / k_segments;
@@ -120,7 +119,6 @@ public class ProcessingDebugDraw extends DebugDraw {
 		radius = radius * scaleFactor;
 		axis = new Vec2(axis.x, axis.y*yFlip);
 		
-		g.colorMode(PApplet.NORMALIZED);
 		float k_segments = 16.0f;
 		float k_increment = 2.0f * (float)Math.PI / k_segments;
 		float theta = 0.0f;
@@ -148,7 +146,6 @@ public class ProcessingDebugDraw extends DebugDraw {
 	 */
 	@Override
 	public void drawPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
-		g.colorMode(PApplet.NORMALIZED);
 		g.stroke(color.x, color.y, color.z);
 		g.noFill();
 		for (int i = 0; i < vertexCount; ++i) {
@@ -165,7 +162,6 @@ public class ProcessingDebugDraw extends DebugDraw {
 	 */
 	@Override
 	public void drawSolidPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
-		g.colorMode(PApplet.NORMALIZED);
 		g.noStroke();
 		g.fill(0.5f * color.x, 0.5f * color.y, 0.5f * color.z, 0.5f*255.0f);
 		g.beginShape(PApplet.POLYGON);
@@ -184,14 +180,10 @@ public class ProcessingDebugDraw extends DebugDraw {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.jbox2d.dynamics.DebugDraw#drawSegment(org.jbox2d.common.Vec2, org.jbox2d.common.Vec2, javax.vecmath.Color3f)
-	 */
 	@Override
 	public void drawSegment(Vec2 p1, Vec2 p2, Color3f color) {
 		p1 = worldToScreen(p1);
 		p2 = worldToScreen(p2);
-		g.colorMode(PApplet.NORMALIZED);
 		g.stroke(color.x, color.y, color.z);
 		g.beginShape(PApplet.LINES);
 		g.vertex(p1.x, p1.y);
@@ -204,7 +196,6 @@ public class ProcessingDebugDraw extends DebugDraw {
 	 */
 	@Override
 	public void drawXForm(XForm xf) {
-		g.colorMode(PApplet.NORMALIZED);
 		Vec2 p1 = xf.position.clone(), p2 = new Vec2();
 		float k_axisScale = 0.4f;
 		g.beginShape(PApplet.LINES);
@@ -231,7 +222,6 @@ public class ProcessingDebugDraw extends DebugDraw {
 	public void drawString(float x, float y, String s, Color3f color) {
 		//g.textFont(m_font, 36);
 		//if (true) return;
-		g.colorMode(PApplet.NORMALIZED);
 		
 		if (firstTime) {g.textFont(m_font);g.textMode(PApplet.SCREEN);firstTime = false;}
 		g.fill(color.x,color.y,color.z);
@@ -242,7 +232,6 @@ public class ProcessingDebugDraw extends DebugDraw {
 	@Override
 	public void drawPoint(Vec2 position, float f, Color3f color) {
 		position = worldToScreen(position);
-		g.colorMode(PApplet.NORMALIZED);
 		float k_segments = 5.0f;
 		float k_increment = 2.0f * (float)Math.PI / k_segments;
 		float k_radius = 3.0f;

@@ -26,7 +26,7 @@ package org.jbox2d.testbed;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
-import javax.vecmath.Color3f;
+import org.jbox2d.common.Color3f;
 
 import processing.core.PApplet;
 
