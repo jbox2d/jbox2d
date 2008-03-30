@@ -39,6 +39,8 @@ import processing.core.PFont;
  */
 public class ProcessingDebugDraw extends DebugDraw {
 	public static ProcessingDebugDraw screen; //static rendering context for debug drawing from within other code
+
+	private boolean firstTime = true;
 	public PApplet g;
 	public PFont m_font;
 	public float fontHeight;
@@ -59,7 +61,6 @@ public class ProcessingDebugDraw extends DebugDraw {
 		g = pApplet;
 		m_font = g.createFont("LucidaGrande-Bold",12);//-Bold-14.vlw");
 		fontHeight = 14.0f;
-
 	}
 	
 	public Vec2 worldToScreen(Vec2 world) {
@@ -226,7 +227,6 @@ public class ProcessingDebugDraw extends DebugDraw {
 
 	}
 	
-	private static boolean firstTime = true;
 	@Override
 	public void drawString(float x, float y, String s, Color3f color) {
 		//g.textFont(m_font, 36);
