@@ -2,7 +2,7 @@
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
  * JBox2D homepage: http://jbox2d.sourceforge.net/ 
- * Box2D homepage: http://www.gphysics.com
+ * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -22,106 +22,110 @@
  */
 package org.jbox2d.testbed.tests;
 
-import org.jbox2d.collision.BoxDef;
-import org.jbox2d.common.Vec2;
+import org.jbox2d.collision.PolygonDef;
+import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
-import org.jbox2d.dynamics.World;
-import org.jbox2d.testbed.PTest;
+import org.jbox2d.testbed.AbstractExample;
+import org.jbox2d.testbed.TestbedMain;
 
-import processing.core.PApplet;
+public class VaryingFriction extends AbstractExample {
 
-
-
-public class VaryingFriction extends PTest {
-
-    public VaryingFriction() {
-        super("VaryingFriction");
+    public VaryingFriction(TestbedMain _parent) {
+        super(_parent);
+    }
+    
+    public String getName() {
+    	return "Varying Friction";
     }
 
     @Override
-    public void go(World world) {
-        {
-            BoxDef sd = new BoxDef();
-            sd.extents = new Vec2(50.0f, 10.0f);
+    public void create() {
+		{
+			PolygonDef sd = new PolygonDef();
+			sd.setAsBox(100.0f, 20.0f);
 
-            BodyDef bd = new BodyDef();
-            bd.position = new Vec2(0.0f, -10.0f);
-            bd.addShape(sd);
-            world.createBody(bd);
-        }
+			BodyDef bd = new BodyDef();
+			bd.position.set(0.0f, -20.0f);
+			Body ground = m_world.createStaticBody(bd);
+			ground.createShape(sd);
+		}
 
-        {
-            BoxDef sd = new BoxDef();
-            sd.extents = new Vec2(6.5f, 0.125f);
+		{
+			PolygonDef sd = new PolygonDef();
+			sd.setAsBox(13.0f, 0.25f);
 
-            BodyDef bd = new BodyDef();
-            bd.position = new Vec2(-2.0f, 11.0f);
-            bd.rotation = -0.25f;
-            bd.addShape(sd);
-            world.createBody(bd);
-        }
+			BodyDef bd = new BodyDef();
+			bd.position.set(-4.0f, 22.0f);
+			bd.angle = -0.25f;
 
-        {
-            BoxDef sd = new BoxDef();
-            sd.extents = new Vec2(0.125f, 0.5f);
+			Body ground = m_world.createStaticBody(bd);
+			ground.createShape(sd);
+		}
 
-            BodyDef bd = new BodyDef();
-            bd.position = new Vec2(5.25f, 9.5f);
-            bd.addShape(sd);
-            world.createBody(bd);
-        }
+		{
+			PolygonDef sd = new PolygonDef();
+			sd.setAsBox(0.25f, 1.0f);
 
-        {
-            BoxDef sd = new BoxDef();
-            sd.extents = new Vec2(6.5f, 0.125f);
+			BodyDef bd = new BodyDef();
+			bd.position.set(10.5f, 19.0f);
 
-            BodyDef bd = new BodyDef();
-            bd.position = new Vec2(2.0f, 7.0f);
-            bd.rotation = 0.25f;
-            bd.addShape(sd);
-            world.createBody(bd);
-        }
+			Body ground = m_world.createStaticBody(bd);
+			ground.createShape(sd);
+		}
 
-        {
-            BoxDef sd = new BoxDef();
-            sd.extents = new Vec2(0.125f, 0.5f);
+		{
+			PolygonDef sd = new PolygonDef();
+			sd.setAsBox(13.0f, 0.25f);
 
-            BodyDef bd = new BodyDef();
-            bd.position = new Vec2(-5.25f, 5.5f);
-            bd.addShape(sd);
-            world.createBody(bd);
-        }
+			BodyDef bd = new BodyDef();
+			bd.position.set(4.0f, 14.0f);
+			bd.angle = 0.25f;
 
-        {
-            BoxDef sd = new BoxDef();
-            sd.extents = new Vec2(6.5f, 0.125f);
+			Body ground = m_world.createStaticBody(bd);
+			ground.createShape(sd);
+		}
 
-            BodyDef bd = new BodyDef();
-            bd.position = new Vec2(-2.0f, 3.0f);
-            bd.rotation = -0.25f;
-            bd.addShape(sd);
-            world.createBody(bd);
-        }
+		{
+			PolygonDef sd = new PolygonDef();
+			sd.setAsBox(0.25f, 1.0f);
 
-        {
-            BoxDef sd = new BoxDef();
-            sd.extents = new Vec2(0.25f, 0.25f);
-            sd.density = 25.0f;
+			BodyDef bd = new BodyDef();
+			bd.position.set(-10.5f, 11.0f);
 
-            BodyDef bd = new BodyDef();
-            bd.addShape(sd);
+			Body ground = m_world.createStaticBody(bd);
+			ground.createShape(sd);
+		}
 
-            float friction[] = new float[] { 0.75f, 0.5f, 0.35f, 0.1f, 0.0f };
+		{
+			PolygonDef sd = new PolygonDef();
+			sd.setAsBox(13.0f, 0.25f);
 
-            for (int i = 0; i < 5; ++i) {
-                sd.friction = friction[i];
-                bd.position = new Vec2(-7.5f + 2.0f * i, 14.0f);
-                world.createBody(bd);
-            }
-        }
-    }
+			BodyDef bd = new BodyDef();
+			bd.position.set(-4.0f, 6.0f);
+			bd.angle = -0.25f;
 
-    public static void main(String[] args) {
-        PApplet.main(new String[] { "org.jbox2d.testbed.tests.VaryingFriction" });
-    }
+			Body ground = m_world.createStaticBody(bd);
+			ground.createShape(sd);
+		}
+
+		{
+			PolygonDef sd = new PolygonDef();
+			sd.setAsBox(0.5f, 0.5f);
+			sd.density = 25.0f;
+
+			float[] friction = {0.75f, 0.5f, 0.35f, 0.1f, 0.0f};
+
+			for (int i = 0; i < 5; ++i)
+			{
+				BodyDef bd = new BodyDef();
+				bd.position.set(-15.0f + 4.0f * i, 28.0f);
+				Body body = m_world.createDynamicBody(bd);
+
+				sd.friction = friction[i];
+				body.createShape(sd);
+				body.setMassFromShapes();
+			}
+		}
+	}
+
 }

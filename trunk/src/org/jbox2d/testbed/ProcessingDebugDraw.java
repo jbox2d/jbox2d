@@ -31,6 +31,8 @@ import org.jbox2d.dynamics.DebugDraw;
 
 import processing.core.PApplet;
 import processing.core.PFont;
+import processing.core.PGraphics3D;
+import processing.core.PImage;
 
 /**
  * Implementation of DebugDraw using Processing (http://www.processing.org)
@@ -222,8 +224,11 @@ public class ProcessingDebugDraw extends DebugDraw {
 	public void drawString(float x, float y, String s, Color3f color) {
 		//g.textFont(m_font, 36);
 		//if (true) return;
-		
-		if (firstTime) {g.textFont(m_font);g.textMode(PApplet.SCREEN);firstTime = false;}
+		if (firstTime) {
+			g.textFont(m_font);
+			if (g.g instanceof PGraphics3D) g.textMode(PApplet.SCREEN);
+			firstTime = false;
+		}
 		g.fill(color.x,color.y,color.z);
 		//g.fill(255.0f);
 		g.text(s, x, y);
@@ -246,6 +251,40 @@ public class ProcessingDebugDraw extends DebugDraw {
 			theta += k_increment;
 		}
 		g.endShape();
+	}
+	
+	/**
+	 * First image is centered on position, then
+	 * localScale is applied, then localOffset, and
+     * lastly rotation.
+     * <BR><BR>
+     * Thus localOffset should be specified in world
+     * units before scaling is applied.
+     * For instance, if you want a MxN image to have its corner
+     * at body center and be scaled by S, use a localOffset
+     * of (M*S/2, N*S/2) and a localScale of S.
+     * <BR><BR>
+     * 
+     */
+	public void drawImage(PImage image, Vec2 position, float rotation, float localScale,
+						  Vec2 localOffset, float halfImageWidth, float halfImageHeight) {
+		position = worldToScreen(position);
+		localOffset = worldToScreenVector(localOffset);
+		localScale *= scaleFactor;
+        g.pushMatrix();
+        g.translate(position.x, position.y);
+        g.rotate(-rotation);
+        g.translate(localOffset.x, localOffset.y);
+        g.scale(localScale);
+        g.image(image, -halfImageWidth, -halfImageHeight);
+        g.popMatrix();
+    }
+	
+	public Vec2 worldToScreenVector(Vec2 world) {
+		return world.mul(scaleFactor);
+	}
+	public Vec2 worldToScreenVector(float x, float y) {
+		return worldToScreenVector(new Vec2(x,y));
 	}
 	
 }

@@ -22,44 +22,43 @@
  */
 package org.jbox2d.testbed.tests;
 
-import org.jbox2d.collision.BoxDef;
 import org.jbox2d.collision.CircleDef;
+import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
-import org.jbox2d.testbed.PTest;
+import org.jbox2d.testbed.AbstractExample;
+import org.jbox2d.testbed.TestbedMain;
 
 import processing.core.PApplet;
 
 
 
-public class VaryingRestitution extends PTest {
+public class VaryingRestitution extends AbstractExample {
 
-    public VaryingRestitution() {
-        super("VaryingRestitution");
+    public VaryingRestitution(TestbedMain _parent) {
+        super(_parent);
     }
 
     @Override
-    public void go(World world) {
+    public void create() {
         {
-            BoxDef sd = new BoxDef();
-            sd.extents = new Vec2(50.0f, 10.0f);
-
+            PolygonDef sd = new PolygonDef();
+            sd.setAsBox(50.0f, 10.0f);
+            
             BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
-            bd.addShape(sd);
-            world.createBody(bd);
+            m_world.createStaticBody(bd).createShape(sd);
         }
 
         {
             CircleDef sd = new CircleDef();
-            ;
-            // sd.poly.m_vertexCount = 8;
             sd.radius = .6f;
             sd.density = 5.0f;
 
             BodyDef bd = new BodyDef();
-            bd.addShape(sd);
+            
 
             float restitution[] = new float[] { 0.0f, 0.1f, 0.3f, 0.5f, 0.75f,
                     0.9f, 1.0f };
@@ -67,12 +66,14 @@ public class VaryingRestitution extends PTest {
             for (int i = 0; i < restitution.length; ++i) {
                 sd.restitution = restitution[i];
                 bd.position = new Vec2(-10.0f + 3.0f * i, 10.0f);
-                m_world.createBody(bd);
+                Body myBody = m_world.createDynamicBody(bd);
+                myBody.createShape(sd);
+                myBody.setMassFromShapes();
             }
         }
     }
 
-    public static void main(String[] args) {
-        PApplet.main(new String[] { "org.jbox2d.testbed.tests.VaryingRestitution" });
+    public String getName() {
+    	return "Varying Restitution";
     }
 }

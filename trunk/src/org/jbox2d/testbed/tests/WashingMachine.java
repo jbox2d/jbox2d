@@ -6,14 +6,27 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.joints.*;
-import org.jbox2d.testbed.PTest;
-
-import processing.core.PApplet;
-
+import org.jbox2d.testbed.AbstractExample;
+import org.jbox2d.testbed.TestbedMain;
 
 
-public class WashingMachine extends PTest {
+public class WashingMachine extends AbstractExample {
 
+	public WashingMachine(TestbedMain _parent) {
+		super(_parent);
+	}
+
+	@Override
+	public void create() {
+		//TODO
+	}
+
+	@Override
+	public String getName() {
+		return "Washing Machine";
+	}
+	
+/*
     RevoluteJoint m_joint1;
 
     public WashingMachine() {
@@ -118,12 +131,10 @@ public class WashingMachine extends PTest {
 
     }
 
-    /**
-     * Entry point
-     */
     public static void main(String[] argv) {
         // new MotorsAndLimits().start();
         PApplet.main(new String[] { "org.jbox2d.testbed.tests.WashingMachine" });
 
     }
+    */
 }

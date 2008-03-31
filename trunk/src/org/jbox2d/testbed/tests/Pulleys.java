@@ -22,91 +22,82 @@
  */
 package org.jbox2d.testbed.tests;
 
-import org.jbox2d.collision.BoxDef;
+import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
-import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.joints.PrismaticJoint;
-import org.jbox2d.dynamics.joints.PrismaticJointDef;
 import org.jbox2d.dynamics.joints.PulleyJoint;
 import org.jbox2d.dynamics.joints.PulleyJointDef;
-import org.jbox2d.testbed.PTest;
-
-import processing.core.PApplet;
-
+import org.jbox2d.testbed.AbstractExample;
+import org.jbox2d.testbed.TestbedMain;
 
 
-public class Pulleys extends PTest {
+public class Pulleys extends AbstractExample {
 
     PulleyJoint m_joint1;
 
     PrismaticJoint m_joint2;
 
-    public Pulleys() {
-        super("Pulleys");
+    public Pulleys(TestbedMain p) {
+        super(p);
     }
 
     @Override
-    public void go(World world) {
-        Body ground = null;
-        {
-            BoxDef sd = new BoxDef();
-            sd.extents.set(50f, 10f);
+    public void create() {
+    	Body ground = null;
+		{
+			PolygonDef sd = new PolygonDef();
+			sd.setAsBox(50.0f, 10.0f);
 
-            BodyDef bd = new BodyDef();
-            bd.position.set(0f, -10f);
-            bd.addShape(sd);
-            ground = world.createBody(bd);
+			BodyDef bd = new BodyDef();
+			bd.position.set(0.0f, -10.0f);
+			ground = m_world.createStaticBody(bd);
+			ground.createShape(sd);
+		}
 
-        }
+		{
+			float a = 2.0f;
+			float b = 4.0f;
+			float y = 16.0f;
+			float L = 12.0f;
 
-        {
-            float a = 2f;
-            float y = 16f;
-            float L = 12f;
+			PolygonDef sd = new PolygonDef();
+			sd.setAsBox(a, b);
+			sd.density = 5.0f;
 
-            BoxDef sd = new BoxDef();
-            sd.extents.set(2f * a, a);
-            sd.density = 5f;
+			BodyDef bd = new BodyDef();
 
-            BodyDef bd = new BodyDef();
-            bd.addShape(sd);
+			bd.position.set(-10.0f, y);
+			Body body1 = m_world.createDynamicBody(bd);
+			body1.createShape(sd);
+			body1.setMassFromShapes();
 
-            bd.position.set(-10f, y);
-            Body body1 = world.createBody(bd);
+			bd.position.set(10.0f, y);
+			Body body2 = m_world.createDynamicBody(bd);
+			body2.createShape(sd);
+			body2.setMassFromShapes();
 
-            bd.position.set(10f, y);
-            Body body2 = world.createBody(bd);
+			PulleyJointDef pulleyDef = new PulleyJointDef();
+			Vec2 anchor1 = new Vec2(-10.0f, y + b);
+			Vec2 anchor2 = new Vec2(10.0f, y + b);
+			Vec2 groundAnchor1 = new Vec2(-10.0f, y + b + L);
+			Vec2 groundAnchor2 = new Vec2(10.0f, y + b + L);
+			pulleyDef.initialize(body1, body2, groundAnchor1, groundAnchor2, anchor1, anchor2, 2.0f);
 
-            PulleyJointDef pulleyDef = new PulleyJointDef();
-            pulleyDef.body1 = body1;
-            pulleyDef.body2 = body2;
-            pulleyDef.anchorPoint1 = new Vec2(-10.0f, y + a);
-            pulleyDef.anchorPoint2 = new Vec2(10.0f, y + a);
-            pulleyDef.groundPoint1 = new Vec2(-10.0f, y + a + L);
-            pulleyDef.groundPoint2 = new Vec2(10.0f, y + a + L);
-            pulleyDef.ratio = 2.0f;
-
-            pulleyDef.maxLength1 = 28.0f;
-            pulleyDef.maxLength2 = 12.0f;
-
-            m_joint1 = (PulleyJoint) (world.createJoint(pulleyDef));
-
-            PrismaticJointDef prismDef = new PrismaticJointDef();
-            prismDef.body1 = ground;
-            prismDef.body2 = body2;
-            prismDef.axis.set(0f, 1f);
-            prismDef.anchorPoint = body2.getCenterPosition();
-            m_joint2 = (PrismaticJoint) (world.createJoint(prismDef));
-        }
+			m_joint1 = (PulleyJoint)m_world.createJoint(pulleyDef);
+		}
 
     }
+    
+    public void postStep() {
+		float ratio = m_joint1.getRatio();
+		float L = m_joint1.getLength1() + ratio * m_joint1.getLength2();
+		m_debugDraw.drawString(5, m_textLine, "L1 + "+ratio+" * L2 = "+L,white);
+		m_textLine += textLineHeight;
+	}
 
-    /**
-     * Entry point
-     */
-    public static void main(String[] argv) {
-        PApplet.main(new String[] { "org.jbox2d.testbed.tests.Pulleys" });
+    public String getName() {
+    	return "Pulleys";
     }
 }
