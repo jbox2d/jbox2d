@@ -86,7 +86,9 @@ public class TestbedOptions {
 					String fieldName = fields[i].getName();
 					int initialV = fields[i].getInt(settings);
 					//System.out.println(initialV);
-					SliderInt mySlider = new SliderInt(pos,sliderWidth,fieldName,initialV,1,5*initialV,fields[i]);
+					int maxIntValue = 100;
+					if (fieldName.equals("hz")) maxIntValue = 200;
+					SliderInt mySlider = new SliderInt(pos,sliderWidth,fieldName,initialV,1,maxIntValue,fields[i]);
 					sliderInts.add(mySlider);
 					pos.y += 2 * (checkboxSize+padding);
 					if (pos.y +checkboxSize+padding> p.height - borderWidth) {

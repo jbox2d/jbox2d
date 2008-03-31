@@ -116,11 +116,17 @@ public class TestbedMain extends PApplet {
     	frameRate(targetFPS);
     	g = new ProcessingDebugDraw(this);
     	//smooth();
-    	for (int i=0; i<1000; ++i) {
+    	for (int i=0; i<100; ++i) {
     		this.requestFocus();
     	}
     	/* Register the examples */
     	// Simple functionality examples
+    	registerExample(new SpriteBinding(this));
+    	registerExample(new Pulleys(this));
+    	registerExample(new Overhang(this));
+    	registerExample(new VaryingRestitution(this));
+    	registerExample(new VaryingFriction(this));
+    	registerExample(new MotorsAndLimits(this));
     	registerExample(new VerticalStack(this));
     	registerExample(new Domino(this));
     	registerExample(new CompoundShapes(this));

@@ -24,9 +24,9 @@
 package org.jbox2d.testbed;
 
 import java.util.ArrayList;
+import processing.core.PImage;
 
 import org.jbox2d.common.Color3f;
-
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.CircleDef;
 import org.jbox2d.collision.Shape;
@@ -39,7 +39,6 @@ import org.jbox2d.dynamics.ContactListener;
 import org.jbox2d.dynamics.DebugDraw;
 import org.jbox2d.dynamics.DestructionListener;
 import org.jbox2d.dynamics.World;
-import org.jbox2d.dynamics.contacts.ContactPoint;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.MouseJoint;
 import org.jbox2d.dynamics.joints.MouseJointDef;
@@ -116,7 +115,8 @@ public abstract class AbstractExample {
 	/** Height of font used to draw text. */
 	static public int textLineHeight = 12;
 	
-    //protected ArrayList<BoundImage> boundImages = new ArrayList<BoundImage>();
+	/** List of images bound to bodies. */
+	protected ArrayList<BoundImage> boundImages = new ArrayList<BoundImage>();
 	
 	/**
 	 * Prints default instructions + specific example instructions.
@@ -234,7 +234,7 @@ public abstract class AbstractExample {
 			cachedCamY = 10.0f;
 			cachedCamScale = 10.0f;
 		}
-		
+		boundImages.clear();
 		create();
 	}
 	
@@ -362,6 +362,10 @@ public abstract class AbstractExample {
 			}
 		}
 		
+		for (BoundImage b:boundImages) {
+            b.draw();
+        }
+		
 		printInstructions();
 		
 		pmouseScreen.set(mouseScreen);
@@ -449,6 +453,26 @@ public abstract class AbstractExample {
     	launchBomb(bombSpawnPoint,vel);
     	bombSpawning = false;
     }
+
+    
+    /**
+     * Draws an image on a body.
+     * 
+     * First image is centered on body center, then
+     * localScale is applied, then localOffset, and
+     * lastly localRotation (all rel. to body center).
+     * 
+     * Thus localOffset should be specified in body
+     * units to the scaled image.  For instance, if
+     * you want a MxN image to have its corner
+     * at body center and be scaled by S, use a localOffset
+     * of (M*S/2, N*S/2) and a localScale of S.
+     * 
+     */
+    public void bindImage(PImage p, Vec2 localOffset, float localRotation, float localScale, Body b) {
+        boundImages.add(new BoundImage(p, localOffset, localRotation, localScale, b));
+    }
+    
     
     /**
      * Set keyDown and newKeyDown arrays when we get a keypress.
@@ -678,7 +702,7 @@ public abstract class AbstractExample {
 
     /**
      * Holder for storing contact information.
-     * Not the same as org.jbox2d.dynamics.contacts.ContactPoint
+     * Not the same as org.jbox2d.dynamics.contacts.ContactPoint (TODO: fix name clash)
      */
     class ContactPoint {
     	public Shape shape1;
@@ -688,6 +712,52 @@ public abstract class AbstractExample {
     	public float normalForce;
     	public float tangentForce;
     	public int state; // 0-add, 1-persist, 2-remove
+    }
+    
+    /**
+     * Holder for images to be drawn on bodies.
+     * You should not need to create BoundImages yourself -
+     * instead, use bindImage(), which will properly
+     * add the BoundImage to the ArrayList of BoundImages
+     * to draw.
+     * <BR><BR>
+     * In a realistic application, you would also want to
+     * decouple the BoundImages from bodies upon body
+     * destruction; here we don't do that because this is
+     * just a simple example of how to do the drawing based
+     * on the body transform.  You also might want to allow
+     * height/width scaling not drawn directly
+     * from the image in case the image needs stretching.
+     * <BR><BR>
+     * Necessarily tied to ProcessingDebugDraw and
+     * Processing's PImage class because of image
+     * format and handling.
+     * 
+     */
+    class BoundImage{
+        private PImage image;
+        private float halfImageWidth;
+        private float halfImageHeight;
+        private Body body;
+        private Vec2 localOffset;
+        private float localRotation;
+        private float localScale;
+        private ProcessingDebugDraw p;
+        
+        public BoundImage(PImage _image, Vec2 _localOffset, float _localRotation, float _localScale, Body _body) {
+            image = _image;
+            localOffset = _localOffset.clone();
+            localRotation = _localRotation;
+            localScale = _localScale;
+            body = _body;
+            halfImageWidth = image.width / 2f;
+            halfImageHeight = image.height / 2f;
+        	p = (ProcessingDebugDraw)m_debugDraw;
+        }
+        
+        public void draw() {
+        	p.drawImage(image, body.getPosition(), body.getAngle()+localRotation, localScale, localOffset, halfImageWidth, halfImageHeight);
+        }
     }
     
 }

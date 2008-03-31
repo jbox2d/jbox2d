@@ -1,15 +1,20 @@
 ===Profiling Information===
 
 Lots of time spent in these methods in each test:
-ContactSolver::solveVelocityConstraints	- some Vec2 creations could be inlined
-Mat22::mul - some simple inlining could help reduce Vec2 creations
-Body::synchronizeTransform - Mat22.mul and Mat22.set(angle) could be inlined
-MathUtils::clamp - rewrite to avoid Math.max/min
-ContactSolver::solvePositionConstraints	 - decent amount of Vec2 creation	
-ContactID::<init> - hmm...either this is called a lot or the inner class is expensive to create, we'll have to see
-Vec2::clone - need to try to use less
-XForm::mul - could optimize a few creations away
-ContactSolver::<init> - several Vec2 optimizations could be applied, m_constraints might be faster as an array, not ArrayList
+[ ] ContactSolver::solveVelocityConstraints	- some Vec2 creations could be inlined
+[ ] Mat22::mul - some simple inlining could help reduce Vec2 creations
+[ ] Body::synchronizeTransform - Mat22.mul and Mat22.set(angle) could be inlined
+[ ] MathUtils::clamp - rewrite to avoid Math.max/min
+[ ] ContactSolver::solvePositionConstraints	 - decent amount of Vec2 creation	
+[ ] ContactID::<init> - hmm...either this is called a lot or the inner class is expensive to create, we'll have to see
+[ ] Vec2::clone - need to try to use less
+[ ] XForm::mul - could optimize a few creations away
+[ ] ContactSolver::<init> - several Vec2 optimizations could be applied, m_constraints might be faster as an array, not ArrayList
+
+[ ] Still need to do some stress tests with joints (ragdolls, maybe?), I'm sure these will be expensive, too...
+[ ] Check CCD stuff for bottlenecks
+
+[ ] Try some tests without graphics just to make sure - Processing methods eat up a lot of the total time
 
 CircleTest.java (1 minute, non JBox2d calls removed):
 	4.4 s	4.4 s	java.lang	Float::floatToIntBits	(because of string handling in TestbedMain?)

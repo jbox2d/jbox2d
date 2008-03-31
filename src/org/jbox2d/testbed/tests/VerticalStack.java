@@ -80,7 +80,7 @@ public class VerticalStack extends AbstractExample {
 				// For this test we are using continuous physics for all boxes.
 				// This is a stress test, you normally wouldn't do this for
 				// performance reasons.
-				//bd.isBullet = true;
+				bd.isBullet = true;
 				bd.allowSleep = true;
 
 				//float32 x = b2Random(-0.1f, 0.1f);
@@ -96,11 +96,11 @@ public class VerticalStack extends AbstractExample {
     }
     
     public String getExampleInstructions() {
-    	return "Press ; to shoot sideways bullet\n";
+    	return "Press , to shoot sideways bullet\n";
     }
     
     public void postStep() {
-    	if (newKeyDown[';']) {
+    	if (newKeyDown[',']) {
     		launchBomb(new Vec2(-40.0f,parent.random(1.0f,10.0f)),new Vec2(200.0f,parent.random(-5.0f,5.0f)));
     	}
     }

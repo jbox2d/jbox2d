@@ -4,58 +4,54 @@ import org.jbox2d.collision.*;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
-import org.jbox2d.dynamics.World;
-import org.jbox2d.testbed.PTest;
+import org.jbox2d.testbed.AbstractExample;
+import org.jbox2d.testbed.TestbedMain;
 
-import processing.core.PApplet;
 import processing.core.PImage;
 
 
 
-//Assumes a .png file named "noise.png" has been added to the build path
+/**
+ * This example demonstrates how to bind a sprite to an image using Processing.
+ * See ProcessingDebugDraw.drawImage() and AbstractExample.bindImage() for more
+ * details on this - these should translate fairly easily to most OpenGL-style
+ * rendering methods.
+ * <BR><BR>
+ * Assumes a .png file named "noise.png" has been added to the build path
+ */
+public class SpriteBinding extends AbstractExample {
 
-public class SpriteBinding extends PTest {
-    
-    public Vec2[] localCoords;
+	public Vec2[] localCoords;
     public Vec2[] texCoords;
     public PImage myImage;
     
     public Body body;
+    
+    public SpriteBinding(TestbedMain _parent) {
+		super(_parent);
+	}
 
-    public SpriteBinding() {
-        super("SpriteBinding");
+    public String getName() {
+    	return "Sprite Binding";
     }
 
-    public void go(World world) {
-        int numBoxes = 25; //number of boxes per row
-        Body[] boxes = new Body[3*numBoxes];
+    public void create() {
+    	
+        int numBoxes = 15; //number of boxes per row
+        int numRows = 6;
+        Body[] boxes = new Body[numRows*numBoxes];
+        
         {        
-
-            // Define the ground box shape.
-            BoxDef groundBoxDef = new BoxDef();
-
-            // The extents are the half-widths of the box.
-            groundBoxDef.extents.set(50.0f, 10.0f);
-
-            // Set the density of the ground box to zero. This will
-            // make the ground body static (fixed).
+            PolygonDef groundBoxDef = new PolygonDef();
+            groundBoxDef.setAsBox(50.0f, 10.0f);
             groundBoxDef.density = 0.0f;
-
-            // Define the ground body.
             BodyDef groundBodyDef = new BodyDef();
             groundBodyDef.position.set(0.0f, -10.0f);
-
-            // Part of a body's def is its list of shapes.
-            groundBodyDef.addShape(groundBoxDef);
-
-            // Call the body factory which allocates memory for the ground body
-            // from a pool and creates the ground box shape (also from a pool).
-            // The body is also added to the world.
-            world.createBody(groundBodyDef);
+            m_world.createStaticBody(groundBodyDef).createShape(groundBoxDef);;
 
             // Define another box shape for our dynamic body.
-            BoxDef boxDef = new BoxDef();
-            boxDef.extents.set(1.0f, 1.0f);
+            PolygonDef boxDef = new PolygonDef();
+            boxDef.setAsBox(1.0f, 1.0f);
 
             // Set the box density to be non-zero, so it will be dynamic.
             boxDef.density = 1.0f;
@@ -64,29 +60,32 @@ public class SpriteBinding extends PTest {
             boxDef.friction = 0.3f;
             
             // Make them bouncy
-            boxDef.restitution = 0.6f;
+            boxDef.restitution = 0.3f;
 
             // Define the dynamic body. We set its position,
             // add the box shape, and call the body factory.
             for (int i=0; i<numBoxes; ++i) {
-                for (int j=0; j<3; ++j) {
+                for (int j=0; j<numRows; ++j) {
                     BodyDef bodyDef = new BodyDef();
-                    bodyDef.position.set(-numBoxes + i*2.5f + (j%2)*.5f, 4.0f + j*4f);
-                    bodyDef.addShape(boxDef);
-                    boxes[i + numBoxes*j] = world.createBody(bodyDef);
+                    bodyDef.position.set(-numBoxes - 3.0f + i*2.5f, 4.0f + j*5.0f);
+                    boxes[i + numBoxes*j] = m_world.createDynamicBody(bodyDef);
+                    boxes[i + numBoxes*j].createShape(boxDef);
+                    boxes[i + numBoxes*j].setMassFromShapes();
+                    boxes[i + numBoxes*j].setAngularVelocity(parent.random(-.5f,.5f));
                 }
             }
             
          }
         
         // Load the image from a file
-        myImage = loadImage("noise.png");
+        myImage = parent.loadImage("noise.png");
         
         // Zero offset (center image on center of object)
-        Vec2 localOffset = new Vec2(0f, 0f);
+        Vec2 localOffset = new Vec2(0.0f, 0f);
         
         // Scale image to fit box width
-        float scale = 2.0f / myImage.width;
+        // (actually, we slightly undershoot here so we can still see the drawn lines)
+        float scale = 1.9f / myImage.width;
         
         // Zero rotation relative to box
         float rot = 0f;
@@ -98,11 +97,4 @@ public class SpriteBinding extends PTest {
         //textureMode(NORMALIZED);
     }
     
-
-    /**
-     * Entry point
-     */
-    public static void main(String[] argv) {
-        PApplet.main(new String[] { "org.jbox2d.testbed.tests.SpriteBinding" });
-    }
 }

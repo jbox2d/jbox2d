@@ -74,134 +74,141 @@ import org.jbox2d.testbed.tests.*;
 
 import processing.core.PApplet;
 
-
+/**
+ * Currently inactive.
+ * 
+ * @author ewjordan
+ *
+ */
 public class TimingTest extends PApplet {
-    
-    public int frames = 500;
-    public int iters = 100;
-    public TestSelection testToTime = TestSelection.CIRCLES;
-    
-    public enum TestSelection{
-        WASHING_MACHINE, COMPOUND_SHAPES, DOMINO, PYRAMID, CIRCLES, DOMINO_TOWER
-    }
-    
-    static public void main(String args[]) {
-        PApplet.main(new String[] { "org.jbox2d.testbed.TimingTest" });
-    }
-
-    protected TestSettings settings;
-
-    protected World m_world;
-
-    public TimingTest() {
-
-    }
-
-    void Step(TestSettings settings) {
-        float timeStep = settings.hz > 0.0f ? 1.0f / settings.hz : 0.0f;
-
-        World.ENABLE_WARM_STARTING = true;//settings.enableWarmStarting;
-        World.ENABLE_POSITION_CORRECTION = true;//settings.enablePositionCorrection;
-
-        m_world.step(timeStep, settings.iterationCount);
-
-        // m_world.m_broadPhase.Validate();
-    }
-
-    void drawFrame() {
-        float transX = width / 2.0f;
-        float transY = height / 2.0f;
-        pushMatrix();
-        translate(transX, transY);
-        scale(10f, -10f);
-        strokeWeight(1.2f / 10f);
-        for (Body b = m_world.m_bodyList; b != null; b = b.m_next) {
-            for (Shape s = b.m_shapeList; s != null; s = s.m_next) {
-                if (b.m_invMass == 0.0f) {
-                    DrawShape(s, color(100, 100, 100));
-                }
-                else if (b.isSleeping()) {
-                    DrawShape(s, color(30, 30, 90));
-                }
-                else {
-                    DrawShape(s, color(30, 30, 30));
-
-                }
-            }
-        }
-        popMatrix();
-    }
-    
-    void DrawShape(Shape shape, int c) {
-        //UPDATE FOR 2.0!!!
-    }
-
-
-    /**
-     * Initialise and run tests
-     */
-    public void setup() {
-        size(500, 500);
-        settings = new TestSettings();
-        long nanos = System.nanoTime();
-        long diff = 0;
-        System.out.println(testToTime + " test");
-        System.out.println(frames+" frames per test, "+iters+" tests.");
-        long diffsum = 0;
-        double fpssum = 0;
-        for (int i=0; i<iters; i++){
-            nanos = System.nanoTime();
-            setupWorld();
-            switch(testToTime){
-                case WASHING_MACHINE:
-                    WashingMachine wm = new WashingMachine();
-                    wm.go(m_world);
-                    break;
-                case COMPOUND_SHAPES:
-                    CompoundShapes cs = new CompoundShapes();
-                    cs.go(m_world);
-                    break;
-                case DOMINO:
-                    Domino d = new Domino();
-                    d.go(m_world);
-                    break;
-                case PYRAMID:
-                    Pyramid p = new Pyramid();
-                    p.go(m_world);
-                    break;
-                case CIRCLES:
-                    Circles c = new Circles();
-                    c.go(m_world);
-                    break;
-                case DOMINO_TOWER:
-                    DominoTower dp = new DominoTower();
-                    dp.go(m_world);
-                    break;
-            }
-            
-            //long initdiff = System.nanoTime() - nanos;
-            nanos = System.nanoTime();
-            for (int j=0; j<frames; j++) {
-                Step(settings);
-            }
-            diff = System.nanoTime() - nanos;
-            double fps = frames / ( diff / ((double)1000000000) );
-            System.out.println(diff + " - "+ fps + " FPS");// + " ns for "+frames+" frames.");
-            diffsum += diff;
-            fpssum += fps;
-            drawFrame();
-        }
-        
-        float avdiff = diffsum / ((float)iters);
-        float avfps = (float)fpssum / iters;
-        System.out.println("Average time: "+avdiff);
-        System.out.println("Average FPS: "+avfps);
-        
-
-    }
-
-    public void setupWorld() {
-        m_world = new World(new AABB(new Vec2(-100f, -100f), new Vec2(100f,
-                100f)), new Vec2(0.0f, -10.0f), true);
-    }
+	
+//    
+//    public int frames = 500;
+//    public int iters = 100;
+//    public TestSelection testToTime = TestSelection.CIRCLES;
+//    
+//    public enum TestSelection{
+//        WASHING_MACHINE, COMPOUND_SHAPES, DOMINO, PYRAMID, CIRCLES, DOMINO_TOWER
+//    }
+//    
+//    static public void main(String args[]) {
+//        PApplet.main(new String[] { "org.jbox2d.testbed.TimingTest" });
+//    }
+//
+//    protected TestSettings settings;
+//
+//    protected World m_world;
+//
+//    public TimingTest() {
+//
+//    }
+//
+//    void Step(TestSettings settings) {
+//        float timeStep = settings.hz > 0.0f ? 1.0f / settings.hz : 0.0f;
+//
+//        World.ENABLE_WARM_STARTING = true;//settings.enableWarmStarting;
+//        World.ENABLE_POSITION_CORRECTION = true;//settings.enablePositionCorrection;
+//
+//        m_world.step(timeStep, settings.iterationCount);
+//
+//        // m_world.m_broadPhase.Validate();
+//    }
+//
+//    void drawFrame() {
+//        float transX = width / 2.0f;
+//        float transY = height / 2.0f;
+//        pushMatrix();
+//        translate(transX, transY);
+//        scale(10f, -10f);
+//        strokeWeight(1.2f / 10f);
+//        for (Body b = m_world.m_bodyList; b != null; b = b.m_next) {
+//            for (Shape s = b.m_shapeList; s != null; s = s.m_next) {
+//                if (b.m_invMass == 0.0f) {
+//                    DrawShape(s, color(100, 100, 100));
+//                }
+//                else if (b.isSleeping()) {
+//                    DrawShape(s, color(30, 30, 90));
+//                }
+//                else {
+//                    DrawShape(s, color(30, 30, 30));
+//
+//                }
+//            }
+//        }
+//        popMatrix();
+//    }
+//    
+//    void DrawShape(Shape shape, int c) {
+//        //UPDATE FOR 2.0!!!
+//    }
+//
+//
+//    /**
+//     * Initialise and run tests
+//     */
+//    public void setup() {
+//        size(500, 500);
+//        settings = new TestSettings();
+//        long nanos = System.nanoTime();
+//        long diff = 0;
+//        System.out.println(testToTime + " test");
+//        System.out.println(frames+" frames per test, "+iters+" tests.");
+//        long diffsum = 0;
+//        double fpssum = 0;
+//        for (int i=0; i<iters; i++){
+//            nanos = System.nanoTime();
+//            setupWorld();
+//            switch(testToTime){
+//                case WASHING_MACHINE:
+//                    WashingMachine wm = new WashingMachine();
+//                    wm.go(m_world);
+//                    break;
+//                case COMPOUND_SHAPES:
+//                    CompoundShapes cs = new CompoundShapes();
+//                    cs.go(m_world);
+//                    break;
+//                case DOMINO:
+//                    Domino d = new Domino();
+//                    d.go(m_world);
+//                    break;
+//                case PYRAMID:
+//                    Pyramid p = new Pyramid();
+//                    p.go(m_world);
+//                    break;
+//                case CIRCLES:
+//                    Circles c = new Circles();
+//                    c.go(m_world);
+//                    break;
+//                case DOMINO_TOWER:
+//                    DominoTower dp = new DominoTower();
+//                    dp.go(m_world);
+//                    break;
+//            }
+//            
+//            //long initdiff = System.nanoTime() - nanos;
+//            nanos = System.nanoTime();
+//            for (int j=0; j<frames; j++) {
+//                Step(settings);
+//            }
+//            diff = System.nanoTime() - nanos;
+//            double fps = frames / ( diff / ((double)1000000000) );
+//            System.out.println(diff + " - "+ fps + " FPS");// + " ns for "+frames+" frames.");
+//            diffsum += diff;
+//            fpssum += fps;
+//            drawFrame();
+//        }
+//        
+//        float avdiff = diffsum / ((float)iters);
+//        float avfps = (float)fpssum / iters;
+//        System.out.println("Average time: "+avdiff);
+//        System.out.println("Average FPS: "+avfps);
+//        
+//
+//    }
+//
+//    public void setupWorld() {
+//        m_world = new World(new AABB(new Vec2(-100f, -100f), new Vec2(100f,
+//                100f)), new Vec2(0.0f, -10.0f), true);
+//    }
+//    
 }
