@@ -32,7 +32,7 @@ import org.jbox2d.common.*;
 
 public class PolygonShape extends Shape implements SupportsGenericDistance{
     // Dump lots of debug information
-	private static boolean m_debug = false;
+	private static boolean m_debug = true;
     
 	/** Local position of the shape centroid in parent body frame. */
     public Vec2 m_centroid;
@@ -136,6 +136,12 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
     		// not cause the plane to pass the centroid.
 
     		// Your shape has a radius/extent less than b2_toiSlop.
+    		if (m_debug && (d.x < 0.0f || d.y < 0.0f)) {
+    			System.out.println("Error, dumping details: ");
+    			System.out.println("d.x: "+d.x+"d.y: "+d.y);
+    			System.out.println("n1: "+n1+"; n2: "+n2);
+    			System.out.println("v: "+v);
+    		}
     		assert(d.x >= 0.0f);
     		assert(d.y >= 0.0f);
     		Mat22 A = new Mat22();

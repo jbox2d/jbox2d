@@ -108,7 +108,8 @@ public class PairManager {
             return pair;
         }
 
-        assert(m_pairCount < Settings.maxPairs && m_freePair != NULL_PAIR);
+        assert(m_pairCount < Settings.maxPairs):"Too many pairs (shape AABB overlaps) - this usually means you have too many bodies, or you need to increase Settings.maxPairs.";
+        assert(m_freePair != NULL_PAIR);
 
         int pairIndex = m_freePair;
         pair = m_pairs[pairIndex];
