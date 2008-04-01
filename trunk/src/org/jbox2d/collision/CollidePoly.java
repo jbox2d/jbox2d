@@ -27,6 +27,7 @@ import org.jbox2d.common.*;
 
 //Updated to rev 55->108 of b2CollidePoly.cpp 
 
+/** Polygon overlap solver - for internal use. */
 public class CollidePoly {
     static class ClipVertex {
         Vec2 v;
@@ -358,8 +359,8 @@ public class CollidePoly {
     }
 }
 
+/** Holder class used internally in CollidePoly. */
 class MaxSeparation {
     public int bestFaceIndex;
-
     public float bestSeparation;
 }

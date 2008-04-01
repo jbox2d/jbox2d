@@ -27,7 +27,9 @@ import org.jbox2d.common.Vec2;
 
 //Updated to rev 108 of b2Collision.h
 
+/** An axis-aligned bounding box. */
 public class AABB {
+	/** Vertex of bounding box. */
     public Vec2 lowerBound, upperBound;
     
     public String toString() {
@@ -49,7 +51,7 @@ public class AABB {
         upperBound = new Vec2();
     }
 
-    // Verify that the bounds are sorted.
+    /** Verify that the bounds are sorted. */
     public boolean isValid() {
         Vec2 d = upperBound.sub(lowerBound);
     	boolean valid = (d.x >= 0.0f && d.y >= 0);
@@ -57,6 +59,7 @@ public class AABB {
     	return valid;
     }
 
+    /** Check if AABBs overlap. */
     public boolean testOverlap(AABB box) {
         Vec2 d1 = box.lowerBound.sub(upperBound);
         Vec2 d2 = lowerBound.sub(box.upperBound);

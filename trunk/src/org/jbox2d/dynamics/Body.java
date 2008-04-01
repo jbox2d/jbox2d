@@ -33,6 +33,17 @@ import org.jbox2d.dynamics.joints.JointEdge;
 // Updated to rev. 54->118 of b2Body.cpp/.h
 // Rewritten completely for rev. 118 (too many changes, needed reorganization for maintainability)
 
+/**
+ * A 2-dimensional rigid body.  Do not create Body objects directly;
+ * instead, pass a BodyDef to either World::createStaticBody or
+ * World::createDynamicBody and then call Body::createShape(ShapeDef)
+ * to add geometry.  For a dynamic body, don't forget to call
+ * Body::setMassFromShapes or (for experts) Body::setMass(MassData) -
+ * if you forget to set the mass, the simulation will have problems.
+ * <BR><BR>
+ * When possible, quantities of interest should be accessed via
+ * getters/setters rather than through the m_* variables.
+ */
 public class Body {
 	
 	//m_flags

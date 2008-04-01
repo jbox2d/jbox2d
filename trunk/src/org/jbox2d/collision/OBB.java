@@ -28,11 +28,13 @@ import org.jbox2d.common.Vec2;
 
 //Updated to rev 56 of b2Collision.h
 
+/** An oriented bounding box. */
 public class OBB {
+	/** The rotation matrix. */
     public Mat22 R;
-
+    /** The local centroid. */
     public Vec2 center;
-
+    /** The half-widths. */
     public Vec2 extents;
 
     public OBB(Mat22 _R, Vec2 _center, Vec2 _extents) {

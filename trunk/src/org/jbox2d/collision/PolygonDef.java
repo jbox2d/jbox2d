@@ -31,6 +31,10 @@ import java.util.List;
 
 import org.jbox2d.common.*;
 
+/**
+ * A convex polygon definition.  Add vertices using PolygonDef.vertices.add(Vec2),
+ * and create the polygon shape using Body::createShape(ShapeDef).
+ */
 public class PolygonDef extends ShapeDef {
 
     public List<Vec2> vertices;

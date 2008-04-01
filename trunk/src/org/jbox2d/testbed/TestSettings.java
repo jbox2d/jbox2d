@@ -23,6 +23,12 @@
 
 package org.jbox2d.testbed;
 
+/**
+ * Settings for the current test.  Mostly self-explanatory.
+ * <BR><BR>
+ * The settings from here are applied during AbstractExample::step().
+ *
+ */
 public class TestSettings {
     public int hz;
 

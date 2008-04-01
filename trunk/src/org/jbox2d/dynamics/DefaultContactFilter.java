@@ -25,10 +25,15 @@ package org.jbox2d.dynamics;
 
 import org.jbox2d.collision.Shape;
 
+/**
+ * Default sample implementation of ContactFilter.
+ */
 public class DefaultContactFilter implements ContactFilter {
 
-	// Return true if contact calculations should be performed between these two shapes.
-	// If you implement your own collision filter you may want to build from this implementation.
+	/**
+	 * Return true if contact calculations should be performed between these two shapes.
+	 * If you implement your own collision filter you may want to build from this implementation.
+	 */
 	public boolean shouldCollide(Shape shape1, Shape shape2) {
 
 		if (shape1.m_groupIndex == shape2.m_groupIndex && shape1.m_groupIndex != 0) {

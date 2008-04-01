@@ -30,9 +30,10 @@ import org.jbox2d.common.*;
 
 //Updated to rev 56->132 of b2Shape.cpp/.h / b2PolygonShape.cpp/.h
 
+/** A convex polygon shape.  Create using Body.createShape(ShapeDef), not the constructor here. */
 public class PolygonShape extends Shape implements SupportsGenericDistance{
-    // Dump lots of debug information
-	private static boolean m_debug = true;
+    /** Dump lots of debug information. */
+	private static boolean m_debug = false;
     
 	/** Local position of the shape centroid in parent body frame. */
     public Vec2 m_centroid;

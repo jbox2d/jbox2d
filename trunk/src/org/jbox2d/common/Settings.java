@@ -25,8 +25,9 @@ package org.jbox2d.common;
 
 //Updated to rev. 55 of b2Settings.cpp/.h
 
+
+/** Global tuning constants based on MKS units and various integer maximums (vertices per shape, pairs, etc.). */
 public class Settings {
-    // Global tuning constants based on MKS units.
 
     // public static final float EPSILON = 0.0000000001f;
 
@@ -57,9 +58,10 @@ public class Settings {
 
     public static final int maxPolygonVertices = 8;
 
-    public static final int maxProxies = 2048; // this must be a power of two
-
-    public static final int maxPairs = 8 * maxProxies; // this must be a power of two
+    /** Must be a power of two. */
+    public static final int maxProxies = 2048;
+    /** Must be a power of two. */
+    public static final int maxPairs = 8 * maxProxies;
     
     // Dynamics
     
@@ -87,13 +89,17 @@ public class Settings {
     
     public static final float toiSlop = 8.0f * linearSlop;
     
-  /// The maximum linear velocity of a body. This limit is very large and is used
-  /// to prevent numerical problems. You shouldn't need to adjust this.
+  /**
+   * The maximum linear velocity of a body. This limit is very large and is used
+   * to prevent numerical problems. You shouldn't need to adjust this.
+   */
   public static final float maxLinearVelocity = 200.0f;
   public static final float maxLinearVelocitySquared = maxLinearVelocity * maxLinearVelocity;
 
-  /// The maximum angular velocity of a body. This limit is very large and is used
-  /// to prevent numerical problems. You shouldn't need to adjust this.
+  /**
+   * The maximum angular velocity of a body. This limit is very large and is used
+   * to prevent numerical problems. You shouldn't need to adjust this.
+   */
   public static final float maxAngularVelocity = 250.0f;
   public static final float maxAngularVelocitySquared = maxAngularVelocity * maxAngularVelocity;
 
