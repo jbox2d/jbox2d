@@ -27,10 +27,18 @@ import org.jbox2d.common.*;
 
 //updated to rev 108 of b2TimeOfImpact.cpp
 
+/** Handles conservative advancement to compute time of impact between shapes. */
 public class TOI {
 	// This algorithm uses conservative advancement to compute the time of
 	// impact (TOI) of two shapes.
 	// Refs: Bullet, Young Kim
+	
+	/**
+	 * Compute the time when two shapes begin to touch or touch at a closer distance.
+	 * <BR><BR><em>Warning</em>: the sweeps must have the same time interval.
+	 * @return the fraction between [0,1] in which the shapes first touch.
+	 * fraction=0 means the shapes begin touching/overlapped, and fraction=1 means the shapes don't touch.
+	 */
 	public static float timeOfImpact(Shape shape1, Sweep sweep1,
 						   			 Shape shape2, Sweep sweep2) {
 		

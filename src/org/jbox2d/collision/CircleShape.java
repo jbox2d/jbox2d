@@ -29,6 +29,7 @@ import org.jbox2d.dynamics.Body;
 
 //Updated to rev 56->108 of b2Shape.cpp/.h
 
+/** A circle shape.  Create using Body.createShape(ShapeDef), not the constructor here. */
 public class CircleShape extends Shape {
 
     public float m_radius;

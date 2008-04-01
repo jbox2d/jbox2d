@@ -35,19 +35,23 @@ package org.jbox2d.collision;
 //I have a feeling that as of right now, key is never being
 //set anyways.  Initial examination seems to show that key is
 //always zero. [hacked around for the moment]
+/** Contact ids to facilitate warm starting.*/
 public class ContactID {
+	/** Inactive in Java port (used for quick compares in C++ as part of a union) */
     public int key;
 
-    // UNION
+    /** The features that intersect to form the contact point */
     public Features features;
-
+    
+    /** The features that intersect to form the contact point */
     public class Features {
+    	/** The edge that defines the outward contact normal. */
         public int referenceFace;
-
+        /** The edge most anti-parallel to the reference edge. */
         public int incidentEdge;
-
+        /** The vertex (0 or 1) on the incident edge that was clipped. */
         public int incidentVertex;
-
+        /** A value of 1 indicates that the reference edge is on shape2. */
         public int flip;
 
         public Features() {

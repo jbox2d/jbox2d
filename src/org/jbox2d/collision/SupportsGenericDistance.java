@@ -31,6 +31,11 @@ import org.jbox2d.common.XForm;
 //SupportsGenericDistance shape1, XForm xf1,
 //SupportsGenericDistance shape2, XForm xf2) function (cleaner than template)
 
+/**
+ * A shape that implements this interface can be used in distance calculations
+ * for continuous collision detection.  This does not remove the necessity of
+ * specialized penetration calculations when CCD is not in effect, however.
+ */
 public interface SupportsGenericDistance {
 	public Vec2 support(XForm xf, Vec2 v);
 	public Vec2 getFirstVertex(XForm xf);

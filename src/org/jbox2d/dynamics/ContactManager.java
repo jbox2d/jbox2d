@@ -39,7 +39,7 @@ import org.jbox2d.dynamics.contacts.NullContact;
 
 //Updated to rev 56->104 of b2ContactManager.cpp/.h
 
-//Delegate of b2World.
+/** Delegate of World - for internal use. */
 public class ContactManager extends PairCallback {
     World m_world;
 

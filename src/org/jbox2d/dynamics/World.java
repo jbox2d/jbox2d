@@ -45,7 +45,16 @@ import org.jbox2d.dynamics.joints.*;
 
 //Updated to rev 56->118 of b2World.cpp/.h
 
-
+/**
+ * The world that physics takes place in.
+ * <BR><BR>
+ * To the extent that it is possible, avoid accessing members
+ * directly, as in a future version their accessibility may
+ * be rolled back - as un-Java as that is, we must follow
+ * upstream C++ conventions, and for now everything is public
+ * to speed development of Box2d, but it is subject to change.
+ * You're warned!
+ */
 public class World {
 	public boolean m_lock;
 	
@@ -74,10 +83,11 @@ public class World {
     
     public int m_positionIterationCount;
 
+    /** Should we apply position correction? */
     public static boolean ENABLE_POSITION_CORRECTION;
-
+    /** Should we use warm-starting?  Improves stability in stacking scenarios. */
     public static boolean ENABLE_WARM_STARTING;
-
+    /** Should we enable continuous collision detection? */
     public static boolean ENABLE_TOI;
     
 	public DestructionListener m_destructionListener;

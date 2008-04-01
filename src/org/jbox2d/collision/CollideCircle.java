@@ -27,6 +27,10 @@ import org.jbox2d.common.*;
 
 //Updated to rev 108 of b2CollideCircle.cpp
 
+/**
+ * Circle/circle and circle/polygon overlap solver -
+ * for internal use only.
+ */
 public class CollideCircle {
 
     public static void collideCircle(Manifold manifold, 

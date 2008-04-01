@@ -202,19 +202,19 @@ public class ProcessingDebugDraw extends DebugDraw {
 		float k_axisScale = 0.4f;
 		g.beginShape(PApplet.LINES);
 		Vec2 p1world = worldToScreen(p1);
-		g.stroke(1.0f, 0.0f, 0.0f);
+		g.stroke(255.0f, 0.0f, 0.0f);
 		g.vertex(p1world.x, p1world.y);
 		p2.x = p1.x + k_axisScale * xf.R.col1.x;
 		p2.y = p1.y + k_axisScale * xf.R.col1.y;
 		Vec2 p2world = worldToScreen(p2);
 		g.vertex(p2world.x, p2world.y);
 
-		g.stroke(0.0f, 1.0f, 0.0f);
+		g.stroke(0.0f, 255.0f, 0.0f);
 		g.vertex(p1world.x, p1world.y);
 		p2.x = p1.x + k_axisScale * xf.R.col2.x;
-		p2.y = p1.x + k_axisScale * xf.R.col2.y;
+		p2.y = p1.y + k_axisScale * xf.R.col2.y;
 		p2world = worldToScreen(p2);
-		g.vertex(p2.x, p2.y);
+		g.vertex(p2world.x, p2world.y);
 
 		g.endShape();
 

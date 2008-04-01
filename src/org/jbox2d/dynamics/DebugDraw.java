@@ -28,6 +28,12 @@ import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
 
+/**
+ * Implement this abstract class to allow JBox2d to 
+ * automatically draw your physics for debugging purposes.
+ * Not intended to replace your own custom rendering
+ * routines!
+ */
 public abstract class DebugDraw {
 	/// Implement and register this class with a b2World to provide debug drawing of physics
 	/// entities in your game.

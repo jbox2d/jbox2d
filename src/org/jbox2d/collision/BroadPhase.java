@@ -32,12 +32,7 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 
-/*
-This broad phase uses the Sweep and Prune algorithm as described in:
-Collision Detection in Interactive 3D Environments by Gino van den Bergen
-Also, some ideas, such as using integral values for fast compares comes from
-Bullet (http:/www.bulletphysics.com).
-*/
+
 
 // Notes:
 // - we use bound arrays instead of linked lists for cache coherence.
@@ -61,6 +56,12 @@ class BoundValues {
     }
 }
 
+/**
+ * This broad phase uses the Sweep and Prune algorithm as described in:
+ * Collision Detection in Interactive 3D Environments by Gino van den Bergen
+ * Also, some ideas, such as using integral values for fast compares comes from
+ * Bullet (http:/www.bulletphysics.com).
+ */
 public class BroadPhase {
     public static final int INVALID = Integer.MAX_VALUE;
 
@@ -639,8 +640,10 @@ public class BroadPhase {
 
 
 
-    // Query an AABB for overlapping proxies, returns the user data and
-    // the count, up to the supplied maximum count.
+    /**
+     * Query an AABB for overlapping proxies, returns the user data and
+     * the count, up to the supplied maximum count.
+     */
     public Object[] query(AABB aabb, int maxCount) {
         if (debugPrint) {
             System.out.println("Query(2 args)");

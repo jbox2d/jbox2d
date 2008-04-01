@@ -27,20 +27,25 @@ import org.jbox2d.common.Vec2;
 
 //Updated to rev 56->108 of b2Collision.h
 
-// A manifold point is a contact point belonging to a contact
-// manifold. It holds details related to the geometry and dynamics
-// of the contact points.
-// The point is stored in local coordinates because CCD
-// requires sub-stepping in which the separation is stale.
+/**
+ * A manifold point is a contact point belonging to a contact
+ * manifold. It holds details related to the geometry and dynamics
+ * of the contact points.
+ * The point is stored in local coordinates because CCD
+ * requires sub-stepping in which the separation is stale.
+ */
 public class ManifoldPoint {
+	/** Local position of the contact point in body1 */
     public Vec2 localPoint1;
+    /** Local position of the contact point in body2 */
     public Vec2 localPoint2;
-
+    /** The separation of the shapes along the normal vector */
     public float separation;
-
+    /** The non-penetration force */
     public float normalForce;
+    /** The friction force */
     public float tangentForce;
-
+    /** Uniquely identifies a contact point between two shapes */
     public ContactID id;
 
     public ManifoldPoint() {

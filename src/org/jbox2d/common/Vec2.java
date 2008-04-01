@@ -23,8 +23,21 @@
 
 package org.jbox2d.common;
 
+/**
+ * A 2-dimensional vector class.  Used heavily in JBox2d.
+ *
+ */
 public class Vec2 {
+	/** Should we count Vec2 creations? */
 	final static public boolean watchCreations = true;
+	/** 
+	 * Running count of Vec2 creations.  Must be zeroed out
+	 * manually (perhaps at start of time step).  Incremented
+	 * in Vec2 constructor if watchCreations flag is true.
+	 * <BR><BR>
+	 * Mainly used for optimization purposes, since temporary
+	 * Vec2 creation is often a bottleneck.
+	 */
 	static public int creationCount = 0;
 	
     public float x, y;
@@ -40,69 +53,83 @@ public class Vec2 {
         // testbed.PTest.debugCount++;
     }
 
+    /** Zero out this vector. */
     public void setZero() {
         x = 0.0f;
         y = 0.0f;
     }
 
+    /** Set the vector component-wise. */
     public void set(float x, float y) {
         this.x = x;
         this.y = y;
     }
 
+    /** Set this vector to another vector. */
     public void set(Vec2 v) {
         this.x = v.x;
         this.y = v.y;
     }
 
+    /** Return the sum of this vector and another; does not alter either one. */
     public Vec2 add(Vec2 v) {
         return new Vec2(x + v.x, y + v.y);
     }
 
+    /** Return the difference of this vector and another; does not alter either one. */
     public Vec2 sub(Vec2 v) {
         return new Vec2(x - v.x, y - v.y);
     }
 
+    /** Return this vector multiplied by a scalar; does not alter this vector. */
     public Vec2 mul(float a) {
         return new Vec2(x * a, y * a);
     }
 
+    /** Return the negation of this vector; does not alter this vector. */
     public Vec2 negate() {
         return new Vec2(-x, -y);
     }
 
+    /** Flip the vector and return it - alters this vector. */
     public Vec2 negateLocal() {
         x = -x;
         y = -y;
         return this;
     }
 
+    /** Add another vector to this one and return result - alters this vector. */
     public Vec2 addLocal(Vec2 v) {
         x += v.x;
         y += v.y;
         return this;
     }
 
+    /** Subtract another vector from this one and return result - alters this vector. */
     public Vec2 subLocal(Vec2 v) {
         x -= v.x;
         y -= v.y;
         return this;
     }
 
+    /** Multiply this vector by a number and return result - alters this vector. */
     public Vec2 mulLocal(float a) {
         x *= a;
         y *= a;
         return this;
     }
 
+    /** Return the length of this vector. */
     public float length() {
         return (float) Math.sqrt(x * x + y * y);
     }
     
+    /** Return the squared length of this vector. */
     public float lengthSquared() {
     	return (x*x + y*y);
     }
 
+    /** Normalize this vector and return the length before normalization.  Alters this vector. */
     public float normalize() {
         float length = length();
         if (length < Settings.EPSILON) {
@@ -115,17 +142,20 @@ public class Vec2 {
         return length;
     }
 
+    /** True if the vector represents a pair of valid, non-infinite floating point numbers. */ 
     public boolean isValid() {
         return x != Float.NaN && x != Float.NEGATIVE_INFINITY
                 && x != Float.POSITIVE_INFINITY && y != Float.NaN
                 && y != Float.NEGATIVE_INFINITY && y != Float.POSITIVE_INFINITY;
     }
 
+    /** Return a new vector that has positive components. */
     public Vec2 abs() {
         return new Vec2(Math.abs(x), Math.abs(y));
     }
 
     @Override
+    /** Return a copy of this vector. */
     public Vec2 clone() {
         return new Vec2(x, y);
     }

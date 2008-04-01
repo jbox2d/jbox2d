@@ -48,6 +48,7 @@ import org.jbox2d.common.*;
 
 //updated to rev 108 of b2Distance.cpp
 
+/** Implements the GJK algorithm for computing distance between shapes. */
 public class Distance{
 	public static int g_GJK_Iterations = 0;
 

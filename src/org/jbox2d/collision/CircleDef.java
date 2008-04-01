@@ -25,6 +25,12 @@ package org.jbox2d.collision;
 
 import org.jbox2d.common.*;
 //updated to rev 108 of b2CircleShape.h/.cpp
+
+/** 
+ * A circle shape definition.  Set the radius and localPosition 
+ * ( (0,0) by default ), and then call Body.createShape(ShapeDef)
+ * to add the shape to a body.
+ */
 public class CircleDef extends ShapeDef {
 
     public float radius;
