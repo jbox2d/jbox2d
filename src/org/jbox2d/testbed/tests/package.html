@@ -1,0 +1,11 @@
+<BODY>
+This package containst all the testbed examples, which extend org.jbox2d.testbed.AbstractExample.  These are likely what you want to look at to see how to create physical objects using JBox2d once you have a game loop and a renderer set up.
+<BR><BR>
+The preferred format for bug submissions is to construct an example like the ones in this package.  To do this, you need the following:
+<UL>
+<LI>Extend the org.jbox2d.testbed.AbstractExample class
+<LI>Add a constructor that takes a TestbedMain as an argument and merely calls super(testbedMain)
+<LI>Add a public String getName() method that returns the name of the example
+<LI>Add a public void create() method that creates the physical objects (using the World m_world inherited from AbstractExample)
+</UL>
+</BODY>
