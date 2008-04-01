@@ -121,6 +121,7 @@ public class TestbedMain extends PApplet {
     	}
     	/* Register the examples */
     	// Simple functionality examples
+    	registerExample(new BipedTest(this));
     	registerExample(new SpriteBinding(this));
     	registerExample(new Pulleys(this));
     	registerExample(new Overhang(this));
@@ -133,6 +134,9 @@ public class TestbedMain extends PApplet {
     	registerExample(new Chain(this));
     	registerExample(new Bridge(this));
     	registerExample(new Gears(this));
+    	
+    	// Shape drawing demo
+    	registerExample(new ShapeDrawing(this));
     	
     	// Stress tests
     	registerExample(new Pyramid(this));
@@ -269,19 +273,19 @@ public class TestbedMain extends PApplet {
     
     /** Dispatch mousePressed events to the current test. */
     public void mousePressed() {
-    	if (currentTest == null) return;
+    	if (currentTest == null || handleOptions) return;
     	currentTest.mouseDown(new Vec2(mouseX,mouseY));
     }
     
     /** Dispatch mouseReleased events to the current test. */
     public void mouseReleased() {
-    	if (currentTest == null) return;
+    	if (currentTest == null || handleOptions) return;
     	currentTest.mouseUp();
     }
     
     /** Dispatch mouseMoved events to the current test. */
     public void mouseMoved() {
-    	if (currentTest == null) return;
+    	if (currentTest == null || handleOptions) return;
     	currentTest.mouseMove(new Vec2(mouseX,mouseY));
     }
     
