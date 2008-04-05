@@ -127,6 +127,7 @@ public abstract class DebugDraw {
 		 * @return Screen position
 		 */
 		public Vec2 worldToScreen(Vec2 worldV) {
+			if (worldV == null) return null;
 			return worldToScreen(worldV.x, worldV.y);
 		}
 		

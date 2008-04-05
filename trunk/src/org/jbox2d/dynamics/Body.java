@@ -42,7 +42,8 @@ import org.jbox2d.dynamics.joints.JointEdge;
  * if you forget to set the mass, the simulation will have problems.
  * <BR><BR>
  * When possible, quantities of interest should be accessed via
- * getters/setters rather than through the m_* variables.
+ * getters/setters rather than through the m_* variables.  These are
+ * internal variables, and their use is generally unsupported.
  */
 public class Body {
 	

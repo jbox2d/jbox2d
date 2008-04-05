@@ -35,6 +35,15 @@ import org.newdawn.slick.tests.AntiAliasTest;
  */
 public class SlickTestMain extends BasicGame {
 
+	public static void main(String[] args) {
+		try {
+			AppGameContainer container = new AppGameContainer(new SlickTestMain());
+			container.setDisplayMode(600,600,false);
+			container.start();
+		} catch (SlickException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public SlickTestMain() {
 		super("Slick/JBox2d Test");
@@ -75,18 +84,7 @@ public class SlickTestMain extends BasicGame {
 		m_debugDraw.container = container;
 		step();
 	}
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		try {
-			AppGameContainer container = new AppGameContainer(new SlickTestMain());
-			container.setDisplayMode(600,600,false);
-			container.start();
-		} catch (SlickException e) {
-			e.printStackTrace();
-		}
-	}
+
 
 	private TestSettings settings;
 	private Body m_bomb;

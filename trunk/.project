@@ -3,6 +3,8 @@
 	<name>JBox2D</name>
 	<comment></comment>
 	<projects>
+		<project>processing-head</project>
+		<project>SlickBox2d</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
