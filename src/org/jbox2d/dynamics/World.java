@@ -870,7 +870,7 @@ public class World {
     			Vec2[] localVertices = poly.getVertices();
     			
     			assert(vertexCount <= Settings.maxPolygonVertices);
-    			Vec2[] vertices = new Vec2[Settings.maxPolygonVertices];
+    			Vec2[] vertices = new Vec2[vertexCount];
 
     			for (int i = 0; i < vertexCount; ++i) {
     				vertices[i] = XForm.mul(xf, localVertices[i]);

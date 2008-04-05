@@ -12,6 +12,9 @@ There is also an Actionscript 3 version of this engine for Flash programmers, ma
 
 Issues can be discussed at the Box2d forums at http://www.box2d.org/forum/
 
+It is highly recommended that you enable assertions when debugging a JBox2d program.  In Eclipse, this is done by adding -ea to the "Run"->"Open Run Dialog"->"Arguments"->"VM arguments" entry for your run configuration.
+The assertions in JBox2d are generally lightweight, so shouldn't cause much of a runtime hit.  If you encounter one, it's probably because you've done something wrong, and the engine will likely not work properly with that input.  If you're sure you haven't done anything bad (please follow the assert to the source code so you can see if there is an explanatory comment), please let us know at the forums.
+
 Current release version: 1.4.3
 Current SVN version: 2.0.0
 
@@ -60,17 +63,19 @@ Please refer to the Box2d manual for the time being, keeping in mind the followi
  
 We strongly recommend using Eclipse, NetBeans, or some other Java IDE that has syntax highlighting and code hints, as this will help you ensure that you are using the appropriate methods.  It's also good for your productivity overall.
 
+We also recommend that you link to the JBox2d source instead of just a .jar so that if you hit assertions you can jump to their location in code.
+
 ------
 Issues
 ------
-.jar distribution: Right now JBox2d is distributed as source, and there's no engine-only .jar file.  We'll fix this, we promise!
+.jar distribution: Right now JBox2d is distributed as source, and there's no engine-only .jar file.  We'll fix this, we promise! [In 2.0, the root of the project contains a jbox2d.jar file that you can include for releases]
 
-Performance: We're aware that JBox2d does not achieve the same impressive performance as Box2d.  Some of this is an unavoidable limitation of Java, some of it is due to lack of Java-specific optimizations.  This should improve a bit as we further optimize, but we're not expecting miracles.
+Performance: We're aware that JBox2d does not achieve the same impressive performance as Box2d.  Some of this is an unavoidable limitation of Java, some of it is due to lack of Java-specific optimizations, and some of it is due to rendering.  This should improve a bit as we further optimize, but we're not expecting miracles.
 
 Lack of Java-ness: This is a difficult issue for us.  We would love to make all the fields private, and refactor everything like mad until it actually looks like Java code.  But we are trying to balance Java-ness, maintainability, and performance, and until the C++ version stabilizes a bit more we need to keep very close to its organizational structure, which means public fields all over the place.  We're aware of this issue, and we take it seriously, but for now it will have to wait if we want to have any chance of keeping up to date.
 
-Javadocs: Yup, we know, this would be very useful.  It just takes some time, and the API has been so unstable that it hasn't been worth it yet.  At least now there is a bit of internal documentation carried over from the C++ engine, which we will convert to Javadoc soon.
+Javadocs: JBox2d 2.0 now has a decent amount of Javadoc for the classes most likely to be used externally.  The coverage will improve over time; let us know if you have specific requests to expand it to certain classes/methods, or if you spot any errors.
 
-Dependencies in testbed: Right now the testbed code depends on the Processing core library (http://www.processing.org) for drawing.  A lot of people have asked for a plain old AWT version of the tests, which we will do if we have time.  We also plan to add Slick and/or JMonkeyEngine demos.  Ultimately, though, it's up to the end user to figure out their own drawing code - it's really not that tough if you look at the way we do it with Processing, the methods are pretty transparent (drawLine(x0,y0,x1,y1) is easy to translate to any engine, no?).
+Dependencies in testbed: Right now the testbed code depends on the Processing core library (http://www.processing.org) for drawing.  Some people have asked for a plain old AWT version of the tests, which we will do if we have time, but it's not a huge priority since it seems like most people are using game engines of some sort.  We also plan to add Slick [2.0: simple example exists now], PulpCore [in progress], and JMonkeyEngine demos.  Ultimately, though, it's up to the end user to figure out their own drawing code - it's really not that tough if you look at the way we do it with Processing, the methods are pretty transparent (drawLine(x0,y0,x1,y1) is easy to translate to any engine, no?).
 
 Other bugs: JBox2d should produce roughly the same output as Box2d.  The exact numerical values may be off by a little bit due to different floating point handling, but we're really shooting for identical large-scale behavior.  If you see any problems, please tell us about them!

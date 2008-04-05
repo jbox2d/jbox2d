@@ -29,6 +29,7 @@ import org.jbox2d.dynamics.DebugDraw;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.geom.Circle;
 import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.opengl.TextureImpl;
 
@@ -79,7 +80,11 @@ public class SlickDebugDraw extends DebugDraw {
 	@Override
 	public void drawCircle(Vec2 center, float radius, Color3f color) {
 		// TODO Auto-generated method stub
-
+		center = worldToScreen(center);
+		Circle circle = new Circle(center.x,center.y,radius);
+		Color slickColor = new Color(color.x/255.0f,color.y/255.0f,color.z/255.0f);
+		g.setColor(slickColor);
+		g.draw(circle);
 	}
 
 	/* (non-Javadoc)

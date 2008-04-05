@@ -4,5 +4,6 @@
 	<classpathentry kind="src" path="data"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="core.jar" sourcepath="/processing-head/core"/>
+	<classpathentry kind="src" path="/SlickBox2d"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

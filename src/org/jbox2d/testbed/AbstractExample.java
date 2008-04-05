@@ -274,7 +274,6 @@ public abstract class AbstractExample {
 		World.ENABLE_TOI = settings.enableTOI;
 
 		m_pointCount = 0;
-		
 		m_world.step(timeStep, settings.iterationCount);
 
 		//Optional validation of broadphase - asserts if there is an error

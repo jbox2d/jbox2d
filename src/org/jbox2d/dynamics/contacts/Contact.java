@@ -33,7 +33,11 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.ContactListener;
 import org.jbox2d.dynamics.World;
 
-
+/**
+ * Base class for contacts between shapes.
+ * @author ewjordan
+ *
+ */
 public abstract class Contact {
 
 	public static final int e_nonSolidFlag	= 0x0001;
@@ -45,22 +49,24 @@ public abstract class Contact {
 
     static boolean s_initialized;
 
-    // The parent world.
+    /** The parent world. */
     public World m_world;
 
-    // World pool and list pointers.
+    /* World pool and list pointers. */
     public Contact m_prev;
     public Contact m_next;
 
-    // Nodes for connecting bodies.
+    /** Node for connecting bodies. */
     public ContactEdge m_node1;
+    /** Node for connecting bodies. */
     public ContactEdge m_node2;
 
     public Shape m_shape1;
     public Shape m_shape2;
 
-    // Combined friction
+    /** Combined friction */
     public float m_friction;
+    /** Combined restitution */
     public float m_restitution;
 
     // public boolean m_islandFlag;
@@ -71,12 +77,14 @@ public abstract class Contact {
 	
     public abstract void evaluate(ContactListener listener);
     
-	/// Get the manifold array.
+	/** Get the manifold array. */
     public abstract List<Manifold> getManifolds();
 
-    /// Get the number of manifolds. This is 0 or 1 between convex shapes.
-	/// This may be greater than 1 for convex-vs-concave shapes. Each
-	/// manifold holds up to two contact points with a shared contact normal.
+    /**
+     * Get the number of manifolds. This is 0 or 1 between convex shapes.
+	 * This may be greater than 1 for convex-vs-concave shapes. Each
+	 * manifold holds up to two contact points with a shared contact normal.
+	 */
     public int getManifoldCount() {
         /*
          * List<Manifold> m = GetManifolds(); if (m == null) return 0; else
@@ -111,10 +119,8 @@ public abstract class Contact {
         m_manifoldCount = 0;
         getManifolds().clear();
 
-        m_friction = (float) Math.sqrt(m_shape1.m_friction
-                * m_shape2.m_friction);
-        m_restitution = Math
-                .max(m_shape1.m_restitution, m_shape2.m_restitution);
+        m_friction = (float) Math.sqrt(m_shape1.m_friction * m_shape2.m_friction);
+        m_restitution = Math.max(m_shape1.m_restitution, m_shape2.m_restitution);
         //m_world = s1.m_body.m_world;
         m_prev = null;
         m_next = null;
