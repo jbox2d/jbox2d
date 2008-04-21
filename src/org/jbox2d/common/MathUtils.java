@@ -28,9 +28,19 @@ package org.jbox2d.common;
  * 
  */
 public class MathUtils {
+	// Max/min rewritten here because for some reason Math.max/min
+	// can run absurdly slow for such simple functions...
+	public static final float max(float a, float b) {
+		return (a > b)?a:b;
+	}
+	
+	public static final float min(float a, float b) {
+		return (a < b)?a:b;
+	}
+	
 	/** Returns the closest value to 'a' that is in between 'low' and 'high' */
     public static final float clamp(float a, float low, float high) {
-        return Math.max(low, Math.min(a, high));
+        return MathUtils.max(low, MathUtils.min(a, high));
     }
 
     public static final Vec2 clamp(Vec2 a, Vec2 low, Vec2 high) {

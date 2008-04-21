@@ -51,7 +51,7 @@ public class CCDTest extends AbstractExample {
 		{
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, 20.0f);
-			Body body = m_world.createStaticBody(bd);
+			Body body = m_world.createBody(bd);
 
 			PolygonDef sd = new PolygonDef();
 			sd.density = 0.0f;
@@ -86,7 +86,7 @@ public class CCDTest extends AbstractExample {
 			BodyDef bd = new BodyDef();
 			bd.position.set( 0.0f, 15.0f );
 			bd.isBullet = true;
-			Body body = m_world.createDynamicBody(bd);
+			Body body = m_world.createBody(bd);
 			body.createShape(sd_bottom);
 			body.createShape(sd_left);
 			body.createShape(sd_right);
@@ -98,7 +98,7 @@ public class CCDTest extends AbstractExample {
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, 15.5f + i);
 			bd.isBullet = true;
-			Body body = m_world.createDynamicBody(bd);
+			Body body = m_world.createBody(bd);
 			body.setAngularVelocity(parent.random(-50.0f, 50.0f));
 
 			CircleDef sd = new CircleDef();

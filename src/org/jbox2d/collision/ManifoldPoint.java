@@ -42,16 +42,16 @@ public class ManifoldPoint {
     /** The separation of the shapes along the normal vector */
     public float separation;
     /** The non-penetration force */
-    public float normalForce;
+    public float normalImpulse;
     /** The friction force */
-    public float tangentForce;
+    public float tangentImpulse;
     /** Uniquely identifies a contact point between two shapes */
     public ContactID id;
 
     public ManifoldPoint() {
         localPoint1 = new Vec2();
         localPoint2 = new Vec2();
-        separation = normalForce = tangentForce = 0f;
+        separation = normalImpulse = tangentImpulse = 0f;
         id = new ContactID();
     }
 
@@ -59,8 +59,8 @@ public class ManifoldPoint {
         localPoint1 = cp.localPoint1.clone();
         localPoint2 = cp.localPoint2.clone();
         separation = cp.separation;
-        normalForce = cp.normalForce;
-        tangentForce = cp.tangentForce;
+        normalImpulse = cp.normalImpulse;
+        tangentImpulse = cp.tangentImpulse;
         id = new ContactID(cp.id);
     }
 }

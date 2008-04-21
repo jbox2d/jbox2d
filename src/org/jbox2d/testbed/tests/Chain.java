@@ -53,7 +53,7 @@ public class Chain extends AbstractExample {
 		{
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, -10.0f);
-			ground = m_world.createStaticBody(bd);
+			ground = m_world.createBody(bd);
 
 			PolygonDef sd = new PolygonDef();
 			sd.setAsBox(50.0f, 10.0f);
@@ -74,7 +74,7 @@ public class Chain extends AbstractExample {
 			for (int i = 0; i < 30; ++i) {
 				BodyDef bd = new BodyDef();
 				bd.position.set(0.5f + i, y);
-				Body body = m_world.createDynamicBody(bd);
+				Body body = m_world.createBody(bd);
 				body.createShape(sd);
 				body.setMassFromShapes();
 				

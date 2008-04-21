@@ -168,8 +168,8 @@ public class ContactManager extends PairCallback {
     				ManifoldPoint point = manifold.points[j];
     				cp.position = XForm.mul(b1.getXForm(), point.localPoint1);
     				cp.separation = point.separation;
-    				cp.normalForce = point.normalForce;
-    				cp.tangentForce = point.tangentForce;
+    				cp.normalForce = point.normalImpulse;
+    				cp.tangentForce = point.tangentImpulse;
     				cp.id = new ContactID(point.id);
     				m_world.m_contactListener.remove(cp);
     			}

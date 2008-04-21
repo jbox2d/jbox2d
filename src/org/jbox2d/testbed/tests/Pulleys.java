@@ -52,7 +52,7 @@ public class Pulleys extends AbstractExample {
 
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, -10.0f);
-			ground = m_world.createStaticBody(bd);
+			ground = m_world.createBody(bd);
 			ground.createShape(sd);
 		}
 
@@ -69,12 +69,12 @@ public class Pulleys extends AbstractExample {
 			BodyDef bd = new BodyDef();
 
 			bd.position.set(-10.0f, y);
-			Body body1 = m_world.createDynamicBody(bd);
+			Body body1 = m_world.createBody(bd);
 			body1.createShape(sd);
 			body1.setMassFromShapes();
 
 			bd.position.set(10.0f, y);
-			Body body2 = m_world.createDynamicBody(bd);
+			Body body2 = m_world.createBody(bd);
 			body2.createShape(sd);
 			body2.setMassFromShapes();
 

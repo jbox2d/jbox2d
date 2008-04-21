@@ -56,7 +56,7 @@ public class Bridge extends AbstractExample {
 
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, 0.0f);
-			ground = m_world.createStaticBody(bd);
+			ground = m_world.createBody(bd);
 			ground.createShape(sd);
 		}
 
@@ -73,7 +73,7 @@ public class Bridge extends AbstractExample {
 			for (int i = 0; i < numPlanks; ++i) {
 				BodyDef bd = new BodyDef();
 				bd.position.set(-14.5f + 1.0f * i, 5.0f);
-				Body body = m_world.createDynamicBody(bd);
+				Body body = m_world.createBody(bd);
 				body.createShape(sd);
 				body.setMassFromShapes();
 
@@ -95,7 +95,7 @@ public class Bridge extends AbstractExample {
 			pd2.restitution = 0.1f;
 			BodyDef bd2 = new BodyDef();
 			bd2.position.set(0.0f, 10.0f);
-			Body body2 = m_world.createDynamicBody(bd2);
+			Body body2 = m_world.createBody(bd2);
 			body2.createShape(pd2);
 			body2.setMassFromShapes();
 			
@@ -105,7 +105,7 @@ public class Bridge extends AbstractExample {
 			cd.friction = 0.2f;
 			BodyDef bd3 = new BodyDef();
 			bd3.position.set(0.0f, 12.0f);
-			Body body3 = m_world.createDynamicBody(bd3);
+			Body body3 = m_world.createBody(bd3);
 			body3.createShape(cd);
 			cd.localPosition.set(0.0f,1.0f);
 			body3.createShape(cd);

@@ -29,7 +29,7 @@ public class BipedTest extends AbstractExample {
 		{
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, 20.0f);
-			Body body = m_world.createStaticBody(bd);
+			Body body = m_world.createBody(bd);
 
 			PolygonDef sd = new PolygonDef();
 			sd.density = 0.0f;
@@ -54,7 +54,7 @@ public class BipedTest extends AbstractExample {
 			BodyDef bd = new BodyDef();
 			bd.position.set(5.0f, 20.0f + i);
 			bd.isBullet = true;
-			Body body = m_world.createDynamicBody(bd);
+			Body body = m_world.createBody(bd);
 			body.setLinearVelocity(new Vec2(0.0f, -100.0f));
 			body.setAngularVelocity(parent.random(-50.0f, 50.0f));
 

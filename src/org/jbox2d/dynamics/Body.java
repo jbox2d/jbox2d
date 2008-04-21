@@ -30,7 +30,7 @@ import org.jbox2d.common.*;
 import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.dynamics.joints.JointEdge;
 
-// Updated to rev. 54->118 of b2Body.cpp/.h
+// Updated to rev. 54->118->142 of b2Body.cpp/.h
 // Rewritten completely for rev. 118 (too many changes, needed reorganization for maintainability)
 
 /**
@@ -111,9 +111,8 @@ public class Body {
 	 * @param type Body.e_dynamicType or Body.e_staticType
 	 * @param world World to create body in
 	 */
-	public Body(BodyDef bd, int type, World world) {
+	public Body(BodyDef bd, World world) {
 		assert(world.m_lock == false);
-		assert(type < e_maxTypes);
 		
 		m_flags = 0;
 		
@@ -121,8 +120,6 @@ public class Body {
 		if (bd.fixedRotation) m_flags |= e_fixedRotationFlag;
 		if (bd.allowSleep) m_flags |= e_allowSleepFlag;
 		if (bd.isSleeping) m_flags |= e_sleepFlag;
-		
-		m_type = type;
 		
 		m_world = world;
 		
@@ -154,26 +151,28 @@ public class Body {
 		
 		m_sleepTime = 0.0f;
 		
-		m_mass = 0.0f;
 		m_invMass = 0.0f;
 		m_I = 0.0f;
 		m_invI = 0.0f;
 		
-		if (m_type == e_dynamicType) {
-			m_mass = bd.massData.mass;
-		}
+		m_mass = bd.massData.mass;
 		
 		if (m_mass > 0.0f) {
 			m_invMass = 1.0f / m_mass;
 		}
 		
-		if ((m_flags & Body.e_fixedRotationFlag) == 0 &&
-				m_type == e_dynamicType) {
+		if ((m_flags & Body.e_fixedRotationFlag) == 0) {
 			m_I = bd.massData.I;
 		}
 		
 		if (m_I > 0.0f) {
 			m_invI = 1.0f / m_I;
+		}
+		
+		if (m_invMass == 0.0f && m_invI == 0.0f) {
+			m_type = e_staticType;
+		} else {
+			m_type = e_dynamicType;
 		}
 		
 		m_userData = bd.userData;
@@ -225,7 +224,7 @@ public class Body {
 			return;
 		}
 
-		assert(s.m_body == this);
+		assert(s.getBody() == this);
 		s.destroyProxy(m_world.m_broadPhase);
 
 		assert(m_shapeCount > 0);
@@ -286,9 +285,6 @@ public class Body {
 		assert(m_world.m_lock == false);
 		if (m_world.m_lock == true) return;
 		
-		if (m_type == e_staticType) return;
-		
-		m_mass = 0.0f;
 		m_invMass = 0.0f;
 		m_I = 0.0f;
 		m_invI = 0.0f;
@@ -316,6 +312,21 @@ public class Body {
 		for (Shape s = m_shapeList; s != null; s = s.m_next) {
 			s.updateSweepRadius(m_sweep.localCenter);
 		}
+		
+		int oldType = m_type;
+		if (m_invMass == 0.0f && m_invI == 0.0f) {
+			m_type = e_staticType;
+		} else {
+			m_type = e_dynamicType;
+		}
+
+		// If the body type changed, we need to refilter the broad-phase proxies.
+		if (oldType != m_type) {
+			for (Shape s = m_shapeList; s != null; s = s.m_next)
+			{
+				s.refilterProxy(m_world.m_broadPhase, m_xf);
+			}
+		}
 	}
 
 	/** 
@@ -326,7 +337,6 @@ public class Body {
 	public void setMassFromShapes(){
 		assert(m_world.m_lock == false);
 		if (m_world.m_lock == true) return;
-		if (m_type == e_staticType) return;
 		
 		// Compute mass data from shapes.  Each shape has its own density.
 		m_mass = 0.0f;
@@ -349,9 +359,6 @@ public class Body {
 			m_invMass = 1.0f / m_mass;
 			center.x *= m_invMass;
 			center.y *= m_invMass;
-		} else {
-			m_invMass = 0.0f;
-			m_invI = 0.0f;
 		}
 		
 		if (m_I > 0.0f && (m_flags & e_fixedRotationFlag) == 0) {
@@ -372,6 +379,20 @@ public class Body {
 		// Update the sweep radii of all child shapes
 		for (Shape s = m_shapeList; s != null; s = s.m_next) {
 			s.updateSweepRadius(m_sweep.localCenter);
+		}
+		
+		int oldType = m_type;
+		if (m_invMass == 0.0f && m_invI == 0.0f) {
+			m_type = e_staticType;
+		} else {
+			m_type = e_dynamicType;
+		}
+
+		// If the body type changed, we need to refilter the broad-phase proxies.
+		if (oldType != m_type) {
+			for (Shape s = m_shapeList; s != null; s = s.m_next) {
+				s.refilterProxy(m_world.m_broadPhase, m_xf);
+			}
 		}
 	}
 	
@@ -657,9 +678,10 @@ public class Body {
 	 * Get the linked list of all contacts attached to this body.
 	 * @return first ContactEdge in linked list
 	 */
+	/* Removed from C++ version
 	public ContactEdge getContactList(){
 		return m_contactList;
-	}
+	}*/
 
 	/** Get the next body in the world's body list. */
 	public Body getNext(){
@@ -709,7 +731,10 @@ public class Body {
 	/** For internal use only. */
 	public void synchronizeTransform(){
 		m_xf.R.set(m_sweep.a);
-		m_xf.position.set(m_sweep.c.sub(Mat22.mul(m_xf.R,m_sweep.localCenter)));
+		//m_xf.position.set(m_sweep.c.sub(Mat22.mul(m_xf.R,m_sweep.localCenter)));
+		Vec2 v1 = m_sweep.localCenter;
+		m_xf.position.x = m_sweep.c.x - (m_xf.R.col1.x * v1.x + m_xf.R.col2.x * v1.y);
+		m_xf.position.y = m_sweep.c.y - (m_xf.R.col1.y * v1.x + m_xf.R.col2.y * v1.y);
 		//System.out.println(m_xf);
 	}
 
@@ -735,6 +760,45 @@ public class Body {
 		m_sweep.c.set(m_sweep.c0);
 		m_sweep.a = m_sweep.a0;
 		synchronizeTransform();
+	}
+	
+	/**
+	 * Get the world linear velocity of a world point attached to this body.
+	 * @param a point in world coordinates.
+	 * @return the world velocity of a point.
+	 */
+	public Vec2 getLinearVelocityFromWorldPoint(Vec2 worldPoint) {
+		return m_linearVelocity.add(Vec2.cross(m_angularVelocity, worldPoint.sub(m_sweep.c)));
+	}
+
+	/**
+	 * Get the world velocity of a local point.
+	 * @param a point in local coordinates.
+	 * @return the world velocity of a point.
+	 */
+	public Vec2 getLinearVelocityFromLocalPoint(Vec2 localPoint) {
+		return getLinearVelocityFromWorldPoint(getWorldPoint(localPoint));
+	}
+	
+	/**
+	 * Put this body to sleep so it will stop simulating.
+	 * This also sets the velocity to zero.
+	 */
+	public void putToSleep() {
+		m_flags |= e_sleepFlag;
+		m_sleepTime = 0.0f;
+		m_linearVelocity.setZero();
+		m_angularVelocity = 0.0f;
+		m_force.setZero();
+		m_torque = 0.0f;
+	}
+	
+	public void setUserData(Object data) {
+		m_userData = data;
+	}
+	
+	public World getWorld() {
+		return m_world;
 	}
 	
 }

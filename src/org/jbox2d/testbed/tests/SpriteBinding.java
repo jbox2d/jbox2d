@@ -47,7 +47,7 @@ public class SpriteBinding extends AbstractExample {
             groundBoxDef.density = 0.0f;
             BodyDef groundBodyDef = new BodyDef();
             groundBodyDef.position.set(0.0f, -10.0f);
-            m_world.createStaticBody(groundBodyDef).createShape(groundBoxDef);;
+            m_world.createBody(groundBodyDef).createShape(groundBoxDef);;
 
             // Define another box shape for our dynamic body.
             PolygonDef boxDef = new PolygonDef();
@@ -68,7 +68,7 @@ public class SpriteBinding extends AbstractExample {
                 for (int j=0; j<numRows; ++j) {
                     BodyDef bodyDef = new BodyDef();
                     bodyDef.position.set(-numBoxes - 3.0f + i*2.5f, 4.0f + j*5.0f);
-                    boxes[i + numBoxes*j] = m_world.createDynamicBody(bodyDef);
+                    boxes[i + numBoxes*j] = m_world.createBody(bodyDef);
                     boxes[i + numBoxes*j].createShape(boxDef);
                     boxes[i + numBoxes*j].setMassFromShapes();
                     boxes[i + numBoxes*j].setAngularVelocity(parent.random(-.5f,.5f));

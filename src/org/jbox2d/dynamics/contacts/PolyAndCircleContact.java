@@ -108,8 +108,8 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
     	Manifold m0 = new Manifold(m_manifold);
         for (int k = 0; k < m_manifold.pointCount; k++) {
             m0.points[k] = new ManifoldPoint(m_manifold.points[k]);
-            m0.points[k].normalForce = m_manifold.points[k].normalForce;
-            m0.points[k].tangentForce = m_manifold.points[k].tangentForce;
+            m0.points[k].normalImpulse = m_manifold.points[k].normalImpulse;
+            m0.points[k].tangentImpulse = m_manifold.points[k].tangentImpulse;
             m0.points[k].separation = m_manifold.points[k].separation;
             //m0.points[k].id.key = m_manifold.points[k].id.key;
             m0.points[k].id.features.set(m_manifold.points[k].id.features);
@@ -135,8 +135,8 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
     			cp.normal = m0.normal;
     			cp.position = XForm.mul(b1.m_xf, m0.points[0].localPoint1);
     			cp.separation = m0.points[0].separation;
-    			cp.normalForce = m0.points[0].normalForce;
-    			cp.tangentForce = m0.points[0].tangentForce;
+    			cp.normalForce = m0.points[0].normalImpulse;
+    			cp.tangentForce = m0.points[0].tangentImpulse;
     			cp.id = new ContactID(m0.points[0].id);
     			listener.remove(cp);
     		}

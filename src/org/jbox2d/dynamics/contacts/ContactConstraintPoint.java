@@ -21,11 +21,11 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-// Updated to rev 89 of b2ContactSolver.h/.cpp
 package org.jbox2d.dynamics.contacts;
 
 import org.jbox2d.common.Vec2;
 
+//Updated to rev 89->139 of b2ContactSolver.h/.cpp
 public class ContactConstraintPoint {
     public Vec2 localAnchor1;
 
@@ -35,9 +35,9 @@ public class ContactConstraintPoint {
     
     public Vec2 r2;
 
-    public float normalForce;
+    public float normalImpulse;
 
-    public float tangentForce;
+    public float tangentImpulse;
 
     public float positionImpulse;
 

@@ -29,6 +29,7 @@ import java.util.List;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.collision.ShapeType;
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.ContactListener;
 import org.jbox2d.dynamics.World;
@@ -117,10 +118,10 @@ public abstract class Contact {
         m_shape2 = s2;
 
         m_manifoldCount = 0;
-        getManifolds().clear();
+        getManifolds().clear(); //unnecessary, I think
 
         m_friction = (float) Math.sqrt(m_shape1.m_friction * m_shape2.m_friction);
-        m_restitution = Math.max(m_shape1.m_restitution, m_shape2.m_restitution);
+        m_restitution = MathUtils.max(m_shape1.m_restitution, m_shape2.m_restitution);
         //m_world = s1.m_body.m_world;
         m_prev = null;
         m_next = null;

@@ -48,7 +48,7 @@ public class Domino extends AbstractExample {
 
             BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
-            m_world.createStaticBody(bd).createShape(sd);
+            m_world.createBody(bd).createShape(sd);
             
         }
 
@@ -59,7 +59,7 @@ public class Domino extends AbstractExample {
 
                 BodyDef bd = new BodyDef();
                 bd.position = new Vec2(0.0f, 5f + 5f * i);
-                m_world.createStaticBody(bd).createShape(sd);
+                m_world.createBody(bd).createShape(sd);
             }
         }
 
@@ -88,7 +88,7 @@ public class Domino extends AbstractExample {
                     }
                     else
                         bd.angle = 0f;
-                    Body myBody = m_world.createDynamicBody(bd);
+                    Body myBody = m_world.createBody(bd);
                     myBody.createShape(sd);
                     myBody.setMassFromShapes();
                 }

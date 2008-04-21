@@ -32,6 +32,12 @@ public class TimeStep {
     public float dt; // time step
 
     public float inv_dt; // inverse time step (0 if dt == 0).
-
+    
+    public float dtRatio;	// dt * inv_dt0
+    
+    public boolean warmStarting;
+	
+    public boolean positionCorrection;
+    
     public int maxIterations;
 }

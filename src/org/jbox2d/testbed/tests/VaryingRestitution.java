@@ -49,7 +49,7 @@ public class VaryingRestitution extends AbstractExample {
             
             BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
-            m_world.createStaticBody(bd).createShape(sd);
+            m_world.createBody(bd).createShape(sd);
         }
 
         {
@@ -66,7 +66,7 @@ public class VaryingRestitution extends AbstractExample {
             for (int i = 0; i < restitution.length; ++i) {
                 sd.restitution = restitution[i];
                 bd.position = new Vec2(-10.0f + 3.0f * i, 10.0f);
-                Body myBody = m_world.createDynamicBody(bd);
+                Body myBody = m_world.createBody(bd);
                 myBody.createShape(sd);
                 myBody.setMassFromShapes();
             }

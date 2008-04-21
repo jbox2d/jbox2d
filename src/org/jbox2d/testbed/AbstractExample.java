@@ -166,7 +166,7 @@ public abstract class AbstractExample {
 		needsReset = true;
 	}
 	
-	/** Overload this if you need to create a different world AABB or gravity vector */
+	/** Override this if you need to create a different world AABB or gravity vector */
 	public void createWorld() {
 		m_worldAABB = new AABB();
 		m_worldAABB.lowerBound = new Vec2(-200.0f, -100.0f);
@@ -221,9 +221,9 @@ public abstract class AbstractExample {
 		((ConcreteDestructionListener)m_destructionListener).test = this;
 		((ConcreteBoundaryListener)m_boundaryListener).test = this;
 		((ConcreteContactListener)m_contactListener).test = this;
-		m_world.setListener(m_destructionListener);
-		m_world.setListener(m_boundaryListener);
-		m_world.setListener(m_contactListener);
+		m_world.setDestructionListener(m_destructionListener);
+		m_world.setBoundaryListener(m_boundaryListener);
+		m_world.setContactListener(m_contactListener);
 		m_world.setDebugDraw(parent.g);
 		if (hasCachedCamera) {
 			m_debugDraw.setCamera(cachedCamX,cachedCamY,cachedCamScale);
@@ -269,9 +269,9 @@ public abstract class AbstractExample {
 		if (settings.drawPairs) m_debugDraw.appendFlags(DebugDraw.e_pairBit);
 		if (settings.drawCOMs) m_debugDraw.appendFlags(DebugDraw.e_centerOfMassBit);
 
-		World.ENABLE_WARM_STARTING = settings.enableWarmStarting;
-		World.ENABLE_POSITION_CORRECTION = settings.enablePositionCorrection;
-		World.ENABLE_TOI = settings.enableTOI;
+		m_world.setWarmStarting(settings.enableWarmStarting);
+		m_world.setPositionCorrection(settings.enablePositionCorrection);
+		m_world.setContinuousPhysics(settings.enableTOI);
 
 		m_pointCount = 0;
 		m_world.step(timeStep, settings.iterationCount);
@@ -285,16 +285,13 @@ public abstract class AbstractExample {
 		}
 
 		if (settings.drawStats) {
-			m_debugDraw.drawString(5, m_textLine, "proxies(max) = "+m_world.m_broadPhase.m_proxyCount+
-					"("+Settings.maxProxies+"), pairs(max) = "+m_world.m_broadPhase.m_pairManager.m_pairCount+
+			m_debugDraw.drawString(5, m_textLine, "proxies(max) = "+m_world.getProxyCount()+
+					"("+Settings.maxProxies+"), pairs(max) = "+m_world.getPairCount()+
 					"("+Settings.maxPairs+")", white);
 			m_textLine += textLineHeight;
 
 			m_debugDraw.drawString(5, m_textLine, "bodies/contacts/joints = "+
-				m_world.m_bodyCount+"/"+m_world.m_contactCount+"/"+m_world.m_jointCount, white);
-			m_textLine += textLineHeight;
-
-			m_debugDraw.drawString(5, m_textLine, "position iterations = "+m_world.m_positionIterationCount, white);
+				m_world.getBodyCount()+"/"+m_world.getContactCount()+"/"+m_world.getJointCount(), white);
 			m_textLine += textLineHeight;
 
 			long memTot = Runtime.getRuntime().totalMemory();
@@ -408,7 +405,7 @@ public abstract class AbstractExample {
     	bd.allowSleep = true;
     	bd.position = position.clone();
     	bd.isBullet = true;
-    	m_bomb = m_world.createDynamicBody(bd);
+    	m_bomb = m_world.createBody(bd);
     	m_bomb.setLinearVelocity(velocity);
 
     	CircleDef sd = new CircleDef();
@@ -418,8 +415,9 @@ public abstract class AbstractExample {
 
     	Vec2 minV = position.sub(new Vec2(0.3f,0.3f));
     	Vec2 maxV = position.add(new Vec2(0.3f,0.3f));
-    	AABB aabb = new AABB(minV, maxV);
-    	boolean inRange = m_world.m_broadPhase.inRange(aabb);
+    	//AABB aabb = new AABB(minV, maxV);
+    	boolean inRange = (minV.x > m_worldAABB.lowerBound.x && minV.y > m_worldAABB.lowerBound.y
+    					&& maxV.x < m_worldAABB.upperBound.x && maxV.y < m_worldAABB.upperBound.y);
 
     	if (inRange) {
     		m_bomb.createShape(sd);
@@ -533,7 +531,7 @@ public abstract class AbstractExample {
 
         if (body != null) {
             MouseJointDef md = new MouseJointDef();
-            md.body1 = m_world.m_groundBody;
+            md.body1 = m_world.getGroundBody();
             md.body2 = body;
             md.target.set(p);
             md.maxForce = 1000.0f * body.m_mass;

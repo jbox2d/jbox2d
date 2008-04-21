@@ -101,7 +101,7 @@ public class PulleyJoint extends Joint {
 
     public PulleyJoint(PulleyJointDef def) {
         super(def);
-        m_ground = m_body1.m_world.m_groundBody;
+        m_ground = m_body1.m_world.getGroundBody();
     	m_groundAnchor1 = def.groundAnchor1.sub(m_ground.m_xf.position);
     	m_groundAnchor2 = def.groundAnchor2.sub(m_ground.m_xf.position);
     	m_localAnchor1 = def.localAnchor1.clone();
@@ -193,7 +193,7 @@ public class PulleyJoint extends Joint {
     	m_limitMass2 = 1.0f / m_limitMass2;
     	m_pulleyMass = 1.0f / m_pulleyMass;
 
-    	if (World.ENABLE_WARM_STARTING) {
+    	if (step.warmStarting) {
     		// Warm starting.
     		Vec2 P1 = m_u1.mul(step.dt * (-m_force - m_limitForce1));
     		Vec2 P2 = m_u2.mul(step.dt * (-m_ratio * m_force - m_limitForce2));

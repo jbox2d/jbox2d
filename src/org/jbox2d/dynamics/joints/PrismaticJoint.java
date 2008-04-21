@@ -192,7 +192,7 @@ public class PrismaticJoint extends Joint {
             m_limitForce = 0.0f;
         }
 
-        if (World.ENABLE_WARM_STARTING){
+        if (step.warmStarting){
     		Vec2 P1 = new Vec2( step.dt * (m_force * m_linearJacobian.linear1.x + (m_motorForce + m_limitForce) * m_motorJacobian.linear1.x),
     							step.dt * (m_force * m_linearJacobian.linear1.y + (m_motorForce + m_limitForce) * m_motorJacobian.linear1.y) );
     		Vec2 P2 = new Vec2( step.dt * (m_force * m_linearJacobian.linear2.x + (m_motorForce + m_limitForce) * m_motorJacobian.linear2.x),

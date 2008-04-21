@@ -61,7 +61,7 @@ public class CompoundShapes extends AbstractExample {
     	{
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, -10.0f);
-			Body body = m_world.createStaticBody(bd);
+			Body body = m_world.createBody(bd);
 
 			PolygonDef sd = new PolygonDef();;
 			sd.setAsBox(50.0f, 10.0f);
@@ -85,7 +85,7 @@ public class CompoundShapes extends AbstractExample {
 				BodyDef bd = new BodyDef();
 				bd.position.set(x + 5.0f, 1.05f + 2.5f * i);
 				bd.angle = parent.random(-3.1415f, 3.1415f);
-				Body body = m_world.createDynamicBody(bd);
+				Body body = m_world.createBody(bd);
 				body.createShape(sd1);
 				body.createShape(sd2);
 				body.setMassFromShapes();
@@ -107,7 +107,7 @@ public class CompoundShapes extends AbstractExample {
 				BodyDef bd = new BodyDef();
 				bd.position.set(x - 5.0f, 1.05f + 2.5f * i);
 				bd.angle = parent.random(-3.1415f, 3.1415f);
-				Body body = m_world.createDynamicBody(bd);
+				Body body = m_world.createBody(bd);
 				body.createShape(sd1);
 				body.createShape(sd2);
 				body.setMassFromShapes();
@@ -141,7 +141,7 @@ public class CompoundShapes extends AbstractExample {
 				BodyDef bd = new BodyDef();
 				bd.position.set(x, 2.05f + 2.5f * i);
 				bd.angle = 0.0f;
-				Body body = m_world.createDynamicBody(bd);
+				Body body = m_world.createBody(bd);
 				body.createShape(sd1);
 				body.createShape(sd2);
 				body.setMassFromShapes();
@@ -163,7 +163,7 @@ public class CompoundShapes extends AbstractExample {
 
 			BodyDef bd = new BodyDef();
 			bd.position.set( 0.0f, 2.0f );
-			Body body = m_world.createDynamicBody(bd);
+			Body body = m_world.createBody(bd);
 			body.createShape(sd_bottom);
 			body.createShape(sd_left);
 			body.createShape(sd_right);

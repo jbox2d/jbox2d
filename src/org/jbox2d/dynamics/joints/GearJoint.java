@@ -31,7 +31,7 @@ import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.World;
 
 
-//Updated to rev 56->97 of b2GearJoint.cpp/.h
+//Updated to rev 56->97->137 of b2GearJoint.cpp/.h
 
 /**
  * A gear joint is used to connect two joints together. Either joint
@@ -99,10 +99,13 @@ public class GearJoint extends Joint {
 
         m_J = new Jacobian();
 
-        assert (def.joint1.m_type == JointType.REVOLUTE_JOINT || def.joint1.m_type == JointType.PRISMATIC_JOINT);
-        assert (def.joint2.m_type == JointType.REVOLUTE_JOINT || def.joint2.m_type == JointType.PRISMATIC_JOINT);
-        assert (def.joint1.m_body1.isStatic());
-        assert (def.joint2.m_body1.isStatic());
+        JointType type1 = def.joint1.getType();
+    	JointType type2 = def.joint2.getType();
+
+    	assert(type1 == JointType.REVOLUTE_JOINT || type1 == JointType.PRISMATIC_JOINT);
+    	assert(type2 == JointType.REVOLUTE_JOINT || type2 == JointType.PRISMATIC_JOINT);
+    	assert(def.joint1.getBody1().isStatic());
+    	assert(def.joint2.getBody1().isStatic());
 
         m_revolute1 = null;
         m_prismatic1 = null;
@@ -111,9 +114,9 @@ public class GearJoint extends Joint {
 
         float coordinate1, coordinate2;
 
-        m_ground1 = def.joint1.m_body1;
-        m_body1 = def.joint1.m_body2;
-        if (def.joint1.m_type == JointType.REVOLUTE_JOINT) {
+        m_ground1 = def.joint1.getBody1();
+        m_body1 = def.joint1.getBody2();
+        if (type1 == JointType.REVOLUTE_JOINT) {
             m_revolute1 = (RevoluteJoint) def.joint1;
             m_groundAnchor1 = m_revolute1.m_localAnchor1;
             m_localAnchor1 = m_revolute1.m_localAnchor2;
@@ -126,9 +129,9 @@ public class GearJoint extends Joint {
             coordinate1 = m_prismatic1.getJointTranslation();
         }
 
-        m_ground2 = def.joint2.m_body1;
-        m_body2 = def.joint2.m_body2;
-        if (def.joint2.m_type == JointType.REVOLUTE_JOINT) {
+        m_ground2 = def.joint2.getBody1();
+        m_body2 = def.joint2.getBody2();
+        if (type2 == JointType.REVOLUTE_JOINT) {
             m_revolute2 = (RevoluteJoint) def.joint2;
             m_groundAnchor2 = m_revolute2.m_localAnchor1;
             m_localAnchor2 = m_revolute2.m_localAnchor2;
@@ -162,8 +165,8 @@ public class GearJoint extends Joint {
             K += b1.m_invI;
         }
         else {
-        	Vec2 ug = Mat22.mul(g1.m_xf.R, m_prismatic1.m_localXAxis1);
-    		Vec2 r = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
+        	Vec2 ug = Mat22.mul(g1.getXForm().R, m_prismatic1.m_localXAxis1);
+    		Vec2 r = Mat22.mul(b1.getXForm().R, m_localAnchor1.sub(b1.getLocalCenter()));
     		float crug = Vec2.cross(r, ug);
             m_J.linear1 = ug.negate();
             m_J.angular1 = -crug;
@@ -175,8 +178,8 @@ public class GearJoint extends Joint {
             K += m_ratio * m_ratio * b2.m_invI;
         }
         else {
-            Vec2 ug = Mat22.mul(g2.m_xf.R, m_prismatic2.m_localXAxis1);
-    		Vec2 r = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
+            Vec2 ug = Mat22.mul(g2.getXForm().R, m_prismatic2.m_localXAxis1);
+    		Vec2 r = Mat22.mul(b2.getXForm().R, m_localAnchor2.sub(b2.getLocalCenter()));
             float crug = Vec2.cross(r, ug);
             m_J.linear2 = ug.mulLocal(-m_ratio);
             m_J.angular2 = -m_ratio * crug;
@@ -187,7 +190,7 @@ public class GearJoint extends Joint {
         assert (K > 0.0f);
         m_mass = 1.0f / K;
 
-        if (World.ENABLE_WARM_STARTING) {
+        if (step.warmStarting) {
     		// Warm starting.
     		float P = step.dt * m_force;
     		b1.m_linearVelocity.x += b1.m_invMass * P * m_J.linear1.x;
@@ -273,7 +276,7 @@ public class GearJoint extends Joint {
 
     public float getReactionTorque() {
     	// TODO_ERIN not tested
-    	Vec2 r = Mat22.mul(m_body2.m_xf.R, m_localAnchor2.sub(m_body2.getLocalCenter()));
+    	Vec2 r = Mat22.mul(m_body2.getXForm().R, m_localAnchor2.sub(m_body2.getLocalCenter()));
     	Vec2 F = new Vec2(m_force * m_J.linear2.x, m_force * m_J.linear2.y);
     	float T = m_force * m_J.angular2 - Vec2.cross(r, F);
     	return T;

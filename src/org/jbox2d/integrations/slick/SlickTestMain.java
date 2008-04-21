@@ -65,9 +65,9 @@ public class SlickTestMain extends BasicGame {
 		((ConcreteDestructionListener)m_destructionListener).test = this;
 		((ConcreteBoundaryListener)m_boundaryListener).test = this;
 		((ConcreteContactListener)m_contactListener).test = this;
-		m_world.setListener(m_destructionListener);
-		m_world.setListener(m_boundaryListener);
-		m_world.setListener(m_contactListener);
+		m_world.setDestructionListener(m_destructionListener);
+		m_world.setBoundaryListener(m_boundaryListener);
+		m_world.setContactListener(m_contactListener);
 		m_debugDraw = new SlickDebugDraw();
 		m_world.setDebugDraw(m_debugDraw);
 		create();
@@ -100,7 +100,7 @@ public class SlickTestMain extends BasicGame {
 	public SlickDebugDraw m_debugDraw;
 	
 	
-	/** Overload this if you need to create a different world AABB or gravity vector */
+	/** Override this if you need to create a different world AABB or gravity vector */
 	public void createWorld() {
 		m_worldAABB = new AABB();
 		m_worldAABB.lowerBound = new Vec2(-200.0f, -100.0f);
@@ -117,7 +117,7 @@ public class SlickTestMain extends BasicGame {
 
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, -10.0f);
-			Body ground = m_world.createStaticBody(bd);
+			Body ground = m_world.createBody(bd);
 			ground.createShape(sd);
 		}
 
@@ -140,7 +140,7 @@ public class SlickTestMain extends BasicGame {
 				for (int j = i; j < 25; ++j) {
 					BodyDef bd = new BodyDef();
 					bd.position.set(y);
-					Body body = m_world.createDynamicBody(bd);
+					Body body = m_world.createBody(bd);
 					body.createShape(sd);
 					body.setMassFromShapes();
 
@@ -177,9 +177,9 @@ public class SlickTestMain extends BasicGame {
 		if (settings.drawPairs) m_debugDraw.appendFlags(DebugDraw.e_pairBit);
 		if (settings.drawCOMs) m_debugDraw.appendFlags(DebugDraw.e_centerOfMassBit);
 
-		World.ENABLE_WARM_STARTING = settings.enableWarmStarting;
-		World.ENABLE_POSITION_CORRECTION = settings.enablePositionCorrection;
-		World.ENABLE_TOI = settings.enableTOI;
+		m_world.setWarmStarting(settings.enableWarmStarting);
+		m_world.setPositionCorrection(settings.enablePositionCorrection);
+		m_world.setContinuousPhysics(settings.enableTOI);
 
 		m_pointCount = 0;
 		

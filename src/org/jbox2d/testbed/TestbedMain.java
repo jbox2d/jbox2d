@@ -121,6 +121,9 @@ public class TestbedMain extends PApplet {
     	}
     	/* Register the examples */
     	// Simple functionality examples
+    	registerExample(new BugTest(this));
+    	registerExample(new SpringRestitutionTest(this));
+    	registerExample(new RestitutionCannon(this));
     	registerExample(new BipedTest(this));
     	registerExample(new SpriteBinding(this));
     	registerExample(new Pulleys(this));
@@ -289,7 +292,7 @@ public class TestbedMain extends PApplet {
     	currentTest.mouseMove(new Vec2(mouseX,mouseY));
     }
     
-    /** Dispatch mouseDragged events to the current test. */
+    /** Just report a mouseMoved event if mouseDragged. */
     public void mouseDragged() {
     	mouseMoved();
     }

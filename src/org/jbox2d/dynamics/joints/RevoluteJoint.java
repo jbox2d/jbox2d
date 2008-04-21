@@ -146,7 +146,7 @@ public class RevoluteJoint extends Joint {
     		m_limitForce = 0.0f;
     	}
 
-    	if (World.ENABLE_WARM_STARTING) {
+    	if (step.warmStarting) {
     		b1.m_linearVelocity.x -= step.dt * invMass1 * m_pivotForce.x;
     		b1.m_linearVelocity.y -= step.dt * invMass1 * m_pivotForce.y;
     		b1.m_angularVelocity -= step.dt * invI1 * (Vec2.cross(r1, m_pivotForce) + m_motorForce + m_limitForce);

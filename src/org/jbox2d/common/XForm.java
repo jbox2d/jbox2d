@@ -73,11 +73,19 @@ public class XForm {
 	}
 	
 	public static Vec2 mul(XForm T, Vec2 v){
-		return T.position.add(T.R.mul(v));
+		return new Vec2(T.position.x + T.R.col1.x * v.x + T.R.col2.x * v.y, 
+						T.position.y + T.R.col1.y * v.x + T.R.col2.y * v.y);
+
+		//return T.position.add(T.R.mul(v));
 	}
 
 	public static Vec2 mulT(XForm T, Vec2 v){
-		return T.R.mulT(v.sub(T.position));
+		float v1x = v.x-T.position.x;
+		float v1y = v.y-T.position.y;
+		Vec2 b = T.R.col1;
+		Vec2 b1 = T.R.col2;
+		return new Vec2((v1x * b.x + v1y * b.y), (v1x * b1.x + v1y * b1.y));
+		//return T.R.mulT(v.sub(T.position));
 	}
 	
 	public String toString() {

@@ -29,7 +29,7 @@ import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.World;
 
 
-//Updated to rev 56->130 of b2DistanceJoint.cpp/.h
+//Updated to rev 56->130->142 of b2DistanceJoint.cpp/.h
 
 //C = norm(p2 - p1) - L
 //u = (p2 - p1) / norm(p2 - p1)
@@ -47,17 +47,26 @@ public class DistanceJoint extends Joint {
     public Vec2 m_localAnchor1;
     public Vec2 m_localAnchor2;
 	public Vec2 m_u;
-	public float m_force;
+	public float m_impulse;
 	public float m_mass;		// effective mass for the constraint.
 	public float m_length;
+	public float m_frequencyHz;
+	public float m_dampingRatio;
+	public float m_gamma;
+	public float m_bias;
 
     public DistanceJoint(DistanceJointDef def) {
         super(def);
-        m_localAnchor1 = def.localAnchor1;
-        m_localAnchor2 = def.localAnchor2;
+        m_localAnchor1 = def.localAnchor1.clone();
+        m_localAnchor2 = def.localAnchor2.clone();
         m_length = def.length;
-        m_force = 0.0f;
+        m_impulse = 0.0f;
         m_u = new Vec2();
+        m_frequencyHz = def.frequencyHz;
+    	m_dampingRatio = def.dampingRatio;
+    	m_gamma = 0.0f;
+    	m_bias = 0.0f;
+    	m_inv_dt = 0.0f;
     }
 
     @Override
@@ -71,7 +80,7 @@ public class DistanceJoint extends Joint {
     }
 
     public Vec2 getReactionForce() {
-    	return new Vec2(m_force * m_u.x, m_force * m_u.y);
+    	return new Vec2(m_impulse * m_u.x, m_impulse * m_u.y);
     }
 
     public float getReactionTorque() {
@@ -80,13 +89,15 @@ public class DistanceJoint extends Joint {
 
     @Override
     public void initVelocityConstraints(TimeStep step) {
+    	m_inv_dt = step.inv_dt;
+    	
     	//TODO: fully inline temp Vec2 ops
     	Body b1 = m_body1;
     	Body b2 = m_body2;
 
     	// Compute the effective mass matrix.
-    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
+    	Vec2 r1 = Mat22.mul(b1.getXForm().R, m_localAnchor1.sub(b1.getLocalCenter()));
+    	Vec2 r2 = Mat22.mul(b2.getXForm().R, m_localAnchor2.sub(b2.getLocalCenter()));
     	m_u.x = b2.m_sweep.c.x + r2.x - b1.m_sweep.c.x - r1.x;
     	m_u.y = b2.m_sweep.c.y + r2.y - b1.m_sweep.c.y - r1.y;
 
@@ -101,31 +112,55 @@ public class DistanceJoint extends Joint {
 
     	float cr1u = Vec2.cross(r1, m_u);
     	float cr2u = Vec2.cross(r2, m_u);
-    	m_mass = b1.m_invMass + b1.m_invI * cr1u * cr1u + b2.m_invMass + b2.m_invI * cr2u * cr2u;
-    	assert(m_mass > Settings.EPSILON);
-    	m_mass = 1.0f / m_mass;
 
-    	if (World.ENABLE_WARM_STARTING) {
-    		float Px = step.dt * m_force * m_u.x;
-    		float Py = step.dt * m_force * m_u.y;
-    		b1.m_linearVelocity.x -= b1.m_invMass * Px;
-    		b1.m_linearVelocity.y -= b1.m_invMass * Py;
-    		b1.m_angularVelocity -= b1.m_invI * (r1.x*Py-r1.y*Px);//b2Cross(r1, P);
-    		b2.m_linearVelocity.x += b2.m_invMass * Px;
-    		b2.m_linearVelocity.y += b2.m_invMass * Py;
-    		b2.m_angularVelocity += b2.m_invI * (r2.x*Py-r2.y*Px);//b2Cross(r2, P);
+    	float invMass = b1.m_invMass + b1.m_invI * cr1u * cr1u + b2.m_invMass + b2.m_invI * cr2u * cr2u;
+    	assert(invMass > Settings.EPSILON);
+    	m_mass = 1.0f / invMass;
+
+    	if (m_frequencyHz > 0.0f) {
+    		float C = length - m_length;
+
+    		// Frequency
+    		float omega = 2.0f * (float)Math.PI * m_frequencyHz;
+
+    		// Damping coefficient
+    		float d = 2.0f * m_mass * m_dampingRatio * omega;
+
+    		// Spring stiffness
+    		float k = m_mass * omega * omega;
+
+    		// magic formulas
+    		m_gamma = 1.0f / (step.dt * (d + step.dt * k));
+    		m_bias = C * step.dt * k * m_gamma;
+
+    		m_mass = 1.0f / (invMass + m_gamma);
+    	}
+
+    	if (step.warmStarting) {
+    		m_impulse *= step.dtRatio;
+    		Vec2 P = m_u.mul(m_impulse);
+    		b1.m_linearVelocity.x -= b1.m_invMass * P.x;
+    		b1.m_linearVelocity.y -= b1.m_invMass * P.y;
+    		b1.m_angularVelocity -= b1.m_invI * Vec2.cross(r1, P);
+    		b2.m_linearVelocity.x += b2.m_invMass * P.x;
+    		b2.m_linearVelocity.y += b2.m_invMass * P.y;
+    		b2.m_angularVelocity += b2.m_invI * Vec2.cross(r2, P);
     	} else {
-    		m_force = 0.0f;
+    		m_impulse = 0.0f;
     	}
     }
 
     @Override
     public boolean solvePositionConstraints() {
+    	if (m_frequencyHz > 0.0f) {
+    		return true;
+    	}
+    	
     	Body b1 = m_body1;
     	Body b2 = m_body2;
 
-    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
+    	Vec2 r1 = Mat22.mul(b1.getXForm().R, m_localAnchor1.sub(b1.getLocalCenter()));
+    	Vec2 r2 = Mat22.mul(b2.getXForm().R, m_localAnchor2.sub(b2.getLocalCenter()));
 
     	Vec2 d = new Vec2(b2.m_sweep.c.x + r2.x - b1.m_sweep.c.x - r1.x,
     					  b2.m_sweep.c.y + r2.y - b1.m_sweep.c.y - r1.y);
@@ -164,11 +199,12 @@ public class DistanceJoint extends Joint {
     	Vec2 v1 = b1.m_linearVelocity.add(Vec2.cross(b1.m_angularVelocity, r1));
     	Vec2 v2 = b2.m_linearVelocity.add(Vec2.cross(b2.m_angularVelocity, r2));
     	float Cdot = Vec2.dot(m_u, v2.subLocal(v1));
-    	float force = -step.inv_dt * m_mass * Cdot;
-    	m_force += force;
+    	
+    	float impulse = -m_mass * (Cdot + m_bias + m_gamma * m_impulse);
+    	m_impulse += impulse;
 
-    	float Px = step.dt * force * m_u.x;
-    	float Py = step.dt * force * m_u.y;
+    	float Px = impulse * m_u.x;
+    	float Py = impulse * m_u.y;
     	b1.m_linearVelocity.x -= b1.m_invMass * Px;
     	b1.m_linearVelocity.y -= b1.m_invMass * Py;
     	b1.m_angularVelocity -= b1.m_invI * (r1.x*Py - r1.y*Px);//b2Cross(r1, P);

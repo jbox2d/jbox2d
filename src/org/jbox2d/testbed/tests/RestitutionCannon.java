@@ -22,58 +22,72 @@
  */
 package org.jbox2d.testbed.tests;
 
+import org.jbox2d.collision.CircleDef;
 import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.World;
 import org.jbox2d.testbed.AbstractExample;
 import org.jbox2d.testbed.TestbedMain;
 
-public class Overhang extends AbstractExample {
+import processing.core.PApplet;
 
-    public Overhang(TestbedMain p) {
-        super(p);
+
+
+public class RestitutionCannon extends AbstractExample {
+	private boolean firstTime = true;
+	
+    public RestitutionCannon(TestbedMain t) {
+        super(t);
     }
     
     public String getName() {
-    	return "Overhang";
+    	return "Restitution Cannon";
+    }
+    
+    public String getExampleInstructions() {
+    	return "All balls have restitution less than 1\n\"Cannon\" results " +
+    			"from the lower balls having higher mass.";
     }
 
     @Override
     public void create() {
-        {
-            PolygonDef sd = new PolygonDef();
-            sd.setAsBox(50.0f, 10.0f);
+    	if (firstTime) {
+			setCamera(2f, 12f, 10f);
+			firstTime = false;
+		}
+    	
+    	{
+			PolygonDef sd = new PolygonDef();
+			sd.setAsBox(50.0f, 10.0f);
 
-            BodyDef bd = new BodyDef();
-            bd.position = new Vec2(0.0f, -10.0f);
-            m_world.createBody(bd).createShape(sd);
-        }
+			BodyDef bd = new BodyDef();
+			bd.position.set(0.0f, -10.0f);
+			Body ground = m_world.createBody(bd);
+			ground.createShape(sd);
+		}
 
-        {
-            PolygonDef sd = new PolygonDef();
-            float w = 4.0f;
-            float h = 0.25f;
-            sd.setAsBox(w, h);
-            sd.density = 1.0f;
-            sd.friction = 0.3f;
-            sd.restitution = 0.0f;
+		{
+			CircleDef sd = new CircleDef();
+			sd.radius = 0.5f;
+			sd.density = 500.0f;
+			sd.restitution = 0.8f;
+			sd.friction = 0.9f;
 
-            BodyDef bd = new BodyDef();
+			Vec2 v = new Vec2(0.0f,10.0f);
+			while (sd.density > 0.02f) {
+				BodyDef bd = new BodyDef();
+				bd.position.set(v);
+				bd.isBullet = true;
+				Body body = m_world.createBody(bd);
+				body.createShape(sd);
+				body.setMassFromShapes();
+				v.y += 2.5*sd.radius;
+				sd.density *= .1f;
+			}
 
-            int numSlats = 8;
-            float lastCMX = 0.0f;
-            float eps = 0.14f;
-            for (int i = 0; i < numSlats; ++i) {
-                float newX = lastCMX + w - eps;
-                lastCMX = (i * lastCMX + newX) / (i + 1);
-                bd.position = new Vec2(newX, .25f + 2 * h * (numSlats - i - 1));
-                Body myBody = m_world.createBody(bd);
-                myBody.createShape(sd);
-                myBody.setMassFromShapes();
-            }
-
-        }
+		}
     }
 
 }
