@@ -68,8 +68,8 @@ public class CircleContact extends Contact implements ContactCreateFcn {
         assert (m_shape1.m_type == ShapeType.CIRCLE_SHAPE);
         assert (m_shape2.m_type == ShapeType.CIRCLE_SHAPE);
         m_manifold.pointCount = 0;
-        m_manifold.points[0].normalForce = 0.0f;
-        m_manifold.points[0].tangentForce = 0.0f;
+        m_manifold.points[0].normalImpulse = 0.0f;
+        m_manifold.points[0].tangentImpulse = 0.0f;
         m_manifold.points[0].localPoint1 = new Vec2();
         m_manifold.points[0].localPoint2 = new Vec2();
     }
@@ -87,8 +87,8 @@ public class CircleContact extends Contact implements ContactCreateFcn {
     	Manifold m0 = new Manifold(m_manifold);
         for (int k = 0; k < m_manifold.pointCount; k++) {
             m0.points[k] = new ManifoldPoint(m_manifold.points[k]);
-            m0.points[k].normalForce = m_manifold.points[k].normalForce;
-            m0.points[k].tangentForce = m_manifold.points[k].tangentForce;
+            m0.points[k].normalImpulse = m_manifold.points[k].normalImpulse;
+            m0.points[k].tangentImpulse = m_manifold.points[k].tangentImpulse;
             m0.points[k].separation = m_manifold.points[k].separation;
             //m0.points[k].id.key = m_manifold.points[k].id.key;
             m0.points[k].id.features.set(m_manifold.points[k].id.features);
@@ -115,8 +115,8 @@ public class CircleContact extends Contact implements ContactCreateFcn {
     			cp.normal.set(m0.normal);
     			cp.position = XForm.mul(b1.m_xf, m0.points[0].localPoint1);
     			cp.separation = m0.points[0].separation;
-    			cp.normalForce = m0.points[0].normalForce;
-    			cp.tangentForce = m0.points[0].tangentForce;
+    			cp.normalForce = m0.points[0].normalImpulse;
+    			cp.tangentForce = m0.points[0].tangentImpulse;
     			cp.id = new ContactID(m0.points[0].id);
     			listener.remove(cp);
     		}

@@ -28,7 +28,7 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
 
 
-//Updated to rev 56->97 of b2Joint.cpp/.h
+//Updated to rev 56->97->144 of b2Joint.cpp/.h
 
 public abstract class Joint {
 
@@ -51,6 +51,8 @@ public abstract class Joint {
     public boolean m_collideConnected;
 
     public Object m_userData;
+    
+    public float m_inv_dt;
 
     public Joint(JointDef description) {
         m_type = description.type;
@@ -141,6 +143,11 @@ public abstract class Joint {
     /** Get the user data pointer. */
     public Object getUserData() {
         return m_userData;
+    }
+    
+    /** Set the user data pointer. */
+    public void setUserData(Object o) {
+    	m_userData = o;
     }
 
     public abstract void initVelocityConstraints(TimeStep step);

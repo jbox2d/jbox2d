@@ -64,7 +64,7 @@ public class MotorsAndLimits extends AbstractExample {
 
     		BodyDef bd = new BodyDef();
     		bd.position.set(0.0f, -10.0f);
-    		ground = m_world.createStaticBody(bd);
+    		ground = m_world.createBody(bd);
     		ground.createShape(sd);
     	}
 
@@ -83,7 +83,7 @@ public class MotorsAndLimits extends AbstractExample {
     		float y = 8.0f;
 
     		bd.position.set(3.0f, y);
-    		body = m_world.createDynamicBody(bd);
+    		body = m_world.createBody(bd);
     		body.createShape(sd);
     		body.setMassFromShapes();
 
@@ -97,7 +97,7 @@ public class MotorsAndLimits extends AbstractExample {
     		prevBody = body;
 
     		bd.position.set(9.0f, y);
-    		body = m_world.createDynamicBody(bd);
+    		body = m_world.createBody(bd);
     		body.createShape(sd);
     		body.setMassFromShapes();
 
@@ -113,7 +113,7 @@ public class MotorsAndLimits extends AbstractExample {
 
     		bd.position.set(-10.0f, 10.0f);
     		bd.angle = 0.5f * (float)Math.PI;
-    		body = m_world.createDynamicBody(bd);
+    		body = m_world.createBody(bd);
     		body.createShape(sd);
     		body.setMassFromShapes();
 

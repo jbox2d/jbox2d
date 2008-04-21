@@ -89,22 +89,31 @@ public class CollidePoly {
 
     	// Convert normal from poly1's frame into poly2's frame.
     	Vec2 normal1World = Mat22.mul(xf1.R, poly1.m_normals[edge1]);
-    	Vec2 normal1 = Mat22.mulT(xf2.R, normal1World);
+    	float normal1x = Vec2.dot(normal1World, xf2.R.col1);
+    	float normal1y = Vec2.dot(normal1World, xf2.R.col2);
 
         // Find support vertex on poly2 for -normal.
         int index = 0;
         float minDot = Float.MAX_VALUE;
         for (int i = 0; i < poly2.m_vertexCount; ++i) {
-            float dot = Vec2.dot(poly2.m_vertices[i], normal1);
+            float dot = poly2.m_vertices[i].x * normal1x + poly2.m_vertices[i].y * normal1y; 
+            	//Vec2.dot(poly2.m_vertices[i], normal1);
             if (dot < minDot) {
                 minDot = dot;
                 index = i;
             }
         }
 
-    	Vec2 v1 = XForm.mul(xf1, poly1.m_vertices[edge1]);
-    	Vec2 v2 = XForm.mul(xf2, poly2.m_vertices[index]);
-    	float separation = Vec2.dot(v2.sub(v1), normal1World);
+    	//Vec2 v1 = XForm.mul(xf1, poly1.m_vertices[edge1]);
+        Vec2 v = poly1.m_vertices[edge1];
+        float v1x = xf1.position.x + xf1.R.col1.x * v.x + xf1.R.col2.x * v.y;
+		float v1y = xf1.position.y + xf1.R.col1.y * v.x + xf1.R.col2.y * v.y;
+		Vec2 v3 = poly2.m_vertices[index];
+		//Vec2 v2 = XForm.mul(xf2, poly2.m_vertices[index]);
+    	float v2x = xf2.position.x + xf2.R.col1.x * v3.x + xf2.R.col2.x * v3.y;
+    	float v2y = xf2.position.y + xf2.R.col1.y * v3.x + xf2.R.col2.y * v3.y;
+		//float separation = Vec2.dot(v2.sub(v1), normal1World);
+    	float separation = (v2x-v1x) * normal1World.x + (v2y-v1y) * normal1World.y;
         
         return separation;
     }
@@ -116,10 +125,19 @@ public class CollidePoly {
         MaxSeparation separation = new MaxSeparation();
 
         int count1 = poly1.m_vertexCount;
+		Vec2 v = poly1.m_centroid;
+		Vec2 v1 = poly2.m_centroid;
         
         // Vector pointing from the centroid of poly1 to the centroid of poly2.
-    	Vec2 d = XForm.mul(xf2, poly2.m_centroid).subLocal(XForm.mul(xf1, poly1.m_centroid));
-    	Vec2 dLocal1 = Mat22.mulT(xf1.R, d);
+        //Vec2 d = XForm.mul(xf2, poly2.m_centroid).subLocal(XForm.mul(xf1, poly1.m_centroid));
+    	//Vec2 dLocal1 = Mat22.mulT(xf1.R, d);
+    	float dx = xf2.position.x + xf2.R.col1.x * v1.x + xf2.R.col2.x * v1.y
+    			 - (xf1.position.x + xf1.R.col1.x * v.x + xf1.R.col2.x * v.y);
+    	float dy = xf2.position.y + xf2.R.col1.y * v1.x + xf2.R.col2.y * v1.y
+    			 - (xf1.position.y + xf1.R.col1.y * v.x + xf1.R.col2.y * v.y);
+		Vec2 b = xf1.R.col1;
+		Vec2 b1 = xf1.R.col2;
+    	Vec2 dLocal1 = new Vec2((dx * b.x + dy * b.y), (dx * b1.x + dy * b1.y));
 
     	// Find edge normal on poly1 that has the largest projection onto d.
         int edge = 0;
@@ -307,12 +325,16 @@ public class CollidePoly {
         sideNormal.normalize();
         Vec2 frontNormal = Vec2.cross(sideNormal, 1.0f);
 
-        v11 = XForm.mul(xf1, v11);
-    	v12 = XForm.mul(xf1, v12);
+        //v11 = XForm.mul(xf1, v11);
+    	//v12 = XForm.mul(xf1, v12);
+    	float v11x = xf1.position.x + xf1.R.col1.x * v11.x + xf1.R.col2.x * v11.y;
+    	float v11y = xf1.position.y + xf1.R.col1.y * v11.x + xf1.R.col2.y * v11.y;
+    	float v12x = xf1.position.x + xf1.R.col1.x * v12.x + xf1.R.col2.x * v12.y; 
+		float v12y = xf1.position.y + xf1.R.col1.y * v12.x + xf1.R.col2.y * v12.y;
 
-        float frontOffset = Vec2.dot(frontNormal, v11);
-        float sideOffset1 = -Vec2.dot(sideNormal, v11);
-        float sideOffset2 = Vec2.dot(sideNormal, v12);
+        float frontOffset = frontNormal.x * v11x + frontNormal.y * v11y;
+        float sideOffset1 = -(sideNormal.x * v11x + sideNormal.y * v11y);
+        float sideOffset2 = sideNormal.x * v12x + sideNormal.y * v12y;
 
         // Clip incident edge against extruded edge1 side edges.
         ClipVertex clipPoints1[] = new ClipVertex[2];
@@ -345,9 +367,20 @@ public class CollidePoly {
             if (separation <= 0.0f) {
                 ManifoldPoint cp = manif.points[pointCount];
                 cp.separation = separation;
-                cp.localPoint1 = XForm.mulT(xfA, clipPoints2[i].v);
-    			cp.localPoint2 = XForm.mulT(xfB, clipPoints2[i].v);
-                cp.id = new ContactID(clipPoints2[i].id);
+                //cp.localPoint1 = XForm.mulT(xfA, clipPoints2[i].v);
+    			//cp.localPoint2 = XForm.mulT(xfB, clipPoints2[i].v);
+                Vec2 vec = clipPoints2[i].v;
+                float v1x = vec.x-xfA.position.x;
+				float v1y = vec.y-xfA.position.y;
+    			cp.localPoint1.x = (v1x * xfA.R.col1.x + v1y * xfA.R.col1.y);
+    			cp.localPoint1.y = (v1x * xfA.R.col2.x + v1y * xfA.R.col2.y);
+    			
+				v1x = vec.x-xfB.position.x;
+				v1y = vec.y-xfB.position.y;
+				cp.localPoint2.x = (v1x * xfB.R.col1.x + v1y * xfB.R.col1.y);
+    			cp.localPoint2.y = (v1x * xfB.R.col2.x + v1y * xfB.R.col2.y);
+    			
+    			cp.id = new ContactID(clipPoints2[i].id);
                 cp.id.features.flip = flip;
                 ++pointCount;
             }

@@ -159,7 +159,7 @@ public class Island {
     	ContactSolver contactSolver = new ContactSolver(step, m_contacts, m_contactCount);
 
     	// Initialize velocity constraints.
-    	contactSolver.initVelocityConstraints();
+    	contactSolver.initVelocityConstraints(step);
 
     	for (int i = 0; i < m_jointCount; ++i) {
     		m_joints[i].initVelocityConstraints(step);
@@ -346,8 +346,8 @@ public class Island {
 
     				// TOI constraint results are not stored, so get
     				// the result from the constraint.
-    				cp.normalForce = ccp.normalForce;
-    				cp.tangentForce = ccp.tangentForce;
+    				cp.normalForce = ccp.normalImpulse;
+    				cp.tangentForce = ccp.tangentImpulse;
 
     				if ( (point.id.features.flip & Collision.NEW_POINT) != 0) {
     					point.id.features.flip &= ~Collision.NEW_POINT;

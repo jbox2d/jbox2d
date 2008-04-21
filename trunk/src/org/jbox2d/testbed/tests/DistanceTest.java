@@ -37,7 +37,7 @@ public class DistanceTest extends AbstractExample {
 
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, 10.0f);
-			m_body1 = m_world.createStaticBody(bd);
+			m_body1 = m_world.createBody(bd);
 			m_shape1 = m_body1.createShape(sd);
 		}
 		
@@ -52,12 +52,12 @@ public class DistanceTest extends AbstractExample {
 
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, 10.0f);
-			m_body2 = m_world.createDynamicBody(bd);
+			m_body2 = m_world.createBody(bd);
 			m_shape2 = m_body2.createShape(sd);
 			m_body2.setMassFromShapes();
 		}
 
-		m_world.m_gravity.set(0.0f, 0.0f);
+		m_world.setGravity(new Vec2(0.0f,0.0f));
 	}
 
 	public void step() {
@@ -83,6 +83,10 @@ public class DistanceTest extends AbstractExample {
 	}
 
 	public void keyPressed(int key) {
+		// This is possible if the key event hits before
+		// initialization.
+		if (m_body2 == null) return;
+		
 		Vec2 p = m_body2.getPosition();
 		float a = m_body2.getAngle();
 

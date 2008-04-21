@@ -37,14 +37,20 @@ import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.World;
 
 
-//Updated to rev 131 of b2ContactSolver.cpp/.h
-
-//FIXME: Update to rev 132, bugfix
+//Updated to rev 131->149 of b2ContactSolver.cpp/.h
 
 public class ContactSolver {
 	public TimeStep m_step;
 	
-    public List<ContactConstraint> m_constraints;
+	/* 
+	 * ContactSolver is often a bottleneck, so let's see if
+	 * a plain array is faster than a List...
+	 */
+    //*
+	public ContactConstraint[] m_constraints;
+	/*/
+	public List<ContactConstraint> m_constraints;
+	//*/
 
     public int m_constraintCount;
 
@@ -57,17 +63,25 @@ public class ContactSolver {
             m_constraintCount += contacts[i].getManifoldCount();
         }
 
-        m_constraints = new ArrayList<ContactConstraint>();
+        //*
+        m_constraints = new ContactConstraint[m_constraintCount];
+        /*/
+        m_constraints = new ArrayList<ContactConstraint>(m_constraintCount);
+        //*/
         for (int i = 0; i < m_constraintCount; i++) {
-            m_constraints.add(new ContactConstraint());
+        	//*
+        	m_constraints[i] = new ContactConstraint();
+            /*/
+        	m_constraints.add(new ContactConstraint());
+        	//*/
         }
 
         int count = 0;
         for (int i = 0; i < contactCount; i++) {// Contact contact : contacts) {
             Contact contact = contacts[i];
             
-            Body b1 = contact.m_shape1.m_body;
-            Body b2 = contact.m_shape2.m_body;
+            Body b1 = contact.m_shape1.getBody();
+            Body b2 = contact.m_shape2.getBody();
             int manifoldCount = contact.getManifoldCount();
             List<Manifold> manifolds = contact.getManifolds();
             float friction = contact.m_friction;
@@ -88,8 +102,13 @@ public class ContactSolver {
                 Vec2 normal = manifold.normal.clone();
 
                 assert (count < m_constraintCount);
-
+                
+                //*
+                ContactConstraint c = m_constraints[count];
+                /*/
                 ContactConstraint c = m_constraints.get(count);
+                //*/
+                
                 c.body1 = b1;
                 c.body2 = b2;
                 c.manifold = manifold; //no copy here!
@@ -103,41 +122,42 @@ public class ContactSolver {
                     ManifoldPoint cp = manifold.points[k];
                     ContactConstraintPoint ccp = c.points[k];
 
-                    ccp.normalForce = cp.normalForce;
-                    ccp.tangentForce = cp.tangentForce;
+                    ccp.normalImpulse = cp.normalImpulse;
+                    ccp.tangentImpulse = cp.tangentImpulse;
                     ccp.separation = cp.separation;
                     ccp.positionImpulse = 0.0f;
 
                     ccp.localAnchor1.set(cp.localPoint1);
     				ccp.localAnchor2.set(cp.localPoint2);
-    				ccp.r1 = Mat22.mul(b1.m_xf.R, cp.localPoint1.sub(b1.getLocalCenter()));
-    				ccp.r2 = Mat22.mul(b2.m_xf.R, cp.localPoint2.sub(b2.getLocalCenter()));
+    				ccp.r1 = Mat22.mul(b1.getXForm().R, cp.localPoint1.sub(b1.getLocalCenter()));
+    				ccp.r2 = Mat22.mul(b2.getXForm().R, cp.localPoint2.sub(b2.getLocalCenter()));
 
-    				float r1Sqr = ccp.r1.x*ccp.r1.x + ccp.r1.y*ccp.r1.y;
-    				float r2Sqr = ccp.r2.x*ccp.r2.x + ccp.r2.y*ccp.r2.y;
-                    float rn1 = Vec2.dot(ccp.r1, normal);
-                    float rn2 = Vec2.dot(ccp.r2, normal);
+    				float rn1 = Vec2.cross(ccp.r1, normal);
+    				float rn2 = Vec2.cross(ccp.r2, normal);
+    				rn1 *= rn1;
+    				rn2 *= rn2;
 
-                    float kNormal = b1.m_invMass + b2.m_invMass;
-                    kNormal += b1.m_invI * (r1Sqr - rn1 * rn1) + b2.m_invI
-                            * (r2Sqr - rn2 * rn2);
+    				float kNormal = b1.m_invMass + b2.m_invMass + b1.m_invI * rn1 + b2.m_invI * rn2;
+
 
                     assert (kNormal > Settings.EPSILON);
                     ccp.normalMass = 1.0f / kNormal;
 
                     float kEqualized = b1.m_mass * b1.m_invMass + b2.m_mass * b2.m_invMass;
-    				kEqualized += b1.m_mass * b1.m_invI * (r1Sqr - rn1 * rn1) + b2.m_mass * b2.m_invI * (r2Sqr - rn2 * rn2);
+                    kEqualized += b1.m_mass * b1.m_invI * rn1 + b2.m_mass * b2.m_invI * rn2;
 
     				assert(kEqualized > Settings.EPSILON);
     				ccp.equalizedMass = 1.0f / kEqualized;
 
                     Vec2 tangent = Vec2.cross(normal, 1.0f);
 
-                    float rt1 = Vec2.dot(ccp.r1, tangent);
-                    float rt2 = Vec2.dot(ccp.r2, tangent);
-                    float kTangent = b1.m_invMass + b2.m_invMass;
-                    kTangent += b1.m_invI * (r1Sqr - rt1 * rt1) + b2.m_invI
-                            * (r2Sqr - rt2 * rt2);
+                    float rt1 = Vec2.cross(ccp.r1, tangent);
+    				float rt2 = Vec2.cross(ccp.r2, tangent);
+    				rt1 *= rt1;
+    				rt2 *= rt2;
+
+    				float kTangent = b1.m_invMass + b2.m_invMass + b1.m_invI * rt1 + b2.m_invI * rt2;
+
                     
                     assert (kTangent > Settings.EPSILON);
                     ccp.tangentMass = 1.0f / kTangent;
@@ -162,29 +182,41 @@ public class ContactSolver {
         assert (count == m_constraintCount);
     }
 
-    public void initVelocityConstraints() {
+    public void initVelocityConstraints(TimeStep step) {
+    	// Zero temp objects created - ewjordan
+    	
         // Warm start.
-        for (int i = 0; i < m_constraintCount; ++i) {// ContactConstraint c :
-            // m_constraints) {
-            ContactConstraint c = m_constraints.get(i);
+        for (int i = 0; i < m_constraintCount; ++i) {
+            
+        	//*
+        	ContactConstraint c = m_constraints[i];
+        	/*/
+        	ContactConstraint c = m_constraints.get(i);
+        	//*/
+        	
             Body b1 = c.body1;
             Body b2 = c.body2;
             float invMass1 = b1.m_invMass;
             float invI1 = b1.m_invI;
             float invMass2 = b2.m_invMass;
             float invI2 = b2.m_invI;
-            Vec2 normal = c.normal;
-            Vec2 tangent = Vec2.cross(normal, 1.0f);
+            float normalx = c.normal.x;
+            float normaly = c.normal.y;
+            float tangentx = normaly;
+            float tangenty = -normalx;
 
-            if (World.ENABLE_WARM_STARTING) {
+            if (step.warmStarting) {
             	
                 for (int j = 0; j < c.pointCount; ++j) {
                     ContactConstraintPoint ccp = c.points[j];
                     
                     //Inlined all vector ops here
-                    float px = m_step.dt * (ccp.normalForce * normal.x + ccp.tangentForce * tangent.x);
-                    float py = m_step.dt * (ccp.normalForce * normal.y + ccp.tangentForce * tangent.y);
-
+                    ccp.normalImpulse *= step.dtRatio;
+    				ccp.tangentImpulse *= step.dtRatio;
+                    
+    				float px = (ccp.normalImpulse * normalx + ccp.tangentImpulse * tangentx);
+                    float py = (ccp.normalImpulse * normaly + ccp.tangentImpulse * tangenty);
+                    
                     b1.m_angularVelocity -= invI1 * (ccp.r1.x * py - ccp.r1.y * px);
                     b1.m_linearVelocity.x -= px * invMass1;
                     b1.m_linearVelocity.y -= py * invMass1;
@@ -196,17 +228,23 @@ public class ContactSolver {
             } else {
                 for (int j = 0; j < c.pointCount; ++j) {
                     ContactConstraintPoint ccp = c.points[j];
-                    ccp.normalForce = 0.0f;
-                    ccp.tangentForce = 0.0f;
+                    ccp.normalImpulse = 0.0f;
+                    ccp.tangentImpulse = 0.0f;
                 }
             }
         }
     }
 
     public void solveVelocityConstraints() {
+    	// (4*constraints + 6*points) temp Vec2s - BOTTLENECK!
+    	
     	for (int i=0; i<this.m_constraintCount; ++i) {
-    			//ContactConstraint c : m_constraints) {
-    		ContactConstraint c = m_constraints.get(i);
+    		
+    		//*
+        	ContactConstraint c = m_constraints[i];
+        	/*/
+        	ContactConstraint c = m_constraints.get(i);
+        	//*/
             Body b1 = c.body1;
             Body b2 = c.body2;
             float w1 = b1.m_angularVelocity;
@@ -217,7 +255,7 @@ public class ContactSolver {
             float invI1 = b1.m_invI;
             float invMass2 = b2.m_invMass;
             float invI2 = b2.m_invI;
-            Vec2 normal = c.normal.clone();
+            Vec2 normal = c.normal;//.clone();
             Vec2 tangent = Vec2.cross(normal, 1.0f);
             float friction = c.friction;
             
@@ -231,34 +269,41 @@ public class ContactSolver {
             
             // Solver normal constraints
             for (int j=0; j<c.pointCount; ++j) {
-            		//ContactConstraintPoint ccp : c.points) {
+            	
             	ContactConstraintPoint ccp = c.points[j];
             	
                 // Relative velocity at contact
-                Vec2 dv = v2.add(Vec2.cross(w2,ccp.r2));
-                dv.subLocal(v1);
-                dv.subLocal(Vec2.cross(w1,ccp.r1));
+                //Vec2 dv = v2.add(Vec2.cross(w2,ccp.r2));
+                //dv.subLocal(v1);
+				//Vec2 a = ccp.r1;
+                //dv.subLocal(new Vec2(-w1 * a.y, w1 * a.x));
+                float dvx = v2.x - w2 * ccp.r2.y - v1.x + w1*ccp.r1.y;
+                float dvy = v2.y + w2 * ccp.r2.x - v1.y - w1*ccp.r1.x;
             	
-    			// Compute normal force
-    			float vn = dv.x*normal.x + dv.y*normal.y;//Vec2.dot(dv, normal);
-    			float lambda = - m_step.inv_dt * ccp.normalMass * (vn - ccp.velocityBias);
+    			// Compute normal impulse
+    			float vn = dvx*normal.x + dvy*normal.y;//Vec2.dot(dv, normal);
+    			float lambda = - ccp.normalMass * (vn - ccp.velocityBias);
 
     			// b2Clamp the accumulated force
-    			float newForce = Math.max(ccp.normalForce + lambda, 0.0f);
-    			lambda = newForce - ccp.normalForce;
+    			float newImpulse = MathUtils.max(ccp.normalImpulse + lambda, 0.0f);
+    			lambda = newImpulse - ccp.normalImpulse;
 
     			// Apply contact impulse
-    			Vec2 P = new Vec2(m_step.dt * lambda * normal.x, m_step.dt * lambda * normal.y);
+    			//Vec2 P = new Vec2(lambda * normal.x, lambda * normal.y);
+    			float Px = lambda * normal.x;
+    			float Py = lambda * normal.y;
     			
-    			v1.x -= invMass1*P.x;
-    			v1.y -= invMass1*P.y;
-    			w1 -= invI1 * Vec2.cross(ccp.r1,P);
+    			v1.x -= invMass1*Px;
+    			v1.y -= invMass1*Py;
+    			w1 -= invI1 * (ccp.r1.x * Py - ccp.r1.y * Px); 
+    							//Vec2.cross(ccp.r1,P);
     			
-    			v2.x += invMass2*P.x;
-    			v2.y += invMass2*P.y;
-    			w2 += invI2 * Vec2.cross(ccp.r2,P);
+    			v2.x += invMass2*Px;
+    			v2.y += invMass2*Py;
+    			w2 += invI2 * (ccp.r2.x * Py - ccp.r2.y * Px);
+    							//Vec2.cross(ccp.r2,P);
     			
-    			ccp.normalForce = newForce;
+    			ccp.normalImpulse = newImpulse;
     
             }
             
@@ -275,25 +320,25 @@ public class ContactSolver {
     			 ContactConstraintPoint ccp = c.points[j];
 
                 // Relative velocity at contact
-                Vec2 dv = v2.add(Vec2.cross(w2, ccp.r2));
-                dv.subLocal(v1);
-                dv.subLocal(Vec2.cross(w1,ccp.r1));
+                //Vec2 dv = v2.add(Vec2.cross(w2, ccp.r2));
+                //dv.subLocal(v1);
+                //dv.subLocal(Vec2.cross(w1,ccp.r1));
+                float dvx = v2.x - w2 * ccp.r2.y - v1.x + w1*ccp.r1.y;
+                float dvy = v2.y + w2 * ccp.r2.x - v1.y - w1*ccp.r1.x;
 
                 // Compute tangent force
-                // float vt = Vec2.dot(dv, tangent);
-                float vt = dv.x * tangent.x + dv.y * tangent.y;
-                float lambda = m_step.inv_dt * ccp.tangentMass * (-vt);
+    			float vt = dvx * tangent.x + dvy * tangent.y;
+    			float lambda = ccp.tangentMass * (-vt);
 
-                // b2Clamp the accumulated force
-                float maxFriction = friction * ccp.normalForce;
-                float newForce = MathUtils.clamp(ccp.tangentForce + lambda,-maxFriction, maxFriction);
-                lambda = newForce - ccp.tangentForce;
+    			// b2Clamp the accumulated force
+    			float maxFriction = friction * ccp.normalImpulse;
+    			float newImpulse = MathUtils.max(-maxFriction, MathUtils.min(ccp.tangentImpulse + lambda, maxFriction));
+    			lambda = newImpulse - ccp.tangentImpulse;
 
-                // Apply contact impulse
-                // Vec2 P = tangent.mul(lambda);
-                lambda *= m_step.dt;
-                float px = tangent.x * lambda;
-                float py = tangent.y * lambda;
+    			// Apply contact impulse
+    			//Vec2 P = lambda * tangent;
+    			float px = lambda * tangent.x;
+    			float py = lambda * tangent.y;
 
                 // b1.m_linearVelocity.subLocal(P.mul(invMass1));
                 v1.x -= px * invMass1;
@@ -307,7 +352,7 @@ public class ContactSolver {
                 // b2.m_angularVelocity += invI2 * Vec2.cross(r2, P);
                 w2 += invI2 * (ccp.r2.x * py - ccp.r2.y * px);
 
-                ccp.tangentForce = newForce;
+                ccp.tangentImpulse = newImpulse;
             }
     		 b1.m_linearVelocity.set(v1);
     		 b1.m_angularVelocity = w1;
@@ -318,13 +363,17 @@ public class ContactSolver {
 
     public void finalizeVelocityConstraints() {
     	for (int i = 0; i < m_constraintCount; ++i) {
-    		ContactConstraint c = m_constraints.get(i);
+    		//*
+        	ContactConstraint c = m_constraints[i];
+        	/*/
+        	ContactConstraint c = m_constraints.get(i);
+        	//*/
     		Manifold m = c.manifold;
 
     		for (int j = 0; j < c.pointCount; ++j)
     		{
-    			m.points[j].normalForce = c.points[j].normalForce;
-    			m.points[j].tangentForce = c.points[j].tangentForce;
+    			m.points[j].normalImpulse = c.points[j].normalImpulse;
+    			m.points[j].tangentImpulse = c.points[j].tangentImpulse;
     		}
     	}
     }
@@ -333,7 +382,11 @@ public class ContactSolver {
         float minSeparation = 0.0f;
         for (int i=0; i<this.m_constraintCount; ++i) {
 			//ContactConstraint c : m_constraints) {
+        	//*
+        	ContactConstraint c = m_constraints[i];
+        	/*/
         	ContactConstraint c = m_constraints.get(i);
+        	//*/
         
 			Body b1 = c.body1;
             Body b2 = c.body2;
@@ -348,8 +401,8 @@ public class ContactSolver {
     		for (int j = 0; j < c.pointCount; ++j) {
     			ContactConstraintPoint ccp = c.points[j];
 
-    			Vec2 r1 = Mat22.mul(b1.m_xf.R, ccp.localAnchor1.sub(b1.getLocalCenter()));
-    			Vec2 r2 = Mat22.mul(b2.m_xf.R, ccp.localAnchor2.sub(b2.getLocalCenter()));
+    			Vec2 r1 = Mat22.mul(b1.getXForm().R, ccp.localAnchor1.sub(b1.getLocalCenter()));
+    			Vec2 r2 = Mat22.mul(b2.getXForm().R, ccp.localAnchor2.sub(b2.getLocalCenter()));
     			
     			//Vec2 p1 = b1.m_sweep.c + r1;
     			//Vec2 p2 = b2.m_sweep.c + r2;
@@ -362,7 +415,7 @@ public class ContactSolver {
     			float separation = dpx*normal.x + dpy*normal.y + ccp.separation;//b2Dot(dp, normal) + ccp->separation;
 
     			// Track max constraint error.
-    			minSeparation = Math.min(minSeparation, separation);
+    			minSeparation = MathUtils.min(minSeparation, separation);
 
     			// Prevent large corrections and allow slop.
     			float C = baumgarte * MathUtils.clamp(separation + Settings.linearSlop, -Settings.maxLinearCorrection, 0.0f);
@@ -372,7 +425,7 @@ public class ContactSolver {
 
     			// b2Clamp the accumulated impulse
     			float impulse0 = ccp.positionImpulse;
-    			ccp.positionImpulse = Math.max(impulse0 + dImpulse, 0.0f);
+    			ccp.positionImpulse = MathUtils.max(impulse0 + dImpulse, 0.0f);
     			dImpulse = ccp.positionImpulse - impulse0;
 
     			float impulsex = dImpulse * normal.x;

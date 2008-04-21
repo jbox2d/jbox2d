@@ -23,7 +23,7 @@
 
 package org.jbox2d.dynamics;
 
-//Updated to rev. 56->118 of b2Body.h
+//Updated to rev. 56->118->142 of b2Body.h
 
 import org.jbox2d.collision.MassData;
 import org.jbox2d.common.Vec2;

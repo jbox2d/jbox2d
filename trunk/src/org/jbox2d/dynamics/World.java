@@ -43,7 +43,7 @@ import org.jbox2d.dynamics.joints.*;
 
 
 
-//Updated to rev 56->118 of b2World.cpp/.h
+//Updated to rev 56->118->142 of b2World.cpp/.h
 
 /**
  * The world that physics takes place in.
@@ -56,45 +56,74 @@ import org.jbox2d.dynamics.joints.*;
  * You're warned!
  */
 public class World {
-	public boolean m_lock;
+	boolean m_lock;
 	
-    public BroadPhase m_broadPhase;
+    BroadPhase m_broadPhase;
 
     ContactManager m_contactManager;
 
-    public Body m_bodyList;
+    Body m_bodyList;
 
     /** Do not access, won't be useful! */
-    public Contact m_contactList;
+    Contact m_contactList;
 
-    public Joint m_jointList;
+    Joint m_jointList;
 
-    public int m_bodyCount;
+    int m_bodyCount;
 
-    public int m_contactCount;
+    int m_contactCount;
 
-    public int m_jointCount;
+    int m_jointCount;
 
-    public Vec2 m_gravity;
+    Vec2 m_gravity;
 
-    public boolean m_allowSleep;
+    boolean m_allowSleep;
 
-    public Body m_groundBody;
+    Body m_groundBody;
     
-    public int m_positionIterationCount;
+    int m_positionIterationCount;
 
     /** Should we apply position correction? */
-    public static boolean ENABLE_POSITION_CORRECTION;
+    boolean m_positionCorrection;
     /** Should we use warm-starting?  Improves stability in stacking scenarios. */
-    public static boolean ENABLE_WARM_STARTING;
+    boolean m_warmStarting;
     /** Should we enable continuous collision detection? */
-    public static boolean ENABLE_TOI;
+    boolean m_continuousPhysics;
     
-	public DestructionListener m_destructionListener;
-	public BoundaryListener m_boundaryListener;
-	public ContactFilter m_contactFilter;
-	public ContactListener m_contactListener;
-	public DebugDraw m_debugDraw;
+	DestructionListener m_destructionListener;
+	BoundaryListener m_boundaryListener;
+	ContactFilter m_contactFilter;
+	ContactListener m_contactListener;
+	DebugDraw m_debugDraw;
+	
+	private float m_inv_dt0;
+
+	/** Get the number of bodies. */
+	public int getBodyCount() {
+		return m_bodyCount;
+	}
+
+	/** Get the number of joints. */
+	public int getJointCount() {
+		return m_jointCount;
+	}
+
+	/** Get the number of contacts (each may have 0 or more contact points). */
+	public int getContactCount() {
+		return m_contactCount;
+	}
+
+	/** Change the global gravity vector. */
+	public void setGravity(Vec2 gravity) {
+		m_gravity = gravity;
+	}
+	
+	/** Get a clone of the global gravity vector.
+	 * @return Clone of gravity vector
+	 */
+	public Vec2 getGravity() {
+		return m_gravity.clone();
+	}
 
 	/** The world provides a single static ground body with no collision shapes.
 	 *	You can use this to simplify the creation of joints and static shapes.
@@ -128,12 +157,17 @@ public class World {
 	 * @param doSleep improve performance by not simulating inactive bodies.
      */
 	public World(AABB worldAABB, Vec2 gravity, boolean doSleep) {
+		m_positionCorrection = true;
+		m_warmStarting = true;
+		m_continuousPhysics = true;
 		m_destructionListener = null;
 		m_boundaryListener = null;
 		m_contactFilter = ContactFilter.DEFAULT_FILTER;//&b2_defaultFilter;
 		m_contactListener = null;
 		m_debugDraw = null;
-
+		
+		m_inv_dt0 = 0.0f;
+		
         m_bodyList = null;
         m_contactList = null;
         m_jointList = null;
@@ -153,30 +187,31 @@ public class World {
         m_broadPhase = new BroadPhase(worldAABB, m_contactManager);
 
         BodyDef bd = new BodyDef();
-        m_groundBody = createStaticBody(bd);
+        m_groundBody = createBody(bd);
     }
 
 	/** Register a destruction listener. */
-    public void setListener(DestructionListener listener) {
+    public void setDestructionListener(DestructionListener listener) {
         m_destructionListener = listener;
     }
     
     /** Register a broad-phase boundary listener. */
-    public void setListener(BoundaryListener listener) {
+    public void setBoundaryListener(BoundaryListener listener) {
     	m_boundaryListener = listener;
     }
+
+    /** Register a contact event listener */
+    public void setContactListener(ContactListener listener) {
+    	m_contactListener = listener;
+    }
+    
 
     /**
      *  Register a contact filter to provide specific control over collision.
 	 *  Otherwise the default filter is used (b2_defaultFilter).
      */
-    public void setFilter(ContactFilter filter) {
+    public void setContactFilter(ContactFilter filter) {
     	m_contactFilter = filter;
-    }
-
-    /** Register a contact event listener */
-    public void setListener(ContactListener listener) {
-    	m_contactListener = listener;
     }
     
     /**
@@ -188,43 +223,19 @@ public class World {
     	m_debugDraw = debugDraw;
     }
     
-	/**
-	 * Create a static rigid body given a definition. No reference to the definition
-	 * is retained.
- 	 * <BR><em>Warning</em>: This function is locked during callbacks.
- 	 */
-	public Body createStaticBody(BodyDef def) {
-    	assert(m_lock == false);
-    	if (m_lock == true) {
-    		return null;
-    	}
-
-    	Body b = new Body(def, Body.e_staticType, this);
-    	
-    	// Add to world doubly linked list.
-    	b.m_prev = null;
-    	b.m_next = m_bodyList;
-    	if (m_bodyList != null) {
-    		m_bodyList.m_prev = b;
-    	}
-    	m_bodyList = b;
-    	++m_bodyCount;
-
-    	return b;
-    }
 	
 	/** 
-	 * Create a dynamic rigid body given a definition. No reference to the definition
-	 * is retained.
+	 * Create a body given a definition. No reference to the definition
+	 * is retained.  Body will be static unless mass is nonzero.
 	 * <BR><em>Warning</em>: This function is locked during callbacks.
 	 */
-	public Body createDynamicBody(BodyDef def) {
+	public Body createBody(BodyDef def) {
 		assert(m_lock == false);
 		if (m_lock == true) {
 			return null;
 		}
 
-		Body b = new Body(def, Body.e_dynamicType, this);
+		Body b = new Body(def, this);
 
 		// Add to world doubly linked list.
 		b.m_prev = null;
@@ -340,7 +351,7 @@ public class World {
             Body b = def.body1.m_shapeCount < def.body2.m_shapeCount ? def.body1
                     : def.body2;
             for (Shape s = b.m_shapeList; s != null; s = s.m_next) {
-                s.resetProxy(m_broadPhase, b.m_xf);
+                s.refilterProxy(m_broadPhase, b.getXForm());
             }
         }
 
@@ -419,7 +430,7 @@ public class World {
             // Reset the proxies on the body with the minimum number of shapes.
             Body b = body1.m_shapeCount < body2.m_shapeCount ? body1 : body2;
             for (Shape s = b.m_shapeList; s != null; s = s.m_next) {
-                s.resetProxy(m_broadPhase, b.m_xf);
+                s.refilterProxy(m_broadPhase, b.getXForm());
             }
         }
     }
@@ -442,6 +453,11 @@ public class World {
     		step.inv_dt = 0.0f;
     	}
 
+    	step.dtRatio = m_inv_dt0 * dt;
+
+    	step.positionCorrection = m_positionCorrection;
+    	step.warmStarting = m_warmStarting;
+    	
     	// Update contacts.
     	m_contactManager.collide();
 
@@ -451,14 +467,20 @@ public class World {
     	}
 
     	// Handle TOI events.
-    	if (ENABLE_TOI && step.dt > 0.0f) {
+    	if (m_continuousPhysics && step.dt > 0.0f) {
     		solveTOI(step);
     	}
 
     	// Draw debug information.
     	drawDebugData();
 
+    	m_inv_dt0 = step.inv_dt;
     	m_lock = false;
+    }
+    
+    /** Re-filter a shape. This re-runs contact filtering on a shape. */
+    public void refilter(Shape shape) {
+    	shape.refilterProxy(m_broadPhase, shape.getBody().getXForm());
     }
 	
 	/**
@@ -584,7 +606,7 @@ public class World {
                 }
             }
 
-            island.solve(step, m_gravity, ENABLE_POSITION_CORRECTION, m_allowSleep);
+            island.solve(step, m_gravity, m_positionCorrection, m_allowSleep);
     		
             m_positionIterationCount = Math.max(m_positionIterationCount, Island.m_positionIterationCount); 
 
@@ -852,7 +874,7 @@ public class World {
     public void drawShape(Shape shape, XForm xf, Color3f color, boolean core) {
     	Color3f coreColor = new Color3f(255f*0.9f, 255f*0.6f, 255f*0.6f);
 
-    	if (shape.m_type == ShapeType.CIRCLE_SHAPE) {
+    	if (shape.getType() == ShapeType.CIRCLE_SHAPE) {
     			CircleShape circle = (CircleShape)shape;
 
     			Vec2 center = XForm.mul(xf, circle.getLocalPosition());
@@ -864,7 +886,7 @@ public class World {
     			if (core) {
     				m_debugDraw.drawCircle(center, radius - Settings.toiSlop, coreColor);
     			}
-    	} else if (shape.m_type == ShapeType.POLYGON_SHAPE) {
+    	} else if (shape.getType() == ShapeType.POLYGON_SHAPE) {
     			PolygonShape poly = (PolygonShape)shape;
     			int vertexCount = poly.getVertexCount();
     			Vec2[] localVertices = poly.getVertices();
@@ -1072,5 +1094,27 @@ public class World {
     	}
     }
 
-    
+    /** Enable/disable warm starting. For testing. */
+	public void setWarmStarting(boolean flag) { m_warmStarting = flag; }
+
+	/** Enable/disable position correction. For testing. */
+	public void setPositionCorrection(boolean flag) { m_positionCorrection = flag; }
+
+	/** Enable/disable continuous physics. For testing. */
+	public void setContinuousPhysics(boolean flag) { m_continuousPhysics = flag; }
+	
+	/** Perform validation of internal data structures. */
+	public void validate() {
+		m_broadPhase.validate();
+	}
+
+	/** Get the number of broad-phase proxies. */
+	public int getProxyCount() {
+		return m_broadPhase.m_proxyCount;
+	}
+
+	/** Get the number of broad-phase pairs. */
+	public int getPairCount() {
+		return m_broadPhase.m_pairManager.m_pairCount;
+	}
 }

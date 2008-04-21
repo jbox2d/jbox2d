@@ -206,7 +206,7 @@ public abstract class Shape {
     }
 
     /** Internal */
-    public void resetProxy(BroadPhase broadPhase, XForm transform){
+    public void refilterProxy(BroadPhase broadPhase, XForm transform){
     	if (m_proxyId != PairManager.NULL_PROXY){
     		broadPhase.destroyProxy(m_proxyId);
     	}

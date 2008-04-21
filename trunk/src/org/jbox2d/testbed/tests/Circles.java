@@ -43,17 +43,17 @@ public class Circles extends AbstractExample {
             sd.friction = 1.0f;
             BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
-            m_world.createStaticBody(bd).createShape(sd);
+            m_world.createBody(bd).createShape(sd);
             
             
             // Walls
             sd.setAsBox(3.0f,50.0f);
             bd = new BodyDef();
             bd.position = new Vec2(53.0f,25.0f);
-            rightWall = m_world.createStaticBody(bd);
+            rightWall = m_world.createBody(bd);
             rightWall.createShape(sd);
             bd.position = new Vec2(-53.0f,25.0f);
-            leftWall = m_world.createStaticBody(bd);
+            leftWall = m_world.createBody(bd);
             leftWall.createShape(sd);
             
             // Corners 
@@ -61,11 +61,11 @@ public class Circles extends AbstractExample {
             sd.setAsBox(20.0f,3.0f);
             bd.angle = (float)(-Math.PI/4.0);
             bd.position = new Vec2(-40f,0.0f);
-            Body myBod = m_world.createStaticBody(bd);
+            Body myBod = m_world.createBody(bd);
             myBod.createShape(sd);
             bd.angle = (float)(Math.PI/4.0);
             bd.position = new Vec2(40f,0.0f);
-            myBod = m_world.createStaticBody(bd);
+            myBod = m_world.createBody(bd);
             myBod.createShape(sd);
             
         }
@@ -76,7 +76,7 @@ public class Circles extends AbstractExample {
         int numPieces = 5;
         float radius = 6f;
         bd.position = new Vec2(0.0f,10.0f);
-        Body body = m_world.createDynamicBody(bd);
+        Body body = m_world.createBody(bd);
         for (int i=0; i<numPieces; i++) {
             cd = new CircleDef();
             cd.radius = 1.2f;
@@ -111,7 +111,7 @@ public class Circles extends AbstractExample {
                     float xPos = -45f + 2*i;
                     float yPos = 50f+j;
                     bod.position = new Vec2(xPos,yPos);
-                    Body myBody = m_world.createDynamicBody(bod);
+                    Body myBody = m_world.createBody(bod);
                     myBody.createShape(circ);
                     myBody.setMassFromShapes();
                     

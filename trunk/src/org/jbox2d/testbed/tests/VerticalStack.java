@@ -57,7 +57,7 @@ public class VerticalStack extends AbstractExample {
 
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, 0.0f);
-			Body ground = m_world.createStaticBody(bd);
+			Body ground = m_world.createBody(bd);
 			ground.createShape(sd);
 
 			sd.setAsBox(0.1f, 10.0f, new Vec2(20.0f, 10.0f), 0.0f);
@@ -87,7 +87,7 @@ public class VerticalStack extends AbstractExample {
 				//float32 x = i % 2 == 0 ? -0.025f : 0.025f;
 				bd.position.set(xs[j]+parent.random(-.05f,.05f), 0.752f + 1.54f * i);
 				//bd.position.Set(xs[j], 2.51f + 4.02f * i);
-				Body body = m_world.createDynamicBody(bd);
+				Body body = m_world.createBody(bd);
 
 				body.createShape(sd);
 				body.setMassFromShapes();

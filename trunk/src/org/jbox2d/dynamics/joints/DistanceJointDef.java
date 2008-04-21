@@ -26,7 +26,7 @@ package org.jbox2d.dynamics.joints;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
-//Updated to rev 56->130 of b2DistanceJoint.cpp/.h
+//Updated to rev 56->130->142 of b2DistanceJoint.cpp/.h
 
 /**
  * Definition for a distance joint.  A distance joint
@@ -42,17 +42,27 @@ public class DistanceJointDef extends JointDef {
 	
 	/** The equilibrium length between the anchor points. */
 	public float length;
+	
+	public float frequencyHz;
+
+	public float dampingRatio;
     
 	public DistanceJointDef() {
 		type = JointType.DISTANCE_JOINT;
 		localAnchor1 = new Vec2(0.0f, 0.0f);
 		localAnchor2 = new Vec2(0.0f, 0.0f);
 		length = 1.0f;
+		frequencyHz = 0.0f;
+		dampingRatio = 0.0f;
 	}
 	
 	/**
 	 * Initialize the bodies, anchors, and length using the world
 	 * anchors.
+	 * @param b1 First body
+	 * @param b2 Second body
+	 * @param anchor1 World anchor on first body
+	 * @param anchor2 World anchor on second body
 	 */
     public void initialize(Body b1, Body b2, Vec2 anchor1, Vec2 anchor2) {	
     	body1 = b1;

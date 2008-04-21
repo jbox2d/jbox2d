@@ -46,7 +46,7 @@ public class VaryingFriction extends AbstractExample {
 
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, -20.0f);
-			Body ground = m_world.createStaticBody(bd);
+			Body ground = m_world.createBody(bd);
 			ground.createShape(sd);
 		}
 
@@ -58,7 +58,7 @@ public class VaryingFriction extends AbstractExample {
 			bd.position.set(-4.0f, 22.0f);
 			bd.angle = -0.25f;
 
-			Body ground = m_world.createStaticBody(bd);
+			Body ground = m_world.createBody(bd);
 			ground.createShape(sd);
 		}
 
@@ -69,7 +69,7 @@ public class VaryingFriction extends AbstractExample {
 			BodyDef bd = new BodyDef();
 			bd.position.set(10.5f, 19.0f);
 
-			Body ground = m_world.createStaticBody(bd);
+			Body ground = m_world.createBody(bd);
 			ground.createShape(sd);
 		}
 
@@ -81,7 +81,7 @@ public class VaryingFriction extends AbstractExample {
 			bd.position.set(4.0f, 14.0f);
 			bd.angle = 0.25f;
 
-			Body ground = m_world.createStaticBody(bd);
+			Body ground = m_world.createBody(bd);
 			ground.createShape(sd);
 		}
 
@@ -92,7 +92,7 @@ public class VaryingFriction extends AbstractExample {
 			BodyDef bd = new BodyDef();
 			bd.position.set(-10.5f, 11.0f);
 
-			Body ground = m_world.createStaticBody(bd);
+			Body ground = m_world.createBody(bd);
 			ground.createShape(sd);
 		}
 
@@ -104,7 +104,7 @@ public class VaryingFriction extends AbstractExample {
 			bd.position.set(-4.0f, 6.0f);
 			bd.angle = -0.25f;
 
-			Body ground = m_world.createStaticBody(bd);
+			Body ground = m_world.createBody(bd);
 			ground.createShape(sd);
 		}
 
@@ -119,7 +119,7 @@ public class VaryingFriction extends AbstractExample {
 			{
 				BodyDef bd = new BodyDef();
 				bd.position.set(-15.0f + 4.0f * i, 28.0f);
-				Body body = m_world.createDynamicBody(bd);
+				Body body = m_world.createBody(bd);
 
 				sd.friction = friction[i];
 				body.createShape(sd);

@@ -30,103 +30,103 @@ public class Biped {
 		// create body parts
 		bd = def.LFootDef;
 		bd.position.addLocal(position);
-		LFoot = w.createDynamicBody(bd);
+		LFoot = w.createBody(bd);
 		LFoot.createShape(def.LFootPoly);
 		LFoot.setMassFromShapes();
 
 		bd = def.RFootDef;
 		bd.position.addLocal(position);
-		RFoot = w.createDynamicBody(bd);
+		RFoot = w.createBody(bd);
 		RFoot.createShape(def.RFootPoly);
 		RFoot.setMassFromShapes();
 
 		bd = def.LCalfDef;
 		bd.position.addLocal(position);
-		LCalf = w.createDynamicBody(bd);
+		LCalf = w.createBody(bd);
 		LCalf.createShape(def.LCalfPoly);
 		LCalf.setMassFromShapes();
 
 		bd = def.RCalfDef;
 		bd.position.addLocal(position);
-		RCalf = w.createDynamicBody(bd);
+		RCalf = w.createBody(bd);
 		RCalf.createShape(def.RCalfPoly);
 		RCalf.setMassFromShapes();
 
 		bd = def.LThighDef;
 		bd.position.addLocal(position);
-		LThigh = w.createDynamicBody(bd);
+		LThigh = w.createBody(bd);
 		LThigh.createShape(def.LThighPoly);
 		LThigh.setMassFromShapes();
 
 		bd = def.RThighDef;
 		bd.position.addLocal(position);
-		RThigh = w.createDynamicBody(bd);
+		RThigh = w.createBody(bd);
 		RThigh.createShape(def.RThighPoly);
 		RThigh.setMassFromShapes();
 
 		bd = def.PelvisDef;
 		bd.position.addLocal(position);
-		Pelvis = w.createDynamicBody(bd);
+		Pelvis = w.createBody(bd);
 		Pelvis.createShape(def.PelvisPoly);
 		Pelvis.setMassFromShapes();
 
 		bd = def.StomachDef;
 		bd.position.addLocal(position);
-		Stomach = w.createDynamicBody(bd);
+		Stomach = w.createBody(bd);
 		Stomach.createShape(def.StomachPoly);
 		Stomach.setMassFromShapes();
 
 		bd = def.ChestDef;
 		bd.position.addLocal(position);
-		Chest = w.createDynamicBody(bd);
+		Chest = w.createBody(bd);
 		Chest.createShape(def.ChestPoly);
 		Chest.setMassFromShapes();
 
 		bd = def.NeckDef;
 		bd.position.addLocal(position);
-		Neck = w.createDynamicBody(bd);
+		Neck = w.createBody(bd);
 		Neck.createShape(def.NeckPoly);
 		Neck.setMassFromShapes();
 
 		bd = def.HeadDef;
 		bd.position.addLocal(position);
-		Head = w.createDynamicBody(bd);
+		Head = w.createBody(bd);
 		Head.createShape(def.HeadCirc);
 		Head.setMassFromShapes();
 
 		bd = def.LUpperArmDef;
 		bd.position.addLocal(position);
-		LUpperArm = w.createDynamicBody(bd);
+		LUpperArm = w.createBody(bd);
 		LUpperArm.createShape(def.LUpperArmPoly);
 		LUpperArm.setMassFromShapes();
 
 		bd = def.RUpperArmDef;
 		bd.position.addLocal(position);
-		RUpperArm = w.createDynamicBody(bd);
+		RUpperArm = w.createBody(bd);
 		RUpperArm.createShape(def.RUpperArmPoly);
 		RUpperArm.setMassFromShapes();
 
 		bd = def.LForearmDef;
 		bd.position.addLocal(position);
-		LForearm = w.createDynamicBody(bd);
+		LForearm = w.createBody(bd);
 		LForearm.createShape(def.LForearmPoly);
 		LForearm.setMassFromShapes();
 
 		bd = def.RForearmDef;
 		bd.position.addLocal(position);
-		RForearm = w.createDynamicBody(bd);
+		RForearm = w.createBody(bd);
 		RForearm.createShape(def.RForearmPoly);
 		RForearm.setMassFromShapes();
 
 		bd = def.LHandDef;
 		bd.position.addLocal(position);
-		LHand = w.createDynamicBody(bd);
+		LHand = w.createBody(bd);
 		LHand.createShape(def.LHandPoly);
 		LHand.setMassFromShapes();
 
 		bd = def.RHandDef;
 		bd.position.addLocal(position);
-		RHand = w.createDynamicBody(bd);
+		RHand = w.createBody(bd);
 		RHand.createShape(def.RHandPoly);
 		RHand.setMassFromShapes();
 		

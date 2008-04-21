@@ -58,7 +58,7 @@ public class Pyramid extends AbstractExample {
 
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, -10.0f);
-			Body ground = m_world.createStaticBody(bd);
+			Body ground = m_world.createBody(bd);
 			ground.createShape(sd);
 		}
 
@@ -68,7 +68,7 @@ public class Pyramid extends AbstractExample {
 			sd.setAsBox(a, a);
 			sd.density = 5.0f;
 			sd.restitution = 0.0f;
-			sd.friction = 0.9f;
+			sd.friction = 0.5f;
 
 			Vec2 x = new Vec2(-10.0f, 0.75f);
 			Vec2 y = new Vec2();
@@ -81,7 +81,7 @@ public class Pyramid extends AbstractExample {
 				for (int j = i; j < 25; ++j) {
 					BodyDef bd = new BodyDef();
 					bd.position.set(y);
-					Body body = m_world.createDynamicBody(bd);
+					Body body = m_world.createBody(bd);
 					body.createShape(sd);
 					body.setMassFromShapes();
 

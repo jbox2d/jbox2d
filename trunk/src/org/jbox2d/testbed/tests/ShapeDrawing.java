@@ -62,7 +62,7 @@ public class ShapeDrawing extends AbstractExample {
 		{
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, -10.0f);
-			ground = m_world.createStaticBody(bd);
+			ground = m_world.createBody(bd);
 
 			PolygonDef sd = new PolygonDef();
 			sd.setAsBox(50.0f, 10.0f);
@@ -104,7 +104,7 @@ public class ShapeDrawing extends AbstractExample {
 		if (mouseStrokeLength < 2) return;
 		BodyDef myBodyDef = new BodyDef();
 		myBodyDef.isBullet = true;
-		Body myBody = m_world.createDynamicBody(myBodyDef);
+		Body myBody = m_world.createBody(myBodyDef);
 		for (int i=0; i<mouseStrokeLength-1; ++i) {
 			PolygonDef sd = new PolygonDef();
 			sd.density = 2.0f;

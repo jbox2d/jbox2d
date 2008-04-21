@@ -53,7 +53,7 @@ public class DominoTower extends AbstractExample {
         sd.restitution = 0.65f;
         bd.position = new Vec2(x, y);
         bd.angle = horizontal? (float)(Math.PI/2.0):0f;
-        Body myBody = world.createDynamicBody(bd);
+        Body myBody = world.createBody(bd);
         myBody.createShape(sd);
         myBody.setMassFromShapes();
     }
@@ -72,7 +72,7 @@ public class DominoTower extends AbstractExample {
 
             BodyDef bd = new BodyDef();
             bd.position = new Vec2(0.0f, -10.0f);
-            m_world.createStaticBody(bd).createShape(sd);
+            m_world.createBody(bd).createShape(sd);
         }
         
         {
@@ -87,14 +87,14 @@ public class DominoTower extends AbstractExample {
             bd.isBullet = true;
             //bd.addShape(sd);
             bd.position = new Vec2(30f, 50f);
-            Body b = m_world.createDynamicBody(bd);
+            Body b = m_world.createBody(bd);
             b.createShape(sd);
             b.setLinearVelocity(new Vec2(-25f,-25f));
             b.setAngularVelocity(6.7f);
             b.setMassFromShapes();
             sd.density = 25f;
             bd.position = new Vec2(-30, 25f);
-            b = m_world.createDynamicBody(bd);
+            b = m_world.createBody(bd);
             b.createShape(sd);
             b.setLinearVelocity(new Vec2(35f, -10f));
             b.setAngularVelocity(-8.3f);
