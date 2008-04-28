@@ -1117,4 +1117,14 @@ public class World {
 	public int getPairCount() {
 		return m_broadPhase.m_pairManager.m_pairCount;
 	}
+	
+	/** Get the world bounding box. */
+	public AABB getWorldAABB() {
+		return m_broadPhase.m_worldAABB;
+	}
+	
+	/** Return true if the bounding box is within range of the world AABB. */
+	public boolean inRange(AABB aabb) {
+		return m_broadPhase.inRange(aabb);
+	}
 }
