@@ -44,6 +44,14 @@ public class PolygonDef extends ShapeDef {
         vertices = new ArrayList<Vec2>();
     }
     
+    /**
+     * Set the polygon to have a rectangular shape.
+     * Note that the dimensions are half-width/height,
+     * not total width/height.  So for a 1m square box,
+     * call setAsBox(0.5f,0.5f)
+     * @param hx Half-width of box
+     * @param hy Half-height of box
+     */
     public void setAsBox(float hx, float hy) {
     	vertices.clear();
     	vertices.add(new Vec2(-hx, -hy));
