@@ -14,6 +14,11 @@ import org.jbox2d.util.blob.BlobStructure.IntIntFloatFloat;
  * BlobMaker offers a static API for the creation of blobs.
  */
 public class BlobMaker {
+	static public float pointRadius = 3.0f;
+	static public float pointDensity = 1.0f;
+	static public float pointFriction = 0.5f;
+	
+	
 	/**
 	 * Creates a blob in a given physics world.
 	 * Does not apply any scaling or translation to the structure
@@ -97,9 +102,11 @@ public class BlobMaker {
 		//How many do we need in each direction to cover AABB?
 		int nWidth = (int)Math.ceil((aabb.upperBound.x - xMin)/scaleX);
 		int nHeight = (int)Math.ceil((aabb.upperBound.y - yMin)/scaleY);
-		//Add 1 so we overshoot by a row/column
+		
+		//Add overshoot
 		++nWidth;
-		++nHeight;
+		nHeight += 2; //why 1 doesn't work, I have no idea...
+		
 		
 		int nPerCell = s.points.size();
 		int nPoints = nPerCell*nWidth*nHeight;
@@ -109,9 +116,9 @@ public class BlobMaker {
 		// Fill the bodies[] array
 		Body[] bodies = new Body[nPoints];
 		CircleDef cd = new CircleDef();
-		cd.radius = 0.2f;
-		cd.density = 5.0f;
-		cd.friction = 0.2f;
+		cd.radius = pointRadius;
+		cd.density = pointDensity;
+		cd.friction = pointFriction;
 		int index = 0;
 		for (int j=0; j<nHeight; ++j) {
 			float yStart = yMin + transY + j*scaleY;
@@ -127,7 +134,8 @@ public class BlobMaker {
 					
 					BodyDef bd = new BodyDef();
 					bd.position = position;
-					bd.fixedRotation = true;
+					bd.fixedRotation = true; //causes problems when extremely compressed
+					//bd.angularDamping = 0.5f;
 					bodies[index] = w.createBody(bd);
 					bodies[index].createShape(cd);
 					bodies[index].setMassFromShapes();
