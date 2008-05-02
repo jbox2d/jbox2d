@@ -23,21 +23,18 @@
 
 package org.jbox2d.testbed.tests;
 
-import org.jbox2d.collision.CircleDef;
 import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
-import org.jbox2d.dynamics.joints.DistanceJointDef;
-import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jbox2d.testbed.AbstractExample;
 import org.jbox2d.testbed.TestbedMain;
 import org.jbox2d.util.blob.*;
 
-public class BugTest extends AbstractExample {
+public class BlobTest extends AbstractExample {
 	private boolean firstTime;
 	
-	public BugTest(TestbedMain _parent) {
+	public BlobTest(TestbedMain _parent) {
 		super(_parent);
 		firstTime = true;
 	}
@@ -61,16 +58,24 @@ public class BugTest extends AbstractExample {
 			ground.createShape(sd);
 		}
 		
-		BlobMaker.createBlob(new SquareLatticeStructure(),
-							 new CircularBlobContainer(new Vec2(0.0f,10.0f),5.0f),
-							 m_world,0.5f, 0.5f, 0.15f, 0.15f);
+		BlobStructure structure = new SquareLatticeStructure();
+		structure.setSpringDamping(0.9f);
+		structure.setSpringFrequency(3f);
+		BlobContainer container = new CircularBlobContainer(new Vec2(0.0f,12.0f),11.0f);
+		
+		BlobMaker.pointRadius = 0.6f;
+		BlobMaker.pointFriction = 0.2f;
+		BlobMaker.pointDensity = 0.1f;
+		BlobMaker.createBlob(structure, container, m_world,
+							//scaleX   scaleY    shiftX  shiftY
+							1.5f,     1.25f,    0.0f,  0.15f);
 
 
 	}
 
 	@Override
 	public String getName() {
-		return "Bug Test";
+		return "BlobMaker Test";
 	}
 
 }
