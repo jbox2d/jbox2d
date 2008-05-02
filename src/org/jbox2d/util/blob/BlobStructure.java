@@ -25,7 +25,7 @@ import java.util.ArrayList;
  * </p>
  */
 public class BlobStructure {
-	// Package access to fields
+	// Package access to all fields
 	ArrayList<BlobPoint> points;
 	ArrayList<IntIntFloatFloat> connections;
 	ArrayList<IntIntFloatFloat> connectionsR;
@@ -33,8 +33,49 @@ public class BlobStructure {
 	ArrayList<IntIntFloatFloat> connectionsD;
 	ArrayList<IntIntFloatFloat> connectionsUR;
 	
-	public float currentFrequency = 10.0f;
-	public float currentDamping = 0.9f;
+	float currentFrequency = 10.0f;
+	float currentDamping = 0.9f;
+	
+	private void updateSprings() {
+		for (IntIntFloatFloat iiff:connections) {
+			iiff.c = currentFrequency;
+			iiff.d = currentDamping;
+		}
+		for (IntIntFloatFloat iiff:connectionsR) {
+			iiff.c = currentFrequency;
+			iiff.d = currentDamping;
+		}
+		for (IntIntFloatFloat iiff:connectionsDR) {
+			iiff.c = currentFrequency;
+			iiff.d = currentDamping;
+		}
+		for (IntIntFloatFloat iiff:connectionsD) {
+			iiff.c = currentFrequency;
+			iiff.d = currentDamping;
+		}
+		for (IntIntFloatFloat iiff:connectionsUR) {
+			iiff.c = currentFrequency;
+			iiff.d = currentDamping;
+		}
+	}
+	
+	public void setSpringFrequency(float freq) {
+		currentFrequency = freq;
+		updateSprings();
+	}
+	
+	public float getSpringFrequency() {
+		return currentFrequency;
+	}
+	
+	public void setSpringDamping(float damp) {
+		currentDamping = damp;
+		updateSprings();
+	}
+	
+	public float getSpringDamping() {
+		return currentDamping;
+	}
 	
 	public BlobStructure() {
 		points = new ArrayList<BlobPoint>();
