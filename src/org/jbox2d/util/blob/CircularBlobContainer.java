@@ -43,8 +43,8 @@ public class CircularBlobContainer implements BlobContainer {
 	}
 
 	public AABB getAABB() {
-		Vec2 min = new Vec2(centerX-radius,centerY-radius);
-		Vec2 max = new Vec2(centerX+radius,centerY+radius);
+		Vec2 min = new Vec2(centerX-radius*1.2f,centerY-radius*1.2f);
+		Vec2 max = new Vec2(centerX+radius*1.2f,centerY+radius*1.2f);
 		return new AABB(min,max);
 	}
 

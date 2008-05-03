@@ -102,16 +102,17 @@ public class BlobMaker {
 		//How many do we need in each direction to cover AABB?
 		int nWidth = (int)Math.ceil((aabb.upperBound.x - xMin)/scaleX);
 		int nHeight = (int)Math.ceil((aabb.upperBound.y - yMin)/scaleY);
-		
+		//System.out.println(nWidth+ " " +(aabb.upperBound.x - xMin)/scaleX);
+		//System.out.println(aabb);
 		//Add overshoot
-		++nWidth;
-		nHeight += 2; //why 1 doesn't work, I have no idea...
+		nWidth += 3;
+		nHeight += 3;
 		
 		
 		int nPerCell = s.points.size();
 		int nPoints = nPerCell*nWidth*nHeight;
 		
-		System.out.println(xMin+ " " +scaleX + " " +nWidth);
+		System.out.println(nWidth + " " +nHeight);
 		
 		// Fill the bodies[] array
 		Body[] bodies = new Body[nPoints];
@@ -129,13 +130,15 @@ public class BlobMaker {
 											 s.points.get(k).position.y+yStart);
 					if (!c.containsPoint(position)) {
 						bodies[index++] = null;
+						//System.out.println("Skipped point at "+position);
 						continue;
 					}
+					//System.out.println("Creating pt at "+position);
 					
 					BodyDef bd = new BodyDef();
 					bd.position = position;
-					bd.fixedRotation = true; //causes problems when extremely compressed
-					//bd.angularDamping = 0.5f;
+					bd.fixedRotation = false; //causes problems when extremely compressed
+					bd.angularDamping = 0.2f;
 					bodies[index] = w.createBody(bd);
 					bodies[index].createShape(cd);
 					bodies[index].setMassFromShapes();
@@ -147,9 +150,9 @@ public class BlobMaker {
 		//Handle the connections - only go up until the row/col right before
 		//the last one, because the last ones overshoot and should have all
 		//null objects.
-		for (int j=0; j<nHeight-1; ++j) {
+		for (int j=0; j<nHeight; ++j) {
 			int rowStartIndex = j*nWidth*nPerCell;
-			for (int i=0; i<nWidth-1; ++i) {
+			for (int i=0; i<nWidth; ++i) {
 				int boxStartIndex = rowStartIndex + i*nPerCell;
 				int indexUR = -(nWidth-1)*nPerCell + boxStartIndex;
 				int indexR = nPerCell + boxStartIndex;
@@ -159,15 +162,6 @@ public class BlobMaker {
 					IntIntFloatFloat iiff = s.connections.get(k);
 					int a = iiff.a + boxStartIndex;
 					int b = iiff.b + boxStartIndex;
-					float freq = iiff.c;
-					float damp = iiff.d;
-					createConnection(bodies,a,b,freq,damp, w);
-				}
-				for (int k=0; k<s.connectionsUR.size(); ++k) {
-					if (j==0) break; //First row has no row above it
-					IntIntFloatFloat iiff = s.connectionsUR.get(k);
-					int a = iiff.a + boxStartIndex;
-					int b = iiff.b + indexUR;
 					float freq = iiff.c;
 					float damp = iiff.d;
 					createConnection(bodies,a,b,freq,damp, w);
@@ -196,13 +190,23 @@ public class BlobMaker {
 					float damp = iiff.d;
 					createConnection(bodies,a,b,freq,damp, w);
 				}
+				for (int k=0; k<s.connectionsUR.size(); ++k) {
+					if (j==0) break; //First row has no row above it
+					IntIntFloatFloat iiff = s.connectionsUR.get(k);
+					int a = iiff.a + boxStartIndex;
+					int b = iiff.b + indexUR;
+					float freq = iiff.c;
+					float damp = iiff.d;
+					createConnection(bodies,a,b,freq,damp, w);
+				}
 			}
 		}
 	}
 
 	private static Joint createConnection(Body[] bodies, int a, int b, float frequency, float damping, World w) {
 		// If either body is null, return - the connection should be ignored.
-		if (bodies[a] == null || bodies[b] == null) return null;
+		if (a >= bodies.length || b >= bodies.length ||
+			bodies[a] == null || bodies[b] == null) return null;
 		
 		DistanceJointDef jd = new DistanceJointDef();
 		jd.collideConnected = false;
