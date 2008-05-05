@@ -23,6 +23,7 @@
 
 package org.jbox2d.testbed.tests;
 
+import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -41,7 +42,7 @@ public class BlobTest extends AbstractExample {
 	
 	@Override
 	public void create() {
-		
+
 		if (firstTime) {
 			setCamera(0.0f,10.0f,20.0f);
 			firstTime = false;
@@ -59,17 +60,39 @@ public class BlobTest extends AbstractExample {
 		}
 		
 		BlobStructure structure = new SquareLatticeStructure();
-		structure.setSpringDamping(0.9f);
+		structure.setSpringDamping(0.1f);
 		structure.setSpringFrequency(3f);
-		BlobContainer container = new CircularBlobContainer(new Vec2(0.0f,12.0f),11.0f);
-		
+		BlobContainer container = new CircularBlobContainer(new Vec2(0.0f,12.0f),6.0f);
+		/*
 		BlobMaker.pointRadius = 0.6f;
 		BlobMaker.pointFriction = 0.2f;
 		BlobMaker.pointDensity = 0.1f;
 		BlobMaker.createBlob(structure, container, m_world,
 							//scaleX   scaleY    shiftX  shiftY
 							1.5f,     1.25f,    0.0f,  0.15f);
+		*/
+		
+		container = new DonutBlobContainer(new Vec2(0.0f,28.0f),1.0f,3.0f);
+		//container = new CircularBlobContainer(new Vec2(0.0f,28.0f),3.0f);
+		/*container = new BlobContainer(){
+			AABB aabb = new AABB(new Vec2(-11f,10f), new Vec2(-8f,15f));
+			public boolean containsPoint(Vec2 p) { 
+				if (p.x < aabb.lowerBound.x || p.x > aabb.upperBound.x ||
+					p.y < aabb.lowerBound.y || p.y > aabb.upperBound.y)
+					return false;
+				return true;
+			}
 
+			public AABB getAABB() {
+				return aabb;
+			}
+		};*/
+		structure.setSpringFrequency(30.0f);
+		BlobMaker.pointRadius = 0.2f;
+		BlobMaker.createBlob(structure, container, m_world,
+				//scaleX   scaleY    shiftX  shiftY
+				0.3f,      0.4f,     0.2f,  0.3f);
+		
 
 	}
 
