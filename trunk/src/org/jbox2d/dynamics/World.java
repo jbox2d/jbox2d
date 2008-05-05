@@ -23,6 +23,8 @@
 
 package org.jbox2d.dynamics;
 
+import java.util.ArrayList;
+
 import org.jbox2d.common.Color3f;
 
 import org.jbox2d.collision.AABB;
@@ -97,6 +99,8 @@ public class World {
 	DebugDraw m_debugDraw;
 	
 	private float m_inv_dt0;
+
+	private ArrayList<Steppable> postStepList;
 
 	/** Get the number of bodies. */
 	public int getBodyCount() {
@@ -188,6 +192,7 @@ public class World {
 
         BodyDef bd = new BodyDef();
         m_groundBody = createBody(bd);
+        postStepList = new ArrayList<Steppable>();
     }
 
 	/** Register a destruction listener. */
@@ -476,6 +481,35 @@ public class World {
 
     	m_inv_dt0 = step.inv_dt;
     	m_lock = false;
+    	
+    	postStep(dt,iterations);
+    }
+    
+    
+    /** Goes through the registered postStep functions and calls them. */
+    private void postStep(float dt, int iterations) {
+    	for (Steppable s:postStepList) {
+    		s.step(dt,iterations);
+    	}
+    }
+    
+    /**
+     * Registers a Steppable object to be stepped
+     * immediately following the physics step, once
+     * the locks are lifted.
+     * @param s
+     */
+    public void registerPostStep(Steppable s) {
+    	postStepList.add(s);
+    }
+    
+    /**
+     * Unregisters a method from post-stepping.
+     * Fails silently if method is not found.
+     * @param s
+     */
+    public void unregisterPostStep(Steppable s) {
+    	postStepList.remove(s);
     }
     
     /** Re-filter a shape. This re-runs contact filtering on a shape. */
@@ -873,7 +907,7 @@ public class World {
     /** For internal use */
     public void drawShape(Shape shape, XForm xf, Color3f color, boolean core) {
     	Color3f coreColor = new Color3f(255f*0.9f, 255f*0.6f, 255f*0.6f);
-
+    	
     	if (shape.getType() == ShapeType.CIRCLE_SHAPE) {
     			CircleShape circle = (CircleShape)shape;
 
@@ -959,6 +993,7 @@ public class World {
     		for (Body b = m_bodyList; b != null; b = b.getNext()) {
     			XForm xf = b.getXForm();
     			for (Shape s = b.getShapeList(); s != null; s = s.getNext()) {
+    				if (s.isSensor()) continue;
     				if (b.isStatic()) {
     					drawShape(s, xf, new Color3f(255f*0.5f, 255f*0.9f, 255f*0.5f), core);
     				}

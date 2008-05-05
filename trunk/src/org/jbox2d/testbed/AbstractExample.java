@@ -79,7 +79,7 @@ public abstract class AbstractExample {
     /** Number of active points in m_points array. */
     protected int m_pointCount;
     /** Array of contact points - use m_pointCount to get number of active elements.  */
-    protected ContactPoint[] m_points;
+    protected ExampleContactPoint[] m_points;
     /** The world object this example uses. */
     protected World m_world;
     /** The bomb body.  May be null if no bomb is active. */
@@ -211,9 +211,9 @@ public abstract class AbstractExample {
 		bombSpawnPoint = null;
 		bombSpawning = false;
 		
-		m_points = new ContactPoint[k_maxContactPoints];
+		m_points = new ExampleContactPoint[k_maxContactPoints];
 		for (int i=0; i<m_points.length; ++i) {
-			m_points[i] = new ContactPoint();
+			m_points[i] = new ExampleContactPoint();
 		}
 		m_destructionListener = new ConcreteDestructionListener();
 		m_boundaryListener = new ConcreteBoundaryListener();
@@ -320,7 +320,7 @@ public abstract class AbstractExample {
 			float k_axisScale = 0.3f;
 
 			for (int i = 0; i < m_pointCount; ++i) {
-				ContactPoint point = m_points[i];
+				ExampleContactPoint point = m_points[i];
 				
 				if (point.state == 0) {
 					// Add
@@ -650,7 +650,7 @@ public abstract class AbstractExample {
     			return;
     		}
 
-    		ContactPoint cp = test.m_points[test.m_pointCount];
+    		ExampleContactPoint cp = test.m_points[test.m_pointCount];
     		cp.shape1 = point.shape1;
     		cp.shape2 = point.shape2;
     		cp.position = point.position.clone();
@@ -666,7 +666,7 @@ public abstract class AbstractExample {
     			return;
     		}
 
-    		ContactPoint cp = test.m_points[test.m_pointCount];
+    		ExampleContactPoint cp = test.m_points[test.m_pointCount];
     		cp.shape1 = point.shape1;
     		cp.shape2 = point.shape2;
     		cp.position = point.position.clone();
@@ -682,7 +682,7 @@ public abstract class AbstractExample {
     			return;
     		}
 
-    		ContactPoint cp = test.m_points[test.m_pointCount];
+    		ExampleContactPoint cp = test.m_points[test.m_pointCount];
     		cp.shape1 = point.shape1;
     		cp.shape2 = point.shape2;
     		cp.position = point.position.clone();
@@ -697,20 +697,6 @@ public abstract class AbstractExample {
     	public AbstractExample test;
     }
 
-    /**
-     * Holder for storing contact information.
-     * Not the same as org.jbox2d.dynamics.contacts.ContactPoint (TODO: fix name clash)
-     */
-    class ContactPoint {
-    	public Shape shape1;
-    	public Shape shape2;
-    	public Vec2 normal;
-    	public Vec2 position;
-    	public float normalForce;
-    	public float tangentForce;
-    	public int state; // 0-add, 1-persist, 2-remove
-    }
-    
     /**
      * Holder for images to be drawn on bodies.
      * You should not need to create BoundImages yourself -

@@ -61,7 +61,7 @@ public class Settings {
     /** Must be a power of two. */
     public static final int maxProxies = 2048;
     /** Must be a power of two. */
-    public static final int maxPairs = 8 * maxProxies;
+    public static final int maxPairs = 2* 8 * maxProxies;
     
     // Dynamics
     
