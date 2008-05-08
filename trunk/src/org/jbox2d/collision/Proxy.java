@@ -23,6 +23,7 @@
 
 package org.jbox2d.collision;
 
+//Updated to rev 139 of b2Broadphase.h
 public class Proxy {
     public int lowerBounds[];
 

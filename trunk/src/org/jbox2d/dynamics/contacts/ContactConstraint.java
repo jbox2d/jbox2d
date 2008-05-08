@@ -30,7 +30,7 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
-
+// Updated to rev 139 of b2ContactSolver.h
 public class ContactConstraint {
     public ContactConstraintPoint points[];
 

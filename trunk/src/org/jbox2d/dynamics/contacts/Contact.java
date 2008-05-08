@@ -34,6 +34,8 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.ContactListener;
 import org.jbox2d.dynamics.World;
 
+// Updated to rev 142 of b2Contact.h/cpp
+
 /**
  * Base class for contacts between shapes.
  * @author ewjordan

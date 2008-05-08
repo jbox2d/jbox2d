@@ -23,7 +23,7 @@
 
 package org.jbox2d.collision;
 
-//Updated to rev 56 of b2PairManager.h
+//Updated to rev 56->136 of b2PairManager.h
 
 public class Pair implements Comparable<Pair> {
     private static final int PAIR_BUFFERED = 0x0001;

@@ -23,7 +23,10 @@
 
 package org.jbox2d.dynamics;
 
+import org.jbox2d.collision.FilterData;
 import org.jbox2d.collision.Shape;
+
+// Updated to rev 143 of b2WorldCallbacks.h/cpp
 
 /**
  * Default sample implementation of ContactFilter.
@@ -35,12 +38,15 @@ public class DefaultContactFilter implements ContactFilter {
 	 * If you implement your own collision filter you may want to build from this implementation.
 	 */
 	public boolean shouldCollide(Shape shape1, Shape shape2) {
+		
+		FilterData filter1 = shape1.getFilterData();
+		FilterData filter2 = shape2.getFilterData();
 
-		if (shape1.m_groupIndex == shape2.m_groupIndex && shape1.m_groupIndex != 0) {
-			return shape1.m_groupIndex > 0;
+		if (filter1.groupIndex == filter2.groupIndex && filter1.groupIndex != 0) {
+			return filter1.groupIndex > 0;
 		}
 
-		boolean collide = (shape1.m_maskBits & shape2.m_categoryBits) != 0 && (shape1.m_categoryBits & shape2.m_maskBits) != 0;
+		boolean collide = (filter1.maskBits & filter2.categoryBits) != 0 && (filter1.categoryBits & filter2.maskBits) != 0;
 		return collide;
 	}
 

@@ -26,7 +26,7 @@ package org.jbox2d.collision;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Vec2;
 
-//Updated to rev 56 of b2Collision.h
+//Updated to rev 56->139 of b2Collision.h
 
 /** An oriented bounding box. */
 public class OBB {

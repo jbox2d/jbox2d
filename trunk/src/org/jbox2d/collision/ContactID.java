@@ -23,7 +23,7 @@
 
 package org.jbox2d.collision;
 
-//Updated to rev 56 of b2Collision.h
+//Updated to rev 56->139 of b2Collision.h
 
 //FIXME: In the C++ version, this class is a union of
 //the key and the features, meaning not that it contains
@@ -35,6 +35,9 @@ package org.jbox2d.collision;
 //I have a feeling that as of right now, key is never being
 //set anyways.  Initial examination seems to show that key is
 //always zero. [hacked around for the moment]
+//
+//Also, it might be better performance-wise to pull features
+//to a top level class if inner classes have more overhead (check this).
 /** Contact ids to facilitate warm starting.*/
 public class ContactID {
 	/** Inactive in Java port (used for quick compares in C++ as part of a union) */
@@ -46,7 +49,7 @@ public class ContactID {
     /** The features that intersect to form the contact point */
     public class Features {
     	/** The edge that defines the outward contact normal. */
-        public int referenceFace;
+        public int referenceEdge;
         /** The edge most anti-parallel to the reference edge. */
         public int incidentEdge;
         /** The vertex (0 or 1) on the incident edge that was clipped. */
@@ -55,35 +58,39 @@ public class ContactID {
         public int flip;
 
         public Features() {
-            referenceFace = incidentEdge = incidentVertex = flip = 0;
+            referenceEdge = incidentEdge = incidentVertex = flip = 0;
         }
 
         public Features(Features f) {
-            referenceFace = f.referenceFace;
+            referenceEdge = f.referenceEdge;
             incidentEdge = f.incidentEdge;
             incidentVertex = f.incidentVertex;
             flip = f.flip;
         }
         
         public void set(Features f){
-            referenceFace = f.referenceFace;
+            referenceEdge = f.referenceEdge;
             incidentEdge = f.incidentEdge;
             incidentVertex = f.incidentVertex;
             flip = f.flip;
         }
         
         public boolean isEqual(Features f){
-            return (referenceFace==f.referenceFace && 
+            return (referenceEdge==f.referenceEdge && 
                     incidentEdge==f.incidentEdge &&
                     incidentVertex==f.incidentVertex &&
                     flip==f.flip);
         }
         
         public String toString() {
-        	String s = "Features: (" + this.flip + " ," + this.incidentEdge + " ," + this.incidentVertex + " ," + this.referenceFace + ")";
+        	String s = "Features: (" + this.flip + " ," + this.incidentEdge + " ," + this.incidentVertex + " ," + this.referenceEdge + ")";
         	return s;
         }
 
+    }
+    
+    public boolean isEqual(ContactID cid) {
+    	return cid.features.isEqual(this.features);
     }
     
     public void zero() {
@@ -91,7 +98,7 @@ public class ContactID {
     	features.flip = 0;
     	features.incidentEdge = 0;
     	features.incidentVertex = 0;
-    	features.referenceFace = 0;
+    	features.referenceEdge = 0;
     }
 
     public ContactID() {

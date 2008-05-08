@@ -132,23 +132,23 @@ public class BipedDef {
 	}
 
 	public void setGroupIndex(int i) {
-		LFootPoly.groupIndex		= i;
-		RFootPoly.groupIndex		= i;
-		LCalfPoly.groupIndex		= i;
-		RCalfPoly.groupIndex		= i;
-		LThighPoly.groupIndex		= i;
-		RThighPoly.groupIndex		= i;
-		PelvisPoly.groupIndex		= i;
-		StomachPoly.groupIndex		= i;
-		ChestPoly.groupIndex		= i;
-		NeckPoly.groupIndex			= i;
-		HeadCirc.groupIndex			= i;
-		LUpperArmPoly.groupIndex	= i;
-		RUpperArmPoly.groupIndex	= i;
-		LForearmPoly.groupIndex		= i;
-		RForearmPoly.groupIndex		= i;
-		LHandPoly.groupIndex		= i;
-		RHandPoly.groupIndex		= i;
+		LFootPoly.filter.groupIndex		= i;
+		RFootPoly.filter.groupIndex		= i;
+		LCalfPoly.filter.groupIndex		= i;
+		RCalfPoly.filter.groupIndex		= i;
+		LThighPoly.filter.groupIndex	= i;
+		RThighPoly.filter.groupIndex	= i;
+		PelvisPoly.filter.groupIndex	= i;
+		StomachPoly.filter.groupIndex	= i;
+		ChestPoly.filter.groupIndex		= i;
+		NeckPoly.filter.groupIndex		= i;
+		HeadCirc.filter.groupIndex		= i;
+		LUpperArmPoly.filter.groupIndex	= i;
+		RUpperArmPoly.filter.groupIndex	= i;
+		LForearmPoly.filter.groupIndex	= i;
+		RForearmPoly.filter.groupIndex	= i;
+		LHandPoly.filter.groupIndex		= i;
+		RHandPoly.filter.groupIndex		= i;
 	}
 
 	public void setLinearDamping(float f) {

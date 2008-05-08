@@ -1,5 +1,6 @@
 package org.jbox2d.testbed;
 
+import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.common.Vec2;
 
@@ -11,7 +12,7 @@ public class ExampleContactPoint {
 	public Shape shape2;
 	public Vec2 normal;
 	public Vec2 position;
-	public float normalForce;
-	public float tangentForce;
+	public Vec2 velocity;
+	ContactID id;
 	public int state; // 0-add, 1-persist, 2-remove
 }

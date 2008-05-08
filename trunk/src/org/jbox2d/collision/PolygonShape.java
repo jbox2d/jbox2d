@@ -28,7 +28,7 @@ import java.util.List;
 import org.jbox2d.common.*;
 
 
-//Updated to rev 56->132 of b2Shape.cpp/.h / b2PolygonShape.cpp/.h
+//Updated to rev 142 of b2Shape.cpp/.h / b2PolygonShape.cpp/.h
 
 /** A convex polygon shape.  Create using Body.createShape(ShapeDef), not the constructor here. */
 public class PolygonShape extends Shape implements SupportsGenericDistance{
@@ -57,7 +57,7 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
     	m_type = ShapeType.POLYGON_SHAPE;
     	PolygonDef poly = (PolygonDef)def;
 
-    	m_vertexCount = poly.vertexCount();
+    	m_vertexCount = poly.getVertexCount();
     	m_vertices = new Vec2[m_vertexCount];
     	m_normals = new Vec2[m_vertexCount];
     	m_coreVertices = new Vec2[m_vertexCount];
@@ -204,6 +204,9 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
     }
     
     
+//TODO eric: get raycasts working - need to
+//     create a class for a raycast result
+    
 //    bool b2PolygonShape::TestSegment(
 //    		const b2XForm& xf,
 //    		float32* lambda,
@@ -226,14 +229,21 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 //    			float32 numerator = b2Dot(m_normals[i], m_vertices[i] - p1);
 //    			float32 denominator = b2Dot(m_normals[i], d);
 //
-//    			if (denominator < 0.0f && numerator > lower * denominator)
+//    			// Note: we want this predicate without division:
+//    			// lower < numerator / denominator, where denominator < 0
+//    			// Since denominator < 0, we have to flip the inequality:
+//    			// lower < numerator / denominator <==> denominator * lower > numerator.
+//
+//    			if (denominator < 0.0f && numerator < lower * denominator)
 //    			{
+//    				// Increase lower.
 //    				// The segment enters this half-space.
 //    				lower = numerator / denominator;
 //    				index = i;
 //    			}
 //    			else if (denominator > 0.0f && numerator < upper * denominator)
 //    			{
+//    				// Decrease upper.
 //    				// The segment exits this half-space.
 //    				upper = numerator / denominator;
 //    			}
@@ -256,11 +266,11 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 //    		return false;
 //    	}
     
-    
-    public Vec2 centroid(XForm xf) {
-    	return XForm.mul(xf, m_centroid);
-    }
 
+	/**
+	 * Get the support point in the given world direction.
+	 * Use the supplied transform.
+	 */
     public Vec2 support(XForm xf, Vec2 d) {
         Vec2 dLocal = Mat22.mulT(xf.R, d);
 
@@ -466,28 +476,48 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		massData.I = I*m_density;
 	}
 	
+	/** Get the first vertex and apply the supplied transform. */
 	public Vec2 getFirstVertex(XForm xf) {
 		return XForm.mul(xf, m_coreVertices[0]);
 	}
 
+	/** Get the oriented bounding box relative to the parent body. */
 	public OBB getOBB() {
 		return m_obb.clone();
 	}
 
+	/** Get the local centroid relative to the parent body. */
 	public Vec2 getCentroid() {
 		return m_centroid.clone();
 	}
 
+	/** Get the number of vertices. */
 	public int getVertexCount() {
 		return m_vertexCount;
 	}
 
+	/** Get the vertices in local coordinates. */
 	public Vec2[] getVertices() {
 		return m_vertices;
 	}
 
+	/**
+	 * Get the core vertices in local coordinates. These vertices
+	 * represent a smaller polygon that is used for time of impact
+	 * computations.
+	 */
 	public Vec2[] getCoreVertices()	{
 		return m_coreVertices;
+	}
+
+	/** Get the edge normal vectors.  There is one for each vertex. */
+	public Vec2[] getNormals() {
+		return m_normals;
+	}
+	
+	/** Get the centroid and apply the supplied transform. */
+	public Vec2 centroid(XForm xf) {
+		return XForm.mul(xf, m_centroid);
 	}
 
 }

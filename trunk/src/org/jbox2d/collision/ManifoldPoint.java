@@ -25,7 +25,7 @@ package org.jbox2d.collision;
 
 import org.jbox2d.common.Vec2;
 
-//Updated to rev 56->108 of b2Collision.h
+//Updated to rev 56->108->139 of b2Collision.h
 
 /**
  * A manifold point is a contact point belonging to a contact

@@ -1,0 +1,17 @@
+Java file -> corresponding C++ file & revision number updated to
+package: org.jbox2d.dynamics
+Updated thru rev 150 (May 8, 2008)
+----------------------------------------------------------------
+
+Body.java					-> b2Body.h/cpp 144
+BodyDef.java				-> b2Body.h/cpp 144
+BoundaryListener.java		-> b2WorldCallbacks.h/cpp 143
+ContactFilter.java			-> b2WorldCallbacks.h/cpp 143
+ContactListener.java		-> b2WorldCallbacks.h/cpp 143
+ContactManager.java			-> b2ContactManager.h/cpp 142
+DefaultContactFilter.java 	-> b2WorldCallbacks.h/cpp 143
+DestructionListener.java	-> b2WorldCallbacks.h/cpp 143
+Island.java					-> b2Island.h/cpp 142
+Steppable.java				-> [None - JBox2d only]
+TimeStep.java				-> b2World.h/cpp 150
+World.java					-> b2World.h/cpp 150

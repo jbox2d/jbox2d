@@ -23,6 +23,13 @@
 
 package org.jbox2d.collision;
 
+// Updated to rev 139 of b2Shape.h
+
+/** 
+ * Superclass for shape definitions.
+ * You should usually use CircleDef or
+ * PolygonDef to define concrete shapes.
+ */
 public class ShapeDef {
 	/** Holds the shape type for down-casting. */
     public ShapeType type;
@@ -39,21 +46,8 @@ public class ShapeDef {
     /** The shape's density, usually in kg/m^2. */
     public float density;
 
-    /** The collision category bits. Normally you would just set one bit. */
-    public int categoryBits;
-
-    /**
-     * The collision mask bits. This states the categories that this
-	 * shape would accept for collision.
-	 */
-    public int maskBits;
-    
-    /**
-     * Collision groups allow a certain group of objects to never collide (negative)
-	 * or always collide (positive). Zero means no collision group. Non-zero group
-	 * filtering always wins against the mask bits.
-	 */
-    public int groupIndex;
+    /** Contact filtering data. */
+    public FilterData filter;
     
     /**
      * A sensor shape collects contact information but never generates a collision
@@ -68,9 +62,10 @@ public class ShapeDef {
         friction = 0.2f;
         restitution = 0.0f;
         density = 0.0f;
-        categoryBits = 0x0001;
-        maskBits = 0xFFFF;
-        groupIndex = 0;
+        filter = new FilterData();
+        filter.categoryBits = 0x0001;
+        filter.maskBits = 0xFFFF;
+        filter.groupIndex = 0;
         isSensor = false;
         
     }
