@@ -39,6 +39,7 @@ import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.ContactListener;
 
+// Updated to rev 142 of b2CircleContact.h/cpp
 
 public class CircleContact extends Contact implements ContactCreateFcn {
 
@@ -49,7 +50,7 @@ public class CircleContact extends Contact implements ContactCreateFcn {
     }
 
     public static void Destroy(Contact contact) {
-        ((CircleContact) contact).Destructor();
+        ((CircleContact) contact).destructor();
     }
 
     public CircleContact clone() {
@@ -65,8 +66,8 @@ public class CircleContact extends Contact implements ContactCreateFcn {
     public CircleContact(Shape shape1, Shape shape2) {
         super(shape1, shape2);
         m_manifold = new Manifold();
-        assert (m_shape1.m_type == ShapeType.CIRCLE_SHAPE);
-        assert (m_shape2.m_type == ShapeType.CIRCLE_SHAPE);
+        assert (m_shape1.getType() == ShapeType.CIRCLE_SHAPE);
+        assert (m_shape2.getType() == ShapeType.CIRCLE_SHAPE);
         m_manifold.pointCount = 0;
         m_manifold.points[0].normalImpulse = 0.0f;
         m_manifold.points[0].tangentImpulse = 0.0f;
@@ -74,15 +75,15 @@ public class CircleContact extends Contact implements ContactCreateFcn {
         m_manifold.points[0].localPoint2 = new Vec2();
     }
 
-    public void Destructor() {
+    public void destructor() {
 
     }
 
     public void evaluate(ContactListener listener) {
         //CollideCircle.collideCircle(m_manifold, (CircleShape) m_shape1,
         //        (CircleShape) m_shape2, false);
-        Body b1 = m_shape1.m_body;
-    	Body b2 = m_shape2.m_body;
+        Body b1 = m_shape1.getBody();
+    	Body b2 = m_shape2.getBody();
 
     	Manifold m0 = new Manifold(m_manifold);
         for (int k = 0; k < m_manifold.pointCount; k++) {
@@ -96,28 +97,60 @@ public class CircleContact extends Contact implements ContactCreateFcn {
         }
         m0.pointCount = m_manifold.pointCount;
     	
-    	CollideCircle.collideCircle(m_manifold, (CircleShape)m_shape1, b1.m_xf, (CircleShape)m_shape2, b2.m_xf);
+    	CollideCircle.collideCircles(m_manifold, (CircleShape)m_shape1, b1.m_xf, (CircleShape)m_shape2, b2.m_xf);
 
+    	ContactPoint cp = new ContactPoint();
+    	cp.shape1 = m_shape1;
+    	cp.shape2 = m_shape2;
+    	cp.friction = m_friction;
+    	cp.restitution = m_restitution;
+
+    	
         if (m_manifold.pointCount > 0) {
             m_manifoldCount = 1;
+            ManifoldPoint mp = m_manifold.points[0];
             if (m0.pointCount == 0) {
-    			m_manifold.points[0].id.features.flip |= Collision.NEW_POINT;
+            	mp.normalImpulse = 0.0f;
+    			mp.tangentImpulse = 0.0f;
+
+    			if (listener != null) {
+    				cp.position = b1.getWorldPoint(mp.localPoint1);
+    				Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
+    				Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+    				cp.velocity = v2.sub(v1);
+    				cp.normal = m_manifold.normal.clone();
+    				cp.separation = mp.separation;
+    				cp.id = new ContactID(mp.id);
+    				listener.add(cp);
+    			}
     		} else {
-    			m_manifold.points[0].id.features.flip &= ~Collision.NEW_POINT;
+    			ManifoldPoint mp0 = m0.points[0];
+    			mp.normalImpulse = mp0.normalImpulse;
+    			mp.tangentImpulse = mp0.tangentImpulse;
+
+    			if (listener != null) {
+    				cp.position = b1.getWorldPoint(mp.localPoint1);
+    				Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
+    				Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+    				cp.velocity = v2.sub(v1);
+    				cp.normal = m_manifold.normal.clone();
+    				cp.separation = mp.separation;
+    				cp.id = new ContactID(mp.id);
+    				listener.persist(cp);
+    			}
     		}
         }
         else {
             m_manifoldCount = 0;
     		if (m0.pointCount > 0 && (listener != null)) {
-    			ContactPoint cp = new ContactPoint();
-    			cp.shape1 = m_shape1;
-    			cp.shape2 = m_shape2;
-    			cp.normal.set(m0.normal);
-    			cp.position = XForm.mul(b1.m_xf, m0.points[0].localPoint1);
-    			cp.separation = m0.points[0].separation;
-    			cp.normalForce = m0.points[0].normalImpulse;
-    			cp.tangentForce = m0.points[0].tangentImpulse;
-    			cp.id = new ContactID(m0.points[0].id);
+    			ManifoldPoint mp0 = m0.points[0];
+    			cp.position = b1.getWorldPoint(mp0.localPoint1);
+    			Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp0.localPoint1);
+    			Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp0.localPoint2);
+    			cp.velocity = v2.sub(v1);
+    			cp.normal = m0.normal.clone();
+    			cp.separation = mp0.separation;
+    			cp.id = new ContactID(mp0.id);
     			listener.remove(cp);
     		}
         }

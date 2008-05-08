@@ -25,7 +25,7 @@ package org.jbox2d.collision;
 
 import org.jbox2d.common.*;
 
-//Updated to rev 55->108 of b2CollidePoly.cpp 
+//Updated to rev 55->108->139 of b2CollidePoly.cpp 
 
 /** Polygon overlap solver - for internal use. */
 public class CollidePoly {
@@ -85,18 +85,25 @@ public class CollidePoly {
     							int edge1, 
     							PolygonShape poly2, XForm xf2) {
         
-        assert(0 <= edge1 && edge1 < poly1.m_vertexCount);
+        int count1 = poly1.getVertexCount();
+    	Vec2[] vertices1 = poly1.getVertices();
+    	Vec2[] normals1 = poly1.getNormals();
+
+    	int count2 = poly2.getVertexCount();
+    	Vec2[] vertices2 = poly2.getVertices();
+
+    	assert(0 <= edge1 && edge1 < count1);
 
     	// Convert normal from poly1's frame into poly2's frame.
-    	Vec2 normal1World = Mat22.mul(xf1.R, poly1.m_normals[edge1]);
+    	Vec2 normal1World = Mat22.mul(xf1.R, normals1[edge1]);
     	float normal1x = Vec2.dot(normal1World, xf2.R.col1);
     	float normal1y = Vec2.dot(normal1World, xf2.R.col2);
 
         // Find support vertex on poly2 for -normal.
         int index = 0;
         float minDot = Float.MAX_VALUE;
-        for (int i = 0; i < poly2.m_vertexCount; ++i) {
-            float dot = poly2.m_vertices[i].x * normal1x + poly2.m_vertices[i].y * normal1y; 
+        for (int i = 0; i < count2; ++i) {
+            float dot = vertices2[i].x * normal1x + vertices2[i].y * normal1y; 
             	//Vec2.dot(poly2.m_vertices[i], normal1);
             if (dot < minDot) {
                 minDot = dot;
@@ -105,10 +112,10 @@ public class CollidePoly {
         }
 
     	//Vec2 v1 = XForm.mul(xf1, poly1.m_vertices[edge1]);
-        Vec2 v = poly1.m_vertices[edge1];
+        Vec2 v = vertices1[edge1];
         float v1x = xf1.position.x + xf1.R.col1.x * v.x + xf1.R.col2.x * v.y;
 		float v1y = xf1.position.y + xf1.R.col1.y * v.x + xf1.R.col2.y * v.y;
-		Vec2 v3 = poly2.m_vertices[index];
+		Vec2 v3 = vertices2[index];
 		//Vec2 v2 = XForm.mul(xf2, poly2.m_vertices[index]);
     	float v2x = xf2.position.x + xf2.R.col1.x * v3.x + xf2.R.col2.x * v3.y;
     	float v2y = xf2.position.y + xf2.R.col1.y * v3.x + xf2.R.col2.y * v3.y;
@@ -124,9 +131,11 @@ public class CollidePoly {
     									   PolygonShape poly2, XForm xf2) {
         MaxSeparation separation = new MaxSeparation();
 
-        int count1 = poly1.m_vertexCount;
-		Vec2 v = poly1.m_centroid;
-		Vec2 v1 = poly2.m_centroid;
+        int count1 = poly1.getVertexCount();
+        Vec2[] normals1 = poly1.getNormals();
+        
+		Vec2 v = poly1.getCentroid();
+		Vec2 v1 = poly2.getCentroid();
         
         // Vector pointing from the centroid of poly1 to the centroid of poly2.
         //Vec2 d = XForm.mul(xf2, poly2.m_centroid).subLocal(XForm.mul(xf1, poly1.m_centroid));
@@ -143,7 +152,7 @@ public class CollidePoly {
         int edge = 0;
         float maxDot = -Float.MAX_VALUE;
         for (int i = 0; i < count1; ++i) {
-            float dot = Vec2.dot(poly1.m_normals[i], dLocal1);
+            float dot = Vec2.dot(normals1[i], dLocal1);
             if (dot > maxDot) {
                 maxDot = dot;
                 edge = i;
@@ -222,16 +231,23 @@ public class CollidePoly {
     							 PolygonShape poly1, XForm xf1, int edge1,
     							 PolygonShape poly2, XForm xf2) {
     	
-    	assert(0 <= edge1 && edge1 < poly1.m_vertexCount);
+    	int count1 = poly1.getVertexCount();
+    	Vec2[] normals1 = poly1.getNormals();
+
+    	int count2 = poly2.getVertexCount();
+    	Vec2[] vertices2 = poly2.getVertices();
+    	Vec2[] normals2 = poly2.getNormals();
+
+    	assert(0 <= edge1 && edge1 < count1);
 
     	// Get the normal of the reference edge in poly2's frame.
-    	Vec2 normal1 = Mat22.mulT(xf2.R, Mat22.mul(xf1.R, poly1.m_normals[edge1]));
+    	Vec2 normal1 = Mat22.mulT(xf2.R, Mat22.mul(xf1.R, normals1[edge1]));
 
     	// Find the incident edge on poly2.
     	int index = 0;
     	float minDot = Float.MAX_VALUE;
-    	for (int i = 0; i < poly2.m_vertexCount; ++i) {
-    		float dot = Vec2.dot(normal1, poly2.m_normals[i]);
+    	for (int i = 0; i < count2; ++i) {
+    		float dot = Vec2.dot(normal1, normals2[i]);
     		if (dot < minDot) {
     			minDot = dot;
     			index = i;
@@ -240,20 +256,20 @@ public class CollidePoly {
 
     	// Build the clip vertices for the incident edge.
     	int i1 = index;
-    	int i2 = i1 + 1 < poly2.m_vertexCount ? i1 + 1 : 0;
+    	int i2 = i1 + 1 < count2 ? i1 + 1 : 0;
     	
     	c[0] = new ClipVertex();
     	c[1] = new ClipVertex();
 
-    	c[0].v = XForm.mul(xf2, poly2.m_vertices[i1]);
-    	c[0].id.features.referenceFace = edge1;
+    	c[0].v = XForm.mul(xf2, vertices2[i1]);
+    	c[0].id.features.referenceEdge = edge1;
     	c[0].id.features.incidentEdge = i1;
     	c[0].id.features.incidentVertex = 0;
     	
     	
 
-    	c[1].v = XForm.mul(xf2, poly2.m_vertices[i2]);
-    	c[1].id.features.referenceFace = edge1;
+    	c[1].v = XForm.mul(xf2, vertices2[i2]);
+    	c[1].id.features.referenceEdge = edge1;
     	c[1].id.features.incidentEdge = i2;
     	c[1].id.features.incidentVertex = 1;
     	
@@ -268,7 +284,7 @@ public class CollidePoly {
     // Clip
 
     // The normal points from 1 to 2
-    public static void collidePoly(Manifold manif, 
+    public static void collidePolygons(Manifold manif, 
     		PolygonShape polyA, XForm xfA,
             PolygonShape polyB, XForm xfB) {
 
@@ -315,11 +331,11 @@ public class CollidePoly {
         ClipVertex incidentEdge[] = new ClipVertex[2];
         findIncidentEdge(incidentEdge, poly1, xf1, edge1, poly2, xf2);
 
-        int count1 = poly1.m_vertexCount;
-        Vec2[] vert1s = poly1.m_vertices;
+        int count1 = poly1.getVertexCount();
+        Vec2[] vertices1 = poly1.getVertices();
 
-        Vec2 v11 = vert1s[edge1];
-        Vec2 v12 = edge1 + 1 < count1 ? vert1s[edge1 + 1] : vert1s[0];
+        Vec2 v11 = vertices1[edge1];
+        Vec2 v12 = edge1 + 1 < count1 ? vertices1[edge1 + 1] : vertices1[0];
 
         Vec2 sideNormal = Mat22.mul(xf1.R, v12.sub(v11));
         sideNormal.normalize();

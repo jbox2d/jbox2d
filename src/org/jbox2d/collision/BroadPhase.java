@@ -23,7 +23,7 @@
 
 package org.jbox2d.collision;
 
-//Version: b2BroadPhase.h/.cpp rev 108
+//Version: b2BroadPhase.h/.cpp rev 108->139
 
 import java.util.Arrays;
 import java.util.Collections;

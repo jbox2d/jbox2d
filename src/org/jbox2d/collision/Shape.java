@@ -27,7 +27,7 @@ import org.jbox2d.common.*;
 import org.jbox2d.dynamics.Body;
 
 
-//Updated through rev. 56 of b2Shape.cpp/.h
+//Updated through rev. 56->139 of b2Shape.cpp/.h
 
 /**
  * A shape is used for collision detection. Shapes are created in World.
@@ -57,9 +57,8 @@ public abstract class Shape {
     
 
     public int m_proxyId;
-    public int m_categoryBits;
-    public int m_maskBits;
-    public int m_groupIndex;
+
+    public FilterData m_filter;
     
     public boolean m_isSensor;
     public Object m_userData;
@@ -76,12 +75,43 @@ public abstract class Shape {
     	m_sweepRadius = 0.0f;
     	m_next = null;
     	m_proxyId = PairManager.NULL_PROXY;
-    	m_categoryBits = def.categoryBits;
-    	m_maskBits = def.maskBits;
-    	m_groupIndex = def.groupIndex;
+    	m_filter = new FilterData();
+    	m_filter.categoryBits = def.filter.categoryBits;
+    	m_filter.maskBits = def.filter.maskBits;
+    	m_filter.groupIndex = def.filter.groupIndex;
     	m_isSensor = def.isSensor;
         
     }
+
+	/** Get the coefficient of friction. */
+	public float getFriction() {
+		return m_friction;
+	}
+	
+	/** Set the coefficient of friction. */
+	public void setFriction(float friction) {
+		m_friction = friction;
+	}
+
+	/** Get the coefficient of restitution. */
+	public float getRestitution() {
+		return m_restitution;
+	}
+	
+	/** Set the coefficient of restitution. */
+	public void setRestitution(float restitution) {
+		m_restitution = restitution;
+	}
+	
+	/** Set the collision filtering data. */
+	public void setFilterData(FilterData filter){
+		m_filter.set(filter);
+	}
+
+	/** Get the collision filtering data. */
+	public FilterData getFilterData() {
+		return m_filter;
+	}
     
     /**
      * Get the type of this shape. You can use this to down cast to the concrete shape.
@@ -105,6 +135,14 @@ public abstract class Shape {
 	 */
     public Object getUserData() {
         return m_userData;
+    }
+    
+    /**
+     * Set the user data associated with the object.
+     * @param o User data to set
+     */
+    public void setUserData(Object o) {
+    	m_userData = o;
     }
 
     /**
@@ -207,17 +245,16 @@ public abstract class Shape {
 
     /** Internal */
     public void refilterProxy(BroadPhase broadPhase, XForm transform){
-    	if (m_proxyId != PairManager.NULL_PROXY){
-    		broadPhase.destroyProxy(m_proxyId);
+    	if (m_proxyId == PairManager.NULL_PROXY){
+    		return;
     	}
-
+    	
+    	broadPhase.destroyProxy(m_proxyId);
+    	
     	AABB aabb = new AABB();
     	computeAABB(aabb, transform);
 
     	boolean inRange = broadPhase.inRange(aabb);
-
-    	// You are affecting a shape outside the world box.
-    	assert(inRange);
 
     	if (inRange) {
     		m_proxyId = broadPhase.createProxy(aabb, this);
@@ -232,8 +269,7 @@ public abstract class Shape {
         if (def.type == ShapeType.CIRCLE_SHAPE) {
             return new CircleShape(def);
         }
-        else if (def.type == ShapeType.BOX_SHAPE
-                || def.type == ShapeType.POLYGON_SHAPE) {
+        else if (def.type == ShapeType.POLYGON_SHAPE) {
             return new PolygonShape(def);
         }
         assert false;

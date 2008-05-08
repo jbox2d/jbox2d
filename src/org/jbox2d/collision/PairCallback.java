@@ -23,7 +23,7 @@
 
 package org.jbox2d.collision;
 
-//Updated to rev 56 of b2PairManager.h
+//Updated to rev 56->136 of b2PairManager.h
 
 public abstract class PairCallback {
     // This should return the new pair user data. It is okay if the

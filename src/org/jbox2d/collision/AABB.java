@@ -25,7 +25,7 @@ package org.jbox2d.collision;
 
 import org.jbox2d.common.Vec2;
 
-//Updated to rev 108 of b2Collision.h
+//Updated to rev 139 of b2Collision.h
 
 /** An axis-aligned bounding box. */
 public class AABB {

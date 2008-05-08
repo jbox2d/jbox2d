@@ -24,7 +24,7 @@
 package org.jbox2d.collision;
 
 import org.jbox2d.common.*;
-//updated to rev 108 of b2CircleShape.h/.cpp
+//updated to rev 139 of b2CircleShape.h/.cpp
 
 /** 
  * A circle shape definition.  Set the radius and localPosition 

@@ -30,6 +30,7 @@ package org.jbox2d.common;
 public class MathUtils {
 	// Max/min rewritten here because for some reason Math.max/min
 	// can run absurdly slow for such simple functions...
+	// TODO: profile, see if this just seems to be the case or is actually causing issues...
 	public static final float max(float a, float b) {
 		return (a > b)?a:b;
 	}

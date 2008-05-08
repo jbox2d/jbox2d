@@ -26,6 +26,8 @@ package org.jbox2d.dynamics;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.dynamics.joints.Joint;
 
+// Updated to rev 143 of b2WorldCallbacks.h
+
 /**
  * Joints and shapes are destroyed when their associated
  * body is destroyed. Implement this listener so that you

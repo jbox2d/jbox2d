@@ -31,13 +31,14 @@ import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.collision.PairCallback;
 import org.jbox2d.collision.Shape;
+import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactPoint;
 import org.jbox2d.dynamics.contacts.NullContact;
 
 
-//Updated to rev 56->104 of b2ContactManager.cpp/.h
+//Updated to rev 56->104->142 of b2ContactManager.cpp/.h
 
 /** Delegate of World - for internal use. */
 public class ContactManager extends PairCallback {
@@ -65,7 +66,7 @@ public class ContactManager extends PairCallback {
             return m_nullContact;
         }
 
-        if (shape1.m_body == shape2.m_body) {
+        if (shape1.getBody() == shape2.getBody()) {
             return m_nullContact;
         }
         
@@ -155,22 +156,27 @@ public class ContactManager extends PairCallback {
     	int manifoldCount = c.getManifoldCount();
     	if (manifoldCount > 0 && (m_world.m_contactListener != null))
     	{
+    		Body b1 = shape1.getBody();
+    		Body b2 = shape2.getBody();
+    		List<Manifold> manifolds = c.getManifolds();
     		ContactPoint cp = new ContactPoint();
     		cp.shape1 = c.getShape1();
     		cp.shape2 = c.getShape2();
-    		Body b1 = cp.shape1.getBody();
-    		List<Manifold> manifolds = c.getManifolds();
+    		cp.friction = c.m_friction;
+    		cp.restitution = c.m_restitution;
     		for (int i = 0; i < manifoldCount; ++i)
     		{
     			Manifold manifold = manifolds.get(i);
     			cp.normal.set(manifold.normal);
     			for (int j = 0; j < manifold.pointCount; ++j) {
-    				ManifoldPoint point = manifold.points[j];
-    				cp.position = XForm.mul(b1.getXForm(), point.localPoint1);
-    				cp.separation = point.separation;
-    				cp.normalForce = point.normalImpulse;
-    				cp.tangentForce = point.tangentImpulse;
-    				cp.id = new ContactID(point.id);
+
+    				ManifoldPoint mp = manifold.points[j];
+    				cp.position = b1.getWorldPoint(mp.localPoint1);
+    				Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
+    				Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+    				cp.velocity = v2.sub(v1);
+    				cp.separation = mp.separation;
+    				cp.id = new ContactID(mp.id);
     				m_world.m_contactListener.remove(cp);
     			}
     		}
@@ -234,38 +240,6 @@ public class ContactManager extends PairCallback {
 
     		c.update(m_world.m_contactListener);
 
-    		if (c.isSolid() == false && (m_world.m_contactListener != null)) {
-    			// report the sensor.
-    			ContactPoint cp = new ContactPoint();
-    			cp.shape1 = c.getShape1();
-    			cp.shape2 = c.getShape2();
-    			
-    			// sensors have no force.
-    			cp.normalForce = 0.0f;
-    			cp.tangentForce = 0.0f;
-
-    			Body b1 = cp.shape1.getBody();
-    			int manifoldCount = c.getManifoldCount();
-    			List<Manifold> manifolds = c.getManifolds();
-    			for (int i = 0; i < manifoldCount; ++i) {
-    				Manifold manifold = manifolds.get(i);
-    				cp.normal.set(manifold.normal);
-    				for (int j = 0; j < manifold.pointCount; ++j) {
-    					ManifoldPoint point = manifold.points[j];
-    					cp.position = XForm.mul(b1.getXForm(), point.localPoint1);
-    					cp.separation = point.separation;
-
-    					if ( (point.id.features.flip & Collision.NEW_POINT) != 0) {
-    						point.id.features.flip &= ~Collision.NEW_POINT;
-    						cp.id = new ContactID(point.id);
-    						m_world.m_contactListener.add(cp);
-    					} else {
-    						cp.id = new ContactID(point.id);
-    						m_world.m_contactListener.persist(cp);
-    					}
-    				}
-    			}
-    		}
     	}
     }
 }

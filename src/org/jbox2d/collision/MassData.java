@@ -25,15 +25,30 @@ package org.jbox2d.collision;
 
 import org.jbox2d.common.Vec2;
 
+// Updated to rev 142 of b2Shape.h
+
+/** This holds the mass data computed for a shape. */
 public class MassData {
+	/** The mass of the shape, usually in kilograms. */
     public float mass;
-
+    /** The position of the shape's centroid relative to the shape's origin. */
     public Vec2 center;
-
+    /** The rotational inertia of the shape. */
     public float I;
 
     public MassData() {
         mass = I = 0f;
         center = new Vec2();
+    }
+    
+    public MassData(MassData md) {
+    	mass = md.mass;
+    	I = md.I;
+    	center = md.center.clone();
+    }
+    
+    /** Return a copy of this object. */
+    public MassData clone() {
+    	return new MassData(this);
     }
 }

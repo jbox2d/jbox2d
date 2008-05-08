@@ -25,7 +25,7 @@ package org.jbox2d.collision;
 
 import org.jbox2d.common.*;
 
-//updated to rev 108 of b2TimeOfImpact.cpp
+//updated to rev 142 of b2TimeOfImpact.cpp
 
 /** Handles conservative advancement to compute time of impact between shapes. */
 public class TOI {

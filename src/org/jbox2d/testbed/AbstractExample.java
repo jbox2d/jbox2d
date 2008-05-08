@@ -29,6 +29,7 @@ import processing.core.PImage;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.CircleDef;
+import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
@@ -39,6 +40,7 @@ import org.jbox2d.dynamics.ContactListener;
 import org.jbox2d.dynamics.DebugDraw;
 import org.jbox2d.dynamics.DestructionListener;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.contacts.ContactResult;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.MouseJoint;
 import org.jbox2d.dynamics.joints.MouseJointDef;
@@ -341,20 +343,22 @@ public abstract class AbstractExample {
 					Vec2 p2 = new Vec2( p1.x + k_axisScale * point.normal.x,
 										p1.y + k_axisScale * point.normal.y);
 					m_debugDraw.drawSegment(p1, p2, new Color3f(0.4f*255f, 0.9f*255f, 0.4f*255f));
-				} else if (settings.drawContactForces) {
+				} 
+				//TODO
+				/*else if (settings.drawContactForces) {
 					Vec2 p1 = point.position;
-					Vec2 p2 = new Vec2( p1.x + k_forceScale * point.normalForce * point.normal.x,
-										p1.y + k_forceScale * point.normalForce * point.normal.y);
+					Vec2 p2 = new Vec2( p1.x + k_forceScale * point.normalImpulse * point.normal.x,
+										p1.y + k_forceScale * point.normalImpulse * point.normal.y);
 					m_debugDraw.drawSegment(p1, p2, new Color3f(0.9f*255f, 0.9f*255f, 0.3f*255f));
 				}
 
 				if (settings.drawFrictionForces) {
 					Vec2 tangent = Vec2.cross(point.normal, 1.0f);
 					Vec2 p1 = point.position;
-					Vec2 p2 = new Vec2( p1.x + k_forceScale * point.tangentForce * tangent.x,
-										p1.y + k_forceScale * point.tangentForce * tangent.y);
+					Vec2 p2 = new Vec2( p1.x + k_forceScale * point.tangentImpulse * tangent.x,
+										p1.y + k_forceScale * point.tangentImpulse * tangent.y);
 					m_debugDraw.drawSegment(p1, p2, new Color3f(0.9f*255f, 0.9f*255f, 0.3f*255f));
-				}
+				}*/
 			}
 		}
 		
@@ -655,8 +659,8 @@ public abstract class AbstractExample {
     		cp.shape2 = point.shape2;
     		cp.position = point.position.clone();
     		cp.normal = point.normal.clone();
-    		cp.normalForce = point.normalForce;
-    		cp.tangentForce = point.tangentForce;
+    		cp.id = new ContactID(point.id);
+    		cp.velocity = point.velocity.clone();
     		cp.state = 0;
 
     		++test.m_pointCount;	
@@ -671,8 +675,8 @@ public abstract class AbstractExample {
     		cp.shape2 = point.shape2;
     		cp.position = point.position.clone();
     		cp.normal = point.normal.clone();
-    		cp.normalForce = point.normalForce;
-    		cp.tangentForce = point.tangentForce;
+    		cp.id = new ContactID(point.id);
+    		cp.velocity = point.velocity.clone();
     		cp.state = 1;
 
     		++test.m_pointCount;
@@ -687,14 +691,18 @@ public abstract class AbstractExample {
     		cp.shape2 = point.shape2;
     		cp.position = point.position.clone();
     		cp.normal = point.normal.clone();
-    		cp.normalForce = point.normalForce;
-    		cp.tangentForce = point.tangentForce;
+    		cp.id = new ContactID(point.id);
+    		cp.velocity = point.velocity.clone();
     		cp.state = 2;
 
     		++test.m_pointCount;
     	}
 
     	public AbstractExample test;
+
+		public void result(ContactResult point) {
+			//TODO
+		}
     }
 
     /**

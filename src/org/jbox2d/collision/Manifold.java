@@ -26,7 +26,7 @@ package org.jbox2d.collision;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 
-//Updated to rev 56->108 of b2Collision.h
+//Updated to rev 56->108->139 of b2Collision.h
 
 /** A manifold for two touching convex shapes. */
 public class Manifold {
@@ -48,7 +48,7 @@ public class Manifold {
 
     public Manifold(Manifold other) {
         points = new ManifoldPoint[Settings.maxManifoldPoints];
-        // FIXME? Need to check how C++ handles an implicit
+        // FIXME? Need to check how C++ version handles an implicit
         // copy of a Manifold, by copying the points array
         // or merely passing a pointer to it.
         // Update: tested both, the arraycopy seems to be correct, leave it!

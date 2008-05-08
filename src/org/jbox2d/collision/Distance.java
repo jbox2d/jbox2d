@@ -41,12 +41,9 @@ package org.jbox2d.collision;
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-//#include "b2Collision.h"
-//#include "Shapes/b2CircleShape.h"
-//#include "Shapes/b2PolygonShape.h"
 import org.jbox2d.common.*;
 
-//updated to rev 108 of b2Distance.cpp
+//updated to rev 108->139 of b2Distance.cpp
 
 /** Implements the GJK algorithm for computing distance between shapes. */
 public class Distance{
@@ -292,13 +289,13 @@ public class Distance{
 		CircleShape circle1, XForm xf1,
 		CircleShape circle2, XForm xf2) {
 		
-		Vec2 p1 = XForm.mul(xf1, circle1.m_localPosition);
-		Vec2 p2 = XForm.mul(xf2, circle2.m_localPosition);
+		Vec2 p1 = XForm.mul(xf1, circle1.getLocalPosition());
+		Vec2 p2 = XForm.mul(xf2, circle2.getLocalPosition());
 
 		Vec2 d = new Vec2(p2.x - p1.x, p2.y - p1.y);
 		float dSqr = Vec2.dot(d, d);
-		float r1 = circle1.m_radius - Settings.toiSlop;
-		float r2 = circle2.m_radius - Settings.toiSlop;
+		float r1 = circle1.getRadius() - Settings.toiSlop;
+		float r2 = circle2.getRadius() - Settings.toiSlop;
 		float r = r1 + r2;
 		if (dSqr > r * r){
 			float dLen = d.normalize();
@@ -329,7 +326,7 @@ public class Distance{
 		PolygonShape polygon, XForm xf1,
 		CircleShape circle,   XForm xf2) {
 		Point point = new Point(new Vec2(0.0f, 0.0f));
-		point.p = XForm.mul(xf2, circle.m_localPosition);
+		point.p = XForm.mul(xf2, circle.getLocalPosition());
 
 		float distance = DistanceGeneric(x1, x2, polygon, xf1, point, XForm.identity);
 

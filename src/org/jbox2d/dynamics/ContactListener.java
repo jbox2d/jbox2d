@@ -24,6 +24,9 @@
 package org.jbox2d.dynamics;
 
 import org.jbox2d.dynamics.contacts.ContactPoint;
+import org.jbox2d.dynamics.contacts.ContactResult;
+
+//Updated to rev 143 of b2WorldCallbacks.h
 
 /**
  * Implement this class to get collision results. You can use these results for
@@ -58,5 +61,7 @@ public interface ContactListener {
 		 * computed geometry and forces.
 		 */
 		public void remove(ContactPoint point);
+		
+		public void result(ContactResult point);
 
 }

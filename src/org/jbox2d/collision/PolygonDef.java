@@ -32,11 +32,21 @@ import java.util.List;
 import org.jbox2d.common.*;
 
 /**
- * A convex polygon definition.  Add vertices using PolygonDef.vertices.add(Vec2),
+ * Convex polygon. The vertices must be in CCW order for a right-handed
+ * coordinate system with the z-axis coming out of the screen.
+ * Add vertices using PolygonDef.add(Vec2),
  * and create the polygon shape using Body::createShape(ShapeDef).
  */
 public class PolygonDef extends ShapeDef {
 
+	/** 
+	 * The polygon vertices in local coordinates.
+	 * <BR><BR>
+	 * Accessing this field is discouraged - it remains
+	 * public for the moment, but that is likely to change.
+	 * Please use addVertex(Vec2) and getVertexList/Array
+	 * instead to add to or inspect the current vertices.
+	 */
     public List<Vec2> vertices;
 
     public PolygonDef() {
@@ -44,14 +54,31 @@ public class PolygonDef extends ShapeDef {
         vertices = new ArrayList<Vec2>();
     }
     
+    /** Add a vertex to the polygon. */
+    public void addVertex(Vec2 v) {
+    	vertices.add(v);
+    }
+    
+    /** Removes all vertices. */
+    public void clearVertices() {
+    	vertices.clear();
+    }
+    
+    /** Return the vertex list as an array. */
+    public Vec2[] getVertexArray() {
+    	return vertices.toArray(new Vec2[0]);
+    }
+    
+    /** Return the vertex list as a List<Vec2>. */
+    public List<Vec2> getVertexList() {
+    	return vertices;
+    }
+    
     /**
-     * Set the polygon to have a rectangular shape.
-     * Note that the dimensions are half-width/height,
-     * not total width/height.  So for a 1m square box,
-     * call setAsBox(0.5f,0.5f)
-     * @param hx Half-width of box
-     * @param hy Half-height of box
-     */
+     * Build vertices to represent an axis-aligned box.
+	 * @param hx the half-width.
+	 * @param hy the half-height.
+	 */
     public void setAsBox(float hx, float hy) {
     	vertices.clear();
     	vertices.add(new Vec2(-hx, -hy));
@@ -60,6 +87,13 @@ public class PolygonDef extends ShapeDef {
     	vertices.add(new Vec2(-hx, hy));
     }
 
+    /**
+     * Build vertices to represent an oriented box.
+	 * @param hx the half-width.
+	 * @param hy the half-height.
+	 * @param center the center of the box in local coordinates.
+	 * @param angle the rotation of the box in local coordinates.
+	 */
     public void setAsBox(float hx, float hy, Vec2 center, float angle) {
     	setAsBox(hx, hy);
     	XForm xf = new XForm();
@@ -71,7 +105,8 @@ public class PolygonDef extends ShapeDef {
     	}
     }
 
-    public int vertexCount() {
+    /** Return the number of vertices. */
+    public int getVertexCount() {
         return vertices.size();
     }
 }

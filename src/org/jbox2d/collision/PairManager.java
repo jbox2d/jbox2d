@@ -26,7 +26,7 @@ package org.jbox2d.collision;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 
-//Updated to rev 56->108 of b2PairManager.cpp/.h
+//Updated to rev 56->108->136 of b2PairManager.cpp/.h
 
 public class PairManager {
 

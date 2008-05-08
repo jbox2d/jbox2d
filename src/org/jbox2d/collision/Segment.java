@@ -25,7 +25,7 @@ package org.jbox2d.collision;
 
 import org.jbox2d.common.*;
 
-//Updated to rev 108 of b2Collision.h/.cpp
+//See b2Collision.h/.cpp
 public class Segment {
 	
 	public Vec2 p1, p2;

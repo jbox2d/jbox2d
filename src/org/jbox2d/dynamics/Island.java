@@ -34,11 +34,12 @@ import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactConstraint;
 import org.jbox2d.dynamics.contacts.ContactConstraintPoint;
 import org.jbox2d.dynamics.contacts.ContactPoint;
+import org.jbox2d.dynamics.contacts.ContactResult;
 import org.jbox2d.dynamics.contacts.ContactSolver;
 import org.jbox2d.dynamics.joints.Joint;
 
 
-//Updated to rev. 46->103 of b2Island.cpp/.h
+//Updated to rev. 46->103->142 of b2Island.cpp/.h
 
 /**
  * Handles much of the heavy lifting of physics solving - for internal use.
@@ -329,34 +330,27 @@ public class Island {
     	for (int i = 0; i < m_contactCount; ++i) {
     		Contact c = m_contacts[i];
     		ContactConstraint cc = constraints[i];
-    		ContactPoint cp = new ContactPoint();
-    		cp.shape1 = c.getShape1();
-    		cp.shape2 = c.getShape2();
-    		Body b1 = cp.shape1.getBody();
+    		ContactResult cr = new ContactResult();
+    		cr.shape1 = c.getShape1();
+    		cr.shape2 = c.getShape2();
+    		Body b1 = cr.shape1.getBody();
     		int manifoldCount = c.getManifoldCount();
     		List<Manifold> manifolds = c.getManifolds();
     		for (int j = 0; j < manifoldCount; ++j) {
     			Manifold manifold = manifolds.get(j);
-    			cp.normal.set(manifold.normal);
+    			cr.normal.set(manifold.normal);
     			for (int k = 0; k < manifold.pointCount; ++k) {
     				ManifoldPoint point = manifold.points[k];
     				ContactConstraintPoint ccp = cc.points[k];
-    				cp.position = XForm.mul(b1.getXForm(), point.localPoint1);
-    				cp.separation = point.separation;
-
+    				cr.position = XForm.mul(b1.getXForm(), point.localPoint1);
+    				
     				// TOI constraint results are not stored, so get
     				// the result from the constraint.
-    				cp.normalForce = ccp.normalImpulse;
-    				cp.tangentForce = ccp.tangentImpulse;
+    				cr.normalImpulse = ccp.normalImpulse;
+    				cr.tangentImpulse = ccp.tangentImpulse;
+    				cr.id = new ContactID(point.id);
 
-    				if ( (point.id.features.flip & Collision.NEW_POINT) != 0) {
-    					point.id.features.flip &= ~Collision.NEW_POINT;
-    					cp.id = new ContactID(point.id);
-    					m_listener.add(cp);
-    				} else {
-    					cp.id = new ContactID(point.id);
-    					m_listener.persist(cp);
-    				}
+    				m_listener.result(cr);
     			}
     		}
     	}

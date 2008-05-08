@@ -25,12 +25,22 @@ package org.jbox2d.dynamics.contacts;
 
 import org.jbox2d.dynamics.Body;
 
+// Updated to rev 139 of b2Contact.h
+
+/**
+ * A contact edge is used to connect bodies and contacts together
+ * in a contact graph where each body is a node and each contact
+ * is an edge. A contact edge belongs to a doubly linked list
+ * maintained in each attached body. Each contact has two contact
+ * nodes, one for each attached body.
+ */
 public class ContactEdge {
+	/** Provides quick access to the other body attached. */
     public Body other;
-
+    /** The contact. */
     public Contact contact;
-
+    /** The previous contact edge in the body's contact list. */
     public ContactEdge prev;
-
+    /** The next contact edge in the body's contact list. */
     public ContactEdge next;
 }

@@ -45,7 +45,7 @@ import org.jbox2d.dynamics.joints.*;
 
 
 
-//Updated to rev 56->118->142 of b2World.cpp/.h
+//Updated to rev 56->118->142->150 of b2World.cpp/.h
 
 /**
  * The world that physics takes place in.

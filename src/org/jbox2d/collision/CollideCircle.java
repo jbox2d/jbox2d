@@ -25,7 +25,7 @@ package org.jbox2d.collision;
 
 import org.jbox2d.common.*;
 
-//Updated to rev 108 of b2CollideCircle.cpp
+//Updated to rev 139 of b2CollideCircle.cpp
 
 /**
  * Circle/circle and circle/polygon overlap solver -
@@ -33,18 +33,21 @@ import org.jbox2d.common.*;
  */
 public class CollideCircle {
 
-    public static void collideCircle(Manifold manifold, 
+    public static void collideCircles(Manifold manifold, 
     		CircleShape circle1, XForm xf1,
             CircleShape circle2, XForm xf2) {
         manifold.pointCount = 0;
 
-    	Vec2 p1 = XForm.mul(xf1, circle1.m_localPosition);
-    	Vec2 p2 = XForm.mul(xf2, circle2.m_localPosition);
+    	Vec2 p1 = XForm.mul(xf1, circle1.getLocalPosition());
+    	Vec2 p2 = XForm.mul(xf2, circle2.getLocalPosition());
 
     	Vec2 d = p2.sub(p1);
         
     	float distSqr = Vec2.dot(d, d);
-        float radiusSum = circle1.m_radius + circle2.m_radius;
+
+    	float r1 = circle1.getRadius();
+    	float r2 = circle2.getRadius();
+    	float radiusSum = r1+r2;
         if (distSqr > radiusSum * radiusSum) {
             return;
         }
@@ -67,8 +70,8 @@ public class CollideCircle {
         manifold.points[0].id.zero(); //use this instead of zeroing through key
         manifold.points[0].separation = separation;
 
-    	p1.addLocal(manifold.normal.mul(circle1.m_radius));
-    	p2.subLocal(manifold.normal.mul(circle2.m_radius));
+    	p1.addLocal(manifold.normal.mul(r1));
+    	p2.subLocal(manifold.normal.mul(r2));
 
     	Vec2 p = new Vec2(0.5f * (p1.x + p2.x), 0.5f * (p1.y + p2.y));
 
@@ -84,16 +87,19 @@ public class CollideCircle {
         manifold.pointCount = 0;
 
         // Compute circle position in the frame of the polygon.
-        Vec2 c = XForm.mul(xf2, circle.m_localPosition);
+        Vec2 c = XForm.mul(xf2, circle.getLocalPosition());
     	Vec2 cLocal = XForm.mulT(xf1, c);
 
         // Find edge with maximum separation.
         int normalIndex = 0;
         float separation = -Float.MAX_VALUE;
-        final float radius = circle.m_radius;
-        for (int i = 0; i < polygon.m_vertexCount; ++i) {
+        float radius = circle.getRadius();
+        int vertexCount = polygon.getVertexCount();
+        Vec2[] vertices = polygon.getVertices();
+        Vec2[] normals = polygon.getNormals();
+        for (int i = 0; i < vertexCount; ++i) {
 
-            float s = Vec2.dot(polygon.m_normals[i], cLocal.sub(polygon.m_vertices[i]));
+            float s = Vec2.dot(normals[i], cLocal.sub(vertices[i]));
             if (s > circle.m_radius) {
                 // Early out.
                 return;
@@ -107,10 +113,10 @@ public class CollideCircle {
         // If the center is inside the polygon ...
         if (separation < Settings.EPSILON) {
             manifold.pointCount = 1;
-            manifold.normal = Mat22.mul(xf1.R, polygon.m_normals[normalIndex]);
+            manifold.normal = Mat22.mul(xf1.R, normals[normalIndex]);
             manifold.points[0].id.features.incidentEdge = normalIndex;
             manifold.points[0].id.features.incidentVertex = Collision.NULL_FEATURE;
-            manifold.points[0].id.features.referenceFace = Collision.NULL_FEATURE;
+            manifold.points[0].id.features.referenceEdge = 0;
             manifold.points[0].id.features.flip = 0;
     		Vec2 position = c.sub(manifold.normal.mul(radius));
     		manifold.points[0].localPoint1 = XForm.mulT(xf1, position);
@@ -121,51 +127,31 @@ public class CollideCircle {
 
         // Project the circle center onto the edge segment.
         int vertIndex1 = normalIndex;
-        int vertIndex2 = vertIndex1 + 1 < polygon.m_vertexCount ? vertIndex1 + 1 : 0;
-        Vec2 e = polygon.m_vertices[vertIndex2].sub(polygon.m_vertices[vertIndex1]);
+        int vertIndex2 = vertIndex1 + 1 < vertexCount ? vertIndex1 + 1 : 0;
+        Vec2 e = vertices[vertIndex2].sub(vertices[vertIndex1]);
         float length = e.normalize();
-
-        // If the edge length is zero ...
-        if (length < Settings.EPSILON) {
-            Vec2 d = cLocal.sub(polygon.m_vertices[vertIndex1]);
-            float dist = d.normalize();
-            if (dist > radius) {
-                return;
-            }
-
-            manifold.pointCount = 1;
-            manifold.normal = Mat22.mul(xf1.R, d);
-            manifold.points[0].id.features.incidentEdge = Collision.NULL_FEATURE;
-            manifold.points[0].id.features.incidentVertex = vertIndex1;
-            manifold.points[0].id.features.referenceFace = Collision.NULL_FEATURE;
-            manifold.points[0].id.features.flip = 0;
-            Vec2 position = c.sub(manifold.normal.mul(radius));
-    		manifold.points[0].localPoint1 = XForm.mulT(xf1, position);
-    		manifold.points[0].localPoint2 = XForm.mulT(xf2, position);
-            manifold.points[0].separation = dist - radius;
-            return;
-        }
+        assert(length > Settings.EPSILON);
 
         // Project the center onto the edge.
-        float u = Vec2.dot(cLocal.sub(polygon.m_vertices[vertIndex1]), e);
-        manifold.points[0].id.features.incidentEdge = Collision.NULL_FEATURE;
-        manifold.points[0].id.features.incidentVertex = Collision.NULL_FEATURE;
-        manifold.points[0].id.features.referenceFace = Collision.NULL_FEATURE;
-        manifold.points[0].id.features.flip = 0;
+        float u = Vec2.dot(cLocal.sub(vertices[vertIndex1]), e);
+
         Vec2 p = new Vec2();
         if (u <= 0.0f) {
-            p.set(polygon.m_vertices[vertIndex1]);
+            p.set(vertices[vertIndex1]);
+            manifold.points[0].id.features.incidentEdge = Collision.NULL_FEATURE;
             manifold.points[0].id.features.incidentVertex = vertIndex1;
         }
         else if (u >= length) {
-            p.set(polygon.m_vertices[vertIndex2]);
+            p.set(vertices[vertIndex2]);
+            manifold.points[0].id.features.incidentEdge = Collision.NULL_FEATURE;
             manifold.points[0].id.features.incidentVertex = vertIndex2;
         }
         else {
-            p.set(polygon.m_vertices[vertIndex1]);
+            p.set(vertices[vertIndex1]);
             p.x += u * e.x;
             p.y += u * e.y;
-            manifold.points[0].id.features.incidentEdge = vertIndex1;
+            manifold.points[0].id.features.incidentEdge = normalIndex;
+            manifold.points[0].id.features.incidentVertex = 0;
         }
 
         Vec2 d = cLocal.sub(p);
@@ -180,7 +166,8 @@ public class CollideCircle {
     	Vec2 position = c.sub(manifold.normal.mul(radius));
     	manifold.points[0].localPoint1 = XForm.mulT(xf1, position);
     	manifold.points[0].localPoint2 = XForm.mulT(xf2, position);
-        
         manifold.points[0].separation = dist - radius;
+        manifold.points[0].id.features.referenceEdge = 0;
+        manifold.points[0].id.features.flip = 0;
     }
 }

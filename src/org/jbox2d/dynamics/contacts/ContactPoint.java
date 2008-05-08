@@ -27,18 +27,30 @@ import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.common.Vec2;
 
+// Updated o rev 139 of b2Contact.h
 public class ContactPoint {
-		public Shape shape1;		///< the first shape
-		public Shape shape2;		///< the second shape
-		public Vec2 position;		///< position in world coordinates
-		public Vec2 normal;			///< points from shape1 to shape2
-		public float separation;		///< the separation is negative when shapes are touching
-		public float normalForce;	///< the signed magnitude of the normal force
-		public float tangentForce;	///< the signed magnitude of the tangent force
-		public ContactID id;			///< the contact id identifies the features in contact
+		/** The first shape */
+		public Shape shape1;		
+		/** The second shape */
+		public Shape shape2;		
+		/** Position in world coordinates */
+		public Vec2 position;
+		/** Velocity of point on body2 relative to point on body1 (pre-solver) */
+		public Vec2 velocity;
+		/** Points from shape1 to shape2 */
+		public Vec2 normal;
+		/** The separation is negative when shapes are touching */
+		public float separation;
+		/** The combined friction coefficient */
+		public float friction; 
+		/** The combined restitution coefficient */
+		public float restitution;
+		/** The contact id identifies the features in contact */
+		public ContactID id;
 		
 		public ContactPoint() {
 			position = new Vec2();
 			normal = new Vec2();
+			id = new ContactID();
 		}
 }

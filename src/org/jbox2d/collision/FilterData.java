@@ -21,14 +21,31 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package org.jbox2d.dynamics;
+package org.jbox2d.collision;
 
-/** This is called when a body's shape passes outside of the world boundary. */
-public interface BoundaryListener {
+// Updated to rev 139 of b2Shape.h
+
+/** This holds contact filtering data. */
+public class FilterData {
+	/** The collision category bits. Normally you would just set one bit. */
+	public int categoryBits;
+
 	/**
-	 * This is called for each body that leaves the world boundary.
-	 * <BR><BR><em>Warning</em>: you can't modify the world inside this callback.
+	 * The collision mask bits. This states the categories that this
+	 * shape would accept for collision.
 	 */
-	public  void violation(Body body);
-}
+	public int maskBits;
 
+	/**
+	 * Collision groups allow a certain group of objects to never collide (negative)
+	 * or always collide (positive). Zero means no collision group. Non-zero group
+	 * filtering always wins against the mask bits.
+	 */
+	public int groupIndex;
+	
+	public void set(FilterData fd) {
+		categoryBits = fd.categoryBits;
+		maskBits = fd.maskBits;
+		groupIndex = fd.groupIndex;
+	}
+}
