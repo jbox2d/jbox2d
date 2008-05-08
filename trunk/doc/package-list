@@ -5,4 +5,4 @@ org.jbox2d.dynamics.contacts
 org.jbox2d.dynamics.joints
 org.jbox2d.testbed
 org.jbox2d.testbed.tests
-org.jbox2d.util.nonconvex
+org.jbox2d.util.blob

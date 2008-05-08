@@ -108,7 +108,6 @@ public class Body {
 	 * to World.createDynamicBody or World.createStaticBody.
 	 * 
 	 * @param bd Body definition
-	 * @param type Body.e_dynamicType or Body.e_staticType
 	 * @param world World to create body in
 	 */
 	public Body(BodyDef bd, World world) {
@@ -764,7 +763,7 @@ public class Body {
 	
 	/**
 	 * Get the world linear velocity of a world point attached to this body.
-	 * @param a point in world coordinates.
+	 * @param worldPoint a point in world coordinates.
 	 * @return the world velocity of a point.
 	 */
 	public Vec2 getLinearVelocityFromWorldPoint(Vec2 worldPoint) {
@@ -773,7 +772,7 @@ public class Body {
 
 	/**
 	 * Get the world velocity of a local point.
-	 * @param a point in local coordinates.
+	 * @param localPoint a point in local coordinates.
 	 * @return the world velocity of a point.
 	 */
 	public Vec2 getLinearVelocityFromLocalPoint(Vec2 localPoint) {

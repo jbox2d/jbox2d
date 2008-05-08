@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="javadoc">
+<target name="javadoc">
+<javadoc access="protected" author="true" classpath="../slick/lib/ibxm.jar:core.jar:../slick/lib/pedigree.jar:../slick/lib/jorbis-0.0.15.jar:../slick/lib/slick-examples.jar:../slick/lib/hiero.jar:../slick/lib/natives-linux.jar:../slick/lib/natives-mac.jar:../slick/lib/jnlp.jar:../slick/lib/lwjgl.jar:../slick/lib/tinylinepp.jar:../slick/lib/jogg-0.0.7.jar:../slick/lib/natives-win32.jar:../slick/applet/lwjgl_util_applet.jar:../slick/lib/jinput.jar:../slick/lib/packulike.jar:../slick/lib/slick-util.jar:../slick/lib/scalar.jar:../SlickBox2d/bin" destdir="doc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="org.jbox2d.dynamics,org.jbox2d.dynamics.joints,org.jbox2d.util.blob,org.jbox2d.dynamics.contacts,org.jbox2d.collision,org.jbox2d.common,org.jbox2d.testbed.tests,org.jbox2d.testbed" source="1.5" sourcepath="src:data" splitindex="true" use="true" version="true"/>
+</target>
+</project>
