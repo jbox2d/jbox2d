@@ -156,7 +156,13 @@ public abstract class Contact {
                 ShapeType.CIRCLE_SHAPE);
         addType(new PolyAndCircleContact(), ShapeType.POLYGON_SHAPE,
                 ShapeType.CIRCLE_SHAPE);
-        addType(new PolyContact(), ShapeType.POLYGON_SHAPE, ShapeType.POLYGON_SHAPE);
+        addType(new PolyContact(), ShapeType.POLYGON_SHAPE, 
+        		ShapeType.POLYGON_SHAPE);
+        addType(new PointAndCircleContact(), ShapeType.POINT_SHAPE,
+        		ShapeType.CIRCLE_SHAPE);
+        addType(new PointAndPolyContact(), ShapeType.POLYGON_SHAPE, 
+        		ShapeType.POINT_SHAPE);
+        
         // AddType(new PolyContact(), ShapeType.BOX_SHAPE, ShapeType.BOX_SHAPE);
     }
 

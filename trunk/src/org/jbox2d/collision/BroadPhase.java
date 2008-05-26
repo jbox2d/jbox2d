@@ -721,8 +721,8 @@ public class BroadPhase {
         if (debugPrint) {
             System.out.println("ComputeBounds()");
         }
-        assert(aabb.upperBound.x > aabb.lowerBound.x);
-        assert(aabb.upperBound.y > aabb.lowerBound.y);
+        assert(aabb.upperBound.x >= aabb.lowerBound.x);
+        assert(aabb.upperBound.y >= aabb.lowerBound.y);
         
         Vec2 minVertex = MathUtils.clamp(aabb.lowerBound, m_worldAABB.lowerBound,
                 m_worldAABB.upperBound);

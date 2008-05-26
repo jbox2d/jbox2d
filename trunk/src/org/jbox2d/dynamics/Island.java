@@ -267,11 +267,23 @@ public class Island {
     public void solveTOI(TimeStep subStep) {
     	ContactSolver contactSolver = new ContactSolver(subStep, m_contacts, m_contactCount);
 
-    	// No warm starting needed for TOI events.
-
+    	// No warm starting needed for TOI contact events.
+    	
+    	// For joints, intialize with the last full step warm starting values
+    	subStep.warmStarting = true;
+    	for (int i = 0; i < m_jointCount; ++i) {
+    		m_joints[i].initVelocityConstraints(subStep);
+    	}
+    	
+    	// ...but don't update the warm starting value during solving
+    	subStep.warmStarting = false;
+    	    	
     	// Solve velocity constraints.
     	for (int i = 0; i < subStep.maxIterations; ++i) {
     		contactSolver.solveVelocityConstraints();
+    		for (int j = 0; j < m_jointCount; ++j) {
+    			m_joints[j].solveVelocityConstraints(subStep);
+    		}
     	}
 
     	// Don't store the TOI contact forces for warm starting
@@ -305,9 +317,16 @@ public class Island {
     	final float k_toiBaumgarte = 0.75f;
     	for (int i = 0; i < subStep.maxIterations; ++i) {
     		boolean contactsOkay = contactSolver.solvePositionConstraints(k_toiBaumgarte);
-    		if (contactsOkay) {
-    			break;
-    		}
+    		
+    		boolean jointsOkay = true;
+    		for (int j = 0; j < m_jointCount; ++j) {
+				boolean jointOkay = m_joints[j].solvePositionConstraints();
+				jointsOkay = jointsOkay && jointOkay;
+			}
+
+			if (contactsOkay && jointsOkay) {
+				break;
+			}
     	}
 
     	report(contactSolver.m_constraints);

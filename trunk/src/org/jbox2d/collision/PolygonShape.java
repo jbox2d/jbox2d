@@ -107,6 +107,7 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 	    		cross = MathUtils.clamp(cross, -1.0f, 1.0f);
 	
 	    		// You have consecutive edges that are almost parallel on your polygon.
+	    		// Or the polygon is not counter-clockwise.
 	    		float angle = (float)Math.asin(cross);
 	    		assert(angle > Settings.angularSlop);
 	    	}
@@ -138,7 +139,7 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 
     		// Your shape has a radius/extent less than b2_toiSlop.
     		if (m_debug && (d.x < 0.0f || d.y < 0.0f)) {
-    			System.out.println("Error, dumping details: ");
+    			System.out.println("Error, polygon extents less than b2_toiSlop, dumping details: ");
     			System.out.println("d.x: "+d.x+"d.y: "+d.y);
     			System.out.println("n1: "+n1+"; n2: "+n2);
     			System.out.println("v: "+v);

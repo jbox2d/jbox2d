@@ -27,6 +27,8 @@ public class Biped {
 		BipedDef def = new BipedDef();
 		BodyDef bd = new BodyDef();
 
+		def.flipHorizontal();
+		
 		// create body parts
 		bd = def.LFootDef;
 		bd.position.addLocal(position);

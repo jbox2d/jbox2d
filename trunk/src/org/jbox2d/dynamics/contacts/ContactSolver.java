@@ -249,8 +249,12 @@ public class ContactSolver {
             Body b2 = c.body2;
             float w1 = b1.m_angularVelocity;
             float w2 = b2.m_angularVelocity;
-            Vec2 v1 = b1.m_linearVelocity.clone();
-            Vec2 v2 = b2.m_linearVelocity.clone();
+            //Vec2 v1 = b1.m_linearVelocity.clone();
+            //Vec2 v2 = b2.m_linearVelocity.clone();
+            float v1x = b1.m_linearVelocity.x;
+            float v1y = b1.m_linearVelocity.y;
+            float v2x = b2.m_linearVelocity.x;
+            float v2y = b2.m_linearVelocity.y;
             float invMass1 = b1.m_invMass;
             float invI1 = b1.m_invI;
             float invMass2 = b2.m_invMass;
@@ -277,8 +281,8 @@ public class ContactSolver {
                 //dv.subLocal(v1);
 				//Vec2 a = ccp.r1;
                 //dv.subLocal(new Vec2(-w1 * a.y, w1 * a.x));
-                float dvx = v2.x - w2 * ccp.r2.y - v1.x + w1*ccp.r1.y;
-                float dvy = v2.y + w2 * ccp.r2.x - v1.y - w1*ccp.r1.x;
+                float dvx = v2x - w2 * ccp.r2.y - v1x + w1*ccp.r1.y;
+                float dvy = v2y + w2 * ccp.r2.x - v1y - w1*ccp.r1.x;
             	
     			// Compute normal impulse
     			float vn = dvx*normal.x + dvy*normal.y;//Vec2.dot(dv, normal);
@@ -293,13 +297,13 @@ public class ContactSolver {
     			float Px = lambda * normal.x;
     			float Py = lambda * normal.y;
     			
-    			v1.x -= invMass1*Px;
-    			v1.y -= invMass1*Py;
+    			v1x -= invMass1*Px;
+    			v1y -= invMass1*Py;
     			w1 -= invI1 * (ccp.r1.x * Py - ccp.r1.y * Px); 
     							//Vec2.cross(ccp.r1,P);
     			
-    			v2.x += invMass2*Px;
-    			v2.y += invMass2*Py;
+    			v2x += invMass2*Px;
+    			v2y += invMass2*Py;
     			w2 += invI2 * (ccp.r2.x * Py - ccp.r2.y * Px);
     							//Vec2.cross(ccp.r2,P);
     			
@@ -323,8 +327,8 @@ public class ContactSolver {
                 //Vec2 dv = v2.add(Vec2.cross(w2, ccp.r2));
                 //dv.subLocal(v1);
                 //dv.subLocal(Vec2.cross(w1,ccp.r1));
-                float dvx = v2.x - w2 * ccp.r2.y - v1.x + w1*ccp.r1.y;
-                float dvy = v2.y + w2 * ccp.r2.x - v1.y - w1*ccp.r1.x;
+                float dvx = v2x - w2 * ccp.r2.y - v1x + w1*ccp.r1.y;
+                float dvy = v2y + w2 * ccp.r2.x - v1y - w1*ccp.r1.x;
 
                 // Compute tangent force
     			float vt = dvx * tangent.x + dvy * tangent.y;
@@ -341,22 +345,24 @@ public class ContactSolver {
     			float py = lambda * tangent.y;
 
                 // b1.m_linearVelocity.subLocal(P.mul(invMass1));
-                v1.x -= px * invMass1;
-                v1.y -= py * invMass1;
+                v1x -= px * invMass1;
+                v1y -= py * invMass1;
                 // b1.m_angularVelocity -= invI1 * Vec2.cross(r1, P);
                 w1 -= invI1 * (ccp.r1.x * py - ccp.r1.y * px);
 
                 // b2.m_linearVelocity.addLocal(P.mul(invMass2));
-                v2.x += px * invMass2;
-                v2.y += py * invMass2;
+                v2x += px * invMass2;
+                v2y += py * invMass2;
                 // b2.m_angularVelocity += invI2 * Vec2.cross(r2, P);
                 w2 += invI2 * (ccp.r2.x * py - ccp.r2.y * px);
 
                 ccp.tangentImpulse = newImpulse;
             }
-    		 b1.m_linearVelocity.set(v1);
+    		 b1.m_linearVelocity.x = v1x;
+    		 b1.m_linearVelocity.y = v1y;
     		 b1.m_angularVelocity = w1;
-    		 b2.m_linearVelocity.set(v2);
+    		 b2.m_linearVelocity.x = v2x;
+    		 b2.m_linearVelocity.y = v2y;
     		 b2.m_angularVelocity = w2;
         }
     }

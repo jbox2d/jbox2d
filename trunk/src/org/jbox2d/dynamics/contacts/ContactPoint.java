@@ -27,7 +27,7 @@ import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.common.Vec2;
 
-// Updated o rev 139 of b2Contact.h
+// Updated to rev 139 of b2Contact.h
 public class ContactPoint {
 		/** The first shape */
 		public Shape shape1;		

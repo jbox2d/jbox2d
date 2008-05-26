@@ -56,7 +56,6 @@ public class MotorsAndLimits extends AbstractExample {
     }
 
     public void create(){
-
     	Body ground = null;
     	{
     		PolygonDef sd = new PolygonDef();
