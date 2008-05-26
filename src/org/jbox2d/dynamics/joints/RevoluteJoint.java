@@ -163,6 +163,9 @@ public class RevoluteJoint extends Joint {
     	m_limitPositionImpulse = 0.0f;
     }
 
+    private Vec2 m_lastWarmStartingPivotForce = new Vec2(0.0f,0.0f);
+    private boolean m_warmStartingOld = true;
+    
     @Override
     public void solveVelocityConstraints(TimeStep step) {
     	Body b1 = m_body1;
@@ -174,8 +177,20 @@ public class RevoluteJoint extends Joint {
     	// Solve point-to-point constraint
     	Vec2 pivotCdot = b2.m_linearVelocity.add( Vec2.cross(b2.m_angularVelocity, r2).subLocal(b1.m_linearVelocity).subLocal(Vec2.cross(b1.m_angularVelocity, r1)));
     	Vec2 pivotForce = Mat22.mul(m_pivotMass, pivotCdot).mulLocal(-step.inv_dt);
-    	m_pivotForce.addLocal(pivotForce);
-
+    	//if (!step.warmStarting) m_pivotForce.set(pivotForce);
+    	//else m_pivotForce.addLocal(pivotForce);
+    	//if (step.warmStarting && (!m_warmStartingOld)) m_pivotForce = m_lastWarmStartingPivotForce;
+    	if (step.warmStarting) {
+    		//if (m_warmStartingOld) {
+    			m_pivotForce.addLocal(pivotForce);
+    			m_lastWarmStartingPivotForce.set(m_pivotForce);
+    		//} else {
+    		//	m_pivotForce = m_lastWarmStartingPivotForce;
+    		//}
+    	} else {
+    		m_pivotForce.set(m_lastWarmStartingPivotForce);
+    	}
+    	
     	Vec2 P = pivotForce.mul(step.dt);
     	b1.m_linearVelocity.x -= b1.m_invMass * P.x;
     	b1.m_linearVelocity.y -= b1.m_invMass * P.y;

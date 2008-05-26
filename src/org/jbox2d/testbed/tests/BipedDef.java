@@ -19,6 +19,7 @@ public class BipedDef {
 	
 	// This was constant in C++, but I think scale should probably be settable
 	static float k_scale = 3.0f;
+	static float k_xFlip = 1.0f; //1.0 or -1.0, depending on whether you want the dude flipped
 	
 	public BodyDef	LFootDef, RFootDef, LCalfDef, RCalfDef, LThighDef, RThighDef, 
 					PelvisDef, StomachDef, ChestDef, NeckDef, HeadDef, 
@@ -106,6 +107,83 @@ public class BipedDef {
 		defaultJoints();
 
 		LFootPoly.friction = RFootPoly.friction = 0.85f;
+	}
+	
+	public void flip(PolygonDef pd) {
+		Vec2[] vs = pd.getVertexArray();
+		pd.clearVertices();
+		//Reverse orientation and flip over x-axis
+		for (int i=vs.length-1; i>=0; --i) {
+			pd.vertices.add(new Vec2(-vs[i].x,vs[i].y));
+		}
+	}
+	
+	public void flip(RevoluteJointDef jd) {
+		jd.localAnchor1.x *= -1;
+		jd.localAnchor2.x *= -1;
+		float la = jd.lowerAngle;
+		float ua = jd.upperAngle;
+		jd.lowerAngle = -ua;
+		jd.upperAngle = -la;
+		jd.referenceAngle *= -1;
+	}
+	
+	public void flip(BodyDef bd) {
+		bd.position.x *= -1;
+	}
+	
+	public void flipHorizontal() {
+		flip(LFootPoly);
+		flip(RFootPoly);  
+		flip(LCalfPoly);  
+		flip(RCalfPoly);  
+		flip(LThighPoly);  
+		flip(RThighPoly); 
+		flip(PelvisPoly);  
+		flip(StomachPoly);  
+		flip(ChestPoly);  
+		flip(NeckPoly); 
+		flip(LUpperArmPoly);  
+		flip(RUpperArmPoly);  
+		flip(LForearmPoly);  
+		flip(RForearmPoly);  
+		flip(LHandPoly);  
+		flip(RHandPoly);
+		
+		flip(LAnkleDef);
+		flip(RAnkleDef); 
+		flip(LKneeDef); 
+		flip(RKneeDef); 
+		flip(LHipDef); 
+		flip(RHipDef); 
+		flip(LowerAbsDef); 
+		flip(UpperAbsDef); 
+		flip(LowerNeckDef); 
+		flip(UpperNeckDef);
+		flip(LShoulderDef); 
+		flip(RShoulderDef); 
+		flip(LElbowDef); 
+		flip(RElbowDef); 
+		flip(LWristDef); 
+		flip(RWristDef);
+		
+		flip(LFootDef);
+		flip(RFootDef);
+		flip(LCalfDef);
+		flip(RCalfDef);
+		flip(LThighDef);
+		flip(RThighDef);
+		flip(PelvisDef);
+		flip(StomachDef);
+		flip(ChestDef);
+		flip(NeckDef);
+		flip(HeadDef);
+		flip(LUpperArmDef);
+		flip(RUpperArmDef);
+		flip(LForearmDef);
+		flip(RForearmDef);
+		flip(LHandDef);
+		flip(RHandDef);
 	}
 
 	public void isFast(boolean b) {

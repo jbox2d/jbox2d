@@ -121,10 +121,9 @@ public class TestbedMain extends PApplet {
     	}
     	/* Register the examples */
     	// Simple functionality examples
-    	registerExample(new SensorTest(this));
-    	registerExample(new BlobTest(this));
+    	//registerExample(new SensorTest(this));
+    	//
     	//registerExample(new SpringRestitutionTest(this));
-    	registerExample(new RestitutionCannon(this));
     	registerExample(new BipedTest(this));
     	registerExample(new SpriteBinding(this));
     	registerExample(new Pulleys(this));
@@ -138,6 +137,8 @@ public class TestbedMain extends PApplet {
     	registerExample(new Chain(this));
     	registerExample(new Bridge(this));
     	registerExample(new Gears(this));
+    	registerExample(new RestitutionCannon(this));
+    	registerExample(new BlobTest(this));
     	
     	// Shape drawing demo
     	registerExample(new ShapeDrawing(this));

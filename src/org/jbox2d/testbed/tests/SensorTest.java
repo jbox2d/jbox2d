@@ -44,7 +44,7 @@ public class SensorTest extends AbstractExample {
 	float density = 0.25f;
 	float sensorSize = 0.5f;
 
-	int nParts = 700;
+	int nParts = 500;
 	
 	public SensorTest(TestbedMain _parent) {
 		super(_parent);
@@ -132,6 +132,7 @@ public class SensorTest extends AbstractExample {
 		cd.density = density;
 		cd.radius = size;
 		cd.restitution = 0.0f;
+		cd.friction = 0.0f;
 		body.createShape(cd);
 		body.setMassFromShapes();
 		cd.isSensor = true;

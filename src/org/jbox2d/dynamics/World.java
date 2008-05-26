@@ -33,6 +33,7 @@ import org.jbox2d.collision.CircleShape;
 import org.jbox2d.collision.OBB;
 import org.jbox2d.collision.Pair;
 import org.jbox2d.collision.PairManager;
+import org.jbox2d.collision.PointShape;
 import org.jbox2d.collision.PolygonShape;
 import org.jbox2d.collision.Proxy;
 import org.jbox2d.collision.Shape;
@@ -687,9 +688,18 @@ public class World {
     /** For internal use: find TOI contacts and solve them. */
     public void solveTOI(TimeStep step) {
     	// Reserve an island and a stack for TOI island solution.
-    	Island island = new Island(m_bodyCount, Settings.maxTOIContactsPerIsland, 0, m_contactListener);
-    	int stackSize = m_bodyCount;
-    	Body[] stack = new Body[stackSize];
+    	Island island = new Island(m_bodyCount, Settings.maxTOIContactsPerIsland, Settings.maxTOIJointsPerIsland, m_contactListener);
+    	
+    	//Simple one pass queue
+    	//Relies on the fact that we're only making one pass
+    	//through and each body can only be pushed/popped once.
+    	//To push: 
+    	//  queue[queueStart+queueSize++] = newElement
+    	//To pop: 
+    	//	poppedElement = queue[queueStart++];
+		//  --queueSize;
+    	int queueCapacity = m_bodyCount;
+    	Body[] queue = new Body[queueCapacity];
 
     	for (Body b = m_bodyList; b != null; b = b.m_next) {
     		b.m_flags &= ~Body.e_islandFlag;
@@ -700,6 +710,10 @@ public class World {
     		// Invalidate TOI
     		c.m_flags &= ~(Contact.e_toiFlag | Contact.e_islandFlag);
     	}
+    	
+    	for (Joint j = m_jointList; j != null; j = j.m_next) {
+            j.m_islandFlag = false;
+        }
 
     	// Find TOI events and solve them.
     	while (true) {
@@ -790,18 +804,22 @@ public class World {
     			seed = b2;
     		}
 
-    		// Reset island and stack.
+    		// Reset island and queue.
     		island.clear();
-    		int stackCount = 0;
-    		stack[stackCount++] = seed;
+    		//int stackCount = 0;
+    		int queueStart = 0; //starting index for queue
+        	int queueSize = 0;  //elements in queue
+    		queue[queueStart+queueSize++] = seed;
     		seed.m_flags |= Body.e_islandFlag;
 
-    		// Perform a depth first search (DFS) on the contact graph.
-    		while (stackCount > 0) {
-    			// Grab the next body off the stack and add it to the island.
-    			Body b = stack[--stackCount];
+    		// Perform a breadth first search (BFS) on the contact/joint graph.
+    		while (queueSize > 0) {
+    			// Grab the head body off the queue and add it to the island.
+    			Body b = queue[queueStart++];
+    			--queueSize;
+    			
     			island.add(b);
-
+    			
     			// Make sure the body is awake.
     			b.m_flags &= ~Body.e_sleepFlag;
 
@@ -844,14 +862,47 @@ public class World {
     					other.wakeUp();
     				}
 
-    				assert(stackCount < stackSize);
-    				stack[stackCount++] = other;
+    				//push to the queue
+    				assert(queueSize < queueCapacity);
+    				queue[queueStart+queueSize++] = other;
     				other.m_flags |= Body.e_islandFlag;
 
     			}
+    			
+    			// Search all joints connect to this body.
+                for ( JointEdge jn = b.m_jointList; jn != null; jn = jn.next) {
+                	if (island.m_jointCount == island.m_jointCapacity) {
+    					continue;
+    				}
+                	
+                	if (jn.joint.m_islandFlag == true) {
+                        continue;
+                    }
+
+                    island.add(jn.joint);
+
+                    jn.joint.m_islandFlag = true;
+
+                    Body other = jn.other;
+                    if ((other.m_flags & Body.e_islandFlag) > 0) {
+                        continue;
+                    }
+                    
+                    if (other.isStatic() == false) {
+                    	//System.out.println(minTOI);
+                    	other.advance(minTOI);
+                    	other.wakeUp();
+                    }
+
+                    assert (queueSize < queueCapacity);
+                    queue[queueStart+queueSize++] = other;
+                    other.m_flags |= Body.e_islandFlag;
+                }
+    			
     		}
 
     		TimeStep subStep = new TimeStep();
+    		subStep.warmStarting = false;
     		subStep.dt = (1.0f - minTOI) * step.dt;
     		assert(subStep.dt > Settings.EPSILON);
     		subStep.inv_dt = 1.0f / subStep.dt;
@@ -888,6 +939,7 @@ public class World {
     			for (ContactEdge cn = b.m_contactList; cn != null; cn = cn.next) {
     				cn.contact.m_flags &= ~Contact.e_toiFlag;
     			}
+    			
     		}
 
     		for (int i = 0; i < island.m_contactCount; ++i) {
@@ -895,6 +947,11 @@ public class World {
 
     			Contact c = island.m_contacts[i];
     			c.m_flags &= ~(Contact.e_toiFlag | Contact.e_islandFlag);
+    		}
+    		
+    		for (int i=0; i < island.m_jointCount; ++i) {
+    			Joint j = island.m_joints[i];
+    			j.m_islandFlag = false;
     		}
 
     		// Commit shape proxy movements to the broad-phase so that new contacts are created.
@@ -920,6 +977,15 @@ public class World {
     			if (core) {
     				m_debugDraw.drawCircle(center, radius - Settings.toiSlop, coreColor);
     			}
+    	} else if (shape.getType() == ShapeType.POINT_SHAPE) {
+    			PointShape point = (PointShape)shape;
+
+				Vec2 center = XForm.mul(xf, point.getLocalPosition());
+				float radius = 0.01f;
+				Vec2 axis = xf.R.col1;
+
+				m_debugDraw.drawSolidCircle(center, radius, axis, color);
+
     	} else if (shape.getType() == ShapeType.POLYGON_SHAPE) {
     			PolygonShape poly = (PolygonShape)shape;
     			int vertexCount = poly.getVertexCount();

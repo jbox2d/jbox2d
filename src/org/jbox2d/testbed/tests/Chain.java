@@ -65,7 +65,7 @@ public class Chain extends AbstractExample {
 			sd.setAsBox(0.6f, 0.125f);
 			sd.density = 20.0f;
 			sd.friction = 0.2f;
-
+			
 			RevoluteJointDef jd = new RevoluteJointDef();
 			jd.collideConnected = false;
 
@@ -85,6 +85,15 @@ public class Chain extends AbstractExample {
 				prevBody = body;
 			}
 		}
+		
+		PointDef pointD = new PointDef();
+		pointD.mass = 0.0f;
+		
+		for (int i=0; i<100; ++i) {
+			pointD.localPosition = new Vec2(-5f+10.0f*(float)Math.random(),10f+10.0f*(float)Math.random());
+			ground.createShape(pointD);
+		}
+
 	}
 	
 	public String getName() {

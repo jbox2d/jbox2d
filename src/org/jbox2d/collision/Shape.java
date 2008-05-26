@@ -272,6 +272,9 @@ public abstract class Shape {
         else if (def.type == ShapeType.POLYGON_SHAPE) {
             return new PolygonShape(def);
         }
+        else if (def.type == ShapeType.POINT_SHAPE) {
+        	return new PointShape(def);
+        }
         assert false;
         return null;
     }

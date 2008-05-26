@@ -345,6 +345,65 @@ public class Distance{
 
 		return distance;
 	}
+	
+	protected static float DistancePolygonPoint(
+			Vec2 x1, Vec2 x2,
+			PolygonShape polygon, XForm xf1,
+			PointShape pt,   XForm xf2) {
+			Point point = new Point(new Vec2(0.0f, 0.0f));
+			point.p = XForm.mul(xf2, pt.getLocalPosition());
+
+			float distance = DistanceGeneric(x1, x2, polygon, xf1, point, XForm.identity);
+
+			float r = 0.0f;
+
+			if (distance > r) {
+				distance -= r;
+				Vec2 d = x2.sub(x1);
+				d.normalize();
+				x2.x -= r * d.x;
+				x2.y -= r * d.y;
+			} else {
+				distance = 0.0f;
+				x2.set(x1);
+			}
+
+			return distance;
+	}
+	
+	protected static float DistanceCirclePoint(
+			Vec2 x1, Vec2 x2,
+			CircleShape circle1, XForm xf1,
+			PointShape pt2, XForm xf2) {
+			
+			Vec2 p1 = XForm.mul(xf1, circle1.getLocalPosition());
+			Vec2 p2 = XForm.mul(xf2, pt2.getLocalPosition());
+
+			Vec2 d = new Vec2(p2.x - p1.x, p2.y - p1.y);
+			float dSqr = Vec2.dot(d, d);
+			float r1 = circle1.getRadius() - Settings.toiSlop;
+			float r2 = 0.0f;
+			float r = r1 + r2;
+			if (dSqr > r * r){
+				float dLen = d.normalize();
+				float distance = dLen - r;
+				x1.set( p1.x + r1 * d.x,
+						p1.y + r1 * d.y);
+				x2.set( p2.x - r2 * d.x,
+						p2.y - r2 * d.y);
+				return distance;
+			} else if (dSqr > Settings.EPSILON * Settings.EPSILON) {
+				d.normalize();
+				x1.set( p1.x + r1 * d.x,
+						p1.y + r1 * d.y);
+				x2.set(x1);
+				return 0.0f;
+			}
+
+			x1.set(p1);
+			x2.set(x1);
+			return 0.0f;
+		}
 
 	/** 
 	 * Find the closest distance between shapes shape1 and shape2, 
@@ -368,19 +427,24 @@ public class Distance{
 
 		if (type1 == ShapeType.CIRCLE_SHAPE && type2 == ShapeType.CIRCLE_SHAPE) {
 			return DistanceCC(x1, x2, (CircleShape)shape1, xf1, (CircleShape)shape2, xf2);
+		} else if (type1 == ShapeType.POLYGON_SHAPE && type2 == ShapeType.CIRCLE_SHAPE) {
+			return DistancePC(x1, x2, (PolygonShape)shape1, xf1, (CircleShape)shape2, xf2);
+		} else if (type1 == ShapeType.CIRCLE_SHAPE && type2 == ShapeType.POLYGON_SHAPE) {
+			return DistancePC(x2, x1, (PolygonShape)shape2, xf2, (CircleShape)shape1, xf1);
+		} else if (type1 == ShapeType.POLYGON_SHAPE && type2 == ShapeType.POLYGON_SHAPE) {
+			return DistanceGeneric(x1, x2, (PolygonShape)shape1, xf1, (PolygonShape)shape2, xf2);
+		} else if (type1 == ShapeType.POINT_SHAPE && type2 == ShapeType.POINT_SHAPE) {
+			return Float.MAX_VALUE;
+		} else if (type1 == ShapeType.POINT_SHAPE && type2 == ShapeType.CIRCLE_SHAPE) {
+			return DistanceCirclePoint(x2, x1, (CircleShape)shape2, xf2, (PointShape)shape1, xf1);
+		} else if (type1 == ShapeType.CIRCLE_SHAPE && type2 == ShapeType.POINT_SHAPE) {
+			return DistanceCirclePoint(x1, x2, (CircleShape)shape1, xf1, (PointShape)shape2, xf2);
+		} else if (type1 == ShapeType.POINT_SHAPE && type2 == ShapeType.POLYGON_SHAPE) {
+			return DistancePolygonPoint(x2,x1,(PolygonShape)shape2,xf2,(PointShape)shape1,xf1);
+		} else if (type1 == ShapeType.POLYGON_SHAPE && type2 == ShapeType.POINT_SHAPE) {
+			return DistancePolygonPoint(x1,x2,(PolygonShape)shape1,xf1,(PointShape)shape2,xf2);
 		}
 		
-		if (type1 == ShapeType.POLYGON_SHAPE && type2 == ShapeType.CIRCLE_SHAPE) {
-			return DistancePC(x1, x2, (PolygonShape)shape1, xf1, (CircleShape)shape2, xf2);
-		}
-
-		if (type1 == ShapeType.CIRCLE_SHAPE && type2 == ShapeType.POLYGON_SHAPE) {
-			return DistancePC(x2, x1, (PolygonShape)shape2, xf2, (CircleShape)shape1, xf1);
-		}
-
-		if (type1 == ShapeType.POLYGON_SHAPE && type2 == ShapeType.POLYGON_SHAPE) {
-			return DistanceGeneric(x1, x2, (PolygonShape)shape1, xf1, (PolygonShape)shape2, xf2);
-		}
 
 		return 0.0f;
 	}
