@@ -63,18 +63,10 @@
 package org.jbox2d.testbed.timingTests;
 
 import org.jbox2d.collision.AABB;
-import org.jbox2d.collision.CircleShape;
-import org.jbox2d.collision.PolygonShape;
-import org.jbox2d.collision.Shape;
-import org.jbox2d.collision.ShapeType;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.testbed.TestSettings;
-import org.jbox2d.testbed.tests.*;
 import org.jbox2d.testbed.timingTests.PistonBenchmark;
-
-import processing.core.PApplet;
 
 /**
  * Benchmarking code.
@@ -82,71 +74,25 @@ import processing.core.PApplet;
  * @author ewjordan
  *
  */
-public class TimingTest extends PApplet {
+public class TimingTest {
 	
     private SimpleTest test;
     public int frames = 1000;
     public int iters = 20;
-    public TestSelection testToTime = TestSelection.CIRCLES;
-    
-    public enum TestSelection{
-        WASHING_MACHINE, COMPOUND_SHAPES, DOMINO, PYRAMID, CIRCLES, DOMINO_TOWER
-    }
-    
-    static public void main(String args[]) {
-        PApplet.main(new String[] { "org.jbox2d.testbed.timingTests.TimingTest" });
-    }
-
     protected TestSettings settings;
-
     protected World m_world;
-
+    
     public TimingTest() {
     	test = new PistonBenchmark();
     }
-
-    void Step(TestSettings settings) {
-        float timeStep = settings.hz > 0.0f ? 1.0f / settings.hz : 0.0f;
-
-        m_world.step(timeStep, settings.iterationCount);
-
-        // m_world.m_broadPhase.Validate();
-    }
-
-    void drawFrame() {
-        float transX = width / 2.0f;
-        float transY = height / 2.0f;
-        pushMatrix();
-        translate(transX, transY);
-        scale(10f, -10f);
-        strokeWeight(1.2f / 10f);
-        for (Body b = m_world.getBodyList(); b != null; b = b.m_next) {
-            for (Shape s = b.m_shapeList; s != null; s = s.m_next) {
-                if (b.m_invMass == 0.0f) {
-                    DrawShape(s, color(100, 100, 100));
-                }
-                else if (b.isSleeping()) {
-                    DrawShape(s, color(30, 30, 90));
-                }
-                else {
-                    DrawShape(s, color(30, 30, 30));
-
-                }
-            }
-        }
-        popMatrix();
-    }
     
-    void DrawShape(Shape shape, int c) {
-        //UPDATE FOR 2.0!!!
+    static public void main(String args[]) {
+        TimingTest myTimingTest = new TimingTest();
+    	myTimingTest.go();
     }
-
-
-    /**
-     * Initialise and run tests
-     */
-    public void setup() {
-        size(500, 500);
+    	
+    public void go() {
+    	
         settings = new TestSettings();
         long nanos = System.nanoTime();
         long diff = 0;
@@ -156,21 +102,21 @@ public class TimingTest extends PApplet {
         double fpssum = 0;
         for (int i=0; i<iters; i++){
             nanos = System.nanoTime();
-            setupWorld();
             
+            setupWorld();
             test.create(m_world);
             
-            //long initdiff = System.nanoTime() - nanos;
+            System.gc();
+            
             nanos = System.nanoTime();
             for (int j=0; j<frames; j++) {
                 Step(settings);
             }
             diff = System.nanoTime() - nanos;
             double fps = frames / ( diff / ((double)1000000000) );
-            System.out.println(diff + " - "+ fps + " FPS");// + " ns for "+frames+" frames.");
+            System.out.println("Test "+i+ " - "+ fps + " FPS");// + " ns for "+frames+" frames.");
             diffsum += diff;
             fpssum += fps;
-            drawFrame();
         }
         
         float avdiff = diffsum / ((float)iters);
@@ -178,7 +124,11 @@ public class TimingTest extends PApplet {
         System.out.println("Average time: "+avdiff);
         System.out.println("Average FPS: "+avfps);
         
+    }
 
+    void Step(TestSettings settings) {
+        float timeStep = settings.hz > 0.0f ? 1.0f / settings.hz : 0.0f;
+        m_world.step(timeStep, settings.iterationCount);
     }
 
     public void setupWorld() {
