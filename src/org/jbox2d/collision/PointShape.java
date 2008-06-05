@@ -5,6 +5,11 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
 
+/**
+ * Point shape.  Like a circle shape of zero radius, except
+ * that it has a finite mass.
+ *
+ */
 public class PointShape extends Shape {
     public Vec2 m_localPosition;
     public float m_mass;

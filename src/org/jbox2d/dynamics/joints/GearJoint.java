@@ -262,11 +262,11 @@ public class GearJoint extends Joint {
     }
 
     public Vec2 getAnchor1() {
-        return m_body1.getWorldPoint(m_localAnchor1);
+        return m_body1.getWorldLocation(m_localAnchor1);
     }
 
     public Vec2 getAnchor2() {
-        return m_body2.getWorldPoint(m_localAnchor2);
+        return m_body2.getWorldLocation(m_localAnchor2);
     }
 
     public Vec2 getReactionForce() {

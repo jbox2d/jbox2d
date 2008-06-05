@@ -101,7 +101,7 @@ public class MouseJoint extends Joint {
 
     @Override
     public Vec2 getAnchor2() {
-    	return m_body2.getWorldPoint(m_localAnchor);
+    	return m_body2.getWorldLocation(m_localAnchor);
     }
 
     @Override

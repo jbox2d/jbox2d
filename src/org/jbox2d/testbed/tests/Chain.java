@@ -86,13 +86,12 @@ public class Chain extends AbstractExample {
 			}
 		}
 		
-		PointDef pointD = new PointDef();
-		pointD.mass = 0.0f;
-		
-		for (int i=0; i<100; ++i) {
-			pointD.localPosition = new Vec2(-5f+10.0f*(float)Math.random(),10f+10.0f*(float)Math.random());
-			ground.createShape(pointD);
-		}
+		//PointDef pointD = new PointDef();
+		//pointD.mass = 0.0f;
+		//for (int i=0; i<100; ++i) {
+		//	pointD.localPosition = new Vec2(-5f+10.0f*(float)Math.random(),10f+10.0f*(float)Math.random());
+		//	ground.createShape(pointD);
+		//}
 
 	}
 	

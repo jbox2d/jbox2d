@@ -82,7 +82,7 @@ public class Pyramid extends AbstractExample {
 					BodyDef bd = new BodyDef();
 					bd.position.set(y);
 					Body body = m_world.createBody(bd);
-					body.setBullet(true);
+					//body.setBullet(true);
 					body.createShape(sd);
 					body.setMassFromShapes();
 

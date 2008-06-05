@@ -399,12 +399,12 @@ public class PrismaticJoint extends Joint {
 
     @Override
     public Vec2 getAnchor1() {
-    	return m_body1.getWorldPoint(m_localAnchor1);
+    	return m_body1.getWorldLocation(m_localAnchor1);
     }
 
     @Override
     public Vec2 getAnchor2() {
-    	return m_body2.getWorldPoint(m_localAnchor2);
+    	return m_body2.getWorldLocation(m_localAnchor2);
     }
 
     /// Get the current joint translation, usually in meters.
@@ -412,8 +412,8 @@ public class PrismaticJoint extends Joint {
     	Body b1 = m_body1;
     	Body b2 = m_body2;
 
-    	Vec2 p1 = b1.getWorldPoint(m_localAnchor1);
-    	Vec2 p2 = b2.getWorldPoint(m_localAnchor2);
+    	Vec2 p1 = b1.getWorldLocation(m_localAnchor1);
+    	Vec2 p2 = b2.getWorldLocation(m_localAnchor2);
     	Vec2 d = p2.sub(p1);
     	Vec2 axis = b1.getWorldVector(m_localXAxis1);
 

@@ -165,7 +165,7 @@ public class PolyContact extends Contact implements ContactCreateFcn {
 
     					// Report persistent point.
     					if (listener != null) {
-    						cp.position = b1.getWorldPoint(mp.localPoint1);
+    						cp.position = b1.getWorldLocation(mp.localPoint1);
     						Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
     						Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
     						cp.velocity = v2.sub(v1);
@@ -180,7 +180,7 @@ public class PolyContact extends Contact implements ContactCreateFcn {
 
     			// Report added point.
     			if (found == false && listener != null) {
-    				cp.position = b1.getWorldPoint(mp.localPoint1);
+    				cp.position = b1.getWorldLocation(mp.localPoint1);
     				Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
     				Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
     				cp.velocity = v2.sub(v1);
@@ -207,7 +207,7 @@ public class PolyContact extends Contact implements ContactCreateFcn {
     		}
 
     		ManifoldPoint mp0 = m0.points[i];
-    		cp.position = b1.getWorldPoint(mp0.localPoint1);
+    		cp.position = b1.getWorldLocation(mp0.localPoint1);
     		Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp0.localPoint1);
     		Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp0.localPoint2);
     		cp.velocity = v2.sub(v1);

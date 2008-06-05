@@ -123,7 +123,7 @@ public class TestbedMain extends PApplet {
     	// Simple functionality examples
     	//registerExample(new SensorTest(this));
     	//
-    	//registerExample(new SpringRestitutionTest(this));
+    	registerExample(new BugTest(this));
     	registerExample(new BipedTest(this));
     	registerExample(new SpriteBinding(this));
     	registerExample(new Pulleys(this));
