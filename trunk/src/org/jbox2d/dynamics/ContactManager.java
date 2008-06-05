@@ -171,7 +171,7 @@ public class ContactManager extends PairCallback {
     			for (int j = 0; j < manifold.pointCount; ++j) {
 
     				ManifoldPoint mp = manifold.points[j];
-    				cp.position = b1.getWorldPoint(mp.localPoint1);
+    				cp.position = b1.getWorldLocation(mp.localPoint1);
     				Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
     				Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
     				cp.velocity = v2.sub(v1);

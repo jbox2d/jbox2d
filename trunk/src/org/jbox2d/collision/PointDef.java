@@ -2,6 +2,9 @@ package org.jbox2d.collision;
 
 import org.jbox2d.common.Vec2;
 
+/**
+ * Point shape definition.
+ */
 public class PointDef extends ShapeDef {
 	public Vec2 localPosition;
 	public float mass;

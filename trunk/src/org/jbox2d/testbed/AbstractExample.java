@@ -306,7 +306,7 @@ public abstract class AbstractExample {
 
 		if (m_mouseJoint != null) {
 			Body body = m_mouseJoint.m_body2;
-			Vec2 p1 = body.getWorldPoint(m_mouseJoint.m_localAnchor);
+			Vec2 p1 = body.getWorldLocation(m_mouseJoint.m_localAnchor);
 			Vec2 p2 = m_mouseJoint.m_target;
 
 			m_debugDraw.drawSegment(p1, p2, new Color3f(255.0f,255.0f,255.0f));
@@ -369,6 +369,7 @@ public abstract class AbstractExample {
 		printInstructions();
 		
 		pmouseScreen.set(mouseScreen);
+		
 		postStep();
 
 		//Should reset newKeyDown after postStep in case it needs to be used there

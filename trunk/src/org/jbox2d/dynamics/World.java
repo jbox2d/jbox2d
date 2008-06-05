@@ -1059,7 +1059,7 @@ public class World {
     		for (Body b = m_bodyList; b != null; b = b.getNext()) {
     			XForm xf = b.getXForm();
     			for (Shape s = b.getShapeList(); s != null; s = s.getNext()) {
-    				if (s.isSensor()) continue;
+    				//if (s.isSensor()) continue;
     				if (b.isStatic()) {
     					drawShape(s, xf, new Color3f(255f*0.5f, 255f*0.9f, 255f*0.5f), core);
     				}

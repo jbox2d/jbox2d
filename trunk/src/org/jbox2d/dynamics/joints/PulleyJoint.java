@@ -386,11 +386,11 @@ public class PulleyJoint extends Joint {
     }
 
     public Vec2 getAnchor1() {
-    	return m_body1.getWorldPoint(m_localAnchor1);
+    	return m_body1.getWorldLocation(m_localAnchor1);
     }
 
     public Vec2 getAnchor2() {
-    	return m_body2.getWorldPoint(m_localAnchor2);
+    	return m_body2.getWorldLocation(m_localAnchor2);
     }
 
     public Vec2 getReactionForce() {
@@ -411,14 +411,14 @@ public class PulleyJoint extends Joint {
     }
 
     public float getLength1() {
-    	Vec2 p = m_body1.getWorldPoint(m_localAnchor1);
+    	Vec2 p = m_body1.getWorldLocation(m_localAnchor1);
     	Vec2 s = m_ground.m_xf.position.add(m_groundAnchor1);
     	Vec2 d = p.subLocal(s);
     	return d.length();
     }
 
     public float getLength2() {
-    	Vec2 p = m_body2.getWorldPoint(m_localAnchor2);
+    	Vec2 p = m_body2.getWorldLocation(m_localAnchor2);
     	Vec2 s = m_ground.m_xf.position.add(m_groundAnchor2);
     	Vec2 d = p.subLocal(s);
     	return d.length();

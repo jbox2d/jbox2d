@@ -114,7 +114,7 @@ public class CircleContact extends Contact implements ContactCreateFcn {
     			mp.tangentImpulse = 0.0f;
 
     			if (listener != null) {
-    				cp.position = b1.getWorldPoint(mp.localPoint1);
+    				cp.position = b1.getWorldLocation(mp.localPoint1);
     				Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
     				Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
     				cp.velocity = v2.sub(v1);
@@ -129,7 +129,7 @@ public class CircleContact extends Contact implements ContactCreateFcn {
     			mp.tangentImpulse = mp0.tangentImpulse;
 
     			if (listener != null) {
-    				cp.position = b1.getWorldPoint(mp.localPoint1);
+    				cp.position = b1.getWorldLocation(mp.localPoint1);
     				Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
     				Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
     				cp.velocity = v2.sub(v1);
@@ -144,7 +144,7 @@ public class CircleContact extends Contact implements ContactCreateFcn {
             m_manifoldCount = 0;
     		if (m0.pointCount > 0 && (listener != null)) {
     			ManifoldPoint mp0 = m0.points[0];
-    			cp.position = b1.getWorldPoint(mp0.localPoint1);
+    			cp.position = b1.getWorldLocation(mp0.localPoint1);
     			Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp0.localPoint1);
     			Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp0.localPoint2);
     			cp.velocity = v2.sub(v1);

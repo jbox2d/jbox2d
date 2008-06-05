@@ -147,8 +147,8 @@ public class SensorTest extends AbstractExample {
 	}
 	
 	public void addSpringForce(Body bA, Vec2 localA, Body bB, Vec2 localB, float k, float friction, float desiredDist) {
-        Vec2 pA = bA.getWorldPoint(localA);
-        Vec2 pB = bB.getWorldPoint(localB);
+        Vec2 pA = bA.getWorldLocation(localA);
+        Vec2 pB = bB.getWorldLocation(localB);
         Vec2 diff = pB.sub(pA);
         //Find velocities of attach points
         Vec2 vA = bA.m_linearVelocity.sub(Vec2.cross(bA.getWorldVector(localA), bA.m_angularVelocity));
@@ -159,8 +159,8 @@ public class SensorTest extends AbstractExample {
         float forceMag = -k*(dx-desiredDist) - friction*vrel;
         //System.out.println(dx+" "+desiredDist);
         diff.mulLocal(forceMag); // diff *= forceMag
-        bB.applyForce(diff, bA.getWorldPoint(localA));
-        bA.applyForce(diff.mulLocal(-1f), bB.getWorldPoint(localB));
+        bB.applyForce(diff, bA.getWorldLocation(localA));
+        bA.applyForce(diff.mulLocal(-1f), bB.getWorldLocation(localB));
         bA.wakeUp();
         bB.wakeUp();
     }

@@ -573,17 +573,37 @@ public class Body {
 	 * @param localPoint a point on the body measured relative the the body's origin.
 	 * @return the same point expressed in world coordinates.
 	 */
-	public Vec2 getWorldPoint(Vec2 localPoint){
+	public Vec2 getWorldLocation(Vec2 localPoint){
 		return XForm.mul(m_xf, localPoint);
+	}
+	
+	/**
+	 * Get the world coordinates of a point given the local coordinates.
+	 * @param localPoint a point on the body measured relative the the body's origin.
+	 * @return the same point expressed in world coordinates.
+	 * @deprecated Use getWorldLocation instead
+	 */
+	public Vec2 getWorldPoint(Vec2 localPoint) {
+		return getWorldLocation(localPoint);
 	}
 
 	/**
 	 * Get the world coordinates of a vector given the local coordinates.
 	 * @param localVector a vector fixed in the body.
 	 * @return the same vector expressed in world coordinates.
+	 * @deprecated Use getWorldDirection instead
 	 */
 	public Vec2 getWorldVector(Vec2 localVector){
-		return Mat22.mul(m_xf.R, localVector);
+		return getWorldDirection(localVector);
+	}
+	
+	/**
+	 * Get the world coordinates of a direction given the local direction.
+	 * @param localDirection a vector fixed in the body.
+	 * @return the same vector expressed in world coordinates.
+	 */
+	public Vec2 getWorldDirection(Vec2 localDirection) {
+		return Mat22.mul(m_xf.R, localDirection);
 	}
 
 	/**
@@ -776,7 +796,7 @@ public class Body {
 	 * @return the world velocity of a point.
 	 */
 	public Vec2 getLinearVelocityFromLocalPoint(Vec2 localPoint) {
-		return getLinearVelocityFromWorldPoint(getWorldPoint(localPoint));
+		return getLinearVelocityFromWorldPoint(getWorldLocation(localPoint));
 	}
 	
 	/**
