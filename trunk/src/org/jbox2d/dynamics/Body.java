@@ -100,6 +100,10 @@ public class Body {
 	 * be set there instead. 
 	 */
 	public Object m_userData;
+	
+	public Body() {
+		
+	}
 
 	/**
 	 * Should not be called by user, as it will not

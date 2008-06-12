@@ -55,6 +55,7 @@ public class ProcessingDebugDraw extends DebugDraw {
     public void setCamera(float x, float y, float scale) {
     	transX = PApplet.map(x,0.0f,-1.0f,g.width*.5f,g.width*.5f+scale);
     	transY = PApplet.map(y,0.0f,yFlip*1.0f,g.height*.5f,g.height*.5f+scale);
+    	//System.out.println(transX+ " " +transY + " "+scale);
     	scaleFactor = scale;
     }
 	
@@ -63,6 +64,14 @@ public class ProcessingDebugDraw extends DebugDraw {
 		g = pApplet;
 		m_font = g.createFont("LucidaGrande-Bold",12);//-Bold-14.vlw");
 		fontHeight = 14.0f;
+	}
+	
+	public float worldToScreen(float worldScale) {
+		return scaleFactor*worldScale;
+	}
+	
+	public float screenToWorld(float screenScale) {
+		return screenScale / scaleFactor;
 	}
 	
 	public Vec2 worldToScreen(Vec2 world) {
@@ -143,9 +152,6 @@ public class ProcessingDebugDraw extends DebugDraw {
 		g.endShape();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.jbox2d.dynamics.DebugDraw#drawPolygon(org.jbox2d.common.Vec2[], int, javax.vecmath.Color3f)
-	 */
 	@Override
 	public void drawPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
 		g.stroke(color.x, color.y, color.z);
@@ -154,14 +160,12 @@ public class ProcessingDebugDraw extends DebugDraw {
 			int ind = (i+1<vertexCount)?i+1:(i+1-vertexCount);
 			Vec2 v1 = worldToScreen(vertices[i]);
 			Vec2 v2 = worldToScreen(vertices[ind]);
+			//System.out.println(v1 + " -> "+v2);
 			g.line(v1.x, v1.y, v2.x, v2.y);
 		}
 
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.jbox2d.dynamics.DebugDraw#drawSolidPolygon(org.jbox2d.common.Vec2[], int, javax.vecmath.Color3f)
-	 */
 	@Override
 	public void drawSolidPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
 		g.noStroke();
@@ -178,6 +182,7 @@ public class ProcessingDebugDraw extends DebugDraw {
 			int ind = (i+1<vertexCount)?i+1:(i+1-vertexCount);
 			Vec2 v1 = worldToScreen(vertices[i]);
 			Vec2 v2 = worldToScreen(vertices[ind]);
+			//System.out.println("Drawing: "+v1+" to "+v2);
 			g.line(v1.x, v1.y, v2.x, v2.y);
 		}
 	}

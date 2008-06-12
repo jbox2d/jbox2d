@@ -99,9 +99,19 @@ public class World {
 	ContactListener m_contactListener;
 	DebugDraw m_debugDraw;
 	
+	boolean m_drawDebugData;
+	
 	private float m_inv_dt0;
 
 	private ArrayList<Steppable> postStepList;
+	
+	public void setDrawDebugData(boolean tf) {
+		m_drawDebugData = tf;
+	}
+	
+	public boolean isDrawingDebugData() {
+		return m_drawDebugData;
+	}
 
 	/** Get the number of bodies. */
 	public int getBodyCount() {
@@ -194,6 +204,7 @@ public class World {
         BodyDef bd = new BodyDef();
         m_groundBody = createBody(bd);
         postStepList = new ArrayList<Steppable>();
+        setDrawDebugData(true);
     }
 
 	/** Register a destruction listener. */
@@ -1046,20 +1057,22 @@ public class World {
 
     /** For internal use */
     public void drawDebugData() {
-    	if (m_debugDraw == null) {
+    	if (m_debugDraw == null || m_drawDebugData == false) {
     		return;
     	}
-
+    	
     	int flags = m_debugDraw.getFlags();
 
     	if ( (flags & DebugDraw.e_shapeBit) != 0) {
-    		
+
     		boolean core = (flags & DebugDraw.e_coreShapeBit) == DebugDraw.e_coreShapeBit;
 
     		for (Body b = m_bodyList; b != null; b = b.getNext()) {
     			XForm xf = b.getXForm();
+
     			for (Shape s = b.getShapeList(); s != null; s = s.getNext()) {
     				//if (s.isSensor()) continue;
+    				
     				if (b.isStatic()) {
     					drawShape(s, xf, new Color3f(255f*0.5f, 255f*0.9f, 255f*0.5f), core);
     				}
