@@ -13,6 +13,7 @@ import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jbox2d.testbed.AbstractExample;
 import org.jbox2d.testbed.ExampleContactPoint;
 import org.jbox2d.testbed.TestbedMain;
+import org.jbox2d.testbed.timingTests.PistonBenchmark;
 
 public class BugTest extends AbstractExample {
 	private boolean firstTime = true;
@@ -36,6 +37,9 @@ public class BugTest extends AbstractExample {
 			firstTime = false;
 		}
     	
+    	new PistonBenchmark().create(m_world);
+    	
+    	/*
     	PolygonDef pd = new PolygonDef();
     	pd.setAsBox(5.0f, 5.0f);
     	pd.isSensor = true;
@@ -64,6 +68,6 @@ public class BugTest extends AbstractExample {
 			else if (cp.state == 2) System.out.println("Remove");
 			System.out.println(cp.shape1 + " " +cp.shape2);
 			System.out.println(cp.position);
-		}
+		}*/
 	}
 }

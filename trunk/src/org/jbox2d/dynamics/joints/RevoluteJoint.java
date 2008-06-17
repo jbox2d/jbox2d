@@ -164,6 +164,8 @@ public class RevoluteJoint extends Joint {
     }
 
     private Vec2 m_lastWarmStartingPivotForce = new Vec2(0.0f,0.0f);
+    private float m_lastWarmStartingMotorForce = 0.0f;
+    private float m_lastWarmStartingLimitForce = 0.0f;
     private boolean m_warmStartingOld = true;
     
     @Override
@@ -181,12 +183,8 @@ public class RevoluteJoint extends Joint {
     	//else m_pivotForce.addLocal(pivotForce);
     	//if (step.warmStarting && (!m_warmStartingOld)) m_pivotForce = m_lastWarmStartingPivotForce;
     	if (step.warmStarting) {
-    		//if (m_warmStartingOld) {
-    			m_pivotForce.addLocal(pivotForce);
-    			m_lastWarmStartingPivotForce.set(m_pivotForce);
-    		//} else {
-    		//	m_pivotForce = m_lastWarmStartingPivotForce;
-    		//}
+    		m_pivotForce.addLocal(pivotForce);
+    		m_lastWarmStartingPivotForce.set(m_pivotForce);
     	} else {
     		m_pivotForce.set(m_lastWarmStartingPivotForce);
     	}
@@ -206,7 +204,9 @@ public class RevoluteJoint extends Joint {
     		float oldMotorForce = m_motorForce;
     		m_motorForce = MathUtils.clamp(m_motorForce + motorForce, -m_maxMotorTorque, m_maxMotorTorque);
     		motorForce = m_motorForce - oldMotorForce;
-
+    		
+    		if (!step.warmStarting) m_motorForce = oldMotorForce;
+    		
     		float P2 = step.dt * motorForce;
     		b1.m_angularVelocity -= b1.m_invI * P2;
     		b2.m_angularVelocity += b2.m_invI * P2;

@@ -216,7 +216,6 @@ public class PolyContact extends Contact implements ContactCreateFcn {
     		cp.id = new ContactID(mp0.id);
     		listener.remove(cp);
     	}
-    	
     }
     
 }

@@ -79,7 +79,9 @@ public class Sweep {
 		}
 
 		// Shift to origin
-		xf.position.subLocal(Mat22.mul(xf.R, localCenter));
+		//xf.position.subLocal(Mat22.mul(xf.R, localCenter));
+		xf.position.x -= xf.R.col1.x * localCenter.x + xf.R.col2.x * localCenter.y;
+		xf.position.y -= xf.R.col1.y * localCenter.x + xf.R.col2.y * localCenter.y;
 	}
 
 	/** 

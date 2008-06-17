@@ -25,6 +25,8 @@
 
 package org.jbox2d.dynamics.contacts;
 
+import java.util.Arrays;
+
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;

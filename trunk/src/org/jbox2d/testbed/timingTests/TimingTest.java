@@ -78,7 +78,7 @@ public class TimingTest {
 	
     private SimpleTest test;
     public int frames = 1000;
-    public int iters = 20;
+    public int iters = 40;
     protected TestSettings settings;
     protected World m_world;
     
@@ -88,6 +88,13 @@ public class TimingTest {
     
     static public void main(String args[]) {
         TimingTest myTimingTest = new TimingTest();
+        try {
+        	myTimingTest.iters = Integer.parseInt(args[0]);
+        } catch(Exception e) {
+        	System.out.println("Suggested usage: java -jar -server -Xms1024M -Xmx2048M jbox2d-2.0.1-speedTest.jar (# of iters)\nFor example, java -jar -server -Xms1024M -Xmx2048M jbox2d-2.0.1-speedTest.jar 40");
+
+        	System.exit(1);
+        }
     	myTimingTest.go();
     }
     	
@@ -98,15 +105,18 @@ public class TimingTest {
         long diff = 0;
         System.out.println("Timing "+test);
         System.out.println(frames+" frames per test, "+iters+" tests.");
+        System.out.println("Bullets are "+ ( (PistonBenchmark.BULLETS)?"on":"off") );
         long diffsum = 0;
         double fpssum = 0;
         for (int i=0; i<iters; i++){
+
+            System.gc();
+            
             nanos = System.nanoTime();
             
             setupWorld();
             test.create(m_world);
             
-            System.gc();
             
             nanos = System.nanoTime();
             for (int j=0; j<frames; j++) {

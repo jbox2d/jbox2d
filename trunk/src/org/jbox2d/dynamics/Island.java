@@ -156,7 +156,7 @@ public class Island {
     			}
     		}
     	}
-    	
+
     	ContactSolver contactSolver = new ContactSolver(step, m_contacts, m_contactCount);
 
     	// Initialize velocity constraints.
@@ -174,6 +174,7 @@ public class Island {
     			m_joints[j].solveVelocityConstraints(step);
     		}
     	}
+
 
     	// Post-solve (store impulses for warm starting).
     	contactSolver.finalizeVelocityConstraints();
@@ -203,11 +204,13 @@ public class Island {
     	if (correctPositions) {
     		// Initialize position constraints.
     		// Contacts don't need initialization.
-    		for (int i = 0; i < m_jointCount; ++i) {
+
+      		for (int i = 0; i < m_jointCount; ++i) {
     			m_joints[i].initPositionConstraints();
     		}
 
-    		// Iterate over constraints.
+
+        	// Iterate over constraints.
     		for (m_positionIterationCount = 0; m_positionIterationCount < step.maxIterations; ++m_positionIterationCount) {
     			boolean contactsOkay = contactSolver.solvePositionConstraints(Settings.contactBaumgarte);
 
@@ -221,6 +224,7 @@ public class Island {
     				break;
     			}
     		}
+
     	}
 
     	report(contactSolver.m_constraints);
@@ -262,6 +266,7 @@ public class Island {
     			}
     		}
     	}
+    	
     }
 
     public void solveTOI(TimeStep subStep) {

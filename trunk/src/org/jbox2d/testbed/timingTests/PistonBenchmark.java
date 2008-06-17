@@ -23,14 +23,19 @@ import org.jbox2d.testbed.timingTests.SimpleTest;
  *	1.6 Average FPS: 			390.21332
  *	1.6 -server Average FPS: 	470.05365
  *
+ *  (131+: with 1024M heap, 1.6 -server: 578.7675 FPS!)
+ *
  *	All bullets:
  *	1.6 Average FPS: 			185.98808
  *	1.6 -server Average FPS: 	221.55266
+ *
+ *
+ *  (C++ performance for no bullets is ~708 FPS, for comparison's sake)
  * @author eric
  *
  */
 public class PistonBenchmark implements SimpleTest{
-	static final boolean BULLETS = false;
+	static final boolean BULLETS = true;
 	private RevoluteJoint m_joint1;
 	private PrismaticJoint m_joint2;
 	
@@ -93,7 +98,7 @@ public class PistonBenchmark implements SimpleTest{
 			// Create a payload
 			for (int i=0; i<100; ++i) {
 				sd.setAsBox(0.4f,0.3f);
-				sd.density = 2.0f;
+				sd.density = 0.1f;
 				bd.position.set(-1.0f, 23.0f + i);
 				if (BULLETS) bd.isBullet = true;
 				else bd.isBullet = false;

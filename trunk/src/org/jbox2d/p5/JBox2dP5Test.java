@@ -31,21 +31,30 @@ public class JBox2dP5Test extends PApplet {
 		
 		if (mousePressed) {
 			//Create a body
-			float x0 = mouseX;
-			float y0 = mouseY;
-			Body randomBod = physics.createCircle(x0, y0, random(5.0f,25f));
-			Vec2 vel = new Vec2(random(-100.0f,100.0f),random(-100.0f,100.0f));
-			randomBod.setLinearVelocity(vel);
+//			float x0 = mouseX;
+//			float y0 = mouseY;
+//			Body randomBod = physics.createCircle(x0, y0, random(5.0f,25f));
+//			Vec2 vel = new Vec2(random(-100.0f,100.0f),random(-100.0f,100.0f));
+//			randomBod.setLinearVelocity(vel);
+//			physics.createPolygon(mouseX+10.0f, mouseY,
+//								  mouseX,	    mouseY-10.0f,
+//								  mouseX-10.0f, mouseY,
+//								  mouseX,	    mouseY+10.0f);
+			float[] xyInterleaved = {mouseX+10.0f, mouseY,
+					  mouseX,	    mouseY-10.0f,
+					  mouseX-10.0f, mouseY,
+					  mouseX,	    mouseY+10.0f};
+			physics.createPolygon(xyInterleaved);
 		}
 		
 		if (keyPressed) {
 
-			physics.setCustomRenderingMethod(physics, "defaultDraw");
+			//physics.setCustomRenderingMethod(physics, "defaultDraw");
 			
 			//Reset everything
-			//physics.destroy();
-			//body = body2 = null;
-			//initScene();
+			physics.destroy();
+			body = body2 = null;
+			initScene();
 		}
 	}
 	
