@@ -217,6 +217,8 @@ public class PrismaticJoint extends Joint {
         m_limitPositionImpulse = 0.0f;
         
     }
+    
+    private float m_lastWarmStartingForce, m_lastWarmStartingTorque;
 
     public void solveVelocityConstraints(TimeStep step) {
         Body b1 = m_body1;
@@ -230,7 +232,14 @@ public class PrismaticJoint extends Joint {
                 .compute(b1.m_linearVelocity, b1.m_angularVelocity,
                         b2.m_linearVelocity, b2.m_angularVelocity);
         float force = -step.inv_dt * m_linearMass * linearCdot;
-        m_force += force;
+        
+        //m_force += force;
+    	if (step.warmStarting) {
+			m_force += (force);
+			m_lastWarmStartingForce = m_force;
+    	} else {
+    		m_force = m_lastWarmStartingForce;
+    	}
 
         float P = step.dt * force;
     	b1.m_linearVelocity.x += (invMass1 * P) * m_linearJacobian.linear1.x;
@@ -245,7 +254,13 @@ public class PrismaticJoint extends Joint {
     	float angularCdot = b2.m_angularVelocity - b1.m_angularVelocity;
     	float torque = -step.inv_dt * m_angularMass * angularCdot;
     	m_torque += torque;
-
+    	if (step.warmStarting) {
+			m_torque += torque;
+			m_lastWarmStartingTorque = m_torque;
+    	} else {
+    		m_torque = m_lastWarmStartingTorque;
+    	}
+    	
     	float L = step.dt * torque;
     	b1.m_angularVelocity -= invI1 * L;
     	b2.m_angularVelocity += invI2 * L;

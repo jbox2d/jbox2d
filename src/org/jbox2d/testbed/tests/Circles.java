@@ -22,6 +22,7 @@ import processing.core.*;
 
 public class Circles extends AbstractExample {
 	private boolean firstTime = true;
+	private static final boolean BULLET = false;
 	
     public Circles(TestbedMain parent) {
         super(parent);
@@ -89,6 +90,8 @@ public class Circles extends AbstractExample {
             body.createShape(cd);   
         }
         body.setMassFromShapes();
+        
+        body.setBullet(BULLET);
 
         RevoluteJointDef rjd = new RevoluteJointDef();
         rjd.initialize(body,ground,body.getPosition());

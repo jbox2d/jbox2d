@@ -99,6 +99,7 @@ import processing.core.PApplet;
  * @author ewjordan
  */
 public class Physics {
+	// All the crap you'd otherwise have to handle yourself
 	private World m_world;
 	private PApplet m_parent;
 	private ProcessingDebugDraw m_draw;
@@ -408,6 +409,59 @@ public class Physics {
 		if (m_density > 0.0f) b.setMassFromShapes();
 		
 		b.setXForm(center, 0.0f);
+		
+		return b;
+	}
+	
+	/**
+	 * Create a polygon based on vertices.
+	 * <BR><BR>
+	 * Polygons must be:
+	 * <ul>
+	 * <li>Ordered clockwise in screen coordinates (which
+	 * becomes counterclockwise in world coordinates).
+	 * <li>Non self-intersecting.
+	 * <li>Convex
+	 * </ul>
+	 * Failure to adhere to any of these restrictions may cause
+	 * simulation crashes or problems.  In particular, if your
+	 * objects are showing up as static objects instead of dynamic
+	 * ones, and are not colliding correctly, you have probably 
+	 * not met the clockwise ordering requirement.
+	 * <BR><BR>
+	 * This can be called with any number of vertices passed as
+	 * pairs of interleaved floats, for instance:
+	 * <pre>
+	 * createPolygon(x0,y0,x1,y1,x2,y2,x3,y3);</pre>
+	 * or
+	 * <pre>
+	 * createPolygon(x0,y0,x1,y1,x2,y2,x3,y3,x4,y4,x5,y5);</pre>
+	 * or
+	 * <pre>
+	 * float[] xyInterleaved = {x0,y0,x1,y1,x2,y2,x3,y3,x4,y4};
+	 * createPolygon(xyInterleaved);</pre>
+	 * are all fine.
+	 * @param vertices Any number of pairs of x,y floats, or an array of the same (screen coordinates)
+	 * @return
+	 */
+	public Body createPolygon(float... vertices) {
+		if (vertices.length % 2 != 0) 
+			throw new IllegalArgumentException("Vertices must be given as pairs of x,y coordinates, " +
+											   "but number of passed parameters was odd.");
+		int nVertices = vertices.length / 2;
+		PolygonDef pd = new PolygonDef();
+		for (int i=0; i<nVertices; ++i) {
+			Vec2 v = screenToWorld(vertices[2*i],vertices[2*i+1]);
+			pd.addVertex(v);
+		}
+		setShapeDefProperties(pd);
+		
+		BodyDef bd = new BodyDef();
+		setBodyDefProperties(bd);
+		
+		Body b = m_world.createBody(bd);
+		b.createShape(pd);
+		if (m_density > 0.0f) b.setMassFromShapes();
 		
 		return b;
 	}
