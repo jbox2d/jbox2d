@@ -781,6 +781,7 @@ public class World {
     				// This is the minimum TOI found so far.
     				minContact = c;
     				minTOI = toi;
+    				
     			}
 
         		
@@ -790,7 +791,7 @@ public class World {
     			// No more TOI events. Done!
     			break;
     		}
-
+    		
     		// Advance the bodies to the TOI.
     		Shape s1 = minContact.getShape1();
     		Shape s2 = minContact.getShape2();

@@ -196,7 +196,7 @@ public class CollideCircle {
             p.x += u * e.x;
             p.y += u * e.y;
             manifold.points[0].id.features.incidentEdge = normalIndex;
-            manifold.points[0].id.features.incidentVertex = 0;
+            manifold.points[0].id.features.incidentVertex = Collision.NULL_FEATURE;
         }
 
         Vec2 d = cLocal.sub(p);
@@ -287,7 +287,7 @@ public class CollideCircle {
             p.x += u * e.x;
             p.y += u * e.y;
             manifold.points[0].id.features.incidentEdge = normalIndex;
-            manifold.points[0].id.features.incidentVertex = 0;
+            manifold.points[0].id.features.incidentVertex = Collision.NULL_FEATURE;
         }
 
         Vec2 d = cLocal.sub(p);
