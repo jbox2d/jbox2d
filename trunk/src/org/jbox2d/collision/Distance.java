@@ -353,9 +353,10 @@ public class Distance{
 			Point point = new Point(new Vec2(0.0f, 0.0f));
 			point.p = XForm.mul(xf2, pt.getLocalPosition());
 
+			//TODO: check if we need to subtract toi slop from this...
 			float distance = DistanceGeneric(x1, x2, polygon, xf1, point, XForm.identity);
-
-			float r = 0.0f;
+			//...or if it's better to do it here
+			float r = -Settings.toiSlop;
 
 			if (distance > r) {
 				distance -= r;
@@ -382,7 +383,7 @@ public class Distance{
 			Vec2 d = new Vec2(p2.x - p1.x, p2.y - p1.y);
 			float dSqr = Vec2.dot(d, d);
 			float r1 = circle1.getRadius() - Settings.toiSlop;
-			float r2 = 0.0f;
+			float r2 = -Settings.toiSlop; //this is necessary, otherwise the toi steps aren't taken correctly...
 			float r = r1 + r2;
 			if (dSqr > r * r){
 				float dLen = d.normalize();
