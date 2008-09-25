@@ -302,8 +302,8 @@ public class CollidePoly {
 
         PolygonShape poly1; // reference poly
         PolygonShape poly2; // incident poly
-        XForm xf1 = new XForm();
-        XForm xf2 = new XForm();
+        XForm xf1 = p_xf1;
+        XForm xf2 = p_xf2;
         int edge1; // reference edge
         byte flip;
         float k_relativeTol = 0.98f;
@@ -336,10 +336,17 @@ public class CollidePoly {
 
         Vec2 v11 = vertices1[edge1];
         Vec2 v12 = edge1 + 1 < count1 ? vertices1[edge1 + 1] : vertices1[0];
+		//Vec2 v1 = v12.sub(v11);
+		float v1x = v12.x-v11.x;
+		float v1y = v12.y-v11.y;
 
-        Vec2 sideNormal = Mat22.mul(xf1.R, v12.sub(v11));
+        //Vec2 sideNormal = Mat22.mul(xf1.R, v12.sub(v11));
+        sideNormal.set(xf1.R.col1.x * v1x + xf1.R.col2.x * v1y,
+        			   xf1.R.col1.y * v1x + xf1.R.col2.y * v1y);
         sideNormal.normalize();
-        Vec2 frontNormal = Vec2.cross(sideNormal, 1.0f);
+        
+        //Vec2 frontNormal = Vec2.cross(sideNormal, 1.0f);
+        frontNormal.set(sideNormal.y,-sideNormal.x);
 
         //v11 = XForm.mul(xf1, v11);
     	//v12 = XForm.mul(xf1, v12);
@@ -386,15 +393,15 @@ public class CollidePoly {
                 //cp.localPoint1 = XForm.mulT(xfA, clipPoints2[i].v);
     			//cp.localPoint2 = XForm.mulT(xfB, clipPoints2[i].v);
                 Vec2 vec = clipPoints2[i].v;
-                float v1x = vec.x-xfA.position.x;
-				float v1y = vec.y-xfA.position.y;
-    			cp.localPoint1.x = (v1x * xfA.R.col1.x + v1y * xfA.R.col1.y);
-    			cp.localPoint1.y = (v1x * xfA.R.col2.x + v1y * xfA.R.col2.y);
+                float u1x = vec.x-xfA.position.x;
+				float u1y = vec.y-xfA.position.y;
+    			cp.localPoint1.x = (u1x * xfA.R.col1.x + u1y * xfA.R.col1.y);
+    			cp.localPoint1.y = (u1x * xfA.R.col2.x + u1y * xfA.R.col2.y);
     			
-				v1x = vec.x-xfB.position.x;
-				v1y = vec.y-xfB.position.y;
-				cp.localPoint2.x = (v1x * xfB.R.col1.x + v1y * xfB.R.col1.y);
-    			cp.localPoint2.y = (v1x * xfB.R.col2.x + v1y * xfB.R.col2.y);
+				u1x = vec.x-xfB.position.x;
+				u1y = vec.y-xfB.position.y;
+				cp.localPoint2.x = (u1x * xfB.R.col1.x + u1y * xfB.R.col1.y);
+    			cp.localPoint2.y = (u1x * xfB.R.col2.x + u1y * xfB.R.col2.y);
     			
     			cp.id = new ContactID(clipPoints2[i].id);
                 cp.id.features.flip = flip;
@@ -406,6 +413,13 @@ public class CollidePoly {
 
         return;
     }
+    
+    // "Pool" objects
+    static private Vec2 sideNormal = new Vec2();
+    static private Vec2 frontNormal = new Vec2();
+    
+    static private XForm p_xf1 = new XForm();
+    static private XForm p_xf2 = new XForm();
 }
 
 /** Holder class used internally in CollidePoly. */

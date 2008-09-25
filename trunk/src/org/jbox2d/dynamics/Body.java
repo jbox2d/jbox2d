@@ -585,7 +585,7 @@ public class Body {
 	 * Get the world coordinates of a point given the local coordinates.
 	 * @param localPoint a point on the body measured relative the the body's origin.
 	 * @return the same point expressed in world coordinates.
-	 * @deprecated Use getWorldLocation instead
+	 * @deprecated Use getWorldLocation instead (clearer naming convention)
 	 */
 	public Vec2 getWorldPoint(Vec2 localPoint) {
 		return getWorldLocation(localPoint);
@@ -595,7 +595,7 @@ public class Body {
 	 * Get the world coordinates of a vector given the local coordinates.
 	 * @param localVector a vector fixed in the body.
 	 * @return the same vector expressed in world coordinates.
-	 * @deprecated Use getWorldDirection instead
+	 * @deprecated Use getWorldDirection instead (clearer naming convention)
 	 */
 	public Vec2 getWorldVector(Vec2 localVector){
 		return getWorldDirection(localVector);

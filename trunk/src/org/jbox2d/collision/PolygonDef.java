@@ -48,6 +48,21 @@ public class PolygonDef extends ShapeDef {
 	 * instead to add to or inspect the current vertices.
 	 */
     public List<Vec2> vertices;
+    
+    public void set(PolygonDef copyMe) {
+    	this.density = copyMe.density;
+    	this.filter = new FilterData();
+    	this.filter.set(copyMe.filter);
+    	this.friction = copyMe.friction;
+    	this.isSensor = copyMe.isSensor;
+    	this.restitution = copyMe.restitution;
+    	this.type = copyMe.type;
+    	this.userData = copyMe.userData;
+    	this.vertices = new ArrayList<Vec2>();
+    	for(int i=0; i<copyMe.vertices.size(); ++i) {
+    		this.addVertex(copyMe.vertices.get(i).clone());
+    	}
+    }
 
     public PolygonDef() {
         type = ShapeType.POLYGON_SHAPE;

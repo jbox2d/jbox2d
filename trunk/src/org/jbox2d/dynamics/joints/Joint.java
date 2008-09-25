@@ -71,6 +71,8 @@ public abstract class Joint {
     // these usually just deallocate memory, it is possible that
     // Erin may alter them to do more nontrivial things, and we
     // should be prepared for this possibility.
+    // Note: this now happens in ConstantVolumeJoint, because
+    // it contains distance joints that also need to be destroyed.
     public static void destroy(Joint j) {
         j.destructor();
         return;
@@ -99,6 +101,9 @@ public abstract class Joint {
         }
         else if (description.type == JointType.GEAR_JOINT) {
             joint = new GearJoint((GearJointDef) description);
+        }
+        else if (description.type == JointType.CONSTANT_VOLUME_JOINT) {
+        	joint = new ConstantVolumeJoint((ConstantVolumeJointDef) description);
         }
         else {
             assert false;

@@ -133,7 +133,7 @@ public class Settings {
     public static int maxTOIContactsPerIsland = 32;
     
     /** Maximum number of joints to be handled to solve a TOI island. */
-    public static int maxTOIJointsPerIsland = 16;
+    public static int maxTOIJointsPerIsland = 0;//16;
 
 
 }

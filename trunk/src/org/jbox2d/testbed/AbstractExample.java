@@ -511,7 +511,7 @@ public abstract class AbstractExample {
     	
     	p = m_debugDraw.screenToWorld(p);
     	
-    	assert m_mouseJoint == null;
+    	if (m_mouseJoint != null) return;
 
         // Make a small box.
 
@@ -539,7 +539,9 @@ public abstract class AbstractExample {
             md.body1 = m_world.getGroundBody();
             md.body2 = body;
             md.target.set(p);
-            md.maxForce = 1000.0f * body.m_mass;
+            md.maxForce = 10000.0f * body.m_mass;
+            md.frequencyHz = 20.0f;
+            md.dampingRatio = 0.9f;
             m_mouseJoint = (MouseJoint) m_world.createJoint(md);
             body.wakeUp();
         }

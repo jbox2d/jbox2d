@@ -30,6 +30,7 @@ import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.common.*;
+import org.jbox2d.dynamics.contacts.CircleContact;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactConstraint;
 import org.jbox2d.dynamics.contacts.ContactConstraintPoint;
@@ -275,18 +276,22 @@ public class Island {
     	// No warm starting needed for TOI contact events.
     	
     	// For joints, intialize with the last full step warm starting values
-    	subStep.warmStarting = true;
-    	for (int i = 0; i < m_jointCount; ++i) {
-    		m_joints[i].initVelocityConstraints(subStep);
+    	if (Settings.maxTOIJointsPerIsland > 0) {
+    		subStep.warmStarting = true;
+    		//for (int i=0; i<m_jointCount; ++i) {
+    		for (int i = m_jointCount-1; i >= 0; --i) {
+    			m_joints[i].initVelocityConstraints(subStep);
+    		}
+    		
+    		// ...but don't update the warm starting value during solving
+    		subStep.warmStarting = false;
     	}
-    	
-    	// ...but don't update the warm starting value during solving
-    	subStep.warmStarting = false;
     	    	
     	// Solve velocity constraints.
     	for (int i = 0; i < subStep.maxIterations; ++i) {
     		contactSolver.solveVelocityConstraints();
-    		for (int j = 0; j < m_jointCount; ++j) {
+    		//for (int j = 0; j < m_jointCount; ++j) {
+    		for (int j = m_jointCount-1; j >= 0; --j) {
     			m_joints[j].solveVelocityConstraints(subStep);
     		}
     	}
@@ -324,8 +329,10 @@ public class Island {
     		boolean contactsOkay = contactSolver.solvePositionConstraints(k_toiBaumgarte);
     		
     		boolean jointsOkay = true;
-    		for (int j = 0; j < m_jointCount; ++j) {
+    		//for (int j = 0; j < m_jointCount; ++j) {
+    		for (int j = m_jointCount-1; j >= 0; --j) {
 				boolean jointOkay = m_joints[j].solvePositionConstraints();
+				//System.out.println("iter "+i + ": "+j + " " + jointOkay);
 				jointsOkay = jointsOkay && jointOkay;
 			}
 
