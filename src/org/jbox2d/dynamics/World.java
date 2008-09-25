@@ -43,6 +43,7 @@ import org.jbox2d.common.*;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.dynamics.joints.*;
+import org.jbox2d.testbed.tests.LiquidTest;
 
 
 
@@ -238,6 +239,10 @@ public class World {
 	 */
     public void setDebugDraw(DebugDraw debugDraw) {
     	m_debugDraw = debugDraw;
+    }
+    
+    public DebugDraw getDebugDraw() {
+    	return m_debugDraw;
     }
     
 	
@@ -521,7 +526,7 @@ public class World {
      * @param s
      */
     public void unregisterPostStep(Steppable s) {
-    	postStepList.remove(s);
+    	if (postStepList != null) postStepList.remove(s);
     }
     
     /** Re-filter a shape. This re-runs contact filtering on a shape. */
@@ -983,7 +988,12 @@ public class World {
     			Vec2 center = XForm.mul(xf, circle.getLocalPosition());
     			float radius = circle.getRadius();
     			Vec2 axis = xf.R.col1;
-
+    			
+    			if (circle.getUserData() != null && circle.getUserData() == LiquidTest.LIQUID_INT) {
+    				m_debugDraw.drawSegment(center, center.add(new Vec2(0.01f,0.01f)), new Color3f(80.0f,80.0f,255f));
+    				return;
+    			}
+    			
     			m_debugDraw.drawSolidCircle(center, radius, axis, color);
 
     			if (core) {
@@ -996,7 +1006,8 @@ public class World {
 				float radius = 0.01f;
 				Vec2 axis = xf.R.col1;
 
-				m_debugDraw.drawSolidCircle(center, radius, axis, color);
+				//m_debugDraw.drawSolidCircle(center, radius, axis, color);
+				m_debugDraw.drawPoint(center, 0.0f, color);
 
     	} else if (shape.getType() == ShapeType.POLYGON_SHAPE) {
     			PolygonShape poly = (PolygonShape)shape;
@@ -1049,6 +1060,16 @@ public class World {
     		m_debugDraw.drawSegment(s1, s2, color);
     	} else if (type == JointType.MOUSE_JOINT) {
     		//Don't draw mouse joint
+    	} else if (type == JointType.CONSTANT_VOLUME_JOINT) {
+    		ConstantVolumeJoint cvj = (ConstantVolumeJoint)joint;
+    		Body[] bodies = cvj.getBodies();
+    		for (int i=0; i<bodies.length; ++i) {
+    			int next = (i==bodies.length-1)?0:i+1;
+    			Vec2 first = bodies[i].getWorldCenter();
+    			Vec2 nextV = bodies[next].getWorldCenter();
+    			m_debugDraw.drawSegment(first, nextV, color);
+    		}
+    		
     	} else {
     		m_debugDraw.drawSegment(x1, p1, color);
     		m_debugDraw.drawSegment(p1, p2, color);

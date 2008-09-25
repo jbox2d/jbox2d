@@ -34,9 +34,7 @@ public class PairManager {
 
     static final int NULL_PROXY = Integer.MAX_VALUE;
 
-    public static final int TABLE_CAPACITY = Settings.maxPairs; // must be a power
-
-    // of two
+    public static final int TABLE_CAPACITY = Settings.maxPairs;
     static final int TABLE_MASK = TABLE_CAPACITY - 1;
 
     public Pair m_pairs[];
@@ -108,7 +106,7 @@ public class PairManager {
             return pair;
         }
 
-        assert(m_pairCount < Settings.maxPairs):"Too many pairs (shape AABB overlaps) - this usually means you have too many bodies, or you need to increase Settings.maxPairs.";
+        assert(m_pairCount < Settings.maxPairs):"Too many pairs ("+m_pairCount+" shape AABB overlaps) - this usually means you have too many bodies, or you need to increase Settings.maxPairs.";
         assert(m_freePair != NULL_PAIR);
 
         int pairIndex = m_freePair;
@@ -296,6 +294,19 @@ public class PairManager {
                     pair.userData = m_callback.pairAdded(proxy1.userData, proxy2.userData);
                     pair.setFinal();
                 }
+                
+//                if ( ((Shape)proxy1.userData).getBody().isStatic() &&
+//                     ((Shape)proxy2.userData).getBody().isStatic() ) {
+//                	if (pair.isFinal() == true) {
+//                        m_callback.pairRemoved(proxy1.userData, proxy2.userData, pair.userData);
+//                    }
+//
+//                    // Store the ids so we can actually remove the pair below.
+//                    m_pairBuffer[removeCount].proxyId1 = pair.proxyId1;
+//                    m_pairBuffer[removeCount].proxyId2 = pair.proxyId2;
+//                    //System.out.println("Buffering "+pair.proxyId1 + ", "+pair.proxyId2 + " for removal");
+//                    ++removeCount;
+//                }
             }
         }
         

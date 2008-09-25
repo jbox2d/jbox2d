@@ -28,6 +28,15 @@ class Triangle{
       y = new float[3];
     }
     
+    public void set(Triangle t) {
+    	x[0] = t.x[0];
+    	x[1] = t.x[1];
+    	x[2] = t.x[2];
+    	y[0] = t.y[0];
+    	y[1] = t.y[1];
+    	y[2] = t.y[2];
+    }
+    
     /*
     public void draw(){
       draw(color(150,150,150),color(255,0,0));

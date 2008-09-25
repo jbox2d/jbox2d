@@ -24,13 +24,17 @@
 package org.jbox2d.testbed;
 
 import java.lang.reflect.Field;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 
 import org.jbox2d.common.Color3f;
 
 import processing.core.PApplet;
 
 import org.jbox2d.common.Vec2;
+
 
 /**
  * A hacked together GUI used to set options in TestSettings
@@ -70,6 +74,7 @@ public class TestbedOptions {
 			Field[] fields = myClass.getFields();
 			Vec2 pos = new Vec2(borderWidth+padding,borderWidth+2*padding + 2*checkboxSize);
 			for (int i=0; i<fields.length; ++i) {
+				//if (fields[i].)
 				//System.out.println(fields[i].getName() + " " +fields[i].getType().getCanonicalName());
 				if (fields[i].getType().getCanonicalName().equals("boolean")) {
 					String fieldName = fields[i].getName();

@@ -123,6 +123,10 @@ public class TestbedMain extends PApplet {
     	// Simple functionality examples
     	//registerExample(new SensorTest(this));
     	//
+    	
+    	//*
+    	registerExample(new BlobTest2(this));
+    	registerExample(new LiquidTest(this));
     	registerExample(new BugTest(this));
     	registerExample(new BipedTest(this));
     	registerExample(new SpriteBinding(this));
@@ -152,7 +156,7 @@ public class TestbedMain extends PApplet {
     	registerExample(new CCDTest(this));
     	registerExample(new DistanceTest(this));
     	//registerExample(new BugTest(this));
-
+//*/
     	//Set up the mouse wheel listener to control zooming
     	addMouseWheelListener(new MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
@@ -230,7 +234,7 @@ public class TestbedMain extends PApplet {
 
 
     		/* ==== Vec2 creation and FPS reporting ==== */
-    		if (currentTest.settings.drawStats) {
+    		if (currentTest.settings.drawStats && Vec2.watchCreations) {
     			g.drawString(5, currentTest.m_textLine, "Vec2 creations/frame: "+Vec2.creationCount, AbstractExample.white);
     			currentTest.m_textLine += AbstractExample.textLineHeight;
     		}

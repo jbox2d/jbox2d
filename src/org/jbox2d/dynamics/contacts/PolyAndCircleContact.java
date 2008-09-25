@@ -53,8 +53,8 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
         m_manifoldCount = 0;
         // These should not be necessary, manifold was
         // just created...
-        m_manifold.points[0].normalImpulse = 0.0f;
-    	m_manifold.points[0].tangentImpulse = 0.0f;
+        //m_manifold.points[0].normalImpulse = 0.0f;
+    	//m_manifold.points[0].tangentImpulse = 0.0f;
     }
 
     public PolyAndCircleContact() {

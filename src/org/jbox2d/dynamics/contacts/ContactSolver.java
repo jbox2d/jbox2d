@@ -63,17 +63,9 @@ public class ContactSolver {
             m_constraintCount += contacts[i].getManifoldCount();
         }
 
-        //*
         m_constraints = new ContactConstraint[m_constraintCount];
-        /*/
-        m_constraints = new ArrayList<ContactConstraint>(m_constraintCount);
-        //*/
         for (int i = 0; i < m_constraintCount; i++) {
-        	//*
         	m_constraints[i] = new ContactConstraint();
-            /*/
-        	m_constraints.add(new ContactConstraint());
-        	//*/
         }
 
         int count = 0;
@@ -92,8 +84,7 @@ public class ContactSolver {
             float w1 = b1.m_angularVelocity;
             float w2 = b2.m_angularVelocity;
 
-            for (int j = 0; j < manifoldCount; ++j) {// Manifold manifold :
-                // manifolds) {
+            for (int j = 0; j < manifoldCount; ++j) {
                 Manifold manifold = manifolds.get(j);
 
                 assert (manifold.pointCount > 0) : "Manifold " + j
@@ -103,11 +94,7 @@ public class ContactSolver {
 
                 assert (count < m_constraintCount);
                 
-                //*
                 ContactConstraint c = m_constraints[count];
-                /*/
-                ContactConstraint c = m_constraints.get(count);
-                //*/
                 
                 c.body1 = b1;
                 c.body2 = b2;
@@ -139,17 +126,16 @@ public class ContactSolver {
     				float rn2 = Vec2.cross(ccp.r2, normal);
     				rn1 *= rn1;
     				rn2 *= rn2;
-
+    				
     				float kNormal = b1.m_invMass + b2.m_invMass + b1.m_invI * rn1 + b2.m_invI * rn2;
-
-
-                    assert (kNormal > Settings.EPSILON);
+    				
+                    assert (kNormal > Settings.EPSILON):"kNormal was "+kNormal;
                     ccp.normalMass = 1.0f / kNormal;
 
                     float kEqualized = b1.m_mass * b1.m_invMass + b2.m_mass * b2.m_invMass;
                     kEqualized += b1.m_mass * b1.m_invI * rn1 + b2.m_mass * b2.m_invI * rn2;
 
-    				assert(kEqualized > Settings.EPSILON);
+    				assert(kEqualized > Settings.EPSILON):"kEqualized was "+kEqualized;
     				ccp.equalizedMass = 1.0f / kEqualized;
 
                     //Vec2 tangent = Vec2.cross(normal, 1.0f);
@@ -245,7 +231,6 @@ public class ContactSolver {
     }
 
     public void solveVelocityConstraints() {
-    	// (4*constraints + 6*points) temp Vec2s - BOTTLENECK!
     	// ewj: now clean of temp objects
     	for (int i=0; i<this.m_constraintCount; ++i) {
     		

@@ -292,4 +292,12 @@ public class ProcessingDebugDraw extends DebugDraw {
 		return worldToScreenVector(new Vec2(x,y));
 	}
 	
+	public Vec2 screenToWorldVector(Vec2 screen) {
+		return screen.mul(1.0f/scaleFactor);
+	}
+	
+	public Vec2 screenToWorldVector(float x, float y) {
+		return screenToWorldVector(new Vec2(x,y));
+	}
+	
 }

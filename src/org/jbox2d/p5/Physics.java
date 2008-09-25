@@ -102,6 +102,20 @@ public class Physics {
 	// All the crap you'd otherwise have to handle yourself
 	private World m_world;
 	private PApplet m_parent;
+	/**
+	 * m_draw is used by default for both drawing
+	 * and coordinate conversions; if a custom
+	 * rendering method is set, m_draw is <em>still</em>
+	 * used for coordinate conversions, so bear this
+	 * in mind.  In particular, however, none of the
+	 * camera functionality of ProcessingDebugDraw is
+	 * used, so don't expect anything like that.  All
+	 * the conversion does is applies a simple (read: unchanging)
+	 * scaling and translation from the default screen space to
+	 * the world space.  Any monkey business with cameras
+	 * and transformations is up to the user, and it's up
+	 * to the user to keep track of it.
+	 */
 	private ProcessingDebugDraw m_draw;
 	private Vec2 m_gravity;
 	private AABB m_worldAABB;
@@ -740,6 +754,23 @@ public class Physics {
 		return m_world;
 	}
 	
+	/** 
+	 * Get the border Body[] array, or null 
+	 * if the border has been removed.
+	 **/
+	public Body[] getBorder() {
+		return m_border;
+	}
+	
+	/** Remove the solid border if it exists. */
+	public void removeBorder() {
+		if (m_border == null) return;
+		for (int i=0; i<m_border.length; ++i) {
+			removeBody(m_border[i]);
+		}
+		m_border = null;
+	}
+	
 	/** Remove a body from the world. */
 	public void removeBody(Body b) {
 		m_world.destroyBody(b);
@@ -748,6 +779,72 @@ public class Physics {
 	/** Remove a joint from the world. */
 	public void removeJoint(Joint j) {
 		m_world.destroyJoint(j);
+	}
+	
+	/**
+	 * Apply a force to the body at the center of mass.
+	 * @param b Body you wish to apply force to
+	 * @param fx x component of force (in pixel units)
+	 * @param fy y component of force (in pixel units)
+	 */
+	public void applyForce(Body b, float fx, float fy) {
+		Vec2 fv = screenToWorldVector(fx,fy);
+		b.applyForce(fv, b.getWorldCenter());
+	}
+	
+	/**
+	 * Apply a force to the body at the center of mass.
+	 * @param b Body you wish to apply force to
+	 * @param f force to apply (in pixel units)
+	 */
+	public void applyForce(Body b, Vec2 f) {
+		b.applyForce(screenToWorldVector(f), b.getWorldCenter());
+	}
+	
+	/**
+	 * Apply a force to a body at a point.
+	 * @param b Body you wish to apply force to
+	 * @param fx x component of force (in pixel units)
+	 * @param fy y component of force (in pixel units)
+	 * @param pointX x coordinate of application point (in screen/pixel coordinates)
+	 * @param pointY y coordinate of application point (in screen/pixel coordinates)
+	 */
+	public void applyForce(Body b, float fx, float fy, float pointX, float pointY) {
+		Vec2 fv = screenToWorldVector(fx,fy);
+		Vec2 point = screenToWorld(pointX, pointY);
+		b.applyForce(fv,point);
+	}
+	
+	/**
+	 * Apply a force to a body at a point
+	 * @param b Body you wish to apply force to
+	 * @param f force to apply (in pixel units)
+	 * @param point application point (in screen/pixel coordinates)
+	 */
+	public void applyForce(Body b, Vec2 f, Vec2 point) {
+		b.applyForce(screenToWorldVector(f), screenToWorld(point));
+	}
+	
+	/** 
+	 *  Get the location of the body's origin (screen coordinates) - 
+	 *  note that this does <em>not</em> usually correspond to the 
+	 *  center of mass position, which may be obtained by calling 
+	 *  {@link #getCMPosition(Body)}. 
+	 * @param b
+	 * @return
+	 */
+	public Vec2 getPosition(Body b) {
+		return worldToScreen(b.getPosition());
+	}
+	
+	/** Get the center of mass position (screen coordinates) */
+	public Vec2 getCMPosition(Body b) {
+		return worldToScreen(b.getWorldCenter());
+	}
+	
+	/** Get the angle (in radians) */
+	public float getAngle(Body b) {
+		return b.getAngle();
 	}
 	
 	
@@ -803,4 +900,19 @@ public class Physics {
 		return m_draw.screenToWorld(length);
 	}
 	
+	public Vec2 screenToWorldVector(Vec2 screenV) {
+		return m_draw.screenToWorldVector(screenV);
+	}
+	
+	public Vec2 screenToWorldVector(float sx, float sy) {
+		return m_draw.screenToWorldVector(sx, sy);
+	}
+	
+	public Vec2 worldToScreenVector(Vec2 worldV) {
+		return m_draw.worldToScreenVector(worldV);
+	}
+	
+	public Vec2 worldToScreenVector(float wx, float wy) {
+		return m_draw.worldToScreenVector(wx, wy);
+	}
 }

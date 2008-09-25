@@ -48,7 +48,7 @@ public abstract class Contact {
 	public static final int e_islandFlag	= 0x0004;
 	public static final int e_toiFlag		= 0x0008;
 
-	static List<ContactRegister> s_registers;
+	static ArrayList<ContactRegister> s_registers;
 
     static boolean s_initialized;
 
@@ -206,8 +206,7 @@ public abstract class Contact {
         if (register != null) {
             if (register.primary) {
                 return register.createFcn.create(shape1, shape2);
-            }
-            else {
+            } else {
                 Contact c = register.createFcn.create(shape2, shape1);
                 for (int i = 0; i < c.getManifoldCount(); ++i) {
                     Manifold m = c.getManifolds().get(i);
@@ -215,16 +214,16 @@ public abstract class Contact {
                 }
                 return c;
             }
-        }
-        else {
+        } else {
             return null;
         }
     }
 
     private static ContactRegister getContactRegister(ShapeType type1,
             ShapeType type2) {
-        for (ContactRegister cr : s_registers) {
-            if (cr.s1 == type1 && cr.s2 == type2) {
+        for (int i=0; i<s_registers.size(); ++i) {//ContactRegister cr : s_registers) {
+            ContactRegister cr = s_registers.get(i);
+        	if (cr.s1 == type1 && cr.s2 == type2) {
                 return cr;
             }
         }

@@ -70,4 +70,8 @@ public class BugTest extends AbstractExample {
 			System.out.println(cp.position);
 		}*/
 	}
+    int count = 0;
+    public void postStep() {
+    	System.out.println(++count);
+    }
 }

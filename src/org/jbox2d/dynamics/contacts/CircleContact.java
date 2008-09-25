@@ -139,8 +139,7 @@ public class CircleContact extends Contact implements ContactCreateFcn {
     				listener.persist(cp);
     			}
     		}
-        }
-        else {
+        } else {
             m_manifoldCount = 0;
     		if (m0.pointCount > 0 && (listener != null)) {
     			ManifoldPoint mp0 = m0.points[0];

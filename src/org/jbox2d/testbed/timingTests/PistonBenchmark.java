@@ -35,7 +35,7 @@ import org.jbox2d.testbed.timingTests.SimpleTest;
  *
  */
 public class PistonBenchmark implements SimpleTest{
-	static final boolean BULLETS = true;
+	static final boolean BULLETS = false;
 	private RevoluteJoint m_joint1;
 	private PrismaticJoint m_joint2;
 	
