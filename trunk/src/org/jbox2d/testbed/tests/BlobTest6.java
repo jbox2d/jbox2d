@@ -36,10 +36,10 @@ import org.jbox2d.util.blob.*;
 
 import processing.core.PApplet;
 
-public class BlobTest2 extends AbstractExample {
+public class BlobTest6 extends AbstractExample {
 	private boolean firstTime;
 	
-	public BlobTest2(TestbedMain _parent) {
+	public BlobTest6(TestbedMain _parent) {
 		super(_parent);
 		firstTime = true;
 	}
@@ -72,9 +72,9 @@ public class BlobTest2 extends AbstractExample {
 		
 		float cx = 0.0f;
 		float cy = 10.0f;
-		float rx = 3.0f;
-		float ry = 4.0f;
-		int nBodies = 8;
+		float rx = 2.0f;
+		float ry = 5.0f;
+		int nBodies = 40;
 		float bodyRadius = 0.5f;
 		for (int i=0; i<nBodies; ++i) {
 			float angle = PApplet.map(i, 0, nBodies, 0, 2*3.1415f);
@@ -95,8 +95,8 @@ public class BlobTest2 extends AbstractExample {
 			body.setMassFromShapes();
 		}
 
-		cvjd.frequencyHz = 10.0f;
-		cvjd.dampingRatio = 1.0f;
+		//cvjd.frequencyHz = 10.0f;
+		//cvjd.dampingRatio = 1.0f;
 		m_world.createJoint(cvjd);
 		
 		BodyDef bd2 = new BodyDef();
