@@ -24,6 +24,10 @@ public class ConstantVolumeJoint extends Joint {
 		return bodies;
 	}
 	
+	public void inflate(float factor) {
+		targetVolume *= factor;
+	}
+	
 	public ConstantVolumeJoint(ConstantVolumeJointDef def) {
 		super(def);
 		if (def.bodies.length <= 2) {
