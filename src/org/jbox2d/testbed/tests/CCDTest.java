@@ -70,18 +70,48 @@ public class CCDTest extends AbstractExample {
 			body.createShape(sd);
 		}
 
+		//container
+//		{
+//			PolygonDef sd_bottom = new PolygonDef();
+//			sd_bottom.setAsBox( 1.5f, 0.15f );
+//			sd_bottom.density = 4.0f;
+//
+//			PolygonDef sd_left = new PolygonDef();
+//			sd_left.setAsBox(0.15f, 2.7f, new Vec2(-1.45f, 2.35f), 0.2f);
+//			sd_left.density = 4.0f;
+//
+//			PolygonDef sd_right = new PolygonDef();
+//			sd_right.setAsBox(0.15f, 2.7f, new Vec2(1.45f, 2.35f), -0.2f);
+//			sd_right.density = 4.0f;
+//
+//			BodyDef bd = new BodyDef();
+//			bd.position.set( 0.0f, 15.0f );
+//			bd.isBullet = true;
+//			Body body = m_world.createBody(bd);
+//			body.createShape(sd_bottom);
+//			body.createShape(sd_left);
+//			body.createShape(sd_right);
+//			body.setMassFromShapes();
+//		}
+		
 		{
+			final float thickness = 0.9f;
+			float ang = 0.0f;//3.14f / 2f;
 			PolygonDef sd_bottom = new PolygonDef();
-			sd_bottom.setAsBox( 1.5f, 0.15f );
+			sd_bottom.setAsBox( 2.5f, thickness, new Vec2(0.0f, 0.0f), ang);
 			sd_bottom.density = 4.0f;
 
 			PolygonDef sd_left = new PolygonDef();
-			sd_left.setAsBox(0.15f, 2.7f, new Vec2(-1.45f, 2.35f), 0.2f);
+			sd_left.setAsBox(thickness, 2.5f, new Vec2(-2.45f, 2.35f), ang);
 			sd_left.density = 4.0f;
 
 			PolygonDef sd_right = new PolygonDef();
-			sd_right.setAsBox(0.15f, 2.7f, new Vec2(1.45f, 2.35f), -0.2f);
+			sd_right.setAsBox(thickness, 2.5f, new Vec2(2.45f, 2.35f), ang);
 			sd_right.density = 4.0f;
+			
+			PolygonDef sd_top = new PolygonDef();
+			sd_top.setAsBox(2.5f, thickness, new Vec2(0.0f, 4.7f), ang);
+			sd_top.density = 4.0f;
 
 			BodyDef bd = new BodyDef();
 			bd.position.set( 0.0f, 15.0f );
@@ -90,20 +120,24 @@ public class CCDTest extends AbstractExample {
 			body.createShape(sd_bottom);
 			body.createShape(sd_left);
 			body.createShape(sd_right);
+			body.createShape(sd_top);
+			//body.setAngularVelocity(94.4f*2);
 			body.setMassFromShapes();
+			
+			m_world.setGravity(new Vec2(0.0f,0.0f));
 		}
 
 
-		for (int i = 0; i < 10; ++i) {
+		for (int i = 0; i < 1; ++i) {
 			BodyDef bd = new BodyDef();
-			bd.position.set(0.0f, 15.5f + i);
+			bd.position.set(0.0f, 15.5f + i*.3f);
 			bd.isBullet = true;
 			Body body = m_world.createBody(bd);
 			body.setAngularVelocity(parent.random(-50.0f, 50.0f));
 
 			CircleDef sd = new CircleDef();
-			sd.radius = 0.25f;
-			sd.density = 1.0f;
+			sd.radius = 0.5f;
+			sd.density = 0.01f;
 			sd.restitution = 0.0f;
 			sd.friction = 0.05f;
 			body.createShape(sd);

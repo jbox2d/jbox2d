@@ -2,8 +2,6 @@
 JBox2d README
 -------------
 
-[This is an SVN pre-2.0 release version.  Try running org.jbox2d.testbed.TestbedMain.java to see the demos]
-
 JBox2d (http://www.sf.net/projects/jbox2d) is a Java port of Box2d (http://www.box2d.org), a 2D rigid body physics engine written in C++.
 Box2d is maintained by Erin Catto.
 JBox2d is maintained by quixote_arg and ewjordan.
@@ -15,14 +13,14 @@ Issues can be discussed at the Box2d forums at http://www.box2d.org/forum/
 It is highly recommended that you enable assertions when debugging a JBox2d program.  In Eclipse, this is done by adding -ea to the "Run"->"Open Run Dialog"->"Arguments"->"VM arguments" entry for your run configuration.
 The assertions in JBox2d are generally lightweight, so shouldn't cause much of a runtime hit.  If you encounter one, it's probably because you've done something wrong, and the engine will likely not work properly with that input.  If you're sure you haven't done anything bad (please follow the assert to the source code so you can see if there is an explanatory comment), please let us know at the forums.
 
-Current release version: 1.4.3
-Current SVN version: 2.0.0
+Current release version: 2.0.1
+Current SVN version: 2.0.1+
 
 ----
 Docs
 ----
 
-Currently JBox2d has no documentation of its own (we're planning on it, but for now we're focusing on keeping the engine up to date).
+Currently JBox2d has Javadocs (see the doc directory), but no separate documentation.
 Please refer to the Box2d manual for the time being, keeping in mind the following syntax differences between Box2d and JBox2d:
 - Class names generally lack the b2 prefix in JBox2d.  For instance:
   [C++]      [Java]
@@ -68,14 +66,12 @@ We also recommend that you link to the JBox2d source instead of just a .jar so t
 ------
 Issues
 ------
-.jar distribution: Right now JBox2d is distributed as source, and there's no engine-only .jar file.  We'll fix this, we promise! [In 2.0, the root of the project contains a jbox2d.jar file that you can include for releases]
+.jar distribution: Three .jars are contained in this directory, jbox2d-2.0.1-full.jar, which is the full distribution, and includes Javadoc, source code attachments, and all examples.  The jbox2d-2.0.1-library-only.jar file is a trimmed down version for release, weighing in at only 156 kb.  The jbox2d-2.0.1-speedTest.jar is an executable .jar for running a basic speed test.
 
 Performance: We're aware that JBox2d does not achieve the same impressive performance as Box2d.  Some of this is an unavoidable limitation of Java, some of it is due to lack of Java-specific optimizations, and some of it is due to rendering.  This should improve a bit as we further optimize, but we're not expecting miracles.
 
 Lack of Java-ness: This is a difficult issue for us.  We would love to make all the fields private, and refactor everything like mad until it actually looks like Java code.  But we are trying to balance Java-ness, maintainability, and performance, and until the C++ version stabilizes a bit more we need to keep very close to its organizational structure, which means public fields all over the place.  We're aware of this issue, and we take it seriously, but for now it will have to wait if we want to have any chance of keeping up to date.
 
-Javadocs: JBox2d 2.0 now has a decent amount of Javadoc for the classes most likely to be used externally.  The coverage will improve over time; let us know if you have specific requests to expand it to certain classes/methods, or if you spot any errors.
-
-Dependencies in testbed: Right now the testbed code depends on the Processing core library (http://www.processing.org) for drawing.  Some people have asked for a plain old AWT version of the tests, which we will do if we have time, but it's not a huge priority since it seems like most people are using game engines of some sort.  We also plan to add Slick [2.0: simple example exists now], PulpCore [in progress], and JMonkeyEngine demos.  Ultimately, though, it's up to the end user to figure out their own drawing code - it's really not that tough if you look at the way we do it with Processing, the methods are pretty transparent (drawLine(x0,y0,x1,y1) is easy to translate to any engine, no?).
+Dependencies in testbed: Right now the testbed code depends on the Processing core library (http://www.processing.org) for drawing.  Some people have asked for a plain old AWT version of the tests, which we will do if we have time, but it's not a huge priority since it seems like most people are using game engines of some sort.  We also might add Slick [2.0: simple example exists now], PulpCore [in progress], and JMonkeyEngine demos.  Ultimately, though, it's up to the end user to figure out their own drawing code - it's really not that tough if you look at the way we do it with Processing, the methods are pretty transparent (drawLine(x0,y0,x1,y1) is easy to translate to any engine, no?).
 
 Other bugs: JBox2d should produce roughly the same output as Box2d.  The exact numerical values may be off by a little bit due to different floating point handling, but we're really shooting for identical large-scale behavior.  If you see any problems, please tell us about them!

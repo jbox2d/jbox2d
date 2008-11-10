@@ -51,7 +51,7 @@ class Triangle{
     }
     */
     
-    public boolean isInside(float _x, float _y){
+    public boolean containsPoint(float _x, float _y){
       float vx2 = _x-x[0]; float vy2 = _y-y[0];
       float vx1 = x[1]-x[0]; float vy1 = y[1]-y[0];
       float vx0 = x[2]-x[0]; float vy0 = y[2]-y[0];
@@ -65,7 +65,7 @@ class Triangle{
       float u = (dot11*dot02 - dot01*dot12)*invDenom;
       float v = (dot00*dot12 - dot01*dot02)*invDenom;
       
-      return ((u>0)&&(v>0)&&(u+v<1));    
+      return ((u>=0)&&(v>=0)&&(u+v<=1));    
     }
     
   }

@@ -28,13 +28,13 @@ public class ForceUtils
 	}
 
 	/** Pushes a body in the specified direction. */
-	public void push(Body b, Vec2 dir, double normalizedForce)
+	public void push(Body b, Vec2 dir, double force)
 	{
 		Vec2 bodyVec = b.getWorldCenter();
 		dir.normalize();
-		if (normalizedForce > 0)
+		if (force > 0)
 		{
-			dir.mulLocal((float) normalizedForce);
+			dir.mulLocal((float) force);
 		}
 		b.applyForce(dir, bodyVec);
 	}
