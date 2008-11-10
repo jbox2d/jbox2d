@@ -125,29 +125,31 @@ public class TestbedMain extends PApplet {
     	//
     	
     	//*
+    	registerExample(new BugTest(this));
+    	registerExample(new CCDTest(this));
+    	//registerExample(new Motox(this));
     	registerExample(new BlobTest3(this));
     	registerExample(new BlobTest4(this));
     	registerExample(new BlobTest5(this));
     	registerExample(new BlobTest6(this));
     	registerExample(new BlobTest2(this));
     	registerExample(new BlobTest7(this));
-//    	registerExample(new LiquidTest(this));
-//    	registerExample(new BugTest(this));
-//    	registerExample(new BipedTest(this));
-//    	registerExample(new SpriteBinding(this));
-//    	registerExample(new Pulleys(this));
-//    	registerExample(new Overhang(this));
-//    	registerExample(new VaryingRestitution(this));
-//    	registerExample(new VaryingFriction(this));
-//    	registerExample(new MotorsAndLimits(this));
-//    	registerExample(new VerticalStack(this));
-//    	registerExample(new Domino(this));
-//    	registerExample(new CompoundShapes(this));
-//    	registerExample(new Chain(this));
-//    	registerExample(new Bridge(this));
-//    	registerExample(new Gears(this));
-//    	registerExample(new RestitutionCannon(this));
-//    	registerExample(new BlobTest(this));
+    	registerExample(new LiquidTest(this));
+    	registerExample(new BipedTest(this));
+    	registerExample(new SpriteBinding(this));
+    	registerExample(new Pulleys(this));
+    	registerExample(new Overhang(this));
+    	registerExample(new VaryingRestitution(this));
+    	registerExample(new VaryingFriction(this));
+    	registerExample(new MotorsAndLimits(this));
+    	registerExample(new VerticalStack(this));
+    	registerExample(new Domino(this));
+    	registerExample(new CompoundShapes(this));
+    	registerExample(new Chain(this));
+    	registerExample(new Bridge(this));
+    	registerExample(new Gears(this));
+    	registerExample(new RestitutionCannon(this));
+    	registerExample(new BlobTest(this));
     	
     	// Shape drawing demo
 //    	registerExample(new ShapeDrawing(this));
@@ -158,7 +160,6 @@ public class TestbedMain extends PApplet {
 //    	registerExample(new Circles(this));
     	
     	// Bug tests
-//    	registerExample(new CCDTest(this));
 //    	registerExample(new DistanceTest(this));
     	//registerExample(new BugTest(this));
 //*/

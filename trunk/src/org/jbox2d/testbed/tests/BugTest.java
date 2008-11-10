@@ -1,11 +1,13 @@
 package org.jbox2d.testbed.tests;
 
+import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.CircleDef;
 import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.joints.PrismaticJoint;
 import org.jbox2d.dynamics.joints.PrismaticJointDef;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
@@ -14,9 +16,20 @@ import org.jbox2d.testbed.AbstractExample;
 import org.jbox2d.testbed.ExampleContactPoint;
 import org.jbox2d.testbed.TestbedMain;
 import org.jbox2d.testbed.timingTests.PistonBenchmark;
+import org.jbox2d.util.nonconvex.Polygon;
 
 public class BugTest extends AbstractExample {
 	private boolean firstTime = true;
+	
+	@Override
+	public void createWorld() {
+		m_worldAABB = new AABB();
+		m_worldAABB.lowerBound = new Vec2(-10000.0f, -10000.0f);
+		m_worldAABB.upperBound = new Vec2(10000.0f, 10000.0f);
+		Vec2 gravity = new Vec2(0.0f, -10.0f);
+		boolean doSleep = true;
+		m_world = new World(m_worldAABB, gravity, doSleep);
+	}
 	
     public BugTest(TestbedMain t) {
         super(t);
@@ -37,8 +50,61 @@ public class BugTest extends AbstractExample {
 			firstTime = false;
 		}
     	
-    	new PistonBenchmark().create(m_world);
+    	Body ground = null;
+		{
+			PolygonDef sd = new PolygonDef();
+			sd.setAsBox(500.0f, 0.2f);
+
+			BodyDef bd = new BodyDef();
+			bd.position.set(0.0f, 0.0f);
+			ground = m_world.createBody(bd);
+			ground.createShape(sd);
+		}
     	
+    	//new PistonBenchmark().create(m_world);
+    	Vec2[] vecs = {
+    			new Vec2(96,224),
+    			new Vec2(96,288),
+    			new Vec2(32,288),
+    			new Vec2(32,320),
+    			new Vec2(96,320),
+    			new Vec2(96,384),
+    			new Vec2(128,384),
+    			new Vec2(128,320),
+    			new Vec2(160,320),
+    			new Vec2(160,384),
+    			new Vec2(192,384),
+    			new Vec2(192,320),
+    			new Vec2(256,320),
+    			new Vec2(256,288),
+    			new Vec2(192,288),
+    			new Vec2(192,224),
+    			new Vec2(160,224),
+    			new Vec2(160,288),
+    			new Vec2(128,288),
+    			new Vec2(128,224)
+    	};
+    	
+    	for (Vec2 v:vecs) {
+    		v.x *= 1.00f;
+    		v.y *= 1.00f;
+    	}
+    	
+//    	float xv[] = {160.000000f,160.000000f,128.000000f,128.000000f,};
+//    	float yv[] = {224.000000f,288.000000f,288.000000f,224.000000f,};
+    	
+    	float xv[] = {1888,1888,640,608,576,480,448,384,352,0,  0,  900};
+    	float yv[] = {448, 416, 416,384,416,416,384,384,416,416,448, 448};
+    	
+    	//Polygon myPoly = new Polygon(vecs);
+    	Polygon myPoly = new Polygon(xv,yv);
+    	PolygonDef pd = new PolygonDef();
+    	pd.density = 1.0f;
+    	BodyDef bd = new BodyDef();
+    	bd.position.set(0.0f,6.0f);
+    	Body body = m_world.createBody(bd);
+    	Polygon.decomposeConvexAndAddTo(myPoly, body, pd);
+    	body.setMassFromShapes();
     	/*
     	PolygonDef pd = new PolygonDef();
     	pd.setAsBox(5.0f, 5.0f);
@@ -72,6 +138,6 @@ public class BugTest extends AbstractExample {
 	}
     int count = 0;
     public void postStep() {
-    	System.out.println(++count);
+    	//System.out.println(++count);
     }
 }

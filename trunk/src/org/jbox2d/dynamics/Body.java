@@ -460,8 +460,17 @@ public class Body {
 	}
 
 	/**
+	 * You probably don't want to use this
+	 * function.  What you really want is getWorldCenter(),
+	 * which returns the center of mass (which actually has
+	 * some physical significance).
+	 * <p>
+	 * Just in case you do want to use this, 
 	 * Get a copy of the world body origin position.  This
 	 * is not necessarily the same as the center of mass.
+	 * In fact, it's not anything in particular.  Just a
+	 * point.
+	 * <p>
 	 * @return the world position of the body's origin.
 	 */
 	public Vec2 getPosition(){
@@ -481,7 +490,10 @@ public class Body {
 		return m_sweep.c.clone();
 	}
 
-	/** Get a copy of the local position of the center of mass. */
+	/** 
+	 * Get local position of the center of mass.
+	 * @return local position of the center of mass
+	 */
 	public Vec2 getLocalCenter(){
 		return m_sweep.localCenter.clone();
 	}

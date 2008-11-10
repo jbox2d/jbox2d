@@ -1,67 +1,22 @@
 Todo:
 
-[ ] Finish testbed update
-[ ] Finish bringing examples over to 2.0
-[ ] Convert Box2d doc format to Javadoc
-[ ] Optimize 
+[ ] Add block solver from latest SVN
+[ ] Volume preserving soft-body code
+[ ] SPH liquids (demo working now!)
+[ ] Finish up TOI joint alterations
+	- All warm starting vars must be set/stored similar to the way it happens in RevoluteJoint.java
+	- Maker sure everything is stable
+
+[never done] Optimize 
 	- See Profiling.txt for bottleneck rundown
-	- Vec2 creations are still pretty nuts, esp. in piles of objects
-		- Fix regressions from 1.4.3 due to upstream changes
-		- Check object pool stack performance vs. inlined floats (inlined floats seem easier to handle for now)
-		- At least clear out the hot spots - contacts, then joints, then others
-	- Trig function calls should be replaced with lookup table
+	- Vec2 creations mostly taken care of, but CCD still has a lot
+	- Trig function calls should be replaced with lookup table (or not? profile...)
 	- Consider moving away from Processing for Testbed, it's not optimized for games (maybe to PulpCore?)
-[ ] Slick example
-[ ] Java2d example
 
 Done:
-
+[X] Fix contact ID bug with poly/circle
 [x] Fix swept AABB bug, get CCD working right
+[x] Finish testbed update
+[x] Finish bringing examples over to 2.0
+[x] Convert Box2d doc format to Javadoc
 
-Haven't applied these changes:
-
-update -r HEAD /Users/eric/Documents/workspace/Box2d/Source
-    U  /Users/eric/Documents/workspace/Box2d/Source/Dynamics/b2Island.cpp
-    U  /Users/eric/Documents/workspace/Box2d/Source/Dynamics/b2World.h
-    U  /Users/eric/Documents/workspace/Box2d/Source/Dynamics/Joints/b2MouseJoint.cpp
-    U  /Users/eric/Documents/workspace/Box2d/Source/Dynamics/Joints/b2DistanceJoint.cpp
-    U  /Users/eric/Documents/workspace/Box2d/Source/Dynamics/Joints/b2PulleyJoint.cpp
-    U  /Users/eric/Documents/workspace/Box2d/Source/Dynamics/Joints/b2RevoluteJoint.h
-    U  /Users/eric/Documents/workspace/Box2d/Source/Dynamics/Joints/b2PrismaticJoint.cpp
-    U  /Users/eric/Documents/workspace/Box2d/Source/Dynamics/Joints/b2MouseJoint.h
-    U  /Users/eric/Documents/workspace/Box2d/Source/Dynamics/Joints/b2GearJoint.cpp
-    U  /Users/eric/Documents/workspace/Box2d/Source/Dynamics/Joints/b2DistanceJoint.h
-    U  /Users/eric/Documents/workspace/Box2d/Source/Dynamics/Joints/b2Joint.h
-    U  /Users/eric/Documents/workspace/Box2d/Source/Dynamics/Joints/b2RevoluteJoint.cpp
-    U  /Users/eric/Documents/workspace/Box2d/Source/Dynamics/b2Body.h
-    C  /Users/eric/Documents/workspace/Box2d/Source/Dynamics/b2World.cpp
-    U  /Users/eric/Documents/workspace/Box2d/Source/Dynamics/Contacts/b2ContactSolver.h
-    U  /Users/eric/Documents/workspace/Box2d/Source/Dynamics/Contacts/b2CircleContact.cpp
-    U  /Users/eric/Documents/workspace/Box2d/Source/Dynamics/Contacts/b2PolyContact.cpp
-    U  /Users/eric/Documents/workspace/Box2d/Source/Dynamics/Contacts/b2PolyAndCircleContact.cpp
-    U  /Users/eric/Documents/workspace/Box2d/Source/Dynamics/Contacts/b2ContactSolver.cpp
-    U  /Users/eric/Documents/workspace/Box2d/Source/Common/b2BlockAllocator.h
-    U  /Users/eric/Documents/workspace/Box2d/Source/Collision/b2PairManager.h
-    U  /Users/eric/Documents/workspace/Box2d/Source/Collision/Shapes/b2PolygonShape.cpp
-    Updated to revision 138.
-    update -r HEAD /Users/eric/Documents/workspace/Box2d/Examples
-    U  /Users/eric/Documents/workspace/Box2d/Examples/TestBed/Tests/Pulleys.h
-    U  /Users/eric/Documents/workspace/Box2d/Examples/TestBed/Tests/PolyCollision.h
-    U  /Users/eric/Documents/workspace/Box2d/Examples/TestBed/Tests/ApplyForce.h
-    U  /Users/eric/Documents/workspace/Box2d/Examples/TestBed/Tests/SensorTest.h
-    U  /Users/eric/Documents/workspace/Box2d/Examples/TestBed/Tests/Web.h
-    U  /Users/eric/Documents/workspace/Box2d/Examples/TestBed/Tests/MotorsAndLimits.h
-    U  /Users/eric/Documents/workspace/Box2d/Examples/TestBed/Tests/DistanceTest.h
-    U  /Users/eric/Documents/workspace/Box2d/Examples/TestBed/Tests/SliderCrank.h
-    U  /Users/eric/Documents/workspace/Box2d/Examples/TestBed/Tests/Gears.h
-    A  /Users/eric/Documents/workspace/Box2d/Examples/TestBed/Tests/ElasticBody.h
-    C  /Users/eric/Documents/workspace/Box2d/Examples/TestBed/Tests/TestEntries.cpp
-    U  /Users/eric/Documents/workspace/Box2d/Examples/TestBed/Tests/BroadPhaseTest.h
-    U  /Users/eric/Documents/workspace/Box2d/Examples/TestBed/Tests/VaryingFriction.h
-    U  /Users/eric/Documents/workspace/Box2d/Examples/TestBed/Tests/TimeOfImpact.h
-    U  /Users/eric/Documents/workspace/Box2d/Examples/TestBed/Framework/Render.cpp
-    U  /Users/eric/Documents/workspace/Box2d/Examples/TestBed/Framework/Test.cpp
-    C  /Users/eric/Documents/workspace/Box2d/Examples/TestBed/Framework/Main.cpp
-    U  /Users/eric/Documents/workspace/Box2d/Examples/TestBed/Framework/Test.h
-    A  /Users/eric/Documents/workspace/Box2d/Examples/TestBed/Makefile
-    Updated to revision 138.

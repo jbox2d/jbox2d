@@ -8,8 +8,6 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 
 /**
- * This code is very old and doesn't work anymore.
- * Will be updated for 2.0 soon...
  * 
  * @author ewjordan
  */
@@ -666,11 +664,13 @@ public class Polygon {
 			int xremLength = vNum;
 			
 	        while (vNum > 3) {
+	        	//System.out.println("vNum: "+vNum);
 	            // Find an ear
 	            int earIndex = -1;
-				//float earVolume = -1.0f;
-				float earMaxMinCross = -10.0f;
+//				float earVolume = -1.0f;
+				float earMaxMinCross = -1000.0f;
 	            for (int i = 0; i < vNum; ++i) {
+	            	//System.out.println("Checking vertex "+i);
 	                if (isEar(i, xrem, yrem, vNum)) {
 						int lower = remainder(i-1,vNum);
 						int upper = remainder(i+1,vNum);
@@ -691,12 +691,12 @@ public class Polygon {
 							earMaxMinCross = minCross;
 						}
 
-						/*//This bit chooses the ear with greatest volume first
-						float testVol = b2Abs( d1.x*d2.y-d2.x*d1.y );
-						if (testVol > earVolume){
-							earIndex = i;
-							earVolume = testVol;
-						}*/
+						//This bit chooses the ear with greatest volume first
+//						float testVol = Math.abs( d1.x*d2.y-d2.x*d1.y );
+//						if (testVol > earVolume){
+//							earIndex = i;
+//							earVolume = testVol;
+//						}//*/
 	                }
 	            }
 				
@@ -887,7 +887,7 @@ public class Polygon {
 	        for (int j = 0; j < xvLength; ++j) {
 	            if (j == i || j == lower || j == upper)
 	                continue;
-	            if (myTri.isInside(xv[j], yv[j]))
+	            if (myTri.containsPoint(xv[j], yv[j]))
 	                return false;
 	        }
 	        return true;
@@ -1036,14 +1036,14 @@ public class Polygon {
 									bd.createShape(toAdd);
 									++extra;
 								} else if (B2_POLYGON_REPORT_ERRORS){
-									System.out.println("Didn't add unusable polygon.  Dumping vertices:\n");
+									System.err.println("Didn't add unusable polygon.  Dumping vertices:\n");
 									p1.print();
 								}
 								if (p2.isUsable()){
 									p2.addTo(pdarray[i+extra]);
 									bd.createShape(pdarray[i+extra]);
 								} else if (B2_POLYGON_REPORT_ERRORS){
-									System.out.println("Didn't add unusable polygon.  Dumping vertices:\n");
+									System.err.println("Didn't add unusable polygon.  Dumping vertices:\n");
 									p2.print();
 								}
 								continue;

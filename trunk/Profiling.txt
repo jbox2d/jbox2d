@@ -52,6 +52,7 @@ CircleTest.java (1 minute, non JBox2d calls removed):
 	105.9 ms	105.9 ms	org.jbox2d.dynamics	Island::solve		
 	
 Pyramid Test (until last brick falls on top, non JBox2d calls removed):
+
 	2.7 s	2.7 s	org.jbox2d.dynamics.contacts	ContactSolver::solveVelocityConstraints	
 	2.5 s	2.5 s	org.jbox2d.common	Mat22::mul	
 	1.8 s	1.8 s	java.lang	Float::floatToIntBits	
