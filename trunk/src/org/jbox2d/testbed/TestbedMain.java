@@ -125,7 +125,7 @@ public class TestbedMain extends PApplet {
     	//
     	
     	//*
-    	registerExample(new BugTest(this));
+    	registerExample(new EdgeTest(this));
     	registerExample(new CCDTest(this));
     	//registerExample(new Motox(this));
     	registerExample(new BlobTest3(this));

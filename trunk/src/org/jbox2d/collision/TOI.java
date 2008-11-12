@@ -72,7 +72,7 @@ public class TOI {
 
 			// Get the distance between shapes.
 			distance = Distance.distance(p1, p2, shape1, xf1, shape2, xf2);
-			//System.out.println(distance);
+			//System.out.println("Distance: "+distance + " alpha: "+alpha);
 			
 			if (iter == 0) {
 				// Compute a reasonable target distance to give some breathing room
@@ -94,6 +94,8 @@ public class TOI {
 
 			// Compute upper bound on remaining movement.
 			float approachVelocityBound = Vec2.dot(normal, v1.sub(v2)) + Math.abs(omega1) * r1 + Math.abs(omega2) * r2;
+			//System.out.println("avb: "+approachVelocityBound);
+			//System.out.println("Normal" + normal);
 			if (Math.abs(approachVelocityBound) < Settings.EPSILON) {
 				alpha = 1.0f;
 				break;
