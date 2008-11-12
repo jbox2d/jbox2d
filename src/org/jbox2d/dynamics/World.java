@@ -30,6 +30,7 @@ import org.jbox2d.common.Color3f;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.BroadPhase;
 import org.jbox2d.collision.CircleShape;
+import org.jbox2d.collision.EdgeShape;
 import org.jbox2d.collision.OBB;
 import org.jbox2d.collision.Pair;
 import org.jbox2d.collision.PairManager;
@@ -772,6 +773,7 @@ public class World {
 
     				// Compute the time of impact.
     				toi = TOI.timeOfImpact(c.m_shape1, b1.m_sweep, c.m_shape2, b2.m_sweep);
+    				//System.out.println(toi);
     				assert(0.0f <= toi && toi <= 1.0f);
     				
     				if (toi > 0.0f && toi < 1.0f) {
@@ -1003,8 +1005,6 @@ public class World {
     			PointShape point = (PointShape)shape;
 
 				Vec2 center = XForm.mul(xf, point.getLocalPosition());
-				float radius = 0.01f;
-				Vec2 axis = xf.R.col1;
 
 				//m_debugDraw.drawSolidCircle(center, radius, axis, color);
 				m_debugDraw.drawPoint(center, 0.0f, color);
@@ -1030,6 +1030,14 @@ public class World {
     				}
     				m_debugDraw.drawPolygon(vertices, vertexCount, coreColor);
     			}
+    		
+    	} else if (shape.getType() == ShapeType.EDGE_SHAPE) {
+    		EdgeShape edge = (EdgeShape) shape;
+    		m_debugDraw.drawSegment(XForm.mul(xf, edge.getVertex1()), XForm.mul(xf, edge.getVertex2()), color);
+    		
+			if (core) {
+				m_debugDraw.drawSegment(XForm.mul(xf, edge.getCoreVertex1()), XForm.mul(xf, edge.getCoreVertex2()), coreColor);
+			}
     		
     	}
     }

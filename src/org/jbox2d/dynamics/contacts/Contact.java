@@ -158,12 +158,14 @@ public abstract class Contact {
                 ShapeType.CIRCLE_SHAPE);
         addType(new PolyContact(), ShapeType.POLYGON_SHAPE, 
         		ShapeType.POLYGON_SHAPE);
+        addType(new PolyAndEdgeContact(), ShapeType.POLYGON_SHAPE,
+        		ShapeType.EDGE_SHAPE);
+        addType(new EdgeAndCircleContact(), ShapeType.EDGE_SHAPE,
+        		ShapeType.CIRCLE_SHAPE);
         addType(new PointAndCircleContact(), ShapeType.POINT_SHAPE,
         		ShapeType.CIRCLE_SHAPE);
         addType(new PointAndPolyContact(), ShapeType.POLYGON_SHAPE, 
         		ShapeType.POINT_SHAPE);
-        
-        // AddType(new PolyContact(), ShapeType.BOX_SHAPE, ShapeType.BOX_SHAPE);
     }
 
     static void addType(ContactCreateFcn createFcn, ShapeType type1,

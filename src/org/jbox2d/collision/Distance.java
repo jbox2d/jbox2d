@@ -317,6 +317,59 @@ public class Distance{
 		x2.set(x1);
 		return 0.0f;
 	}
+	
+	protected static float DistanceEdgeCircle(
+			Vec2 x1, Vec2 x2,
+			final EdgeShape edge, final XForm xf1,
+			final CircleShape circle, final XForm xf2) {
+		
+		Vec2 vWorld;
+		Vec2 d;
+		float dSqr;
+		float dLen;
+		float r = circle.getRadius() - Settings.toiSlop;
+		Vec2 cWorld = XForm.mul(xf2, circle.getLocalPosition());
+		Vec2 cLocal = XForm.mulT(xf1, cWorld);
+		float dirDist = Vec2.dot(cLocal.sub(edge.getCoreVertex1()), edge.getDirectionVector());
+		if (dirDist <= 0.0f) {
+			vWorld = XForm.mul(xf1, edge.getCoreVertex1());
+		} else if (dirDist >= edge.getLength()) {
+			vWorld = XForm.mul(xf1, edge.getCoreVertex2());
+		} else {
+			x1.set(XForm.mul(xf1, edge.getCoreVertex1().add(edge.getDirectionVector().mul(dirDist))));
+			dLen = Vec2.dot(cLocal.sub(edge.getCoreVertex1()), edge.getNormalVector());
+			if (dLen < 0.0f) {
+				if (dLen < -r) {
+					x2.set(XForm.mul(xf1, cLocal.add(edge.getNormalVector().mul(r))));
+					return -dLen - r;
+				} else {
+					x2.set(x1);
+					return 0.0f;
+				}
+			} else {
+				if (dLen > r) {
+					x2.set(XForm.mul(xf1, cLocal.sub(edge.getNormalVector().mul(r))));
+					//System.out.println("dlen - r: "+(dLen - r));
+					return dLen - r;
+				} else {
+					x2.set(x1);
+					return 0.0f;
+				}
+			}
+		}
+			
+		x1.set(vWorld);
+		d = cWorld.sub(vWorld);
+		dSqr = Vec2.dot(d, d);
+		if (dSqr > r * r) {
+			dLen = d.normalize();
+			x2.set(cWorld.sub(d.mul(r)));
+			return dLen - r;
+		} else {
+			x2.set(vWorld);
+			return 0.0f;
+		}
+	}
 
 
 	// GJK is more robust with polygon-vs-point than polygon-vs-circle.
@@ -434,6 +487,14 @@ public class Distance{
 			return DistancePC(x2, x1, (PolygonShape)shape2, xf2, (CircleShape)shape1, xf1);
 		} else if (type1 == ShapeType.POLYGON_SHAPE && type2 == ShapeType.POLYGON_SHAPE) {
 			return DistanceGeneric(x1, x2, (PolygonShape)shape1, xf1, (PolygonShape)shape2, xf2);
+		} else if (type1 == ShapeType.EDGE_SHAPE && type2 == ShapeType.CIRCLE_SHAPE) {
+			return DistanceEdgeCircle(x1, x2, (EdgeShape)shape1, xf1, (CircleShape)shape2, xf2);
+		} else if (type1 == ShapeType.CIRCLE_SHAPE && type2 == ShapeType.EDGE_SHAPE) {
+			return DistanceEdgeCircle(x2, x1, (EdgeShape)shape2, xf2, (CircleShape)shape1, xf1);
+		} else if (type1 == ShapeType.POLYGON_SHAPE && type2 == ShapeType.EDGE_SHAPE) {
+			return DistanceGeneric(x2, x1, (EdgeShape)shape2, xf2, (PolygonShape)shape1, xf1);
+		} else if (type1 == ShapeType.EDGE_SHAPE && type2 == ShapeType.POLYGON_SHAPE) {
+			return DistanceGeneric(x1, x2, (EdgeShape)shape1, xf1, (PolygonShape)shape2, xf2);
 		} else if (type1 == ShapeType.POINT_SHAPE && type2 == ShapeType.POINT_SHAPE) {
 			return Float.MAX_VALUE;
 		} else if (type1 == ShapeType.POINT_SHAPE && type2 == ShapeType.CIRCLE_SHAPE) {
