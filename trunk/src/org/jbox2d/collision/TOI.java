@@ -29,6 +29,14 @@ import org.jbox2d.common.*;
 
 /** Handles conservative advancement to compute time of impact between shapes. */
 public class TOI {
+
+	// These are used to avoid allocations on a hot path:
+	private final Vec2 p1 = new Vec2();
+	private final Vec2 p2 = new Vec2();
+	private final XForm xf1 = new XForm();
+	private final XForm xf2 = new XForm();
+	private final Distance distanceCalculator = new Distance();
+
 	// This algorithm uses conservative advancement to compute the time of
 	// impact (TOI) of two shapes.
 	// Refs: Bullet, Young Kim
@@ -39,7 +47,7 @@ public class TOI {
 	 * @return the fraction between [0,1] in which the shapes first touch.
 	 * fraction=0 means the shapes begin touching/overlapped, and fraction=1 means the shapes don't touch.
 	 */
-	public static float timeOfImpact(Shape shape1, Sweep sweep1,
+	public float timeOfImpact(Shape shape1, Sweep sweep1,
 						   			 Shape shape2, Sweep sweep2) {
 		
 		float r1 = shape1.getSweepRadius();
@@ -49,29 +57,29 @@ public class TOI {
 		assert(1.0f - sweep1.t0 > Settings.EPSILON);
 
 		float t0 = sweep1.t0;
-		Vec2 v1 = sweep1.c.sub(sweep1.c0);
-		Vec2 v2 = sweep2.c.sub(sweep2.c0);
+		// INLINED
+		//Vec2 v1 = sweep1.c.sub(sweep1.c0);
+		//Vec2 v2 = sweep2.c.sub(sweep2.c0);
+		//Vec2 v = v1.sub(v2);
+		float vx = (sweep1.c.x - sweep1.c0.x) - (sweep2.c.x - sweep2.c0.x);
+		float vy = (sweep1.c.y - sweep1.c0.y) - (sweep2.c.y - sweep2.c0.y);
+		
 		float omega1 = sweep1.a - sweep1.a0;
 		float omega2 = sweep2.a - sweep2.a0;
 
 		float alpha = 0.0f;
 
-		Vec2 p1 = new Vec2();
-		Vec2 p2 = new Vec2();
 		final int k_maxIterations = 20;	// TODO_ERIN b2Settings
 		int iter = 0;
-		Vec2 normal = new Vec2(0.0f, 0.0f);
 		float distance = 0.0f;
 		float targetDistance = 0.0f;
 		while(true){
 			float t = (1.0f - alpha) * t0 + alpha;
-			XForm xf1 = new XForm();
-			XForm xf2 = new XForm();
 			sweep1.getXForm(xf1, t);
 			sweep2.getXForm(xf2, t);
 
 			// Get the distance between shapes.
-			distance = Distance.distance(p1, p2, shape1, xf1, shape2, xf2);
+			distance = distanceCalculator.distance(p1, p2, shape1, xf1, shape2, xf2);
 			//System.out.println("Distance: "+distance + " alpha: "+alpha);
 			
 			if (iter == 0) {
@@ -89,11 +97,22 @@ public class TOI {
 				break;
 			}
 
-			normal = p2.sub(p1);
-			normal.normalize();
+			// INLINED
+			//normal = p2.sub(p1);
+			//normal.normalize();
+			float normalx = p2.x - p1.x;
+			float normaly = p2.y - p1.y;
+			float length = (float) Math.sqrt(normalx * normalx + normaly * normaly);
+			if (length >= Settings.EPSILON) {
+				float invLength = 1.0f / length;
+				normalx *= invLength;
+				normaly *= invLength;
+			}
 
 			// Compute upper bound on remaining movement.
-			float approachVelocityBound = Vec2.dot(normal, v1.sub(v2)) + Math.abs(omega1) * r1 + Math.abs(omega2) * r2;
+			// INLINED
+			//float approachVelocityBound = Vec2.dot(normal, v) + Math.abs(omega1) * r1 + Math.abs(omega2) * r2;
+			float approachVelocityBound = (normalx * vx + normaly * vy) + Math.abs(omega1) * r1 + Math.abs(omega2) * r2;
 			//System.out.println("avb: "+approachVelocityBound);
 			//System.out.println("Normal" + normal);
 			if (Math.abs(approachVelocityBound) < Settings.EPSILON) {

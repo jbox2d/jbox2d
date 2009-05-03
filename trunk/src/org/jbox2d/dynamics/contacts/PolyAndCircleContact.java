@@ -121,7 +121,10 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
     	CollideCircle.collidePolygonAndCircle(m_manifold, (PolygonShape)m_shape1, b1.getXForm(), (CircleShape)m_shape2, b2.getXForm());
 
     	boolean[] persisted= {false, false};
-
+    	
+    	Vec2 v1 = new Vec2();
+    	Vec2 v2 = new Vec2();
+    	
     	ContactPoint cp = new ContactPoint();
     	cp.shape1 = m_shape1;
     	cp.shape2 = m_shape2;
@@ -157,11 +160,11 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
 
     					// Report persistent point.
     					if (listener != null) {
-    						cp.position = b1.getWorldLocation(mp.localPoint1);
-    						Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
-    						Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+    						b1.getWorldLocation(cp.position, mp.localPoint1);
+    						b1.getLinearVelocityFromLocalPoint(v1, mp.localPoint1);
+    						b2.getLinearVelocityFromLocalPoint(v2, mp.localPoint2);
     						cp.velocity = v2.sub(v1);
-    						cp.normal = m_manifold.normal.clone();
+    						cp.normal.set(m_manifold.normal);
     						cp.separation = mp.separation;
     						cp.id = new ContactID(id);
     						listener.persist(cp);
@@ -172,11 +175,11 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
 
     			// Report added point.
     			if (found == false && listener != null) {
-    				cp.position = b1.getWorldLocation(mp.localPoint1);
-    				Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
-    				Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+    				b1.getWorldLocation(cp.position, mp.localPoint1);
+    				b1.getLinearVelocityFromLocalPoint(v1, mp.localPoint1);
+    				b2.getLinearVelocityFromLocalPoint(v2, mp.localPoint2);
     				cp.velocity = v2.sub(v1);
-    				cp.normal = m_manifold.normal.clone();
+    				cp.normal.set(m_manifold.normal);
     				cp.separation = mp.separation;
     				cp.id = new ContactID(id);
     				listener.add(cp);
@@ -199,11 +202,11 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
     		}
 
     		ManifoldPoint mp0 = m0.points[i];
-    		cp.position = b1.getWorldLocation(mp0.localPoint1);
-    		Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp0.localPoint1);
-    		Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp0.localPoint2);
+    		b1.getWorldLocation(cp.position, mp0.localPoint1);
+    		b1.getLinearVelocityFromLocalPoint(v1, mp0.localPoint1);
+    		b2.getLinearVelocityFromLocalPoint(v2, mp0.localPoint2);
     		cp.velocity = v2.sub(v1);
-    		cp.normal = m0.normal.clone();
+    		cp.normal.set(m0.normal);
     		cp.separation = mp0.separation;
     		cp.id = new ContactID(mp0.id);
     		listener.remove(cp);

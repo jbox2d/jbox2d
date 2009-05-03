@@ -222,6 +222,7 @@ public abstract class Shape {
 	/** Internal */
 	public abstract void updateSweepRadius(Vec2 center);
     
+	private AABB aabb = new AABB();
 	/** Internal */
     public boolean synchronize(BroadPhase broadPhase, XForm transform1, XForm transform2) {
     	if (m_proxyId == PairManager.NULL_PROXY) {	
@@ -229,7 +230,8 @@ public abstract class Shape {
     	}
 
     	// Compute an AABB that covers the swept shape (may miss some rotation effect).
-    	AABB aabb = new AABB();
+    	// INLINED
+    	//AABB aabb = new AABB();
     	computeSweptAABB(aabb, transform1, transform2);
     	//if (this.getType() == ShapeType.CIRCLE_SHAPE){
     	//	System.out.println("Sweeping: "+transform1+" " +transform2);

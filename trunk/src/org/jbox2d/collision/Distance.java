@@ -47,7 +47,25 @@ import org.jbox2d.common.*;
 
 /** Implements the GJK algorithm for computing distance between shapes. */
 public class Distance{
-	public static int g_GJK_Iterations = 0;
+	public int g_GJK_Iterations = 0;
+
+	// These are used to avoid allocations on hot paths:
+	private Vec2 p1s[] = new Vec2[3];
+	private Vec2 p2s[] = new Vec2[3];
+	private Vec2 points[] = new Vec2[3];
+	private Vec2 v = new Vec2();
+	private Vec2 vNeg = new Vec2();
+	private Vec2 w = new Vec2();
+	private Vec2 w1 = new Vec2();
+	private Vec2 w2 = new Vec2();
+
+	public Distance() {
+		for (int i=0; i<3; ++i) {
+			p1s[i] = new Vec2();
+			p2s[i] = new Vec2();
+			points[i] = new Vec2();
+		}
+	}
 
 	// GJK using Voronoi regions (Christer Ericson) and region selection
 	// optimizations (Casey Muratori).
@@ -89,14 +107,17 @@ public class Distance{
 		Vec2 b = points[1];
 		Vec2 c = points[2];
 
-		Vec2 ab = b.sub(a);
-		Vec2 ac = c.sub(a);
-		Vec2 bc = c.sub(b);
+		float abx = b.x - a.x;
+		float aby = b.y - a.y;
+		float acx = c.x - a.x;
+		float acy = c.y - a.y;
+		float bcx = c.x - b.x;
+		float bcy = c.y - b.y;
 
-		float sn = -Vec2.dot(a, ab), sd = Vec2.dot(b, ab);
-		float tn = -Vec2.dot(a, ac), td = Vec2.dot(c, ac);
-		float un = -Vec2.dot(b, bc), ud = Vec2.dot(c, bc);
-
+		float sn = -(a.x * abx + a.y * aby), sd = b.x * abx + b.y * aby;
+		float tn = -(a.x * acx + a.y * acy), td = c.x * acx + c.y * acy;
+		float un = -(b.x * bcx + b.y * bcy), ud = c.x * bcx + c.y * bcy;
+		
 		// In vertex c region?
 		if (td <= 0.0f && ud <= 0.0f) {
 			// Single point
@@ -114,7 +135,7 @@ public class Distance{
 		assert(sn > 0.0f || tn > 0.0f);
 		assert(sd > 0.0f || un > 0.0f);
 
-		float n = Vec2.cross(ab, ac);
+		float n = abx * acy - aby * acx;
 
 		// Should not be in edge ab region.
 		float vc = n * Vec2.cross(a, b);
@@ -167,12 +188,18 @@ public class Distance{
 	protected static boolean InPoints(Vec2 w, Vec2[] points, int pointCount) {
 		float k_tolerance = 100.0f * Settings.EPSILON;
 		for (int i = 0; i < pointCount; ++i) {
-			Vec2 d =Vec2.abs(w.sub(points[i])); 
+			Vec2 v = points[i];
+			// INLINED
+			//Vec2 d =Vec2.abs(w.sub(points[i]));
 //				new Vec2( Math.abs(w.x-points[i].x), Math.abs(w.y-points[i].y));//Vec2.abs(w - points[i]);
-			Vec2 m = Vec2.max(Vec2.abs(w), Vec2.abs(points[i]));
+			//Vec2 m = Vec2.max(Vec2.abs(w), Vec2.abs(points[i]));
+			float dx = Math.abs(w.x - v.x);
+			float dy = Math.abs(w.y - v.y);
+			float mx = Math.max(Math.abs(w.x), Math.abs(points[i].x));
+			float my = Math.max(Math.abs(w.y), Math.abs(points[i].y));
 			
-			if (d.x < k_tolerance * (m.x + 1.0f) &&
-				d.y < k_tolerance * (m.y + 1.0f)) {
+			if (dx < k_tolerance * (mx + 1.0f) &&
+				dy < k_tolerance * (my + 1.0f)) {
 				return true;
 			}
 		}
@@ -194,33 +221,25 @@ public class Distance{
 	 * @param xf2 Transform of shape2
 	 * @return
 	 */
-	public static float DistanceGeneric(Vec2 x1, Vec2 x2,
+	public float DistanceGeneric(Vec2 x1, Vec2 x2,
 						  SupportsGenericDistance shape1, XForm xf1,
 						  SupportsGenericDistance shape2, XForm xf2) {
-		Vec2 p1s[] = new Vec2[3];
-		Vec2 p2s[] = new Vec2[3];
-		Vec2 points[] = new Vec2[3];
-		
-		for (int i=0; i<3; ++i) {
-			p1s[i] = new Vec2();
-			p2s[i] = new Vec2();
-			points[i] = new Vec2();
-		}
 		
 		int pointCount = 0;
 
-		x1.set(shape1.getFirstVertex(xf1));
-		x2.set(shape2.getFirstVertex(xf2));
+		shape1.getFirstVertex(x1, xf1);
+		shape2.getFirstVertex(x2, xf2);
 
 		float vSqr = 0.0f;
 		int maxIterations = 20;
 		for (int iter = 0; iter < maxIterations; ++iter) {
-			Vec2 v = x2.sub(x1);
-			Vec2 w1 = shape1.support(xf1, v);
-			Vec2 w2 = shape2.support(xf2, v.negate());
+			v.set(x2.x - x1.x, x2.y - x1.y);
+			shape1.support(w1, xf1, v);
+			vNeg.set(-v.x, -v.y);
+			shape2.support(w2, xf2, vNeg);
 
 			vSqr = Vec2.dot(v, v);
-			Vec2 w = w2.sub(w1);
+			w.set(w2.x - w1.x, w2.y - w1.y);
 			float vw = Vec2.dot(v, w);
 			if (vSqr - vw <= 0.01f * vSqr || InPoints(w, points, pointCount)) // or w in points
 			{
@@ -271,8 +290,9 @@ public class Distance{
 
 			if (pointCount == 3 || vSqr <= 100.0f * Settings.EPSILON * maxSqr) {
 				g_GJK_Iterations = iter;
-				v.set(x2.x - x1.x, x2.y - x1.y);// x2 - x1
-				vSqr = Vec2.dot(v, v);
+				float vx = x2.x - x1.x;
+				float vy = x2.y - x1.y;
+				vSqr = vx * vx + vy * vy;
 
 				return (float)Math.sqrt(vSqr);
 				//
@@ -374,23 +394,34 @@ public class Distance{
 
 	// GJK is more robust with polygon-vs-point than polygon-vs-circle.
 	// So we convert polygon-vs-circle to polygon-vs-point.
-	protected static float DistancePC(
+	protected float DistancePC(
 		Vec2 x1, Vec2 x2,
 		PolygonShape polygon, XForm xf1,
 		CircleShape circle,   XForm xf2) {
-		Point point = new Point(new Vec2(0.0f, 0.0f));
-		point.p = XForm.mul(xf2, circle.getLocalPosition());
-
+		// v is just used as a dummy Vec2 since it gets overwritten in a moment
+		Point point = new Point(v);
+		// INLINED
+		//point.p = XForm.mul(xf2, circle.getLocalPosition());
+		point.p.set(
+			xf2.position.x + xf2.R.col1.x * circle.m_localPosition.x + xf2.R.col2.x * circle.m_localPosition.y, 
+			xf2.position.y + xf2.R.col1.y * circle.m_localPosition.x + xf2.R.col2.y * circle.m_localPosition.y);
+		
 		float distance = DistanceGeneric(x1, x2, polygon, xf1, point, XForm.identity);
 
 		float r = circle.getRadius() - Settings.toiSlop;
 
 		if (distance > r) {
 			distance -= r;
-			Vec2 d = x2.sub(x1);
-			d.normalize();
-			x2.x -= r * d.x;
-			x2.y -= r * d.y;
+			float dx = x2.x - x1.x;
+			float dy = x2.y - x1.y;
+			float length = (float) Math.sqrt(dx * dx + dy * dy);
+			if (length >= Settings.EPSILON) {
+				float invLength = 1.0f / length;
+				dx *= invLength;
+				dy *= invLength;
+			}
+			x2.x -= r * dx;
+			x2.y -= r * dy;
 		} else {
 			distance = 0.0f;
 			x2.set(x1);
@@ -399,13 +430,18 @@ public class Distance{
 		return distance;
 	}
 	
-	protected static float DistancePolygonPoint(
+	protected float DistancePolygonPoint(
 			Vec2 x1, Vec2 x2,
 			PolygonShape polygon, XForm xf1,
 			PointShape pt,   XForm xf2) {
-			Point point = new Point(new Vec2(0.0f, 0.0f));
-			point.p = XForm.mul(xf2, pt.getLocalPosition());
-
+			// v is just used as a dummy Vec2 since it gets overwritten in a moment
+			Point point = new Point(v);
+			// INLINED
+			//point.p = XForm.mul(xf2, pt.m_localPosition);
+			point.p.set(
+				xf2.position.x + xf2.R.col1.x * pt.m_localPosition.x + xf2.R.col2.x * pt.m_localPosition.y,
+				xf2.position.y + xf2.R.col1.y * pt.m_localPosition.x + xf2.R.col2.y * pt.m_localPosition.y);
+			
 			//TODO: check if we need to subtract toi slop from this...
 			float distance = DistanceGeneric(x1, x2, polygon, xf1, point, XForm.identity);
 			//...or if it's better to do it here
@@ -413,10 +449,16 @@ public class Distance{
 
 			if (distance > r) {
 				distance -= r;
-				Vec2 d = x2.sub(x1);
-				d.normalize();
-				x2.x -= r * d.x;
-				x2.y -= r * d.y;
+				float dx = x2.x - x1.x;
+				float dy = x2.y - x1.y;
+				float length = (float) Math.sqrt(dx * dx + dy * dy);
+				if (length >= Settings.EPSILON) {
+					float invLength = 1.0f / length;
+					dx *= invLength;
+					dy *= invLength;
+				}
+				x2.x -= r * dx;
+				x2.y -= r * dy;
 			} else {
 				distance = 0.0f;
 				x2.set(x1);
@@ -472,7 +514,7 @@ public class Distance{
 	 * @param shape2 Second shape to test
 	 * @param xf2 Transform of second shape
 	 */
-	public static float distance(Vec2 x1, Vec2 x2,
+	public float distance(Vec2 x1, Vec2 x2,
 					 Shape shape1, XForm xf1,
 					 Shape shape2, XForm xf2) {
 		
@@ -521,12 +563,12 @@ class Point implements SupportsGenericDistance{
 		p = _p.clone();
 	}
 	
-	public Vec2 support(XForm xf, Vec2 v) {
-		return p;
+	public void support(Vec2 dest, XForm xf, Vec2 v) {
+		dest.set(p);
 	}
 
-	public Vec2 getFirstVertex(XForm xf) {
-		return p;
+	public void getFirstVertex(Vec2 dest, XForm xf) {
+		dest.set(p);
 	}
 	
 }

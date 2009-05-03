@@ -29,7 +29,33 @@ import java.util.ArrayList;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.DebugDraw;
-import org.jbox2d.testbed.tests.*;
+import org.jbox2d.testbed.tests.BipedTest;
+import org.jbox2d.testbed.tests.BlobTest;
+import org.jbox2d.testbed.tests.BlobTest2;
+import org.jbox2d.testbed.tests.BlobTest3;
+import org.jbox2d.testbed.tests.BlobTest4;
+import org.jbox2d.testbed.tests.BlobTest5;
+import org.jbox2d.testbed.tests.BlobTest6;
+import org.jbox2d.testbed.tests.BlobTest7;
+import org.jbox2d.testbed.tests.Bridge;
+import org.jbox2d.testbed.tests.CCDTest;
+import org.jbox2d.testbed.tests.Chain;
+import org.jbox2d.testbed.tests.Circles;
+import org.jbox2d.testbed.tests.CompoundShapes;
+import org.jbox2d.testbed.tests.Domino;
+import org.jbox2d.testbed.tests.DominoTower;
+import org.jbox2d.testbed.tests.EdgeTest;
+import org.jbox2d.testbed.tests.Gears;
+import org.jbox2d.testbed.tests.LiquidTest;
+import org.jbox2d.testbed.tests.MotorsAndLimits;
+import org.jbox2d.testbed.tests.Overhang;
+import org.jbox2d.testbed.tests.Pulleys;
+import org.jbox2d.testbed.tests.Pyramid;
+import org.jbox2d.testbed.tests.RestitutionCannon;
+import org.jbox2d.testbed.tests.SpriteBinding;
+import org.jbox2d.testbed.tests.VaryingFriction;
+import org.jbox2d.testbed.tests.VaryingRestitution;
+import org.jbox2d.testbed.tests.VerticalStack;
 
 import processing.core.PApplet;
 
@@ -155,9 +181,9 @@ public class TestbedMain extends PApplet {
 //    	registerExample(new ShapeDrawing(this));
     	
     	// Stress tests
-//    	registerExample(new Pyramid(this));
-//    	registerExample(new DominoTower(this));
-//    	registerExample(new Circles(this));
+    	registerExample(new Pyramid(this));
+    	registerExample(new DominoTower(this));
+    	registerExample(new Circles(this));
     	
     	// Bug tests
 //    	registerExample(new DistanceTest(this));

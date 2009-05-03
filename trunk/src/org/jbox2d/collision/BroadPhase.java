@@ -431,6 +431,8 @@ public class BroadPhase {
          }
     }
 
+    private BoundValues newValues = new BoundValues();
+    private BoundValues oldValues = new BoundValues();
     // Call MoveProxy as many times as you like, then when you are done
     // call Flush to finalized the proxy pairs (for your time step).
     void moveProxy(int proxyId, AABB aabb) {
@@ -449,11 +451,9 @@ public class BroadPhase {
         Proxy proxy = m_proxyPool[proxyId];
         
         //Get new bound values
-        BoundValues newValues = new BoundValues();
         computeBounds(newValues.lowerValues, newValues.upperValues, aabb);
         
         //Get old bound values
-        BoundValues oldValues = new BoundValues();
         for (int axis = 0; axis < 2; ++axis) {
             oldValues.lowerValues[axis] = m_bounds[axis][proxy.lowerBounds[axis]].value;
             oldValues.upperValues[axis] = m_bounds[axis][proxy.upperBounds[axis]].value;
@@ -504,11 +504,9 @@ public class BroadPhase {
                     }
 
                     --proxy.lowerBounds[axis];
-
-                    // b2Swap(*bound, *prevEdge);
-                    Bound tmp = new Bound(bound);
-                    bound.set(prevBound);
-                    prevBound.set(tmp);
+                    
+                    bound.swap(prevBound);
+                    
                     --index;
                 }
             }
@@ -539,12 +537,9 @@ public class BroadPhase {
                     }
 
                     ++proxy.upperBounds[axis];
-                    // b2Swap(*bound, *nextEdge);
-                    // wasn't actually swapping! bounds[index] and
-                    // bounds[index+1] need to be swapped by VALUE
-                    Bound tmp = new Bound(bound);
-                    bound.set(nextBound);
-                    nextBound.set(tmp);
+                    
+                    bound.swap(nextBound);
+                    
                     ++index;
                 }
             }
@@ -580,13 +575,9 @@ public class BroadPhase {
                     }
 
                     ++proxy.lowerBounds[axis];
-                    // b2Swap(*bound, *nextEdge);
-                    // Bound tmp = bound;
-                    // bound = nextEdge;
-                    // nextEdge = tmp;
-                    Bound tmp = new Bound(bound);
-                    bound.set(nextBound);
-                    nextBound.set(tmp);
+                    
+                    bound.swap(nextBound);
+                    
                     ++index;
                 }
             }
@@ -617,13 +608,9 @@ public class BroadPhase {
                     }
 
                     --proxy.upperBounds[axis];
-                    // b2Swap(*bound, *prevEdge);
-                    // Bound tmp = bound;
-                    // bound = prevEdge;
-                    // prevEdge = tmp;
-                    Bound tmp = new Bound(bound);
-                    bound.set(prevBound);
-                    prevBound.set(tmp);
+                    
+                    bound.swap(prevBound);
+                    
                     --index;
                 }
             }
@@ -724,11 +711,15 @@ public class BroadPhase {
         assert(aabb.upperBound.x >= aabb.lowerBound.x);
         assert(aabb.upperBound.y >= aabb.lowerBound.y);
         
-        Vec2 minVertex = MathUtils.clamp(aabb.lowerBound, m_worldAABB.lowerBound,
-                m_worldAABB.upperBound);
-        Vec2 maxVertex = MathUtils.clamp(aabb.upperBound, m_worldAABB.lowerBound,
-                m_worldAABB.upperBound);
-
+        float bx = aabb.lowerBound.x < m_worldAABB.upperBound.x ? aabb.lowerBound.x : m_worldAABB.upperBound.x;
+		float by = aabb.lowerBound.y < m_worldAABB.upperBound.y ? aabb.lowerBound.y : m_worldAABB.upperBound.y;
+        float minVertexX = m_worldAABB.lowerBound.x > bx ? m_worldAABB.lowerBound.x : bx;
+        float minVertexY = m_worldAABB.lowerBound.y > by ? m_worldAABB.lowerBound.y : by;
+		float b1x = aabb.upperBound.x < m_worldAABB.upperBound.x ? aabb.upperBound.x : m_worldAABB.upperBound.x;
+		float b1y = aabb.upperBound.y < m_worldAABB.upperBound.y ? aabb.upperBound.y : m_worldAABB.upperBound.y;
+		float maxVertexX = m_worldAABB.lowerBound.x > b1x ? m_worldAABB.lowerBound.x : b1x;
+		float maxVertexY = m_worldAABB.lowerBound.y > b1y ? m_worldAABB.lowerBound.y : b1y;
+		
         // System.out.printf("minV = %f %f, maxV = %f %f
         // \n",aabb.minVertex.x,aabb.minVertex.y,aabb.maxVertex.x,aabb.maxVertex.y);
 
@@ -736,13 +727,13 @@ public class BroadPhase {
         // sorting of
         // lower/upper bounds that would have equal values.
         // TODO_ERIN implement fast float to int conversion.
-        lowerValues[0] = (int) (m_quantizationFactor.x * (minVertex.x - m_worldAABB.lowerBound.x))
+        lowerValues[0] = (int) (m_quantizationFactor.x * (minVertexX - m_worldAABB.lowerBound.x))
                 & (Integer.MAX_VALUE - 1);
-        upperValues[0] = (int) (m_quantizationFactor.x * (maxVertex.x - m_worldAABB.lowerBound.x)) | 1;
+        upperValues[0] = (int) (m_quantizationFactor.x * (maxVertexX - m_worldAABB.lowerBound.x)) | 1;
 
-        lowerValues[1] = (int) (m_quantizationFactor.y * (minVertex.y - m_worldAABB.lowerBound.y))
+        lowerValues[1] = (int) (m_quantizationFactor.y * (minVertexY - m_worldAABB.lowerBound.y))
                 & (Integer.MAX_VALUE - 1);
-        upperValues[1] = (int) (m_quantizationFactor.y * (maxVertex.y - m_worldAABB.lowerBound.y)) | 1;
+        upperValues[1] = (int) (m_quantizationFactor.y * (maxVertexY - m_worldAABB.lowerBound.y)) | 1;
     }
 
  
@@ -849,8 +840,12 @@ public class BroadPhase {
     }
 
     public boolean inRange(AABB aabb) {
-        Vec2 d = Vec2.max(aabb.lowerBound.sub(m_worldAABB.upperBound),
-                m_worldAABB.lowerBound.sub(aabb.upperBound));
-        return (Math.max(d.x, d.y) < 0.0f);
+    	float ax = aabb.lowerBound.x - m_worldAABB.upperBound.x;
+		float ay = aabb.lowerBound.y - m_worldAABB.upperBound.y;
+		float bx = m_worldAABB.lowerBound.x - aabb.upperBound.x;
+		float by = m_worldAABB.lowerBound.y - aabb.upperBound.y;
+		float dx = Math.max(ax, bx);
+		float dy = Math.max(ay, by);
+        return (Math.max(dx, dy) < 0.0f);
     }
 }

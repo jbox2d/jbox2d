@@ -125,10 +125,10 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 		massData.I = 0;
 	}
 	
-	public Vec2 support(final XForm xf, final Vec2 d) {
+	public void support(Vec2 dest, final XForm xf, final Vec2 d) {
 		Vec2 v1 = XForm.mul(xf, m_coreV1);
 		Vec2 v2 = XForm.mul(xf, m_coreV2);
-		return Vec2.dot(v1, d) > Vec2.dot(v2, d) ? v1 : v2;
+		dest.set(Vec2.dot(v1, d) > Vec2.dot(v2, d) ? v1 : v2);
 	}
 	
 	public void setPrevEdge(EdgeShape edge, final Vec2 core, final Vec2 cornerDir, boolean convex) {
@@ -198,8 +198,8 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 		return m_prevEdge;
 	}
 
-	public Vec2 getFirstVertex(XForm xf) {
-		return XForm.mul(xf, m_coreV1);
+	public void getFirstVertex(Vec2 dest, XForm xf) {
+		dest.set(XForm.mul(xf, m_coreV1));
 	}
 
 	public boolean corner1IsConvex() {
