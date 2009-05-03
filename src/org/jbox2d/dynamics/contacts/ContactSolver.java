@@ -116,11 +116,15 @@ public class ContactSolver {
 
                     ccp.localAnchor1.set(cp.localPoint1);
     				ccp.localAnchor2.set(cp.localPoint2);
+    				// INLINED
     				//ccp.r1 = Mat22.mul(b1.getXForm().R, cp.localPoint1.sub(b1.getLocalCenter()));
     				//ccp.r2 = Mat22.mul(b2.getXForm().R, cp.localPoint2.sub(b2.getLocalCenter()));
-    				//TODO: still a couple of temp creations here
-    				ccp.r1 = Mat22.mul(b1.m_xf.R, cp.localPoint1.sub(b1.m_sweep.localCenter));
-    				ccp.r2 = Mat22.mul(b2.m_xf.R, cp.localPoint2.sub(b2.m_sweep.localCenter));
+    				float v3x = cp.localPoint1.x - b1.m_sweep.localCenter.x;
+    				float v3y = cp.localPoint1.y - b1.m_sweep.localCenter.y;
+    				ccp.r1.set(b1.m_xf.R.col1.x * v3x + b1.m_xf.R.col2.x * v3y, b1.m_xf.R.col1.y * v3x + b1.m_xf.R.col2.y * v3y);
+    				float v4x = cp.localPoint2.x - b2.m_sweep.localCenter.x;
+    				float v4y = cp.localPoint2.y - b2.m_sweep.localCenter.y;
+    				ccp.r2.set(b2.m_xf.R.col1.x * v4x + b2.m_xf.R.col2.x * v4y, b2.m_xf.R.col1.y * v4x + b2.m_xf.R.col2.y * v4y);
 
     				float rn1 = Vec2.cross(ccp.r1, normal);
     				float rn2 = Vec2.cross(ccp.r2, normal);
@@ -161,9 +165,14 @@ public class ContactSolver {
                     if (ccp.separation > 0.0f) {
                         ccp.velocityBias = -60.0f * ccp.separation; // TODO_ERIN b2TimeStep
                     }
-                    //TODO: still a couple of temp creations here
-                    Vec2 buffer = Vec2.cross(w2, ccp.r2).subLocal(Vec2.cross(w1, ccp.r1)).addLocal(v2).subLocal(v1);
-                    float vRel = Vec2.dot(c.normal, buffer);
+					Vec2 a2 = ccp.r2;
+					Vec2 a3 = ccp.r1;
+                    // INLINED
+                    //Vec2 buffer = Vec2.cross(w2, ccp.r2).subLocal(Vec2.cross(w1, ccp.r1)).addLocal(v2).subLocal(v1);
+					//float vRel = Vec2.dot(c.normal, buffer);
+                    float bufferx = -w2 * a2.y - (-w1 * a3.y) + v2.x - v1.x;
+                    float buffery = w2 * a2.x - w1 * a3.x + v2.y - v1.y;
+					float vRel = c.normal.x * bufferx + c.normal.y * buffery;
                     if (vRel < -Settings.velocityThreshold) {
                     	ccp.velocityBias += -c.restitution * vRel;
                     }

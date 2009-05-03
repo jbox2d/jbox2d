@@ -796,11 +796,15 @@ public class Body {
 		//seems to be missing from C++ version...
 	}
 
+	private XForm xf1 = new XForm();
 	/** For internal use only. */
 	public boolean synchronizeShapes(){
-		XForm xf1 = new XForm();
+		// INLINED
+		//XForm xf1 = new XForm();
+		//xf1.R.set(m_sweep.a0);
+		//xf1.position.set(m_sweep.c0.sub(Mat22.mul(xf1.R, m_sweep.localCenter)));
 		xf1.R.set(m_sweep.a0);
-		xf1.position.set(m_sweep.c0.sub(Mat22.mul(xf1.R, m_sweep.localCenter)));
+		xf1.position.set(m_sweep.c0.x - xf1.R.col1.x * m_sweep.localCenter.x + xf1.R.col2.x * m_sweep.localCenter.y, m_sweep.c0.y - xf1.R.col1.y * m_sweep.localCenter.x + xf1.R.col2.y * m_sweep.localCenter.y);
 		
 		boolean inRange = true;
 		for (Shape s = m_shapeList; s != null; s = s.m_next) {
@@ -874,6 +878,26 @@ public class Body {
 	 */
 	public Vec2 getLinearVelocityFromLocalPoint(Vec2 localPoint) {
 		return getLinearVelocityFromWorldPoint(getWorldLocation(localPoint));
+	}
+	
+	public void getLinearVelocityFromWorldPoint(Vec2 dest, Vec2 worldPoint) {
+		float ax = worldPoint.x - m_sweep.c.x;
+		float ay = worldPoint.y - m_sweep.c.y;
+		float vx = -m_angularVelocity * ay;
+		float vy = m_angularVelocity * ax;
+		dest.set(m_linearVelocity.x + vx, m_linearVelocity.y + vy);
+	}
+
+	public void getWorldLocation(Vec2 dest, Vec2 localPoint) {
+		dest.set(
+			m_xf.position.x + m_xf.R.col1.x * localPoint.x + m_xf.R.col2.x * localPoint.y,
+			m_xf.position.y + m_xf.R.col1.y * localPoint.x + m_xf.R.col2.y * localPoint.y);			
+	}
+
+	private Vec2 worldLocation = new Vec2();
+	public void getLinearVelocityFromLocalPoint(Vec2 dest, Vec2 localPoint) {
+		getWorldLocation(worldLocation, localPoint);
+		getLinearVelocityFromWorldPoint(dest, worldLocation);
 	}
 	
 	/**

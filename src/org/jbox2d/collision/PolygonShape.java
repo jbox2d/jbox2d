@@ -272,7 +272,7 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 	 * Get the support point in the given world direction.
 	 * Use the supplied transform.
 	 */
-    public Vec2 support(XForm xf, Vec2 d) {
+    public void support(Vec2 dest, XForm xf, Vec2 d) {
         Vec2 dLocal = Mat22.mulT(xf.R, d);
 
         int bestIndex = 0;
@@ -285,7 +285,7 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
             }
         }
 
-        return XForm.mul(xf, m_coreVertices[bestIndex]); 
+        dest.set(XForm.mul(xf, m_coreVertices[bestIndex]));
     }
 
 	public static Vec2 computeCentroid(List<Vec2> vs) {
@@ -478,8 +478,8 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 	}
 	
 	/** Get the first vertex and apply the supplied transform. */
-	public Vec2 getFirstVertex(XForm xf) {
-		return XForm.mul(xf, m_coreVertices[0]);
+	public void getFirstVertex(Vec2 dest, XForm xf) {
+		dest.set(XForm.mul(xf, m_coreVertices[0]));
 	}
 
 	/** Get the oriented bounding box relative to the parent body. */

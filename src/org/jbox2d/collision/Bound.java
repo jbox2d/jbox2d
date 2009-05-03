@@ -58,6 +58,18 @@ public class Bound {
         return (value & 1) == 1;
     }
 
+    void swap(Bound other) {
+    	int value = this.value;
+    	int proxyId = this.proxyId;
+    	int stabbingCount = this.stabbingCount;
+    	this.value = other.value;
+    	this.proxyId = other.proxyId;
+    	this.stabbingCount = other.stabbingCount;
+    	other.value = value;
+    	other.proxyId = proxyId;
+    	other.stabbingCount = stabbingCount;
+    }
+
     @Override
     public String toString() {
         String ret = "Bound variable:\n";

@@ -275,7 +275,7 @@ public class Island {
 
     	// No warm starting needed for TOI contact events.
     	
-    	// For joints, intialize with the last full step warm starting values
+    	// For joints, initialize with the last full step warm starting values
     	if (Settings.maxTOIJointsPerIsland > 0) {
     		subStep.warmStarting = true;
     		//for (int i=0; i<m_jointCount; ++i) {

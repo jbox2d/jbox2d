@@ -52,7 +52,6 @@ public class ContactConstraintPoint {
     public float velocityBias;
 
     public ContactConstraintPoint() {
-        // Probably unnecessary to init
         localAnchor1 = new Vec2();
         localAnchor2 = new Vec2();
         r1 = new Vec2();
