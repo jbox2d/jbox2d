@@ -81,6 +81,8 @@ public class CollidePoly {
         return numOut;
     }
 
+    // DMNOTE pooled
+    private static Vec2 normal1World = new Vec2();
     static float edgeSeparation(PolygonShape poly1, XForm xf1,
     							int edge1, 
     							PolygonShape poly2, XForm xf2) {
@@ -95,7 +97,7 @@ public class CollidePoly {
     	assert(0 <= edge1 && edge1 < count1);
 
     	// Convert normal from poly1's frame into poly2's frame.
-    	Vec2 normal1World = Mat22.mul(xf1.R, normals1[edge1]);
+    	Mat22.mulToOut(xf1.R, normals1[edge1], normal1World);
     	float normal1x = Vec2.dot(normal1World, xf2.R.col1);
     	float normal1y = Vec2.dot(normal1World, xf2.R.col2);
 
@@ -125,6 +127,8 @@ public class CollidePoly {
         return separation;
     }
 
+    // DMNOTE pooled
+    private static Vec2 dLocal1 = new Vec2();
     // Find the max separation between poly1 and poly2 using face normals
     // from poly1.
     static MaxSeparation findMaxSeparation(PolygonShape poly1, XForm xf1,
@@ -146,7 +150,8 @@ public class CollidePoly {
     			 - (xf1.position.y + xf1.R.col1.y * v.x + xf1.R.col2.y * v.y);
 		Vec2 b = xf1.R.col1;
 		Vec2 b1 = xf1.R.col2;
-    	Vec2 dLocal1 = new Vec2((dx * b.x + dy * b.y), (dx * b1.x + dy * b1.y));
+    	dLocal1.x = (dx * b.x + dy * b.y);
+    	dLocal1.y = (dx * b1.x + dy * b1.y);
 
     	// Find edge normal on poly1 that has the largest projection onto d.
         int edge = 0;
@@ -227,6 +232,10 @@ public class CollidePoly {
         return separation;
     }
 
+    // DMNOTE pooled
+    private static Vec2 mulTemp = new Vec2();
+    private static Vec2 normal1 = new Vec2();
+    // DMNOTE optimized
     static void findIncidentEdge(ClipVertex c[], 
     							 PolygonShape poly1, XForm xf1, int edge1,
     							 PolygonShape poly2, XForm xf2) {
@@ -241,7 +250,8 @@ public class CollidePoly {
     	assert(0 <= edge1 && edge1 < count1);
 
     	// Get the normal of the reference edge in poly2's frame.
-    	Vec2 normal1 = Mat22.mulT(xf2.R, Mat22.mul(xf1.R, normals1[edge1]));
+    	Mat22.mulToOut( xf1.R, normals1[edge1], mulTemp);
+    	Mat22.mulTransToOut(xf2.R, mulTemp, normal1);
 
     	// Find the incident edge on poly2.
     	int index = 0;
@@ -261,14 +271,14 @@ public class CollidePoly {
     	c[0] = new ClipVertex();
     	c[1] = new ClipVertex();
 
-    	c[0].v = XForm.mul(xf2, vertices2[i1]);
+    	XForm.mulToOut(xf2, vertices2[i1], c[0].v);
     	c[0].id.features.referenceEdge = edge1;
     	c[0].id.features.incidentEdge = i1;
     	c[0].id.features.incidentVertex = 0;
     	
     	
 
-    	c[1].v = XForm.mul(xf2, vertices2[i2]);
+    	XForm.mulToOut(xf2, vertices2[i2], c[1].v);
     	c[1].id.features.referenceEdge = edge1;
     	c[1].id.features.incidentEdge = i2;
     	c[1].id.features.incidentVertex = 1;
@@ -284,6 +294,7 @@ public class CollidePoly {
     // Clip
 
     // The normal points from 1 to 2
+    // DMNOTE optimized
     public static void collidePolygons(Manifold manif, 
     		PolygonShape polyA, XForm xfA,
             PolygonShape polyB, XForm xfB) {
@@ -380,7 +391,10 @@ public class CollidePoly {
         }
 
         // Now clipPoints2 contains the clipped points.
-        manif.normal = (flip != 0) ? frontNormal.negate() : frontNormal.clone();
+        manif.normal.set(frontNormal);
+        if(flip != 0){
+        	manif.normal.negateLocal();
+        }
 
         int pointCount = 0;
         for (int i = 0; i < Settings.maxManifoldPoints; ++i) {

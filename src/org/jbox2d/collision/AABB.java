@@ -50,21 +50,34 @@ public class AABB {
         lowerBound = new Vec2();
         upperBound = new Vec2();
     }
-
-    /** Verify that the bounds are sorted. */
-    public boolean isValid() {
-        Vec2 d = upperBound.sub(lowerBound);
-    	boolean valid = (d.x >= 0.0f && d.y >= 0);
-    	valid = valid && lowerBound.isValid() && upperBound.isValid();
-    	return valid;
+    
+    // DMNOTE needed for the stack
+    public void set(AABB aabb){
+    	lowerBound.set( aabb.lowerBound);
+    	upperBound.set( aabb.upperBound);
     }
 
-    /** Check if AABBs overlap. */
-    public boolean testOverlap(AABB box) {
-        Vec2 d1 = box.lowerBound.sub(upperBound);
-        Vec2 d2 = lowerBound.sub(box.upperBound);
+    /** Verify that the bounds are sorted. DMNOTE optimized */
+    public boolean isValid() {
+        float dx = upperBound.x - lowerBound.x;
+        float dy = upperBound.y - lowerBound.y;
+    	if(!(dx >= 0.0f && dy >= 0)){
+    		return false;
+    	}
+    	return lowerBound.isValid() && upperBound.isValid();
+    }
 
-        if (d1.x > 0.0f || d1.y > 0.0f || d2.x > 0.0f || d2.y > 0.0f) {
+    /** Check if AABBs overlap. DMNOTE optimized */
+    public boolean testOverlap(AABB box) {
+        float d1x = box.lowerBound.x - upperBound.x;
+        float d1y = box.lowerBound.y - upperBound.y;
+        float d2x = lowerBound.x - box.upperBound.x;
+        float d2y = lowerBound.y - box.upperBound.y;
+
+       // Vec2 d1 = box.lowerBound.sub(upperBound);
+        //Vec2 d2 = lowerBound.sub(box.upperBound);
+
+        if (d1x > 0.0f || d1y > 0.0f || d2x > 0.0f || d2y > 0.0f) {
             return false;
         }
         else {

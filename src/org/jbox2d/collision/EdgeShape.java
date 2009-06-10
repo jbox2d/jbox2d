@@ -38,8 +38,9 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 		m_length = m_direction.normalize();
 		m_normal = new Vec2(m_direction.y, -m_direction.x);
 		
-		m_coreV1 = (m_normal.sub(m_direction)).mul(-Settings.toiSlop).add(m_v1);
-		m_coreV2 = (m_normal.add(m_direction)).mul(-Settings.toiSlop).add(m_v2);
+		// DMNOTE they are new objects after that first math call
+		m_coreV1 = (m_normal.sub(m_direction)).mulLocal(-Settings.toiSlop).addLocal(m_v1);
+		m_coreV2 = (m_normal.add(m_direction)).mulLocal(-Settings.toiSlop).addLocal(m_v2);
 		
 		m_cornerDir1 = m_normal.clone();
 		m_cornerDir2 = m_normal.mul(-1.0f);
@@ -58,6 +59,7 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 	}
 	
 	public boolean testPoint(final XForm transform, final Vec2 p) {
+		// DMNOTE this could use some optimization.
 		return false;
 	}
 	
@@ -101,20 +103,47 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 //return e_missCollide;
 //}
 
+	// DMNOTE optimized
 	public void computeAABB(AABB aabb, final XForm transform) {
-		Vec2 v1 = XForm.mul(transform, m_v1);
+		/*Vec2 v1 = XForm.mul(transform, m_v1);
 		Vec2 v2 = XForm.mul(transform, m_v2);
 		aabb.lowerBound = Vec2.min(v1, v2);
-		aabb.upperBound = Vec2.max(v1, v2);
+		aabb.upperBound = Vec2.max(v1, v2);*/
+		
+		// DMNOTE we avoid one creation. crafty huh?  i won't bother
+		// pooling the creation, as this method isn't very hot
+		XForm.mulToOut(transform, m_v1, aabb.lowerBound);
+		Vec2 v2 = XForm.mul(transform, m_v2);
+		
+		Vec2.maxToOut(aabb.lowerBound, v2, aabb.upperBound);
+		Vec2.minToOut(aabb.lowerBound, v2, aabb.lowerBound);
 	}
 	
+	// DMNOTE pooling
+	
+	private Vec2 sweptV1 = new Vec2();
+	private Vec2 sweptV2 = new Vec2();
+	private Vec2 sweptV3 = new Vec2();
+	private Vec2 sweptV4 = new Vec2();
+	// DMNOTE this method is pretty hot (called every time step)
 	public void computeSweptAABB(AABB aabb, final XForm transform1, final XForm transform2) {
-		Vec2 v1 = XForm.mul(transform1, m_v1);
-		Vec2 v2 = XForm.mul(transform1, m_v2);
-		Vec2 v3 = XForm.mul(transform2, m_v1);
-		Vec2 v4 = XForm.mul(transform2, m_v2);
-		aabb.lowerBound = Vec2.min(Vec2.min(Vec2.min(v1, v2), v3), v4);
-		aabb.upperBound = Vec2.max(Vec2.max(Vec2.max(v1, v2), v3), v4);
+		
+		XForm.mulToOut(transform1, m_v1, sweptV1);
+		XForm.mulToOut(transform1, m_v2, sweptV2);
+		XForm.mulToOut(transform2, m_v1, sweptV3);
+		XForm.mulToOut(transform2, m_v2, sweptV4);
+		
+		//aabb.lowerBound = Vec2.min(Vec2.min(Vec2.min(v1, v2), v3), v4);
+		//aabb.upperBound = Vec2.max(Vec2.max(Vec2.max(v1, v2), v3), v4);
+		
+		// DMNOTE ok here's the non object-creation-crazy way
+		Vec2.minToOut( sweptV1, sweptV2, aabb.lowerBound);
+		Vec2.minToOut( aabb.lowerBound, sweptV3, aabb.lowerBound);
+		Vec2.minToOut( aabb.lowerBound, sweptV4, aabb.lowerBound);
+		
+		Vec2.maxToOut( sweptV1, sweptV2, aabb.upperBound);
+		Vec2.maxToOut( aabb.upperBound, sweptV3, aabb.upperBound);
+		Vec2.maxToOut( aabb.upperBound, sweptV4, aabb.upperBound);
 	}
 	
 	public void computeMass(MassData massData) {
@@ -125,10 +154,13 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 		massData.I = 0;
 	}
 	
+	// DMNOTE pooled
+	private Vec2 supportV1 = new Vec2();
+	private Vec2 supportV2 = new Vec2();
 	public void support(Vec2 dest, final XForm xf, final Vec2 d) {
-		Vec2 v1 = XForm.mul(xf, m_coreV1);
-		Vec2 v2 = XForm.mul(xf, m_coreV2);
-		dest.set(Vec2.dot(v1, d) > Vec2.dot(v2, d) ? v1 : v2);
+		XForm.mulToOut(xf, m_coreV1, supportV1);
+		XForm.mulToOut(xf, m_coreV2, supportV2);
+		dest.set(Vec2.dot(supportV1, d) > Vec2.dot(supportV2, d) ? supportV1 : supportV2);
 	}
 	
 	public void setPrevEdge(EdgeShape edge, final Vec2 core, final Vec2 cornerDir, boolean convex) {
@@ -199,7 +231,7 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 	}
 
 	public void getFirstVertex(Vec2 dest, XForm xf) {
-		dest.set(XForm.mul(xf, m_coreV1));
+		XForm.mulToOut(xf, m_coreV1, dest);
 	}
 
 	public boolean corner1IsConvex() {

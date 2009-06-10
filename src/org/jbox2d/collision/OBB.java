@@ -43,8 +43,9 @@ public class OBB {
         extents = _extents.clone();
     }
 
+    // DMNOTE fixed double allocation
     public OBB(OBB copy) {
-        this(copy.R.clone(), copy.center.clone(), copy.extents.clone());
+        this(copy.R, copy.center, copy.extents);
     }
 
     public OBB() {

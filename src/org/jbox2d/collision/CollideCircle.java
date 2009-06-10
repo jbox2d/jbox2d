@@ -33,17 +33,25 @@ import org.jbox2d.common.*;
  */
 public class CollideCircle {
 
+	// DMNOTE pooled
+	private static Vec2 colCCP1 = new Vec2();
+	private static Vec2 colCCP2 = new Vec2();
+	private static Vec2 colCCD = new Vec2();
+	private static Vec2 colCCP = new Vec2();
+	
+	// DMNOTE optimized
     public static void collideCircles(Manifold manifold, 
     		CircleShape circle1, XForm xf1,
             CircleShape circle2, XForm xf2) {
         manifold.pointCount = 0;
 
-    	Vec2 p1 = XForm.mul(xf1, circle1.getLocalPosition());
-    	Vec2 p2 = XForm.mul(xf2, circle2.getLocalPosition());
+    	XForm.mulToOut(xf1, circle1.getLocalPosition(), colCCP1);
+    	XForm.mulToOut(xf2, circle2.getLocalPosition(), colCCP2);
 
-    	Vec2 d = p2.sub(p1);
+    	colCCD.x = colCCP2.x - colCCP1.x;
+    	colCCD.y = colCCP2.y - colCCP1.y;
         
-    	float distSqr = Vec2.dot(d, d);
+    	float distSqr = Vec2.dot(colCCD, colCCD);
 
     	float r1 = circle1.getRadius();
     	float r2 = circle2.getRadius();
@@ -61,36 +69,45 @@ public class CollideCircle {
             float dist = (float) Math.sqrt(distSqr);
             separation = dist - radiusSum;
             float a = 1.0f / dist;
-            manifold.normal.x = a * d.x;
-            manifold.normal.y = a * d.y;
+            manifold.normal.x = a * colCCD.x;
+            manifold.normal.y = a * colCCD.y;
         }
 
         manifold.pointCount = 1;
         //manifold.points[0].id.key = 0;
         manifold.points[0].id.zero(); //use this instead of zeroing through key
         manifold.points[0].separation = separation;
+        
+        // let this one slide
+    	colCCP1.addLocal(manifold.normal.mul(r1));
+    	colCCP2.subLocal(manifold.normal.mul(r2));
 
-    	p1.addLocal(manifold.normal.mul(r1));
-    	p2.subLocal(manifold.normal.mul(r2));
+    	colCCP.x = 0.5f * (colCCP1.x + colCCP2.x);
+    	colCCP.y = 0.5f * (colCCP1.y + colCCP2.y);
 
-    	Vec2 p = new Vec2(0.5f * (p1.x + p2.x), 0.5f * (p1.y + p2.y));
-
-    	manifold.points[0].localPoint1 = XForm.mulT(xf1, p);
-    	manifold.points[0].localPoint2 = XForm.mulT(xf2, p);
-
+    	XForm.mulTransToOut(xf1, colCCP, manifold.points[0].localPoint1);
+    	XForm.mulTransToOut(xf2, colCCP, manifold.points[0].localPoint2);
     }
     
+    // DMNOTE pooled
+    private static Vec2 colPCP1 = new Vec2();
+	private static Vec2 colPCP2 = new Vec2();
+	private static Vec2 colPCD = new Vec2();
+	private static Vec2 colPCP = new Vec2();
+	
+	// DMNOTE optimized
     public static void collidePointAndCircle(Manifold manifold, 
     		PointShape point1, XForm xf1,
             CircleShape circle2, XForm xf2) {
         manifold.pointCount = 0;
 
-    	Vec2 p1 = XForm.mul(xf1, point1.getLocalPosition());
-    	Vec2 p2 = XForm.mul(xf2, circle2.getLocalPosition());
+    	XForm.mulToOut(xf1, point1.getLocalPosition(), colPCP1);
+    	XForm.mulToOut(xf2, circle2.getLocalPosition(), colPCP2);
 
-    	Vec2 d = p2.sub(p1);
+    	colPCD.x = colPCP2.x - colPCP1.x;
+    	colPCD.y = colPCP2.y - colPCP1.y;
         
-    	float distSqr = Vec2.dot(d, d);
+    	float distSqr = Vec2.dot(colPCD, colPCD);
 
     	float r2 = circle2.getRadius();
 
@@ -107,8 +124,8 @@ public class CollideCircle {
             float dist = (float) Math.sqrt(distSqr);
             separation = dist - r2;
             float a = 1.0f / dist;
-            manifold.normal.x = a * d.x;
-            manifold.normal.y = a * d.y;
+            manifold.normal.x = a * colPCD.x;
+            manifold.normal.y = a * colPCD.y;
         }
 
         manifold.pointCount = 1;
@@ -116,13 +133,14 @@ public class CollideCircle {
         manifold.points[0].id.zero(); //use this instead of zeroing through key
         manifold.points[0].separation = separation;
 
-    	p2.subLocal(manifold.normal.mul(r2));
+        // leave this for now
+    	colPCP2.subLocal(manifold.normal.mul(r2));
 
-    	Vec2 p = new Vec2(0.5f * (p1.x + p2.x), 0.5f * (p1.y + p2.y));
+    	colPCP.x = 0.5f * (colPCP1.x + colPCP2.x);
+    	colPCP.y = 0.5f * (colPCP1.y + colPCP2.y);
 
-    	manifold.points[0].localPoint1 = XForm.mulT(xf1, p);
-    	manifold.points[0].localPoint2 = XForm.mulT(xf2, p);
-
+    	XForm.mulTransToOut(xf1, colPCP, manifold.points[0].localPoint1);
+    	XForm.mulTransToOut(xf2, colPCP, manifold.points[0].localPoint2);
     }
 
     public static void collidePolygonAndCircle(Manifold manifold, 
@@ -171,7 +189,8 @@ public class CollideCircle {
             manifold.pointCount = 1;
 			// INLINED
             //manifold.normal = Mat22.mul(xf1.R, normals[normalIndex]);
-            manifold.normal.set(xf1.R.col1.x * normals[normalIndex].x + xf1.R.col2.x * normals[normalIndex].y, xf1.R.col1.y * normals[normalIndex].x + xf1.R.col2.y * normals[normalIndex].y);
+            manifold.normal.x = xf1.R.col1.x * normals[normalIndex].x + xf1.R.col2.x * normals[normalIndex].y;
+            manifold.normal.y = xf1.R.col1.y * normals[normalIndex].x + xf1.R.col2.y * normals[normalIndex].y;
             
             manifold.points[0].id.features.incidentEdge = normalIndex;
             manifold.points[0].id.features.incidentVertex = Collision.NULL_FEATURE;
@@ -186,10 +205,12 @@ public class CollideCircle {
             float positiony = cy - manifold.normal.y * radius;
 			float v1x1 = positionx-xf1.position.x;
 			float v1y1 = positiony-xf1.position.y;
-			manifold.points[0].localPoint1.set((v1x1 * xf1.R.col1.x + v1y1 * xf1.R.col1.y), (v1x1 * xf1.R.col2.x + v1y1 * xf1.R.col2.y));
+			manifold.points[0].localPoint1.x = (v1x1 * xf1.R.col1.x + v1y1 * xf1.R.col1.y);
+			manifold.points[0].localPoint1.y = (v1x1 * xf1.R.col2.x + v1y1 * xf1.R.col2.y);
 			float v1x2 = positionx-xf2.position.x;
 			float v1y2 = positiony-xf2.position.y;
-			manifold.points[0].localPoint2.set((v1x2 * xf2.R.col1.x + v1y2 * xf2.R.col1.y), (v1x2 * xf2.R.col2.x + v1y2 * xf2.R.col2.y));
+			manifold.points[0].localPoint2.x = (v1x2 * xf2.R.col1.x + v1y2 * xf2.R.col1.y);
+			manifold.points[0].localPoint2.y = (v1x2 * xf2.R.col2.x + v1y2 * xf2.R.col2.y);
 			
             manifold.points[0].separation = separation - radius;
             return;
@@ -262,21 +283,34 @@ public class CollideCircle {
     	//manifold.points[0].localPoint1 = XForm.mulT(xf1, position);
     	//manifold.points[0].localPoint2 = XForm.mulT(xf2, position);
         
-    	manifold.normal.set(xf1.R.col1.x * dx + xf1.R.col2.x * dy, xf1.R.col1.y * dx + xf1.R.col2.y * dy);
+    	manifold.normal.x = xf1.R.col1.x * dx + xf1.R.col2.x * dy;
+    	manifold.normal.y = xf1.R.col1.y * dx + xf1.R.col2.y * dy;
     	float positionx = cx - manifold.normal.x * radius;
     	float positiony = cy - manifold.normal.y * radius;
 		float v1x1 = positionx - xf1.position.x;
 		float v1y1 = positiony - xf1.position.y;
-		manifold.points[0].localPoint1.set((v1x1 * xf1.R.col1.x + v1y1 * xf1.R.col1.y), (v1x1 * xf1.R.col2.x + v1y1 * xf1.R.col2.y));
+		manifold.points[0].localPoint1.x = (v1x1 * xf1.R.col1.x + v1y1 * xf1.R.col1.y);
+		manifold.points[0].localPoint1.y = (v1x1 * xf1.R.col2.x + v1y1 * xf1.R.col2.y);
 		float v1x2 = positionx - xf2.position.x;
 		float v1y2 = positiony - xf2.position.y;
-		manifold.points[0].localPoint2.set((v1x2 * xf2.R.col1.x + v1y2 * xf2.R.col1.y), (v1x2 * xf2.R.col2.x + v1y2 * xf2.R.col2.y));
+		manifold.points[0].localPoint2.x = (v1x2 * xf2.R.col1.x + v1y2 * xf2.R.col1.y);
+		manifold.points[0].localPoint2.y = (v1x2 * xf2.R.col2.x + v1y2 * xf2.R.col2.y);
     	
     	manifold.points[0].separation = dist - radius;
         manifold.points[0].id.features.referenceEdge = 0;
         manifold.points[0].id.features.flip = 0;
     }
     
+    
+    // DMNOTE pooled
+    private static Vec2 colPPc = new Vec2();
+    private static Vec2 colPPcLocal = new Vec2();
+    private static Vec2 colPPsub = new Vec2();
+    private static Vec2 colPPe = new Vec2();
+    private static Vec2 colPPp = new Vec2();
+    private static Vec2 colPPd = new Vec2();
+    
+    // DMNOTE optimized
     public static void collidePolygonAndPoint(Manifold manifold, 
     		PolygonShape polygon, XForm xf1,
             PointShape point, XForm xf2) {
@@ -284,8 +318,8 @@ public class CollideCircle {
         manifold.pointCount = 0;
 
         // Compute circle position in the frame of the polygon.
-        Vec2 c = XForm.mul(xf2, point.getLocalPosition());
-    	Vec2 cLocal = XForm.mulT(xf1, c);
+        XForm.mulToOut(xf2, point.getLocalPosition(), colPPc);
+    	XForm.mulTransToOut(xf1, colPPc, colPPcLocal);
 
         // Find edge with maximum separation.
         int normalIndex = 0;
@@ -295,8 +329,9 @@ public class CollideCircle {
         Vec2[] vertices = polygon.getVertices();
         Vec2[] normals = polygon.getNormals();
         for (int i = 0; i < vertexCount; ++i) {
-
-            float s = Vec2.dot(normals[i], cLocal.sub(vertices[i]));
+        	colPPsub.set( colPPcLocal);
+        	colPPsub.subLocal( vertices[i]);
+            float s = Vec2.dot(normals[i], colPPsub);
             if (s > 0) {
                 // Early out.
                 return;
@@ -315,9 +350,9 @@ public class CollideCircle {
             manifold.points[0].id.features.incidentVertex = Collision.NULL_FEATURE;
             manifold.points[0].id.features.referenceEdge = 0;
             manifold.points[0].id.features.flip = 0;
-    		Vec2 position = c;
-    		manifold.points[0].localPoint1 = XForm.mulT(xf1, position);
-    		manifold.points[0].localPoint2 = XForm.mulT(xf2, position);
+    		Vec2 position = colPPc;
+    		XForm.mulTransToOut(xf1, position, manifold.points[0].localPoint1);
+    		XForm.mulTransToOut(xf2, position, manifold.points[0].localPoint2);
             manifold.points[0].separation = separation;
             return;
         }
@@ -330,39 +365,43 @@ public class CollideCircle {
         assert(length > Settings.EPSILON);
 
         // Project the center onto the edge.
-        float u = Vec2.dot(cLocal.sub(vertices[vertIndex1]), e);
-
-        Vec2 p = new Vec2();
+        colPPsub.set(colPPcLocal);
+        colPPsub.subLocal( vertices[vertIndex1]);
+        float u = Vec2.dot(colPPsub, e);
+        
+        colPPp.setZero();
         if (u <= 0.0f) {
-            p.set(vertices[vertIndex1]);
+            colPPp.set(vertices[vertIndex1]);
             manifold.points[0].id.features.incidentEdge = Collision.NULL_FEATURE;
             manifold.points[0].id.features.incidentVertex = vertIndex1;
         }
         else if (u >= length) {
-            p.set(vertices[vertIndex2]);
+        	colPPp.set(vertices[vertIndex2]);
             manifold.points[0].id.features.incidentEdge = Collision.NULL_FEATURE;
             manifold.points[0].id.features.incidentVertex = vertIndex2;
         }
         else {
-            p.set(vertices[vertIndex1]);
-            p.x += u * e.x;
-            p.y += u * e.y;
+        	colPPp.set(vertices[vertIndex1]);
+        	colPPp.x += u * e.x;
+        	colPPp.y += u * e.y;
             manifold.points[0].id.features.incidentEdge = normalIndex;
             manifold.points[0].id.features.incidentVertex = Collision.NULL_FEATURE;
         }
+        
+        colPPd.set(colPPcLocal);
+        colPPd.subLocal( colPPp);
 
-        Vec2 d = cLocal.sub(p);
-        float dist = d.normalize();
+        float dist = colPPd.normalize();
         if (dist > 0) {
             return;
         }
 
         manifold.pointCount = 1;
         
-    	manifold.normal = Mat22.mul(xf1.R, d);
-    	Vec2 position = c;
-    	manifold.points[0].localPoint1 = XForm.mulT(xf1, position);
-    	manifold.points[0].localPoint2 = XForm.mulT(xf2, position);
+    	Mat22.mulToOut(xf1.R, colPPd, manifold.normal);
+    	Vec2 position = colPPc;
+    	XForm.mulTransToOut(xf1, position, manifold.points[0].localPoint1);
+    	XForm.mulTransToOut(xf2, position, manifold.points[0].localPoint2);
         manifold.points[0].separation = dist;
         manifold.points[0].id.features.referenceEdge = 0;
         manifold.points[0].id.features.flip = 0;

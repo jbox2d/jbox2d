@@ -67,7 +67,7 @@ public class MouseJoint extends Joint {
         m_C = new Vec2();
         m_mass = new Mat22();
         m_target = def.target;
-        m_localAnchor = XForm.mulT(m_body2.m_xf, m_target);
+        m_localAnchor = XForm.mulTrans(m_body2.m_xf, m_target);
 
         m_maxForce = def.maxForce;
 
