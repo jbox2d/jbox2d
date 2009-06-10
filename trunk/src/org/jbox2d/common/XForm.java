@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -23,72 +23,89 @@
 
 package org.jbox2d.common;
 
-/** 
+/**
  * A transform contains translation and rotation. It is used to represent
  * the position and orientation of rigid frames.
+ * DMNOTE: added ToOut methods, and added final where appropriate
  */
 public class XForm {
 	/** The translation caused by the transform */
 	public Vec2 position;
-	
+
 	/** A matrix representing a rotation */
 	public Mat22 R;
-	
+
 	/** The identity transform */
 	public static XForm identity;
-	
+
 	static{
-		identity = new XForm();
-		identity.setIdentity();
+		XForm.identity = new XForm();
+		XForm.identity.setIdentity();
 	}
-	
+
 	/** The default constructor. */
 	public XForm() {
 		position = new Vec2();
 		R = new Mat22();
 	}
-	
+
 	/** Initialize as a copy of another transform. */
-	public XForm(XForm xf) {
+	public XForm(final XForm xf) {
 		position = xf.position.clone();
 		R = xf.R.clone();
 	}
 
 	/** Initialize using a position vector and a rotation matrix. */
-	public XForm(Vec2 _position, Mat22 _R){
+	public XForm(final Vec2 _position, final Mat22 _R){
 		position = _position.clone();
 		R = _R.clone();
 	}
-	
+
 	/** Set this to equal another transform. */
-	public void set(XForm xf) {
+	public final void set(final XForm xf) {
 		position.set(xf.position);
 		R.set(xf.R);
 	}
 
 	/** Set this to the identity transform. */
-	public void setIdentity(){
+	public final void setIdentity(){
 		position.setZero();
 		R.setIdentity();
 	}
-	
-	public static Vec2 mul(XForm T, Vec2 v){
-		return new Vec2(T.position.x + T.R.col1.x * v.x + T.R.col2.x * v.y, 
-						T.position.y + T.R.col1.y * v.x + T.R.col2.y * v.y);
 
-		//return T.position.add(T.R.mul(v));
+	public final static Vec2 mul(final XForm T, final Vec2 v){
+		return new Vec2(T.position.x + T.R.col1.x * v.x + T.R.col2.x * v.y,
+		                T.position.y + T.R.col1.y * v.x + T.R.col2.y * v.y);
 	}
 
-	public static Vec2 mulT(XForm T, Vec2 v){
-		float v1x = v.x-T.position.x;
-		float v1y = v.y-T.position.y;
-		Vec2 b = T.R.col1;
-		Vec2 b1 = T.R.col2;
+	/* DMNOTE added */
+	public final static void mulToOut(final XForm T, final Vec2 v, final Vec2 out){
+		final float tempy = T.position.y + T.R.col1.y * v.x + T.R.col2.y * v.y;
+		out.x = T.position.x + T.R.col1.x * v.x + T.R.col2.x * v.y;
+		out.y = tempy;
+	}
+
+	public final static Vec2 mulTrans(final XForm T, final Vec2 v){
+		final float v1x = v.x-T.position.x;
+		final float v1y = v.y-T.position.y;
+		final Vec2 b = T.R.col1;
+		final Vec2 b1 = T.R.col2;
 		return new Vec2((v1x * b.x + v1y * b.y), (v1x * b1.x + v1y * b1.y));
 		//return T.R.mulT(v.sub(T.position));
 	}
-	
-	public String toString() {
+
+	public final static void mulTransToOut(final XForm T, final Vec2 v, final Vec2 out){
+		final float v1x = v.x-T.position.x;
+		final float v1y = v.y-T.position.y;
+		final Vec2 b = T.R.col1;
+		final Vec2 b1 = T.R.col2;
+		final float tempy = v1x * b1.x + v1y * b1.y;
+		out.x = v1x * b.x + v1y * b.y;
+		out.y = tempy;
+	}
+
+	@Override
+	public final String toString() {
 		String s = "XForm:\n";
 		s += "Position: "+position + "\n";
 		s += "R: \n"+R+"\n";

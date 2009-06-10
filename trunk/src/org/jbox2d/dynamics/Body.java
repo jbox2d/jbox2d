@@ -190,10 +190,13 @@ public class Body {
 	
 	private float connectEdges(EdgeShape s1, EdgeShape s2, float angle1) {
 		float angle2 = (float)Math.atan2(s2.getDirectionVector().y, s2.getDirectionVector().x);
+		
 		Vec2 core = s2.getDirectionVector().mul( (float)Math.tan((angle2 - angle1) * 0.5f)) ;
-		core =  (core.sub(s2.getNormalVector())).mul(Settings.toiSlop).add(s2.getVertex1());
+		(core.subLocal(s2.getNormalVector())).mulLocal(Settings.toiSlop).addLocal(s2.getVertex1());
+		
 		Vec2 cornerDir = s1.getDirectionVector().add(s2.getDirectionVector());
 		cornerDir.normalize();
+		
 		boolean convex = Vec2.dot(s1.getDirectionVector(), s2.getNormalVector()) > 0.0f;
 		s1.setNextEdge(s2, core, cornerDir, convex);
 		s2.setPrevEdge(s1, core, cornerDir, convex);
@@ -369,7 +372,7 @@ public class Body {
 		
 		// Move center of mass.
 		m_sweep.localCenter.set(massData.center);
-		m_sweep.c.set(XForm.mul(m_xf, m_sweep.localCenter));
+		XForm.mulToOut(m_xf, m_sweep.localCenter,m_sweep.c);
 		m_sweep.c0.set(m_sweep.c);
 		
 		// Update the sweep radii of all child shapes
@@ -408,7 +411,9 @@ public class Body {
 		m_I = 0.0f;
 		m_invI = 0.0f;
 		
-		Vec2 center = new Vec2(0.0f, 0.0f);
+		// DMNOTE might as well allocate, not really a hot path anyways
+		Vec2 center = new Vec2();
+		center.setZero();
 		for (Shape s = m_shapeList; s != null; s = s.m_next) {
 			MassData massData = new MassData();
 			s.computeMass(massData);
@@ -437,7 +442,7 @@ public class Body {
 		
 		// Move center of mass
 		m_sweep.localCenter.set(center);
-		m_sweep.c.set(XForm.mul(m_xf, m_sweep.localCenter));
+		XForm.mulToOut(m_xf, m_sweep.localCenter, m_sweep.c);
 		m_sweep.c0.set(m_sweep.c);
 		
 		// Update the sweep radii of all child shapes
@@ -477,7 +482,7 @@ public class Body {
 		m_xf.R.set(angle);
 		m_xf.position.set(position);
 
-		m_sweep.c.set(XForm.mul(m_xf, m_sweep.localCenter));
+		XForm.mulToOut(m_xf, m_sweep.localCenter, m_sweep.c);
 		m_sweep.c0.set(m_sweep.c);
 		m_sweep.a0 = m_sweep.a = angle;
 
@@ -689,7 +694,7 @@ public class Body {
 	 * @return the corresponding local point relative to the body's origin.
 	 */
 	public Vec2 getLocalPoint(Vec2 worldPoint){
-		return XForm.mulT(m_xf, worldPoint);
+		return XForm.mulTrans(m_xf, worldPoint);
 	}
 
 	/** 
@@ -698,7 +703,7 @@ public class Body {
 	 * @return the corresponding local vector.
 	 */
 	public Vec2 getLocalVector(Vec2 worldVector){
-		return Mat22.mulT(m_xf.R, worldVector);
+		return Mat22.mulTrans(m_xf.R, worldVector);
 	}
 
 	/** Is this body treated like a bullet for continuous collision detection? */

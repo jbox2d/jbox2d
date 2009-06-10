@@ -177,12 +177,12 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
     	m_sweepRadius = 0.0f;
     	for (int i = 0; i < m_vertexCount; ++i) {
     		Vec2 d = m_coreVertices[i].sub(center);
-    		m_sweepRadius = Math.max(m_sweepRadius, d.length());
+    		m_sweepRadius = MathUtils.max(m_sweepRadius, d.length());
     	}
     }
     
     public boolean testPoint(XForm xf, Vec2 p) {
-    	Vec2 pLocal = Mat22.mulT(xf.R, p.sub(xf.position));
+    	Vec2 pLocal = Mat22.mulTrans(xf.R, p.sub(xf.position));
 
     	if (m_debug) {
     		System.out.println("--testPoint debug--");
@@ -267,25 +267,27 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 //    		return false;
 //    	}
     
-
+    // DMNOTE pooling, somewhat hot
+    private Vec2 supportDLocal = new Vec2();
 	/**
 	 * Get the support point in the given world direction.
 	 * Use the supplied transform.
 	 */
+    // DMNOTE optimized
     public void support(Vec2 dest, XForm xf, Vec2 d) {
-        Vec2 dLocal = Mat22.mulT(xf.R, d);
+        Mat22.mulTransToOut(xf.R, d, supportDLocal);
 
         int bestIndex = 0;
-        float bestValue = Vec2.dot(m_coreVertices[0], dLocal);
+        float bestValue = Vec2.dot(m_coreVertices[0], supportDLocal);
         for (int i = 1; i < m_vertexCount; ++i) {
-            float value = Vec2.dot(m_coreVertices[i], dLocal);
+            float value = Vec2.dot(m_coreVertices[i], supportDLocal);
             if (value > bestValue) {
                 bestIndex = i;
                 bestValue = value;
             }
         }
 
-        dest.set(XForm.mul(xf, m_coreVertices[bestIndex]));
+        XForm.mulToOut(xf, m_coreVertices[bestIndex], dest);
     }
 
 	public static Vec2 computeCentroid(List<Vec2> vs) {
@@ -337,6 +339,8 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 	    }
 	
 	// http://www.geometrictools.com/Documentation/MinimumAreaRectangle.pdf
+	// DMNOTE this is only called in the constructor, so we can keep this
+	// unpooled.  I'll still make optimizations though
 	public static void computeOBB(OBB obb, Vec2[] vs){
 		int count = vs.length;
 		assert(count <= Settings.maxPolygonVertices);
@@ -348,22 +352,33 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 
 		float minArea = Float.MAX_VALUE;
 		
+		Vec2 ux = new Vec2();
+		Vec2 uy = new Vec2();
+		Vec2 lower = new Vec2();
+		Vec2 upper = new Vec2();
+		Vec2 d = new Vec2();
+		Vec2 r = new Vec2();
+		
 		for (int i = 1; i <= count; ++i){
 			Vec2 root = p[i-1];
-			Vec2 ux = p[i].sub(root);
+			ux.set(p[i]);
+			ux.subLocal(root);
 			float length = ux.normalize();
 			assert(length > Settings.EPSILON);
-			Vec2 uy = new Vec2(-ux.y, ux.x);
-			Vec2 lower = new Vec2(Float.MAX_VALUE, Float.MAX_VALUE);
-			Vec2 upper = new Vec2(-Float.MAX_VALUE, -Float.MAX_VALUE);
+			uy.x = -ux.y;
+			uy.y = ux.x;
+			lower.x = Float.MAX_VALUE;
+			lower.y = Float.MAX_VALUE;
+			upper.x = -Float.MAX_VALUE; // DMNOTE wouldn't this just be Float.MIN_VALUE?
+			upper.y = -Float.MAX_VALUE;
 
 			for (int j = 0; j < count; ++j) {
-				Vec2 d = p[j].sub(root);
-				Vec2 r = new Vec2();
+				d.set(p[j]);
+				d.subLocal(root);
 				r.x = Vec2.dot(ux, d);
 				r.y = Vec2.dot(uy, d);
-				lower = Vec2.min(lower, r);
-				upper = Vec2.max(upper, r);
+				Vec2.minToOut(lower, r, lower);
+				Vec2.maxToOut(upper, r, upper);
 			}
 
 			float area = (upper.x - lower.x) * (upper.y - lower.y);
@@ -371,35 +386,59 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 				minArea = area;
 				obb.R.col1.set(ux);
 				obb.R.col2.set(uy);
+				
 				Vec2 center = new Vec2(0.5f * (lower.x + upper.x), 0.5f * (lower.y + upper.y));
-				obb.center = root.add(Mat22.mul(obb.R, center));
-				obb.extents = new Vec2(0.5f * (upper.x - lower.x), 0.5f * (upper.y - lower.y));
+				Mat22.mulToOut(obb.R, center, obb.center);
+				obb.center.addLocal(root);
+				//obb.center = root.add(Mat22.mul(obb.R, center));
+				
+				obb.extents.x = 0.5f * (upper.x - lower.x);
+				obb.extents.y = 0.5f * (upper.y - lower.y);
 			}
 		}
 
 		assert(minArea < Float.MAX_VALUE);
 	}
 	
+	// DMNOTE pooling, hot method
+	private Mat22 caabbR = new Mat22();
+	private Vec2 caabbH = new Vec2();
 	public void computeAABB(AABB aabb, XForm xf) {
-		Mat22 R = Mat22.mul(xf.R, m_obb.R);
+		/*Mat22 R = Mat22.mul(xf.R, m_obb.R);
 		Mat22 absR = Mat22.abs(R);
 		Vec2 h = Mat22.mul(absR, m_obb.extents);
-		Vec2 position = xf.position.add(Mat22.mul(xf.R, m_obb.center));
-		aabb.lowerBound = position.sub(h);
-		aabb.upperBound = position.add(h);//save a Vec2 creation, reuse temp
+		Vec2 position = xf.position.add(Mat22.mul(xf.R, m_obb.center));*/
+		
+		
+		Mat22.mulToOut(xf.R, m_obb.R, caabbR);
+		caabbR.absLocal();
+		Mat22.mulToOut(caabbR, m_obb.extents, caabbH);
+		// we treat the lowerbound like the position
+		Mat22.mulToOut(xf.R, m_obb.center, aabb.lowerBound);
+		aabb.lowerBound.addLocal(xf.position);
+		
+		aabb.upperBound.set(aabb.lowerBound);
+		
+		aabb.lowerBound.subLocal(caabbH);
+		aabb.upperBound.addLocal(caabbH);
+		//aabb.lowerBound = position.sub(caabbH);
+		//aabb.upperBound = position.add(caabbH);//save a Vec2 creation, reuse temp
 	}
 	
+	// DMNOTE pooling, hot method
+	private AABB sweptAABB1 = new AABB();
+	private AABB sweptAABB2 = new AABB();
+	
 	public void computeSweptAABB(AABB aabb, XForm transform1, XForm transform2) {
-		
-		AABB aabb1 = new AABB();
-		AABB aabb2 = new AABB();
-		computeAABB(aabb1, transform1);
-		computeAABB(aabb2, transform2);
-		aabb.lowerBound = Vec2.min(aabb1.lowerBound, aabb2.lowerBound);
-		aabb.upperBound = Vec2.max(aabb1.upperBound, aabb2.upperBound);
+
+		computeAABB(sweptAABB1, transform1);
+		computeAABB(sweptAABB2, transform2);
+		Vec2.minToOut(sweptAABB1.lowerBound, sweptAABB2.lowerBound, aabb.lowerBound);
+		Vec2.maxToOut(sweptAABB1.upperBound, sweptAABB2.upperBound, aabb.upperBound);
 		//System.out.println("poly sweepaabb: "+aabb.lowerBound+" "+aabb.upperBound);
 	}
 	
+	// DMNOTE not very hot method so I'm not pooling.  still optimized though
 	public void computeMass(MassData massData) {
 		// Polygon mass, centroid, and inertia.
 		// Let rho be the polygon density in mass per unit area.
@@ -436,6 +475,9 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		Vec2 pRef = new Vec2(0.0f, 0.0f);
 
 		float k_inv3 = 1.0f / 3.0f;
+		
+		Vec2 e1 = new Vec2();
+		Vec2 e2 = new Vec2();
 
 		for (int i = 0; i < m_vertexCount; ++i) {
 			// Triangle vertices.
@@ -443,8 +485,11 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 			Vec2 p2 = m_vertices[i];
 			Vec2 p3 = i + 1 < m_vertexCount ? m_vertices[i+1] : m_vertices[0];
 
-			Vec2 e1 = p2.sub(p1);
-			Vec2 e2 = p3.sub(p1);
+			e1.set(p2);
+			e1.subLocal(p1);
+			
+			e2.set(p3);
+			e2.subLocal(p1);
 
 			float D = Vec2.cross(e1, e2);
 

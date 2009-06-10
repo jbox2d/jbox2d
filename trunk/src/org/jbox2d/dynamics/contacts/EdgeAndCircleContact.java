@@ -128,7 +128,7 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 		manifold.pointCount = 0;
 		Vec2 d = new Vec2();
 		Vec2 c = XForm.mul(xf2, circle.getLocalPosition());
-		Vec2 cLocal = XForm.mulT(xf1, c);
+		Vec2 cLocal = XForm.mulTrans(xf1, c);
 		Vec2 n = edge.getNormalVector();
 		Vec2 v1 = edge.getVertex1();
 		Vec2 v2 = edge.getVertex2();
@@ -159,8 +159,8 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 			manifold.points[0].id.zero();// key = 0;
 			manifold.points[0].separation = separation;
 			c.subLocal(manifold.normal.mul(radius));
-			manifold.points[0].localPoint1 = XForm.mulT(xf1, c);
-			manifold.points[0].localPoint2 = XForm.mulT(xf2, c);
+			manifold.points[0].localPoint1 = XForm.mulTrans(xf1, c);
+			manifold.points[0].localPoint2 = XForm.mulTrans(xf2, c);
 			return;
 		}
 		
@@ -181,8 +181,8 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 		manifold.points[0].id.zero();//key = 0;
 		manifold.points[0].separation = separation;
 		c.subLocal(manifold.normal.mul(radius));
-		manifold.points[0].localPoint1 = XForm.mulT(xf1, c);
-		manifold.points[0].localPoint2 = XForm.mulT(xf2, c);
+		manifold.points[0].localPoint1 = XForm.mulTrans(xf1, c);
+		manifold.points[0].localPoint2 = XForm.mulTrans(xf2, c);
 
 	}
 

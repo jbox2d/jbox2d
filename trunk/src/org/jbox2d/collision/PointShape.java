@@ -23,9 +23,13 @@ public class PointShape extends Shape {
     	m_mass = pointDef.mass;
     }
     
+    // DMNOTE optimized
 	@Override
 	public void computeAABB(AABB aabb, XForm transform) {
-    	Vec2 p = transform.position.add(Mat22.mul(transform.R, m_localPosition));
+		//Vec2 p = transform.position.add(Mat22.mul(transform.R, m_localPosition));
+    	Vec2 p = new Vec2();
+    	Mat22.mulToOut(transform.R, m_localPosition, p);
+    	p.add(transform.position);
     	aabb.lowerBound.set(p.x-Settings.EPSILON, p.y-Settings.EPSILON);
     	aabb.upperBound.set(p.x+Settings.EPSILON, p.y+Settings.EPSILON);
 	}
@@ -37,26 +41,41 @@ public class PointShape extends Shape {
     	massData.I = 0.0f;
 	}
 
+	// DMNOTE pooled
+	private Vec2 sweptP1 = new Vec2();
+	private Vec2 sweptP2 = new Vec2();
+	// DMNOTE fairly hot method, called every update
 	@Override
 	public void computeSweptAABB(AABB aabb, XForm transform1, XForm transform2) {
-    	Vec2 p1 = transform1.position.add(Mat22.mul(transform1.R, m_localPosition));
-    	Vec2 p2 = transform2.position.add(Mat22.mul(transform2.R, m_localPosition));
-    	Vec2 lower = Vec2.min(p1, p2);
-    	Vec2 upper = Vec2.max(p1, p2);
+		
+    	//Vec2 p1 = transform1.position.add(Mat22.mul(transform1.R, m_localPosition));
+    	//Vec2 p2 = transform2.position.add(Mat22.mul(transform2.R, m_localPosition));
+		Mat22.mulToOut( transform2.R, m_localPosition, sweptP1);
+		Mat22.mulToOut( transform2.R, m_localPosition, sweptP2);
+		
+    	Vec2.minToOut( sweptP1, sweptP2, aabb.lowerBound);
+    	Vec2.maxToOut( sweptP1, sweptP2, aabb.upperBound);
 
-    	aabb.lowerBound.set(lower.x - Settings.EPSILON, lower.y - Settings.EPSILON);
-    	aabb.upperBound.set(upper.x + Settings.EPSILON, upper.y + Settings.EPSILON);    	
+    	aabb.lowerBound.x -= Settings.EPSILON;
+    	aabb.lowerBound.y -= Settings.EPSILON;
+    	
+    	aabb.upperBound.x += Settings.EPSILON;
+    	aabb.upperBound.y += Settings.EPSILON;
 	}
 
 	@Override
 	public boolean testPoint(XForm xf, Vec2 p) {
+		// DMNOTE could use more optimization
 		return false;
 	}
 
+	// DMNOTE optimized
 	@Override
 	public void updateSweepRadius(Vec2 center) {
-		Vec2 d = m_localPosition.sub(center);
-    	m_sweepRadius = d.length() - Settings.toiSlop;
+		//Vec2 d = m_localPosition.sub(center);
+		float dx = m_localPosition.x - center.x;
+		float dy = m_localPosition.y - center.y;
+    	m_sweepRadius = (float)Math.sqrt(dx*dx + dy*dy) - Settings.toiSlop;
 	}
 	
 	//Returns a copy of local position

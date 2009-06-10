@@ -168,9 +168,9 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 		Vec2 v1 = XForm.mul(xf2, edge.getVertex1());
 		Vec2 v2 = XForm.mul(xf2, edge.getVertex2());
 		Vec2 n = Mat22.mul(xf2.R, edge.getNormalVector());
-		Vec2 v1Local = XForm.mulT(xf1, v1);
-		Vec2 v2Local = XForm.mulT(xf1, v2);
-		Vec2 nLocal = Mat22.mulT(xf1.R, n);
+		Vec2 v1Local = XForm.mulTrans(xf1, v1);
+		Vec2 v2Local = XForm.mulTrans(xf1, v2);
+		Vec2 nLocal = Mat22.mulTrans(xf1.R, n);
 
 		float separation1;
 		int separationIndex1 = -1; // which normal on the poly found the shallowest depth?
@@ -265,11 +265,11 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 				// if -normal angle is closer to adjacent edge than this edge, 
 				// let the adjacent edge handle it and return with no contact:
 				if (separationV1) {
-					if (Vec2.dot(normals[separationIndex1], Mat22.mulT(xf1.R, Mat22.mul(xf2.R, edge.getCorner1Vector()))) >= 0.0f) {
+					if (Vec2.dot(normals[separationIndex1], Mat22.mulTrans(xf1.R, Mat22.mul(xf2.R, edge.getCorner1Vector()))) >= 0.0f) {
 						return;
 					}
 				} else {
-					if (Vec2.dot(normals[separationIndex2], Mat22.mulT(xf1.R, Mat22.mul(xf2.R, edge.getCorner2Vector()))) <= 0.0f) {
+					if (Vec2.dot(normals[separationIndex2], Mat22.mulTrans(xf1.R, Mat22.mul(xf2.R, edge.getCorner2Vector()))) <= 0.0f) {
 						return;
 					}
 				}
@@ -303,7 +303,7 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 			manifold.points[0].id.features.referenceEdge = 0;
 			manifold.points[0].id.features.flip = 0;
 			manifold.points[0].localPoint1 = vertices[enterEndIndex];
-			manifold.points[0].localPoint2 = XForm.mulT(xf2, XForm.mul(xf1, vertices[enterEndIndex]));
+			manifold.points[0].localPoint2 = XForm.mulTrans(xf2, XForm.mul(xf1, vertices[enterEndIndex]));
 			manifold.points[0].separation = enterSepN;
 			return;
 		}
@@ -343,7 +343,7 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 			}
 		} else {
 			manifold.points[0].localPoint1 = vertices[enterEndIndex];
-			manifold.points[0].localPoint2 = XForm.mulT(xf2, XForm.mul(xf1, vertices[enterEndIndex]));
+			manifold.points[0].localPoint2 = XForm.mulTrans(xf2, XForm.mul(xf1, vertices[enterEndIndex]));
 			manifold.points[0].separation = enterSepN;
 		}
 		
@@ -363,7 +363,7 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 			}
 		} else {
 			manifold.points[1].localPoint1 = vertices[exitStartIndex];
-			manifold.points[1].localPoint2 = XForm.mulT(xf2, XForm.mul(xf1, vertices[exitStartIndex]));
+			manifold.points[1].localPoint2 = XForm.mulTrans(xf2, XForm.mul(xf1, vertices[exitStartIndex]));
 			manifold.points[1].separation = exitSepN;
 		}
 	}

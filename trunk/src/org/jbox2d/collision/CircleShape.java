@@ -47,13 +47,18 @@ public class CircleShape extends Shape {
     public void updateSweepRadius(Vec2 center) {
     	// Update the sweep radius (maximum radius) as measured from
     	// a local center point.
-    	Vec2 d = m_localPosition.sub(center);
-    	m_sweepRadius = d.length() + m_radius - Settings.toiSlop;
+    	//Vec2 d = m_localPosition.sub(center);
+    	float dx = m_localPosition.x - center.x;
+    	float dy = m_localPosition.y - center.y;
+    	m_sweepRadius = (float)Math.sqrt( dx*dx + dy*dy) + m_radius - Settings.toiSlop;
     }
     
     public boolean testPoint(XForm transform, Vec2 p) {
-    	Vec2 center = transform.position.add(Mat22.mul(transform.R, m_localPosition));
-    	Vec2 d = p.sub(center);
+    	Vec2 center = new Vec2();
+    	Mat22.mulToOut(transform.R, m_localPosition, center);
+    	center.addLocal(transform.position);
+    	
+    	Vec2 d = center.subLocal(p).negateLocal();
     	return Vec2.dot(d, d) <= m_radius * m_radius;
     }
     
@@ -107,9 +112,13 @@ public class CircleShape extends Shape {
  }*/
     
     public void computeAABB(AABB aabb, XForm transform) {
-    	Vec2 p = transform.position.add(Mat22.mul(transform.R, m_localPosition));
-    	aabb.lowerBound.set(p.x - m_radius, p.y - m_radius);
-    	aabb.upperBound.set(p.x + m_radius, p.y + m_radius);
+    	Vec2 p = Mat22.mul(transform.R, m_localPosition);
+    	p.addLocal(transform.position);
+    	
+    	aabb.lowerBound.x = p.x - m_radius;
+    	aabb.lowerBound.y = p.y - m_radius;
+    	aabb.upperBound.x = p.x + m_radius;
+    	aabb.upperBound.y = p.y + m_radius;
     }
 
     public void computeSweptAABB(AABB aabb, XForm transform1, XForm transform2) {
@@ -128,8 +137,10 @@ public class CircleShape extends Shape {
     	float lowery = p1y < p2y ? p1y : p2y;
     	float upperx = p1x > p2x ? p1x : p2x;
     	float uppery = p1y > p2y ? p1y : p2y;
-    	aabb.lowerBound.set(lowerx - m_radius, lowery - m_radius);
-    	aabb.upperBound.set(upperx + m_radius, uppery + m_radius);
+    	aabb.lowerBound.x = lowerx - m_radius;
+    	aabb.lowerBound.y = lowery - m_radius;
+    	aabb.upperBound.x = upperx + m_radius;
+    	aabb.upperBound.y = uppery + m_radius;
     	//System.out.println("Circle swept AABB: " + aabb.lowerBound + " " + aabb.upperBound);
     	//System.out.println("Transforms: "+transform1.position+ " " + transform2.position+"\n");
     	

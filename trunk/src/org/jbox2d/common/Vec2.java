@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -25,12 +25,13 @@ package org.jbox2d.common;
 
 /**
  * A 2-dimensional vector class.  Used heavily in JBox2d.
- *
+ * DMNOTE: added ToOut methods, added modifiers, and a
+ * few optimizations
  */
 public class Vec2 {
 	/** Should we count Vec2 creations? */
 	static public boolean watchCreations = true;
-	/** 
+	/**
 	 * Running count of Vec2 creations.  Must be zeroed out
 	 * manually (perhaps at start of time step).  Incremented
 	 * in Vec2 constructor if watchCreations flag is true.
@@ -39,161 +40,201 @@ public class Vec2 {
 	 * Vec2 creation is often a bottleneck.
 	 */
 	static public int creationCount = 0;
-	
-    public float x, y;
 
-    public Vec2() {
-        this(0, 0);
-    }
+	public float x, y;
 
-    public Vec2(float x, float y) {
-    	if (watchCreations) ++creationCount;
-        this.x = x;
-        this.y = y;
-        // testbed.PTest.debugCount++;
-    }
+	public Vec2() {
+		this(0, 0);
+	}
 
-    /** Zero out this vector. */
-    public void setZero() {
-        x = 0.0f;
-        y = 0.0f;
-    }
+	public Vec2(float x, float y) {
+		if (Vec2.watchCreations) {
+			++Vec2.creationCount;
+		}
+		this.x = x;
+		this.y = y;
+		// testbed.PTest.debugCount++;
+	}
 
-    /** Set the vector component-wise. */
-    public void set(float x, float y) {
-        this.x = x;
-        this.y = y;
-    }
+	/** Zero out this vector. */
+	public final void setZero() {
+		x = 0.0f;
+		y = 0.0f;
+	}
 
-    /** Set this vector to another vector. */
-    public void set(Vec2 v) {
-        this.x = v.x;
-        this.y = v.y;
-    }
+	/** Set the vector component-wise. */
+	public final void set(float x, float y) {
+		this.x = x;
+		this.y = y;
+	}
 
-    /** Return the sum of this vector and another; does not alter either one. */
-    public Vec2 add(Vec2 v) {
-        return new Vec2(x + v.x, y + v.y);
-    }
+	/** Set this vector to another vector. */
+	public final void set(Vec2 v) {
+		this.x = v.x;
+		this.y = v.y;
+	}
 
-    /** Return the difference of this vector and another; does not alter either one. */
-    public Vec2 sub(Vec2 v) {
-        return new Vec2(x - v.x, y - v.y);
-    }
+	/** Return the sum of this vector and another; does not alter either one. */
+	public final Vec2 add(Vec2 v) {
+		return new Vec2(x + v.x, y + v.y);
+	}
 
-    /** Return this vector multiplied by a scalar; does not alter this vector. */
-    public Vec2 mul(float a) {
-        return new Vec2(x * a, y * a);
-    }
+	/** Return the difference of this vector and another; does not alter either one. */
+	public final Vec2 sub(Vec2 v) {
+		return new Vec2(x - v.x, y - v.y);
+	}
 
-    /** Return the negation of this vector; does not alter this vector. */
-    public Vec2 negate() {
-        return new Vec2(-x, -y);
-    }
+	/** Return this vector multiplied by a scalar; does not alter this vector. */
+	public final Vec2 mul(float a) {
+		return new Vec2(x * a, y * a);
+	}
 
-    /** Flip the vector and return it - alters this vector. */
-    public Vec2 negateLocal() {
-        x = -x;
-        y = -y;
-        return this;
-    }
+	/** Return the negation of this vector; does not alter this vector. */
+	public final Vec2 negate() {
+		return new Vec2(-x, -y);
+	}
 
-    /** Add another vector to this one and return result - alters this vector. */
-    public Vec2 addLocal(Vec2 v) {
-        x += v.x;
-        y += v.y;
-        return this;
-    }
+	/** Flip the vector and return it - alters this vector. */
+	public final Vec2 negateLocal() {
+		x = -x;
+		y = -y;
+		return this;
+	}
 
-    /** Subtract another vector from this one and return result - alters this vector. */
-    public Vec2 subLocal(Vec2 v) {
-        x -= v.x;
-        y -= v.y;
-        return this;
-    }
+	/** Add another vector to this one and return result - alters this vector. */
+	public final Vec2 addLocal(Vec2 v) {
+		x += v.x;
+		y += v.y;
+		return this;
+	}
 
-    /** Multiply this vector by a number and return result - alters this vector. */
-    public Vec2 mulLocal(float a) {
-        x *= a;
-        y *= a;
-        return this;
-    }
+	/** Subtract another vector from this one and return result - alters this vector. */
+	public final Vec2 subLocal(Vec2 v) {
+		x -= v.x;
+		y -= v.y;
+		return this;
+	}
 
-    /** Return the length of this vector. */
-    public float length() {
-        return (float) Math.sqrt(x * x + y * y);
-    }
-    
-    /** Return the squared length of this vector. */
-    public float lengthSquared() {
-    	return (x*x + y*y);
-    }
+	/** Multiply this vector by a number and return result - alters this vector. */
+	public final Vec2 mulLocal(float a) {
+		x *= a;
+		y *= a;
+		return this;
+	}
 
-    /** Normalize this vector and return the length before normalization.  Alters this vector. */
-    public float normalize() {
-        float length = length();
-        if (length < Settings.EPSILON) {
-            return 0f;
-        }
+	/** Return the length of this vector. */
+	public final float length() {
+		return (float) Math.sqrt(x * x + y * y);
+	}
 
-        float invLength = 1.0f / length;
-        x *= invLength;
-        y *= invLength;
-        return length;
-    }
+	/** Return the squared length of this vector. */
+	public final float lengthSquared() {
+		return (x*x + y*y);
+	}
 
-    /** True if the vector represents a pair of valid, non-infinite floating point numbers. */ 
-    public boolean isValid() {
-        return x != Float.NaN && x != Float.NEGATIVE_INFINITY
-                && x != Float.POSITIVE_INFINITY && y != Float.NaN
-                && y != Float.NEGATIVE_INFINITY && y != Float.POSITIVE_INFINITY;
-    }
+	/** Normalize this vector and return the length before normalization.  Alters this vector. */
+	public final float normalize() {
+		float length = length();
+		if (length < Settings.EPSILON) {
+			return 0f;
+		}
 
-    /** Return a new vector that has positive components. */
-    public Vec2 abs() {
-        return new Vec2(Math.abs(x), Math.abs(y));
-    }
+		float invLength = 1.0f / length;
+		x *= invLength;
+		y *= invLength;
+		return length;
+	}
 
-    @Override
-    /** Return a copy of this vector. */
-    public Vec2 clone() {
-        return new Vec2(x, y);
-    }
+	/** True if the vector represents a pair of valid, non-infinite floating point numbers. */
+	public final boolean isValid() {
+		return x != Float.NaN && x != Float.NEGATIVE_INFINITY
+		&& x != Float.POSITIVE_INFINITY && y != Float.NaN
+		&& y != Float.NEGATIVE_INFINITY && y != Float.POSITIVE_INFINITY;
+	}
 
-    @Override
-    public String toString() {
-        return "(" + x + "," + y + ")";
-    }
+	/** Return a new vector that has positive components. */
+	public final Vec2 abs() {
+		return new Vec2(Math.abs(x), Math.abs(y));
+	}
 
-    /*
-     * Static
-     */
-    
-    public static Vec2 abs(Vec2 a) {
-    	return new Vec2(Math.abs(a.x), Math.abs(a.y));
-    }
-    
-    public static float dot(Vec2 a, Vec2 b) {
-        return a.x * b.x + a.y * b.y;
-    }
+	/* DMNOTE created */
+	public final void absLocal(){
+		x = Math.abs(x);
+		y = Math.abs(y);
+	}
 
-    public static float cross(Vec2 a, Vec2 b) {
-        return a.x * b.y - a.y * b.x;
-    }
+	@Override
+	/** Return a copy of this vector. */
+	public final Vec2 clone() {
+		return new Vec2(x, y);
+	}
 
-    public static Vec2 cross(Vec2 a, float s) {
-        return new Vec2(s * a.y, -s * a.x);
-    }
+	@Override
+	public final String toString() {
+		return "(" + x + "," + y + ")";
+	}
 
-    public static Vec2 cross(float s, Vec2 a) {
-        return new Vec2(-s * a.y, s * a.x);
-    }
+	/*
+	 * Static
+	 */
 
-    public static Vec2 min(Vec2 a, Vec2 b) {
-        return new Vec2(a.x < b.x ? a.x : b.x, a.y < b.y ? a.y : b.y);
-    }
+	public final static Vec2 abs(Vec2 a) {
+		return new Vec2(Math.abs(a.x), Math.abs(a.y));
+	}
 
-    public static Vec2 max(Vec2 a, Vec2 b) {
-        return new Vec2(a.x > b.x ? a.x : b.x, a.y > b.y ? a.y : b.y);
-    }
+	/* DMNOTE created */
+	public final static void absToOut(Vec2 a, Vec2 out){
+		out.x = Math.abs( a.x);
+		out.y = Math.abs( a.y);
+	}
+
+	public final static float dot(Vec2 a, Vec2 b) {
+		return a.x * b.x + a.y * b.y;
+	}
+
+	public final static float cross(Vec2 a, Vec2 b) {
+		return a.x * b.y - a.y * b.x;
+	}
+
+	public final static Vec2 cross(Vec2 a, float s) {
+		return new Vec2(s * a.y, -s * a.x);
+	}
+
+	/* DMNOTE created */
+	public final static void crossToOut(Vec2 a, float s, Vec2 out){
+		float tempy = -s * a.x;
+		out.x = s * a.y;
+		out.y = tempy;
+	}
+
+	public final static Vec2 cross(float s, Vec2 a) {
+		return new Vec2(-s * a.y, s * a.x);
+	}
+
+	/* DMNOTE created */
+	public final static void crossToOut(float s, Vec2 a, Vec2 out){
+		float tempY = s * a.x;
+		out.x = -s * a.y;
+		out.y = tempY;
+	}
+
+	public final static Vec2 min(Vec2 a, Vec2 b) {
+		return new Vec2(a.x < b.x ? a.x : b.x, a.y < b.y ? a.y : b.y);
+	}
+
+	public final static Vec2 max(Vec2 a, Vec2 b) {
+		return new Vec2(a.x > b.x ? a.x : b.x, a.y > b.y ? a.y : b.y);
+	}
+
+	/* DMNOTE created */
+	public final static void minToOut(Vec2 a, Vec2 b, Vec2 out) {
+		out.x = a.x < b.x ? a.x : b.x;
+		out.y = a.y < b.y ? a.y : b.y;
+	}
+
+	/* DMNOTE created */
+	public final static void maxToOut(Vec2 a, Vec2 b, Vec2 out) {
+		out.x = a.x > b.x ? a.x : b.x;
+		out.y = a.y > b.y ? a.y : b.y;
+	}
 }

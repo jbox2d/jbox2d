@@ -102,8 +102,9 @@ public class TOI {
 			//normal.normalize();
 			float normalx = p2.x - p1.x;
 			float normaly = p2.y - p1.y;
-			float length = (float) Math.sqrt(normalx * normalx + normaly * normaly);
-			if (length >= Settings.EPSILON) {
+			float lenSqrd = normalx * normalx + normaly * normaly;
+			if (lenSqrd >= Settings.EPSILON*Settings.EPSILON) {
+				float length = (float) Math.sqrt(lenSqrd);
 				float invLength = 1.0f / length;
 				normalx *= invLength;
 				normaly *= invLength;

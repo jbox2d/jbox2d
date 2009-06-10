@@ -295,7 +295,7 @@ public class LiquidTest extends AbstractExample {
 		
 		checkBounds();
 		
-		System.out.println(m_world.getGroundBody().getXForm());
+		//System.out.println(m_world.getGroundBody().getXForm());
 	}
 	
 	private void checkBounds() {

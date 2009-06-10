@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="org/jbox2d/testbed/tests/TheoJansen.java" kind="src" path="src"/>
+	<classpathentry excluding="org/jbox2d/testbed/tests/TheoJansen.java|cz/advel/stack/|cz/advel/stack/instrument/" kind="src" path="src"/>
 	<classpathentry kind="src" path="data"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="core.jar" sourcepath="/processing-head/core"/>
-	<classpathentry kind="src" path="/SlickBox2d"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>JBox2D</name>
+	<name>JBox2D - from svn</name>
 	<comment></comment>
 	<projects>
-		<project>processing-head</project>
-		<project>SlickBox2d</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

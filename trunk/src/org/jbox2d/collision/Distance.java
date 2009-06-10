@@ -72,12 +72,18 @@ public class Distance{
 
 	// The origin is either in the region of points[1] or in the edge region. The origin is
 	// not in region of points[0] because that is the old point.
+	
+	// DMNOTE pooled
+	private static Vec2 p2r = new Vec2();
+	private static Vec2 p2d = new Vec2();
 	protected static int ProcessTwo(Vec2 x1, Vec2 x2, Vec2[] p1s, Vec2[] p2s, Vec2[] points) {
 		// If in point[1] region
-		Vec2 r = new Vec2(-points[1].x,-points[1].y);
-		Vec2 d = new Vec2(points[0].x - points[1].x,points[0].y - points[1].y);
-		float length = d.normalize();
-		float lambda = Vec2.dot(r, d);
+		p2r.x = -points[1].x;
+		p2r.y = -points[1].y;
+		p2d.x = points[0].x - points[1].x;
+		p2d.y = points[0].y - points[1].y;
+		float length = p2d.normalize();
+		float lambda = Vec2.dot(p2r, p2d);
 		if (lambda <= 0.0f || length < Settings.EPSILON) {
 			// The simplex is reduced to a point.
 			x1.set(p1s[1]);
@@ -195,8 +201,8 @@ public class Distance{
 			//Vec2 m = Vec2.max(Vec2.abs(w), Vec2.abs(points[i]));
 			float dx = Math.abs(w.x - v.x);
 			float dy = Math.abs(w.y - v.y);
-			float mx = Math.max(Math.abs(w.x), Math.abs(points[i].x));
-			float my = Math.max(Math.abs(w.y), Math.abs(points[i].y));
+			float mx = MathUtils.max(Math.abs(w.x), Math.abs(points[i].x));
+			float my = MathUtils.max(Math.abs(w.y), Math.abs(points[i].y));
 			
 			if (dx < k_tolerance * (mx + 1.0f) &&
 				dy < k_tolerance * (my + 1.0f)) {
@@ -285,7 +291,7 @@ public class Distance{
 
 			float maxSqr = -Float.MAX_VALUE;// -FLT_MAX;
 			for (int i = 0; i < pointCount; ++i) {
-				maxSqr = Math.max(maxSqr, Vec2.dot(points[i], points[i]));
+				maxSqr = MathUtils.max(maxSqr, Vec2.dot(points[i], points[i]));
 			}
 
 			if (pointCount == 3 || vSqr <= 100.0f * Settings.EPSILON * maxSqr) {
@@ -304,63 +310,85 @@ public class Distance{
 		//
 	}
 
+	// DMNOTE pooled
+	private static Vec2 distCCp1 = new Vec2();
+	private static Vec2 distCCp2 = new Vec2();
+	private static Vec2 distCCd = new Vec2();
+	
 	protected static float DistanceCC(
 		Vec2 x1, Vec2 x2,
 		CircleShape circle1, XForm xf1,
 		CircleShape circle2, XForm xf2) {
 		
-		Vec2 p1 = XForm.mul(xf1, circle1.getLocalPosition());
-		Vec2 p2 = XForm.mul(xf2, circle2.getLocalPosition());
+		XForm.mulToOut(xf1, circle1.getLocalPosition(), distCCp1);
+		XForm.mulToOut(xf2, circle2.getLocalPosition(), distCCp2);
 
-		Vec2 d = new Vec2(p2.x - p1.x, p2.y - p1.y);
-		float dSqr = Vec2.dot(d, d);
+		distCCd.x = distCCp2.x - distCCp1.x;
+		distCCd.y = distCCp2.y - distCCp1.y;
+		float dSqr = Vec2.dot(distCCd, distCCd);
 		float r1 = circle1.getRadius() - Settings.toiSlop;
 		float r2 = circle2.getRadius() - Settings.toiSlop;
 		float r = r1 + r2;
 		if (dSqr > r * r){
-			float dLen = d.normalize();
+			float dLen = distCCd.normalize();
 			float distance = dLen - r;
-			x1.set( p1.x + r1 * d.x,
-					p1.y + r1 * d.y);
-			x2.set( p2.x - r2 * d.x,
-					p2.y - r2 * d.y);
+			x1.set( distCCp1.x + r1 * distCCd.x,
+			        distCCp1.y + r1 * distCCd.y);
+			x2.set( distCCp2.x - r2 * distCCd.x,
+			        distCCp2.y - r2 * distCCd.y);
 			return distance;
 		} else if (dSqr > Settings.EPSILON * Settings.EPSILON) {
-			d.normalize();
-			x1.set( p1.x + r1 * d.x,
-					p1.y + r1 * d.y);
+			distCCd.normalize();
+			x1.set( distCCp1.x + r1 * distCCd.x,
+			        distCCp1.y + r1 * distCCd.y);
 			x2.set(x1);
 			return 0.0f;
 		}
 
-		x1.set(p1);
+		x1.set(distCCp1);
 		x2.set(x1);
 		return 0.0f;
 	}
+	
+	// DMNOTE pooled
+	private static Vec2 cWorld = new Vec2(); // just like sea world but with less water and more chlorine
+	//private static Vec2 shamoo = new Vec2();
+	private static Vec2 ECcLocal = new Vec2();
+	private static Vec2 ECvWorld = new Vec2();
+	private static Vec2 ECd = new Vec2();
+	private static Vec2 ECtemp = new Vec2();
 	
 	protected static float DistanceEdgeCircle(
 			Vec2 x1, Vec2 x2,
 			final EdgeShape edge, final XForm xf1,
 			final CircleShape circle, final XForm xf2) {
 		
-		Vec2 vWorld;
-		Vec2 d;
 		float dSqr;
 		float dLen;
 		float r = circle.getRadius() - Settings.toiSlop;
-		Vec2 cWorld = XForm.mul(xf2, circle.getLocalPosition());
-		Vec2 cLocal = XForm.mulT(xf1, cWorld);
-		float dirDist = Vec2.dot(cLocal.sub(edge.getCoreVertex1()), edge.getDirectionVector());
+		XForm.mulToOut(xf2, circle.getLocalPosition(), cWorld);
+		XForm.mulTransToOut(xf1, cWorld, ECcLocal);
+		float dirDist = Vec2.dot(ECcLocal.sub(edge.getCoreVertex1()), edge.getDirectionVector());
+		
 		if (dirDist <= 0.0f) {
-			vWorld = XForm.mul(xf1, edge.getCoreVertex1());
+			XForm.mulToOut(xf1, edge.getCoreVertex1(), ECvWorld);
 		} else if (dirDist >= edge.getLength()) {
-			vWorld = XForm.mul(xf1, edge.getCoreVertex2());
+			XForm.mulToOut(xf1, edge.getCoreVertex2(), ECvWorld);
 		} else {
-			x1.set(XForm.mul(xf1, edge.getCoreVertex1().add(edge.getDirectionVector().mul(dirDist))));
-			dLen = Vec2.dot(cLocal.sub(edge.getCoreVertex1()), edge.getNormalVector());
+			x1.set(edge.getDirectionVector());
+			x1.mulLocal( dirDist).addLocal( edge.getCoreVertex1());
+			XForm.mulToOut( xf1, x1, x1);
+			//x1.set(XForm.mul(xf1, edge.getCoreVertex1().add(edge.getDirectionVector().mul(dirDist))));
+			ECtemp.set( ECcLocal);
+			ECtemp.subLocal(edge.getCoreVertex1());
+			dLen = Vec2.dot(ECtemp, edge.getNormalVector());
+			
 			if (dLen < 0.0f) {
 				if (dLen < -r) {
-					x2.set(XForm.mul(xf1, cLocal.add(edge.getNormalVector().mul(r))));
+					x2.set(edge.getNormalVector());
+					x2.mulLocal( r).addLocal( ECcLocal);
+					XForm.mulToOut( xf1, x2, x2);
+					//x2.set(XForm.mul(xf1, ECcLocal.add(edge.getNormalVector().mul(r))));
 					return -dLen - r;
 				} else {
 					x2.set(x1);
@@ -368,7 +396,10 @@ public class Distance{
 				}
 			} else {
 				if (dLen > r) {
-					x2.set(XForm.mul(xf1, cLocal.sub(edge.getNormalVector().mul(r))));
+					x2.set(edge.getNormalVector());
+					x2.mulLocal( r).subLocal( ECcLocal).negateLocal();
+					XForm.mulToOut( xf1, x2, x2);
+					//x2.set(XForm.mul(xf1, ECcLocal.sub(edge.getNormalVector().mul(r))));
 					//System.out.println("dlen - r: "+(dLen - r));
 					return dLen - r;
 				} else {
@@ -378,15 +409,18 @@ public class Distance{
 			}
 		}
 			
-		x1.set(vWorld);
-		d = cWorld.sub(vWorld);
-		dSqr = Vec2.dot(d, d);
+		x1.set(ECvWorld);
+		ECd.set(cWorld);
+		ECd.subLocal(ECvWorld);
+		dSqr = Vec2.dot(ECd, ECd);
 		if (dSqr > r * r) {
-			dLen = d.normalize();
-			x2.set(cWorld.sub(d.mul(r)));
+			dLen = ECd.normalize();
+			x2.set( ECd);
+			x2.mulLocal( r).subLocal( cWorld).negateLocal();
+			//x2.set(ECcWorld.sub(ECd.mul(r)));
 			return dLen - r;
 		} else {
-			x2.set(vWorld);
+			x2.set(ECvWorld);
 			return 0.0f;
 		}
 	}
@@ -467,36 +501,42 @@ public class Distance{
 			return distance;
 	}
 	
+	// DMNOTE pooled
+	private static Vec2 CPp1 = new Vec2();
+	private static Vec2 CPp2 = new Vec2();
+	private static Vec2 CPd = new Vec2();
+	
 	protected static float DistanceCirclePoint(
 			Vec2 x1, Vec2 x2,
 			CircleShape circle1, XForm xf1,
 			PointShape pt2, XForm xf2) {
 			
-			Vec2 p1 = XForm.mul(xf1, circle1.getLocalPosition());
-			Vec2 p2 = XForm.mul(xf2, pt2.getLocalPosition());
+			XForm.mulToOut(xf1, circle1.getLocalPosition(), CPp1);
+			XForm.mulToOut(xf2, pt2.getLocalPosition(), CPp2);
 
-			Vec2 d = new Vec2(p2.x - p1.x, p2.y - p1.y);
-			float dSqr = Vec2.dot(d, d);
+			CPd.x = CPp2.x - CPp1.x;
+			CPd.y = CPp2.y - CPp1.y;
+			float dSqr = Vec2.dot(CPd, CPd);
 			float r1 = circle1.getRadius() - Settings.toiSlop;
 			float r2 = -Settings.toiSlop; //this is necessary, otherwise the toi steps aren't taken correctly...
 			float r = r1 + r2;
 			if (dSqr > r * r){
-				float dLen = d.normalize();
+				float dLen = CPd.normalize();
 				float distance = dLen - r;
-				x1.set( p1.x + r1 * d.x,
-						p1.y + r1 * d.y);
-				x2.set( p2.x - r2 * d.x,
-						p2.y - r2 * d.y);
+				x1.set( CPp1.x + r1 * CPd.x,
+				        CPp1.y + r1 * CPd.y);
+				x2.set( CPp2.x - r2 * CPd.x,
+				        CPp2.y - r2 * CPd.y);
 				return distance;
 			} else if (dSqr > Settings.EPSILON * Settings.EPSILON) {
-				d.normalize();
-				x1.set( p1.x + r1 * d.x,
-						p1.y + r1 * d.y);
+				CPd.normalize();
+				x1.set( CPp1.x + r1 * CPd.x,
+				        CPp1.y + r1 * CPd.y);
 				x2.set(x1);
 				return 0.0f;
 			}
 
-			x1.set(p1);
+			x1.set(CPp1);
 			x2.set(x1);
 			return 0.0f;
 		}
