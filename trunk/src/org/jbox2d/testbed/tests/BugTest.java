@@ -1,21 +1,13 @@
 package org.jbox2d.testbed.tests;
 
 import org.jbox2d.collision.AABB;
-import org.jbox2d.collision.CircleDef;
 import org.jbox2d.collision.PolygonDef;
-import org.jbox2d.collision.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.World;
-import org.jbox2d.dynamics.joints.PrismaticJoint;
-import org.jbox2d.dynamics.joints.PrismaticJointDef;
-import org.jbox2d.dynamics.joints.RevoluteJoint;
-import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jbox2d.testbed.AbstractExample;
-import org.jbox2d.testbed.ExampleContactPoint;
 import org.jbox2d.testbed.TestbedMain;
-import org.jbox2d.testbed.timingTests.PistonBenchmark;
 import org.jbox2d.util.nonconvex.Polygon;
 
 public class BugTest extends AbstractExample {

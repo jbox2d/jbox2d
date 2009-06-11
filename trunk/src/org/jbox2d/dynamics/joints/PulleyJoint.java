@@ -29,7 +29,6 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
-import org.jbox2d.dynamics.World;
 
 
 //Updated to rev. 56->130 of b2PulleyJoint.cpp/.h

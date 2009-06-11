@@ -23,18 +23,15 @@
 
 package org.jbox2d.dynamics.contacts;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.collision.Manifold;
-import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
-import org.jbox2d.dynamics.World;
 
 
 //Updated to rev 131->149 of b2ContactSolver.cpp/.h

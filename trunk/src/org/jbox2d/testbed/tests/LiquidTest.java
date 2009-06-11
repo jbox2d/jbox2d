@@ -3,10 +3,8 @@ package org.jbox2d.testbed.tests;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.CircleDef;
 import org.jbox2d.collision.MassData;
-import org.jbox2d.collision.PointDef;
 import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;

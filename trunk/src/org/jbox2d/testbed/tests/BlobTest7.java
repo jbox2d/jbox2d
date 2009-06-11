@@ -25,7 +25,6 @@ package org.jbox2d.testbed.tests;
 
 import java.util.ArrayList;
 
-import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.CircleDef;
 import org.jbox2d.collision.PolygonDef;
 import org.jbox2d.common.Vec2;
@@ -35,8 +34,6 @@ import org.jbox2d.dynamics.joints.ConstantVolumeJoint;
 import org.jbox2d.dynamics.joints.ConstantVolumeJointDef;
 import org.jbox2d.testbed.AbstractExample;
 import org.jbox2d.testbed.TestbedMain;
-import org.jbox2d.util.blob.*;
-
 import processing.core.PApplet;
 
 public class BlobTest7 extends AbstractExample {
