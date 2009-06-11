@@ -26,36 +26,10 @@ package org.jbox2d.testbed;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.DebugDraw;
-import org.jbox2d.testbed.tests.BipedTest;
-import org.jbox2d.testbed.tests.BlobTest;
-import org.jbox2d.testbed.tests.BlobTest2;
-import org.jbox2d.testbed.tests.BlobTest3;
-import org.jbox2d.testbed.tests.BlobTest4;
-import org.jbox2d.testbed.tests.BlobTest5;
-import org.jbox2d.testbed.tests.BlobTest6;
-import org.jbox2d.testbed.tests.BlobTest7;
-import org.jbox2d.testbed.tests.Bridge;
-import org.jbox2d.testbed.tests.CCDTest;
-import org.jbox2d.testbed.tests.Chain;
-import org.jbox2d.testbed.tests.Circles;
-import org.jbox2d.testbed.tests.CompoundShapes;
-import org.jbox2d.testbed.tests.Domino;
-import org.jbox2d.testbed.tests.DominoTower;
-import org.jbox2d.testbed.tests.EdgeTest;
-import org.jbox2d.testbed.tests.Gears;
-import org.jbox2d.testbed.tests.LiquidTest;
-import org.jbox2d.testbed.tests.MotorsAndLimits;
-import org.jbox2d.testbed.tests.Overhang;
-import org.jbox2d.testbed.tests.Pulleys;
-import org.jbox2d.testbed.tests.Pyramid;
-import org.jbox2d.testbed.tests.RestitutionCannon;
-import org.jbox2d.testbed.tests.SpriteBinding;
-import org.jbox2d.testbed.tests.VaryingFriction;
-import org.jbox2d.testbed.tests.VaryingRestitution;
-import org.jbox2d.testbed.tests.VerticalStack;
 
 import processing.core.PApplet;
 
@@ -139,63 +113,24 @@ public class TestbedMain extends PApplet {
     	 * why, but for now let's use P3D and live without the smoothing...
     	 */
     	size(640,480,P3D);
+//    	smooth();
     	frameRate(targetFPS);
     	g = new ProcessingDebugDraw(this);
     	//smooth();
     	for (int i=0; i<100; ++i) {
     		this.requestFocus();
     	}
+    	
     	/* Register the examples */
-    	// Simple functionality examples
-    	//registerExample(new SensorTest(this));
-    	//
+    	registerExamples(ExampleList.getExamples(this));
     	
-    	//*
-    	registerExample(new EdgeTest(this));
-    	registerExample(new CCDTest(this));
-    	//registerExample(new Motox(this));
-    	registerExample(new BlobTest3(this));
-    	registerExample(new BlobTest4(this));
-    	registerExample(new BlobTest5(this));
-    	registerExample(new BlobTest6(this));
-    	registerExample(new BlobTest2(this));
-    	registerExample(new BlobTest7(this));
-    	registerExample(new LiquidTest(this));
-    	registerExample(new BipedTest(this));
-    	registerExample(new SpriteBinding(this));
-    	registerExample(new Pulleys(this));
-    	registerExample(new Overhang(this));
-    	registerExample(new VaryingRestitution(this));
-    	registerExample(new VaryingFriction(this));
-    	registerExample(new MotorsAndLimits(this));
-    	registerExample(new VerticalStack(this));
-    	registerExample(new Domino(this));
-    	registerExample(new CompoundShapes(this));
-    	registerExample(new Chain(this));
-    	registerExample(new Bridge(this));
-    	registerExample(new Gears(this));
-    	registerExample(new RestitutionCannon(this));
-    	registerExample(new BlobTest(this));
-    	
-    	// Shape drawing demo
-//    	registerExample(new ShapeDrawing(this));
-    	
-    	// Stress tests
-    	registerExample(new Pyramid(this));
-    	registerExample(new DominoTower(this));
-    	registerExample(new Circles(this));
-    	
-    	// Bug tests
-//    	registerExample(new DistanceTest(this));
-    	//registerExample(new BugTest(this));
-//*/
     	//Set up the mouse wheel listener to control zooming
     	addMouseWheelListener(new MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
             	if (currentTest != null) {
             		ProcessingDebugDraw d = (ProcessingDebugDraw)(currentTest.m_debugDraw);
             		int notches = e.getWheelRotation();
-                	Vec2 oldCenter = d.screenToWorld(width / 2.0f, height / 2.0f);
+                	Vec2 oldCenter = d.screenToWorld(mouseX, mouseY);
                 	//Change the zoom and clamp it to reasonable values 
                 	if (notches < 0) {
                 		d.scaleFactor = min(300f, d.scaleFactor * 1.05f);
@@ -203,10 +138,15 @@ public class TestbedMain extends PApplet {
                 	else if (notches > 0) {
                 		d.scaleFactor = max(.02f, d.scaleFactor / 1.05f);
                 	}
-                	Vec2 newCenter = d.screenToWorld(width / 2.0f, height / 2.0f);
+                	Vec2 newCenter = d.screenToWorld(mouseX, mouseY);
                 	d.transX -= (oldCenter.x - newCenter.x) * d.scaleFactor;
                 	d.transY -= (oldCenter.y - newCenter.y) * d.scaleFactor;
-                	currentTest.cachedCamScale = d.scaleFactor;
+                	float camX = PApplet.map(d.transX,d.g.width*.5f,	d.g.width*.5f+d.scaleFactor,	0.0f,	-1.0f);
+                	float camY = PApplet.map(d.transY,d.g.height*.5f,	d.g.height*.5f+d.scaleFactor,	0.0f,	d.yFlip*1.0f);
+                	currentTest.setCamera(camX, camY, d.scaleFactor);
+//                	currentTest.cachedCamScale = d.scaleFactor;
+//                	currentTest.cachedCamX = d.transX;
+//                	currentTest.cachedCamY = d.transY;
             	}
             }
         });
@@ -315,7 +255,7 @@ public class TestbedMain extends PApplet {
     /** Dispatch mousePressed events to the current test. */
     public void mousePressed() {
     	if (currentTest == null || handleOptions) return;
-    	currentTest.mouseDown(new Vec2(mouseX,mouseY));
+    	currentTest.mouseDown(new Vec2(mouseX, mouseY));
     }
     
     /** Dispatch mouseReleased events to the current test. */
@@ -327,7 +267,7 @@ public class TestbedMain extends PApplet {
     /** Dispatch mouseMoved events to the current test. */
     public void mouseMoved() {
     	if (currentTest == null || handleOptions) return;
-    	currentTest.mouseMove(new Vec2(mouseX,mouseY));
+    	currentTest.mouseMove(new Vec2(mouseX, mouseY));
     }
     
     /** Just report a mouseMoved event if mouseDragged. */
@@ -364,7 +304,7 @@ public class TestbedMain extends PApplet {
     		currentTest.needsReset = true;
     		return;
     	}
-    	if (currentTest == null) return;
+    	if (currentTest == null || currentTest.settings == null) return;
     	if (key == 'r') currentTest.needsReset = true;
     	if (key == ' ') currentTest.launchBomb();
     	if (key == 'p') {
@@ -392,6 +332,13 @@ public class TestbedMain extends PApplet {
     /** Register an AbstractExample to the current list of examples. */
     public void registerExample(AbstractExample test) {
     	tests.add(test);
+    }
+    
+    /** Register AbstractExamples to the current list of examples. */
+    public void registerExamples(List<AbstractExample> exampleList) {
+    	for (AbstractExample ae:exampleList) {
+    		registerExample(ae);
+    	}
     }
 
     /** Start PApplet as a Java program (can also be run as an applet). */
