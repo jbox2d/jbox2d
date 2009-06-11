@@ -374,7 +374,7 @@ public class World {
             Body b = def.body1.m_shapeCount < def.body2.m_shapeCount ? def.body1
                     : def.body2;
             for (Shape s = b.m_shapeList; s != null; s = s.m_next) {
-                s.refilterProxy(m_broadPhase, b.getXForm());
+                s.refilterProxy(m_broadPhase, b.getMemberXForm());
             }
         }
 
@@ -453,7 +453,7 @@ public class World {
             // Reset the proxies on the body with the minimum number of shapes.
             Body b = body1.m_shapeCount < body2.m_shapeCount ? body1 : body2;
             for (Shape s = b.m_shapeList; s != null; s = s.m_next) {
-                s.refilterProxy(m_broadPhase, b.getXForm());
+                s.refilterProxy(m_broadPhase, b.getMemberXForm());
             }
         }
     }
@@ -532,7 +532,7 @@ public class World {
     
     /** Re-filter a shape. This re-runs contact filtering on a shape. */
     public void refilter(Shape shape) {
-    	shape.refilterProxy(m_broadPhase, shape.getBody().getXForm());
+    	shape.refilterProxy(m_broadPhase, shape.getBody().getMemberXForm());
     }
 	
 	/**
@@ -1067,8 +1067,8 @@ public class World {
     public void drawJoint(Joint joint) {
     	Body b1 = joint.getBody1();
     	Body b2 = joint.getBody2();
-    	XForm xf1 = b1.getXForm();
-    	XForm xf2 = b2.getXForm();
+    	XForm xf1 = b1.getMemberXForm();
+    	XForm xf2 = b2.getMemberXForm();
     	Vec2 x1 = xf1.position;
     	Vec2 x2 = xf2.position;
     	Vec2 p1 = joint.getAnchor1();
@@ -1093,8 +1093,8 @@ public class World {
     		for (int i=0; i<bodies.length; ++i) {
     			int next = (i==bodies.length-1)?0:i+1;
     			// TODO decide how to handle these calls
-    			Vec2 first = bodies[i].getWorldCenter();
-    			Vec2 nextV = bodies[next].getWorldCenter();
+    			Vec2 first = bodies[i].getMemberWorldCenter();
+    			Vec2 nextV = bodies[next].getMemberWorldCenter();
     			m_debugDraw.drawSegment(first, nextV, jointColor);
     		}
     		
@@ -1138,7 +1138,7 @@ public class World {
 
     		for (Body b = m_bodyList; b != null; b = b.getNext()) {
     			// TODO change the way this is handled
-    			XForm xf = b.getXForm();
+    			XForm xf = b.getMemberXForm();
 
     			for (Shape s = b.getShapeList(); s != null; s = s.getNext()) {
     				//if (s.isSensor()) continue;
@@ -1239,7 +1239,7 @@ public class World {
 
     		for (Body b = m_bodyList; b != null; b = b.getNext()) {
     			// TODO figure out a better way to handle this
-    			XForm xf = b.getXForm();
+    			XForm xf = b.getMemberXForm();
     			
     			for (Shape s = b.getShapeList(); s != null; s = s.getNext()) {
     				if (s.getType() != ShapeType.POLYGON_SHAPE) {
@@ -1270,8 +1270,8 @@ public class World {
     	if ( (flags & DebugDraw.e_centerOfMassBit) != 0) {
     		for (Body b = m_bodyList; b != null; b = b.getNext()) {
     			// TODO handle this differently
-    			XForm xf = b.getXForm();
-    			xf.position = b.getWorldCenter();
+    			XForm xf = b.getMemberXForm();
+    			xf.position = b.getMemberWorldCenter();
     			m_debugDraw.drawXForm(xf);
     		}
     	}

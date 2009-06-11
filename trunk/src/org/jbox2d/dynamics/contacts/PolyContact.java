@@ -123,7 +123,7 @@ public class PolyContact extends Contact implements ContactCreateFcn {
         }
         m0.pointCount = m_manifold.pointCount;
 
-        CollidePoly.collidePolygons(m_manifold, (PolygonShape) m_shape1,b1.getXForm(),(PolygonShape) m_shape2, b2.getXForm());
+        CollidePoly.collidePolygons(m_manifold, (PolygonShape) m_shape1,b1.getMemberXForm(),(PolygonShape) m_shape2, b2.getMemberXForm());
 
         boolean[] persisted = {false, false};
 

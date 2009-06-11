@@ -521,12 +521,22 @@ public class Body {
 	 * @return the world transform of the body's origin.
 	 */
 	public XForm getXForm(){
-		// TODO this returns a copy, so when grabbing
-		// this from inside the engine, maybe access it
-		// through local variables instead?
 		XForm xf = new XForm();
 		xf.set(m_xf);
 		return xf;
+	}
+	
+	/**
+	 * More for internal use.  It isn't copied,
+	 * so don't modify it.  instead try to use {@link #setXForm(Vec2, float)}.
+	 * Otherwise, this also gives you direct access to the body's XForm, if you
+	 * really need to change something (careful!).
+	 * @see #getXForm()
+	 * @see #setXForm(Vec2, float)
+	 * @return an uncopied version of this body's XForm
+	 */
+	public XForm getMemberXForm(){
+		return m_xf;
 	}
 
 	/**
@@ -546,6 +556,19 @@ public class Body {
 	public Vec2 getPosition(){
 		return m_xf.position.clone();
 	}
+	
+	/**
+	 * This is more for internal use.  It isn't copied, so don't
+	 * modify it.  This is the position of the body's XForm
+	 * ({@link #getXForm()}), and if you want to change that I would
+	 * suggest using {@link #setXForm(Vec2, float)}.  Modifying this
+	 * will not do what you want.
+	 * @see #getPosition()
+	 * @return the body's world position of the body's origin.
+	 */
+	public Vec2 getMemberPosition(){
+		return m_xf.position;
+	}
 
 	/**
 	 * Get the angle in radians.
@@ -560,10 +583,18 @@ public class Body {
 	 * @return a copy of the world position
 	 */
 	public Vec2 getWorldCenter(){
-		// TODO this returns a copy, so when grabbing
-		// this from inside the engine, maybe access it
-		// through local variables instead?
 		return m_sweep.c.clone();
+	}
+
+	/** 
+	 * More for internal use. It isn't copied, so don't
+	 * modify it.  Modifying this will not do what you want,
+	 * instead use {@link #setXForm(Vec2, float)}
+	 * @see #getWorldCenter()
+	 * @return the world position
+	 */
+	public Vec2 getMemberWorldCenter(){
+		return m_sweep.c;
 	}
 
 	/** 
@@ -571,10 +602,16 @@ public class Body {
 	 * @return a copy of the local position of the center of mass
 	 */
 	public Vec2 getLocalCenter(){
-		// TODO this returns a copy, so when grabbing
-		// this from inside the engine, maybe access it
-		// through local variables instead?
 		return m_sweep.localCenter.clone();
+	}
+	
+	/** 
+	 * More for internal use. It isn't a copy, so don't
+	 * modify it.
+	 * @return the local position of the center of mass
+	 */
+	public Vec2 getMemberLocalCenter(){
+		return m_sweep.localCenter;
 	}
 
 	/**
@@ -586,14 +623,12 @@ public class Body {
 	}
 
 	/**
-	 * Get a copy of the linear velocity of the center of mass.
-	 * @return a copy of the linear velocity of the center of mass.
+	 * Get the linear velocity of the center of mass. This isn't a copy,
+	 * so modifying this will change the linear velocity.
+	 * @return a the linear velocity of the center of mass.
 	 */
 	public Vec2 getLinearVelocity(){
-		// TODO this returns a copy, so when grabbing
-		// this from inside the engine, maybe access it
-		// through local variables instead?
-		return m_linearVelocity.clone();
+		return m_linearVelocity;
 	}
 
 	/**

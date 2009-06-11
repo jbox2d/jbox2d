@@ -183,8 +183,8 @@ public class SpringRestitutionTest extends AbstractExample {
         Vec2 pB = bB.getWorldLocation(localB);
         Vec2 diff = pB.sub(pA);
         //Find velocities of attach points
-        Vec2 vA = bA.m_linearVelocity.sub(Vec2.cross(bA.getWorldVector(localA), bA.m_angularVelocity));
-        Vec2 vB = bB.m_linearVelocity.sub(Vec2.cross(bB.getWorldVector(localB), bB.m_angularVelocity));
+        Vec2 vA = bA.m_linearVelocity.sub(Vec2.cross(bA.getWorldDirection(localA), bA.m_angularVelocity));
+        Vec2 vB = bB.m_linearVelocity.sub(Vec2.cross(bB.getWorldDirection(localB), bB.m_angularVelocity));
         Vec2 vdiff = vB.sub(vA);
         float dx = diff.normalize(); //normalizes diff and puts length into dx
         float vrel = vdiff.x*diff.x + vdiff.y*diff.y;

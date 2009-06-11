@@ -116,7 +116,7 @@ class PointAndPolyContact extends Contact implements ContactCreateFcn {
         }
         m0.pointCount = m_manifold.pointCount;
     	
-        CollideCircle.collidePolygonAndPoint(m_manifold, (PolygonShape)m_shape1, b1.getXForm(), (PointShape)m_shape2, b2.getXForm());
+        CollideCircle.collidePolygonAndPoint(m_manifold, (PolygonShape)m_shape1, b1.getMemberXForm(), (PointShape)m_shape2, b2.getMemberXForm());
     	//CollideCircle.collidePolygonAndCircle(m_manifold, (PolygonShape)m_shape1, b1.getXForm(), (CircleShape)m_shape2, b2.getXForm());
 
     	boolean[] persisted= {false, false};

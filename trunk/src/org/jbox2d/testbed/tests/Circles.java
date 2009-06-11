@@ -88,7 +88,7 @@ public class Circles extends AbstractExample {
         body.setBullet(BULLET);
 
         RevoluteJointDef rjd = new RevoluteJointDef();
-        rjd.initialize(body,ground,body.getPosition());
+        rjd.initialize(body,ground,body.getMemberPosition());
         rjd.motorSpeed = (float) Math.PI;
         rjd.maxMotorTorque = 1000000.0f;
         rjd.enableMotor = true;

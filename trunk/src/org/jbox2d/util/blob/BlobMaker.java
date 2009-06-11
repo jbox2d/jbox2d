@@ -212,7 +212,7 @@ public class BlobMaker {
 		jd.collideConnected = false;
 		jd.dampingRatio = damping;
 		jd.frequencyHz = frequency;
-		jd.initialize(bodies[a],bodies[b],bodies[a].getPosition(),bodies[b].getPosition());
+		jd.initialize(bodies[a],bodies[b],bodies[a].getMemberPosition(),bodies[b].getMemberPosition());
 		return w.createJoint(jd);
 	}
 }

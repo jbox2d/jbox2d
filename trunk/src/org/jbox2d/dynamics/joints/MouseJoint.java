@@ -109,7 +109,7 @@ public class MouseJoint extends Joint {
         Body b = m_body2;
 
      // Compute the effective mass matrix.
-    	Vec2 r = Mat22.mul(b.m_xf.R, m_localAnchor.sub(b.getLocalCenter()));
+    	Vec2 r = Mat22.mul(b.m_xf.R, m_localAnchor.sub(b.getMemberLocalCenter()));
 
         // K = [(1/m1 + 1/m2) * eye(2) - skew(r1) * invI1 * skew(r1) - skew(r2)
         // * invI2 * skew(r2)]
@@ -153,7 +153,7 @@ public class MouseJoint extends Joint {
     public void solveVelocityConstraints(TimeStep step) {
     	Body b = m_body2;
 
-    	Vec2 r = Mat22.mul(b.m_xf.R, m_localAnchor.sub(b.getLocalCenter()));
+    	Vec2 r = Mat22.mul(b.m_xf.R, m_localAnchor.sub(b.getMemberLocalCenter()));
 
     	// Cdot = v + cross(w, r)
     	Vec2 Cdot = b.m_linearVelocity.add(Vec2.cross(b.m_angularVelocity, r));

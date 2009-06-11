@@ -125,8 +125,8 @@ public class PulleyJoint extends Joint {
     	Body b1 = m_body1;
     	Body b2 = m_body2;
 
-    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
+    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
+    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
 
     	Vec2 p1 = b1.m_sweep.c.add(r1);
     	Vec2 p2 = b2.m_sweep.c.add(r2);
@@ -211,8 +211,8 @@ public class PulleyJoint extends Joint {
     	Body b1 = m_body1;
     	Body b2 = m_body2;
 
-    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
+    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
+    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
 
     	if (m_state == LimitState.AT_UPPER_LIMIT) {
     		Vec2 v1 = b1.m_linearVelocity.add(Vec2.cross(b1.m_angularVelocity, r1));
@@ -275,8 +275,8 @@ public class PulleyJoint extends Joint {
     	float linearError = 0.0f;
 
     	if (m_state == LimitState.AT_UPPER_LIMIT) {
-    		Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
-    		Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
+    		Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
+    		Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
 
     		Vec2 p1 = b1.m_sweep.c.add(r1);
     		Vec2 p2 = b2.m_sweep.c.add(r2);
@@ -324,7 +324,7 @@ public class PulleyJoint extends Joint {
     	}
 
     	if (m_limitState1 == LimitState.AT_UPPER_LIMIT) {
-    		Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
+    		Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
     		Vec2 p1 = b1.m_sweep.c.add(r1);
 
     		m_u1.set(p1.x - s1.x, p1.y - s1.y);
@@ -353,7 +353,7 @@ public class PulleyJoint extends Joint {
     	}
 
     	if (m_limitState2 == LimitState.AT_UPPER_LIMIT) {
-    		Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
+    		Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
     		Vec2 p2 = b2.m_sweep.c.add(r2);
 
     		m_u2.set(p2.x - s2.x, p2.y - s2.y);

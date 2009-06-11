@@ -164,8 +164,8 @@ public class GearJoint extends Joint {
             K += b1.m_invI;
         }
         else {
-        	Vec2 ug = Mat22.mul(g1.getXForm().R, m_prismatic1.m_localXAxis1);
-    		Vec2 r = Mat22.mul(b1.getXForm().R, m_localAnchor1.sub(b1.getLocalCenter()));
+        	Vec2 ug = Mat22.mul(g1.getMemberXForm().R, m_prismatic1.m_localXAxis1);
+    		Vec2 r = Mat22.mul(b1.getMemberXForm().R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
     		float crug = Vec2.cross(r, ug);
             m_J.linear1 = ug.negate();
             m_J.angular1 = -crug;
@@ -177,8 +177,8 @@ public class GearJoint extends Joint {
             K += m_ratio * m_ratio * b2.m_invI;
         }
         else {
-            Vec2 ug = Mat22.mul(g2.getXForm().R, m_prismatic2.m_localXAxis1);
-    		Vec2 r = Mat22.mul(b2.getXForm().R, m_localAnchor2.sub(b2.getLocalCenter()));
+            Vec2 ug = Mat22.mul(g2.getMemberXForm().R, m_prismatic2.m_localXAxis1);
+    		Vec2 r = Mat22.mul(b2.getMemberXForm().R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
             float crug = Vec2.cross(r, ug);
             m_J.linear2 = ug.mulLocal(-m_ratio);
             m_J.angular2 = -m_ratio * crug;
@@ -275,7 +275,7 @@ public class GearJoint extends Joint {
 
     public float getReactionTorque() {
     	// TODO_ERIN not tested
-    	Vec2 r = Mat22.mul(m_body2.getXForm().R, m_localAnchor2.sub(m_body2.getLocalCenter()));
+    	Vec2 r = Mat22.mul(m_body2.getMemberXForm().R, m_localAnchor2.sub(m_body2.getMemberLocalCenter()));
     	Vec2 F = new Vec2(m_force * m_J.linear2.x, m_force * m_J.linear2.y);
     	float T = m_force * m_J.angular2 - Vec2.cross(r, F);
     	return T;

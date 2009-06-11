@@ -298,7 +298,7 @@ public class LiquidTest extends AbstractExample {
 	
 	private void checkBounds() {
 		for (int i=0; i<liquid.length; ++i) {
-			if (liquid[i].getWorldCenter().y < -10.0f) {
+			if (liquid[i].getMemberWorldCenter().y < -10.0f) {
 				m_world.destroyBody(liquid[i]);
 				float massPerParticle = totalMass / nParticles;
 				CircleDef pd = new CircleDef();
@@ -323,7 +323,7 @@ public class LiquidTest extends AbstractExample {
 			}
 		}
 		
-		if (bod.getWorldCenter().y < -15.0f) {
+		if (bod.getMemberWorldCenter().y < -15.0f) {
 			m_world.destroyBody(bod);
 			PolygonDef polyDef = new PolygonDef();
 			polyDef.setAsBox(parent.random(0.3f,0.7f), parent.random(0.3f,0.7f));

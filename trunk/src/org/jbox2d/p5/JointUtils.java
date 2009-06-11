@@ -52,7 +52,7 @@ public class JointUtils
 		/*
 		 * Auto-length based on world body positions.
 		 */
-		float length = a.getPosition().subLocal(b.getPosition()).length();
+		float length = a.getMemberPosition().subLocal(b.getMemberPosition()).length();
 		jd.length = length;
 
 		/*
@@ -126,13 +126,13 @@ public class JointUtils
 		{
 			if (i >= shapes1.length || shapes1[i] == null)
 				return null;
-			if (shapes1[i].testPoint(shapes1[i].getBody().getXForm(), pA))
+			if (shapes1[i].testPoint(shapes1[i].getBody().getMemberXForm(), pA))
 				body1 = shapes1[i++].getBody();
 			for (j = 0; j < shapes2.length; ++j)
 			{
 				if (shapes2[j] == null)
 					break;
-				if (shapes2[j].testPoint(shapes2[j].getBody().getXForm(), pB))
+				if (shapes2[j].testPoint(shapes2[j].getBody().getMemberXForm(), pB))
 					body2 = shapes2[j].getBody();
 				if (body2 != body1)
 				{

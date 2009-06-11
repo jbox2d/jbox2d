@@ -38,7 +38,7 @@ public class ConstantVolumeJoint extends Joint {
 		targetLengths = new float[bodies.length];
 		for (int i=0; i<targetLengths.length; ++i) {
 			int next = (i == targetLengths.length-1)?0:i+1;
-			float dist = bodies[i].getWorldCenter().sub(bodies[next].getWorldCenter()).length();
+			float dist = bodies[i].getMemberWorldCenter().sub(bodies[next].getMemberWorldCenter()).length();
 			targetLengths[i] = dist;
 		}
 		targetVolume = getArea();
@@ -49,7 +49,7 @@ public class ConstantVolumeJoint extends Joint {
 			DistanceJointDef djd = new DistanceJointDef();
 			djd.frequencyHz = def.frequencyHz;//20.0f;
 			djd.dampingRatio = def.dampingRatio;//50.0f;
-			djd.initialize(bodies[i], bodies[next], bodies[i].getWorldCenter(), bodies[next].getWorldCenter());
+			djd.initialize(bodies[i], bodies[next], bodies[i].getMemberWorldCenter(), bodies[next].getMemberWorldCenter());
 			distanceJoints[i] = (DistanceJoint)world.createJoint(djd);
 		}
 		
@@ -72,11 +72,11 @@ public class ConstantVolumeJoint extends Joint {
 	
 	private float getArea() {
 		  float area = 0.0f;
-		  area += bodies[bodies.length-1].getWorldCenter().x * bodies[0].getWorldCenter().y -
-		  		  bodies[0].getWorldCenter().x * bodies[bodies.length-1].getWorldCenter().y;
+		  area += bodies[bodies.length-1].getMemberWorldCenter().x * bodies[0].getMemberWorldCenter().y -
+		  		  bodies[0].getMemberWorldCenter().x * bodies[bodies.length-1].getMemberWorldCenter().y;
 		  for (int i=0; i<bodies.length-1; ++i){
-		    area += bodies[i].getWorldCenter().x * bodies[i+1].getWorldCenter().y - 
-		    		bodies[i+1].getWorldCenter().x * bodies[i].getWorldCenter().y;
+		    area += bodies[i].getMemberWorldCenter().x * bodies[i+1].getMemberWorldCenter().y - 
+		    		bodies[i+1].getMemberWorldCenter().x * bodies[i].getMemberWorldCenter().y;
 		  }
 		  area *= .5f;
 		  return area;
@@ -90,8 +90,8 @@ public class ConstantVolumeJoint extends Joint {
 		  float perimeter = 0.0f;
 		  for (int i=0; i<bodies.length; ++i) {
 		    int next = (i==bodies.length-1)?0:i+1;
-		    float dx = bodies[next].getWorldCenter().x-bodies[i].getWorldCenter().x;
-		    float dy = bodies[next].getWorldCenter().y-bodies[i].getWorldCenter().y;
+		    float dx = bodies[next].getMemberWorldCenter().x-bodies[i].getMemberWorldCenter().x;
+		    float dy = bodies[next].getMemberWorldCenter().y-bodies[i].getMemberWorldCenter().y;
 		    float dist = (float)Math.sqrt(dx*dx+dy*dy);
 		    if (dist < Settings.EPSILON) dist = 1.0f;
 		    normals[i].x = dy / dist;
@@ -130,7 +130,7 @@ public class ConstantVolumeJoint extends Joint {
 		for (int i=0; i<bodies.length; ++i) {
 			int prev = (i==0)?bodies.length-1:i-1;
 			int next = (i==bodies.length-1)?0:i+1;
-			d[i] = bodies[next].getWorldCenter().sub(bodies[prev].getWorldCenter());
+			d[i] = bodies[next].getMemberWorldCenter().sub(bodies[prev].getMemberWorldCenter());
 		}
 		
 		if (step.warmStarting) {
@@ -161,7 +161,7 @@ public class ConstantVolumeJoint extends Joint {
 		for (int i=0; i<bodies.length; ++i) {
 			int prev = (i==0)?bodies.length-1:i-1;
 			int next = (i==bodies.length-1)?0:i+1;
-			d[i] = bodies[next].getWorldCenter().sub(bodies[prev].getWorldCenter());
+			d[i] = bodies[next].getMemberWorldCenter().sub(bodies[prev].getMemberWorldCenter());
 			dotMassSum += (d[i].lengthSquared())/bodies[i].getMass();
 			crossMassSum += Vec2.cross(bodies[i].getLinearVelocity(),d[i]);
 		}
