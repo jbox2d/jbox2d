@@ -9,7 +9,6 @@ import org.jbox2d.testbed.tests.Bridge;
 import org.jbox2d.testbed.tests.Chain;
 import org.jbox2d.testbed.tests.Circles;
 import org.jbox2d.testbed.tests.CompoundShapes;
-import org.jbox2d.testbed.tests.ConvexDecomposition;
 import org.jbox2d.testbed.tests.Domino;
 import org.jbox2d.testbed.tests.DominoTower;
 import org.jbox2d.testbed.tests.EdgeTest;
@@ -29,7 +28,6 @@ public class ExampleList {
 		// Simple functionality examples
     	//
     	ArrayList<AbstractExample> exampleList = new ArrayList<AbstractExample>();
-    	exampleList.add(new ConvexDecomposition(testbed));
     	//*
 //    	exampleList.add(new ScratchPad(testbed));
     	exampleList.add(new SensorTest(testbed));
