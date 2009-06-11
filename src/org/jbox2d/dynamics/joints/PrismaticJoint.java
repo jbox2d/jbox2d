@@ -117,8 +117,8 @@ public class PrismaticJoint extends Joint {
         Body b2 = m_body2;
 
         // Compute the effective masses.
-        Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
+        Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
+    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
 
         float invMass1 = b1.m_invMass, invMass2 = b2.m_invMass;
         float invI1 = b1.m_invI, invI2 = b2.m_invI;
@@ -318,8 +318,8 @@ public class PrismaticJoint extends Joint {
     	float invMass1 = b1.m_invMass, invMass2 = b2.m_invMass;
     	float invI1 = b1.m_invI, invI2 = b2.m_invI;
 
-    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
+    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
+    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
     	Vec2 p1 = b1.m_sweep.c.add(r1);
     	Vec2 p2 = b2.m_sweep.c.add(r2);
     	Vec2 d = p2.sub(p1);
@@ -359,8 +359,8 @@ public class PrismaticJoint extends Joint {
     	// Solve linear limit constraint.
     	if (m_enableLimit && m_limitState != LimitState.INACTIVE_LIMIT)
     	{
-    		Vec2 r1z = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
-    		Vec2 r2z = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
+    		Vec2 r1z = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
+    		Vec2 r2z = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
     		Vec2 p1z = b1.m_sweep.c.add(r1z);
     		Vec2 p2z = b2.m_sweep.c.add(r2z);
     		Vec2 dz = p2z.sub(p1z);
@@ -429,7 +429,7 @@ public class PrismaticJoint extends Joint {
     	Vec2 p1 = b1.getWorldLocation(m_localAnchor1);
     	Vec2 p2 = b2.getWorldLocation(m_localAnchor2);
     	Vec2 d = p2.sub(p1);
-    	Vec2 axis = b1.getWorldVector(m_localXAxis1);
+    	Vec2 axis = b1.getWorldDirection(m_localXAxis1);
 
     	float translation = Vec2.dot(d, axis);
     	return translation;
@@ -440,12 +440,12 @@ public class PrismaticJoint extends Joint {
     	Body b1 = m_body1;
     	Body b2 = m_body2;
 
-    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
+    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
+    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
     	Vec2 p1 = b1.m_sweep.c.add(r1);
     	Vec2 p2 = b2.m_sweep.c.add(r2);
     	Vec2 d = p2.sub(p1);
-    	Vec2 axis = b1.getWorldVector(m_localXAxis1);
+    	Vec2 axis = b1.getWorldDirection(m_localXAxis1);
 
     	Vec2 v1 = b1.m_linearVelocity;
     	Vec2 v2 = b2.m_linearVelocity;

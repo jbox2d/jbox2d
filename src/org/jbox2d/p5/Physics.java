@@ -540,7 +540,7 @@ public class Physics {
 		Vec2 dir = new Vec2(dirX, dirY);
 		dir.normalize();
 		PrismaticJointDef pjd = new PrismaticJointDef();
-		pjd.initialize(a, b, (a.getWorldCenter().add(b.getWorldCenter())).mul(0.5f), dir);
+		pjd.initialize(a, b, (a.getMemberWorldCenter().add(b.getMemberWorldCenter())).mul(0.5f), dir);
 		return (PrismaticJoint)m_world.createJoint(pjd);
 	}
 	
@@ -789,7 +789,7 @@ public class Physics {
 	 */
 	public void applyForce(Body b, float fx, float fy) {
 		Vec2 fv = screenToWorldVector(fx,fy);
-		b.applyForce(fv, b.getWorldCenter());
+		b.applyForce(fv, b.getMemberWorldCenter());
 	}
 	
 	/**
@@ -798,7 +798,7 @@ public class Physics {
 	 * @param f force to apply (in pixel units)
 	 */
 	public void applyForce(Body b, Vec2 f) {
-		b.applyForce(screenToWorldVector(f), b.getWorldCenter());
+		b.applyForce(screenToWorldVector(f), b.getMemberWorldCenter());
 	}
 	
 	/**
@@ -834,12 +834,12 @@ public class Physics {
 	 * @return
 	 */
 	public Vec2 getPosition(Body b) {
-		return worldToScreen(b.getPosition());
+		return worldToScreen(b.getMemberPosition());
 	}
 	
 	/** Get the center of mass position (screen coordinates) */
 	public Vec2 getCMPosition(Body b) {
-		return worldToScreen(b.getWorldCenter());
+		return worldToScreen(b.getMemberWorldCenter());
 	}
 	
 	/** Get the angle (in radians) */

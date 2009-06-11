@@ -64,7 +64,7 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
         }
         m0.pointCount = m_manifold.pointCount;
 		
-		CollidePolyAndEdge(m_manifold, (PolygonShape)m_shape1, b1.getXForm(), (EdgeShape)m_shape2, b2.getXForm());
+		CollidePolyAndEdge(m_manifold, (PolygonShape)m_shape1, b1.getMemberXForm(), (EdgeShape)m_shape2, b2.getMemberXForm());
 
 		boolean[] persisted = {false, false};
 
@@ -105,7 +105,7 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 
 						// Report persistent point.
 						if (listener != null) {
-							cp.position = b1.getWorldPoint(mp.localPoint1);
+							cp.position = b1.getWorldLocation(mp.localPoint1);
 							Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
 							Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
 							cp.velocity = v2.sub(v1);
@@ -120,7 +120,7 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 
 				// Report added point.
 				if (found == false && listener != null) {
-					cp.position = b1.getWorldPoint(mp.localPoint1);
+					cp.position = b1.getWorldLocation(mp.localPoint1);
 					Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
 					Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
 					cp.velocity = v2.sub(v1);
@@ -147,7 +147,7 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 			}
 
 			ManifoldPoint mp0 = m0.points[i];
-			cp.position = b1.getWorldPoint(mp0.localPoint1);
+			cp.position = b1.getWorldLocation(mp0.localPoint1);
 			Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp0.localPoint1);
 			Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp0.localPoint2);
 			cp.velocity = v2.sub(v1);

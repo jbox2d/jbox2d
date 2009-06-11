@@ -111,8 +111,8 @@ public class DistanceJoint extends Joint {
     	Body b2 = m_body2;
 
     	// Compute the effective mass matrix.
-    	Vec2 r1 = Mat22.mul(b1.getXForm().R, m_localAnchor1.sub(b1.getLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.getXForm().R, m_localAnchor2.sub(b2.getLocalCenter()));
+    	Vec2 r1 = Mat22.mul(b1.getMemberXForm().R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
+    	Vec2 r2 = Mat22.mul(b2.getMemberXForm().R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
     	m_u.x = b2.m_sweep.c.x + r2.x - b1.m_sweep.c.x - r1.x;
     	m_u.y = b2.m_sweep.c.y + r2.y - b1.m_sweep.c.y - r1.y;
 
@@ -174,8 +174,8 @@ public class DistanceJoint extends Joint {
     	Body b1 = m_body1;
     	Body b2 = m_body2;
 
-    	Vec2 r1 = Mat22.mul(b1.getXForm().R, m_localAnchor1.sub(b1.getLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.getXForm().R, m_localAnchor2.sub(b2.getLocalCenter()));
+    	Vec2 r1 = Mat22.mul(b1.getMemberXForm().R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
+    	Vec2 r2 = Mat22.mul(b2.getMemberXForm().R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
 
     	Vec2 d = new Vec2(b2.m_sweep.c.x + r2.x - b1.m_sweep.c.x - r1.x,
     					  b2.m_sweep.c.y + r2.y - b1.m_sweep.c.y - r1.y);
@@ -207,8 +207,8 @@ public class DistanceJoint extends Joint {
     	Body b1 = m_body1;
     	Body b2 = m_body2;
 
-    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getLocalCenter()));
+    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
+    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
 
     	// Cdot = dot(u, v + cross(w, r))
     	Vec2 v1 = b1.m_linearVelocity.add(Vec2.cross(b1.m_angularVelocity, r1));

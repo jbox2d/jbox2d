@@ -73,7 +73,7 @@ public class SpriteBinding extends AbstractExample {
                     boxes[i + numBoxes*j].setMassFromShapes();
                     boxes[i + numBoxes*j].setAngularVelocity(parent.random(-.5f,.5f));
                     float angle = (float)(Math.random()*Math.PI);
-                    boxes[i + numBoxes*j].setXForm(boxes[i+numBoxes*j].getPosition(), angle);
+                    boxes[i + numBoxes*j].setXForm(boxes[i+numBoxes*j].getMemberPosition(), angle);
                 }
             }
             

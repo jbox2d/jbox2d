@@ -17,7 +17,7 @@ public class ForceUtils
 	/** Pushes a body towards the specified location. */
 	public void pushTowards(Body b, Vec2 worldTarget, double force)
 	{
-		Vec2 bodyVec = b.getWorldCenter();
+		Vec2 bodyVec = b.getMemberWorldCenter();
 		// First find the vector going from this body to the specified point
 		worldTarget.subLocal(bodyVec);
 		// Then, scale the vector to the specified force
@@ -30,7 +30,7 @@ public class ForceUtils
 	/** Pushes a body in the specified direction. */
 	public void push(Body b, Vec2 dir, double force)
 	{
-		Vec2 bodyVec = b.getWorldCenter();
+		Vec2 bodyVec = b.getMemberWorldCenter();
 		dir.normalize();
 		if (force > 0)
 		{

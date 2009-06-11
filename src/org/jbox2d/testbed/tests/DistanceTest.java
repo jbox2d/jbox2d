@@ -68,7 +68,7 @@ public class DistanceTest extends AbstractExample {
 		Vec2 x1 = new Vec2();
 		Vec2 x2 = new Vec2();
 		Distance d = new Distance();
-		float distance = d.distance(x1, x2, m_shape1, m_body1.getXForm(), m_shape2, m_body2.getXForm());
+		float distance = d.distance(x1, x2, m_shape1, m_body1.getMemberXForm(), m_shape2, m_body2.getMemberXForm());
 
 		m_debugDraw.drawString(5, m_textLine, "distance = "+distance, white);
 		m_textLine += 15;
@@ -86,7 +86,7 @@ public class DistanceTest extends AbstractExample {
 		// initialization.
 		if (m_body2 == null) return;
 		
-		Vec2 p = m_body2.getPosition();
+		Vec2 p = m_body2.getMemberPosition();
 		float a = m_body2.getAngle();
 
 		switch (key) {

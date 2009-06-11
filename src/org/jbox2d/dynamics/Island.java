@@ -370,7 +370,7 @@ public class Island {
     			for (int k = 0; k < manifold.pointCount; ++k) {
     				ManifoldPoint point = manifold.points[k];
     				ContactConstraintPoint ccp = cc.points[k];
-    				XForm.mulToOut(b1.getXForm(), point.localPoint1, cr.position);
+    				XForm.mulToOut(b1.getMemberXForm(), point.localPoint1, cr.position);
     				
     				// TOI constraint results are not stored, so get
     				// the result from the constraint.

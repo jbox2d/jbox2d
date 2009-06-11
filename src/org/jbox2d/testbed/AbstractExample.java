@@ -526,7 +526,7 @@ public abstract class AbstractExample {
         for (int j = 0; j < shapes.length; j++) {
             Body shapeBody = shapes[j].getBody();
             if (shapeBody.isStatic() == false) {
-                boolean inside = shapes[j].testPoint(shapeBody.getXForm(),p);
+                boolean inside = shapes[j].testPoint(shapeBody.getMemberXForm(),p);
                 if (inside) {
                     body = shapes[j].m_body;
                     break;
@@ -750,7 +750,7 @@ public abstract class AbstractExample {
         }
         
         public void draw() {
-        	p.drawImage(image, body.getPosition(), body.getAngle()+localRotation, localScale, localOffset, halfImageWidth, halfImageHeight);
+        	p.drawImage(image, body.getMemberPosition(), body.getAngle()+localRotation, localScale, localOffset, halfImageWidth, halfImageHeight);
         }
     }
     
