@@ -188,6 +188,7 @@ public class Body {
 		
 	}
 	
+	// DMNOTE this isn't a hot method, allocation is just fine
 	private float connectEdges(EdgeShape s1, EdgeShape s2, float angle1) {
 		float angle2 = (float)Math.atan2(s2.getDirectionVector().y, s2.getDirectionVector().x);
 		
@@ -208,6 +209,7 @@ public class Body {
 	 * <BR><em>Warning</em>: This function is locked during callbacks.
 	 * @param def the shape definition.
 	 */
+	// DMNOTE not a hot method, allocations are fine
 	public Shape createShape(ShapeDef def){
 		assert(m_world.m_lock == false);
 
@@ -220,8 +222,8 @@ public class Body {
 		//       shapes directly to the body instead of returning them?)
 		if (def.type == ShapeType.EDGE_SHAPE) {
 			EdgeChainDef edgeDef = (EdgeChainDef)def;
-			Vec2 v1 = new Vec2();
-			Vec2 v2 = new Vec2();
+			Vec2 v1;// = new Vec2();
+			Vec2 v2;// = new Vec2();
 			int i = 0;
 			
 			if (edgeDef.isLoop()) {
@@ -411,9 +413,8 @@ public class Body {
 		m_I = 0.0f;
 		m_invI = 0.0f;
 		
-		// DMNOTE might as well allocate, not really a hot path anyways
+		// DMNOTE might as well allocate, not really a hot path
 		Vec2 center = new Vec2();
-		center.setZero();
 		for (Shape s = m_shapeList; s != null; s = s.m_next) {
 			MassData massData = new MassData();
 			s.computeMass(massData);
@@ -520,6 +521,9 @@ public class Body {
 	 * @return the world transform of the body's origin.
 	 */
 	public XForm getXForm(){
+		// TODO this returns a copy, so when grabbing
+		// this from inside the engine, maybe access it
+		// through local variables instead?
 		XForm xf = new XForm();
 		xf.set(m_xf);
 		return xf;
@@ -537,7 +541,7 @@ public class Body {
 	 * In fact, it's not anything in particular.  Just a
 	 * point.
 	 * <p>
-	 * @return the world position of the body's origin.
+	 * @return a copy of the world position of the body's origin.
 	 */
 	public Vec2 getPosition(){
 		return m_xf.position.clone();
@@ -551,16 +555,25 @@ public class Body {
 		return m_sweep.a;
 	}
 
-	/** Get a copy of the world position of the center of mass. */
+	/** 
+	 * Get a copy of the world position of the center of mass.
+	 * @return a copy of the world position
+	 */
 	public Vec2 getWorldCenter(){
+		// TODO this returns a copy, so when grabbing
+		// this from inside the engine, maybe access it
+		// through local variables instead?
 		return m_sweep.c.clone();
 	}
 
 	/** 
 	 * Get local position of the center of mass.
-	 * @return local position of the center of mass
+	 * @return a copy of the local position of the center of mass
 	 */
 	public Vec2 getLocalCenter(){
+		// TODO this returns a copy, so when grabbing
+		// this from inside the engine, maybe access it
+		// through local variables instead?
 		return m_sweep.localCenter.clone();
 	}
 
@@ -574,9 +587,12 @@ public class Body {
 
 	/**
 	 * Get a copy of the linear velocity of the center of mass.
-	 * @return the linear velocity of the center of mass.
+	 * @return a copy of the linear velocity of the center of mass.
 	 */
 	public Vec2 getLinearVelocity(){
+		// TODO this returns a copy, so when grabbing
+		// this from inside the engine, maybe access it
+		// through local variables instead?
 		return m_linearVelocity.clone();
 	}
 
@@ -603,10 +619,12 @@ public class Body {
 	 * @param force the world force vector, usually in Newtons (N).
 	 * @param point the world position of the point of application.
 	 */
+	// DMNOTE only one instantiated object, so we inline
 	public void applyForce(Vec2 force, Vec2 point){
 		if (isSleeping()) wakeUp();
 		m_force.addLocal(force);
-		m_torque += Vec2.cross(point.sub(m_sweep.c), force);
+		//m_torque += Vec2.cross(point.sub(m_sweep.c), force);
+		m_torque += (point.x - m_sweep.c.x) * force.y - (point.y - m_sweep.c.y) * force.x;
 	}
 
 	/**
@@ -627,11 +645,13 @@ public class Body {
 	 * @param impulse the world impulse vector, usually in N-seconds or kg-m/s.
 	 * @param point the world position of the point of application.
 	 */
+	// DMNOTE only one allocation, so we inline
 	public void applyImpulse(Vec2 impulse, Vec2 point){
 		if (isSleeping()) wakeUp();
 		m_linearVelocity.x += m_invMass * impulse.x;
-		m_linearVelocity.y += m_invMass * impulse.y;
-		m_angularVelocity += m_invI * Vec2.cross(point.sub(m_sweep.c), impulse);
+		m_linearVelocity.y += m_invMass * impulse.y;		
+		//m_angularVelocity += m_invI * Vec2.cross(point.sub(m_sweep.c), impulse);
+		m_angularVelocity += m_invI * ((point.x - m_sweep.c.x) * impulse.y - (point.y - m_sweep.c.y) * impulse.x);
 	}
 
 	/**
@@ -657,6 +677,17 @@ public class Body {
 	 */
 	public Vec2 getWorldLocation(Vec2 localPoint){
 		return XForm.mul(m_xf, localPoint);
+	}
+	
+	/** 
+	 * Get the world coordinates of a point given the local coordinates.
+	 * @param localPoint a point on the body measured relative the the body's origin.
+	 * @param out where to put the same point expressed in world coordinates.
+	 */
+	public void getWorldLocationToOut(Vec2 localPoint, Vec2 out){
+		// TODO optimize engine methods that call
+		// getWorldLocation to use this one
+		XForm.mulToOut( m_xf, localPoint, out);
 	}
 	
 	/**
@@ -687,6 +718,17 @@ public class Body {
 	public Vec2 getWorldDirection(Vec2 localDirection) {
 		return Mat22.mul(m_xf.R, localDirection);
 	}
+	
+	/**
+	 * Get the world coordinates of a direction given the local direction.
+	 * @param localDirection a vector fixed in the body.
+	 * @param out where to put the same vector expressed in world coordinates.
+	 */
+	public void getWorldDirectionToOut(Vec2 localDirection, Vec2 out){
+		// TODO optimize engine methods that use
+		// getWorldDirection with this one
+		Mat22.mulToOut( m_xf.R, localDirection, out);
+	}
 
 	/**
 	 * Gets a local point relative to the body's origin given a world point.
@@ -696,6 +738,17 @@ public class Body {
 	public Vec2 getLocalPoint(Vec2 worldPoint){
 		return XForm.mulTrans(m_xf, worldPoint);
 	}
+	
+	/**
+	 * Gets a local point relative to the body's origin given a world point.
+	 * @param worldPoint a point in world coordinates.
+	 * @param out where to put the the corresponding local point relative to the body's origin.
+	 */
+	public void getLocalPointToOut(Vec2 worldPoint, Vec2 out){
+		// TODO optimized engine methods that
+		// use getLocalPoint to use this one
+		XForm.mulTransToOut(m_xf, worldPoint, out);
+	}
 
 	/** 
 	 * Gets a local vector given a world vector.
@@ -704,6 +757,17 @@ public class Body {
 	 */
 	public Vec2 getLocalVector(Vec2 worldVector){
 		return Mat22.mulTrans(m_xf.R, worldVector);
+	}
+	
+	/** 
+	 * Gets a local vector given a world vector.
+	 * @param worldVector a vector in world coordinates.
+	 * @param out where to put the corresponding local vector.
+	 */
+	public void getLocalVectorToOut(Vec2 worldVector, Vec2 out){
+		// TODO optimized engine methods that
+		// use getLocalVector to use this one
+		Mat22.mulToOut( m_xf.R, worldVector, out);
 	}
 
 	/** Is this body treated like a bullet for continuous collision detection? */
@@ -775,7 +839,7 @@ public class Body {
 		return m_jointList;
 	}
 
-	/**
+	/*
 	 * Get the linked list of all contacts attached to this body.
 	 * @return first ContactEdge in linked list
 	 */
@@ -801,6 +865,7 @@ public class Body {
 		//seems to be missing from C++ version...
 	}
 
+	// DMNOTE pooled
 	private XForm xf1 = new XForm();
 	/** For internal use only. */
 	public boolean synchronizeShapes(){
@@ -872,8 +937,39 @@ public class Body {
 	 * @param worldPoint a point in world coordinates.
 	 * @return the world velocity of a point.
 	 */
+	// DMNOTE optimized
 	public Vec2 getLinearVelocityFromWorldPoint(Vec2 worldPoint) {
-		return m_linearVelocity.add(Vec2.cross(m_angularVelocity, worldPoint.sub(m_sweep.c)));
+		float ax = worldPoint.x - m_sweep.c.x;
+		float ay = worldPoint.y - m_sweep.c.y;
+		float vx = -m_angularVelocity * ay;
+		float vy = m_angularVelocity * ax;
+		return new Vec2(m_linearVelocity.x + vx, m_linearVelocity.y + vy);
+		
+		/*Vec2 out = new Vec2(worldPoint);
+		out.subLocal( m_sweep.c);
+		Vec2.crossToOut(m_angularVelocity, out, out);
+		out.add(m_linearVelocity);
+		return out;*/
+		//return m_linearVelocity.add(Vec2.cross(m_angularVelocity, worldPoint.sub(m_sweep.c)));
+	}
+	
+	/**
+	 * Get the world linear velocity of a world point attached to this body.
+	 * @param worldPoint a point in world coordinates.
+	 * @param out where to put the world velocity of a point.
+	 */
+	// DMNOTE optimized
+	public void getLinearVelocityFromWorldPointToOut(Vec2 worldPoint, Vec2 out) {
+		float ax = worldPoint.x - m_sweep.c.x;
+		float ay = worldPoint.y - m_sweep.c.y;
+		float vx = -m_angularVelocity * ay;
+		float vy = m_angularVelocity * ax;
+		out.set(m_linearVelocity.x + vx, m_linearVelocity.y + vy);
+		/*
+		out.set( worldPoint);
+		out.subLocal( m_sweep.c);
+		Vec2.crossToOut( m_angularVelocity, out, out);
+		out.add( m_linearVelocity);*/
 	}
 
 	/**
@@ -881,28 +977,38 @@ public class Body {
 	 * @param localPoint a point in local coordinates.
 	 * @return the world velocity of a point.
 	 */
+	// DMNOTE optimized
 	public Vec2 getLinearVelocityFromLocalPoint(Vec2 localPoint) {
-		return getLinearVelocityFromWorldPoint(getWorldLocation(localPoint));
-	}
-	
-	public void getLinearVelocityFromWorldPoint(Vec2 dest, Vec2 worldPoint) {
-		float ax = worldPoint.x - m_sweep.c.x;
-		float ay = worldPoint.y - m_sweep.c.y;
+		Vec2 out = new Vec2();
+		getWorldLocationToOut(localPoint, out);
+		float ax = out.x - m_sweep.c.x;
+		float ay = out.y - m_sweep.c.y;
 		float vx = -m_angularVelocity * ay;
 		float vy = m_angularVelocity * ax;
-		dest.set(m_linearVelocity.x + vx, m_linearVelocity.y + vy);
+		out.x = m_linearVelocity.x + vx;
+		out.y = m_linearVelocity.y + vy;
+		return out;
+		//Vec2 worldLocation = getWorldLocationToOut(localPoint);
+		//getLinearVelocityFromWorldPointToOut(worldLocation, worldLocation);
+		//return worldLocation;
 	}
-
-	public void getWorldLocation(Vec2 dest, Vec2 localPoint) {
-		dest.set(
-			m_xf.position.x + m_xf.R.col1.x * localPoint.x + m_xf.R.col2.x * localPoint.y,
-			m_xf.position.y + m_xf.R.col1.y * localPoint.x + m_xf.R.col2.y * localPoint.y);			
-	}
-
-	private Vec2 worldLocation = new Vec2();
-	public void getLinearVelocityFromLocalPoint(Vec2 dest, Vec2 localPoint) {
-		getWorldLocation(worldLocation, localPoint);
-		getLinearVelocityFromWorldPoint(dest, worldLocation);
+	
+	/**
+	 * Get the world velocity of a local point.
+	 * @param localPoint a point in local coordinates.
+	 * @param out where to put the world velocity of a point.
+	 */
+	// DMNOTE optimized
+	public void getLinearVelocityFromLocalPointToOut(Vec2 localPoint, Vec2 out) {
+		//getWorldLocationToOut(localPoint, out);
+		//getLinearVelocityFromWorldPointToOut(out, out);
+		getWorldLocationToOut(localPoint, out);
+		float ax = out.x - m_sweep.c.x;
+		float ay = out.y - m_sweep.c.y;
+		float vx = -m_angularVelocity * ay;
+		float vy = m_angularVelocity * ax;
+		out.x = m_linearVelocity.x + vx;
+		out.y = m_linearVelocity.y + vy;
 	}
 	
 	/**

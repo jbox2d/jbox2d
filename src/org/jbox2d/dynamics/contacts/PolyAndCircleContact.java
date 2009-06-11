@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.jbox2d.collision.CircleShape;
 import org.jbox2d.collision.CollideCircle;
-import org.jbox2d.collision.Collision;
 import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
@@ -36,7 +35,6 @@ import org.jbox2d.collision.PolygonShape;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.collision.ShapeType;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.ContactListener;
 
@@ -160,9 +158,9 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
 
     					// Report persistent point.
     					if (listener != null) {
-    						b1.getWorldLocation(cp.position, mp.localPoint1);
-    						b1.getLinearVelocityFromLocalPoint(v1, mp.localPoint1);
-    						b2.getLinearVelocityFromLocalPoint(v2, mp.localPoint2);
+    						b1.getWorldLocationToOut(mp.localPoint1, cp.position);
+    						b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
+    						b2.getLinearVelocityFromLocalPointToOut(mp.localPoint2, v2);
     						cp.velocity = v2.sub(v1);
     						cp.normal.set(m_manifold.normal);
     						cp.separation = mp.separation;
@@ -175,9 +173,9 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
 
     			// Report added point.
     			if (found == false && listener != null) {
-    				b1.getWorldLocation(cp.position, mp.localPoint1);
-    				b1.getLinearVelocityFromLocalPoint(v1, mp.localPoint1);
-    				b2.getLinearVelocityFromLocalPoint(v2, mp.localPoint2);
+    				b1.getWorldLocationToOut(mp.localPoint1, cp.position);
+    				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
+    				b2.getLinearVelocityFromLocalPointToOut(mp.localPoint2, v2);
     				cp.velocity = v2.sub(v1);
     				cp.normal.set(m_manifold.normal);
     				cp.separation = mp.separation;
@@ -202,9 +200,9 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
     		}
 
     		ManifoldPoint mp0 = m0.points[i];
-    		b1.getWorldLocation(cp.position, mp0.localPoint1);
-    		b1.getLinearVelocityFromLocalPoint(v1, mp0.localPoint1);
-    		b2.getLinearVelocityFromLocalPoint(v2, mp0.localPoint2);
+    		b1.getWorldLocationToOut(mp0.localPoint1, cp.position);
+    		b1.getLinearVelocityFromLocalPointToOut(mp0.localPoint1, v1);
+    		b2.getLinearVelocityFromLocalPointToOut(mp0.localPoint2, v2);
     		cp.velocity = v2.sub(v1);
     		cp.normal.set(m0.normal);
     		cp.separation = mp0.separation;

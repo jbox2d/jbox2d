@@ -56,6 +56,10 @@ public class Vec2 {
 		// testbed.PTest.debugCount++;
 	}
 
+	public Vec2( Vec2 toCopy) {
+		this(toCopy.x, toCopy.y);
+	}
+
 	/** Zero out this vector. */
 	public final void setZero() {
 		x = 0.0f;
@@ -78,6 +82,8 @@ public class Vec2 {
 	public final Vec2 add(Vec2 v) {
 		return new Vec2(x + v.x, y + v.y);
 	}
+	
+	
 
 	/** Return the difference of this vector and another; does not alter either one. */
 	public final Vec2 sub(Vec2 v) {
@@ -101,10 +107,17 @@ public class Vec2 {
 		return this;
 	}
 
-	/** Add another vector to this one and return result - alters this vector. */
+	/** Add another vector to this one and returns result - alters this vector. */
 	public final Vec2 addLocal(Vec2 v) {
 		x += v.x;
 		y += v.y;
+		return this;
+	}
+	
+	/** Adds values to this vector and returns result - alters this vector. */
+	public final Vec2 addLocal( float x, float y) {
+		this.x+=x;
+		this.y+=y;
 		return this;
 	}
 
