@@ -22,15 +22,11 @@
  */
 package org.jbox2d.testbed.tests;
 
-import java.util.Random;
-
 import org.jbox2d.collision.*;
 import org.jbox2d.common.*;
 import org.jbox2d.dynamics.*;
 import org.jbox2d.testbed.AbstractExample;
 import org.jbox2d.testbed.TestbedMain;
-
-import processing.core.PApplet;
 
 
 public class CompoundShapes extends AbstractExample {

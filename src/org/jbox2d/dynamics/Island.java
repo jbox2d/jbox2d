@@ -25,16 +25,13 @@ package org.jbox2d.dynamics;
 
 import java.util.List;
 
-import org.jbox2d.collision.Collision;
 import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.common.*;
-import org.jbox2d.dynamics.contacts.CircleContact;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactConstraint;
 import org.jbox2d.dynamics.contacts.ContactConstraintPoint;
-import org.jbox2d.dynamics.contacts.ContactPoint;
 import org.jbox2d.dynamics.contacts.ContactResult;
 import org.jbox2d.dynamics.contacts.ContactSolver;
 import org.jbox2d.dynamics.joints.Joint;

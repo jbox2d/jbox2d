@@ -25,14 +25,12 @@ package org.jbox2d.dynamics;
 
 import java.util.List;
 
-import org.jbox2d.collision.Collision;
 import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.collision.PairCallback;
 import org.jbox2d.collision.Shape;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactPoint;
 import org.jbox2d.dynamics.contacts.NullContact;

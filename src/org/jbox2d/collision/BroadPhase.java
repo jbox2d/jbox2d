@@ -24,10 +24,6 @@
 package org.jbox2d.collision;
 
 //Version: b2BroadPhase.h/.cpp rev 108->139
-
-import java.util.Arrays;
-import java.util.Collections;
-
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
@@ -98,7 +94,8 @@ public class BroadPhase {
     public static final boolean s_validate = false;
 
     // Dumps m_bounds array to console for debugging
-    private void dump() {
+    @SuppressWarnings("unused")
+	private void dump() {
         for (int i = 0; i < 10; i++) {
             System.out.printf("bounds[ %d ] = %d, %d \n", i,
                     m_bounds[0][i].value, m_bounds[1][i].value);

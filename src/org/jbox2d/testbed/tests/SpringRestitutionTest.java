@@ -32,8 +32,6 @@ import org.jbox2d.dynamics.World;
 import org.jbox2d.testbed.AbstractExample;
 import org.jbox2d.testbed.TestbedMain;
 
-import processing.core.PApplet;
-
 public class SpringRestitutionTest extends AbstractExample {
 	//Used to calculate restitution vs. floor
 	

@@ -24,7 +24,6 @@
 package org.jbox2d.collision;
 
 import org.jbox2d.common.*;
-import org.jbox2d.dynamics.Body;
 
 
 //Updated to rev 56->108->139 of b2Shape.cpp/.h

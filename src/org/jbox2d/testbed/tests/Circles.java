@@ -10,15 +10,9 @@ import org.jbox2d.collision.*;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
-import org.jbox2d.dynamics.World;
-import org.jbox2d.dynamics.joints.PrismaticJoint;
-import org.jbox2d.dynamics.joints.PrismaticJointDef;
-import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jbox2d.testbed.AbstractExample;
 import org.jbox2d.testbed.TestbedMain;
-
-import processing.core.*;
 
 public class Circles extends AbstractExample {
 	private boolean firstTime = true;
