@@ -705,6 +705,8 @@ public class World {
     /** For internal use: find TOI contacts and solve them. */
     public void solveTOI(TimeStep step) {
     	// Reserve an island and a stack for TOI island solution.
+    	// DMNOTE do we always have to make a new island? or can we make
+    	// it static?
     	Island island = new Island(m_bodyCount, Settings.maxTOIContactsPerIsland, Settings.maxTOIJointsPerIsland, m_contactListener);
     	
     	//Simple one pass queue
@@ -920,6 +922,7 @@ public class World {
     			
     		}
 
+    		// DMNOTE do we need to create one every time?
     		TimeStep subStep = new TimeStep();
     		subStep.warmStarting = false;
     		subStep.dt = (1.0f - minTOI) * step.dt;
@@ -979,35 +982,42 @@ public class World {
     	}
 
     }
-
+    // DMNOTE pooled
+    private Color3f coreColor = new Color3f(255f*0.9f, 255f*0.6f, 255f*0.6f);
+    private Vec2 drawingCenter = new Vec2();
+    private Vec2 circCenterMoved = new Vec2();
+    private Color3f liquidColor = new Color3f(80.0f,80.0f,255f);
+    private Vec2 segLeft = new Vec2();
+    private Vec2 segRight = new Vec2();
     /** For internal use */
     public void drawShape(Shape shape, XForm xf, Color3f color, boolean core) {
-    	Color3f coreColor = new Color3f(255f*0.9f, 255f*0.6f, 255f*0.6f);
     	
     	if (shape.getType() == ShapeType.CIRCLE_SHAPE) {
     			CircleShape circle = (CircleShape)shape;
 
-    			Vec2 center = XForm.mul(xf, circle.getLocalPosition());
+    			XForm.mulToOut(xf, circle.getLocalPosition(), drawingCenter);
     			float radius = circle.getRadius();
     			Vec2 axis = xf.R.col1;
     			
+    			circCenterMoved.x = drawingCenter.x + .01f;
+    			circCenterMoved.y = drawingCenter.y + .01f;
     			if (circle.getUserData() != null && circle.getUserData() == LiquidTest.LIQUID_INT) {
-    				m_debugDraw.drawSegment(center, center.add(new Vec2(0.01f,0.01f)), new Color3f(80.0f,80.0f,255f));
+    				m_debugDraw.drawSegment(drawingCenter, circCenterMoved, liquidColor);
     				return;
     			}
     			
-    			m_debugDraw.drawSolidCircle(center, radius, axis, color);
+    			m_debugDraw.drawSolidCircle(drawingCenter, radius, axis, color);
 
     			if (core) {
-    				m_debugDraw.drawCircle(center, radius - Settings.toiSlop, coreColor);
+    				m_debugDraw.drawCircle(drawingCenter, radius - Settings.toiSlop, coreColor);
     			}
     	} else if (shape.getType() == ShapeType.POINT_SHAPE) {
     			PointShape point = (PointShape)shape;
 
-				Vec2 center = XForm.mul(xf, point.getLocalPosition());
+				XForm.mulToOut(xf, point.getLocalPosition(), drawingCenter);
 
 				//m_debugDraw.drawSolidCircle(center, radius, axis, color);
-				m_debugDraw.drawPoint(center, 0.0f, color);
+				m_debugDraw.drawPoint(drawingCenter, 0.0f, color);
 
     	} else if (shape.getType() == ShapeType.POLYGON_SHAPE) {
     			PolygonShape poly = (PolygonShape)shape;
@@ -1018,6 +1028,10 @@ public class World {
     			Vec2[] vertices = new Vec2[vertexCount];
 
     			for (int i = 0; i < vertexCount; ++i) {
+    				// DMNOTE these aren't instantiated so we need to be creating
+    				// these.  To get rid of these instantiations, we would need
+    				// to change the DebugDraw so you give it local vertices and the
+    				// XForm to transform them with
     				vertices[i] = XForm.mul(xf, localVertices[i]);
     			}
 
@@ -1026,6 +1040,7 @@ public class World {
     			if (core) {
     				Vec2[] localCoreVertices = poly.getCoreVertices();
     				for (int i = 0; i < vertexCount; ++i) {
+    					// DMNOTE same as above
     					vertices[i] = XForm.mul(xf, localCoreVertices[i]);
     				}
     				m_debugDraw.drawPolygon(vertices, vertexCount, coreColor);
@@ -1033,15 +1048,21 @@ public class World {
     		
     	} else if (shape.getType() == ShapeType.EDGE_SHAPE) {
     		EdgeShape edge = (EdgeShape) shape;
-    		m_debugDraw.drawSegment(XForm.mul(xf, edge.getVertex1()), XForm.mul(xf, edge.getVertex2()), color);
+    		XForm.mulToOut( xf, edge.getVertex1(), segLeft);
+    		XForm.mulToOut( xf, edge.getVertex2(), segRight);
+    		m_debugDraw.drawSegment(segLeft, segRight, color);
     		
 			if (core) {
-				m_debugDraw.drawSegment(XForm.mul(xf, edge.getCoreVertex1()), XForm.mul(xf, edge.getCoreVertex2()), coreColor);
+				XForm.mulToOut( xf, edge.getCoreVertex1(), segLeft);
+	    		XForm.mulToOut( xf, edge.getCoreVertex2(), segRight);
+				m_debugDraw.drawSegment(segLeft, segRight, coreColor);
 			}
     		
     	}
     }
     
+    // DMNOTE pooled
+    private Color3f jointColor = new Color3f(255f*0.5f, 255f*0.8f, 255f*0.8f);
     /** For internal use */
     public void drawJoint(Joint joint) {
     	Body b1 = joint.getBody1();
@@ -1053,19 +1074,17 @@ public class World {
     	Vec2 p1 = joint.getAnchor1();
     	Vec2 p2 = joint.getAnchor2();
 
-    	Color3f color = new Color3f(255f*0.5f, 255f*0.8f, 255f*0.8f);
-
     	JointType type = joint.getType();
     	
     	if (type == JointType.DISTANCE_JOINT) {
-    		m_debugDraw.drawSegment(p1, p2, color);
+    		m_debugDraw.drawSegment(p1, p2, jointColor);
     	} else if (type == JointType.PULLEY_JOINT) {
     		PulleyJoint pulley = (PulleyJoint)joint;
     		Vec2 s1 = pulley.getGroundAnchor1();
     		Vec2 s2 = pulley.getGroundAnchor2();
-    		m_debugDraw.drawSegment(s1, p1, color);
-    		m_debugDraw.drawSegment(s2, p2, color);
-    		m_debugDraw.drawSegment(s1, s2, color);
+    		m_debugDraw.drawSegment(s1, p1, jointColor);
+    		m_debugDraw.drawSegment(s2, p2, jointColor);
+    		m_debugDraw.drawSegment(s1, s2, jointColor);
     	} else if (type == JointType.MOUSE_JOINT) {
     		//Don't draw mouse joint
     	} else if (type == JointType.CONSTANT_VOLUME_JOINT) {
@@ -1073,18 +1092,38 @@ public class World {
     		Body[] bodies = cvj.getBodies();
     		for (int i=0; i<bodies.length; ++i) {
     			int next = (i==bodies.length-1)?0:i+1;
+    			// TODO decide how to handle these calls
     			Vec2 first = bodies[i].getWorldCenter();
     			Vec2 nextV = bodies[next].getWorldCenter();
-    			m_debugDraw.drawSegment(first, nextV, color);
+    			m_debugDraw.drawSegment(first, nextV, jointColor);
     		}
     		
     	} else {
-    		m_debugDraw.drawSegment(x1, p1, color);
-    		m_debugDraw.drawSegment(p1, p2, color);
-    		m_debugDraw.drawSegment(x2, p2, color);
+    		m_debugDraw.drawSegment(x1, p1, jointColor);
+    		m_debugDraw.drawSegment(p1, p2, jointColor);
+    		m_debugDraw.drawSegment(x2, p2, jointColor);
     	}
     }
 
+    // DMNOTE pooled
+    private Color3f staticColor = new Color3f(255f*0.5f, 255f*0.9f, 255f*0.5f);
+    private Color3f sleepingColor = new Color3f(255f*0.5f, 255f*0.5f, 255f*0.9f);
+    private Color3f activeColor = new Color3f(255f*0.9f, 255f*0.9f, 255f*0.9f);
+    private Color3f pairColor = new Color3f(255f*0.9f, 255f*0.9f, 255f*0.3f);
+    private Color3f aabbColor = new Color3f(255f*0.9f, 255f*0.3f,255f* 0.9f);
+    private Color3f obbColor =  new Color3f(0.5f, 0.3f, 0.5f);
+    private Color3f worldColor = new Color3f(255.0f*0.3f, 255.0f*0.9f, 255.0f*0.9f);
+    private AABB pairB1 = new AABB();
+    private AABB pairB2 = new AABB();
+    private Vec2 pairX1 = new Vec2();
+    private Vec2 pairX2 = new Vec2();
+    private AABB aabbB = new AABB();
+    private Vec2[] cornerVecs = {
+    		new Vec2(),
+    		new Vec2(),
+    		new Vec2(),
+    		new Vec2()
+    };
     /** For internal use */
     public void drawDebugData() {
     	if (m_debugDraw == null || m_drawDebugData == false) {
@@ -1098,18 +1137,19 @@ public class World {
     		boolean core = (flags & DebugDraw.e_coreShapeBit) == DebugDraw.e_coreShapeBit;
 
     		for (Body b = m_bodyList; b != null; b = b.getNext()) {
+    			// TODO change the way this is handled
     			XForm xf = b.getXForm();
 
     			for (Shape s = b.getShapeList(); s != null; s = s.getNext()) {
     				//if (s.isSensor()) continue;
     				
     				if (b.isStatic()) {
-    					drawShape(s, xf, new Color3f(255f*0.5f, 255f*0.9f, 255f*0.5f), core);
+    					drawShape(s, xf, staticColor, core);
     				}
     				else if (b.isSleeping()) {
-    					drawShape(s, xf, new Color3f(255f*0.5f, 255f*0.5f, 255f*0.9f), core);
+    					drawShape(s, xf, sleepingColor, core);
     				} else {
-    					drawShape(s, xf, new Color3f(255f*0.9f, 255f*0.9f, 255f*0.9f), core);
+    					drawShape(s, xf, activeColor, core);
     				}
     			}
     		}
@@ -1125,9 +1165,9 @@ public class World {
 
     	if ( (flags & DebugDraw.e_pairBit) != 0) {
     		BroadPhase bp = m_broadPhase;
+    		// DMNOTE eh just keep this
     		Vec2 invQ = new Vec2(0.0f, 0.0f);
     		invQ.set(1.0f / bp.m_quantizationFactor.x, 1.0f / bp.m_quantizationFactor.y);
-    		Color3f color = new Color3f(255f*0.9f, 255f*0.9f, 255f*0.3f);
 
     		for (int i = 0; i < PairManager.TABLE_CAPACITY; ++i) {
     			int index = bp.m_pairManager.m_hashTable[i];
@@ -1136,23 +1176,22 @@ public class World {
     				Proxy p1 = bp.m_proxyPool[pair.proxyId1];
     				Proxy p2 = bp.m_proxyPool[pair.proxyId2];
 
-    				AABB b1 = new AABB();
-    				AABB b2 = new AABB();
-    				b1.lowerBound.x = bp.m_worldAABB.lowerBound.x + invQ.x * bp.m_bounds[0][p1.lowerBounds[0]].value;
-    				b1.lowerBound.y = bp.m_worldAABB.lowerBound.y + invQ.y * bp.m_bounds[1][p1.lowerBounds[1]].value;
-    				b1.upperBound.x = bp.m_worldAABB.lowerBound.x + invQ.x * bp.m_bounds[0][p1.upperBounds[0]].value;
-    				b1.upperBound.y = bp.m_worldAABB.lowerBound.y + invQ.y * bp.m_bounds[1][p1.upperBounds[1]].value;
-    				b2.lowerBound.x = bp.m_worldAABB.lowerBound.x + invQ.x * bp.m_bounds[0][p2.lowerBounds[0]].value;
-    				b2.lowerBound.y = bp.m_worldAABB.lowerBound.y + invQ.y * bp.m_bounds[1][p2.lowerBounds[1]].value;
-    				b2.upperBound.x = bp.m_worldAABB.lowerBound.x + invQ.x * bp.m_bounds[0][p2.upperBounds[0]].value;
-    				b2.upperBound.y = bp.m_worldAABB.lowerBound.y + invQ.y * bp.m_bounds[1][p2.upperBounds[1]].value;
+    				
+    				pairB1.lowerBound.x = bp.m_worldAABB.lowerBound.x + invQ.x * bp.m_bounds[0][p1.lowerBounds[0]].value;
+    				pairB1.lowerBound.y = bp.m_worldAABB.lowerBound.y + invQ.y * bp.m_bounds[1][p1.lowerBounds[1]].value;
+    				pairB1.upperBound.x = bp.m_worldAABB.lowerBound.x + invQ.x * bp.m_bounds[0][p1.upperBounds[0]].value;
+    				pairB1.upperBound.y = bp.m_worldAABB.lowerBound.y + invQ.y * bp.m_bounds[1][p1.upperBounds[1]].value;
+    				pairB2.lowerBound.x = bp.m_worldAABB.lowerBound.x + invQ.x * bp.m_bounds[0][p2.lowerBounds[0]].value;
+    				pairB2.lowerBound.y = bp.m_worldAABB.lowerBound.y + invQ.y * bp.m_bounds[1][p2.lowerBounds[1]].value;
+    				pairB2.upperBound.x = bp.m_worldAABB.lowerBound.x + invQ.x * bp.m_bounds[0][p2.upperBounds[0]].value;
+    				pairB2.upperBound.y = bp.m_worldAABB.lowerBound.y + invQ.y * bp.m_bounds[1][p2.upperBounds[1]].value;
 
-    				Vec2 x1 = new Vec2(0.5f * (b1.lowerBound.x + b1.upperBound.x),
-    								   0.5f * (b1.lowerBound.y + b1.upperBound.y));
-    				Vec2 x2 = new Vec2(0.5f * (b2.lowerBound.x + b2.upperBound.x),
-    								   0.5f * (b2.lowerBound.y + b2.upperBound.y));
+    				pairX1.x = 0.5f * (pairB1.lowerBound.x + pairB1.upperBound.x);
+    				pairX1.y = 0.5f * (pairB1.lowerBound.y + pairB1.upperBound.y);
+    				pairX2.x = 0.5f * (pairB2.lowerBound.x + pairB2.upperBound.x);
+    				pairX2.y = 0.5f * (pairB2.lowerBound.y + pairB2.upperBound.y);
 
-    				m_debugDraw.drawSegment(x1, x2, color);
+    				m_debugDraw.drawSegment(pairX1, pairX1, pairColor);
 
     				index = pair.next;
     			}
@@ -1168,43 +1207,40 @@ public class World {
 
     		Vec2 invQ = new Vec2();
     		invQ.set(1.0f / bp.m_quantizationFactor.x, 1.0f / bp.m_quantizationFactor.y);
-    		Color3f color = new Color3f(255f*0.9f, 255f*0.3f,255f* 0.9f);
+
     		for (int i = 0; i < Settings.maxProxies; ++i) {
     			Proxy p = bp.m_proxyPool[i];
     			if (p.isValid() == false) {
     				continue;
     			}
 
-    			AABB b = new AABB();
-    			b.lowerBound.x = worldLower.x + invQ.x * bp.m_bounds[0][p.lowerBounds[0]].value;
-    			b.lowerBound.y = worldLower.y + invQ.y * bp.m_bounds[1][p.lowerBounds[1]].value;
-    			b.upperBound.x = worldLower.x + invQ.x * bp.m_bounds[0][p.upperBounds[0]].value;
-    			b.upperBound.y = worldLower.y + invQ.y * bp.m_bounds[1][p.upperBounds[1]].value;
+    			
+    			aabbB.lowerBound.x = worldLower.x + invQ.x * bp.m_bounds[0][p.lowerBounds[0]].value;
+    			aabbB.lowerBound.y = worldLower.y + invQ.y * bp.m_bounds[1][p.lowerBounds[1]].value;
+    			aabbB.upperBound.x = worldLower.x + invQ.x * bp.m_bounds[0][p.upperBounds[0]].value;
+    			aabbB.upperBound.y = worldLower.y + invQ.y * bp.m_bounds[1][p.upperBounds[1]].value;
 
-    			Vec2[] vs = new Vec2[4];
-    			vs[0] = new Vec2(b.lowerBound.x, b.lowerBound.y);
-    			vs[1] = new Vec2(b.upperBound.x, b.lowerBound.y);
-    			vs[2] = new Vec2(b.upperBound.x, b.upperBound.y);
-    			vs[3] = new Vec2(b.lowerBound.x, b.upperBound.y);
+    			cornerVecs[0].set(aabbB.lowerBound.x, aabbB.lowerBound.y);
+    			cornerVecs[1].set(aabbB.upperBound.x, aabbB.lowerBound.y);
+    			cornerVecs[2].set(aabbB.upperBound.x, aabbB.upperBound.y);
+    			cornerVecs[3].set(aabbB.lowerBound.x, aabbB.upperBound.y);
 
-    			m_debugDraw.drawPolygon(vs, 4, color);
+    			m_debugDraw.drawPolygon(cornerVecs, 4, aabbColor);
     		}
-
-    		
     	}
     	
-    	Vec2[] vsw = new Vec2[4];
-		vsw[0]= new Vec2(worldLower.x, worldLower.y);
-		vsw[1]= new Vec2(worldUpper.x, worldLower.y);
-		vsw[2]= new Vec2(worldUpper.x, worldUpper.y);
-		vsw[3]= new Vec2(worldLower.x, worldUpper.y);
-		m_debugDraw.drawPolygon(vsw, 4, new Color3f(255.0f*0.3f, 255.0f*0.9f, 255.0f*0.9f));
+    	cornerVecs[0].set(worldLower.x, worldLower.y);
+    	cornerVecs[1].set(worldUpper.x, worldLower.y);
+    	cornerVecs[2].set(worldUpper.x, worldUpper.y);
+    	cornerVecs[3].set(worldLower.x, worldUpper.y);
+		m_debugDraw.drawPolygon(cornerVecs, 4, worldColor);
 
     	if ( (flags & DebugDraw.e_obbBit) != 0) {
-    		Color3f color = new Color3f(0.5f, 0.3f, 0.5f);
 
     		for (Body b = m_bodyList; b != null; b = b.getNext()) {
+    			// TODO figure out a better way to handle this
     			XForm xf = b.getXForm();
+    			
     			for (Shape s = b.getShapeList(); s != null; s = s.getNext()) {
     				if (s.getType() != ShapeType.POLYGON_SHAPE) {
     					continue;
@@ -1213,24 +1249,27 @@ public class World {
     				PolygonShape poly = (PolygonShape)s;
     				OBB obb = poly.getOBB();
     				Vec2 h = obb.extents;
-    				Vec2[] vs = new Vec2[4];
-    				vs[0] = new Vec2(-h.x, -h.y);
-    				vs[1] = new Vec2( h.x, -h.y);
-    				vs[2] = new Vec2( h.x,  h.y);
-    				vs[3] = new Vec2(-h.x,  h.y);
+    				
+    				cornerVecs[0].set(-h.x, -h.y);
+    				cornerVecs[1].set( h.x, -h.y);
+    				cornerVecs[2].set( h.x,  h.y);
+    				cornerVecs[3].set(-h.x,  h.y);
 
-    				for (int i = 0; i < 4; ++i) {
-    					vs[i] = obb.center.add(Mat22.mul(obb.R, vs[i]));
-    					vs[i] = XForm.mul(xf, vs[i]);
+    				for (int i = 0; i < cornerVecs.length; ++i) {
+    					Mat22.mulToOut(obb.R, cornerVecs[i], cornerVecs[i]);
+    					XForm.mulToOut( xf, cornerVecs[i], cornerVecs[i]);
+    					//vs[i] = obb.center.add(Mat22.mul(obb.R, vs[i]));
+    					//vs[i] = XForm.mul(xf, vs[i]);
     				}
 
-    				m_debugDraw.drawPolygon(vs, 4, color);
+    				m_debugDraw.drawPolygon(cornerVecs, 4, obbColor);
     			}
     		}
     	}
 
     	if ( (flags & DebugDraw.e_centerOfMassBit) != 0) {
     		for (Body b = m_bodyList; b != null; b = b.getNext()) {
+    			// TODO handle this differently
     			XForm xf = b.getXForm();
     			xf.position = b.getWorldCenter();
     			m_debugDraw.drawXForm(xf);

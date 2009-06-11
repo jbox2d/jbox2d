@@ -254,7 +254,7 @@ public class Island {
     				minSleepTime = 0.0f;
     			} else {
     				b.m_sleepTime += step.dt;
-    				minSleepTime = Math.min(minSleepTime, b.m_sleepTime);
+    				minSleepTime = MathUtils.min(minSleepTime, b.m_sleepTime);
     			}
     		}
 
@@ -373,7 +373,7 @@ public class Island {
     			for (int k = 0; k < manifold.pointCount; ++k) {
     				ManifoldPoint point = manifold.points[k];
     				ContactConstraintPoint ccp = cc.points[k];
-    				cr.position = XForm.mul(b1.getXForm(), point.localPoint1);
+    				XForm.mulToOut(b1.getXForm(), point.localPoint1, cr.position);
     				
     				// TOI constraint results are not stored, so get
     				// the result from the constraint.
