@@ -159,6 +159,7 @@ public class CircleShape extends Shape {
     }
     
     //Returns a copy of local position
+    // TODO make one that doesn't return a clone
     public Vec2 getLocalPosition() {
     	return m_localPosition.clone();
     }
