@@ -57,4 +57,20 @@ public class ContactConstraintPoint {
         r1 = new Vec2();
         r2 = new Vec2();
     }
+    
+    // DMNOTE added for object reusability
+    public void set( ContactConstraintPoint cp){
+    	localAnchor1.set(cp.localAnchor1);
+    	localAnchor2.set(cp.localAnchor2);
+    	r1.set(cp.r1);
+    	r2.set(cp.r2);
+    	normalImpulse = cp.normalImpulse;
+    	tangentImpulse = cp.tangentImpulse;
+    	positionImpulse = cp.positionImpulse;
+    	normalMass = cp.normalMass;
+    	tangentMass = cp.tangentMass;
+        equalizedMass = cp.equalizedMass;
+        separation = cp.separation;
+        velocityBias = cp.velocityBias;
+    }
 }

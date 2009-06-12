@@ -57,4 +57,17 @@ public class ContactConstraint {
         normal = new Vec2();
         manifold = new Manifold();
     }
+    
+    public void set(ContactConstraint cp){
+    	pointCount = cp.pointCount;
+    	normal.set(cp.normal);
+    	manifold.set(cp.manifold);
+    	friction = cp.friction;
+    	restitution = cp.restitution;
+    	body1 = cp.body1;
+    	body2 = cp.body2;
+    	for(int i=0; i<cp.pointCount; i++){
+    		points[i].set(cp.points[i]);
+    	}
+    }
 }

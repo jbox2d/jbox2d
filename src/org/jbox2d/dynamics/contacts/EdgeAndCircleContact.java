@@ -49,16 +49,15 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 		
 	}
 
+	// DMNOTE pooled
+	private Manifold m0 = new Manifold();
+	private Vec2 v1 = new Vec2();
 	@Override
 	public void evaluate(ContactListener listener) {
 		Body b1 = m_shape1.getBody();
 		Body b2 = m_shape2.getBody();
 
-		Manifold m0 = new Manifold(m_manifold);
-        for (int k = 0; k < m_manifold.pointCount; k++) {
-            m0.points[k] = new ManifoldPoint(m_manifold.points[k]);
-        }
-        m0.pointCount = m_manifold.pointCount;
+		m0.set(m_manifold);
 
 		CollideEdgeAndCircle(m_manifold, (EdgeShape)m_shape1, b1.getMemberXForm(), (CircleShape)m_shape2, b2.getMemberXForm());
 
@@ -81,12 +80,17 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 
 				if (listener != null) {
 					cp.position = b1.getWorldLocation(mp.localPoint1);
-					Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
-					Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
-					cp.velocity = v2.sub(v1);
-					cp.normal = m_manifold.normal.clone();
+					//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
+    				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
+    				// DMNOTE cp.velocity isn't instantiated in the constructor,
+    				// so we just create it here
+    				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+    				//cp.velocity = v2.sub(v1);
+    				cp.velocity.subLocal(v1);
+    				
+					cp.normal.set(m_manifold.normal);
 					cp.separation = mp.separation;
-					cp.id = new ContactID(mp.id);
+					cp.id.set(mp.id);
 					listener.add(cp);
 				}
 			} else {
@@ -96,12 +100,17 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 
 				if (listener != null) {
 					cp.position = b1.getWorldLocation(mp.localPoint1);
-					Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
-					Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
-					cp.velocity = v2.sub(v1);
-					cp.normal = m_manifold.normal.clone();
+					//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
+    				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
+    				// DMNOTE cp.velocity isn't instantiated in the constructor,
+    				// so we just create it here
+    				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+    				//cp.velocity = v2.sub(v1);
+    				cp.velocity.subLocal(v1);
+    				
+					cp.normal.set(m_manifold.normal);
 					cp.separation = mp.separation;
-					cp.id = new ContactID(mp.id);
+					cp.id.set(mp.id);
 					listener.persist(cp);
 				}
 			}
@@ -110,79 +119,107 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 			if (m0.pointCount > 0 && (listener != null)) {
 				ManifoldPoint mp0 = m0.points[0];
 				cp.position = b1.getWorldLocation(mp0.localPoint1);
-				Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp0.localPoint1);
-				Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp0.localPoint2);
-				cp.velocity = v2.sub(v1);
-				cp.normal = m0.normal.clone();
+				//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
+				b1.getLinearVelocityFromLocalPointToOut(mp0.localPoint1, v1);
+				// DMNOTE cp.velocity isn't instantiated in the constructor,
+				// so we just create it here
+				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp0.localPoint2);
+				//cp.velocity = v2.sub(v1);
+				cp.velocity.subLocal(v1);
+				
+				cp.normal.set(m_manifold.normal);
 				cp.separation = mp0.separation;
-				cp.id = new ContactID(mp0.id);
+				cp.id.set(mp0.id);
 				listener.remove(cp);
 			}
 		}
 
 	}
 	
-	public void CollideEdgeAndCircle(Manifold manifold,
+	// DMNOTE TODO move this to dynamics?
+	private static Vec2 ECd = new Vec2();
+	private static Vec2 ECc = new Vec2();
+	private static Vec2 ECcLocal = new Vec2();
+	private static Vec2 ECcLocalSubV1 = new Vec2();
+	public final static void CollideEdgeAndCircle(Manifold manifold,
 			final EdgeShape edge, final XForm xf1,
 			final CircleShape circle, final XForm xf2) {
 		manifold.pointCount = 0;
-		Vec2 d = new Vec2();
-		Vec2 c = XForm.mul(xf2, circle.getLocalPosition());
-		Vec2 cLocal = XForm.mulTrans(xf1, c);
+		
+		XForm.mulToOut(xf2, circle.getLocalPosition(), ECc);
+		XForm.mulTransToOut(xf1, ECc, ECcLocal);
+		
 		Vec2 n = edge.getNormalVector();
 		Vec2 v1 = edge.getVertex1();
 		Vec2 v2 = edge.getVertex2();
 		float radius = circle.getRadius();
 		float separation;
 		
-		float dirDist = Vec2.dot((cLocal.sub(v1)), edge.getDirectionVector());
+		ECd.set(ECcLocal);
+		ECd.subLocal(v1);
+		
+		float dirDist = Vec2.dot(ECd, edge.getDirectionVector());
 		if (dirDist <= 0) {
-			d = cLocal.sub(v1);
-			if (Vec2.dot(d, edge.getCorner1Vector()) < 0) {
+
+			if (Vec2.dot(ECd, edge.getCorner1Vector()) < 0) {
 				return;
 			}
-			d = c.sub(XForm.mul(xf1, v1));
+			XForm.mulToOut(xf1, v1, ECd);
+			ECd.subLocal(ECc);
+			ECd.negateLocal();
+			// d = c.sub(XForm.mul(xf1, v1));
 		} else if (dirDist >= edge.getLength()) {
-			d = cLocal.sub(v2);
-			if (Vec2.dot(d, edge.getCorner2Vector()) > 0) {
+			ECd.set(ECcLocal);
+			ECd.subLocal(v2);
+			if (Vec2.dot(ECd, edge.getCorner2Vector()) > 0) {
 				return;
 			}
-			d = c.sub(XForm.mul(xf1, v2));
+			XForm.mulToOut(xf1, v2, ECd);
+			ECd.subLocal(ECc);
+			ECd.negateLocal();
+			//d = c.sub(XForm.mul(xf1, v2));
 		} else {
-			separation = Vec2.dot(cLocal.sub(v1), n);
+			separation = Vec2.dot(ECd, n);
 			if (separation > radius || separation < -radius) {
 				return;
 			}
 			separation -= radius;
-			manifold.normal = Mat22.mul(xf1.R, n);
+			Mat22.mulToOut(xf1.R, n, manifold.normal);
 			manifold.pointCount = 1;
 			manifold.points[0].id.zero();// key = 0;
 			manifold.points[0].separation = separation;
-			c.subLocal(manifold.normal.mul(radius));
-			manifold.points[0].localPoint1 = XForm.mulTrans(xf1, c);
-			manifold.points[0].localPoint2 = XForm.mulTrans(xf2, c);
+			// just use d as temp vec here, we don't need it any more
+			ECd.set(manifold.normal);
+			ECd.mulLocal(radius);
+			ECc.subLocal(ECd);
+			XForm.mulTransToOut(xf1, ECc, manifold.points[0].localPoint1);
+			XForm.mulTransToOut(xf2, ECc, manifold.points[0].localPoint2);
 			return;
 		}
 		
-		float distSqr = Vec2.dot(d,d);
+		float distSqr = Vec2.dot(ECd,ECd);
 		if (distSqr > radius * radius) {
 			return;
 		}
 		
 		if (distSqr < Settings.EPSILON) {
 			separation = -radius;
-			manifold.normal = Mat22.mul(xf1.R, n);
+			Mat22.mulToOut(xf1.R, n, manifold.normal);
 		} else {
-			separation = d.normalize() - radius;
-			manifold.normal.set(d);
+			separation = ECd.normalize() - radius;
+			manifold.normal.set(ECd);
 		}
 		
 		manifold.pointCount = 1;
 		manifold.points[0].id.zero();//key = 0;
 		manifold.points[0].separation = separation;
-		c.subLocal(manifold.normal.mul(radius));
-		manifold.points[0].localPoint1 = XForm.mulTrans(xf1, c);
-		manifold.points[0].localPoint2 = XForm.mulTrans(xf2, c);
+		// just use d as temp vec here, we don't need it any more
+		ECd.set(manifold.normal);
+		ECd.mulLocal(radius);
+		ECc.subLocal(ECd);
+		//c.subLocal(manifold.normal.mul(radius));
+		 XForm.mulTransToOut(xf1, ECc, manifold.points[0].localPoint1);
+		 XForm.mulTransToOut(xf2, ECc, manifold.points[0].localPoint2);
 
 	}
 
