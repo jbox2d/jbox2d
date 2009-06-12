@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.jbox2d.collision.CircleShape;
 import org.jbox2d.collision.CollideCircle;
-import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.collision.Shape;
@@ -77,14 +76,19 @@ public class CircleContact extends Contact implements ContactCreateFcn {
 
     }
 
+    //DMNOTE pooled lets see if this workds
+    private Manifold m0 = new Manifold();
+    private Vec2 v1 = new Vec2();
     public void evaluate(ContactListener listener) {
         //CollideCircle.collideCircle(m_manifold, (CircleShape) m_shape1,
         //        (CircleShape) m_shape2, false);
         Body b1 = m_shape1.getBody();
     	Body b2 = m_shape2.getBody();
 
-    	Manifold m0 = new Manifold(m_manifold);
-        for (int k = 0; k < m_manifold.pointCount; k++) {
+    	
+    	m0.set(m_manifold);
+        //Manifold m0 = new Manifold(m_manifold);  DMNOTE all this should have been taken care of with set
+    	/*for (int k = 0; k < m_manifold.pointCount; k++) {
             m0.points[k] = new ManifoldPoint(m_manifold.points[k]);
             m0.points[k].normalImpulse = m_manifold.points[k].normalImpulse;
             m0.points[k].tangentImpulse = m_manifold.points[k].tangentImpulse;
@@ -93,10 +97,11 @@ public class CircleContact extends Contact implements ContactCreateFcn {
             m0.points[k].id.features.set(m_manifold.points[k].id.features);
             //System.out.println(m_manifold.points[k].id.key);
         }
-        m0.pointCount = m_manifold.pointCount;
+        m0.pointCount = m_manifold.pointCount;*/
     	
     	CollideCircle.collideCircles(m_manifold, (CircleShape)m_shape1, b1.m_xf, (CircleShape)m_shape2, b2.m_xf);
 
+    	// we use this, so allocation is needed
     	ContactPoint cp = new ContactPoint();
     	cp.shape1 = m_shape1;
     	cp.shape2 = m_shape2;
@@ -112,13 +117,17 @@ public class CircleContact extends Contact implements ContactCreateFcn {
     			mp.tangentImpulse = 0.0f;
 
     			if (listener != null) {
-    				cp.position = b1.getWorldLocation(mp.localPoint1);
-    				Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
-    				Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
-    				cp.velocity = v2.sub(v1);
-    				cp.normal = m_manifold.normal.clone();
+    				b1.getWorldLocationToOut(mp.localPoint1, cp.position);
+    				//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
+    				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
+    				// DMNOTE cp.velocity isn't instantiated in the constructor,
+    				// so we just create it here
+    				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+    				//cp.velocity = v2.sub(v1);
+    				cp.velocity.subLocal(v1);
+    				cp.normal.set(m_manifold.normal);
     				cp.separation = mp.separation;
-    				cp.id = new ContactID(mp.id);
+    				cp.id.set(mp.id);
     				listener.add(cp);
     			}
     		} else {
@@ -127,13 +136,16 @@ public class CircleContact extends Contact implements ContactCreateFcn {
     			mp.tangentImpulse = mp0.tangentImpulse;
 
     			if (listener != null) {
-    				cp.position = b1.getWorldLocation(mp.localPoint1);
-    				Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
-    				Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
-    				cp.velocity = v2.sub(v1);
-    				cp.normal = m_manifold.normal.clone();
+    				b1.getWorldLocationToOut(mp.localPoint1, cp.position);
+    				
+    				//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
+    				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
+    				//Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+    				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+    				cp.velocity.subLocal(v1);
+    				cp.normal.set(m_manifold.normal);
     				cp.separation = mp.separation;
-    				cp.id = new ContactID(mp.id);
+    				cp.id.set(mp.id);
     				listener.persist(cp);
     			}
     		}
@@ -141,13 +153,15 @@ public class CircleContact extends Contact implements ContactCreateFcn {
             m_manifoldCount = 0;
     		if (m0.pointCount > 0 && (listener != null)) {
     			ManifoldPoint mp0 = m0.points[0];
-    			cp.position = b1.getWorldLocation(mp0.localPoint1);
-    			Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp0.localPoint1);
-    			Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp0.localPoint2);
-    			cp.velocity = v2.sub(v1);
-    			cp.normal = m0.normal.clone();
+    			b1.getWorldLocationToOut(mp0.localPoint1, cp.position);
+    			//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp0.localPoint1);
+				b1.getLinearVelocityFromLocalPointToOut(mp0.localPoint1, v1);
+				//Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp0.localPoint2);
+				cp.velocity.subLocal(v1);
+    			cp.normal.set(m0.normal);
     			cp.separation = mp0.separation;
-    			cp.id = new ContactID(mp0.id);
+    			cp.id.set(mp0.id);
     			listener.remove(cp);
     		}
         }
