@@ -149,6 +149,30 @@ public abstract class Contact {
     public Shape getShape2() {
         return m_shape2;
     }
+    
+    
+    public void update(ContactListener listener) {
+    	int oldCount = getManifoldCount();
+    	evaluate(listener);
+    	int newCount = getManifoldCount();
+
+    	Body body1 = m_shape1.getBody();
+    	Body body2 = m_shape2.getBody();
+    	
+    	if (newCount == 0 && oldCount > 0) {
+    		body1.wakeUp();
+    		body2.wakeUp();
+    	}
+
+    	// Slow contacts don't generate TOI events.
+    	if (body1.isStatic() || body1.isBullet() || body2.isStatic() || body2.isBullet()) {
+    		m_flags &= ~e_slowFlag;
+    	} else {
+    		m_flags |= e_slowFlag;
+    	}
+    }
+
+    public abstract Contact clone();
 
     static void initializeRegisters() {
         s_registers = new ArrayList<ContactRegister>();
@@ -241,27 +265,4 @@ public abstract class Contact {
             contact.getShape2().getBody().wakeUp();
         }
     }
-    
-    public void update(ContactListener listener) {
-    	int oldCount = getManifoldCount();
-    	evaluate(listener);
-    	int newCount = getManifoldCount();
-
-    	Body body1 = m_shape1.getBody();
-    	Body body2 = m_shape2.getBody();
-    	
-    	if (newCount == 0 && oldCount > 0) {
-    		body1.wakeUp();
-    		body2.wakeUp();
-    	}
-
-    	// Slow contacts don't generate TOI events.
-    	if (body1.isStatic() || body1.isBullet() || body2.isStatic() || body2.isBullet()) {
-    		m_flags &= ~e_slowFlag;
-    	} else {
-    		m_flags |= e_slowFlag;
-    	}
-    }
-
-    public abstract Contact clone();
 }

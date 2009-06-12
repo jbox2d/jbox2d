@@ -110,5 +110,11 @@ public class ContactID {
         key = c.key;
         features = new Features(c.features);
     }
+    
+    // for object reusability
+    public void set(ContactID c){
+    	key = c.key;
+    	features.set(c.features);
+    }
 
 }

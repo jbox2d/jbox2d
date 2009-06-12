@@ -52,12 +52,26 @@ public class Manifold {
         // copy of a Manifold, by copying the points array
         // or merely passing a pointer to it.
         // Update: tested both, the arraycopy seems to be correct, leave it!
-        System.arraycopy(other.points, 0, points, 0, other.points.length);
+        // DMNOTE we don't need to copy all of them, do we?
+        System.arraycopy(other.points, 0, points, 0, other.pointCount);//other.points.length);
         // points = new ManifoldPoint[other.points.length];
         // for (int i=0; i<other.pointCount; i++){
         //   points[i] = new ManifoldPoint(other.points[i]);
         // }
         normal = other.normal.clone();
         pointCount = other.pointCount;// points.length;
+    }
+    
+    // DMNOTE for object reusability
+    public void set(Manifold cp){
+    	// will this work?
+    	//System.arraycopy(cp.points, 0, points, 0, cp.pointCount);
+    	// just do this for now
+    	for(int i=0; i<cp.pointCount; i++){
+    		points[i].set(cp.points[i]);
+    	}
+    	
+    	normal.set(cp.normal);
+    	pointCount = cp.pointCount;
     }
 }

@@ -63,4 +63,14 @@ public class ManifoldPoint {
         tangentImpulse = cp.tangentImpulse;
         id = new ContactID(cp.id);
     }
+    
+    // put here for object reusability
+    public void set(ManifoldPoint cp){
+    	localPoint1.set(cp.localPoint1);
+    	localPoint2.set(cp.localPoint2);
+        separation = cp.separation;
+        normalImpulse = cp.normalImpulse;
+        tangentImpulse = cp.tangentImpulse;
+        id.set(cp.id);
+    }
 }
