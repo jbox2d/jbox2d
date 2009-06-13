@@ -26,7 +26,7 @@ package org.jbox2d.common;
 /**
  * A transform contains translation and rotation. It is used to represent
  * the position and orientation of rigid frames.
- * DMNOTE: added ToOut methods, and added final where appropriate
+ * djm: added ToOut methods, and added final where appropriate
  */
 public class XForm {
 	/** The translation caused by the transform */
@@ -78,7 +78,7 @@ public class XForm {
 		                T.position.y + T.R.col1.y * v.x + T.R.col2.y * v.y);
 	}
 
-	/* DMNOTE added */
+	/* djm added */
 	public final static void mulToOut(final XForm T, final Vec2 v, final Vec2 out){
 		final float tempy = T.position.y + T.R.col1.y * v.x + T.R.col2.y * v.y;
 		out.x = T.position.x + T.R.col1.x * v.x + T.R.col2.x * v.y;

@@ -58,7 +58,7 @@ public class ContactConstraintPoint {
         r2 = new Vec2();
     }
     
-    // DMNOTE added for object reusability
+    // djm added for object reusability
     public void set( ContactConstraintPoint cp){
     	localAnchor1.set(cp.localAnchor1);
     	localAnchor2.set(cp.localAnchor2);

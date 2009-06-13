@@ -25,7 +25,7 @@ package org.jbox2d.common;
 
 /**
  * A 2-dimensional vector class.  Used heavily in JBox2d.
- * DMNOTE: added ToOut methods, added modifiers, and a
+ * djm: added ToOut methods, added modifiers, and a
  * few optimizations
  */
 public class Vec2 {
@@ -170,7 +170,7 @@ public class Vec2 {
 		return new Vec2(Math.abs(x), Math.abs(y));
 	}
 
-	/* DMNOTE created */
+	/* djm created */
 	public final void absLocal(){
 		x = Math.abs(x);
 		y = Math.abs(y);
@@ -195,7 +195,7 @@ public class Vec2 {
 		return new Vec2(Math.abs(a.x), Math.abs(a.y));
 	}
 
-	/* DMNOTE created */
+	/* djm created */
 	public final static void absToOut(Vec2 a, Vec2 out){
 		out.x = Math.abs( a.x);
 		out.y = Math.abs( a.y);
@@ -213,7 +213,7 @@ public class Vec2 {
 		return new Vec2(s * a.y, -s * a.x);
 	}
 
-	/* DMNOTE created */
+	/* djm created */
 	public final static void crossToOut(Vec2 a, float s, Vec2 out){
 		float tempy = -s * a.x;
 		out.x = s * a.y;
@@ -224,11 +224,16 @@ public class Vec2 {
 		return new Vec2(-s * a.y, s * a.x);
 	}
 
-	/* DMNOTE created */
+	/* djm created */
 	public final static void crossToOut(float s, Vec2 a, Vec2 out){
 		float tempY = s * a.x;
 		out.x = -s * a.y;
 		out.y = tempY;
+	}
+	
+	public final static void negateToOut(Vec2 a, Vec2 out){
+		out.x = -a.x;
+		out.y = -a.y;
 	}
 
 	public final static Vec2 min(Vec2 a, Vec2 b) {
@@ -239,13 +244,13 @@ public class Vec2 {
 		return new Vec2(a.x > b.x ? a.x : b.x, a.y > b.y ? a.y : b.y);
 	}
 
-	/* DMNOTE created */
+	/* djm created */
 	public final static void minToOut(Vec2 a, Vec2 b, Vec2 out) {
 		out.x = a.x < b.x ? a.x : b.x;
 		out.y = a.y < b.y ? a.y : b.y;
 	}
 
-	/* DMNOTE created */
+	/* djm created */
 	public final static void maxToOut(Vec2 a, Vec2 b, Vec2 out) {
 		out.x = a.x > b.x ? a.x : b.x;
 		out.y = a.y > b.y ? a.y : b.y;

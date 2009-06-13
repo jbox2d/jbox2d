@@ -94,7 +94,7 @@ public class DistanceJoint extends Joint {
         return m_body2.getWorldLocation(m_localAnchor2);
     }
 
-    // DMNOTE pooled
+    // djm pooled
     private Vec2 reactionForce = new Vec2();
     public Vec2 getReactionForce() {
     	reactionForce.x = m_impulse * m_u.x;
@@ -106,7 +106,7 @@ public class DistanceJoint extends Joint {
         return 0.0f;
     }
 
-    // DMNOTE pooled
+    // djm pooled
     private Vec2 r1 = new Vec2();
     private Vec2 r2 = new Vec2();
     private Vec2 P = new Vec2();
@@ -174,7 +174,7 @@ public class DistanceJoint extends Joint {
     	}
     }
 
-    // DMNOTE pooled, and use pooled objects above
+    // djm pooled, and use pooled objects above
     private Vec2 d = new Vec2();
     @Override
     public boolean solvePositionConstraints() {
@@ -213,7 +213,7 @@ public class DistanceJoint extends Joint {
     	return Math.abs(C) < Settings.linearSlop;
     }
 
-    // DMNOTE pooled, and use pool above
+    // djm pooled, and use pool above
     private Vec2 v1 = new Vec2();
     private Vec2 v2 = new Vec2();
     @Override

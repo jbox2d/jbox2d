@@ -73,7 +73,7 @@ public class Distance{
 	// The origin is either in the region of points[1] or in the edge region. The origin is
 	// not in region of points[0] because that is the old point.
 	
-	// DMNOTE pooled
+	// djm pooled
 	private static Vec2 p2r = new Vec2();
 	private static Vec2 p2d = new Vec2();
 	protected static int ProcessTwo(Vec2 x1, Vec2 x2, Vec2[] p1s, Vec2[] p2s, Vec2[] points) {
@@ -310,7 +310,7 @@ public class Distance{
 		//
 	}
 
-	// DMNOTE pooled
+	// djm pooled
 	private static Vec2 distCCp1 = new Vec2();
 	private static Vec2 distCCp2 = new Vec2();
 	private static Vec2 distCCd = new Vec2();
@@ -350,7 +350,7 @@ public class Distance{
 		return 0.0f;
 	}
 	
-	// DMNOTE pooled
+	// djm pooled
 	private static Vec2 cWorld = new Vec2(); // just like sea world but with less water and more chlorine
 	//private static Vec2 shamoo = new Vec2();
 	private static Vec2 ECcLocal = new Vec2();
@@ -501,7 +501,7 @@ public class Distance{
 			return distance;
 	}
 	
-	// DMNOTE pooled
+	// djm pooled
 	private static Vec2 CPp1 = new Vec2();
 	private static Vec2 CPp2 = new Vec2();
 	private static Vec2 CPd = new Vec2();

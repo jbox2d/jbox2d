@@ -27,7 +27,7 @@ public class ConstantVolumeJoint extends Joint {
 		targetVolume *= factor;
 	}
 	
-	// DMNOTE this is not a hot method, so no pool. no one wants
+	// djm this is not a hot method, so no pool. no one wants
 	// to swim when it's cold out.  except when you have a hot
 	// tub.....then its amazing.....hmmmm......
 	public ConstantVolumeJoint(ConstantVolumeJointDef def) {
@@ -135,7 +135,7 @@ public class ConstantVolumeJoint extends Joint {
 		  return done;
 	}
 	
-	// DMNOTE pooled
+	// djm pooled
 	private Vec2[] d;
 	private float m_impulse = 0.0f;
 	@Override

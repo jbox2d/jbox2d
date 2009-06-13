@@ -53,7 +53,7 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
     	return this;
 	}
 
-	// DMNOTE pooled
+	// djm pooled
     private Manifold m0 = new Manifold();
     private Vec2 v1 = new Vec2();
 	@Override
@@ -108,7 +108,7 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 							b1.getWorldLocationToOut(mp.localPoint1, cp.position);
     						//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
     	    				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
-    	    				// DMNOTE cp.velocity isn't instantiated in the constructor,
+    	    				// djm cp.velocity isn't instantiated in the constructor,
     	    				// so we just create it here
     	    				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
     	    				//cp.velocity = v2.sub(v1);
@@ -128,7 +128,7 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 					b1.getWorldLocationToOut(mp.localPoint1, cp.position);
 					//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
     				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
-    				// DMNOTE cp.velocity isn't instantiated in the constructor,
+    				// djm cp.velocity isn't instantiated in the constructor,
     				// so we just create it here
     				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
     				//cp.velocity = v2.sub(v1);
@@ -160,7 +160,7 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
     		b1.getWorldLocationToOut(mp0.localPoint1, cp.position);
 			//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
 			b1.getLinearVelocityFromLocalPointToOut(mp0.localPoint1, v1);
-			// DMNOTE cp.velocity isn't instantiated in the constructor,
+			// djm cp.velocity isn't instantiated in the constructor,
 			// so we just create it here
 			cp.velocity = b2.getLinearVelocityFromLocalPoint(mp0.localPoint2);
 			//cp.velocity = v2.sub(v1);
@@ -173,8 +173,8 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 		}
 	}
 	
-	// DMNOTE TODO shouldn't this be in a static collision class??
-	// DMNOTE pooled
+	// djm TODO shouldn't this be in a static collision class??
+	// djm pooled
 	private static Vec2 PEv1 = new Vec2();
 	private static Vec2 PEv2 = new Vec2();
 	private static Vec2 PEn = new Vec2();

@@ -252,7 +252,7 @@ public abstract class Shape {
     	}
     	
     	broadPhase.destroyProxy(m_proxyId);
-    	// DMNOTE don't pool this, it could be used to
+    	// djm don't pool this, it could be used to
     	// create a proxy
     	AABB aabb = new AABB();
     	computeAABB(aabb, transform);
@@ -302,7 +302,7 @@ public abstract class Shape {
     public void createProxy(BroadPhase broadPhase, XForm transform) {
     	assert(m_proxyId == PairManager.NULL_PROXY);
 
-    	// DMNOTE don't pool this,
+    	// djm don't pool this,
     	// could be used
     	AABB aabb = new AABB();
     	computeAABB(aabb, transform);

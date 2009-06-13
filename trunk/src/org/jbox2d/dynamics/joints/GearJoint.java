@@ -93,6 +93,7 @@ public class GearJoint extends Joint {
 	/** Force for accumulation/warm starting. */
 	float m_force;
 
+	// not a hot method, no pooling
     public GearJoint(GearJointDef def) {
         super(def);
 
@@ -150,6 +151,9 @@ public class GearJoint extends Joint {
         m_force = 0.0f;
     }
 
+    // djm pooled
+    private Vec2 ug = new Vec2();
+    private Vec2 r = new Vec2();
     public void initVelocityConstraints(TimeStep step) {
         Body g1 = m_ground1;
         Body g2 = m_ground2;
@@ -164,8 +168,8 @@ public class GearJoint extends Joint {
             K += b1.m_invI;
         }
         else {
-        	Vec2 ug = Mat22.mul(g1.getMemberXForm().R, m_prismatic1.m_localXAxis1);
-    		Vec2 r = Mat22.mul(b1.getMemberXForm().R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
+        	Mat22.mulToOut(g1.getMemberXForm().R, m_prismatic1.m_localXAxis1, ug);
+        	Mat22.mulToOut(b1.getMemberXForm().R, m_localAnchor1.sub(b1.getMemberLocalCenter()), r);
     		float crug = Vec2.cross(r, ug);
             m_J.linear1 = ug.negate();
             m_J.angular1 = -crug;
@@ -177,8 +181,8 @@ public class GearJoint extends Joint {
             K += m_ratio * m_ratio * b2.m_invI;
         }
         else {
-            Vec2 ug = Mat22.mul(g2.getMemberXForm().R, m_prismatic2.m_localXAxis1);
-    		Vec2 r = Mat22.mul(b2.getMemberXForm().R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
+            Mat22.mulToOut(g2.getMemberXForm().R, m_prismatic2.m_localXAxis1, ug);
+    		Mat22.mulToOut(b2.getMemberXForm().R, m_localAnchor2.sub(b2.getMemberLocalCenter()), r);
             float crug = Vec2.cross(r, ug);
             m_J.linear2 = ug.mulLocal(-m_ratio);
             m_J.angular2 = -m_ratio * crug;
@@ -263,16 +267,31 @@ public class GearJoint extends Joint {
     public Vec2 getAnchor1() {
         return m_body1.getWorldLocation(m_localAnchor1);
     }
+    
+    public void getAnchor1ToOut(Vec2 out){
+    	m_body1.getWorldLocationToOut(m_localAnchor1, out);
+    }
 
     public Vec2 getAnchor2() {
         return m_body2.getWorldLocation(m_localAnchor2);
+    }
+    
+    public void getAnchor2ToOut(Vec2 out){
+    	m_body2.getWorldLocationToOut(m_localAnchor2, out);
     }
 
     public Vec2 getReactionForce() {
     	// TODO_ERIN not tested
         return new Vec2(m_force * m_J.linear2.x, m_force * m_J.linear2.y);
     }
+    
+    public void getReactionForceToOut(Vec2 out){
+    	// TODO_ERIN using your untested code above
+    	out.x = m_force * m_J.linear2.x;
+    	out.y = m_force * m_J.linear2.y;
+    }
 
+    // djm not optimizing because this is untested code.
     public float getReactionTorque() {
     	// TODO_ERIN not tested
     	Vec2 r = Mat22.mul(m_body2.getMemberXForm().R, m_localAnchor2.sub(m_body2.getMemberLocalCenter()));
