@@ -27,6 +27,9 @@ public class ConstantVolumeJoint extends Joint {
 		targetVolume *= factor;
 	}
 	
+	// DMNOTE this is not a hot method, so no pool. no one wants
+	// to swim when it's cold out.  except when you have a hot
+	// tub.....then its amazing.....hmmmm......
 	public ConstantVolumeJoint(ConstantVolumeJointDef def) {
 		super(def);
 		if (def.bodies.length <= 2) {
@@ -61,6 +64,12 @@ public class ConstantVolumeJoint extends Joint {
 		this.m_body1 = bodies[0];
 		this.m_body2 = bodies[1];
 		this.m_collideConnected = false;
+		
+		d = new Vec2[bodies.length];
+		// init pooled array
+		for(int i=0; i<bodies.length; i++){
+			d[i] = new Vec2();
+		}
 	}
 	
 	@Override
@@ -72,6 +81,7 @@ public class ConstantVolumeJoint extends Joint {
 	
 	private float getArea() {
 		  float area = 0.0f;
+		  // i'm glad i changed these all to member access
 		  area += bodies[bodies.length-1].getMemberWorldCenter().x * bodies[0].getMemberWorldCenter().y -
 		  		  bodies[0].getMemberWorldCenter().x * bodies[bodies.length-1].getMemberWorldCenter().y;
 		  for (int i=0; i<bodies.length-1; ++i){
@@ -109,8 +119,12 @@ public class ConstantVolumeJoint extends Joint {
 		    					  toExtrude * (normals[i].y + normals[next].y));
 		    //sumdeltax += dx;
 		    float norm = delta.length();
-		    if (norm > Settings.maxLinearCorrection) delta.mulLocal(Settings.maxLinearCorrection/norm);
-		    if (norm > Settings.linearSlop) done = false;
+		    if (norm > Settings.maxLinearCorrection){
+		    	delta.mulLocal(Settings.maxLinearCorrection/norm);
+		    }
+		    if (norm > Settings.linearSlop){
+		    	done = false;
+		    }
 		    bodies[next].m_sweep.c.x += delta.x;
 		    bodies[next].m_sweep.c.y += delta.y;
 		    bodies[next].synchronizeTransform();
@@ -120,17 +134,19 @@ public class ConstantVolumeJoint extends Joint {
 		  //System.out.println(sumdeltax);
 		  return done;
 	}
-
+	
+	// DMNOTE pooled
+	private Vec2[] d;
 	private float m_impulse = 0.0f;
 	@Override
 	public void initVelocityConstraints(TimeStep step) {
 		m_step = step;
 		
-		Vec2[] d = new Vec2[bodies.length];
 		for (int i=0; i<bodies.length; ++i) {
 			int prev = (i==0)?bodies.length-1:i-1;
 			int next = (i==bodies.length-1)?0:i+1;
-			d[i] = bodies[next].getMemberWorldCenter().sub(bodies[prev].getMemberWorldCenter());
+			d[i].set(bodies[next].getMemberWorldCenter());
+			d[i].subLocal(bodies[prev].getMemberWorldCenter());
 		}
 		
 		if (step.warmStarting) {
@@ -157,11 +173,12 @@ public class ConstantVolumeJoint extends Joint {
 	public void solveVelocityConstraints(TimeStep step) {
 		float crossMassSum = 0.0f;
 		float dotMassSum = 0.0f;
-		Vec2[] d = new Vec2[bodies.length];
+		
 		for (int i=0; i<bodies.length; ++i) {
 			int prev = (i==0)?bodies.length-1:i-1;
 			int next = (i==bodies.length-1)?0:i+1;
-			d[i] = bodies[next].getMemberWorldCenter().sub(bodies[prev].getMemberWorldCenter());
+			d[i].set(bodies[next].getMemberWorldCenter());
+			d[i].subLocal(bodies[prev].getMemberWorldCenter());
 			dotMassSum += (d[i].lengthSquared())/bodies[i].getMass();
 			crossMassSum += Vec2.cross(bodies[i].getLinearVelocity(),d[i]);
 		}

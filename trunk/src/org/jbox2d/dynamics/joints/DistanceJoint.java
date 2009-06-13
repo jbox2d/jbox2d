@@ -94,14 +94,22 @@ public class DistanceJoint extends Joint {
         return m_body2.getWorldLocation(m_localAnchor2);
     }
 
+    // DMNOTE pooled
+    private Vec2 reactionForce = new Vec2();
     public Vec2 getReactionForce() {
-    	return new Vec2(m_impulse * m_u.x, m_impulse * m_u.y);
+    	reactionForce.x = m_impulse * m_u.x;
+    	reactionForce.y = m_impulse * m_u.y;
+    	return reactionForce;
     }
 
     public float getReactionTorque() {
         return 0.0f;
     }
 
+    // DMNOTE pooled
+    private Vec2 r1 = new Vec2();
+    private Vec2 r2 = new Vec2();
+    private Vec2 P = new Vec2();
     @Override
     public void initVelocityConstraints(TimeStep step) {
     	m_inv_dt = step.inv_dt;
@@ -111,8 +119,8 @@ public class DistanceJoint extends Joint {
     	Body b2 = m_body2;
 
     	// Compute the effective mass matrix.
-    	Vec2 r1 = Mat22.mul(b1.getMemberXForm().R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.getMemberXForm().R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
+    	Mat22.mulToOut(b1.getMemberXForm().R, m_localAnchor1.sub(b1.getMemberLocalCenter()), r1);
+    	Mat22.mulToOut(b2.getMemberXForm().R, m_localAnchor2.sub(b2.getMemberLocalCenter()), r2);
     	m_u.x = b2.m_sweep.c.x + r2.x - b1.m_sweep.c.x - r1.x;
     	m_u.y = b2.m_sweep.c.y + r2.y - b1.m_sweep.c.y - r1.y;
 
@@ -153,7 +161,8 @@ public class DistanceJoint extends Joint {
 
     	if (step.warmStarting) {
     		m_impulse *= step.dtRatio;
-    		Vec2 P = m_u.mul(m_impulse);
+    		P.set(m_u);
+    		P.mulLocal(m_impulse);
     		b1.m_linearVelocity.x -= b1.m_invMass * P.x;
     		b1.m_linearVelocity.y -= b1.m_invMass * P.y;
     		b1.m_angularVelocity -= b1.m_invI * Vec2.cross(r1, P);
@@ -165,6 +174,8 @@ public class DistanceJoint extends Joint {
     	}
     }
 
+    // DMNOTE pooled, and use pooled objects above
+    private Vec2 d = new Vec2();
     @Override
     public boolean solvePositionConstraints() {
     	if (m_frequencyHz > 0.0f) {
@@ -174,11 +185,11 @@ public class DistanceJoint extends Joint {
     	Body b1 = m_body1;
     	Body b2 = m_body2;
 
-    	Vec2 r1 = Mat22.mul(b1.getMemberXForm().R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.getMemberXForm().R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
+    	Mat22.mulToOut(b1.getMemberXForm().R, m_localAnchor1.sub(b1.getMemberLocalCenter()), r1);
+    	Mat22.mulToOut(b2.getMemberXForm().R, m_localAnchor2.sub(b2.getMemberLocalCenter()), r2);
 
-    	Vec2 d = new Vec2(b2.m_sweep.c.x + r2.x - b1.m_sweep.c.x - r1.x,
-    					  b2.m_sweep.c.y + r2.y - b1.m_sweep.c.y - r1.y);
+    	d.x = b2.m_sweep.c.x + r2.x - b1.m_sweep.c.x - r1.x;
+    	d.y = b2.m_sweep.c.y + r2.y - b1.m_sweep.c.y - r1.y;
 
     	float length = d.normalize();
     	float C = length - m_length;
@@ -202,17 +213,24 @@ public class DistanceJoint extends Joint {
     	return Math.abs(C) < Settings.linearSlop;
     }
 
+    // DMNOTE pooled, and use pool above
+    private Vec2 v1 = new Vec2();
+    private Vec2 v2 = new Vec2();
     @Override
     public void solveVelocityConstraints(TimeStep step) {
     	Body b1 = m_body1;
     	Body b2 = m_body2;
 
-    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
+    	Mat22.mulToOut(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()), r1);
+    	Mat22.mulToOut(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()), r2);
 
     	// Cdot = dot(u, v + cross(w, r))
-    	Vec2 v1 = b1.m_linearVelocity.add(Vec2.cross(b1.m_angularVelocity, r1));
-    	Vec2 v2 = b2.m_linearVelocity.add(Vec2.cross(b2.m_angularVelocity, r2));
+    	Vec2.crossToOut( b1.m_angularVelocity, r1, v1);
+    	Vec2.crossToOut( b2.m_angularVelocity, r2, v2);
+    	v1.addLocal( b1.m_linearVelocity);
+    	v2.addLocal( b2.m_linearVelocity);
+    	//Vec2 v1 = b1.m_linearVelocity.add(Vec2.cross(b1.m_angularVelocity, r1));
+    	//Vec2 v2 = b2.m_linearVelocity.add(Vec2.cross(b2.m_angularVelocity, r2));
     	float Cdot = Vec2.dot(m_u, v2.subLocal(v1));
     	
     	float impulse = -m_mass * (Cdot + m_bias + m_gamma * m_impulse);
