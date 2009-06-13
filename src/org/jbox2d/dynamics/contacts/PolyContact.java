@@ -59,7 +59,9 @@ public class PolyContact extends Contact implements ContactCreateFcn {
 
     public Contact clone() {
         PolyContact newC = new PolyContact(this.m_shape1, this.m_shape2);
-        if (this.m_manifold != null) newC.m_manifold = new Manifold(this.m_manifold);
+        if (this.m_manifold != null){
+        	newC.m_manifold.set(this.m_manifold);
+        }
         newC.m_manifoldCount = this.m_manifoldCount;
         // The parent world.
         newC.m_world = this.m_world;
@@ -86,7 +88,7 @@ public class PolyContact extends Contact implements ContactCreateFcn {
     @Override
     public List<Manifold> getManifolds() {
         // System.out.println("PolyContact.GetManifolds()");
-        List<Manifold> ret = new ArrayList<Manifold>();
+        List<Manifold> ret = new ArrayList<Manifold>(1);
         if (m_manifold != null) {
             ret.add(m_manifold);
         }
@@ -104,15 +106,19 @@ public class PolyContact extends Contact implements ContactCreateFcn {
     		System.out.println("Manifold point dump: "+mp.normalImpulse+" "+mp.tangentImpulse);
     	}
     }
-
+    
+    // DMNOTE pooled
+    private Manifold m0 = new Manifold();
+    private Vec2 v1 = new Vec2();
     @Override
     public void evaluate(ContactListener listener) {
     	Body b1 = m_shape1.getBody();
     	Body b2 = m_shape2.getBody();
         // Manifold m0 = m_manifold;
-        Manifold m0 = new Manifold(m_manifold);
-        //This next stuff might be unnecessary now [ewj: nope, we need it]
-        for (int k = 0; k < m_manifold.pointCount; k++) {
+        m0.set(m_manifold);
+        //This next stuff might be unnecessary now [ewj: nope, we need it] - DM thats because 
+        // the clone constructor was wrong.  it is unnecessary now.
+        /*for (int k = 0; k < m_manifold.pointCount; k++) {
             m0.points[k] = new ManifoldPoint(m_manifold.points[k]);
             m0.points[k].normalImpulse = m_manifold.points[k].normalImpulse;
             m0.points[k].tangentImpulse = m_manifold.points[k].tangentImpulse;
@@ -121,7 +127,7 @@ public class PolyContact extends Contact implements ContactCreateFcn {
             m0.points[k].id.features.set(m_manifold.points[k].id.features);
             //System.out.println(m_manifold.points[k].normalForce);
         }
-        m0.pointCount = m_manifold.pointCount;
+        m0.pointCount = m_manifold.pointCount;*/
 
         CollidePoly.collidePolygons(m_manifold, (PolygonShape) m_shape1,b1.getMemberXForm(),(PolygonShape) m_shape2, b2.getMemberXForm());
 
@@ -146,7 +152,7 @@ public class PolyContact extends Contact implements ContactCreateFcn {
     			mp.normalImpulse = 0.0f;
     			mp.tangentImpulse = 0.0f;
     			boolean found = false;
-    			ContactID id = new ContactID(mp.id);
+    			ContactID id = mp.id;
 
     			for (int j = 0; j < m0.pointCount; ++j) {
     				if (persisted[j] == true) {
@@ -166,12 +172,18 @@ public class PolyContact extends Contact implements ContactCreateFcn {
     					// Report persistent point.
     					if (listener != null) {
     						cp.position = b1.getWorldLocation(mp.localPoint1);
-    						Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
-    						Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
-    						cp.velocity = v2.sub(v1);
-    						cp.normal = m_manifold.normal.clone();
+							b1.getWorldLocationToOut(mp.localPoint1, cp.position);
+    						//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
+    	    				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
+    	    				// DMNOTE cp.velocity isn't instantiated in the constructor,
+    	    				// so we just create it here
+    	    				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+    	    				//cp.velocity = v2.sub(v1);
+    	    				cp.velocity.subLocal(v1);
+    	    				
+    						cp.normal.set(m_manifold.normal);
     						cp.separation = mp.separation;
-    						cp.id = new ContactID(id);
+    						cp.id.set(id);
     						listener.persist(cp);
     					}
     					break;
@@ -180,13 +192,18 @@ public class PolyContact extends Contact implements ContactCreateFcn {
 
     			// Report added point.
     			if (found == false && listener != null) {
-    				cp.position = b1.getWorldLocation(mp.localPoint1);
-    				Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
-    				Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
-    				cp.velocity = v2.sub(v1);
-    				cp.normal = m_manifold.normal.clone();
-    				cp.separation = mp.separation;
-    				cp.id = new ContactID(id);
+    				b1.getWorldLocationToOut(mp.localPoint1, cp.position);
+					//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
+    				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
+    				// DMNOTE cp.velocity isn't instantiated in the constructor,
+    				// so we just create it here
+    				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+    				//cp.velocity = v2.sub(v1);
+    				cp.velocity.subLocal(v1);
+    				
+					cp.normal.set(m_manifold.normal);
+					cp.separation = mp.separation;
+					cp.id.set(id);
     				listener.add(cp);
     			}
     		}
@@ -207,13 +224,19 @@ public class PolyContact extends Contact implements ContactCreateFcn {
     		}
 
     		ManifoldPoint mp0 = m0.points[i];
-    		cp.position = b1.getWorldLocation(mp0.localPoint1);
-    		Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp0.localPoint1);
-    		Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp0.localPoint2);
-    		cp.velocity = v2.sub(v1);
-    		cp.normal = m0.normal.clone();
-    		cp.separation = mp0.separation;
-    		cp.id = new ContactID(mp0.id);
+    		b1.getWorldLocationToOut(mp0.localPoint1, cp.position);
+			//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
+			b1.getLinearVelocityFromLocalPointToOut(mp0.localPoint1, v1);
+			// DMNOTE cp.velocity isn't instantiated in the constructor,
+			// so we just create it here
+			cp.velocity = b2.getLinearVelocityFromLocalPoint(mp0.localPoint2);
+			//cp.velocity = v2.sub(v1);
+			cp.velocity.subLocal(v1);
+			
+			cp.normal.set(m_manifold.normal);
+			cp.separation = mp0.separation;
+			cp.id.set(mp0.id);
+			
     		listener.remove(cp);
     	}
     }
