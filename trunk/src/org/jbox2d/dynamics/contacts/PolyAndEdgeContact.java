@@ -53,16 +53,15 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
     	return this;
 	}
 
+	// DMNOTE pooled
+    private Manifold m0 = new Manifold();
+    private Vec2 v1 = new Vec2();
 	@Override
 	public void evaluate(ContactListener listener) {
 		Body b1 = m_shape1.getBody();
 		Body b2 = m_shape2.getBody();
 
-		Manifold m0 = new Manifold(m_manifold);
-        for (int k = 0; k < m_manifold.pointCount; k++) {
-            m0.points[k] = new ManifoldPoint(m_manifold.points[k]);
-        }
-        m0.pointCount = m_manifold.pointCount;
+		m0.set( m_manifold);
 		
 		CollidePolyAndEdge(m_manifold, (PolygonShape)m_shape1, b1.getMemberXForm(), (EdgeShape)m_shape2, b2.getMemberXForm());
 
@@ -106,12 +105,18 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 						// Report persistent point.
 						if (listener != null) {
 							cp.position = b1.getWorldLocation(mp.localPoint1);
-							Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
-							Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
-							cp.velocity = v2.sub(v1);
-							cp.normal = m_manifold.normal.clone();
-							cp.separation = mp.separation;
-							cp.id = new ContactID(id);
+							b1.getWorldLocationToOut(mp.localPoint1, cp.position);
+    						//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
+    	    				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
+    	    				// DMNOTE cp.velocity isn't instantiated in the constructor,
+    	    				// so we just create it here
+    	    				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+    	    				//cp.velocity = v2.sub(v1);
+    	    				cp.velocity.subLocal(v1);
+    	    				
+    						cp.normal.set(m_manifold.normal);
+    						cp.separation = mp.separation;
+    						cp.id.set(id);
 							listener.persist(cp);
 						}
 						break;
@@ -120,13 +125,18 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 
 				// Report added point.
 				if (found == false && listener != null) {
-					cp.position = b1.getWorldLocation(mp.localPoint1);
-					Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
-					Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
-					cp.velocity = v2.sub(v1);
-					cp.normal = m_manifold.normal.clone();
+					b1.getWorldLocationToOut(mp.localPoint1, cp.position);
+					//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
+    				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
+    				// DMNOTE cp.velocity isn't instantiated in the constructor,
+    				// so we just create it here
+    				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+    				//cp.velocity = v2.sub(v1);
+    				cp.velocity.subLocal(v1);
+    				
+					cp.normal.set(m_manifold.normal);
 					cp.separation = mp.separation;
-					cp.id = new ContactID(id);
+					cp.id.set(id);
 					listener.add(cp);
 				}
 			}
@@ -147,30 +157,44 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 			}
 
 			ManifoldPoint mp0 = m0.points[i];
-			cp.position = b1.getWorldLocation(mp0.localPoint1);
-			Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp0.localPoint1);
-			Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp0.localPoint2);
-			cp.velocity = v2.sub(v1);
-			cp.normal = m0.normal.clone();
+    		b1.getWorldLocationToOut(mp0.localPoint1, cp.position);
+			//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
+			b1.getLinearVelocityFromLocalPointToOut(mp0.localPoint1, v1);
+			// DMNOTE cp.velocity isn't instantiated in the constructor,
+			// so we just create it here
+			cp.velocity = b2.getLinearVelocityFromLocalPoint(mp0.localPoint2);
+			//cp.velocity = v2.sub(v1);
+			cp.velocity.subLocal(v1);
+			
+			cp.normal.set(m_manifold.normal);
 			cp.separation = mp0.separation;
-			cp.id = new ContactID(mp0.id);
+			cp.id.set(mp0.id);
 			listener.remove(cp);
 		}
-
 	}
 	
-	void CollidePolyAndEdge(Manifold manifold,
+	// DMNOTE TODO shouldn't this be in a static collision class??
+	// DMNOTE pooled
+	private static Vec2 PEv1 = new Vec2();
+	private static Vec2 PEv2 = new Vec2();
+	private static Vec2 PEn = new Vec2();
+	private static Vec2 PEv1Local = new Vec2();
+	private static Vec2 PEv2Local = new Vec2();
+	private static Vec2 PEnLocal = new Vec2();
+	private static Vec2 temp = new Vec2();
+	private static Vec2 temp2 = new Vec2();
+	public static final void CollidePolyAndEdge(Manifold manifold,
 			  final PolygonShape polygon, 
 			  final XForm xf1,
 			  final EdgeShape edge, 
 			  final XForm xf2) {
 		manifold.pointCount = 0;
-		Vec2 v1 = XForm.mul(xf2, edge.getVertex1());
-		Vec2 v2 = XForm.mul(xf2, edge.getVertex2());
-		Vec2 n = Mat22.mul(xf2.R, edge.getNormalVector());
-		Vec2 v1Local = XForm.mulTrans(xf1, v1);
-		Vec2 v2Local = XForm.mulTrans(xf1, v2);
-		Vec2 nLocal = Mat22.mulTrans(xf1.R, n);
+		XForm.mulToOut(xf2, edge.getVertex1(), PEv1);
+		XForm.mulToOut(xf2, edge.getVertex2(), PEv2);
+		Mat22.mulToOut(xf2.R, edge.getNormalVector(), PEn);
+		XForm.mulTransToOut(xf1, PEv1, PEv1Local);
+		XForm.mulTransToOut(xf1, PEv2, PEv2Local);
+		Mat22.mulTransToOut(xf1.R, PEn, PEnLocal);
 
 		float separation1;
 		int separationIndex1 = -1; // which normal on the poly found the shallowest depth?
@@ -205,10 +229,17 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 		// for each poly normal, get the edge's depth into the poly. 
 		// for each poly vertex, get the vertex's depth into the edge. 
 		// use these calculations to define the remaining variables declared above.
-		prevSepN = Vec2.dot(vertices[vertexCount-1].sub(v1Local), nLocal);
+		temp.set( vertices[vertexCount-1]);
+		temp.subLocal( PEv1Local);
+		prevSepN = Vec2.dot(temp, PEnLocal);
+		
 		for (int i = 0; i < vertexCount; i++) {
-			separation1 = Vec2.dot(v1Local.sub(vertices[i]), normals[i]);
-			separation2 = Vec2.dot(v2Local.sub(vertices[i]), normals[i]);
+			temp.set(PEv1Local);
+			temp.subLocal( vertices[i]);
+			separation1 = Vec2.dot(temp, normals[i]);
+			temp.set(PEv2Local);
+			temp.subLocal( vertices[i]);
+			separation2 = Vec2.dot(temp, normals[i]);
 			if (separation2 < separation1) {
 				if (separation2 > separationMax) {
 					separationMax = separation2;
@@ -231,7 +262,10 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 				separationIndex2 = i;
 			}
 		
-			nextSepN = Vec2.dot(vertices[i].sub(v1Local), nLocal);
+			temp.set( vertices[i]);
+			temp.subLocal( PEv1Local);
+			
+			nextSepN = Vec2.dot(temp, PEnLocal);
 			if (nextSepN >= 0.0f && prevSepN < 0.0f) {
 				exitStartIndex = (i == 0) ? vertexCount-1 : i-1;
 				exitEndIndex = i;
@@ -265,35 +299,42 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 				// if -normal angle is closer to adjacent edge than this edge, 
 				// let the adjacent edge handle it and return with no contact:
 				if (separationV1) {
-					if (Vec2.dot(normals[separationIndex1], Mat22.mulTrans(xf1.R, Mat22.mul(xf2.R, edge.getCorner1Vector()))) >= 0.0f) {
+					Mat22.mulToOut( xf2.R, edge.getCorner1Vector(), temp);
+					Mat22.mulTransToOut(xf1.R, temp, temp);
+					if (Vec2.dot(normals[separationIndex1], temp) >= 0.0f) {
 						return;
 					}
 				} else {
-					if (Vec2.dot(normals[separationIndex2], Mat22.mulTrans(xf1.R, Mat22.mul(xf2.R, edge.getCorner2Vector()))) <= 0.0f) {
+					Mat22.mulToOut( xf2.R, edge.getCorner2Vector(), temp);
+					Mat22.mulTransToOut(xf1.R, temp, temp);
+					if (Vec2.dot(normals[separationIndex2], temp) <= 0.0f) {
 						return;
 					}
 				}
 			
 				manifold.pointCount = 1;
-				manifold.normal = Mat22.mul(xf1.R, normals[separationIndex]);
+				Mat22.mulToOut(xf1.R, normals[separationIndex], manifold.normal);
 				manifold.points[0].separation = separationMax;
 				manifold.points[0].id.features.incidentEdge = separationIndex;
 				manifold.points[0].id.features.incidentVertex = Collision.NULL_FEATURE;
 				manifold.points[0].id.features.referenceEdge = 0;
 				manifold.points[0].id.features.flip = 0;
 				if (separationV1) {
-					manifold.points[0].localPoint1 = v1Local;
-					manifold.points[0].localPoint2 = edge.getVertex1();
+					manifold.points[0].localPoint1.set( PEv1Local);
+					manifold.points[0].localPoint2.set( edge.getVertex1());
 				} else {
-					manifold.points[0].localPoint1 = v2Local;
-					manifold.points[0].localPoint2 = edge.getVertex2();
+					manifold.points[0].localPoint1.set(PEv2Local);
+					manifold.points[0].localPoint2.set(edge.getVertex2());
 				}
 				return;
 			}
 		}
 		
 		// We're going to use the edge's normal now.
-		manifold.normal = n.mul(-1.0f);
+		temp.set( PEn);
+		temp.mulLocal( -1f);
+		
+		manifold.normal.set( temp);// = n.mul(-1.0f);
 		
 		// Check whether we only need one contact point.
 		if (enterEndIndex == exitStartIndex) {
@@ -302,8 +343,8 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 			manifold.points[0].id.features.incidentVertex = Collision.NULL_FEATURE;
 			manifold.points[0].id.features.referenceEdge = 0;
 			manifold.points[0].id.features.flip = 0;
-			manifold.points[0].localPoint1 = vertices[enterEndIndex];
-			manifold.points[0].localPoint2 = XForm.mulTrans(xf2, XForm.mul(xf1, vertices[enterEndIndex]));
+			manifold.points[0].localPoint1.set(vertices[enterEndIndex]);
+			XForm.mulTransToOut(xf2, XForm.mul(xf1, vertices[enterEndIndex]), manifold.points[0].localPoint2);
 			manifold.points[0].separation = enterSepN;
 			return;
 		}
@@ -311,21 +352,27 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 		manifold.pointCount = 2;
 		
 		// dirLocal should be the edge's direction vector, but in the frame of the polygon.
-		Vec2 dirLocal = Vec2.cross(nLocal, -1.0f); // TODO: figure out why this optimization didn't work
+		Vec2.crossToOut(PEnLocal, -1.0f, temp); // TODO: figure out why this optimization didn't work
 		//Vec2 dirLocal = XForm.mulT(xf1.R, XForm.mul(xf2.R, edge.GetDirectionVector()));
+		temp2.set( vertices[enterEndIndex]);
+		temp2.subLocal( PEv1Local);
 		
-		float dirProj1 = Vec2.dot(dirLocal, vertices[enterEndIndex].sub(v1Local));
+		float dirProj1 = Vec2.dot(temp, temp2);
 		float dirProj2 = 0.0f;
 		
 		// The contact resolution is more robust if the two manifold points are 
 		// adjacent to each other on the polygon. So pick the first two poly
 		// vertices that are under the edge:
+		temp2.set( vertices[exitStartIndex]);
+		temp2.subLocal( PEv1Local);
+		
 		exitEndIndex = (enterEndIndex == vertexCount - 1) ? 0 : enterEndIndex + 1;
 		if (exitEndIndex != exitStartIndex) {
 			exitStartIndex = exitEndIndex;
-			exitSepN = Vec2.dot(nLocal, vertices[exitStartIndex].sub(v1Local));
+			exitSepN = Vec2.dot(PEnLocal, temp2);
 		}
-		dirProj2 = Vec2.dot(dirLocal, vertices[exitStartIndex].sub(v1Local));
+		// temp is dirLocal still
+		dirProj2 = Vec2.dot(temp, temp2);
 		
 		manifold.points[0].id.features.incidentEdge = enterEndIndex;
 		manifold.points[0].id.features.incidentVertex = Collision.NULL_FEATURE;
@@ -333,8 +380,8 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 		manifold.points[0].id.features.flip = 0;
 		
 		if (dirProj1 > edge.getLength()) {
-			manifold.points[0].localPoint1 = v2Local;
-			manifold.points[0].localPoint2 = edge.getVertex2();
+			manifold.points[0].localPoint1.set(PEv2Local);
+			manifold.points[0].localPoint2.set(edge.getVertex2());
 			float ratio = (edge.getLength() - dirProj2) / (dirProj1 - dirProj2);
 			if (ratio > 100.0f * Settings.EPSILON && ratio < 1.0f) {
 				manifold.points[0].separation = exitSepN * (1.0f - ratio) + enterSepN * ratio;
@@ -342,8 +389,8 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 				manifold.points[0].separation = enterSepN;
 			}
 		} else {
-			manifold.points[0].localPoint1 = vertices[enterEndIndex];
-			manifold.points[0].localPoint2 = XForm.mulTrans(xf2, XForm.mul(xf1, vertices[enterEndIndex]));
+			manifold.points[0].localPoint1.set(vertices[enterEndIndex]);
+			XForm.mulTransToOut(xf2, XForm.mul(xf1, vertices[enterEndIndex]), manifold.points[0].localPoint2);
 			manifold.points[0].separation = enterSepN;
 		}
 		
@@ -353,8 +400,8 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 		manifold.points[1].id.features.flip = 0;
 		
 		if (dirProj2 < 0.0f) {
-			manifold.points[1].localPoint1 = v1Local;
-			manifold.points[1].localPoint2 = edge.getVertex1();
+			manifold.points[1].localPoint1.set(PEv1Local);
+			manifold.points[1].localPoint2.set(edge.getVertex1());
 			float ratio = (-dirProj1) / (dirProj2 - dirProj1);
 			if (ratio > 100.0f * Settings.EPSILON && ratio < 1.0f) {
 				manifold.points[1].separation = enterSepN * (1.0f - ratio) + exitSepN * ratio;
@@ -362,8 +409,8 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 				manifold.points[1].separation = exitSepN;
 			}
 		} else {
-			manifold.points[1].localPoint1 = vertices[exitStartIndex];
-			manifold.points[1].localPoint2 = XForm.mulTrans(xf2, XForm.mul(xf1, vertices[exitStartIndex]));
+			manifold.points[1].localPoint1.set(vertices[exitStartIndex]);
+			XForm.mulTransToOut(xf2, XForm.mul(xf1, vertices[exitStartIndex]), manifold.points[1].localPoint2);
 			manifold.points[1].separation = exitSepN;
 		}
 	}

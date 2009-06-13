@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jbox2d.collision.CircleShape;
-import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.EdgeShape;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
@@ -79,7 +78,7 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 				mp.tangentImpulse = 0.0f;
 
 				if (listener != null) {
-					cp.position = b1.getWorldLocation(mp.localPoint1);
+					b1.getWorldLocationToOut(mp.localPoint1, cp.position);
 					//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
     				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
     				// DMNOTE cp.velocity isn't instantiated in the constructor,
@@ -99,7 +98,8 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 				mp.tangentImpulse = mp0.tangentImpulse;
 
 				if (listener != null) {
-					cp.position = b1.getWorldLocation(mp.localPoint1);
+					b1.getWorldLocationToOut(mp.localPoint1, cp.position);
+					//cp.position = b1.getWorldLocation(mp.localPoint1);
 					//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
     				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
     				// DMNOTE cp.velocity isn't instantiated in the constructor,
@@ -118,7 +118,8 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 			m_manifoldCount = 0;
 			if (m0.pointCount > 0 && (listener != null)) {
 				ManifoldPoint mp0 = m0.points[0];
-				cp.position = b1.getWorldLocation(mp0.localPoint1);
+				b1.getWorldLocationToOut(mp0.localPoint1, cp.position);
+				//cp.position = b1.getWorldLocation(mp0.localPoint1);
 				//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
 				b1.getLinearVelocityFromLocalPointToOut(mp0.localPoint1, v1);
 				// DMNOTE cp.velocity isn't instantiated in the constructor,
@@ -140,7 +141,7 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 	private static Vec2 ECd = new Vec2();
 	private static Vec2 ECc = new Vec2();
 	private static Vec2 ECcLocal = new Vec2();
-	private static Vec2 ECcLocalSubV1 = new Vec2();
+	//private static Vec2 ECcLocalSubV1 = new Vec2();
 	public final static void CollideEdgeAndCircle(Manifold manifold,
 			final EdgeShape edge, final XForm xf1,
 			final CircleShape circle, final XForm xf2) {
