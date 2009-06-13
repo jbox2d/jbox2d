@@ -114,7 +114,7 @@ public class PolygonDef extends ShapeDef {
     	XForm xf = new XForm();
     	xf.position.set(center);
     	xf.R.set(angle);
-    	// DMNOTE optimized. I'm leaving the XForm creation, it doesn't matter here
+    	// djm optimized. I'm leaving the XForm creation, it doesn't matter here
     	for (int i = 0; i < vertices.size(); ++i) {
     		XForm.mulToOut(xf, vertices.get(i), vertices.get(i));
     	}

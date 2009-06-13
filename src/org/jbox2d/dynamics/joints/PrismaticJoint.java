@@ -90,7 +90,7 @@ public class PrismaticJoint extends Joint {
     	m_refAngle = def.referenceAngle;
 
     	m_linearJacobian = new Jacobian();
-    	m_linearJacobian.setZero();
+    	//m_linearJacobian.setZero(); djm not needed
     	m_linearMass = 0.0f;
     	m_force = 0.0f;
 
@@ -98,7 +98,7 @@ public class PrismaticJoint extends Joint {
     	m_torque = 0.0f;
 
     	m_motorJacobian = new Jacobian();
-    	m_motorJacobian.setZero();
+    	//m_motorJacobian.setZero(); djm not needed
     	m_motorMass = 0.0f;
     	m_motorForce = 0.0f;
     	m_limitForce = 0.0f;
@@ -112,24 +112,36 @@ public class PrismaticJoint extends Joint {
     	m_enableMotor = def.enableMotor;
     }
 
+    // djm pooled
+    private Vec2 r1 = new Vec2();
+    private Vec2 r2 = new Vec2();
+    private Vec2 ax1 = new Vec2();
+    private Vec2 ay1 = new Vec2();
+    private Vec2 e = new Vec2();
+    private Vec2 ax1Neg = new Vec2();
+    private Vec2 ay1Neg = new Vec2();
+    private Vec2 d = new Vec2();
     public void initVelocityConstraints(TimeStep step) {
         Body b1 = m_body1;
         Body b2 = m_body2;
 
         // Compute the effective masses.
-        Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
+        Mat22.mulToOut(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()), r1);
+    	Mat22.mulToOut(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()), r2);
 
         float invMass1 = b1.m_invMass, invMass2 = b2.m_invMass;
         float invI1 = b1.m_invI, invI2 = b2.m_invI;
 
         // Compute point to line constraint effective mass.
         // J = [-ay1 -cross(d+r1,ay1) ay1 cross(r2,ay1)]
-        Vec2 ay1 = Mat22.mul(b1.m_xf.R, m_localYAxis1);
-    	Vec2 e = b2.m_sweep.c.add(r2).subLocal(b1.m_sweep.c);	// e = d + r1
-
-        m_linearJacobian.set(ay1.negate(), -Vec2.cross(e, ay1), ay1, Vec2
-                .cross(r2, ay1));
+        Mat22.mulToOut(b1.m_xf.R, m_localYAxis1, ay1);
+    	e.set(b2.m_sweep.c);
+    	e.addLocal(r2).subLocal(b1.m_sweep.c);	// e = d + r1
+    	
+    	Vec2.negateToOut( ay1, ay1Neg);
+    	
+        m_linearJacobian.set(ay1Neg, -Vec2.cross(e, ay1), ay1, Vec2.cross(r2, ay1));
+        
         m_linearMass = invMass1 + invI1 * m_linearJacobian.angular1
                 * m_linearJacobian.angular1 + invMass2 + invI2
                 * m_linearJacobian.angular2 * m_linearJacobian.angular2;
@@ -147,10 +159,11 @@ public class PrismaticJoint extends Joint {
         // Compute motor and limit terms.
         if (m_enableLimit || m_enableMotor) {
             // The motor and limit share a Jacobian and effective mass.
-        	Vec2 ax1 = Mat22.mul(b1.m_xf.R, m_localXAxis1);
+        	Mat22.mulToOut(b1.m_xf.R, m_localXAxis1, ax1);
+    		Vec2.negateToOut( ax1, ax1Neg);
     		
-            m_motorJacobian.set(ax1.negate(), -Vec2.cross(e, ax1), ax1, Vec2
-                    .cross(r2, ax1));
+            m_motorJacobian.set(ax1Neg, -Vec2.cross(e, ax1), ax1, Vec2.cross(r2, ax1));
+            
             m_motorMass = invMass1 + invI1 * m_motorJacobian.angular1
                     * m_motorJacobian.angular1 + invMass2 + invI2
                     * m_motorJacobian.angular2 * m_motorJacobian.angular2;
@@ -158,7 +171,9 @@ public class PrismaticJoint extends Joint {
             m_motorMass = 1.0f / m_motorMass;
 
             if (m_enableLimit) {
-                Vec2 d = e.sub(r1); // p2 - p1
+            	d.set( e);
+            	d.subLocal( r1);
+                //Vec2 d = e.sub(r1); // p2 - p1
                 float jointTranslation = Vec2.dot(ax1, d);
 
                 if (Math.abs(m_upperTranslation - m_lowerTranslation) < 2.0f * Settings.linearSlop) {
@@ -192,19 +207,24 @@ public class PrismaticJoint extends Joint {
         }
 
         if (step.warmStarting){
-    		Vec2 P1 = new Vec2( step.dt * (m_force * m_linearJacobian.linear1.x + (m_motorForce + m_limitForce) * m_motorJacobian.linear1.x),
-    							step.dt * (m_force * m_linearJacobian.linear1.y + (m_motorForce + m_limitForce) * m_motorJacobian.linear1.y) );
-    		Vec2 P2 = new Vec2( step.dt * (m_force * m_linearJacobian.linear2.x + (m_motorForce + m_limitForce) * m_motorJacobian.linear2.x),
-    							step.dt * (m_force * m_linearJacobian.linear2.y + (m_motorForce + m_limitForce) * m_motorJacobian.linear2.y) );
+    		//Vec2 P1 = new Vec2( step.dt * (m_force * m_linearJacobian.linear1.x + (m_motorForce + m_limitForce) * m_motorJacobian.linear1.x),
+    		//					step.dt * (m_force * m_linearJacobian.linear1.y + (m_motorForce + m_limitForce) * m_motorJacobian.linear1.y) );
+    		//Vec2 P2 = new Vec2( step.dt * (m_force * m_linearJacobian.linear2.x + (m_motorForce + m_limitForce) * m_motorJacobian.linear2.x),
+    		//					step.dt * (m_force * m_linearJacobian.linear2.y + (m_motorForce + m_limitForce) * m_motorJacobian.linear2.y) );
     		float L1 = step.dt * (m_force * m_linearJacobian.angular1 - m_torque + (m_motorForce + m_limitForce) * m_motorJacobian.angular1);
     		float L2 = step.dt * (m_force * m_linearJacobian.angular2 + m_torque + (m_motorForce + m_limitForce) * m_motorJacobian.angular2);
 
-    		b1.m_linearVelocity.x += invMass1 * P1.x;
-    		b1.m_linearVelocity.y += invMass1 * P1.y;
+    		//b1.m_linearVelocity.x += invMass1 * P1.x;
+    		//b1.m_linearVelocity.y += invMass1 * P1.y; djm no vec creation
+    		b1.m_linearVelocity.x += invMass1 * step.dt * (m_force * m_linearJacobian.linear1.x + (m_motorForce + m_limitForce) * m_motorJacobian.linear1.x);
+    		b1.m_linearVelocity.y += invMass1 * step.dt * (m_force * m_linearJacobian.linear1.y + (m_motorForce + m_limitForce) * m_motorJacobian.linear1.y);
+    		
     		b1.m_angularVelocity += invI1 * L1;
 
-    		b2.m_linearVelocity.x += invMass2 * P2.x;
-    		b2.m_linearVelocity.y += invMass2 * P2.y;
+    		
+    		b2.m_linearVelocity.x += invMass2 * step.dt * (m_force * m_linearJacobian.linear2.x + (m_motorForce + m_limitForce) * m_motorJacobian.linear2.x);
+    		b2.m_linearVelocity.y += invMass2 * step.dt * (m_force * m_linearJacobian.linear2.y + (m_motorForce + m_limitForce) * m_motorJacobian.linear2.y);
+    		
     		b2.m_angularVelocity += invI2 * L2;  
         } else {
         	m_force = 0.0f;
@@ -227,9 +247,8 @@ public class PrismaticJoint extends Joint {
         float invI1 = b1.m_invI, invI2 = b2.m_invI;
 
         // Solve linear constraint.
-        float linearCdot = m_linearJacobian
-                .compute(b1.m_linearVelocity, b1.m_angularVelocity,
-                        b2.m_linearVelocity, b2.m_angularVelocity);
+        float linearCdot = m_linearJacobian.compute(b1.m_linearVelocity, b1.m_angularVelocity,
+                                                    b2.m_linearVelocity, b2.m_angularVelocity);
         float force = -step.inv_dt * m_linearMass * linearCdot;
         
         //m_force += force;
@@ -311,19 +330,35 @@ public class PrismaticJoint extends Joint {
     	}
     }
 
+    // djm pooled, using pool above too
+    private Vec2 temp = new Vec2();
+    private Vec2 p1 = new Vec2();
+    private Vec2 p2 = new Vec2();
+    private Vec2 r1z = new Vec2();
+    private Vec2 r2z = new Vec2();
+    private Vec2 p1z = new Vec2();
+    private Vec2 p2z = new Vec2();
+    private Vec2 dz = new Vec2();
+    @Override
     public boolean solvePositionConstraints() {
     	Body b1 = m_body1;
     	Body b2 = m_body2;
 
     	float invMass1 = b1.m_invMass, invMass2 = b2.m_invMass;
     	float invI1 = b1.m_invI, invI2 = b2.m_invI;
-
-    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
-    	Vec2 p1 = b1.m_sweep.c.add(r1);
-    	Vec2 p2 = b2.m_sweep.c.add(r2);
-    	Vec2 d = p2.sub(p1);
-    	Vec2 ay1 = Mat22.mul(b1.m_xf.R, m_localYAxis1);
+    	temp.set(m_localAnchor1);
+    	temp.subLocal(b1.getMemberLocalCenter());
+    	Mat22.mulToOut(b1.m_xf.R, temp, r1);
+    	temp.set(m_localAnchor2);
+    	temp.subLocal(b2.getMemberLocalCenter());
+    	Mat22.mulToOut(b2.m_xf.R, temp, r2);
+    	p1.set(b1.m_sweep.c);
+    	p1.addLocal(r1);
+    	p2.set(b2.m_sweep.c);
+    	p2.addLocal(r2);
+    	d.set(p2);
+    	d.subLocal(p1);
+    	Mat22.mulToOut(b1.m_xf.R, m_localYAxis1, ay1);
 
     	// Solve linear (point-to-line) constraint.
     	float linearC = Vec2.dot(ay1, d);
@@ -359,12 +394,27 @@ public class PrismaticJoint extends Joint {
     	// Solve linear limit constraint.
     	if (m_enableLimit && m_limitState != LimitState.INACTIVE_LIMIT)
     	{
-    		Vec2 r1z = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
+    		/*Vec2 r1z = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
     		Vec2 r2z = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
     		Vec2 p1z = b1.m_sweep.c.add(r1z);
     		Vec2 p2z = b2.m_sweep.c.add(r2z);
     		Vec2 dz = p2z.sub(p1z);
-    		Vec2 ax1 = Mat22.mul(b1.m_xf.R, m_localXAxis1);
+    		Vec2 ax1 = Mat22.mul(b1.m_xf.R, m_localXAxis1);*/
+    		temp.set(m_localAnchor1);
+    		temp.subLocal(b1.getMemberLocalCenter());
+    		Mat22.mulToOut(b1.m_xf.R, temp, r1z);
+    		temp.set(m_localAnchor2);
+    		temp.subLocal(b2.getMemberLocalCenter());
+    		Mat22.mulToOut(b2.m_xf.R, temp, r2z);
+    		
+    		p1z.set(b1.m_sweep.c);
+    		p1z.addLocal(r1z);
+    		p2z.set(b2.m_sweep.c);
+    		p2z.addLocal(r2z);
+
+    		dz.set(p2z);
+    		dz.subLocal(p1z);
+    		Mat22.mulToOut(b1.m_xf.R, m_localXAxis1, ax1);
 
     		float translation = Vec2.dot(ax1, dz);
     		float limitImpulse = 0.0f;
@@ -373,10 +423,10 @@ public class PrismaticJoint extends Joint {
     			// Prevent large angular corrections
     			float limitC = MathUtils.clamp(translation, -Settings.maxLinearCorrection, Settings.maxLinearCorrection);
     			limitImpulse = -m_motorMass * limitC;
-    			positionError = Math.max(positionError, Math.abs(angularC));
+    			positionError = MathUtils.max(positionError, Math.abs(angularC));
     		} else if (m_limitState == LimitState.AT_LOWER_LIMIT) {
     			float limitC = translation - m_lowerTranslation;
-    			positionError = Math.max(positionError, -limitC);
+    			positionError = MathUtils.max(positionError, -limitC);
 
     			// Prevent large linear corrections and allow some slop.
     			limitC = MathUtils.clamp(limitC + Settings.linearSlop, -Settings.maxLinearCorrection, 0.0f);
@@ -386,13 +436,13 @@ public class PrismaticJoint extends Joint {
     			limitImpulse = m_limitPositionImpulse - oldLimitImpulse;
     		} else if (m_limitState == LimitState.AT_UPPER_LIMIT) {
     			float limitC = translation - m_upperTranslation;
-    			positionError = Math.max(positionError, limitC);
+    			positionError = MathUtils.max(positionError, limitC);
 
     			// Prevent large linear corrections and allow some slop.
     			limitC = MathUtils.clamp(limitC - Settings.linearSlop, 0.0f, Settings.maxLinearCorrection);
     			limitImpulse = -m_motorMass * limitC;
     			float oldLimitImpulse = m_limitPositionImpulse;
-    			m_limitPositionImpulse = Math.min(m_limitPositionImpulse + limitImpulse, 0.0f);
+    			m_limitPositionImpulse = MathUtils.min(m_limitPositionImpulse + limitImpulse, 0.0f);
     			limitImpulse = m_limitPositionImpulse - oldLimitImpulse;
     		}
 
@@ -415,44 +465,69 @@ public class PrismaticJoint extends Joint {
     public Vec2 getAnchor1() {
     	return m_body1.getWorldLocation(m_localAnchor1);
     }
+    
+    public void getAnchor1ToOut(Vec2 out){
+    	m_body1.getWorldLocationToOut( m_localAnchor1, out);
+    }
 
     @Override
     public Vec2 getAnchor2() {
     	return m_body2.getWorldLocation(m_localAnchor2);
     }
+    
+    public void getAnchor2ToOut(Vec2 out){
+    	m_body2.getWorldLocationToOut( m_localAnchor2, out);
+    }
 
     /// Get the current joint translation, usually in meters.
+    // djm pooled, and from above
+    private Vec2 axis = new Vec2();
     public float getJointTranslation() {
     	Body b1 = m_body1;
     	Body b2 = m_body2;
 
-    	Vec2 p1 = b1.getWorldLocation(m_localAnchor1);
-    	Vec2 p2 = b2.getWorldLocation(m_localAnchor2);
-    	Vec2 d = p2.sub(p1);
-    	Vec2 axis = b1.getWorldDirection(m_localXAxis1);
+    	b1.getWorldLocationToOut(m_localAnchor1, p1);
+    	b2.getWorldLocationToOut(m_localAnchor2, p2);
+    	d.set(p2);
+    	d.subLocal(p1);
+    	b1.getWorldDirectionToOut(m_localXAxis1, axis);
 
     	float translation = Vec2.dot(d, axis);
     	return translation;
     }
 
     /// Get the current joint translation speed, usually in meters per second.
+    // djm pooled, use pool from above
+    private Vec2 w1xAxis = new Vec2();
+    private Vec2 v22 = new Vec2();
+    private Vec2 w2xR2 = new Vec2();
+    private Vec2 w1xR1 = new Vec2();
 	public float getJointSpeed() {
     	Body b1 = m_body1;
     	Body b2 = m_body2;
 
-    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
-    	Vec2 p1 = b1.m_sweep.c.add(r1);
-    	Vec2 p2 = b2.m_sweep.c.add(r2);
-    	Vec2 d = p2.sub(p1);
-    	Vec2 axis = b1.getWorldDirection(m_localXAxis1);
+    	Mat22.mulToOut(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()), r1);
+    	Mat22.mulToOut(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()), r2);
+    	p1.set(b1.m_sweep.c);
+    	p1.addLocal(r1);
+    	p2.set(b2.m_sweep.c);
+    	p2.addLocal(r2);
+    	
+    	d.set(p2);
+    	d.subLocal(p1);
+    	b1.getWorldDirectionToOut(m_localXAxis1, axis);
 
     	Vec2 v1 = b1.m_linearVelocity;
     	Vec2 v2 = b2.m_linearVelocity;
     	float w1 = b1.m_angularVelocity;
     	float w2 = b2.m_angularVelocity;
-
-    	float speed = Vec2.dot(d, Vec2.cross(w1, axis)) + Vec2.dot(axis, v2.add(Vec2.cross(w2, r2)).subLocal(v1).subLocal(Vec2.cross(w1, r1)));
+    	
+    	Vec2.crossToOut( w1, axis, w1xAxis);
+    	Vec2.crossToOut( w2, r2, w2xR2);
+    	Vec2.crossToOut( w1, r1, w1xR1);
+    	v22.set( v2);
+    	float speed = Vec2.dot(d, w1xAxis) + Vec2.dot(axis, v22.addLocal(w2xR2).subLocal(v1).subLocal(w1xR1));
+    	//float speed = Vec2.dot(d, Vec2.cross(w1, axis)) + Vec2.dot(axis, v2.add(Vec2.cross(w2, r2)).subLocal(v1).subLocal(Vec2.cross(w1, r1)));
     	return speed;
     }
 
@@ -461,12 +536,24 @@ public class PrismaticJoint extends Joint {
     	return m_torque;
     }
     
+    // djm a little expensive
     public Vec2 getReactionForce() {
     	Vec2 ax1 = Mat22.mul(m_body1.m_xf.R, m_localXAxis1);
     	Vec2 ay1 = Mat22.mul(m_body1.m_xf.R, m_localYAxis1);
 
     	return new Vec2(m_limitForce * ax1.x + m_force * ay1.x, 
     					m_limitForce * ax1.y + m_force * ay1.y);
+    }
+    
+    // djm pooled
+    private Vec2 reactionAx1 = new Vec2();
+    public void getReactionForceToOut(Vec2 out){
+    	Mat22.mulToOut(m_body1.m_xf.R, m_localXAxis1, reactionAx1);
+    	Mat22.mulToOut(m_body1.m_xf.R, m_localYAxis1, out);
+    	
+    	//float tempy = m_limitForce * reactionAx1.x + m_force * out.x;
+    	out.x = m_limitForce * reactionAx1.x + m_force * out.x;
+    	out.y = m_limitForce * reactionAx1.y + m_force * out.y;
     }
     
     /** Is the joint limit enabled? */

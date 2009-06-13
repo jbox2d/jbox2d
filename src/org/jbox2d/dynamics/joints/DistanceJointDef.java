@@ -67,8 +67,8 @@ public class DistanceJointDef extends JointDef {
     public void initialize(Body b1, Body b2, Vec2 anchor1, Vec2 anchor2) {	
     	body1 = b1;
     	body2 = b2;
-    	localAnchor1 = body1.getLocalPoint(anchor1);
-    	localAnchor2 = body2.getLocalPoint(anchor2);
+    	localAnchor1.set(body1.getLocalPoint(anchor1));
+    	localAnchor2.set(body2.getLocalPoint(anchor2));
     	Vec2 d = anchor2.sub(anchor1);
 		length = d.length();
 	}

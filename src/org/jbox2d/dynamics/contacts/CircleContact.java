@@ -76,7 +76,7 @@ public class CircleContact extends Contact implements ContactCreateFcn {
 
     }
 
-    //DMNOTE pooled lets see if this workds
+    //djm pooled lets see if this workds
     private Manifold m0 = new Manifold();
     private Vec2 v1 = new Vec2();
     public void evaluate(ContactListener listener) {
@@ -87,7 +87,7 @@ public class CircleContact extends Contact implements ContactCreateFcn {
 
     	
     	m0.set(m_manifold);
-        //Manifold m0 = new Manifold(m_manifold);  DMNOTE all this should have been taken care of with set
+        //Manifold m0 = new Manifold(m_manifold);  djm all this should have been taken care of with set
     	/*for (int k = 0; k < m_manifold.pointCount; k++) {
             m0.points[k] = new ManifoldPoint(m_manifold.points[k]);
             m0.points[k].normalImpulse = m_manifold.points[k].normalImpulse;
@@ -120,7 +120,7 @@ public class CircleContact extends Contact implements ContactCreateFcn {
     				b1.getWorldLocationToOut(mp.localPoint1, cp.position);
     				//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
     				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
-    				// DMNOTE cp.velocity isn't instantiated in the constructor,
+    				// djm cp.velocity isn't instantiated in the constructor,
     				// so we just create it here
     				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
     				//cp.velocity = v2.sub(v1);

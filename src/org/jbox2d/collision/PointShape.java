@@ -23,7 +23,7 @@ public class PointShape extends Shape {
     	m_mass = pointDef.mass;
     }
     
-    // DMNOTE optimized
+    // djm optimized
 	@Override
 	public void computeAABB(AABB aabb, XForm transform) {
 		//Vec2 p = transform.position.add(Mat22.mul(transform.R, m_localPosition));
@@ -41,10 +41,10 @@ public class PointShape extends Shape {
     	massData.I = 0.0f;
 	}
 
-	// DMNOTE pooled
+	// djm pooled
 	private Vec2 sweptP1 = new Vec2();
 	private Vec2 sweptP2 = new Vec2();
-	// DMNOTE fairly hot method, called every update
+	// djm fairly hot method, called every update
 	@Override
 	public void computeSweptAABB(AABB aabb, XForm transform1, XForm transform2) {
 		
@@ -65,11 +65,11 @@ public class PointShape extends Shape {
 
 	@Override
 	public boolean testPoint(XForm xf, Vec2 p) {
-		// DMNOTE could use more optimization
+		// djm could use more optimization
 		return false;
 	}
 
-	// DMNOTE optimized
+	// djm optimized
 	@Override
 	public void updateSweepRadius(Vec2 center) {
 		//Vec2 d = m_localPosition.sub(center);

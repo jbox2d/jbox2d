@@ -25,7 +25,7 @@ package org.jbox2d.common;
 
 /**
  * A 2x2 matrix class.
- * DMNOTE: added ToOut methods, optimized, and added modifiers
+ * djm: added ToOut methods, optimized, and added modifiers
  * @author ewjordan
  *
  */
@@ -42,7 +42,7 @@ public class Mat22 {
 	}
 
 	/** Construct zero matrix.  Note: this is NOT an identity matrix!
-	 * DMNOTE fixed double allocation problem*/
+	 * djm fixed double allocation problem*/
 	public Mat22() {
 		col1 = new Vec2();
 		col2 = new Vec2();
@@ -92,7 +92,7 @@ public class Mat22 {
 
 	/**
 	 * Return a clone of this matrix.
-	 * DMNOTE fixed double allocation
+	 * djm fixed double allocation
 	 */
 	@Override
 	public final Mat22 clone() {
@@ -181,7 +181,7 @@ public class Mat22 {
 
 	/**
 	 * Return the matrix composed of the absolute values of all elements.
-	 * DMNOTE: fixed double allocation
+	 * djm: fixed double allocation
 	 * @return Absolute value matrix
 	 */
 	public final Mat22 abs() {
@@ -191,7 +191,7 @@ public class Mat22 {
 		                 Math.abs(col2.y));
 	}
 
-	/* DMNOTE: added */
+	/* djm: added */
 	public final void absLocal(){
 		col1.absLocal();
 		col2.absLocal();
@@ -205,7 +205,7 @@ public class Mat22 {
 		return R.abs();
 	}
 
-	/* DMNOTE created */
+	/* djm created */
 	public static void absToOut(Mat22 R, Mat22 out){
 		out.col1.x = Math.abs(R.col1.x);
 		out.col1.y = Math.abs(R.col1.y);
@@ -223,7 +223,7 @@ public class Mat22 {
 		                * v.y);
 	}
 
-	/* DMNOTE added */
+	/* djm added */
 	public final void mulToOut(Vec2 v, Vec2 out){
 		float tempy = col1.y * v.x + col2.y * v.y;
 		out.x = col1.x * v.x + col2.x * v.y;
@@ -233,7 +233,7 @@ public class Mat22 {
 
 	/**
 	 * Multiply another matrix by this one (this one on left).
-	 * DMNOTE optimized
+	 * djm optimized
 	 * @param R
 	 * @return
 	 */
@@ -251,7 +251,7 @@ public class Mat22 {
 		return C;
 	}
 
-	/* DMNOTE: created */
+	/* djm: created */
 	public final void mulToOut(Mat22 R, Mat22 out){
 		this.mulToOut( R.col1, out.col1);
 		this.mulToOut( R.col2, out.col2);
@@ -259,7 +259,7 @@ public class Mat22 {
 
 	/**
 	 * Multiply another matrix by the transpose of this one (transpose of this one on left).
-	 * DMNOTE: optimized
+	 * djm: optimized
 	 * @param B
 	 * @return
 	 */
@@ -283,7 +283,7 @@ public class Mat22 {
 		return C;
 	}
 
-	/* DMNOTE added */
+	/* djm added */
 	public final void mulTransToOut(Mat22 B, Mat22 out){
 		//Vec2 c1 = Stack.alloc( Vec2.class);
 		out.col1.x = Vec2.dot(this.col1, B.col1);
@@ -305,7 +305,7 @@ public class Mat22 {
 		return new Vec2(Vec2.dot(v, col1), Vec2.dot(v, col2));
 	}
 
-	/* DMNOTE added */
+	/* djm added */
 	public final void mulTransToOut(Vec2 v, Vec2 out){
 		out.x = Vec2.dot(v, col1);
 		out.y = Vec2.dot(v, col2);
@@ -345,7 +345,7 @@ public class Mat22 {
 		return x;
 	}
 
-	/* DMNOTE added */
+	/* djm added */
 	public final void solveToOut(Vec2 b, Vec2 out) {
 		float a11 = col1.x, a12 = col2.x, a21 = col1.y, a22 = col2.y;
 		float det = a11 * a22 - a12 * a21;
@@ -361,7 +361,7 @@ public class Mat22 {
 		return R.mul(v);
 	}
 
-	/* DMNOTE added */
+	/* djm added */
 	public final static void mulToOut(Mat22 R, Vec2 v, Vec2 out) {
 		R.mulToOut(v, out);
 	}
@@ -370,7 +370,7 @@ public class Mat22 {
 		return A.mul(B);
 	}
 
-	/* DMNOTE added */
+	/* djm added */
 	public final static void mulToOut(Mat22 A, Mat22 B, Mat22 out){
 		A.mulToOut( B, out);
 	}
@@ -379,7 +379,7 @@ public class Mat22 {
 		return R.mulTrans(v);
 	}
 
-	/* DMNOTE added */
+	/* djm added */
 	public final static void mulTransToOut(Mat22 R, Vec2 v, Vec2 out) {
 		R.mulTransToOut(v, out);
 	}
@@ -388,7 +388,7 @@ public class Mat22 {
 		return A.mulTrans(B);
 	}
 
-	/* DMNOTE added */
+	/* djm added */
 	public final static void mulTransToOut(Mat22 A, Mat22 B, Mat22 out){
 		A.mulTransToOut(B, out);
 	}

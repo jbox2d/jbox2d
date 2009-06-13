@@ -48,9 +48,9 @@ public class PrismaticJointDef extends JointDef {
 	public void initialize(Body b1, Body b2, Vec2 anchor, Vec2 axis) {
 		body1 = b1;
 		body2 = b2;
-		localAnchor1 = body1.getLocalPoint(anchor);
-		localAnchor2 = body2.getLocalPoint(anchor);
-		localAxis1 = body1.getLocalVector(axis);
+		body1.getLocalPointToOut(anchor, localAnchor1);
+		body2.getLocalPointToOut(anchor, localAnchor2);
+		body1.getLocalVectorToOut(axis, localAxis1);
 		referenceAngle = body2.getAngle() - body1.getAngle();
 	}
 

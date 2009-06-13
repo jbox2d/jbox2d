@@ -33,13 +33,13 @@ import org.jbox2d.common.*;
  */
 public class CollideCircle {
 
-	// DMNOTE pooled
+	// djm pooled
 	private static Vec2 colCCP1 = new Vec2();
 	private static Vec2 colCCP2 = new Vec2();
 	private static Vec2 colCCD = new Vec2();
 	private static Vec2 colCCP = new Vec2();
 	
-	// DMNOTE optimized
+	// djm optimized
     public static void collideCircles(Manifold manifold, 
     		CircleShape circle1, XForm xf1,
             CircleShape circle2, XForm xf2) {
@@ -89,13 +89,13 @@ public class CollideCircle {
     	XForm.mulTransToOut(xf2, colCCP, manifold.points[0].localPoint2);
     }
     
-    // DMNOTE pooled
+    // djm pooled
     private static Vec2 colPCP1 = new Vec2();
 	private static Vec2 colPCP2 = new Vec2();
 	private static Vec2 colPCD = new Vec2();
 	private static Vec2 colPCP = new Vec2();
 	
-	// DMNOTE optimized
+	// djm optimized
     public static void collidePointAndCircle(Manifold manifold, 
     		PointShape point1, XForm xf1,
             CircleShape circle2, XForm xf2) {
@@ -302,7 +302,7 @@ public class CollideCircle {
     }
     
     
-    // DMNOTE pooled
+    // djm pooled
     private static Vec2 colPPc = new Vec2();
     private static Vec2 colPPcLocal = new Vec2();
     private static Vec2 colPPsub = new Vec2();
@@ -310,7 +310,7 @@ public class CollideCircle {
     private static Vec2 colPPp = new Vec2();
     private static Vec2 colPPd = new Vec2();
     
-    // DMNOTE optimized
+    // djm optimized
     public static void collidePolygonAndPoint(Manifold manifold, 
     		PolygonShape polygon, XForm xf1,
             PointShape point, XForm xf2) {
@@ -360,14 +360,15 @@ public class CollideCircle {
         // Project the circle center onto the edge segment.
         int vertIndex1 = normalIndex;
         int vertIndex2 = vertIndex1 + 1 < vertexCount ? vertIndex1 + 1 : 0;
-        Vec2 e = vertices[vertIndex2].sub(vertices[vertIndex1]);
-        float length = e.normalize();
+        colPPe.set( vertices[vertIndex2]);
+        colPPe.subLocal(vertices[vertIndex1]);
+        float length = colPPe.normalize();
         assert(length > Settings.EPSILON);
 
         // Project the center onto the edge.
         colPPsub.set(colPPcLocal);
         colPPsub.subLocal( vertices[vertIndex1]);
-        float u = Vec2.dot(colPPsub, e);
+        float u = Vec2.dot(colPPsub, colPPe);
         
         colPPp.setZero();
         if (u <= 0.0f) {
@@ -382,8 +383,8 @@ public class CollideCircle {
         }
         else {
         	colPPp.set(vertices[vertIndex1]);
-        	colPPp.x += u * e.x;
-        	colPPp.y += u * e.y;
+        	colPPp.x += u * colPPe.x;
+        	colPPp.y += u * colPPe.y;
             manifold.points[0].id.features.incidentEdge = normalIndex;
             manifold.points[0].id.features.incidentVertex = Collision.NULL_FEATURE;
         }

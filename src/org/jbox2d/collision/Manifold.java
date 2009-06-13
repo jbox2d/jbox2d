@@ -53,8 +53,8 @@ public class Manifold {
         // or merely passing a pointer to it.
         // Update: tested both, the arraycopy seems to be correct, leave it!
         
-        // DMNOTE we don't need to copy all of them, do we?
-        // DMNOTE this doesn't do what you think (whoever wrote that above.
+        // djm we don't need to copy all of them, do we?
+        // djm this doesn't do what you think (whoever wrote that above.
         // this isn't a cloned copy, this is an exact copy of the 
         // pointer values.  the only reason this still worked
         // was because every time this constructor is used,
@@ -68,13 +68,13 @@ public class Manifold {
         // }
         normal = other.normal.clone();
         pointCount = other.pointCount;// points.length;
-        // DMNOTE this is correct now
+        // djm this is correct now
         for(int i=0; i < other.points.length; i++){
     		points[i] = new ManifoldPoint(other.points[i]);
     	}
     }
     
-    // DMNOTE for object reusability
+    // djm for object reusability
     public void set(Manifold cp){
     	// will this work?
     	//System.arraycopy(cp.points, 0, points, 0, cp.pointCount);

@@ -77,7 +77,7 @@ public class PointAndCircleContact extends Contact implements ContactCreateFcn {
     	
     }
     
-    // DMNOTE pooled
+    // djm pooled
     private Manifold m0 = new Manifold();
     private Vec2 v1 = new Vec2();
     public void evaluate(ContactListener listener) {
@@ -109,7 +109,7 @@ public class PointAndCircleContact extends Contact implements ContactCreateFcn {
     				b1.getWorldLocationToOut(mp.localPoint1, cp.position);
 					//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
     				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
-    				// DMNOTE cp.velocity isn't instantiated in the constructor,
+    				// djm cp.velocity isn't instantiated in the constructor,
     				// so we just create it here
     				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
     				//cp.velocity = v2.sub(v1);
@@ -129,7 +129,7 @@ public class PointAndCircleContact extends Contact implements ContactCreateFcn {
     				b1.getWorldLocationToOut(mp.localPoint1, cp.position);
 					//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
     				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
-    				// DMNOTE cp.velocity isn't instantiated in the constructor,
+    				// djm cp.velocity isn't instantiated in the constructor,
     				// so we just create it here
     				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
     				//cp.velocity = v2.sub(v1);
@@ -150,7 +150,7 @@ public class PointAndCircleContact extends Contact implements ContactCreateFcn {
     			b1.getWorldLocationToOut(mp0.localPoint1, cp.position);
 				//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
 				b1.getLinearVelocityFromLocalPointToOut(mp0.localPoint1, v1);
-				// DMNOTE cp.velocity isn't instantiated in the constructor,
+				// djm cp.velocity isn't instantiated in the constructor,
 				// so we just create it here
 				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp0.localPoint2);
 				//cp.velocity = v2.sub(v1);

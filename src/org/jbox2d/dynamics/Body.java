@@ -188,7 +188,7 @@ public class Body {
 		
 	}
 	
-	// DMNOTE this isn't a hot method, allocation is just fine
+	// djm this isn't a hot method, allocation is just fine
 	private float connectEdges(EdgeShape s1, EdgeShape s2, float angle1) {
 		float angle2 = (float)Math.atan2(s2.getDirectionVector().y, s2.getDirectionVector().x);
 		
@@ -209,7 +209,7 @@ public class Body {
 	 * <BR><em>Warning</em>: This function is locked during callbacks.
 	 * @param def the shape definition.
 	 */
-	// DMNOTE not a hot method, allocations are fine
+	// djm not a hot method, allocations are fine
 	public Shape createShape(ShapeDef def){
 		assert(m_world.m_lock == false);
 
@@ -413,7 +413,7 @@ public class Body {
 		m_I = 0.0f;
 		m_invI = 0.0f;
 		
-		// DMNOTE might as well allocate, not really a hot path
+		// djm might as well allocate, not really a hot path
 		Vec2 center = new Vec2();
 		for (Shape s = m_shapeList; s != null; s = s.m_next) {
 			MassData massData = new MassData();
@@ -654,7 +654,7 @@ public class Body {
 	 * @param force the world force vector, usually in Newtons (N).
 	 * @param point the world position of the point of application.
 	 */
-	// DMNOTE only one instantiated object, so we inline
+	// djm only one instantiated object, so we inline
 	public void applyForce(Vec2 force, Vec2 point){
 		if (isSleeping()) wakeUp();
 		m_force.addLocal(force);
@@ -680,7 +680,7 @@ public class Body {
 	 * @param impulse the world impulse vector, usually in N-seconds or kg-m/s.
 	 * @param point the world position of the point of application.
 	 */
-	// DMNOTE only one allocation, so we inline
+	// djm only one allocation, so we inline
 	public void applyImpulse(Vec2 impulse, Vec2 point){
 		if (isSleeping()) wakeUp();
 		m_linearVelocity.x += m_invMass * impulse.x;
@@ -900,7 +900,7 @@ public class Body {
 		//seems to be missing from C++ version...
 	}
 
-	// DMNOTE pooled
+	// djm pooled
 	private XForm xf1 = new XForm();
 	/** For internal use only. */
 	public boolean synchronizeShapes(){
@@ -972,7 +972,7 @@ public class Body {
 	 * @param worldPoint a point in world coordinates.
 	 * @return the world velocity of a point.
 	 */
-	// DMNOTE optimized
+	// djm optimized
 	public Vec2 getLinearVelocityFromWorldPoint(Vec2 worldPoint) {
 		float ax = worldPoint.x - m_sweep.c.x;
 		float ay = worldPoint.y - m_sweep.c.y;
@@ -993,7 +993,7 @@ public class Body {
 	 * @param worldPoint a point in world coordinates.
 	 * @param out where to put the world velocity of a point.
 	 */
-	// DMNOTE optimized
+	// djm optimized
 	public void getLinearVelocityFromWorldPointToOut(Vec2 worldPoint, Vec2 out) {
 		float ax = worldPoint.x - m_sweep.c.x;
 		float ay = worldPoint.y - m_sweep.c.y;
@@ -1012,7 +1012,7 @@ public class Body {
 	 * @param localPoint a point in local coordinates.
 	 * @return the world velocity of a point.
 	 */
-	// DMNOTE optimized
+	// djm optimized
 	public Vec2 getLinearVelocityFromLocalPoint(Vec2 localPoint) {
 		Vec2 out = new Vec2();
 		getWorldLocationToOut(localPoint, out);
@@ -1033,7 +1033,7 @@ public class Body {
 	 * @param localPoint a point in local coordinates.
 	 * @param out where to put the world velocity of a point.
 	 */
-	// DMNOTE optimized
+	// djm optimized
 	public void getLinearVelocityFromLocalPointToOut(Vec2 localPoint, Vec2 out) {
 		//getWorldLocationToOut(localPoint, out);
 		//getLinearVelocityFromWorldPointToOut(out, out);

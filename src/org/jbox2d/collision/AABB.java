@@ -51,13 +51,13 @@ public class AABB {
         upperBound = new Vec2();
     }
     
-    // DMNOTE needed for the stack
+    // djm needed for the stack
     public void set(AABB aabb){
     	lowerBound.set( aabb.lowerBound);
     	upperBound.set( aabb.upperBound);
     }
 
-    /** Verify that the bounds are sorted. DMNOTE optimized */
+    /** Verify that the bounds are sorted. djm optimized */
     public boolean isValid() {
         float dx = upperBound.x - lowerBound.x;
         float dy = upperBound.y - lowerBound.y;
@@ -67,7 +67,7 @@ public class AABB {
     	return lowerBound.isValid() && upperBound.isValid();
     }
 
-    /** Check if AABBs overlap. DMNOTE optimized */
+    /** Check if AABBs overlap. djm optimized */
     public boolean testOverlap(AABB box) {
         float d1x = box.lowerBound.x - upperBound.x;
         float d1y = box.lowerBound.y - upperBound.y;

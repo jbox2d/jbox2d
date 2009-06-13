@@ -38,7 +38,7 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 		m_length = m_direction.normalize();
 		m_normal = new Vec2(m_direction.y, -m_direction.x);
 		
-		// DMNOTE they are new objects after that first math call
+		// djm they are new objects after that first math call
 		m_coreV1 = (m_normal.sub(m_direction)).mulLocal(-Settings.toiSlop).addLocal(m_v1);
 		m_coreV2 = (m_normal.add(m_direction)).mulLocal(-Settings.toiSlop).addLocal(m_v2);
 		
@@ -59,7 +59,7 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 	}
 	
 	public boolean testPoint(final XForm transform, final Vec2 p) {
-		// DMNOTE this could use some optimization.
+		// djm this could use some optimization.
 		return false;
 	}
 	
@@ -103,14 +103,14 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 //return e_missCollide;
 //}
 
-	// DMNOTE optimized
+	// djm optimized
 	public void computeAABB(AABB aabb, final XForm transform) {
 		/*Vec2 v1 = XForm.mul(transform, m_v1);
 		Vec2 v2 = XForm.mul(transform, m_v2);
 		aabb.lowerBound = Vec2.min(v1, v2);
 		aabb.upperBound = Vec2.max(v1, v2);*/
 		
-		// DMNOTE we avoid one creation. crafty huh?  i won't bother
+		// djm we avoid one creation. crafty huh?  i won't bother
 		// pooling the creation, as this method isn't very hot
 		XForm.mulToOut(transform, m_v1, aabb.lowerBound);
 		Vec2 v2 = XForm.mul(transform, m_v2);
@@ -119,13 +119,13 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 		Vec2.minToOut(aabb.lowerBound, v2, aabb.lowerBound);
 	}
 	
-	// DMNOTE pooling
+	// djm pooling
 	
 	private Vec2 sweptV1 = new Vec2();
 	private Vec2 sweptV2 = new Vec2();
 	private Vec2 sweptV3 = new Vec2();
 	private Vec2 sweptV4 = new Vec2();
-	// DMNOTE this method is pretty hot (called every time step)
+	// djm this method is pretty hot (called every time step)
 	public void computeSweptAABB(AABB aabb, final XForm transform1, final XForm transform2) {
 		
 		XForm.mulToOut(transform1, m_v1, sweptV1);
@@ -136,7 +136,7 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 		//aabb.lowerBound = Vec2.min(Vec2.min(Vec2.min(v1, v2), v3), v4);
 		//aabb.upperBound = Vec2.max(Vec2.max(Vec2.max(v1, v2), v3), v4);
 		
-		// DMNOTE ok here's the non object-creation-crazy way
+		// djm ok here's the non object-creation-crazy way
 		Vec2.minToOut( sweptV1, sweptV2, aabb.lowerBound);
 		Vec2.minToOut( aabb.lowerBound, sweptV3, aabb.lowerBound);
 		Vec2.minToOut( aabb.lowerBound, sweptV4, aabb.lowerBound);
@@ -154,7 +154,7 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 		massData.I = 0;
 	}
 	
-	// DMNOTE pooled
+	// djm pooled
 	private Vec2 supportV1 = new Vec2();
 	private Vec2 supportV2 = new Vec2();
 	public void support(Vec2 dest, final XForm xf, final Vec2 d) {

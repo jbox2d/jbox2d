@@ -267,13 +267,13 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 //    		return false;
 //    	}
     
-    // DMNOTE pooling, somewhat hot
+    // djm pooling, somewhat hot
     private Vec2 supportDLocal = new Vec2();
 	/**
 	 * Get the support point in the given world direction.
 	 * Use the supplied transform.
 	 */
-    // DMNOTE optimized
+    // djm optimized
     public void support(Vec2 dest, XForm xf, Vec2 d) {
         Mat22.mulTransToOut(xf.R, d, supportDLocal);
 
@@ -339,7 +339,7 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 	    }
 	
 	// http://www.geometrictools.com/Documentation/MinimumAreaRectangle.pdf
-	// DMNOTE this is only called in the constructor, so we can keep this
+	// djm this is only called in the constructor, so we can keep this
 	// unpooled.  I'll still make optimizations though
 	public static void computeOBB(OBB obb, Vec2[] vs){
 		int count = vs.length;
@@ -369,7 +369,7 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 			uy.y = ux.x;
 			lower.x = Float.MAX_VALUE;
 			lower.y = Float.MAX_VALUE;
-			upper.x = -Float.MAX_VALUE; // DMNOTE wouldn't this just be Float.MIN_VALUE?
+			upper.x = -Float.MAX_VALUE; // djm wouldn't this just be Float.MIN_VALUE?
 			upper.y = -Float.MAX_VALUE;
 
 			for (int j = 0; j < count; ++j) {
@@ -400,7 +400,7 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		assert(minArea < Float.MAX_VALUE);
 	}
 	
-	// DMNOTE pooling, hot method
+	// djm pooling, hot method
 	private Mat22 caabbR = new Mat22();
 	private Vec2 caabbH = new Vec2();
 	public void computeAABB(AABB aabb, XForm xf) {
@@ -425,7 +425,7 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		//aabb.upperBound = position.add(caabbH);//save a Vec2 creation, reuse temp
 	}
 	
-	// DMNOTE pooling, hot method
+	// djm pooling, hot method
 	private AABB sweptAABB1 = new AABB();
 	private AABB sweptAABB2 = new AABB();
 	
@@ -438,7 +438,7 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		//System.out.println("poly sweepaabb: "+aabb.lowerBound+" "+aabb.upperBound);
 	}
 	
-	// DMNOTE not very hot method so I'm not pooling.  still optimized though
+	// djm not very hot method so I'm not pooling.  still optimized though
 	public void computeMass(MassData massData) {
 		// Polygon mass, centroid, and inertia.
 		// Let rho be the polygon density in mass per unit area.

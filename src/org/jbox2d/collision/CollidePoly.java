@@ -81,7 +81,7 @@ public class CollidePoly {
         return numOut;
     }
 
-    // DMNOTE pooled
+    // djm pooled
     private static Vec2 normal1World = new Vec2();
     static float edgeSeparation(PolygonShape poly1, XForm xf1,
     							int edge1, 
@@ -127,7 +127,7 @@ public class CollidePoly {
         return separation;
     }
 
-    // DMNOTE pooled
+    // djm pooled
     private static Vec2 dLocal1 = new Vec2();
     // Find the max separation between poly1 and poly2 using face normals
     // from poly1.
@@ -232,10 +232,10 @@ public class CollidePoly {
         return separation;
     }
 
-    // DMNOTE pooled
+    // djm pooled
     private static Vec2 mulTemp = new Vec2();
     private static Vec2 normal1 = new Vec2();
-    // DMNOTE optimized
+    // djm optimized
     static void findIncidentEdge(ClipVertex c[], 
     							 PolygonShape poly1, XForm xf1, int edge1,
     							 PolygonShape poly2, XForm xf2) {
@@ -294,7 +294,7 @@ public class CollidePoly {
     // Clip
 
     // The normal points from 1 to 2
-    // DMNOTE optimized
+    // djm optimized
     public static void collidePolygons(Manifold manif, 
     		PolygonShape polyA, XForm xfA,
             PolygonShape polyB, XForm xfB) {

@@ -25,7 +25,7 @@ package org.jbox2d.common;
 
 /**
  * A few math methods that don't fit very well anywhere else.
- * DMNOTE: added ToOut method, and added modifier where appropriate
+ * djm: added ToOut method, and added modifier where appropriate
  */
 public class MathUtils {
 	// Max/min rewritten here because for some reason Math.max/min
@@ -44,7 +44,7 @@ public class MathUtils {
 		return MathUtils.max(low, MathUtils.min(a, high));
 	}
 
-	/* DMNOTE optimized */
+	/* djm optimized */
 	public final static Vec2 clamp(Vec2 a, Vec2 low, Vec2 high) {
 		Vec2 min = new Vec2();
 		Vec2.minToOut( a, high, min);
@@ -52,7 +52,7 @@ public class MathUtils {
 		return min;
 	}
 
-	/* DMNOTE created */
+	/* djm created */
 	public final static void clampToOut(Vec2 a, Vec2 low, Vec2 high, Vec2 dest) {
 		Vec2.minToOut( a, high, dest);
 		Vec2.maxToOut( low, dest, dest);

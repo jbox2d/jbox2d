@@ -37,7 +37,8 @@ public class Jacobian {
     public Jacobian() {
         linear1 = new Vec2();
         linear2 = new Vec2();
-        setZero();
+        angular1 = 0;
+        angular2 = 0;
     }
 
     void setZero() {
@@ -48,9 +49,9 @@ public class Jacobian {
     }
 
     void set(Vec2 x1, float a1, Vec2 x2, float a2) {
-        linear1 = x1;
+        linear1.set(x1);
         angular1 = a1;
-        linear2 = x2;
+        linear2.set(x2);
         angular2 = a2;
     }
 

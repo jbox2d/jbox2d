@@ -705,7 +705,7 @@ public class World {
     /** For internal use: find TOI contacts and solve them. */
     public void solveTOI(TimeStep step) {
     	// Reserve an island and a stack for TOI island solution.
-    	// DMNOTE do we always have to make a new island? or can we make
+    	// djm do we always have to make a new island? or can we make
     	// it static?
     	Island island = new Island(m_bodyCount, Settings.maxTOIContactsPerIsland, Settings.maxTOIJointsPerIsland, m_contactListener);
     	
@@ -922,7 +922,7 @@ public class World {
     			
     		}
 
-    		// DMNOTE do we need to create one every time?
+    		// djm do we need to create one every time?
     		TimeStep subStep = new TimeStep();
     		subStep.warmStarting = false;
     		subStep.dt = (1.0f - minTOI) * step.dt;
@@ -982,7 +982,7 @@ public class World {
     	}
 
     }
-    // DMNOTE pooled
+    // djm pooled
     private Color3f coreColor = new Color3f(255f*0.9f, 255f*0.6f, 255f*0.6f);
     private Vec2 drawingCenter = new Vec2();
     private Vec2 circCenterMoved = new Vec2();
@@ -1028,7 +1028,7 @@ public class World {
     			Vec2[] vertices = new Vec2[vertexCount];
 
     			for (int i = 0; i < vertexCount; ++i) {
-    				// DMNOTE these aren't instantiated so we need to be creating
+    				// djm these aren't instantiated so we need to be creating
     				// these.  To get rid of these instantiations, we would need
     				// to change the DebugDraw so you give it local vertices and the
     				// XForm to transform them with
@@ -1040,7 +1040,7 @@ public class World {
     			if (core) {
     				Vec2[] localCoreVertices = poly.getCoreVertices();
     				for (int i = 0; i < vertexCount; ++i) {
-    					// DMNOTE same as above
+    					// djm same as above
     					vertices[i] = XForm.mul(xf, localCoreVertices[i]);
     				}
     				m_debugDraw.drawPolygon(vertices, vertexCount, coreColor);
@@ -1061,7 +1061,7 @@ public class World {
     	}
     }
     
-    // DMNOTE pooled
+    // djm pooled
     private Color3f jointColor = new Color3f(255f*0.5f, 255f*0.8f, 255f*0.8f);
     /** For internal use */
     public void drawJoint(Joint joint) {
@@ -1105,7 +1105,7 @@ public class World {
     	}
     }
 
-    // DMNOTE pooled
+    // djm pooled
     private Color3f staticColor = new Color3f(255f*0.5f, 255f*0.9f, 255f*0.5f);
     private Color3f sleepingColor = new Color3f(255f*0.5f, 255f*0.5f, 255f*0.9f);
     private Color3f activeColor = new Color3f(255f*0.9f, 255f*0.9f, 255f*0.9f);
@@ -1165,7 +1165,7 @@ public class World {
 
     	if ( (flags & DebugDraw.e_pairBit) != 0) {
     		BroadPhase bp = m_broadPhase;
-    		// DMNOTE eh just keep this
+    		// djm eh just keep this
     		Vec2 invQ = new Vec2(0.0f, 0.0f);
     		invQ.set(1.0f / bp.m_quantizationFactor.x, 1.0f / bp.m_quantizationFactor.y);
 
