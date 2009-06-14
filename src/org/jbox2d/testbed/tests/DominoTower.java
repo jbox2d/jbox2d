@@ -102,26 +102,28 @@ public class DominoTower extends AbstractExample {
         }
 
         { 
-            
+            float currX;
             //Make base
             for (int i=0; i<baseCount; ++i) {
-                float currX = i*1.5f*dheight - (1.5f*dheight*baseCount/2f);
+                currX = i*1.5f*dheight - (1.5f*dheight*baseCount/2f);
                 makeDomino(currX, dheight/2.0f, false, m_world);
                 makeDomino(currX, dheight+dwidth/2.0f, true, m_world);
             }
+            currX = baseCount*1.5f*dheight - (1.5f*dheight*baseCount/2f);            
             //Make 'I's
             for (int j=1; j<baseCount; ++j) {
                 if (j > 3) ddensity *= .8f;
                 float currY = dheight*.5f + (dheight+2f*dwidth)*.99f*j; //y at center of 'I' structure
                 
                 for (int i=0; i<baseCount - j; ++i) {
-                    float currX = i*1.5f*dheight - (1.5f*dheight*(baseCount-j)/2f);// + random(-.05f, .05f);
+                    currX = i*1.5f*dheight - (1.5f*dheight*(baseCount-j)/2f);// + parent.random(-.05f, .05f);
                     ddensity *= 2.5f;
                     if (i==0) {
                         makeDomino(currX - (1.25f*dheight) + .5f*dwidth, currY-dwidth, false, m_world);
                     }
                     if (i==baseCount-j-1) {
-                        if (j != 1) makeDomino(currX + (1.25f*dheight) - .5f*dwidth, currY-dwidth, false, m_world);
+                        /*if (j != 1) djm: why is this here? it makes it off balance*/
+                    	makeDomino(currX + (1.25f*dheight) - .5f*dwidth, currY-dwidth, false, m_world);
                     }
                     ddensity /= 2.5f;
                     makeDomino(currX, currY, false, m_world);
