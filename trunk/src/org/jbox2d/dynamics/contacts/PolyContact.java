@@ -41,6 +41,7 @@ import org.jbox2d.dynamics.ContactListener;
 public class PolyContact extends Contact implements ContactCreateFcn {
 
     Manifold m_manifold;
+    ArrayList<Manifold> manifoldList = new ArrayList<Manifold>();
 
     public PolyContact(Shape s1, Shape s2) {
         super(s1, s2);
@@ -49,12 +50,16 @@ public class PolyContact extends Contact implements ContactCreateFcn {
 
         m_manifold = new Manifold();
         m_manifoldCount = 0;
+        manifoldList.add(m_manifold);
+
     }
 
     public PolyContact() {
         super();
         m_manifold = new Manifold();
         m_manifoldCount = 0;
+        manifoldList.add(m_manifold);
+
     }
 
     public Contact clone() {
@@ -87,13 +92,7 @@ public class PolyContact extends Contact implements ContactCreateFcn {
 
     @Override
     public List<Manifold> getManifolds() {
-        // System.out.println("PolyContact.GetManifolds()");
-        List<Manifold> ret = new ArrayList<Manifold>(1);
-        if (m_manifold != null) {
-            ret.add(m_manifold);
-        }
-
-        return ret;
+    	return manifoldList;
     }
 
     public Contact create(Shape shape1, Shape shape2) {

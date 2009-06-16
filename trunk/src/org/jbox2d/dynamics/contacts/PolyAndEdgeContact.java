@@ -20,7 +20,8 @@ import org.jbox2d.dynamics.ContactListener;
 
 public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 	Manifold m_manifold;
-	
+    ArrayList<Manifold> manifoldList = new ArrayList<Manifold>();
+
 	public Contact create(Shape s1, Shape s2) {
 		// TODO Auto-generated method stub
 		return new PolyAndEdgeContact(s1,s2);
@@ -29,6 +30,7 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 	public PolyAndEdgeContact() {
 		super();
 		m_manifold = new Manifold();
+        manifoldList.add(m_manifold);
 		m_manifoldCount = 0;
 	}
 	 
@@ -37,6 +39,8 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 		assert (m_shape1.getType() == ShapeType.POLYGON_SHAPE);
 		assert (m_shape2.getType() == ShapeType.EDGE_SHAPE);
         m_manifold = new Manifold();
+        m_manifoldCount = 0;
+        manifoldList.add(m_manifold);
 	}
 
 	public static void Destroy(Contact contact) {
@@ -420,11 +424,6 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 
 	@Override
     public List<Manifold> getManifolds() {
-        List<Manifold> ret = new ArrayList<Manifold>(1);
-        if (m_manifold != null) {
-            ret.add(m_manifold);
-        }
-
-        return ret;
+        return manifoldList;
     }
 }

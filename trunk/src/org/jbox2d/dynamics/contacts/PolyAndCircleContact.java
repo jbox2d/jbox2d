@@ -42,12 +42,14 @@ import org.jbox2d.dynamics.ContactListener;
 class PolyAndCircleContact extends Contact implements ContactCreateFcn {
 
     Manifold m_manifold;
+    ArrayList<Manifold> manifoldList = new ArrayList<Manifold>();
 
     public PolyAndCircleContact(Shape s1, Shape s2) {
         super(s1, s2);
         assert (m_shape1.getType() == ShapeType.POLYGON_SHAPE);
         assert (m_shape2.getType() == ShapeType.CIRCLE_SHAPE);
         m_manifold = new Manifold();
+        manifoldList.add(m_manifold);
         m_manifoldCount = 0;
         // These should not be necessary, manifold was
         // just created...
@@ -91,11 +93,7 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
 
     @Override
     public List<Manifold> getManifolds() {
-        List<Manifold> ret = new ArrayList<Manifold>(1);
-        if (m_manifold != null) {
-            ret.add(m_manifold);
-        }
-        return ret;
+        return manifoldList;
     }
 
     // djm pooled

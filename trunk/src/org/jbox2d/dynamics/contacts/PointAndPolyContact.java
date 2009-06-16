@@ -41,12 +41,15 @@ import org.jbox2d.dynamics.ContactListener;
 class PointAndPolyContact extends Contact implements ContactCreateFcn {
 
     Manifold m_manifold;
+    ArrayList<Manifold> manifoldList = new ArrayList<Manifold>();
 
     public PointAndPolyContact(Shape s1, Shape s2) {
         super(s1, s2);
         assert (m_shape1.getType() == ShapeType.POLYGON_SHAPE);
         assert (m_shape2.getType() == ShapeType.POINT_SHAPE);
         m_manifold = new Manifold();
+        manifoldList.add(m_manifold);
+
         m_manifoldCount = 0;
         // These should not be necessary, manifold was
         // just created...
@@ -57,6 +60,8 @@ class PointAndPolyContact extends Contact implements ContactCreateFcn {
     public PointAndPolyContact() {
         super();
         m_manifold = new Manifold();
+        manifoldList.add(m_manifold);
+
         m_manifoldCount = 0;
     }
 
@@ -64,6 +69,7 @@ class PointAndPolyContact extends Contact implements ContactCreateFcn {
         PointAndPolyContact newC = new PointAndPolyContact(this.m_shape1,
                 this.m_shape2);
         newC.m_manifold.set(this.m_manifold);
+        
         newC.m_manifoldCount = this.m_manifoldCount;
         // The parent world.
         newC.m_world = this.m_world;
@@ -95,6 +101,10 @@ class PointAndPolyContact extends Contact implements ContactCreateFcn {
             ret.add(m_manifold);
         }
         return ret;
+    }
+    
+    public Manifold getFirstManifold(){
+    	return m_manifold;
     }
 
     // djm pooled
