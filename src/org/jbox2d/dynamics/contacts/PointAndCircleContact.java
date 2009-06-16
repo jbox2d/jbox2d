@@ -42,6 +42,7 @@ import org.jbox2d.dynamics.ContactListener;
 public class PointAndCircleContact extends Contact implements ContactCreateFcn {
 
     Manifold m_manifold;
+    ArrayList<Manifold> manifoldList = new ArrayList<Manifold>();
 
     public Contact create(Shape shape1, Shape shape2) {
         return new PointAndCircleContact(shape1, shape2);
@@ -58,6 +59,7 @@ public class PointAndCircleContact extends Contact implements ContactCreateFcn {
     public PointAndCircleContact() {
         super();
         m_manifold = new Manifold();
+        manifoldList.add(m_manifold);
         m_manifoldCount = 0;
     }
 
@@ -66,6 +68,7 @@ public class PointAndCircleContact extends Contact implements ContactCreateFcn {
         m_manifold = new Manifold();
         assert (m_shape1.getType() == ShapeType.POINT_SHAPE);
         assert (m_shape2.getType() == ShapeType.CIRCLE_SHAPE);
+        manifoldList.add(m_manifold);
         m_manifold.pointCount = 0;
         m_manifold.points[0].normalImpulse = 0.0f;
         m_manifold.points[0].tangentImpulse = 0.0f;
@@ -166,12 +169,6 @@ public class PointAndCircleContact extends Contact implements ContactCreateFcn {
 
     @Override
     public List<Manifold> getManifolds() {
-        List<Manifold> ret = new ArrayList<Manifold>(1);
-        if (m_manifold != null) {
-            ret.add(m_manifold);
-        }
-
-        return ret;
+        return manifoldList;
     }
-
 }

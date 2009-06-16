@@ -18,11 +18,14 @@ import org.jbox2d.dynamics.ContactListener;
 
 public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 	Manifold m_manifold;
+    ArrayList<Manifold> manifoldList = new ArrayList<Manifold>();
+
 	
 	public EdgeAndCircleContact() {
 		// TODO Auto-generated constructor stub
 		super();
 		m_manifold = new Manifold();
+		manifoldList.add(m_manifold);
 		m_manifoldCount = 0;
 	}
 
@@ -31,6 +34,7 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 		assert(m_shape1.getType() == ShapeType.EDGE_SHAPE);
 		assert(m_shape2.getType() == ShapeType.CIRCLE_SHAPE);
 		m_manifold = new Manifold();
+		manifoldList.add(m_manifold);
 		m_manifoldCount = 0;
 	}
 
@@ -226,12 +230,7 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 
 	@Override
 	public List<Manifold> getManifolds() {
-		List<Manifold> ret = new ArrayList<Manifold>(1);
-        if (m_manifold != null) {
-            ret.add(m_manifold);
-        }
-
-        return ret;
+		return manifoldList;
 	}
 
 	public Contact create(Shape s1, Shape s2) {

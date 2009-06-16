@@ -48,4 +48,9 @@ public class NullContact extends Contact {
         System.out.println("NullContact.GetManifolds()");
         return null;
     }
+    
+    public Manifold getFirstManifold(){
+    	System.out.println("NullContact.GetFirstManifold()");
+        return null;
+    }
 }

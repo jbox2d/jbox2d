@@ -146,6 +146,8 @@ public class ContactManager extends PairCallback {
     	destroy(c);
     }
 
+    // djm pooled
+    private Vec2 v1 = new Vec2();
     public void destroy(Contact c) {
     	Shape shape1 = c.getShape1();
     	Shape shape2 = c.getShape2();
@@ -169,12 +171,13 @@ public class ContactManager extends PairCallback {
     			for (int j = 0; j < manifold.pointCount; ++j) {
 
     				ManifoldPoint mp = manifold.points[j];
-    				cp.position = b1.getWorldLocation(mp.localPoint1);
-    				Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
-    				Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
-    				cp.velocity = v2.sub(v1);
+    				b1.getWorldLocationToOut(mp.localPoint1, cp.position);
+    				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
+    				// velocity isn't initialized in the contact point
+    				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+    				cp.velocity.subLocal(v1);
     				cp.separation = mp.separation;
-    				cp.id = new ContactID(mp.id);
+    				cp.id.set(mp.id);
     				m_world.m_contactListener.remove(cp);
     			}
     		}
