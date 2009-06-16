@@ -89,6 +89,13 @@ public class Mat22 {
 		col2.x = m.col2.x;
 		col2.y = m.col2.y;
 	}
+	
+	public final void set(float col1x, float col2x, float col1y, float col2y) {
+		col1.x = col1x;
+		col1.y = col1y;
+		col2.x = col2x;
+		col2.y = col2y;
+	}
 
 	/**
 	 * Return a clone of this matrix.

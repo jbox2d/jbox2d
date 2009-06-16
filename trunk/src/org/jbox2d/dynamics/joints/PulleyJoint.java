@@ -113,8 +113,8 @@ public class PulleyJoint extends Joint {
 
     	m_constant = def.length1 + m_ratio * def.length2;
 
-    	m_maxLength1 = Math.min(def.maxLength1, m_constant - m_ratio * MIN_PULLEY_LENGTH);
-    	m_maxLength2 = Math.min(def.maxLength2, (m_constant - MIN_PULLEY_LENGTH) / m_ratio);
+    	m_maxLength1 = MathUtils.min(def.maxLength1, m_constant - m_ratio * MIN_PULLEY_LENGTH);
+    	m_maxLength2 = MathUtils.min(def.maxLength2, (m_constant - MIN_PULLEY_LENGTH) / m_ratio);
 
     	m_force = 0.0f;
     	m_limitForce1 = 0.0f;
