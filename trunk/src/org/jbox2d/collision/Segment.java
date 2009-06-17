@@ -26,6 +26,7 @@ package org.jbox2d.collision;
 import org.jbox2d.common.*;
 
 //See b2Collision.h/.cpp
+// djm: is this used?
 public class Segment {
 	
 	public Vec2 p1, p2;

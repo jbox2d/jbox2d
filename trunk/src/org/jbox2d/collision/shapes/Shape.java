@@ -21,8 +21,13 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package org.jbox2d.collision;
+package org.jbox2d.collision.shapes;
 
+import org.jbox2d.collision.AABB;
+import org.jbox2d.collision.BroadPhase;
+import org.jbox2d.collision.FilterData;
+import org.jbox2d.collision.MassData;
+import org.jbox2d.collision.PairManager;
 import org.jbox2d.common.*;
 import org.jbox2d.dynamics.Body;
 

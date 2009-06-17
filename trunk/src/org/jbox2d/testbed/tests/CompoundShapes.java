@@ -23,6 +23,8 @@
 package org.jbox2d.testbed.tests;
 
 import org.jbox2d.collision.*;
+import org.jbox2d.collision.shapes.CircleDef;
+import org.jbox2d.collision.shapes.PolygonDef;
 import org.jbox2d.common.*;
 import org.jbox2d.dynamics.*;
 import org.jbox2d.testbed.AbstractExample;

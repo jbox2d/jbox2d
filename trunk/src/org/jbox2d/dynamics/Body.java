@@ -23,12 +23,12 @@
 
 package org.jbox2d.dynamics;
 
-import org.jbox2d.collision.EdgeChainDef;
-import org.jbox2d.collision.EdgeShape;
 import org.jbox2d.collision.MassData;
-import org.jbox2d.collision.Shape;
-import org.jbox2d.collision.ShapeDef;
-import org.jbox2d.collision.ShapeType;
+import org.jbox2d.collision.shapes.EdgeChainDef;
+import org.jbox2d.collision.shapes.EdgeShape;
+import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.collision.shapes.ShapeDef;
+import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.*;
 import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.dynamics.joints.JointEdge;

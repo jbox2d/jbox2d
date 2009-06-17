@@ -41,6 +41,12 @@ package org.jbox2d.collision;
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.collision.shapes.EdgeShape;
+import org.jbox2d.collision.shapes.PointShape;
+import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.*;
 
 //updated to rev 108->139 of b2Distance.cpp

@@ -21,7 +21,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package org.jbox2d.collision;
+package org.jbox2d.collision.shapes;
 
 // Updated to rev 144 of b2Shape.h
 public enum ShapeType {

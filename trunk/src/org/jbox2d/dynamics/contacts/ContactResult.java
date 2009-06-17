@@ -1,7 +1,7 @@
 package org.jbox2d.dynamics.contacts;
 
 import org.jbox2d.collision.ContactID;
-import org.jbox2d.collision.Shape;
+import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
 
 // Updated to rev 139 of b2Contact.h

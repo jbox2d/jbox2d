@@ -28,9 +28,9 @@ import processing.core.PImage;
 
 import org.jbox2d.common.Color3f;
 import org.jbox2d.collision.AABB;
-import org.jbox2d.collision.CircleDef;
 import org.jbox2d.collision.ContactID;
-import org.jbox2d.collision.Shape;
+import org.jbox2d.collision.shapes.CircleDef;
+import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
