@@ -23,7 +23,7 @@
 
 package org.jbox2d.dynamics.contacts;
 
-import org.jbox2d.collision.ShapeType;
+import org.jbox2d.collision.shapes.ShapeType;
 
 public class ContactRegister {
     public ShapeType s1, s2;

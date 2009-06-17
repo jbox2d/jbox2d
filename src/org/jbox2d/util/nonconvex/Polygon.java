@@ -1,6 +1,6 @@
 package org.jbox2d.util.nonconvex;
 
-import org.jbox2d.collision.PolygonDef;
+import org.jbox2d.collision.shapes.PolygonDef;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;

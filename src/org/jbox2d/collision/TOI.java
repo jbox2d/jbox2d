@@ -23,6 +23,7 @@
 
 package org.jbox2d.collision;
 
+import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.*;
 
 //updated to rev 142 of b2TimeOfImpact.cpp

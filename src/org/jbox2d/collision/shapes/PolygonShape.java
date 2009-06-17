@@ -21,10 +21,14 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package org.jbox2d.collision;
+package org.jbox2d.collision.shapes;
 
 import java.util.List;
 
+import org.jbox2d.collision.AABB;
+import org.jbox2d.collision.MassData;
+import org.jbox2d.collision.OBB;
+import org.jbox2d.collision.SupportsGenericDistance;
 import org.jbox2d.common.*;
 
 

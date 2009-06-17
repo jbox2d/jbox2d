@@ -1,4 +1,4 @@
-package org.jbox2d.collision;
+package org.jbox2d.collision.shapes;
 
 import org.jbox2d.common.Vec2;
 

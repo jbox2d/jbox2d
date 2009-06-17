@@ -26,13 +26,13 @@ package org.jbox2d.dynamics.contacts;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jbox2d.collision.CollideCircle;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
-import org.jbox2d.collision.PointShape;
-import org.jbox2d.collision.PolygonShape;
-import org.jbox2d.collision.Shape;
-import org.jbox2d.collision.ShapeType;
+import org.jbox2d.collision.shapes.CollidePoly;
+import org.jbox2d.collision.shapes.PointShape;
+import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.ContactListener;
@@ -119,7 +119,7 @@ class PointAndPolyContact extends Contact implements ContactCreateFcn {
     	m0.set(m_manifold);
         
     	
-        CollideCircle.collidePolygonAndPoint(m_manifold, (PolygonShape)m_shape1, b1.getMemberXForm(), (PointShape)m_shape2, b2.getMemberXForm());
+        CollidePoly.collidePolygonAndPoint(m_manifold, (PolygonShape)m_shape1, b1.getMemberXForm(), (PointShape)m_shape2, b2.getMemberXForm());
     	//CollideCircle.collidePolygonAndCircle(m_manifold, (PolygonShape)m_shape1, b1.getXForm(), (CircleShape)m_shape2, b2.getXForm());
 
     	boolean[] persisted= {false, false};

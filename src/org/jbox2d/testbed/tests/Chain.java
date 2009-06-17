@@ -27,6 +27,7 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jbox2d.collision.*;
+import org.jbox2d.collision.shapes.PolygonDef;
 import org.jbox2d.testbed.AbstractExample;
 import org.jbox2d.testbed.TestbedMain;
 

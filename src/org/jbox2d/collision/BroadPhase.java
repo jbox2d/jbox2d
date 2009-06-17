@@ -217,7 +217,8 @@ public class BroadPhase {
     }
 
     // Create and destroy proxies. These call Flush first.
-    int createProxy(AABB aabb, //int groupIndex, int categoryBits, int maskBits,
+    /** internal */
+    public int createProxy(AABB aabb, //int groupIndex, int categoryBits, int maskBits,
             Object userData) {
         if (debugPrint) {
             System.out.println("CreateProxy()");
@@ -432,7 +433,8 @@ public class BroadPhase {
     private BoundValues oldValues = new BoundValues();
     // Call MoveProxy as many times as you like, then when you are done
     // call Flush to finalized the proxy pairs (for your time step).
-    void moveProxy(int proxyId, AABB aabb) {
+    /** internal */
+    public void moveProxy(int proxyId, AABB aabb) {
         if (debugPrint) {
             System.out.println("MoveProxy()");
         }

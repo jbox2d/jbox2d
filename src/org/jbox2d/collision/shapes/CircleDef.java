@@ -21,7 +21,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package org.jbox2d.collision;
+package org.jbox2d.collision.shapes;
 
 import org.jbox2d.common.*;
 //updated to rev 139 of b2CircleShape.h/.cpp

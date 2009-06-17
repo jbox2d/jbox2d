@@ -23,7 +23,7 @@
 
 package org.jbox2d.dynamics;
 
-import org.jbox2d.collision.Shape;
+import org.jbox2d.collision.shapes.Shape;
 
 // Updated to rev 143 of b2WorldCallbacks.h/cpp
 // See also DefaultContactFilter.java

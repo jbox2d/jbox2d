@@ -21,7 +21,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package org.jbox2d.collision;
+package org.jbox2d.collision.shapes;
 
 //Updated to rev 56 of b2Shape.cpp/.h
 // -> rev 97 of b2PolygonShape.cpp/.h
@@ -29,6 +29,7 @@ package org.jbox2d.collision;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jbox2d.collision.FilterData;
 import org.jbox2d.common.*;
 
 /**

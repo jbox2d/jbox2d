@@ -29,7 +29,7 @@ import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.collision.PairCallback;
-import org.jbox2d.collision.Shape;
+import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactPoint;

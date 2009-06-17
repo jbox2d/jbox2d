@@ -26,13 +26,13 @@ package org.jbox2d.dynamics.contacts;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jbox2d.collision.CircleShape;
-import org.jbox2d.collision.CollideCircle;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
-import org.jbox2d.collision.PointShape;
-import org.jbox2d.collision.Shape;
-import org.jbox2d.collision.ShapeType;
+import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.collision.shapes.CollideCircle;
+import org.jbox2d.collision.shapes.PointShape;
+import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.ContactListener;

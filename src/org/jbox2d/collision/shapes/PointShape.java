@@ -1,5 +1,7 @@
-package org.jbox2d.collision;
+package org.jbox2d.collision.shapes;
 
+import org.jbox2d.collision.AABB;
+import org.jbox2d.collision.MassData;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;

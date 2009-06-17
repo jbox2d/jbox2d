@@ -1,4 +1,4 @@
-package org.jbox2d.collision;
+package org.jbox2d.collision.shapes;
 
 import java.util.ArrayList;
 import java.util.List;

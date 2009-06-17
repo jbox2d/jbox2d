@@ -21,8 +21,10 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package org.jbox2d.collision;
+package org.jbox2d.collision.shapes;
 
+import org.jbox2d.collision.Collision;
+import org.jbox2d.collision.Manifold;
 import org.jbox2d.common.*;
 
 //Updated to rev 139 of b2CollideCircle.cpp
@@ -301,110 +303,90 @@ public class CollideCircle {
         manifold.points[0].id.features.flip = 0;
     }
     
-    
-    // djm pooled
-    private static Vec2 colPPc = new Vec2();
-    private static Vec2 colPPcLocal = new Vec2();
-    private static Vec2 colPPsub = new Vec2();
-    private static Vec2 colPPe = new Vec2();
-    private static Vec2 colPPp = new Vec2();
-    private static Vec2 colPPd = new Vec2();
-    
-    // djm optimized
-    public static void collidePolygonAndPoint(Manifold manifold, 
-    		PolygonShape polygon, XForm xf1,
-            PointShape point, XForm xf2) {
-    	
-        manifold.pointCount = 0;
+	// djm TODO move this to dynamics?
+	private static Vec2 ECd = new Vec2();
+	private static Vec2 ECc = new Vec2();
+	private static Vec2 ECcLocal = new Vec2();
+	//private static Vec2 ECcLocalSubV1 = new Vec2();
+	public final static void collideEdgeAndCircle(Manifold manifold,
+			final EdgeShape edge, final XForm xf1,
+			final CircleShape circle, final XForm xf2) {
+		manifold.pointCount = 0;
+		
+		XForm.mulToOut(xf2, circle.getLocalPosition(), ECc);
+		XForm.mulTransToOut(xf1, ECc, ECcLocal);
+		
+		Vec2 n = edge.getNormalVector();
+		Vec2 v1 = edge.getVertex1();
+		Vec2 v2 = edge.getVertex2();
+		float radius = circle.getRadius();
+		float separation;
+		
+		ECd.set(ECcLocal);
+		ECd.subLocal(v1);
+		
+		float dirDist = Vec2.dot(ECd, edge.getDirectionVector());
+		if (dirDist <= 0) {
 
-        // Compute circle position in the frame of the polygon.
-        XForm.mulToOut(xf2, point.getLocalPosition(), colPPc);
-    	XForm.mulTransToOut(xf1, colPPc, colPPcLocal);
+			if (Vec2.dot(ECd, edge.getCorner1Vector()) < 0) {
+				return;
+			}
+			XForm.mulToOut(xf1, v1, ECd);
+			ECd.subLocal(ECc);
+			ECd.negateLocal();
+			// d = c.sub(XForm.mul(xf1, v1));
+		} else if (dirDist >= edge.getLength()) {
+			ECd.set(ECcLocal);
+			ECd.subLocal(v2);
+			if (Vec2.dot(ECd, edge.getCorner2Vector()) > 0) {
+				return;
+			}
+			XForm.mulToOut(xf1, v2, ECd);
+			ECd.subLocal(ECc);
+			ECd.negateLocal();
+			//d = c.sub(XForm.mul(xf1, v2));
+		} else {
+			separation = Vec2.dot(ECd, n);
+			if (separation > radius || separation < -radius) {
+				return;
+			}
+			separation -= radius;
+			Mat22.mulToOut(xf1.R, n, manifold.normal);
+			manifold.pointCount = 1;
+			manifold.points[0].id.zero();// key = 0;
+			manifold.points[0].separation = separation;
+			// just use d as temp vec here, we don't need it any more
+			ECd.set(manifold.normal);
+			ECd.mulLocal(radius);
+			ECc.subLocal(ECd);
+			XForm.mulTransToOut(xf1, ECc, manifold.points[0].localPoint1);
+			XForm.mulTransToOut(xf2, ECc, manifold.points[0].localPoint2);
+			return;
+		}
+		
+		float distSqr = Vec2.dot(ECd,ECd);
+		if (distSqr > radius * radius) {
+			return;
+		}
+		
+		if (distSqr < Settings.EPSILON) {
+			separation = -radius;
+			Mat22.mulToOut(xf1.R, n, manifold.normal);
+		} else {
+			separation = ECd.normalize() - radius;
+			manifold.normal.set(ECd);
+		}
+		
+		manifold.pointCount = 1;
+		manifold.points[0].id.zero();//key = 0;
+		manifold.points[0].separation = separation;
+		// just use d as temp vec here, we don't need it any more
+		ECd.set(manifold.normal);
+		ECd.mulLocal(radius);
+		ECc.subLocal(ECd);
+		//c.subLocal(manifold.normal.mul(radius));
+		 XForm.mulTransToOut(xf1, ECc, manifold.points[0].localPoint1);
+		 XForm.mulTransToOut(xf2, ECc, manifold.points[0].localPoint2);
 
-        // Find edge with maximum separation.
-        int normalIndex = 0;
-        float separation = -Float.MAX_VALUE;
-        
-        int vertexCount = polygon.getVertexCount();
-        Vec2[] vertices = polygon.getVertices();
-        Vec2[] normals = polygon.getNormals();
-        for (int i = 0; i < vertexCount; ++i) {
-        	colPPsub.set( colPPcLocal);
-        	colPPsub.subLocal( vertices[i]);
-            float s = Vec2.dot(normals[i], colPPsub);
-            if (s > 0) {
-                // Early out.
-                return;
-            }
-
-            if (s > separation) {
-                normalIndex = i;
-                separation = s;
-            }
-        }
-        // If the center is inside the polygon ...
-        if (separation < Settings.EPSILON) {
-            manifold.pointCount = 1;
-            manifold.normal = Mat22.mul(xf1.R, normals[normalIndex]);
-            manifold.points[0].id.features.incidentEdge = normalIndex;
-            manifold.points[0].id.features.incidentVertex = Collision.NULL_FEATURE;
-            manifold.points[0].id.features.referenceEdge = 0;
-            manifold.points[0].id.features.flip = 0;
-    		Vec2 position = colPPc;
-    		XForm.mulTransToOut(xf1, position, manifold.points[0].localPoint1);
-    		XForm.mulTransToOut(xf2, position, manifold.points[0].localPoint2);
-            manifold.points[0].separation = separation;
-            return;
-        }
-
-        // Project the circle center onto the edge segment.
-        int vertIndex1 = normalIndex;
-        int vertIndex2 = vertIndex1 + 1 < vertexCount ? vertIndex1 + 1 : 0;
-        colPPe.set( vertices[vertIndex2]);
-        colPPe.subLocal(vertices[vertIndex1]);
-        float length = colPPe.normalize();
-        assert(length > Settings.EPSILON);
-
-        // Project the center onto the edge.
-        colPPsub.set(colPPcLocal);
-        colPPsub.subLocal( vertices[vertIndex1]);
-        float u = Vec2.dot(colPPsub, colPPe);
-        
-        colPPp.setZero();
-        if (u <= 0.0f) {
-            colPPp.set(vertices[vertIndex1]);
-            manifold.points[0].id.features.incidentEdge = Collision.NULL_FEATURE;
-            manifold.points[0].id.features.incidentVertex = vertIndex1;
-        }
-        else if (u >= length) {
-        	colPPp.set(vertices[vertIndex2]);
-            manifold.points[0].id.features.incidentEdge = Collision.NULL_FEATURE;
-            manifold.points[0].id.features.incidentVertex = vertIndex2;
-        }
-        else {
-        	colPPp.set(vertices[vertIndex1]);
-        	colPPp.x += u * colPPe.x;
-        	colPPp.y += u * colPPe.y;
-            manifold.points[0].id.features.incidentEdge = normalIndex;
-            manifold.points[0].id.features.incidentVertex = Collision.NULL_FEATURE;
-        }
-        
-        colPPd.set(colPPcLocal);
-        colPPd.subLocal( colPPp);
-
-        float dist = colPPd.normalize();
-        if (dist > 0) {
-            return;
-        }
-
-        manifold.pointCount = 1;
-        
-    	Mat22.mulToOut(xf1.R, colPPd, manifold.normal);
-    	Vec2 position = colPPc;
-    	XForm.mulTransToOut(xf1, position, manifold.points[0].localPoint1);
-    	XForm.mulTransToOut(xf2, position, manifold.points[0].localPoint2);
-        manifold.points[0].separation = dist;
-        manifold.points[0].id.features.referenceEdge = 0;
-        manifold.points[0].id.features.flip = 0;
-    }
+	}
 }

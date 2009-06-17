@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jbox2d.collision.Manifold;
-import org.jbox2d.collision.Shape;
-import org.jbox2d.collision.ShapeType;
+import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.ContactListener;

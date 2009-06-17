@@ -3,16 +3,14 @@ package org.jbox2d.dynamics.contacts;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jbox2d.collision.CircleShape;
-import org.jbox2d.collision.EdgeShape;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
-import org.jbox2d.collision.Shape;
-import org.jbox2d.collision.ShapeType;
-import org.jbox2d.common.Mat22;
-import org.jbox2d.common.Settings;
+import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.collision.shapes.CollideCircle;
+import org.jbox2d.collision.shapes.EdgeShape;
+import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.ContactListener;
 
@@ -62,7 +60,7 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 
 		m0.set(m_manifold);
 
-		CollideEdgeAndCircle(m_manifold, (EdgeShape)m_shape1, b1.getMemberXForm(), (CircleShape)m_shape2, b2.getMemberXForm());
+		CollideCircle.collideEdgeAndCircle(m_manifold, (EdgeShape)m_shape1, b1.getMemberXForm(), (CircleShape)m_shape2, b2.getMemberXForm());
 
 		ContactPoint cp = new ContactPoint();
 		cp.shape1 = m_shape1;
@@ -141,93 +139,6 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 
 	}
 	
-	// djm TODO move this to dynamics?
-	private static Vec2 ECd = new Vec2();
-	private static Vec2 ECc = new Vec2();
-	private static Vec2 ECcLocal = new Vec2();
-	//private static Vec2 ECcLocalSubV1 = new Vec2();
-	public final static void CollideEdgeAndCircle(Manifold manifold,
-			final EdgeShape edge, final XForm xf1,
-			final CircleShape circle, final XForm xf2) {
-		manifold.pointCount = 0;
-		
-		XForm.mulToOut(xf2, circle.getLocalPosition(), ECc);
-		XForm.mulTransToOut(xf1, ECc, ECcLocal);
-		
-		Vec2 n = edge.getNormalVector();
-		Vec2 v1 = edge.getVertex1();
-		Vec2 v2 = edge.getVertex2();
-		float radius = circle.getRadius();
-		float separation;
-		
-		ECd.set(ECcLocal);
-		ECd.subLocal(v1);
-		
-		float dirDist = Vec2.dot(ECd, edge.getDirectionVector());
-		if (dirDist <= 0) {
-
-			if (Vec2.dot(ECd, edge.getCorner1Vector()) < 0) {
-				return;
-			}
-			XForm.mulToOut(xf1, v1, ECd);
-			ECd.subLocal(ECc);
-			ECd.negateLocal();
-			// d = c.sub(XForm.mul(xf1, v1));
-		} else if (dirDist >= edge.getLength()) {
-			ECd.set(ECcLocal);
-			ECd.subLocal(v2);
-			if (Vec2.dot(ECd, edge.getCorner2Vector()) > 0) {
-				return;
-			}
-			XForm.mulToOut(xf1, v2, ECd);
-			ECd.subLocal(ECc);
-			ECd.negateLocal();
-			//d = c.sub(XForm.mul(xf1, v2));
-		} else {
-			separation = Vec2.dot(ECd, n);
-			if (separation > radius || separation < -radius) {
-				return;
-			}
-			separation -= radius;
-			Mat22.mulToOut(xf1.R, n, manifold.normal);
-			manifold.pointCount = 1;
-			manifold.points[0].id.zero();// key = 0;
-			manifold.points[0].separation = separation;
-			// just use d as temp vec here, we don't need it any more
-			ECd.set(manifold.normal);
-			ECd.mulLocal(radius);
-			ECc.subLocal(ECd);
-			XForm.mulTransToOut(xf1, ECc, manifold.points[0].localPoint1);
-			XForm.mulTransToOut(xf2, ECc, manifold.points[0].localPoint2);
-			return;
-		}
-		
-		float distSqr = Vec2.dot(ECd,ECd);
-		if (distSqr > radius * radius) {
-			return;
-		}
-		
-		if (distSqr < Settings.EPSILON) {
-			separation = -radius;
-			Mat22.mulToOut(xf1.R, n, manifold.normal);
-		} else {
-			separation = ECd.normalize() - radius;
-			manifold.normal.set(ECd);
-		}
-		
-		manifold.pointCount = 1;
-		manifold.points[0].id.zero();//key = 0;
-		manifold.points[0].separation = separation;
-		// just use d as temp vec here, we don't need it any more
-		ECd.set(manifold.normal);
-		ECd.mulLocal(radius);
-		ECc.subLocal(ECd);
-		//c.subLocal(manifold.normal.mul(radius));
-		 XForm.mulTransToOut(xf1, ECc, manifold.points[0].localPoint1);
-		 XForm.mulTransToOut(xf2, ECc, manifold.points[0].localPoint2);
-
-	}
-
 	@Override
 	public List<Manifold> getManifolds() {
 		return manifoldList;

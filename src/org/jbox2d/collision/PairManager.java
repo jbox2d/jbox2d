@@ -32,10 +32,10 @@ public class PairManager {
 
     public static final int NULL_PAIR = Integer.MAX_VALUE;
 
-    static final int NULL_PROXY = Integer.MAX_VALUE;
+    public static final int NULL_PROXY = Integer.MAX_VALUE;
 
     public static final int TABLE_CAPACITY = Settings.maxPairs;
-    static final int TABLE_MASK = TABLE_CAPACITY - 1;
+    public static final int TABLE_MASK = TABLE_CAPACITY - 1;
 
     public Pair m_pairs[];
 
