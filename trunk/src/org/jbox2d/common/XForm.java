@@ -35,13 +35,13 @@ public class XForm {
 	/** A matrix representing a rotation */
 	public Mat22 R;
 
-	/** The identity transform */
+	/* The identity transform djm this is never used
 	public static XForm identity;
 
 	static{
 		XForm.identity = new XForm();
 		XForm.identity.setIdentity();
-	}
+	}*/
 
 	/** The default constructor. */
 	public XForm() {
