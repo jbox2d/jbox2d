@@ -37,6 +37,10 @@ public class Manifold {
     /** The number of manifold points. */
     public int pointCount;
 
+    /**
+     * creates a manifold with 0 points, with it's points array
+     * full of instantiated ManifoldPoints.
+     */
     public Manifold() {
         points = new ManifoldPoint[Settings.maxManifoldPoints];
         for (int i = 0; i < Settings.maxManifoldPoints; i++) {
@@ -46,28 +50,14 @@ public class Manifold {
         pointCount = 0;
     }
 
+    /**
+     * Creates this manifold as a copy of the other
+     * @param other
+     */
     public Manifold(Manifold other) {
         points = new ManifoldPoint[Settings.maxManifoldPoints];
-        // FIXME? Need to check how C++ version handles an implicit
-        // copy of a Manifold, by copying the points array
-        // or merely passing a pointer to it.
-        // Update: tested both, the arraycopy seems to be correct, leave it!
-        
-        // djm we don't need to copy all of them, do we?
-        // djm this doesn't do what you think (whoever wrote that above.
-        // this isn't a cloned copy, this is an exact copy of the 
-        // pointer values.  the only reason this still worked
-        // was because every time this constructor is used,
-        // the points of this manifold is replaced by the points of actual copies of the
-        // points in the other manifold.
-        // SO WHAT DO WE DO? don't use this
-        //System.arraycopy(other.points, 0, points, 0, other.points.length);
-        // points = new ManifoldPoint[other.points.length];
-        // for (int i=0; i<other.pointCount; i++){
-        //   points[i] = new ManifoldPoint(other.points[i]);
-        // }
         normal = other.normal.clone();
-        pointCount = other.pointCount;// points.length;
+        pointCount = other.pointCount;
         // djm this is correct now
         for(int i=0; i < other.points.length; i++){
     		points[i] = new ManifoldPoint(other.points[i]);
@@ -75,6 +65,10 @@ public class Manifold {
     }
     
     // djm for object reusability
+    /**
+     * copies this manifold from the given one
+     * @param cp manifold to copy from
+     */
     public void set(Manifold cp){
     	// will this work?
     	//System.arraycopy(cp.points, 0, points, 0, cp.pointCount);
