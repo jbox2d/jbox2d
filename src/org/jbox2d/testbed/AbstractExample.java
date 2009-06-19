@@ -240,6 +240,14 @@ public abstract class AbstractExample {
 		create();
 	}
 	
+	private Color3f color_mouseJoint = new Color3f(255.0f,255.0f,255.0f);
+	private Color3f color_bomb = new Color3f(255f*0.5f,255f*0.5f,255f*0.5f);
+	private Color3f color_toBomb = new Color3f(55f*0.5f,55f*0.5f,255f*0.5f);
+	private Vec2 bombAxis = new Vec2(1,0);
+	private Color3f color_addContactPoint = new Color3f(255.0f, 150.0f, 150.0f);
+	private Color3f color_persistContactPoint = new Color3f(255.0f, 0.0f, 0.0f);
+	private Color3f color_removeContactPoint = new Color3f(0.0f, 155.0f, 155.0f);
+	private Color3f color_contactNormal = new Color3f(0.4f*255f, 0.9f*255f, 0.4f*255f);
 	/**
 	 * Take a physics step.  This is the guts of the simulation loop.
 	 * When creating your own game, the most important thing to have
@@ -309,12 +317,12 @@ public abstract class AbstractExample {
 			Vec2 p1 = body.getWorldLocation(m_mouseJoint.m_localAnchor);
 			Vec2 p2 = m_mouseJoint.m_target;
 
-			m_debugDraw.drawSegment(p1, p2, new Color3f(255.0f,255.0f,255.0f));
+			m_debugDraw.drawSegment(p1, p2, color_mouseJoint);
 		}
 		
 		if (bombSpawning) {
-			m_debugDraw.drawSolidCircle(bombSpawnPoint, 0.3f, new Vec2(1.0f,0.0f),new Color3f(255f*0.5f,255f*0.5f,255f*0.5f));
-			m_debugDraw.drawSegment(bombSpawnPoint, mouseWorld, new Color3f(55f*0.5f,55f*0.5f,255f*0.5f));
+			m_debugDraw.drawSolidCircle(bombSpawnPoint, 0.3f, bombAxis, color_bomb);
+			m_debugDraw.drawSegment(bombSpawnPoint, mouseWorld, color_toBomb);
 		}
 
 		if (settings.drawContactPoints) {
@@ -327,22 +335,22 @@ public abstract class AbstractExample {
 				if (point.state == 0) {
 					// Add
 					//System.out.println("Add");
-					m_debugDraw.drawPoint(point.position, 0.3f, new Color3f(255.0f, 150.0f, 150.0f));
+					m_debugDraw.drawPoint(point.position, 0.3f, color_addContactPoint);
 				} else if (point.state == 1) {
 					// Persist
 					//System.out.println("Persist");
-					m_debugDraw.drawPoint(point.position, 0.1f, new Color3f(255.0f, 0.0f, 0.0f));
+					m_debugDraw.drawPoint(point.position, 0.1f, color_persistContactPoint);
 				} else {
 					// Remove
 					//System.out.println("Remove");
-					m_debugDraw.drawPoint(point.position, 0.5f, new Color3f(0.0f, 155.0f, 155.0f));
+					m_debugDraw.drawPoint(point.position, 0.5f, color_removeContactPoint);
 				}
 
 				if (settings.drawContactNormals) {
 					Vec2 p1 = point.position;
 					Vec2 p2 = new Vec2( p1.x + k_axisScale * point.normal.x,
 										p1.y + k_axisScale * point.normal.y);
-					m_debugDraw.drawSegment(p1, p2, new Color3f(0.4f*255f, 0.9f*255f, 0.4f*255f));
+					m_debugDraw.drawSegment(p1, p2, color_contactNormal);
 				} 
 				//TODO
 				/*else if (settings.drawContactForces) {
@@ -498,6 +506,9 @@ public abstract class AbstractExample {
         }
     }
     
+    // djm pooled
+    private Vec2 d = new Vec2(0.001f, 0.001f);
+    private AABB aabb = new AABB();
     /**
      * Handle mouseDown events.
      * @param p The screen location that the mouse is down at.
@@ -515,8 +526,10 @@ public abstract class AbstractExample {
 
         // Make a small box.
 
-        Vec2 d = new Vec2(0.001f, 0.001f);
-        AABB aabb = new AABB(p.sub(d), p.add(d));
+        aabb.lowerBound.set(p);
+        aabb.lowerBound.subLocal(d);
+        aabb.upperBound.set(p);
+        aabb.upperBound.addLocal(d);
 
         // Query the world for overlapping shapes.
         int k_maxCount = 10;

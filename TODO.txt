@@ -1,5 +1,6 @@
 Todo:
 
+[ ] Update entire engine from the current Box2D build
 [ ] Add block solver from latest SVN
 [ ] Volume preserving soft-body code
 [ ] SPH liquids (demo working now!)
@@ -7,13 +8,14 @@ Todo:
 	- All warm starting vars must be set/stored similar to the way it happens in RevoluteJoint.java
 	- Maker sure everything is stable
 
-[never done] Optimize 
+[ ] Optimize 
 	- See Profiling.txt for bottleneck rundown
-	- Vec2 creations mostly taken care of, but CCD still has a lot
+    - Vec2 creations mostly taken care of, but CCD still has a lot
 	- Trig function calls should be replaced with lookup table (or not? profile...)
 	- Consider moving away from Processing for Testbed, it's not optimized for games (maybe to PulpCore?)
 
 Done:
+[x] cut down Vec2 creations by half or more, increase in speed
 [X] Fix contact ID bug with poly/circle
 [x] Fix swept AABB bug, get CCD working right
 [x] Finish testbed update
