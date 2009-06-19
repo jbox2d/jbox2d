@@ -87,14 +87,26 @@ public class RevoluteJoint extends Joint {
     	m_enableMotor = def.enableMotor;
     }
 
+    // djm pooled
+    private Vec2 r1 = new Vec2();
+    private Vec2 r2 = new Vec2();
+    private Mat22 K1 = new Mat22();
+    private Mat22 K2 = new Mat22();
+    private Mat22 K3 = new Mat22();
     @Override
     public void initVelocityConstraints(TimeStep step) {
     	Body b1 = m_body1;
     	Body b2 = m_body2;
 
     	// Compute the effective mass matrix.
-    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
+    	//Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
+    	//Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
+    	r1.set(b1.getMemberLocalCenter());
+    	r2.set(b2.getMemberLocalCenter());
+    	r1.subLocal(m_localAnchor1).negateLocal();
+    	r2.subLocal(m_localAnchor2).negateLocal();
+    	Mat22.mulToOut(b1.m_xf.R, r1, r1);
+    	Mat22.mulToOut(b2.m_xf.R, r2, r2);
 
     	// K    = [(1/m1 + 1/m2) * eye(2) - skew(r1) * invI1 * skew(r1) - skew(r2) * invI2 * skew(r2)]
     	//      = [1/m1+1/m2     0    ] + invI1 * [r1.y*r1.y -r1.x*r1.y] + invI2 * [r1.y*r1.y -r1.x*r1.y]
@@ -102,20 +114,19 @@ public class RevoluteJoint extends Joint {
     	float invMass1 = b1.m_invMass, invMass2 = b2.m_invMass;
     	float invI1 = b1.m_invI, invI2 = b2.m_invI;
 
-    	Mat22 K1 = new Mat22();
     	K1.col1.x = invMass1 + invMass2;	K1.col2.x = 0.0f;
     	K1.col1.y = 0.0f;					K1.col2.y = invMass1 + invMass2;
 
-    	Mat22 K2 = new Mat22();
     	K2.col1.x =  invI1 * r1.y * r1.y;	K2.col2.x = -invI1 * r1.x * r1.y;
     	K2.col1.y = -invI1 * r1.x * r1.y;	K2.col2.y =  invI1 * r1.x * r1.x;
 
-    	Mat22 K3 = new Mat22();
     	K3.col1.x =  invI2 * r2.y * r2.y;	K3.col2.x = -invI2 * r2.x * r2.y;
     	K3.col1.y = -invI2 * r2.x * r2.y;	K3.col2.y =  invI2 * r2.x * r2.x;
 
-    	Mat22 K = K1.addLocal(K2).addLocal(K3);
-    	m_pivotMass = K.invert();
+    	//Mat22 K = K1.addLocal(K2).addLocal(K3);
+    	K1.addLocal(K2).addLocal(K3);
+    	
+    	m_pivotMass = K1.invert();
 
     	m_motorMass = 1.0f / (invI1 + invI2);
 
@@ -163,21 +174,38 @@ public class RevoluteJoint extends Joint {
     }
 
     private Vec2 m_lastWarmStartingPivotForce = new Vec2(0.0f,0.0f);
-    private float m_lastWarmStartingMotorForce = 0.0f;
-    private float m_lastWarmStartingLimitForce = 0.0f;
-    private boolean m_warmStartingOld = true;
+    //private float m_lastWarmStartingMotorForce = 0.0f; djm not used
+    //private float m_lastWarmStartingLimitForce = 0.0f;
+    //private boolean m_warmStartingOld = true;
     
+    // djm pooled, some from above
+    private Vec2 temp = new Vec2();
+    private Vec2 pivotCdot = new Vec2();
+    private Vec2 pivotForce = new Vec2();
     @Override
     public void solveVelocityConstraints(TimeStep step) {
     	Body b1 = m_body1;
     	Body b2 = m_body2;
 
-    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
+    	//Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
+    	//Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
+    	r1.set(b1.getMemberLocalCenter());
+    	r2.set(b2.getMemberLocalCenter());
+    	r1.subLocal(m_localAnchor1).negateLocal();
+    	r2.subLocal(m_localAnchor2).negateLocal();
+    	Mat22.mulToOut(b1.m_xf.R, r1, r1);
+    	Mat22.mulToOut(b2.m_xf.R, r2, r2);
 
     	// Solve point-to-point constraint
-    	Vec2 pivotCdot = b2.m_linearVelocity.add( Vec2.cross(b2.m_angularVelocity, r2).subLocal(b1.m_linearVelocity).subLocal(Vec2.cross(b1.m_angularVelocity, r1)));
-    	Vec2 pivotForce = Mat22.mul(m_pivotMass, pivotCdot).mulLocal(-step.inv_dt);
+    	//Vec2 pivotCdot = b2.m_linearVelocity.add( Vec2.cross(b2.m_angularVelocity, r2).subLocal(b1.m_linearVelocity).subLocal(Vec2.cross(b1.m_angularVelocity, r1)));
+    	//Vec2 pivotForce = Mat22.mul(m_pivotMass, pivotCdot).mulLocal(-step.inv_dt);
+    	Vec2.crossToOut(b1.m_angularVelocity, r1, temp);
+    	Vec2.crossToOut(b2.m_angularVelocity, r2, pivotCdot);
+    	pivotCdot.subLocal(b1.m_linearVelocity).subLocal(temp).addLocal(b2.m_linearVelocity);
+    	
+    	Mat22.mulToOut(m_pivotMass, pivotCdot, pivotForce);
+    	pivotForce.mulLocal(-step.inv_dt);
+    	
     	//if (!step.warmStarting) m_pivotForce.set(pivotForce);
     	//else m_pivotForce.addLocal(pivotForce);
     	//if (step.warmStarting && (!m_warmStartingOld)) m_pivotForce = m_lastWarmStartingPivotForce;
@@ -188,7 +216,9 @@ public class RevoluteJoint extends Joint {
     		m_pivotForce.set(m_lastWarmStartingPivotForce);
     	}
     	
-    	Vec2 P = pivotForce.mul(step.dt);
+    	//Vec2 P = pivotForce.mul(step.dt);
+    	Vec2 P = pivotForce.mulLocal(step.dt);
+    	
     	b1.m_linearVelocity.x -= b1.m_invMass * P.x;
     	b1.m_linearVelocity.y -= b1.m_invMass * P.y;
     	b1.m_angularVelocity -= b1.m_invI * Vec2.cross(r1, P);
@@ -233,6 +263,11 @@ public class RevoluteJoint extends Joint {
     	}
     }
 
+    // djm pooled, some from above
+    private Vec2 p1 = new Vec2();
+    private Vec2 p2 = new Vec2();
+    private Vec2 ptpC = new Vec2();
+    private Vec2 impulse = new Vec2();
     @Override
     public boolean solvePositionConstraints() {
         Body b1 = m_body1;
@@ -241,12 +276,22 @@ public class RevoluteJoint extends Joint {
         float positionError = 0f;
 
         // Solve point-to-point position error.
-        Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
-
-    	Vec2 p1 = b1.m_sweep.c.add(r1);
-    	Vec2 p2 = b2.m_sweep.c.add(r2);
-    	Vec2 ptpC = p2.sub(p1);
+    	//Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
+    	//Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
+    	r1.set(b1.getMemberLocalCenter());
+    	r2.set(b2.getMemberLocalCenter());
+    	r1.subLocal(m_localAnchor1).negateLocal();
+    	r2.subLocal(m_localAnchor2).negateLocal();
+    	Mat22.mulToOut(b1.m_xf.R, r1, r1);
+    	Mat22.mulToOut(b2.m_xf.R, r2, r2);
+    	
+    	
+    	p1.set(b1.m_sweep.c);
+    	p1.addLocal(r1);
+    	p2.set(b2.m_sweep.c);
+    	p2.addLocal(r2);
+    	ptpC.set(p2);
+    	ptpC.subLocal(p1);
 
     	positionError = ptpC.length();
 
@@ -257,20 +302,17 @@ public class RevoluteJoint extends Joint {
     	float invMass1 = b1.m_invMass, invMass2 = b2.m_invMass;
     	float invI1 = b1.m_invI, invI2 = b2.m_invI;
 
-        Mat22 K1 = new Mat22();
         K1.col1.x = invMass1 + invMass2;    K1.col2.x = 0.0f;
         K1.col1.y = 0.0f;                   K1.col2.y = invMass1 + invMass2;
         
-        Mat22 K2 = new Mat22();
         K2.col1.x =  invI1 * r1.y * r1.y;   K2.col2.x = -invI1 * r1.x * r1.y;
         K2.col1.y = -invI1 * r1.x * r1.y;   K2.col2.y =  invI1 * r1.x * r1.x;
 
-        Mat22 K3 = new Mat22();
         K3.col1.x =  invI2 * r2.y * r2.y;   K3.col2.x = -invI2 * r2.x * r2.y;
         K3.col1.y = -invI2 * r2.x * r2.y;   K3.col2.y =  invI2 * r2.x * r2.x;
 
-        Mat22 K = K1.add(K2).add(K3);
-        Vec2 impulse = K.solve(ptpC.negate());
+        Mat22 K = K1.addLocal(K2).addLocal(K3);
+        K.solveToOut(ptpC.negateLocal(), impulse);
 
     	b1.m_sweep.c.x -= b1.m_invMass * impulse.x;
     	b1.m_sweep.c.y -= b1.m_invMass * impulse.y;

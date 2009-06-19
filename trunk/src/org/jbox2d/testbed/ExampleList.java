@@ -3,25 +3,7 @@ package org.jbox2d.testbed;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jbox2d.testbed.tests.BipedTest;
-import org.jbox2d.testbed.tests.BlobTest3;
-import org.jbox2d.testbed.tests.Bridge;
-import org.jbox2d.testbed.tests.Chain;
-import org.jbox2d.testbed.tests.Circles;
-import org.jbox2d.testbed.tests.CompoundShapes;
-import org.jbox2d.testbed.tests.Domino;
-import org.jbox2d.testbed.tests.DominoTower;
-import org.jbox2d.testbed.tests.EdgeTest;
-import org.jbox2d.testbed.tests.Gears;
-import org.jbox2d.testbed.tests.LiquidTest;
-import org.jbox2d.testbed.tests.MotorsAndLimits;
-import org.jbox2d.testbed.tests.Overhang;
-import org.jbox2d.testbed.tests.Pulleys;
-import org.jbox2d.testbed.tests.Pyramid;
-import org.jbox2d.testbed.tests.SensorTest;
-import org.jbox2d.testbed.tests.SpriteBinding;
-import org.jbox2d.testbed.tests.VaryingFriction;
-import org.jbox2d.testbed.tests.VerticalStack;
+import org.jbox2d.testbed.tests.*;
 
 public class ExampleList {
 	public static List<AbstractExample> getExamples(TestbedMain testbed) {
@@ -35,11 +17,11 @@ public class ExampleList {
 //    	exampleList.add(new CCDTest(testbed));
 //    	exampleList.add(new Motox(testbed));
     	exampleList.add(new BlobTest3(testbed));
-//    	exampleList.add(new BlobTest4(testbed));
+    	exampleList.add(new BlobTest4(testbed));
 //    	exampleList.add(new BlobTest5(testbed));
-//    	exampleList.add(new BlobTest6(testbed));
+//   	exampleList.add(new BlobTest6(testbed));
 //    	exampleList.add(new BlobTest2(testbed));
-//    	exampleList.add(new BlobTest7(testbed));
+    	exampleList.add(new BlobTest7(testbed));
     	exampleList.add(new LiquidTest(testbed));
     	exampleList.add(new BipedTest(testbed));
     	exampleList.add(new SpriteBinding(testbed));

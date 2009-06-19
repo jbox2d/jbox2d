@@ -121,22 +121,42 @@ public class PulleyJoint extends Joint {
     	m_limitForce2 = 0.0f;
     }
 
+    // djm pooled
+    private Vec2 r1 = new Vec2();
+    private Vec2 r2 = new Vec2();
+    private Vec2 p1 = new Vec2();
+    private Vec2 p2 = new Vec2();
+    private Vec2 s1 = new Vec2();
+    private Vec2 s2 = new Vec2();
+    private Vec2 P1 = new Vec2();
+    private Vec2 P2 = new Vec2();
     public void initVelocityConstraints(TimeStep step) {
     	Body b1 = m_body1;
     	Body b2 = m_body2;
 
-    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
+    	r1.set(b1.getMemberLocalCenter());
+    	r2.set(b2.getMemberLocalCenter());
+    	r1.subLocal(m_localAnchor1).negateLocal();
+    	r2.subLocal(m_localAnchor2).negateLocal();
+    	Mat22.mulToOut(b1.m_xf.R, r1, r1);
+    	Mat22.mulToOut(b2.m_xf.R, r2, r2);
+    	
+    	
+    	p1.set(b1.m_sweep.c);
+    	p1.addLocal(r1);
+    	p2.set(b2.m_sweep.c);
+    	p2.addLocal(r2);
 
-    	Vec2 p1 = b1.m_sweep.c.add(r1);
-    	Vec2 p2 = b2.m_sweep.c.add(r2);
-
-    	Vec2 s1 = m_ground.m_xf.position.add(m_groundAnchor1);
-    	Vec2 s2 = m_ground.m_xf.position.add(m_groundAnchor2);
+    	s1.set(m_ground.m_xf.position);
+    	s1.addLocal(m_groundAnchor1);
+    	s2.set(m_ground.m_xf.position);
+    	s2.addLocal(m_groundAnchor2);
 
     	// Get the pulley axes.
-    	m_u1 = p1.sub(s1);
-    	m_u2 = p2.sub(s2);
+    	m_u1.set(p1);
+    	m_u1.subLocal(s1);
+    	m_u2.set(p2);
+    	m_u2.subLocal(s2);
 
     	float length1 = m_u1.length();
     	float length2 = m_u2.length();
@@ -194,12 +214,14 @@ public class PulleyJoint extends Joint {
 
     	if (step.warmStarting) {
     		// Warm starting.
-    		Vec2 P1 = m_u1.mul(step.dt * (-m_force - m_limitForce1));
-    		Vec2 P2 = m_u2.mul(step.dt * (-m_ratio * m_force - m_limitForce2));
-    		b1.m_linearVelocity.addLocal(P1.mul(b1.m_invMass));
+    		P1.set(m_u1);
+    		P1.mulLocal(step.dt * (-m_force - m_limitForce1));
+    		P2.set(m_u2);
+    		P2.mulLocal(step.dt * (-m_ratio * m_force - m_limitForce2));
     		b1.m_angularVelocity += b1.m_invI * Vec2.cross(r1, P1);
-    		b2.m_linearVelocity.addLocal(P2.mul(b2.m_invMass));
     		b2.m_angularVelocity += b2.m_invI * Vec2.cross(r2, P2);
+    		b1.m_linearVelocity.addLocal(P1.mulLocal(b1.m_invMass));
+    		b2.m_linearVelocity.addLocal(P2.mulLocal(b2.m_invMass));
     	} else {
     		m_force = 0.0f;
     		m_limitForce1 = 0.0f;
@@ -207,16 +229,28 @@ public class PulleyJoint extends Joint {
     	}
     }
 
+    // djm pooled, some from above
+    private Vec2 v1 = new Vec2();
+    private Vec2 v2 = new Vec2();
     public void solveVelocityConstraints(TimeStep step) {
     	Body b1 = m_body1;
     	Body b2 = m_body2;
-
-    	Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
-    	Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
+    	
+    	
+    	r1.set(b1.getMemberLocalCenter());
+    	r2.set(b2.getMemberLocalCenter());
+    	r1.subLocal(m_localAnchor1).negateLocal();
+    	r2.subLocal(m_localAnchor2).negateLocal();
+    	Mat22.mulToOut(b1.m_xf.R, r1, r1);
+    	Mat22.mulToOut(b2.m_xf.R, r2, r2);
 
     	if (m_state == LimitState.AT_UPPER_LIMIT) {
-    		Vec2 v1 = b1.m_linearVelocity.add(Vec2.cross(b1.m_angularVelocity, r1));
-    		Vec2 v2 = b2.m_linearVelocity.add(Vec2.cross(b2.m_angularVelocity, r2));
+    		//Vec2 v1 = b1.m_linearVelocity.add(Vec2.cross(b1.m_angularVelocity, r1));
+    		//Vec2 v2 = b2.m_linearVelocity.add(Vec2.cross(b2.m_angularVelocity, r2));
+    		Vec2.crossToOut(b1.m_angularVelocity, r1, v1);
+    		Vec2.crossToOut(b2.m_angularVelocity, r2, v2);
+    		v1.add(b1.m_linearVelocity);
+    		v2.add(b2.m_linearVelocity);
 
     		float Cdot = -Vec2.dot(m_u1, v1) - m_ratio * Vec2.dot(m_u2, v2);
     		float force = -step.inv_dt * m_pulleyMass * Cdot;
@@ -224,8 +258,10 @@ public class PulleyJoint extends Joint {
     		m_force = Math.max(0.0f, m_force + force);
     		force = m_force - oldForce;
 
-    		Vec2 P1 = m_u1.mul(-step.dt * force);
-    		Vec2 P2 = m_u2.mul(-step.dt * m_ratio * force);
+    		P1.set(m_u1);
+    		P1.mulLocal(-step.dt * force);
+    		P2.set(m_u2);
+    		P2.mulLocal(-step.dt * m_ratio * force);
     		b1.m_linearVelocity.x += b1.m_invMass * P1.x;
     		b1.m_linearVelocity.y += b1.m_invMass * P1.y;
     		b1.m_angularVelocity += b1.m_invI * Vec2.cross(r1, P1);
@@ -243,7 +279,9 @@ public class PulleyJoint extends Joint {
     		m_limitForce1 = Math.max(0.0f, m_limitForce1 + force);
     		force = m_limitForce1 - oldForce;
 
-    		Vec2 P1 = m_u1.mul(-step.dt * force);
+    		//Vec2 P1 = m_u1.mul(-step.dt * force);
+    		P1.set(m_u1);
+    		P1.mulLocal(-step.dt * force);
     		b1.m_linearVelocity.x += b1.m_invMass * P1.x;
     		b1.m_linearVelocity.y += b1.m_invMass * P1.y;
     		b1.m_angularVelocity += b1.m_invI * Vec2.cross(r1, P1);
@@ -258,28 +296,40 @@ public class PulleyJoint extends Joint {
     		m_limitForce2 = Math.max(0.0f, m_limitForce2 + force);
     		force = m_limitForce2 - oldForce;
 
-    		Vec2 P2 = m_u2.mul(-step.dt * force);
+    		//Vec2 P2 = m_u2.mul(-step.dt * force);
+    		P2.set(m_u2);
+    		P2.mulLocal(-step.dt * force);
     		b2.m_linearVelocity.x += b2.m_invMass * P2.x;
     		b2.m_linearVelocity.y += b2.m_invMass * P2.y;
     		b2.m_angularVelocity += b2.m_invI * Vec2.cross(r2, P2);
     	}
     }
-
+    
+    //djm pooled, some from above
+    
     public boolean solvePositionConstraints() {
     	Body b1 = m_body1;
     	Body b2 = m_body2;
 
-    	Vec2 s1 = m_ground.m_xf.position.add(m_groundAnchor1);
-    	Vec2 s2 = m_ground.m_xf.position.add(m_groundAnchor2);
+    	s1.set(m_ground.m_xf.position);
+    	s1.addLocal(m_groundAnchor1);
+    	s2.set(m_ground.m_xf.position);
+    	s2.addLocal(m_groundAnchor2);
 
     	float linearError = 0.0f;
 
     	if (m_state == LimitState.AT_UPPER_LIMIT) {
-    		Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
-    		Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
+    		r1.set(b1.getMemberLocalCenter());
+        	r2.set(b2.getMemberLocalCenter());
+        	r1.subLocal(m_localAnchor1).negateLocal();
+        	r2.subLocal(m_localAnchor2).negateLocal();
+        	Mat22.mulToOut(b1.m_xf.R, r1, r1);
+        	Mat22.mulToOut(b2.m_xf.R, r2, r2);
 
-    		Vec2 p1 = b1.m_sweep.c.add(r1);
-    		Vec2 p2 = b2.m_sweep.c.add(r2);
+        	p1.set(b1.m_sweep.c);
+        	p1.addLocal(r1);
+        	p2.set(b2.m_sweep.c);
+        	p2.addLocal(r2);
 
     		// Get the pulley axes.
     		m_u1.set(p1.x - s1.x,p1.y - s1.y);
@@ -301,16 +351,20 @@ public class PulleyJoint extends Joint {
     		}
 
     		float C = m_constant - length1 - m_ratio * length2;
-    		linearError = Math.max(linearError, -C);
+    		linearError = MathUtils.max(linearError, -C);
 
     		C = MathUtils.clamp(C + Settings.linearSlop, -Settings.maxLinearCorrection, 0.0f);
     		float impulse = -m_pulleyMass * C;
     		float oldImpulse = m_positionImpulse;
-    		m_positionImpulse = Math.max(0.0f, m_positionImpulse + impulse);
+    		m_positionImpulse = MathUtils.max(0.0f, m_positionImpulse + impulse);
     		impulse = m_positionImpulse - oldImpulse;
 
-    		Vec2 P1 = m_u1.mul(-impulse);
-    		Vec2 P2 = m_u2.mul(-m_ratio * impulse);
+    		//Vec2 P1 = m_u1.mul(-impulse);
+    		//Vec2 P2 = m_u2.mul(-m_ratio * impulse);
+    		P1.set(m_u1);
+    		P1.mulLocal(-impulse);
+    		P2.set(m_u2);
+    		P2.mulLocal(-m_ratio * impulse);
 
     		b1.m_sweep.c.x += b1.m_invMass * P1.x;
     		b1.m_sweep.c.y += b1.m_invMass * P1.y;
@@ -324,9 +378,15 @@ public class PulleyJoint extends Joint {
     	}
 
     	if (m_limitState1 == LimitState.AT_UPPER_LIMIT) {
-    		Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
-    		Vec2 p1 = b1.m_sweep.c.add(r1);
-
+    		//Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
+    		r1.set(b1.getMemberLocalCenter());
+        	r1.subLocal(m_localAnchor1).negateLocal();
+        	Mat22.mulToOut(b1.m_xf.R, r1, r1);
+    		
+        	//Vec2 p1 = b1.m_sweep.c.add(r1);
+        	p1.set(b1.m_sweep.c);
+        	p1.addLocal(r1);
+        	
     		m_u1.set(p1.x - s1.x, p1.y - s1.y);
     		float length1 = m_u1.length();
 
@@ -337,14 +397,17 @@ public class PulleyJoint extends Joint {
     		}
 
     		float C = m_maxLength1 - length1;
-    		linearError = Math.max(linearError, -C);
+    		linearError = MathUtils.max(linearError, -C);
     		C = MathUtils.clamp(C + Settings.linearSlop, -Settings.maxLinearCorrection, 0.0f);
     		float impulse = -m_limitMass1 * C;
     		float oldLimitPositionImpulse = m_limitPositionImpulse1;
-    		m_limitPositionImpulse1 = Math.max(0.0f, m_limitPositionImpulse1 + impulse);
+    		m_limitPositionImpulse1 = MathUtils.max(0.0f, m_limitPositionImpulse1 + impulse);
     		impulse = m_limitPositionImpulse1 - oldLimitPositionImpulse;
 
-    		Vec2 P1 = m_u1.mul(-impulse);
+    		//Vec2 P1 = m_u1.mul(-impulse);
+    		P1.set(m_u1);
+    		P1.mulLocal(-impulse);
+    		
     		b1.m_sweep.c.x += b1.m_invMass * P1.x;
     		b1.m_sweep.c.y += b1.m_invMass * P1.y;
     		b1.m_sweep.a += b1.m_invI * Vec2.cross(r1, P1);
@@ -353,9 +416,16 @@ public class PulleyJoint extends Joint {
     	}
 
     	if (m_limitState2 == LimitState.AT_UPPER_LIMIT) {
-    		Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
-    		Vec2 p2 = b2.m_sweep.c.add(r2);
+    		//Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
+    		//Vec2 p2 = b2.m_sweep.c.add(r2);
 
+        	r2.set(b2.getMemberLocalCenter());
+        	r2.subLocal(m_localAnchor2).negateLocal();
+        	Mat22.mulToOut(b2.m_xf.R, r2, r2);
+
+        	p2.set(b2.m_sweep.c);
+        	p2.addLocal(r2);
+        	
     		m_u2.set(p2.x - s2.x, p2.y - s2.y);
     		float length2 = m_u2.length();
 
@@ -366,14 +436,16 @@ public class PulleyJoint extends Joint {
     		}
 
     		float C = m_maxLength2 - length2;
-    		linearError = Math.max(linearError, -C);
+    		linearError = MathUtils.max(linearError, -C);
     		C = MathUtils.clamp(C + Settings.linearSlop, -Settings.maxLinearCorrection, 0.0f);
     		float impulse = -m_limitMass2 * C;
     		float oldLimitPositionImpulse = m_limitPositionImpulse2;
-    		m_limitPositionImpulse2 = Math.max(0.0f, m_limitPositionImpulse2 + impulse);
+    		m_limitPositionImpulse2 = MathUtils.max(0.0f, m_limitPositionImpulse2 + impulse);
     		impulse = m_limitPositionImpulse2 - oldLimitPositionImpulse;
 
-    		Vec2 P2 = m_u2.mul(-impulse);
+    		//Vec2 P2 = m_u2.mul(-impulse);
+    		P2.set(m_u2);
+    		P2.mulLocal(-impulse);
     		b2.m_sweep.c.x += b2.m_invMass * P2.x;
     		b2.m_sweep.c.y += b2.m_invMass * P2.y;
     		b2.m_sweep.a += b2.m_invI * Vec2.cross(r2, P2);
