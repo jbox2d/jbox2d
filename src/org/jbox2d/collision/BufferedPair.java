@@ -25,6 +25,9 @@ package org.jbox2d.collision;
 
 //Updated to rev 139 of b2PairManager.h
 
+/**
+ * Used in pair manager.
+ */
 public class BufferedPair implements Comparable<BufferedPair> {
     int proxyId1;
 

@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -29,59 +29,78 @@ import org.jbox2d.common.Vec2;
 
 /** An axis-aligned bounding box. */
 public class AABB {
-	/** Vertex of bounding box. */
-    public Vec2 lowerBound, upperBound;
-    
-    public String toString() {
-    	String s = ""+lowerBound+" -> "+upperBound;
-    	return s;
-    }
+	/** Bottom left vertex of bounding box. */
+	public Vec2 lowerBound;
+	/** Top right vertex of bounding box. */
+	public Vec2 upperBound;
 
-    public AABB(Vec2 minVertex, Vec2 maxVertex) {
-        this.lowerBound = minVertex.clone(); // clone to be safe
-        this.upperBound = maxVertex.clone();
-    }
+	/**
+	 * Creates the default object, with vertices at 0,0 and 0,0.
+	 */
+	public AABB() {
+		lowerBound = new Vec2();
+		upperBound = new Vec2();
+	}
 
-    public AABB(AABB copy) {
-        this(copy.lowerBound, copy.upperBound); // relies on cloning in AABB(Vec2, Vec2) constructor
-    }
+	/**
+	 * Copies from the given object
+	 * @param copy the object to copy from
+	 */
+	public AABB(final AABB copy) {
+		this(copy.lowerBound, copy.upperBound);
+	}
+	
+	/**
+	 * Creates an AABB object using the given bounding
+	 * vertices.
+	 * @param lowerVertex the bottom left vertex of the bounding box
+	 * @param maxVertex the top right vertex of the bounding box
+	 */
+	public AABB(final Vec2 lowerVertex, final Vec2 upperVertex) {
+		this.lowerBound = lowerVertex.clone(); // clone to be safe
+		this.upperBound = upperVertex.clone();
+	}
 
-    public AABB() {
-        lowerBound = new Vec2();
-        upperBound = new Vec2();
-    }
-    
-    // djm needed for the stack
-    public void set(AABB aabb){
-    	lowerBound.set( aabb.lowerBound);
-    	upperBound.set( aabb.upperBound);
-    }
 
-    /** Verify that the bounds are sorted. djm optimized */
-    public boolean isValid() {
-        float dx = upperBound.x - lowerBound.x;
-        float dy = upperBound.y - lowerBound.y;
-    	if(!(dx >= 0.0f && dy >= 0)){
-    		return false;
-    	}
-    	return lowerBound.isValid() && upperBound.isValid();
-    }
+	/**
+	 * Sets this object from the given object
+	 * @param aabb the object to copy from
+	 */
+	public final void set(final AABB aabb){
+		lowerBound.set( aabb.lowerBound);
+		upperBound.set( aabb.upperBound);
+	}
 
-    /** Check if AABBs overlap. djm optimized */
-    public boolean testOverlap(AABB box) {
-        float d1x = box.lowerBound.x - upperBound.x;
-        float d1y = box.lowerBound.y - upperBound.y;
-        float d2x = lowerBound.x - box.upperBound.x;
-        float d2y = lowerBound.y - box.upperBound.y;
+	/** Verify that the bounds are sorted*/
+	public final boolean isValid() {
+		final float dx = upperBound.x - lowerBound.x;
+		final float dy = upperBound.y - lowerBound.y;
+		if(!(dx >= 0.0f && dy >= 0)){
+			return false;
+		}
+		return lowerBound.isValid() && upperBound.isValid();
+	}
 
-       // Vec2 d1 = box.lowerBound.sub(upperBound);
-        //Vec2 d2 = lowerBound.sub(box.upperBound);
+	/** Check if AABBs overlap. djm optimized */
+	public final boolean testOverlap(final AABB box) {
+		final float d1x = box.lowerBound.x - upperBound.x;
+		final float d1y = box.lowerBound.y - upperBound.y;
+		final float d2x = lowerBound.x - box.upperBound.x;
+		final float d2y = lowerBound.y - box.upperBound.y;
 
-        if (d1x > 0.0f || d1y > 0.0f || d2x > 0.0f || d2y > 0.0f) {
-            return false;
-        }
-        else {
-            return true;
-        }
-    }
+		// Vec2 d1 = box.lowerBound.sub(upperBound);
+		//Vec2 d2 = lowerBound.sub(box.upperBound);
+
+		if (d1x > 0.0f || d1y > 0.0f || d2x > 0.0f || d2y > 0.0f) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public final String toString() {
+		final String s = ""+lowerBound+" -> "+upperBound;
+		return s;
+	}
 }

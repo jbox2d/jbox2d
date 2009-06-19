@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -25,57 +25,64 @@ package org.jbox2d.collision;
 
 //Updated to rev 139 of b2BroadPhase.h
 
+/**
+ * Used in BroadPhase
+ */
 public class Bound {
-    public int value;
+	public int value;
 
-    int proxyId;
+	public int proxyId;
 
-    int stabbingCount;
+	public int stabbingCount;
 
-    public Bound() {
-        value = 0;
-        proxyId = 0;
-        stabbingCount = 0;
-    }
+	public Bound() {
+		value = 0;
+		proxyId = 0;
+		stabbingCount = 0;
+	}
 
-    public Bound(Bound b) {
-        value = b.value;
-        proxyId = b.proxyId;
-        stabbingCount = b.stabbingCount;
-    }
+	public Bound(final Bound b) {
+		value = b.value;
+		proxyId = b.proxyId;
+		stabbingCount = b.stabbingCount;
+	}
 
-    public void set(Bound b) {
-        value = b.value;
-        proxyId = b.proxyId;
-        stabbingCount = b.stabbingCount;
-    }
+	public final void set(final Bound b) {
+		value = b.value;
+		proxyId = b.proxyId;
+		stabbingCount = b.stabbingCount;
+	}
 
-    boolean isLower() {
-        return (value & 1) == 0;
-    }
+	public final boolean isLower() {
+		return (value & 1) == 0;
+	}
 
-    boolean isUpper() {
-        return (value & 1) == 1;
-    }
+	public final boolean isUpper() {
+		return (value & 1) == 1;
+	}
 
-    void swap(Bound other) {
-    	int value = this.value;
-    	int proxyId = this.proxyId;
-    	int stabbingCount = this.stabbingCount;
-    	this.value = other.value;
-    	this.proxyId = other.proxyId;
-    	this.stabbingCount = other.stabbingCount;
-    	other.value = value;
-    	other.proxyId = proxyId;
-    	other.stabbingCount = stabbingCount;
-    }
+	/**
+	 * swaps the values of this bound with the other bound
+	 * @param other bound to swap values with
+	 */
+	public final void swap(final Bound other) {
+		final int value = this.value;
+		final int proxyId = this.proxyId;
+		final int stabbingCount = this.stabbingCount;
+		this.value = other.value;
+		this.proxyId = other.proxyId;
+		this.stabbingCount = other.stabbingCount;
+		other.value = value;
+		other.proxyId = proxyId;
+		other.stabbingCount = stabbingCount;
+	}
 
-    @Override
-    public String toString() {
-        String ret = "Bound variable:\n";
-        ret += "value: " + value + "\n";
-        ret += "proxyId: " + proxyId + "\n";
-        ret += "stabbing count: " + stabbingCount + "\n";
-        return ret;
-    }
+	@Override
+	public String toString() {
+		String ret = "Bound variable:\n";
+		ret += "value: " + value + "\n";
+		ret += "proxyId: " + proxyId + "\n";
+		ret += "stabbing count: " + stabbingCount + "\n";
+		return ret;
+	}
 }

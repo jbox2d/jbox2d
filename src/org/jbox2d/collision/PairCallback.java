@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -26,15 +26,21 @@ package org.jbox2d.collision;
 //Updated to rev 56->136 of b2PairManager.h
 
 public abstract class PairCallback {
-    // This should return the new pair user data. It is okay if the
-    // user data is null.
-    public abstract Object pairAdded(Object proxyUserData1,
-            Object proxyUserData2);
+	/**
+	 * This should return the new pair user data. It is okay if the
+	 * user data is null.
+	 */
+	public abstract Object pairAdded(Object proxyUserData1,
+	                                 Object proxyUserData2);
 
-    // This should free the pair's user data. In extreme circumstances, it is
-    // possible
-    // this will be called with null pairUserData because the pair never
-    // existed.
-    public abstract void pairRemoved(Object proxyUserData1,
-            Object proxyUserData2, Object pairUserData);
+	/**
+	 * This should free the pair's user data. In extreme circumstances, it is
+	 * possible this will be called with null pairUserData because the pair never
+	 * existed.
+	 * @param proxyUserData1
+	 * @param proxyUserData2
+	 * @param pairUserData
+	 */
+	public abstract void pairRemoved(Object proxyUserData1,
+	                                 Object proxyUserData2, Object pairUserData);
 }

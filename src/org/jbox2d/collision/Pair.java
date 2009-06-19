@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -26,70 +26,70 @@ package org.jbox2d.collision;
 //Updated to rev 56->136 of b2PairManager.h
 
 public class Pair implements Comparable<Pair> {
-    private static final int PAIR_BUFFERED = 0x0001;
+	private static final int PAIR_BUFFERED = 0x0001;
 
-    private static final int PAIR_REMOVED = 0x0002;
+	private static final int PAIR_REMOVED = 0x0002;
 
-    private static final int PAIR_FINAL = 0x0004;
+	private static final int PAIR_FINAL = 0x0004;
 
-    public Object userData;
+	public Object userData;
 
-    public int proxyId1;
+	public int proxyId1;
 
-    public int proxyId2;
+	public int proxyId2;
 
-    public int status;
-    
-    public int next;
+	public int status;
 
-    public Pair() {
+	public int next;
 
-    }
+	public Pair() {
 
-    /**
-     * Copy constructor
-     */
-    public Pair(Pair other) {
-        this.userData = other.userData;
-        this.proxyId1 = other.proxyId1;
-        this.proxyId2 = other.proxyId2;
-        this.status = other.status;
-    }
+	}
 
-    public void setBuffered() {
-        status |= PAIR_BUFFERED;
-    }
+	/**
+	 * Copy constructor
+	 */
+	public Pair(final Pair other) {
+		this.userData = other.userData;
+		this.proxyId1 = other.proxyId1;
+		this.proxyId2 = other.proxyId2;
+		this.status = other.status;
+	}
 
-    public void clearBuffered() {
-        status &= ~PAIR_BUFFERED;
-    }
+	public void setBuffered() {
+		status |= Pair.PAIR_BUFFERED;
+	}
 
-    public boolean isBuffered() {
-        return (status & PAIR_BUFFERED) == PAIR_BUFFERED;
-    }
+	public void clearBuffered() {
+		status &= ~Pair.PAIR_BUFFERED;
+	}
 
-    public void clearRemoved() {
-        status &= ~PAIR_REMOVED;
-    }
+	public boolean isBuffered() {
+		return (status & Pair.PAIR_BUFFERED) == Pair.PAIR_BUFFERED;
+	}
 
-    public void setRemoved() {
-        status |= PAIR_REMOVED;
-    }
+	public void clearRemoved() {
+		status &= ~Pair.PAIR_REMOVED;
+	}
 
-    public boolean isRemoved() {
-        return (status & PAIR_REMOVED) == PAIR_REMOVED;
-    }
+	public void setRemoved() {
+		status |= Pair.PAIR_REMOVED;
+	}
 
-    public void setFinal() {
-        status |= PAIR_FINAL;
-    }
+	public boolean isRemoved() {
+		return (status & Pair.PAIR_REMOVED) == Pair.PAIR_REMOVED;
+	}
 
-    public boolean isFinal() {
-        return (status & PAIR_FINAL) == PAIR_FINAL;
-    }
+	public void setFinal() {
+		status |= Pair.PAIR_FINAL;
+	}
 
-    public int compareTo(Pair p) {
-        // XXX check
-        return proxyId1 - p.proxyId1;
-    }
+	public boolean isFinal() {
+		return (status & Pair.PAIR_FINAL) == Pair.PAIR_FINAL;
+	}
+
+	public int compareTo(final Pair p) {
+		// XXX check
+		return proxyId1 - p.proxyId1;
+	}
 }

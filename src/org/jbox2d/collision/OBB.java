@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -31,31 +31,44 @@ import org.jbox2d.common.Vec2;
 /** An oriented bounding box. */
 public class OBB {
 	/** The rotation matrix. */
-    public Mat22 R;
-    /** The local centroid. */
-    public Vec2 center;
-    /** The half-widths. */
-    public Vec2 extents;
+	public Mat22 R;
+	/** The local centroid. */
+	public Vec2 center;
+	/** The half-widths. */
+	public Vec2 extents;
 
-    public OBB(Mat22 _R, Vec2 _center, Vec2 _extents) {
-        R = _R.clone();
-        center = _center.clone();
-        extents = _extents.clone();
-    }
+	/**
+	 * creates OBB with the given data.  The arguments are cloned
+	 * before being placed in the object
+	 * @param _R
+	 * @param _center
+	 * @param _extents
+	 */
+	public OBB(final Mat22 _R, final Vec2 _center, final Vec2 _extents) {
+		R = _R.clone();
+		center = _center.clone();
+		extents = _extents.clone();
+	}
 
-    // djm fixed double allocation
-    public OBB(OBB copy) {
-        this(copy.R, copy.center, copy.extents);
-    }
+	/**
+	 * copies from the given OBB
+	 * @param copy
+	 */
+	public OBB(final OBB copy) {
+		this(copy.R, copy.center, copy.extents);
+	}
 
-    public OBB() {
-        R = new Mat22();
-        center = new Vec2();
-        extents = new Vec2();
-    }
+	public OBB() {
+		R = new Mat22();
+		center = new Vec2();
+		extents = new Vec2();
+	}
 
-    public OBB clone() {
-        return new OBB(this);
-    }
-
+	/**
+	 * returns a copy
+	 */
+	@Override
+	public OBB clone() {
+		return new OBB(this);
+	}
 }

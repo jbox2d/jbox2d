@@ -48,6 +48,9 @@ public class ManifoldPoint {
     /** Uniquely identifies a contact point between two shapes */
     public ContactID id;
 
+    /**
+     * Blank manifold point with everything zeroed out.
+     */
     public ManifoldPoint() {
         localPoint1 = new Vec2();
         localPoint2 = new Vec2();
@@ -55,6 +58,10 @@ public class ManifoldPoint {
         id = new ContactID();
     }
 
+    /**
+     * Creates a manifold point as a copy of the given point
+     * @param cp point to copy from
+     */
     public ManifoldPoint(ManifoldPoint cp) {
         localPoint1 = cp.localPoint1.clone();
         localPoint2 = cp.localPoint2.clone();
@@ -64,7 +71,10 @@ public class ManifoldPoint {
         id = new ContactID(cp.id);
     }
     
-    // put here for object reusability
+    /**
+     * Sets this manifold point form the given one
+     * @param cp the point to copy from
+     */
     public void set(ManifoldPoint cp){
     	localPoint1.set(cp.localPoint1);
     	localPoint2.set(cp.localPoint2);

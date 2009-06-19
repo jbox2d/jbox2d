@@ -36,11 +36,18 @@ public class MassData {
     /** The rotational inertia of the shape. */
     public float I;
 
+    /**
+     * Blank mass data
+     */
     public MassData() {
         mass = I = 0f;
         center = new Vec2();
     }
     
+    /**
+     * Copies from the given mass data 
+     * @param md mass data to copy from
+     */
     public MassData(MassData md) {
     	mass = md.mass;
     	I = md.I;

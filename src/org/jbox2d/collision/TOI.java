@@ -36,7 +36,6 @@ public class TOI {
 	private final Vec2 p2 = new Vec2();
 	private final XForm xf1 = new XForm();
 	private final XForm xf2 = new XForm();
-	private final Distance distanceCalculator = new Distance();
 
 	// This algorithm uses conservative advancement to compute the time of
 	// impact (TOI) of two shapes.
@@ -80,7 +79,7 @@ public class TOI {
 			sweep2.getXForm(xf2, t);
 
 			// Get the distance between shapes.
-			distance = distanceCalculator.distance(p1, p2, shape1, xf1, shape2, xf2);
+			distance = Distance.distance(p1, p2, shape1, xf1, shape2, xf2);
 			//System.out.println("Distance: "+distance + " alpha: "+alpha);
 			
 			if (iter == 0) {
