@@ -25,7 +25,6 @@ package org.jbox2d.dynamics;
 
 import java.util.List;
 
-import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.collision.PairCallback;

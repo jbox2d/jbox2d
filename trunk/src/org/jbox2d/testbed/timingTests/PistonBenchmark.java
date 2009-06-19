@@ -35,9 +35,9 @@ import org.jbox2d.testbed.timingTests.SimpleTest;
  *
  */
 public class PistonBenchmark implements SimpleTest{
-	static final boolean BULLETS = false;
-	private RevoluteJoint m_joint1;
-	private PrismaticJoint m_joint2;
+	public static boolean BULLETS = false;
+	public RevoluteJoint m_joint1;
+	public PrismaticJoint m_joint2;
 	
 	public void create(World world) {
     	{
@@ -60,7 +60,7 @@ public class PistonBenchmark implements SimpleTest{
 			rjd.motorSpeed = 1.0f * 3.1415f;
 			rjd.maxMotorTorque = Float.MAX_VALUE;
 			rjd.enableMotor = true;
-			RevoluteJoint m_joint1 = (RevoluteJoint)world.createJoint(rjd);
+			m_joint1 = (RevoluteJoint)world.createJoint(rjd);
 
 			prevBody = body;
 
@@ -93,7 +93,7 @@ public class PistonBenchmark implements SimpleTest{
 			//pjd.maxMotorForce = Float.MAX_VALUE;
 			pjd.enableMotor = false;
 
-			PrismaticJoint m_joint2 = (PrismaticJoint)world.createJoint(pjd);
+			m_joint2 = (PrismaticJoint)world.createJoint(pjd);
 
 			// Create a payload
 			for (int i=0; i<100; ++i) {

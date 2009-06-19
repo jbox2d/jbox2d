@@ -118,7 +118,7 @@ public class Physics {
 	 */
 	private ProcessingDebugDraw m_draw;
 	private Vec2 m_gravity;
-	private AABB m_worldAABB;
+	public AABB m_worldAABB;
 	private TestSettings m_settings;
 	
 	private Body[] m_border;
@@ -266,9 +266,9 @@ public class Physics {
 	 * @param methodName The name of the method (without the parenthesis) to call
 	 */
 	public void setCustomRenderingMethod(Object object, String methodName) {
-		Class c = object.getClass();
+		Class<?> c = object.getClass();
 	    try {
-	      Class methodArgs[] = new Class[] { World.class };
+	      Class<?> methodArgs[] = new Class[] { World.class };
 	      Method method = c.getMethod(methodName, methodArgs);
 	      m_customRenderingObject = object;
 	      m_customRenderingMethod = method;

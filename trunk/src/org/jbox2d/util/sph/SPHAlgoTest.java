@@ -6,6 +6,8 @@ import org.jbox2d.common.Vec2;
 import processing.core.PApplet;
 
 public class SPHAlgoTest extends PApplet {
+	private static final long serialVersionUID = 1L;
+	
 	public SPHGroup sphGroup;
 	public float tStep = 1.0f/30.0f;
 	public void setup() {

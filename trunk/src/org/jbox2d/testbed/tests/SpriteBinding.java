@@ -1,6 +1,5 @@
 package org.jbox2d.testbed.tests;
 
-import org.jbox2d.collision.*;
 import org.jbox2d.collision.shapes.PolygonDef;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
