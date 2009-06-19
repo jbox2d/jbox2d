@@ -81,7 +81,7 @@ public class EdgeTest extends AbstractExample {
     	return new Vec2(xout, yout);
     }
     
-    private void makeCircle(float x, float y, float r) {
+    public void makeCircle(float x, float y, float r) {
     	BodyDef bd = new BodyDef();
     	bd.position = new Vec2(x,y);
     	Body b = m_world.createBody(bd);
@@ -93,7 +93,7 @@ public class EdgeTest extends AbstractExample {
     	b.setMassFromShapes();
     }
     
-    private void makeBox(float x, float y, float size) {
+    public void makeBox(float x, float y, float size) {
     	BodyDef bd = new BodyDef();
     	bd.position = new Vec2(x,y);
     	Body b = m_world.createBody(bd);

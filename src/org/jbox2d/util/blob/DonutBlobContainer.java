@@ -8,13 +8,13 @@ import org.jbox2d.common.Vec2;
  */
 public class DonutBlobContainer implements BlobContainer {
 	private float centerX, centerY;
-	private float radiusSmall, radiusLarge;
+	private float /*radiusSmall, */radiusLarge;
 	private float radiusSmallSqr, radiusLargeSqr;
 	
 	public DonutBlobContainer(Vec2 _center, float _radiusSmall, float _radiusLarge) {
 		centerX = _center.x;
 		centerY = _center.y;
-		radiusSmall = _radiusSmall;
+		//radiusSmall = _radiusSmall;
 		radiusLarge = _radiusLarge;
 		radiusSmallSqr = _radiusSmall*_radiusSmall;
 		radiusLargeSqr = _radiusLarge*_radiusLarge;

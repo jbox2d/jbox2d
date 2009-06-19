@@ -6,6 +6,8 @@ import org.jbox2d.dynamics.joints.PrismaticJoint;
 import processing.core.PApplet;
 
 public class JBox2dP5Test extends PApplet {
+
+	private static final long serialVersionUID = 1L;
 	
 	public Physics physics;
 	private Body body, body2;

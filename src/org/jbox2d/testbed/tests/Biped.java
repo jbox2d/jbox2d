@@ -11,13 +11,13 @@ import org.jbox2d.dynamics.joints.RevoluteJoint;
  */
 public class Biped {
 
-	private World m_world;
+	public World m_world;
 
-	private Body LFoot, RFoot, LCalf, RCalf, LThigh, RThigh,
+	public Body LFoot, RFoot, LCalf, RCalf, LThigh, RThigh,
 				 Pelvis, Stomach, Chest, Neck, Head,
 				 LUpperArm, RUpperArm, LForearm, RForearm, LHand, RHand;
 
-	private RevoluteJoint LAnkle, RAnkle, LKnee, RKnee, LHip, RHip, 
+	public RevoluteJoint LAnkle, RAnkle, LKnee, RKnee, LHip, RHip, 
 						  LowerAbs, UpperAbs, LowerNeck, UpperNeck,
 						  LShoulder, RShoulder, LElbow, RElbow, LWrist, RWrist;
 

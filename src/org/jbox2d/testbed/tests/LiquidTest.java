@@ -15,6 +15,7 @@ import org.jbox2d.testbed.TestbedMain;
 
 import processing.core.PApplet;
 
+// TODO make this liquid usable for developers
 public class LiquidTest extends AbstractExample {
 	private boolean firstTime = true;
 	
@@ -33,7 +34,7 @@ public class LiquidTest extends AbstractExample {
 	private float rad = 0.6f;
 	private float visc = 0.004f;//0.005f;
 	
-	private ArrayList[][] hash;
+	private ArrayList<Integer>[][] hash;
 	private int hashWidth,hashHeight;
 	
 	private int hashX(float x) {
@@ -46,12 +47,13 @@ public class LiquidTest extends AbstractExample {
 		return (int)f;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public LiquidTest(TestbedMain t) {
         super(t);
         hash = new ArrayList[40][40];
         for (int i=0; i<40; ++i) {
         	for (int j=0; j<40; ++j) {
-        		hash[i][j] = new ArrayList();
+        		hash[i][j] = new ArrayList<Integer>();
         	}
         }
         hashWidth = 40;
@@ -102,7 +104,7 @@ public class LiquidTest extends AbstractExample {
 		
 		for(int i = 0; i < liquid.length; i++) {
 			// Populate the neighbor list from the 9 proximate cells
-			ArrayList neighbors = new ArrayList();
+			ArrayList<Integer> neighbors = new ArrayList<Integer>();
 	        int hcell = hashX(liquid[i].m_sweep.c.x);
 	        int vcell = hashY(liquid[i].m_sweep.c.y);
 	        for(int nx = -1; nx < 2; nx++) {

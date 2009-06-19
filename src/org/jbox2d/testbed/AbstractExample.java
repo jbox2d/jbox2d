@@ -326,7 +326,7 @@ public abstract class AbstractExample {
 		}
 
 		if (settings.drawContactPoints) {
-			float k_forceScale = 0.01f;
+			//float k_forceScale = 0.01f;
 			float k_axisScale = 0.3f;
 
 			for (int i = 0; i < m_pointCount; ++i) {
