@@ -701,7 +701,6 @@ public class World {
         
     }
     
-    private TOI toiCalculator = new TOI();
     /** For internal use: find TOI contacts and solve them. */
     public void solveTOI(TimeStep step) {
     	// Reserve an island and a stack for TOI island solution.
@@ -774,7 +773,7 @@ public class World {
     				assert(t0 < 1.0f);
 
     				// Compute the time of impact.
-    				toi = toiCalculator.timeOfImpact(c.m_shape1, b1.m_sweep, c.m_shape2, b2.m_sweep);
+    				toi = TOI.timeOfImpact(c.m_shape1, b1.m_sweep, c.m_shape2, b2.m_sweep);
     				//System.out.println(toi);
     				assert(0.0f <= toi && toi <= 1.0f);
     				
@@ -995,7 +994,7 @@ public class World {
     	if (shape.getType() == ShapeType.CIRCLE_SHAPE) {
     			CircleShape circle = (CircleShape)shape;
 
-    			XForm.mulToOut(xf, circle.getLocalPosition(), drawingCenter);
+    			XForm.mulToOut(xf, circle.getMemberLocalPosition(), drawingCenter);
     			float radius = circle.getRadius();
     			Vec2 axis = xf.R.col1;
     			

@@ -65,7 +65,7 @@ public class OBB {
 	}
 
 	/**
-	 * returns a copy
+	 * @return a copy
 	 */
 	@Override
 	public OBB clone() {

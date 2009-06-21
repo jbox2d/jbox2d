@@ -36,9 +36,23 @@ public class CircleDef extends ShapeDef {
     public float radius;
     public Vec2 localPosition;
 
+    /**
+     * creates a circle definition at (0,0) with a radius of 1.
+     */
     public CircleDef() {
         type = ShapeType.CIRCLE_SHAPE;
 		localPosition = new Vec2(0.0f, 0.0f);
+		radius = 1.0f;
+    }
+    
+    /**
+     * creates the circle definition at the given point with
+     * a radius of 1
+     * @param argVec
+     */
+    public CircleDef(final Vec2 argVec){
+    	localPosition = argVec.clone();
+        type = ShapeType.CIRCLE_SHAPE;
 		radius = 1.0f;
     }
 }

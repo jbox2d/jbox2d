@@ -345,8 +345,8 @@ public class Distance{
 	                                  final CircleShape circle1, final XForm xf1,
 	                                  final CircleShape circle2, final XForm xf2) {
 
-		XForm.mulToOut(xf1, circle1.getLocalPosition(), Distance.distCCp1);
-		XForm.mulToOut(xf2, circle2.getLocalPosition(), Distance.distCCp2);
+		XForm.mulToOut(xf1, circle1.getMemberLocalPosition(), Distance.distCCp1);
+		XForm.mulToOut(xf2, circle2.getMemberLocalPosition(), Distance.distCCp2);
 
 		Distance.distCCd.x = Distance.distCCp2.x - Distance.distCCp1.x;
 		Distance.distCCd.y = Distance.distCCp2.y - Distance.distCCp1.y;
@@ -401,7 +401,7 @@ public class Distance{
 		float dSqr;
 		float dLen;
 		final float r = circle.getRadius() - Settings.toiSlop;
-		XForm.mulToOut(xf2, circle.getLocalPosition(), Distance.cWorld);
+		XForm.mulToOut(xf2, circle.getMemberLocalPosition(), Distance.cWorld);
 		XForm.mulTransToOut(xf1, Distance.cWorld, Distance.ECcLocal);
 		final float dirDist = Vec2.dot(Distance.ECcLocal.sub(edge.getCoreVertex1()), edge.getDirectionVector());
 
@@ -579,7 +579,7 @@ public class Distance{
 	                                           final CircleShape circle1, final XForm xf1,
 	                                           final PointShape pt2, final XForm xf2) {
 
-		XForm.mulToOut(xf1, circle1.getLocalPosition(), Distance.CPp1);
+		XForm.mulToOut(xf1, circle1.getMemberLocalPosition(), Distance.CPp1);
 		XForm.mulToOut(xf2, pt2.getLocalPosition(), Distance.CPp2);
 
 		Distance.CPd.x = Distance.CPp2.x - Distance.CPp1.x;
