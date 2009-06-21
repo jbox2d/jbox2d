@@ -495,7 +495,10 @@ public class PairManager {
 	//        return index;
 	//    }
 
-	private int hash(final int proxyId1, final int proxyId2) {
+	private final int hash(final int proxyId1, final int proxyId2) {
+		// djm: this operation here is pretty self explanitory,
+		// so i don't think I need to describe what's happening,
+		// or what the result is
 		int key = (proxyId2 << 16) | proxyId1;
 		key = ~key + (key << 15);
 		key = key ^ (key >>> 12);
@@ -506,16 +509,35 @@ public class PairManager {
 		return key;
 	}
 
-	boolean equals(final Pair pair, final int proxyId1, final int proxyId2) {
+	/**
+	 * returns if the pair has the two proxy id's
+	 * @param pair
+	 * @param proxyId1
+	 * @param proxyId2
+	 * @return
+	 */
+	public final boolean equals(final Pair pair, final int proxyId1, final int proxyId2) {
 		return pair.proxyId1 == proxyId1 && pair.proxyId2 == proxyId2;
 	}
 
-	boolean equals(final BufferedPair pair1, final BufferedPair pair2) {
+	/**
+	 * returns if the pairs have the same proxy id's
+	 * @param pair1
+	 * @param pair2
+	 * @return
+	 */
+	public final boolean equals(final BufferedPair pair1, final BufferedPair pair2) {
 		return pair1.proxyId1 == pair2.proxyId1 && pair1.proxyId2 == pair2.proxyId2;
 	}
 
-	// For sorting.
-	boolean minor (final BufferedPair pair1, final BufferedPair pair2){
+	/**
+	 *  For sorting.  Returns if the first pair's proxyid's are less than the
+	 *  second pair, starting with proxyId1
+	 * @param pair1
+	 * @param pair2
+	 * @return
+	 */
+	public final boolean minor (final BufferedPair pair1, final BufferedPair pair2){
 		if (pair1.proxyId1 < pair2.proxyId1) {
 			return true;
 		}

@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -24,7 +24,10 @@
 package org.jbox2d.collision;
 
 import org.jbox2d.collision.shapes.Shape;
-import org.jbox2d.common.*;
+import org.jbox2d.common.Settings;
+import org.jbox2d.common.Sweep;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.common.XForm;
 
 //updated to rev 142 of b2TimeOfImpact.cpp
 
@@ -32,40 +35,40 @@ import org.jbox2d.common.*;
 public class TOI {
 
 	// These are used to avoid allocations on a hot path:
-	private final Vec2 p1 = new Vec2();
-	private final Vec2 p2 = new Vec2();
-	private final XForm xf1 = new XForm();
-	private final XForm xf2 = new XForm();
+	private static final Vec2 p1 = new Vec2();
+	private static final Vec2 p2 = new Vec2();
+	private static final XForm xf1 = new XForm();
+	private static final XForm xf2 = new XForm();
 
 	// This algorithm uses conservative advancement to compute the time of
 	// impact (TOI) of two shapes.
 	// Refs: Bullet, Young Kim
-	
+
 	/**
 	 * Compute the time when two shapes begin to touch or touch at a closer distance.
 	 * <BR><BR><em>Warning</em>: the sweeps must have the same time interval.
 	 * @return the fraction between [0,1] in which the shapes first touch.
 	 * fraction=0 means the shapes begin touching/overlapped, and fraction=1 means the shapes don't touch.
 	 */
-	public float timeOfImpact(Shape shape1, Sweep sweep1,
-						   			 Shape shape2, Sweep sweep2) {
-		
-		float r1 = shape1.getSweepRadius();
-		float r2 = shape2.getSweepRadius();
+	public static final float timeOfImpact(final Shape shape1, final Sweep sweep1,
+	                                       final Shape shape2, final Sweep sweep2) {
+
+		final float r1 = shape1.getSweepRadius();
+		final float r2 = shape2.getSweepRadius();
 
 		assert(sweep1.t0 == sweep2.t0);
 		assert(1.0f - sweep1.t0 > Settings.EPSILON);
 
-		float t0 = sweep1.t0;
+		final float t0 = sweep1.t0;
 		// INLINED
 		//Vec2 v1 = sweep1.c.sub(sweep1.c0);
 		//Vec2 v2 = sweep2.c.sub(sweep2.c0);
 		//Vec2 v = v1.sub(v2);
-		float vx = (sweep1.c.x - sweep1.c0.x) - (sweep2.c.x - sweep2.c0.x);
-		float vy = (sweep1.c.y - sweep1.c0.y) - (sweep2.c.y - sweep2.c0.y);
-		
-		float omega1 = sweep1.a - sweep1.a0;
-		float omega2 = sweep2.a - sweep2.a0;
+		final float vx = (sweep1.c.x - sweep1.c0.x) - (sweep2.c.x - sweep2.c0.x);
+		final float vy = (sweep1.c.y - sweep1.c0.y) - (sweep2.c.y - sweep2.c0.y);
+
+		final float omega1 = sweep1.a - sweep1.a0;
+		final float omega2 = sweep2.a - sweep2.a0;
 
 		float alpha = 0.0f;
 
@@ -74,14 +77,14 @@ public class TOI {
 		float distance = 0.0f;
 		float targetDistance = 0.0f;
 		while(true){
-			float t = (1.0f - alpha) * t0 + alpha;
-			sweep1.getXForm(xf1, t);
-			sweep2.getXForm(xf2, t);
+			final float t = (1.0f - alpha) * t0 + alpha;
+			sweep1.getXForm(TOI.xf1, t);
+			sweep2.getXForm(TOI.xf2, t);
 
 			// Get the distance between shapes.
-			distance = Distance.distance(p1, p2, shape1, xf1, shape2, xf2);
+			distance = Distance.distance(TOI.p1, TOI.p2, shape1, TOI.xf1, shape2, TOI.xf2);
 			//System.out.println("Distance: "+distance + " alpha: "+alpha);
-			
+
 			if (iter == 0) {
 				// Compute a reasonable target distance to give some breathing room
 				// for conservative advancement.
@@ -100,12 +103,12 @@ public class TOI {
 			// INLINED
 			//normal = p2.sub(p1);
 			//normal.normalize();
-			float normalx = p2.x - p1.x;
-			float normaly = p2.y - p1.y;
-			float lenSqrd = normalx * normalx + normaly * normaly;
+			float normalx = TOI.p2.x - TOI.p1.x;
+			float normaly = TOI.p2.y - TOI.p1.y;
+			final float lenSqrd = normalx * normalx + normaly * normaly;
 			if (lenSqrd >= Settings.EPSILON*Settings.EPSILON) {
-				float length = (float) Math.sqrt(lenSqrd);
-				float invLength = 1.0f / length;
+				final float length = (float) Math.sqrt(lenSqrd);
+				final float invLength = 1.0f / length;
 				normalx *= invLength;
 				normaly *= invLength;
 			}
@@ -113,7 +116,7 @@ public class TOI {
 			// Compute upper bound on remaining movement.
 			// INLINED
 			//float approachVelocityBound = Vec2.dot(normal, v) + Math.abs(omega1) * r1 + Math.abs(omega2) * r2;
-			float approachVelocityBound = (normalx * vx + normaly * vy) + Math.abs(omega1) * r1 + Math.abs(omega2) * r2;
+			final float approachVelocityBound = (normalx * vx + normaly * vy) + Math.abs(omega1) * r1 + Math.abs(omega2) * r2;
 			//System.out.println("avb: "+approachVelocityBound);
 			//System.out.println("Normal" + normal);
 			if (Math.abs(approachVelocityBound) < Settings.EPSILON) {
@@ -122,9 +125,9 @@ public class TOI {
 			}
 
 			// Get the conservative time increment. Don't advance all the way.
-			float dAlpha = (distance - targetDistance) / approachVelocityBound;
+			final float dAlpha = (distance - targetDistance) / approachVelocityBound;
 			//float32 dt = (distance - 0.5f * b2_linearSlop) / approachVelocityBound;
-			float newAlpha = alpha + dAlpha;
+			final float newAlpha = alpha + dAlpha;
 
 			// The shapes may be moving apart or a safe distance apart.
 			if (newAlpha < 0.0f || 1.0f < newAlpha) {
