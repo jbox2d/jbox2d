@@ -271,7 +271,9 @@ public class PulleyJoint extends Joint {
     	}
 
     	if (m_limitState1 == LimitState.AT_UPPER_LIMIT) {
-    		Vec2 v1 = b1.m_linearVelocity.add(Vec2.cross(b1.m_angularVelocity, r1));
+    		Vec2.crossToOut(b1.m_angularVelocity, r1, v1);
+    		v1.addLocal(b1.m_linearVelocity);
+    		//Vec2 v1 = b1.m_linearVelocity.add(Vec2.cross(b1.m_angularVelocity, r1));
 
     		float Cdot = -Vec2.dot(m_u1, v1);
     		float force = -step.inv_dt * m_limitMass1 * Cdot;
@@ -288,7 +290,9 @@ public class PulleyJoint extends Joint {
     	}
 
     	if (m_limitState2 == LimitState.AT_UPPER_LIMIT) {
-    		Vec2 v2 = b2.m_linearVelocity.add(Vec2.cross(b2.m_angularVelocity, r2));
+    		Vec2.crossToOut(b2.m_angularVelocity, r2, v2);
+    		v2.addLocal(b2.m_linearVelocity);
+    		//Vec2 v2 = b2.m_linearVelocity.add(Vec2.cross(b2.m_angularVelocity, r2));
 
     		float Cdot = -Vec2.dot(m_u2, v2);
     		float force = -step.inv_dt * m_limitMass2 * Cdot;

@@ -2,7 +2,6 @@
 	<description>Here so we can build the distributions</description>
 	<property file="building.properties"/>
 	
-	
 	<target name="dist-library" depends="copyLibraryToTemp">
 		<mkdir dir="${dist}"/>
 		
@@ -17,7 +16,7 @@
 		</copy>
 		
 		<echo>Constructing jar</echo>
-		<jar basedir="temp" destfile="${dist}/JBox2D-${version}-rev${buildNumber}-Library-Only.jar"/>
+		<jar basedir="temp" destfile="${dist}/${libraryJarName}"/>
 		
 		<echo>Cleaning up</echo>
 		<delete dir="temp"/>
@@ -29,15 +28,22 @@
 		<echo>unpacking dependency jar classes</echo>
 		<unjar dest="temp">
 			<fileset dir="${lib}">
-			        <include name="*.jar"/>
+				<include name="*.jar"/>
 			</fileset>
 		</unjar>
+		
+		<echo>copying over the data files used in the Processing implementation</echo>
+		<copy todir="temp">
+			<fileset dir="data">
+				<include name="**"/>
+			</fileset>
+		</copy>
 		
 		<echo>Creating manifest</echo>
 		<echo file="Full.mf" append="false">Main-Class: org.jbox2d.testbed.TestbedMain</echo>
 		
 		<echo>Constructing jar</echo>
-		<jar basedir="temp" manifest="Full.mf" destfile="${dist}/JBox2D-${version}-rev${buildNumber}-Full.jar"/>
+		<jar basedir="temp" manifest="Full.mf" destfile="${dist}/${fullJarName}"/>
 		
 		<echo>Cleaning up</echo>
 		<delete dir="temp"/>
