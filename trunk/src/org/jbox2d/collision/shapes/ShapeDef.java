@@ -58,7 +58,6 @@ public class ShapeDef {
 	public boolean isSensor;
     
     public ShapeDef() {
-
         type = ShapeType.UNKNOWN_SHAPE;
         userData = null;
         friction = 0.2f;
@@ -68,8 +67,6 @@ public class ShapeDef {
         filter.categoryBits = 0x0001;
         filter.maskBits = 0xFFFF;
         filter.groupIndex = 0;
-        isSensor = false;
-        
+        isSensor = false;  
     }
-
 }

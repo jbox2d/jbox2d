@@ -60,6 +60,9 @@ public class CircleShape extends Shape {
 		m_radius = circleDef.radius;
 	}
 
+	/**
+	 * @see Shape#updateSweepRadius(Vec2)
+	 */
 	@Override
 	public void updateSweepRadius(final Vec2 center) {
 		// Update the sweep radius (maximum radius) as measured from
@@ -72,6 +75,7 @@ public class CircleShape extends Shape {
 
 	/**
 	 * checks to see if the point is in this shape.
+	 * @see Shape#testPoint(XForm, Vec2)
 	 */
 	// djm: not a hot method, don't pool
 	@Override
@@ -177,6 +181,9 @@ public class CircleShape extends Shape {
 
 	}
 
+	/**
+	 * @see Shape#computeMass(MassData)
+	 */
 	@Override
 	public void computeMass(final MassData massData) {
 		massData.mass = m_density * (float)Math.PI * m_radius * m_radius;

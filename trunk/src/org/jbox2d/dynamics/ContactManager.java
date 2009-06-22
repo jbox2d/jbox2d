@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -39,207 +39,208 @@ import org.jbox2d.dynamics.contacts.NullContact;
 
 /** Delegate of World - for internal use. */
 public class ContactManager extends PairCallback {
-    World m_world;
+	World m_world;
 
-    // This lets us provide broadphase proxy pair user data for
-    // contacts that shouldn't exist.
-    NullContact m_nullContact;
+	// This lets us provide broadphase proxy pair user data for
+	// contacts that shouldn't exist.
+	NullContact m_nullContact;
 
-    boolean m_destroyImmediate;
+	boolean m_destroyImmediate;
 
-    public ContactManager() {
-        m_nullContact = new NullContact();
-        m_destroyImmediate = false;
-    }
+	public ContactManager() {
+		m_nullContact = new NullContact();
+		m_destroyImmediate = false;
+	}
 
-    public Object pairAdded(Object proxyUserData1, Object proxyUserData2) {
-        Shape shape1 = (Shape) proxyUserData1;
-        Shape shape2 = (Shape) proxyUserData2;
+	@Override
+	public Object pairAdded(final Object proxyUserData1, final Object proxyUserData2) {
+		Shape shape1 = (Shape) proxyUserData1;
+		Shape shape2 = (Shape) proxyUserData2;
 
-        Body body1 = shape1.getBody();
-        Body body2 = shape2.getBody();
+		Body body1 = shape1.getBody();
+		Body body2 = shape2.getBody();
 
-        if (body1.isStatic() && body2.isStatic()) {
-            return m_nullContact;
-        }
+		if (body1.isStatic() && body2.isStatic()) {
+			return m_nullContact;
+		}
 
-        if (shape1.getBody() == shape2.getBody()) {
-            return m_nullContact;
-        }
-        
-        if (body2.isConnected(body1)) {
-    		return m_nullContact;
-    	}
-        
-        if (m_world.m_contactFilter != null && m_world.m_contactFilter.shouldCollide(shape1, shape2) == false){
-            return m_nullContact;
-        }
+		if (shape1.getBody() == shape2.getBody()) {
+			return m_nullContact;
+		}
 
-     // Call the factory.
-    	Contact c = Contact.createContact(shape1, shape2);
+		if (body2.isConnected(body1)) {
+			return m_nullContact;
+		}
 
-    	if (c == null) {
-    		return m_nullContact;
-    	}
+		if (m_world.m_contactFilter != null && m_world.m_contactFilter.shouldCollide(shape1, shape2) == false){
+			return m_nullContact;
+		}
 
-    	// Contact creation may swap shapes.
-    	shape1 = c.getShape1();
-    	shape2 = c.getShape2();
-    	body1 = shape1.getBody();
-    	body2 = shape2.getBody();
+		// Call the factory.
+		final Contact c = Contact.createContact(shape1, shape2);
 
-    	// Insert into the world.
-    	c.m_prev = null;
-    	c.m_next = m_world.m_contactList;
-    	if (m_world.m_contactList != null) {
-    		m_world.m_contactList.m_prev = c;
-    	}
-    	m_world.m_contactList = c;
+		if (c == null) {
+			return m_nullContact;
+		}
 
-    	// Connect to island graph.
+		// Contact creation may swap shapes.
+		shape1 = c.getShape1();
+		shape2 = c.getShape2();
+		body1 = shape1.getBody();
+		body2 = shape2.getBody();
 
-    	// Connect to body 1
-    	c.m_node1.contact = c;
-    	c.m_node1.other = body2;
+		// Insert into the world.
+		c.m_prev = null;
+		c.m_next = m_world.m_contactList;
+		if (m_world.m_contactList != null) {
+			m_world.m_contactList.m_prev = c;
+		}
+		m_world.m_contactList = c;
 
-    	c.m_node1.prev = null;
-    	c.m_node1.next = body1.m_contactList;
-    	if (body1.m_contactList != null) {
-    		body1.m_contactList.prev = c.m_node1;
-    	}
-    	body1.m_contactList = c.m_node1;
+		// Connect to island graph.
 
-    	// Connect to body 2
-    	c.m_node2.contact = c;
-    	c.m_node2.other = body1;
+		// Connect to body 1
+		c.m_node1.contact = c;
+		c.m_node1.other = body2;
 
-    	c.m_node2.prev = null;
-    	c.m_node2.next = body2.m_contactList;
-    	if (body2.m_contactList != null) {
-    		body2.m_contactList.prev = c.m_node2;
-    	}
-    	body2.m_contactList = c.m_node2;
+		c.m_node1.prev = null;
+		c.m_node1.next = body1.m_contactList;
+		if (body1.m_contactList != null) {
+			body1.m_contactList.prev = c.m_node1;
+		}
+		body1.m_contactList = c.m_node1;
 
-    	++m_world.m_contactCount;
-    	return c;
-    }
+		// Connect to body 2
+		c.m_node2.contact = c;
+		c.m_node2.other = body1;
 
- // This is a callback from the broadphase when two AABB proxies cease
- // to overlap. We retire the b2Contact.
-    public void pairRemoved(Object proxyUserData1, Object proxyUserData2,
-            Object pairUserData) {
-    	//B2_NOT_USED(proxyUserData1);
-    	//B2_NOT_USED(proxyUserData2);
+		c.m_node2.prev = null;
+		c.m_node2.next = body2.m_contactList;
+		if (body2.m_contactList != null) {
+			body2.m_contactList.prev = c.m_node2;
+		}
+		body2.m_contactList = c.m_node2;
 
-    	if (pairUserData == null) {
-    		return;
-    	}
+		++m_world.m_contactCount;
+		return c;
+	}
 
-    	Contact c = (Contact)pairUserData;
-    	if (c == m_nullContact) {
-    		return;
-    	}
+	// This is a callback from the broadphase when two AABB proxies cease
+	// to overlap. We retire the b2Contact.
+	@Override
+	public void pairRemoved(final Object proxyUserData1, final Object proxyUserData2,
+	                        final Object pairUserData) {
+		//B2_NOT_USED(proxyUserData1);
+		//B2_NOT_USED(proxyUserData2);
 
-    	// An attached body is being destroyed, we must destroy this contact
-    	// immediately to avoid orphaned shape pointers.
-    	destroy(c);
-    }
+		if (pairUserData == null) {
+			return;
+		}
 
-    // djm pooled
-    private Vec2 v1 = new Vec2();
-    public void destroy(Contact c) {
-    	Shape shape1 = c.getShape1();
-    	Shape shape2 = c.getShape2();
+		final Contact c = (Contact)pairUserData;
+		if (c == m_nullContact) {
+			return;
+		}
 
-    	// Inform the user that this contact is ending.
-    	int manifoldCount = c.getManifoldCount();
-    	if (manifoldCount > 0 && (m_world.m_contactListener != null))
-    	{
-    		Body b1 = shape1.getBody();
-    		Body b2 = shape2.getBody();
-    		List<Manifold> manifolds = c.getManifolds();
-    		ContactPoint cp = new ContactPoint();
-    		cp.shape1 = c.getShape1();
-    		cp.shape2 = c.getShape2();
-    		cp.friction = c.m_friction;
-    		cp.restitution = c.m_restitution;
-    		for (int i = 0; i < manifoldCount; ++i)
-    		{
-    			Manifold manifold = manifolds.get(i);
-    			cp.normal.set(manifold.normal);
-    			for (int j = 0; j < manifold.pointCount; ++j) {
+		// An attached body is being destroyed, we must destroy this contact
+		// immediately to avoid orphaned shape pointers.
+		destroy(c);
+	}
 
-    				ManifoldPoint mp = manifold.points[j];
-    				b1.getWorldLocationToOut(mp.localPoint1, cp.position);
-    				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
-    				// velocity isn't initialized in the contact point
-    				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
-    				cp.velocity.subLocal(v1);
-    				cp.separation = mp.separation;
-    				cp.id.set(mp.id);
-    				m_world.m_contactListener.remove(cp);
-    			}
-    		}
-    	}
+	// djm pooled
+	private final Vec2 v1 = new Vec2();
+	public void destroy(final Contact c) {
+		final Shape shape1 = c.getShape1();
+		final Shape shape2 = c.getShape2();
 
-    	// Remove from the world.
-    	if (c.m_prev != null) {
-    		c.m_prev.m_next = c.m_next;
-    	}
+		// Inform the user that this contact is ending.
+		final int manifoldCount = c.getManifoldCount();
+		if (manifoldCount > 0 && (m_world.m_contactListener != null))
+		{
+			final Body b1 = shape1.getBody();
+			final Body b2 = shape2.getBody();
+			final List<Manifold> manifolds = c.getManifolds();
+			final ContactPoint cp = new ContactPoint();
+			cp.shape1 = c.getShape1();
+			cp.shape2 = c.getShape2();
+			cp.friction = c.m_friction;
+			cp.restitution = c.m_restitution;
+			for (int i = 0; i < manifoldCount; ++i)
+			{
+				final Manifold manifold = manifolds.get(i);
+				cp.normal.set(manifold.normal);
+				for (int j = 0; j < manifold.pointCount; ++j) {
 
-    	if (c.m_next != null) {
-    		c.m_next.m_prev = c.m_prev;
-    	}
+					final ManifoldPoint mp = manifold.points[j];
+					b1.getWorldLocationToOut(mp.localPoint1, cp.position);
+					b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
+					// velocity isn't initialized in the contact point
+					cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+					cp.velocity.subLocal(v1);
+					cp.separation = mp.separation;
+					cp.id.set(mp.id);
+					m_world.m_contactListener.remove(cp);
+				}
+			}
+		}
 
-    	if (c == m_world.m_contactList) {
-    		m_world.m_contactList = c.m_next;
-    	}
+		// Remove from the world.
+		if (c.m_prev != null) {
+			c.m_prev.m_next = c.m_next;
+		}
 
-    	Body body1 = shape1.getBody();
-    	Body body2 = shape2.getBody();
+		if (c.m_next != null) {
+			c.m_next.m_prev = c.m_prev;
+		}
 
-    	// Remove from body 1
-    	if (c.m_node1.prev != null) {
-    		c.m_node1.prev.next = c.m_node1.next;
-    	}
+		if (c == m_world.m_contactList) {
+			m_world.m_contactList = c.m_next;
+		}
 
-    	if (c.m_node1.next != null) {
-    		c.m_node1.next.prev = c.m_node1.prev;
-    	}
+		final Body body1 = shape1.getBody();
+		final Body body2 = shape2.getBody();
 
-    	if (c.m_node1 == body1.m_contactList) {
-    		body1.m_contactList = c.m_node1.next;
-    	}
+		// Remove from body 1
+		if (c.m_node1.prev != null) {
+			c.m_node1.prev.next = c.m_node1.next;
+		}
 
-    	// Remove from body 2
-    	if (c.m_node2.prev != null) {
-    		c.m_node2.prev.next = c.m_node2.next;
-    	}
+		if (c.m_node1.next != null) {
+			c.m_node1.next.prev = c.m_node1.prev;
+		}
 
-    	if (c.m_node2.next != null) {
-    		c.m_node2.next.prev = c.m_node2.prev;
-    	}
+		if (c.m_node1 == body1.m_contactList) {
+			body1.m_contactList = c.m_node1.next;
+		}
 
-    	if (c.m_node2 == body2.m_contactList) {
-    		body2.m_contactList = c.m_node2.next;
-    	}
+		// Remove from body 2
+		if (c.m_node2.prev != null) {
+			c.m_node2.prev.next = c.m_node2.next;
+		}
 
-    	// Call the factory.
-    	Contact.destroy(c);
-    	--m_world.m_contactCount;
-    }
+		if (c.m_node2.next != null) {
+			c.m_node2.next.prev = c.m_node2.prev;
+		}
 
-    public void collide() {
-    	// Update awake contacts.
-    	for (Contact c = m_world.m_contactList; c != null; c = c.getNext()) {
-    		Body body1 = c.getShape1().getBody();
-    		Body body2 = c.getShape2().getBody();
-    		if (body1.isSleeping() && body2.isSleeping()) {
-    			continue;
-    		}
+		if (c.m_node2 == body2.m_contactList) {
+			body2.m_contactList = c.m_node2.next;
+		}
 
-    		c.update(m_world.m_contactListener);
+		// Call the factory.
+		Contact.destroy(c);
+		--m_world.m_contactCount;
+	}
 
-    	}
-    }
+	public void collide() {
+		// Update awake contacts.
+		for (Contact c = m_world.m_contactList; c != null; c = c.getNext()) {
+			final Body body1 = c.getShape1().getBody();
+			final Body body2 = c.getShape2().getBody();
+			if (body1.isSleeping() && body2.isSleeping()) {
+				continue;
+			}
+
+			c.update(m_world.m_contactListener);
+		}
+	}
 }

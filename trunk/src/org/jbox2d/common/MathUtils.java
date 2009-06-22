@@ -31,29 +31,29 @@ public class MathUtils {
 	// Max/min rewritten here because for some reason Math.max/min
 	// can run absurdly slow for such simple functions...
 	// TODO: profile, see if this just seems to be the case or is actually causing issues...
-	public final static float max(float a, float b) {
+	public final static float max(final float a, final float b) {
 		return (a > b)?a:b;
 	}
 
-	public final static float min(float a, float b) {
+	public final static float min(final float a, final float b) {
 		return (a < b)?a:b;
 	}
 
 	/** Returns the closest value to 'a' that is in between 'low' and 'high' */
-	public final static float clamp(float a, float low, float high) {
+	public final static float clamp(final float a, final float low, final float high) {
 		return MathUtils.max(low, MathUtils.min(a, high));
 	}
 
 	/* djm optimized */
-	public final static Vec2 clamp(Vec2 a, Vec2 low, Vec2 high) {
-		Vec2 min = new Vec2();
+	public final static Vec2 clamp(final Vec2 a, final Vec2 low, final Vec2 high) {
+		final Vec2 min = new Vec2();
 		Vec2.minToOut( a, high, min);
 		Vec2.maxToOut(low, min, min);
 		return min;
 	}
 
 	/* djm created */
-	public final static void clampToOut(Vec2 a, Vec2 low, Vec2 high, Vec2 dest) {
+	public final static void clampToOut(final Vec2 a, final Vec2 low, final Vec2 high, final Vec2 dest) {
 		Vec2.minToOut( a, high, dest);
 		Vec2.maxToOut( low, dest, dest);
 	}
@@ -77,7 +77,7 @@ public class MathUtils {
 		return x + 1;
 	}
 
-	public final static boolean isPowerOfTwo(int x) {
+	public final static boolean isPowerOfTwo(final int x) {
 		return x > 0 && (x & (x - 1)) == 0;
 	}
 

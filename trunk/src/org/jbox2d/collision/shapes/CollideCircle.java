@@ -122,7 +122,7 @@ public class CollideCircle {
 	                                               final CircleShape circle2, final XForm xf2) {
 		manifold.pointCount = 0;
 
-		XForm.mulToOut(xf1, point1.getLocalPosition(), colPCP1);
+		XForm.mulToOut(xf1, point1.getMemberLocalPosition(), colPCP1);
 		XForm.mulToOut(xf2, circle2.getMemberLocalPosition(), colPCP2);
 
 		colPCD.x = colPCP2.x - colPCP1.x;

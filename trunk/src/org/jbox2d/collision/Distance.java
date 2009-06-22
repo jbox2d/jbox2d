@@ -248,8 +248,8 @@ public class Distance{
 
 		int pointCount = 0;
 
-		shape1.getFirstVertex(x1, xf1);
-		shape2.getFirstVertex(x2, xf2);
+		shape1.getFirstVertexToOut(xf1, x1);
+		shape2.getFirstVertexToOut(xf2, x2);
 
 		float vSqr = 0.0f;
 		final int maxIterations = 20;
@@ -580,7 +580,7 @@ public class Distance{
 	                                           final PointShape pt2, final XForm xf2) {
 
 		XForm.mulToOut(xf1, circle1.getMemberLocalPosition(), Distance.CPp1);
-		XForm.mulToOut(xf2, pt2.getLocalPosition(), Distance.CPp2);
+		XForm.mulToOut(xf2, pt2.getMemberLocalPosition(), Distance.CPp2);
 
 		Distance.CPd.x = Distance.CPp2.x - Distance.CPp1.x;
 		Distance.CPd.y = Distance.CPp2.y - Distance.CPp1.y;
@@ -680,8 +680,8 @@ class Point implements SupportsGenericDistance{
 		dest.set(p);
 	}
 
-	public void getFirstVertex(final Vec2 dest, final XForm xf) {
-		dest.set(p);
+	public void getFirstVertexToOut(final XForm xf, final Vec2 out) {
+		out.set(p);
 	}
 
 }

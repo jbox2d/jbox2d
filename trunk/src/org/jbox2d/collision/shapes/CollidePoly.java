@@ -467,7 +467,7 @@ public class CollidePoly {
 		manifold.pointCount = 0;
 
 		// Compute circle position in the frame of the polygon.
-		XForm.mulToOut(xf2, point.getLocalPosition(), colPPc);
+		XForm.mulToOut(xf2, point.getMemberLocalPosition(), colPPc);
 		XForm.mulTransToOut(xf1, colPPc, colPPcLocal);
 
 		// Find edge with maximum separation.
