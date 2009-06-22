@@ -6,16 +6,24 @@ import org.jbox2d.collision.SupportsGenericDistance;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
+import org.jbox2d.dynamics.Body;
 
+/**
+ * An edge shape.  Create using {@link Body#createShape(ShapeDef)} with an {@link EdgeChainDef},
+ * not the constructor here.
+ * @see Body#createShape(ShapeDef)
+ * @see EdgeChainDef
+ * @author daniel
+ */
 public class EdgeShape extends Shape implements SupportsGenericDistance {
 	//private updatesweepradius
-	private Vec2 m_v1;
-	private Vec2 m_v2;
+	private final Vec2 m_v1;
+	private final Vec2 m_v2;
 	private Vec2 m_coreV1;
 	private Vec2 m_coreV2;
-	private float m_length;
-	private Vec2 m_normal;
-	private Vec2 m_direction;
+	private final float m_length;
+	private final Vec2 m_normal;
+	private final Vec2 m_direction;
 	// Unit vector halfway between m_direction and m_prevEdge.m_direction:
 	private Vec2 m_cornerDir1;
 	// Unit vector halfway between m_direction and m_nextEdge.m_direction:
@@ -24,156 +32,188 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 	private boolean m_cornerConvex2;
 	EdgeShape m_nextEdge;
 	EdgeShape m_prevEdge;
-	
+
+	/**
+	 * Don't use this.  Instead create using {@link Body#createShape(ShapeDef)} with an
+	 * {@link EdgeChainDef}, not the constructor here.
+	 * @see Body#createShape(ShapeDef)
+	 * @see EdgeChainDef
+	 * @param v1
+	 * @param v2
+	 * @param def
+	 */
 	public EdgeShape(final Vec2 v1, final Vec2 v2, final ShapeDef def) {
 		super(def);
 		assert(def.type == ShapeType.EDGE_SHAPE);
 
 		m_type = ShapeType.EDGE_SHAPE;
-		
+
 		m_prevEdge = null;
 		m_nextEdge = null;
-		
+
 		m_v1 = v1;
 		m_v2 = v2;
-		
+
 		m_direction = m_v2.sub(m_v1);
 		m_length = m_direction.normalize();
 		m_normal = new Vec2(m_direction.y, -m_direction.x);
-		
+
 		// djm they are new objects after that first math call
 		m_coreV1 = (m_normal.sub(m_direction)).mulLocal(-Settings.toiSlop).addLocal(m_v1);
 		m_coreV2 = (m_normal.add(m_direction)).mulLocal(-Settings.toiSlop).addLocal(m_v2);
-		
+
 		m_cornerDir1 = m_normal.clone();
 		m_cornerDir2 = m_normal.mul(-1.0f);
 	}
-	
+
+	/**
+	 * @see Shape#updateSweepRadius(Vec2)
+	 */
+	@Override
 	public void updateSweepRadius(final Vec2 center) {
 		// Update the sweep radius (maximum radius) as measured from
 		// a local center point.
-		float dx = m_coreV1.x - center.x;
-		float dy = m_coreV1.y - center.y;
-		float d1 = dx*dx+dy*dy;
-		float dx2 = m_coreV2.x - center.x;
-		float dy2 = m_coreV2.y - center.y;
-		float d2 = dx2*dx2+dy2*dy2;
+		final float dx = m_coreV1.x - center.x;
+		final float dy = m_coreV1.y - center.y;
+		final float d1 = dx*dx+dy*dy;
+		final float dx2 = m_coreV2.x - center.x;
+		final float dy2 = m_coreV2.y - center.y;
+		final float d2 = dx2*dx2+dy2*dy2;
 		m_sweepRadius = (float)Math.sqrt(d1 > d2 ? d1 : d2);
 	}
-	
+
+	/**
+	 * @see Shape#testPoint(XForm, Vec2)
+	 */
+	@Override
 	public boolean testPoint(final XForm transform, final Vec2 p) {
 		// djm this could use some optimization.
 		return false;
 	}
-	
-//	b2SegmentCollide b2EdgeShape::TestSegment(const b2XForm& transform,
-//			float32* lambda,
-//			b2Vec2* normal,
-//			const b2Segment& segment,
-//			float32 maxLambda) const
-//{
-//b2Vec2 r = segment.p2 - segment.p1;
-//b2Vec2 v1 = b2Mul(transform, m_v1);
-//b2Vec2 d = b2Mul(transform, m_v2); - v1;
-//b2Vec2 n = b2Cross(d, 1.0f);
-//
-//const float32 k_slop = 100.0f * B2_FLT_EPSILON;
-//float32 denom = -b2Dot(r, n);
-//
-//// Cull back facing collision and ignore parallel segments.
-//if (denom > k_slop)
-//{
-//// Does the segment intersect the infinite line associated with this segment?
-//b2Vec2 b = segment.p1 - v1;
-//float32 a = b2Dot(b, n);
-//
-//if (0.0f <= a && a <= maxLambda * denom)
-//{
-//float32 mu2 = -r.x * b.y + r.y * b.x;
-//
-//// Does the segment intersect this segment?
-//if (-k_slop * denom <= mu2 && mu2 <= denom * (1.0f + k_slop))
-//{
-//a /= denom;
-//n.Normalize();
-//*lambda = a;
-//*normal = n;
-//return e_hitCollide;
-//}
-//}
-//}
-//
-//return e_missCollide;
-//}
 
-	// djm optimized
-	public void computeAABB(AABB aabb, final XForm transform) {
+	//	b2SegmentCollide b2EdgeShape::TestSegment(const b2XForm& transform,
+	//			float32* lambda,
+	//			b2Vec2* normal,
+	//			const b2Segment& segment,
+	//			float32 maxLambda) const
+	//{
+	//b2Vec2 r = segment.p2 - segment.p1;
+	//b2Vec2 v1 = b2Mul(transform, m_v1);
+	//b2Vec2 d = b2Mul(transform, m_v2); - v1;
+	//b2Vec2 n = b2Cross(d, 1.0f);
+	//
+	//const float32 k_slop = 100.0f * B2_FLT_EPSILON;
+	//float32 denom = -b2Dot(r, n);
+	//
+	//// Cull back facing collision and ignore parallel segments.
+	//if (denom > k_slop)
+	//{
+	//// Does the segment intersect the infinite line associated with this segment?
+	//b2Vec2 b = segment.p1 - v1;
+	//float32 a = b2Dot(b, n);
+	//
+	//if (0.0f <= a && a <= maxLambda * denom)
+	//{
+	//float32 mu2 = -r.x * b.y + r.y * b.x;
+	//
+	//// Does the segment intersect this segment?
+	//if (-k_slop * denom <= mu2 && mu2 <= denom * (1.0f + k_slop))
+	//{
+	//a /= denom;
+	//n.Normalize();
+	//*lambda = a;
+	//*normal = n;
+	//return e_hitCollide;
+	//}
+	//}
+	//}
+	//
+	//return e_missCollide;
+	//}
+
+	/**
+	 * @see Shape#computeAABB(AABB, XForm)
+	 */
+	@Override
+	public void computeAABB(final AABB aabb, final XForm transform) {
 		/*Vec2 v1 = XForm.mul(transform, m_v1);
 		Vec2 v2 = XForm.mul(transform, m_v2);
 		aabb.lowerBound = Vec2.min(v1, v2);
 		aabb.upperBound = Vec2.max(v1, v2);*/
-		
+
 		// djm we avoid one creation. crafty huh?  i won't bother
-		// pooling the creation, as this method isn't very hot
+		// pooling one creation, as this method isn't hot
 		XForm.mulToOut(transform, m_v1, aabb.lowerBound);
-		Vec2 v2 = XForm.mul(transform, m_v2);
-		
+		final Vec2 v2 = XForm.mul(transform, m_v2);
+
 		Vec2.maxToOut(aabb.lowerBound, v2, aabb.upperBound);
 		Vec2.minToOut(aabb.lowerBound, v2, aabb.lowerBound);
 	}
-	
+
 	// djm pooling
-	
-	private Vec2 sweptV1 = new Vec2();
-	private Vec2 sweptV2 = new Vec2();
-	private Vec2 sweptV3 = new Vec2();
-	private Vec2 sweptV4 = new Vec2();
-	// djm this method is pretty hot (called every time step)
-	public void computeSweptAABB(AABB aabb, final XForm transform1, final XForm transform2) {
-		
+
+	private final Vec2 sweptV1 = new Vec2();
+	private final Vec2 sweptV2 = new Vec2();
+	private final Vec2 sweptV3 = new Vec2();
+	private final Vec2 sweptV4 = new Vec2();
+
+	/**
+	 * @see Shape#computeSweptAABB(AABB, XForm, XForm)
+	 */
+	@Override
+	public void computeSweptAABB(final AABB aabb, final XForm transform1, final XForm transform2) {
+		// djm this method is pretty hot (called every time step)
+
 		XForm.mulToOut(transform1, m_v1, sweptV1);
 		XForm.mulToOut(transform1, m_v2, sweptV2);
 		XForm.mulToOut(transform2, m_v1, sweptV3);
 		XForm.mulToOut(transform2, m_v2, sweptV4);
-		
+
 		//aabb.lowerBound = Vec2.min(Vec2.min(Vec2.min(v1, v2), v3), v4);
 		//aabb.upperBound = Vec2.max(Vec2.max(Vec2.max(v1, v2), v3), v4);
-		
+
 		// djm ok here's the non object-creation-crazy way
 		Vec2.minToOut( sweptV1, sweptV2, aabb.lowerBound);
 		Vec2.minToOut( aabb.lowerBound, sweptV3, aabb.lowerBound);
 		Vec2.minToOut( aabb.lowerBound, sweptV4, aabb.lowerBound);
-		
+
 		Vec2.maxToOut( sweptV1, sweptV2, aabb.upperBound);
 		Vec2.maxToOut( aabb.upperBound, sweptV3, aabb.upperBound);
 		Vec2.maxToOut( aabb.upperBound, sweptV4, aabb.upperBound);
 	}
-	
-	public void computeMass(MassData massData) {
+
+	/**
+	 * @see Shape#computeMass(MassData)
+	 */
+	@Override
+	public void computeMass(final MassData massData) {
 		massData.mass = 0;
 		massData.center = m_v1;
 
 		// inertia about the local origin
 		massData.I = 0;
 	}
-	
+
 	// djm pooled
-	private Vec2 supportV1 = new Vec2();
-	private Vec2 supportV2 = new Vec2();
-	public void support(Vec2 dest, final XForm xf, final Vec2 d) {
+	private final Vec2 supportV1 = new Vec2();
+	private final Vec2 supportV2 = new Vec2();
+	/**
+	 * @see SupportsGenericDistance#support(Vec2, XForm, Vec2)
+	 */
+	public void support(final Vec2 dest, final XForm xf, final Vec2 d) {
 		XForm.mulToOut(xf, m_coreV1, supportV1);
 		XForm.mulToOut(xf, m_coreV2, supportV2);
 		dest.set(Vec2.dot(supportV1, d) > Vec2.dot(supportV2, d) ? supportV1 : supportV2);
 	}
-	
-	public void setPrevEdge(EdgeShape edge, final Vec2 core, final Vec2 cornerDir, boolean convex) {
+
+	public void setPrevEdge(final EdgeShape edge, final Vec2 core, final Vec2 cornerDir, final boolean convex) {
 		m_prevEdge = edge;
 		m_coreV1 = core;
 		m_cornerDir1 = cornerDir;
 		m_cornerConvex1 = convex;
 	}
-	
-	public void setNextEdge(EdgeShape edge, final Vec2 core, final Vec2 cornerDir, boolean convex) {
+
+	public void setNextEdge(final EdgeShape edge, final Vec2 core, final Vec2 cornerDir, final boolean convex) {
 		m_nextEdge = edge;
 		m_coreV2 = core;
 		m_cornerDir2 = cornerDir;
@@ -233,8 +273,11 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 		return m_prevEdge;
 	}
 
-	public void getFirstVertex(Vec2 dest, XForm xf) {
-		XForm.mulToOut(xf, m_coreV1, dest);
+	/**
+	 * @see SupportsGenericDistance#getFirstVertexToOut(XForm, Vec2)
+	 */
+	public void getFirstVertexToOut(final XForm xf, final Vec2 out) {
+		XForm.mulToOut(xf, m_coreV1, out);
 	}
 
 	public boolean corner1IsConvex() {

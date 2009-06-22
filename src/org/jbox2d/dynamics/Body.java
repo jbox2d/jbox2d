@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -29,7 +29,11 @@ import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.ShapeDef;
 import org.jbox2d.collision.shapes.ShapeType;
-import org.jbox2d.common.*;
+import org.jbox2d.common.Mat22;
+import org.jbox2d.common.Settings;
+import org.jbox2d.common.Sweep;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.dynamics.joints.JointEdge;
 
@@ -49,7 +53,7 @@ import org.jbox2d.dynamics.joints.JointEdge;
  * internal variables, and their use is generally unsupported.
  */
 public class Body {
-	
+
 	//m_flags
 	public static final int e_frozenFlag = 0x0002;
 	public static final int e_islandFlag = 0x0004;
@@ -64,16 +68,16 @@ public class Body {
 	public static final int e_dynamicType = 1;
 	public static final int e_maxTypes = 2;
 	public int m_type;
-	
+
 	/** The body origin transform */
-	public XForm m_xf; 
-	
+	public XForm m_xf;
+
 	/** The swept motion for CCD */
-	public Sweep m_sweep;  
-	
+	public Sweep m_sweep;
+
 	public Vec2 m_linearVelocity;
 	public float m_angularVelocity;
-	
+
 	public Vec2 m_force;
 	public float m_torque;
 
@@ -95,17 +99,17 @@ public class Body {
 
 	public float m_sleepTime;
 
-	/** 
+	/**
 	 * A holder to attach external data to a body.
 	 * Useful to keep track of what game entity
 	 * each body represents. This is copied from
 	 * the BodyDef used to create the body, so may
-	 * be set there instead. 
+	 * be set there instead.
 	 */
 	public Object m_userData;
-	
+
 	public Body() {
-		
+
 	}
 
 	/**
@@ -117,88 +121,96 @@ public class Body {
 	 * @param bd Body definition
 	 * @param world World to create body in
 	 */
-	public Body(BodyDef bd, World world) {
+	public Body(final BodyDef bd, final World world) {
 		assert(world.m_lock == false);
-		
+
 		m_flags = 0;
-		
-		if (bd.isBullet) m_flags |= e_bulletFlag;
-		if (bd.fixedRotation) m_flags |= e_fixedRotationFlag;
-		if (bd.allowSleep) m_flags |= e_allowSleepFlag;
-		if (bd.isSleeping) m_flags |= e_sleepFlag;
-		
+
+		if (bd.isBullet) {
+			m_flags |= e_bulletFlag;
+		}
+		if (bd.fixedRotation) {
+			m_flags |= e_fixedRotationFlag;
+		}
+		if (bd.allowSleep) {
+			m_flags |= e_allowSleepFlag;
+		}
+		if (bd.isSleeping) {
+			m_flags |= e_sleepFlag;
+		}
+
 		m_world = world;
-		
+
 		m_xf = new XForm();
-		
+
 		m_xf.position.set(bd.position);
 		m_xf.R.set(bd.angle);
-		
+
 		m_sweep = new Sweep();
 		m_sweep.localCenter.set(bd.massData.center);
 		m_sweep.t0 = 1.0f;
 		m_sweep.a0 = m_sweep.a = bd.angle;
 		m_sweep.c.set(XForm.mul(m_xf, m_sweep.localCenter));
 		m_sweep.c0.set(m_sweep.c);
-		
+
 		m_jointList = null;
 		m_contactList = null;
 		m_prev = null;
 		m_next = null;
-		
+
 		m_linearDamping = bd.linearDamping;
 		m_angularDamping = bd.angularDamping;
-		
+
 		m_force = new Vec2(0.0f, 0.0f);
 		m_torque = 0.0f;
-		
+
 		m_linearVelocity = new Vec2(0.0f, 0.0f);
 		m_angularVelocity = 0.0f;
-		
+
 		m_sleepTime = 0.0f;
-		
+
 		m_invMass = 0.0f;
 		m_I = 0.0f;
 		m_invI = 0.0f;
-		
+
 		m_mass = bd.massData.mass;
-		
+
 		if (m_mass > 0.0f) {
 			m_invMass = 1.0f / m_mass;
 		}
-		
+
 		if ((m_flags & Body.e_fixedRotationFlag) == 0) {
 			m_I = bd.massData.I;
 		}
-		
+
 		if (m_I > 0.0f) {
 			m_invI = 1.0f / m_I;
 		}
-		
+
 		if (m_invMass == 0.0f && m_invI == 0.0f) {
 			m_type = e_staticType;
 		} else {
 			m_type = e_dynamicType;
 		}
-		
+
 		m_userData = bd.userData;
-		
+
 		m_shapeList = null;
 		m_shapeCount = 0;
-		
+
 	}
-	
+
 	// djm this isn't a hot method, allocation is just fine
-	private float connectEdges(EdgeShape s1, EdgeShape s2, float angle1) {
-		float angle2 = (float)Math.atan2(s2.getDirectionVector().y, s2.getDirectionVector().x);
-		
-		Vec2 core = s2.getDirectionVector().mul( (float)Math.tan((angle2 - angle1) * 0.5f)) ;
+	private float connectEdges(final EdgeShape s1, final EdgeShape s2, final float angle1) {
+		final float angle2 = (float)Math.atan2(s2.getDirectionVector().y, s2.getDirectionVector().x);
+
+		final Vec2 core = s2.getDirectionVector().mul( (float)Math.tan((angle2 - angle1) * 0.5f)) ;
 		(core.subLocal(s2.getNormalVector())).mulLocal(Settings.toiSlop).addLocal(s2.getVertex1());
-		
-		Vec2 cornerDir = s1.getDirectionVector().add(s2.getDirectionVector());
+
+		final Vec2 cornerDir = s1.getDirectionVector().add(s2.getDirectionVector());
 		cornerDir.normalize();
-		
-		boolean convex = Vec2.dot(s1.getDirectionVector(), s2.getNormalVector()) > 0.0f;
+
+		final boolean convex = Vec2.dot(s1.getDirectionVector(), s2.getNormalVector()) > 0.0f;
 		s1.setNextEdge(s2, core, cornerDir, convex);
 		s2.setPrevEdge(s1, core, cornerDir, convex);
 		return angle2;
@@ -210,22 +222,22 @@ public class Body {
 	 * @param def the shape definition.
 	 */
 	// djm not a hot method, allocations are fine
-	public Shape createShape(ShapeDef def){
+	public Shape createShape(final ShapeDef def){
 		assert(m_world.m_lock == false);
 
 		if (m_world.m_lock == true){
 			return null;
 		}
-		
+
 		// TODO: Decide on a better place to initialize edgeShapes. (b2Shape::Create() can't
 		//       return more than one shape to add to parent body... maybe it should add
 		//       shapes directly to the body instead of returning them?)
 		if (def.type == ShapeType.EDGE_SHAPE) {
-			EdgeChainDef edgeDef = (EdgeChainDef)def;
+			final EdgeChainDef edgeDef = (EdgeChainDef)def;
 			Vec2 v1;// = new Vec2();
 			Vec2 v2;// = new Vec2();
 			int i = 0;
-			
+
 			if (edgeDef.isLoop()) {
 				v1 = edgeDef.getVertices().get(edgeDef.getVertexCount()-1);
 				i = 0;
@@ -233,14 +245,14 @@ public class Body {
 				v1 = edgeDef.getVertices().get(0);
 				i = 1;
 			}
-			
+
 			EdgeShape s0 = null;
 			EdgeShape s1 = null;
 			EdgeShape s2 = null;
 			float angle = 0.0f;
 			for (; i < edgeDef.getVertexCount(); i++) {
 				v2 = edgeDef.getVertices().get(i);
-				
+
 				s2 = new EdgeShape(v1, v2, def);
 				s2.m_next = m_shapeList;
 				m_shapeList = s2;
@@ -248,7 +260,7 @@ public class Body {
 				s2.m_body = this;
 				s2.createProxy(m_world.m_broadPhase, m_xf);
 				s2.updateSweepRadius(m_sweep.localCenter);
-				
+
 				if (s1 == null) {
 					s0 = s2;
 					angle = (float)Math.atan2(s2.getDirectionVector().y, s2.getDirectionVector().x);
@@ -258,12 +270,14 @@ public class Body {
 				s1 = s2;
 				v1 = v2;
 			}
-			if (edgeDef.isLoop()) connectEdges(s1, s0, angle);
+			if (edgeDef.isLoop()) {
+				connectEdges(s1, s0, angle);
+			}
 			return s0;
 		}
 
 
-		Shape s = Shape.create(def);
+		final Shape s = Shape.create(def);
 
 		s.m_next = m_shapeList;
 		m_shapeList = s;
@@ -279,15 +293,15 @@ public class Body {
 
 		return s;
 	}
-	
-	/** 
+
+	/**
 	 * Destroy a shape. This removes the shape from the broad-phase and
 	 * therefore destroys any contacts associated with this shape. All shapes
 	 * attached to a body are implicitly destroyed when the body is destroyed.
 	 * <BR><em>Warning</em>: This function is locked during callbacks.
 	 * @param s the shape to be removed.
 	 */
-	public void destroyShape(Shape s){
+	public void destroyShape(final Shape s){
 		assert(m_world.m_lock == false);
 		if (m_world.m_lock == true) {
 			return;
@@ -297,7 +311,7 @@ public class Body {
 		s.destroyProxy(m_world.m_broadPhase);
 
 		assert(m_shapeCount > 0);
-		
+
 		// Remove s from linked list, fix up connections
 		// TODO: verify that this works right
 		Shape node = m_shapeList;
@@ -325,14 +339,14 @@ public class Body {
 		{
 			if (*node == s)
 			{
-				*node = s->m_next;
+		 *node = s->m_next;
 				found = true;
 				break;
 			}
 
 			node = &(*node)->m_next;
 		}
-		*/
+		 */
 
 		// You tried to remove a shape that is not attached to this body.
 		assert(found);
@@ -343,46 +357,48 @@ public class Body {
 		--m_shapeCount;
 		Shape.destroy(s);
 	}
-	
+
 	/**
 	 * Set the mass properties. Note that this changes the center of mass position.
 	 * If you are not sure how to compute mass properties, use setMassFromShapes().
 	 * The inertia tensor is assumed to be relative to the center of mass.
 	 * @param massData the mass properties.
 	 */
-	public void setMass(MassData massData){
+	public void setMass(final MassData massData){
 		assert(m_world.m_lock == false);
-		if (m_world.m_lock == true) return;
-		
+		if (m_world.m_lock == true) {
+			return;
+		}
+
 		m_invMass = 0.0f;
 		m_I = 0.0f;
 		m_invI = 0.0f;
-		
+
 		m_mass = massData.mass;
-		
+
 		if (m_mass > 0.0f) {
 			m_invMass = 1.0f / m_mass;
 		}
-		
+
 		if ((m_flags & Body.e_fixedRotationFlag) == 0) {
 			m_I = massData.I;
 		}
-		
+
 		if (m_I > 0.0f) {
 			m_invI = 1.0f / m_I;
 		}
-		
+
 		// Move center of mass.
 		m_sweep.localCenter.set(massData.center);
 		XForm.mulToOut(m_xf, m_sweep.localCenter,m_sweep.c);
 		m_sweep.c0.set(m_sweep.c);
-		
+
 		// Update the sweep radii of all child shapes
 		for (Shape s = m_shapeList; s != null; s = s.m_next) {
 			s.updateSweepRadius(m_sweep.localCenter);
 		}
-		
-		int oldType = m_type;
+
+		final int oldType = m_type;
 		if (m_invMass == 0.0f && m_invI == 0.0f) {
 			m_type = e_staticType;
 		} else {
@@ -398,39 +414,41 @@ public class Body {
 		}
 	}
 
-	/** 
+	/**
 	 * Compute the mass properties from the attached shapes. You typically call this
 	 * after adding all the shapes. If you add or remove shapes later, you may want
 	 * to call this again. Note that this changes the center of mass position.
 	 */
 	public void setMassFromShapes(){
 		assert(m_world.m_lock == false);
-		if (m_world.m_lock == true) return;
-		
+		if (m_world.m_lock == true) {
+			return;
+		}
+
 		// Compute mass data from shapes.  Each shape has its own density.
 		m_mass = 0.0f;
 		m_invMass = 0.0f;
 		m_I = 0.0f;
 		m_invI = 0.0f;
-		
+
 		// djm might as well allocate, not really a hot path
-		Vec2 center = new Vec2();
+		final Vec2 center = new Vec2();
 		for (Shape s = m_shapeList; s != null; s = s.m_next) {
-			MassData massData = new MassData();
+			final MassData massData = new MassData();
 			s.computeMass(massData);
 			m_mass += massData.mass;
 			center.x += massData.mass * massData.center.x;
 			center.y += massData.mass * massData.center.y;
 			m_I += massData.I;
 		}
-		
+
 		// Compute center of mass, and shift the origin to the COM
 		if (m_mass > 0.0f) {
 			m_invMass = 1.0f / m_mass;
 			center.x *= m_invMass;
 			center.y *= m_invMass;
 		}
-		
+
 		if (m_I > 0.0f && (m_flags & e_fixedRotationFlag) == 0) {
 			// Center the inertia about the center of mass
 			m_I -= m_mass * Vec2.dot(center, center);
@@ -440,18 +458,18 @@ public class Body {
 			m_I = 0.0f;
 			m_invI = 0.0f;
 		}
-		
+
 		// Move center of mass
 		m_sweep.localCenter.set(center);
 		XForm.mulToOut(m_xf, m_sweep.localCenter, m_sweep.c);
 		m_sweep.c0.set(m_sweep.c);
-		
+
 		// Update the sweep radii of all child shapes
 		for (Shape s = m_shapeList; s != null; s = s.m_next) {
 			s.updateSweepRadius(m_sweep.localCenter);
 		}
-		
-		int oldType = m_type;
+
+		final int oldType = m_type;
 		if (m_invMass == 0.0f && m_invI == 0.0f) {
 			m_type = e_staticType;
 		} else {
@@ -465,7 +483,7 @@ public class Body {
 			}
 		}
 	}
-	
+
 	/**
 	 * Set the position of the body's origin and rotation (radians).
 	 * This breaks any contacts and wakes the other bodies.
@@ -475,10 +493,14 @@ public class Body {
 	 * @return false if the movement put a shape outside the world. In this case the
 	 * body is automatically frozen.
 	 */
-	public boolean setXForm(Vec2 position, float angle){
+	public boolean setXForm(final Vec2 position, final float angle){
 		assert(m_world.m_lock == false);
-		if (m_world.m_lock == true) return true;
-		if (isFrozen())	return false;
+		if (m_world.m_lock == true) {
+			return true;
+		}
+		if (isFrozen()) {
+			return false;
+		}
 
 		m_xf.R.set(angle);
 		m_xf.position.set(position);
@@ -490,7 +512,7 @@ public class Body {
 		boolean freeze = false;
 
 		for (Shape s = m_shapeList; s != null; s = s.m_next) {
-			boolean inRange = s.synchronize(m_world.m_broadPhase, m_xf, m_xf);
+			final boolean inRange = s.synchronize(m_world.m_broadPhase, m_xf, m_xf);
 
 			if (inRange == false) {
 				freeze = true;
@@ -515,17 +537,17 @@ public class Body {
 
 		return true;
 	}
-	
+
 	/**
 	 * Get a copy of the body transform for the body's origin.
 	 * @return the world transform of the body's origin.
 	 */
 	public XForm getXForm(){
-		XForm xf = new XForm();
+		final XForm xf = new XForm();
 		xf.set(m_xf);
 		return xf;
 	}
-	
+
 	/**
 	 * More for internal use.  It isn't copied,
 	 * so don't modify it.  instead try to use {@link #setXForm(Vec2, float)}.
@@ -545,7 +567,7 @@ public class Body {
 	 * which returns the center of mass (which actually has
 	 * some physical significance).
 	 * <p>
-	 * Just in case you do want to use this, 
+	 * Just in case you do want to use this,
 	 * Get a copy of the world body origin position.  This
 	 * is not necessarily the same as the center of mass.
 	 * In fact, it's not anything in particular.  Just a
@@ -556,7 +578,7 @@ public class Body {
 	public Vec2 getPosition(){
 		return m_xf.position.clone();
 	}
-	
+
 	/**
 	 * This is more for internal use.  It isn't copied, so don't
 	 * modify it.  This is the position of the body's XForm
@@ -578,7 +600,7 @@ public class Body {
 		return m_sweep.a;
 	}
 
-	/** 
+	/**
 	 * Get a copy of the world position of the center of mass.
 	 * @return a copy of the world position
 	 */
@@ -586,7 +608,7 @@ public class Body {
 		return m_sweep.c.clone();
 	}
 
-	/** 
+	/**
 	 * More for internal use. It isn't copied, so don't
 	 * modify it.  Modifying this will not do what you want,
 	 * instead use {@link #setXForm(Vec2, float)}
@@ -597,15 +619,15 @@ public class Body {
 		return m_sweep.c;
 	}
 
-	/** 
+	/**
 	 * Get local position of the center of mass.
 	 * @return a copy of the local position of the center of mass
 	 */
 	public Vec2 getLocalCenter(){
 		return m_sweep.localCenter.clone();
 	}
-	
-	/** 
+
+	/**
 	 * More for internal use. It isn't a copy, so don't
 	 * modify it.
 	 * @return the local position of the center of mass
@@ -618,7 +640,7 @@ public class Body {
 	 * Set the linear velocity of the center of mass.
 	 * @param v the new linear velocity of the center of mass.
 	 */
-	public void setLinearVelocity(Vec2 v){
+	public void setLinearVelocity(final Vec2 v){
 		m_linearVelocity.set(v);
 	}
 
@@ -635,11 +657,11 @@ public class Body {
 	 * Set the angular velocity.
 	 * @param omega the new angular velocity in radians/second.
 	 */
-	public void setAngularVelocity(float omega){
+	public void setAngularVelocity(final float omega){
 		m_angularVelocity = omega;
 	}
 
-	/** 
+	/**
 	 * Get the angular velocity.
 	 * @return the angular velocity in radians/second.
 	 */
@@ -655,8 +677,10 @@ public class Body {
 	 * @param point the world position of the point of application.
 	 */
 	// djm only one instantiated object, so we inline
-	public void applyForce(Vec2 force, Vec2 point){
-		if (isSleeping()) wakeUp();
+	public void applyForce(final Vec2 force, final Vec2 point){
+		if (isSleeping()) {
+			wakeUp();
+		}
 		m_force.addLocal(force);
 		//m_torque += Vec2.cross(point.sub(m_sweep.c), force);
 		m_torque += (point.x - m_sweep.c.x) * force.y - (point.y - m_sweep.c.y) * force.x;
@@ -668,8 +692,10 @@ public class Body {
 	 * This wakes up the body.
 	 * @param torque about the z-axis (out of the screen), usually in N-m.
 	 */
-	public void applyTorque(float torque){
-		if (isSleeping()) wakeUp();
+	public void applyTorque(final float torque){
+		if (isSleeping()) {
+			wakeUp();
+		}
 		m_torque += torque;
 	}
 
@@ -681,10 +707,12 @@ public class Body {
 	 * @param point the world position of the point of application.
 	 */
 	// djm only one allocation, so we inline
-	public void applyImpulse(Vec2 impulse, Vec2 point){
-		if (isSleeping()) wakeUp();
+	public void applyImpulse(final Vec2 impulse, final Vec2 point){
+		if (isSleeping()) {
+			wakeUp();
+		}
 		m_linearVelocity.x += m_invMass * impulse.x;
-		m_linearVelocity.y += m_invMass * impulse.y;		
+		m_linearVelocity.y += m_invMass * impulse.y;
 		//m_angularVelocity += m_invI * Vec2.cross(point.sub(m_sweep.c), impulse);
 		m_angularVelocity += m_invI * ((point.x - m_sweep.c.x) * impulse.y - (point.y - m_sweep.c.y) * impulse.x);
 	}
@@ -705,33 +733,34 @@ public class Body {
 		return m_I;
 	}
 
-	/** 
+	/**
 	 * Get the world coordinates of a point given the local coordinates.
 	 * @param localPoint a point on the body measured relative the the body's origin.
 	 * @return the same point expressed in world coordinates.
 	 */
-	public Vec2 getWorldLocation(Vec2 localPoint){
+	public Vec2 getWorldLocation(final Vec2 localPoint){
 		return XForm.mul(m_xf, localPoint);
 	}
-	
-	/** 
+
+	/**
 	 * Get the world coordinates of a point given the local coordinates.
 	 * @param localPoint a point on the body measured relative the the body's origin.
 	 * @param out where to put the same point expressed in world coordinates.
 	 */
-	public void getWorldLocationToOut(Vec2 localPoint, Vec2 out){
+	public void getWorldLocationToOut(final Vec2 localPoint, final Vec2 out){
 		// TODO optimize engine methods that call
 		// getWorldLocation to use this one
 		XForm.mulToOut( m_xf, localPoint, out);
 	}
-	
+
 	/**
 	 * Get the world coordinates of a point given the local coordinates.
 	 * @param localPoint a point on the body measured relative the the body's origin.
 	 * @return the same point expressed in world coordinates.
 	 * @deprecated Use getWorldLocation instead (clearer naming convention)
 	 */
-	public Vec2 getWorldPoint(Vec2 localPoint) {
+	@Deprecated
+	public Vec2 getWorldPoint(final Vec2 localPoint) {
 		return getWorldLocation(localPoint);
 	}
 
@@ -741,25 +770,26 @@ public class Body {
 	 * @return the same vector expressed in world coordinates.
 	 * @deprecated Use getWorldDirection instead (clearer naming convention)
 	 */
-	public Vec2 getWorldVector(Vec2 localVector){
+	@Deprecated
+	public Vec2 getWorldVector(final Vec2 localVector){
 		return getWorldDirection(localVector);
 	}
-	
+
 	/**
 	 * Get the world coordinates of a direction given the local direction.
 	 * @param localDirection a vector fixed in the body.
 	 * @return the same vector expressed in world coordinates.
 	 */
-	public Vec2 getWorldDirection(Vec2 localDirection) {
+	public Vec2 getWorldDirection(final Vec2 localDirection) {
 		return Mat22.mul(m_xf.R, localDirection);
 	}
-	
+
 	/**
 	 * Get the world coordinates of a direction given the local direction.
 	 * @param localDirection a vector fixed in the body.
 	 * @param out where to put the same vector expressed in world coordinates.
 	 */
-	public void getWorldDirectionToOut(Vec2 localDirection, Vec2 out){
+	public void getWorldDirectionToOut(final Vec2 localDirection, final Vec2 out){
 		// TODO optimize engine methods that use
 		// getWorldDirection with this one
 		Mat22.mulToOut( m_xf.R, localDirection, out);
@@ -770,36 +800,36 @@ public class Body {
 	 * @param worldPoint a point in world coordinates.
 	 * @return the corresponding local point relative to the body's origin.
 	 */
-	public Vec2 getLocalPoint(Vec2 worldPoint){
+	public Vec2 getLocalPoint(final Vec2 worldPoint){
 		return XForm.mulTrans(m_xf, worldPoint);
 	}
-	
+
 	/**
 	 * Gets a local point relative to the body's origin given a world point.
 	 * @param worldPoint a point in world coordinates.
 	 * @param out where to put the the corresponding local point relative to the body's origin.
 	 */
-	public void getLocalPointToOut(Vec2 worldPoint, Vec2 out){
+	public void getLocalPointToOut(final Vec2 worldPoint, final Vec2 out){
 		// TODO optimized engine methods that
 		// use getLocalPoint to use this one
 		XForm.mulTransToOut(m_xf, worldPoint, out);
 	}
 
-	/** 
+	/**
 	 * Gets a local vector given a world vector.
 	 * @param worldVector a vector in world coordinates.
 	 * @return the corresponding local vector.
 	 */
-	public Vec2 getLocalVector(Vec2 worldVector){
+	public Vec2 getLocalVector(final Vec2 worldVector){
 		return Mat22.mulTrans(m_xf.R, worldVector);
 	}
-	
-	/** 
+
+	/**
 	 * Gets a local vector given a world vector.
 	 * @param worldVector a vector in world coordinates.
 	 * @param out where to put the corresponding local vector.
 	 */
-	public void getLocalVectorToOut(Vec2 worldVector, Vec2 out){
+	public void getLocalVectorToOut(final Vec2 worldVector, final Vec2 out){
 		// TODO optimized engine methods that
 		// use getLocalVector to use this one
 		Mat22.mulToOut( m_xf.R, worldVector, out);
@@ -810,11 +840,11 @@ public class Body {
 		return (m_flags & e_bulletFlag) == e_bulletFlag;
 	}
 
-	/** 
-	 * Should this body be treated like a bullet for continuous collision detection? 
+	/**
+	 * Should this body be treated like a bullet for continuous collision detection?
 	 * Use sparingly, as continuous collision detection can be expensive.
 	 */
-	public void setBullet(boolean flag){
+	public void setBullet(final boolean flag){
 		if (flag) {
 			m_flags |= e_bulletFlag;
 		} else {
@@ -843,7 +873,7 @@ public class Body {
 	}
 
 	/** Set to false to prevent this body from sleeping due to inactivity. */
-	public void allowSleeping(boolean flag){
+	public void allowSleeping(final boolean flag){
 		if (flag) {
 			m_flags |= e_allowSleepFlag;
 		} else {
@@ -892,7 +922,7 @@ public class Body {
 	public Object getUserData(){
 		return m_userData;
 	}
-	
+
 	/* INTERNALS BELOW */
 
 	/** For internal use only. */
@@ -901,7 +931,7 @@ public class Body {
 	}
 
 	// djm pooled
-	private XForm xf1 = new XForm();
+	private final XForm xf1 = new XForm();
 	/** For internal use only. */
 	public boolean synchronizeShapes(){
 		// INLINED
@@ -910,13 +940,15 @@ public class Body {
 		//xf1.position.set(m_sweep.c0.sub(Mat22.mul(xf1.R, m_sweep.localCenter)));
 		xf1.R.set(m_sweep.a0);
 		xf1.position.set(m_sweep.c0.x - xf1.R.col1.x * m_sweep.localCenter.x + xf1.R.col2.x * m_sweep.localCenter.y, m_sweep.c0.y - xf1.R.col1.y * m_sweep.localCenter.x + xf1.R.col2.y * m_sweep.localCenter.y);
-		
+
 		boolean inRange = true;
 		for (Shape s = m_shapeList; s != null; s = s.m_next) {
 			inRange = s.synchronize(m_world.m_broadPhase, xf1, m_xf);
-			if (inRange == false) break;
+			if (inRange == false) {
+				break;
+			}
 		}
-		
+
 		if (inRange == false) {
 			m_flags |= e_frozenFlag;
 			m_linearVelocity.setZero();
@@ -924,11 +956,11 @@ public class Body {
 			for (Shape s = m_shapeList; s != null; s = s.m_next) {
 				s.destroyProxy(m_world.m_broadPhase);
 			}
-			
+
 			// Failure
 			return false;
 		}
-		
+
 		// Success
 		return true;
 	}
@@ -937,7 +969,7 @@ public class Body {
 	public void synchronizeTransform(){
 		m_xf.R.set(m_sweep.a);
 		//m_xf.position.set(m_sweep.c.sub(Mat22.mul(m_xf.R,m_sweep.localCenter)));
-		Vec2 v1 = m_sweep.localCenter;
+		final Vec2 v1 = m_sweep.localCenter;
 		m_xf.position.x = m_sweep.c.x - (m_xf.R.col1.x * v1.x + m_xf.R.col2.x * v1.y);
 		m_xf.position.y = m_sweep.c.y - (m_xf.R.col1.y * v1.x + m_xf.R.col2.y * v1.y);
 		//System.out.println(m_xf);
@@ -948,7 +980,7 @@ public class Body {
 	 * It may lie, depending on the collideConnected flag, so
 	 * it won't be very useful external to the engine.
 	 */
-	public boolean isConnected(Body other){
+	public boolean isConnected(final Body other){
 		for (JointEdge jn = m_jointList; jn != null; jn = jn.next) {
 			if (jn.other == other) {
 				//System.out.println("connected");
@@ -959,27 +991,27 @@ public class Body {
 	}
 
 	/** For internal use only. */
-	public void advance(float t){
+	public void advance(final float t){
 		// Advance to the new safe time
 		m_sweep.advance(t);
 		m_sweep.c.set(m_sweep.c0);
 		m_sweep.a = m_sweep.a0;
 		synchronizeTransform();
 	}
-	
+
 	/**
 	 * Get the world linear velocity of a world point attached to this body.
 	 * @param worldPoint a point in world coordinates.
 	 * @return the world velocity of a point.
 	 */
 	// djm optimized
-	public Vec2 getLinearVelocityFromWorldPoint(Vec2 worldPoint) {
-		float ax = worldPoint.x - m_sweep.c.x;
-		float ay = worldPoint.y - m_sweep.c.y;
-		float vx = -m_angularVelocity * ay;
-		float vy = m_angularVelocity * ax;
+	public Vec2 getLinearVelocityFromWorldPoint(final Vec2 worldPoint) {
+		final float ax = worldPoint.x - m_sweep.c.x;
+		final float ay = worldPoint.y - m_sweep.c.y;
+		final float vx = -m_angularVelocity * ay;
+		final float vy = m_angularVelocity * ax;
 		return new Vec2(m_linearVelocity.x + vx, m_linearVelocity.y + vy);
-		
+
 		/*Vec2 out = new Vec2(worldPoint);
 		out.subLocal( m_sweep.c);
 		Vec2.crossToOut(m_angularVelocity, out, out);
@@ -987,18 +1019,18 @@ public class Body {
 		return out;*/
 		//return m_linearVelocity.add(Vec2.cross(m_angularVelocity, worldPoint.sub(m_sweep.c)));
 	}
-	
+
 	/**
 	 * Get the world linear velocity of a world point attached to this body.
 	 * @param worldPoint a point in world coordinates.
 	 * @param out where to put the world velocity of a point.
 	 */
 	// djm optimized
-	public void getLinearVelocityFromWorldPointToOut(Vec2 worldPoint, Vec2 out) {
-		float ax = worldPoint.x - m_sweep.c.x;
-		float ay = worldPoint.y - m_sweep.c.y;
-		float vx = -m_angularVelocity * ay;
-		float vy = m_angularVelocity * ax;
+	public void getLinearVelocityFromWorldPointToOut(final Vec2 worldPoint, final Vec2 out) {
+		final float ax = worldPoint.x - m_sweep.c.x;
+		final float ay = worldPoint.y - m_sweep.c.y;
+		final float vx = -m_angularVelocity * ay;
+		final float vy = m_angularVelocity * ax;
 		out.set(m_linearVelocity.x + vx, m_linearVelocity.y + vy);
 		/*
 		out.set( worldPoint);
@@ -1013,13 +1045,13 @@ public class Body {
 	 * @return the world velocity of a point.
 	 */
 	// djm optimized
-	public Vec2 getLinearVelocityFromLocalPoint(Vec2 localPoint) {
-		Vec2 out = new Vec2();
+	public Vec2 getLinearVelocityFromLocalPoint(final Vec2 localPoint) {
+		final Vec2 out = new Vec2();
 		getWorldLocationToOut(localPoint, out);
-		float ax = out.x - m_sweep.c.x;
-		float ay = out.y - m_sweep.c.y;
-		float vx = -m_angularVelocity * ay;
-		float vy = m_angularVelocity * ax;
+		final float ax = out.x - m_sweep.c.x;
+		final float ay = out.y - m_sweep.c.y;
+		final float vx = -m_angularVelocity * ay;
+		final float vy = m_angularVelocity * ax;
 		out.x = m_linearVelocity.x + vx;
 		out.y = m_linearVelocity.y + vy;
 		return out;
@@ -1027,25 +1059,25 @@ public class Body {
 		//getLinearVelocityFromWorldPointToOut(worldLocation, worldLocation);
 		//return worldLocation;
 	}
-	
+
 	/**
 	 * Get the world velocity of a local point.
 	 * @param localPoint a point in local coordinates.
 	 * @param out where to put the world velocity of a point.
 	 */
 	// djm optimized
-	public void getLinearVelocityFromLocalPointToOut(Vec2 localPoint, Vec2 out) {
+	public void getLinearVelocityFromLocalPointToOut(final Vec2 localPoint, final Vec2 out) {
 		//getWorldLocationToOut(localPoint, out);
 		//getLinearVelocityFromWorldPointToOut(out, out);
 		getWorldLocationToOut(localPoint, out);
-		float ax = out.x - m_sweep.c.x;
-		float ay = out.y - m_sweep.c.y;
-		float vx = -m_angularVelocity * ay;
-		float vy = m_angularVelocity * ax;
+		final float ax = out.x - m_sweep.c.x;
+		final float ay = out.y - m_sweep.c.y;
+		final float vx = -m_angularVelocity * ay;
+		final float vy = m_angularVelocity * ax;
 		out.x = m_linearVelocity.x + vx;
 		out.y = m_linearVelocity.y + vy;
 	}
-	
+
 	/**
 	 * Put this body to sleep so it will stop simulating.
 	 * This also sets the velocity to zero.
@@ -1058,14 +1090,14 @@ public class Body {
 		m_force.setZero();
 		m_torque = 0.0f;
 	}
-	
-	public void setUserData(Object data) {
+
+	public void setUserData(final Object data) {
 		m_userData = data;
 	}
-	
+
 	public World getWorld() {
 		return m_world;
 	}
-	
+
 }
 

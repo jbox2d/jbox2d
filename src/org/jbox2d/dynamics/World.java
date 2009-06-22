@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -25,8 +25,6 @@ package org.jbox2d.dynamics;
 
 import java.util.ArrayList;
 
-import org.jbox2d.common.Color3f;
-
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.BroadPhase;
 import org.jbox2d.collision.OBB;
@@ -40,10 +38,19 @@ import org.jbox2d.collision.shapes.PointShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.ShapeType;
-import org.jbox2d.common.*;
+import org.jbox2d.common.Color3f;
+import org.jbox2d.common.Mat22;
+import org.jbox2d.common.Settings;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
-import org.jbox2d.dynamics.joints.*;
+import org.jbox2d.dynamics.joints.ConstantVolumeJoint;
+import org.jbox2d.dynamics.joints.Joint;
+import org.jbox2d.dynamics.joints.JointDef;
+import org.jbox2d.dynamics.joints.JointEdge;
+import org.jbox2d.dynamics.joints.JointType;
+import org.jbox2d.dynamics.joints.PulleyJoint;
 import org.jbox2d.testbed.tests.LiquidTest;
 
 
@@ -62,55 +69,55 @@ import org.jbox2d.testbed.tests.LiquidTest;
  */
 public class World {
 	boolean m_lock;
-	
-    BroadPhase m_broadPhase;
 
-    ContactManager m_contactManager;
+	BroadPhase m_broadPhase;
 
-    Body m_bodyList;
+	ContactManager m_contactManager;
 
-    /** Do not access, won't be useful! */
-    Contact m_contactList;
+	Body m_bodyList;
 
-    Joint m_jointList;
+	/** Do not access, won't be useful! */
+	Contact m_contactList;
 
-    int m_bodyCount;
+	Joint m_jointList;
 
-    int m_contactCount;
+	int m_bodyCount;
 
-    int m_jointCount;
+	int m_contactCount;
 
-    Vec2 m_gravity;
+	int m_jointCount;
 
-    boolean m_allowSleep;
+	Vec2 m_gravity;
 
-    Body m_groundBody;
-    
-    int m_positionIterationCount;
+	boolean m_allowSleep;
 
-    /** Should we apply position correction? */
-    boolean m_positionCorrection;
-    /** Should we use warm-starting?  Improves stability in stacking scenarios. */
-    boolean m_warmStarting;
-    /** Should we enable continuous collision detection? */
-    boolean m_continuousPhysics;
-    
+	Body m_groundBody;
+
+	int m_positionIterationCount;
+
+	/** Should we apply position correction? */
+	boolean m_positionCorrection;
+	/** Should we use warm-starting?  Improves stability in stacking scenarios. */
+	boolean m_warmStarting;
+	/** Should we enable continuous collision detection? */
+	boolean m_continuousPhysics;
+
 	DestructionListener m_destructionListener;
 	BoundaryListener m_boundaryListener;
 	ContactFilter m_contactFilter;
 	ContactListener m_contactListener;
 	DebugDraw m_debugDraw;
-	
+
 	boolean m_drawDebugData;
-	
+
 	private float m_inv_dt0;
 
-	private ArrayList<Steppable> postStepList;
-	
-	public void setDrawDebugData(boolean tf) {
+	private final ArrayList<Steppable> postStepList;
+
+	public void setDrawDebugData(final boolean tf) {
 		m_drawDebugData = tf;
 	}
-	
+
 	public boolean isDrawingDebugData() {
 		return m_drawDebugData;
 	}
@@ -131,10 +138,10 @@ public class World {
 	}
 
 	/** Change the global gravity vector. */
-	public void setGravity(Vec2 gravity) {
+	public void setGravity(final Vec2 gravity) {
 		m_gravity = gravity;
 	}
-	
+
 	/** Get a clone of the global gravity vector.
 	 * @return Clone of gravity vector
 	 */
@@ -146,34 +153,34 @@ public class World {
 	 *	You can use this to simplify the creation of joints and static shapes.
 	 */
 	public Body getGroundBody() {
-        return m_groundBody;
-    }
-	
+		return m_groundBody;
+	}
+
 	/**
 	 * Get the world body list. With the returned body, use Body.getNext() to get
 	 * the next body in the world list. A NULL body indicates the end of the list.
 	 * @return the head of the world body list.
 	 */
-    public Body getBodyList() {
-        return m_bodyList;
-    }
+	public Body getBodyList() {
+		return m_bodyList;
+	}
 
-    /**
-     * Get the world joint list. With the returned joint, use Joint.getNext() to get
-     * the next joint in the world list. A NULL joint indicates the end of the list.
+	/**
+	 * Get the world joint list. With the returned joint, use Joint.getNext() to get
+	 * the next joint in the world list. A NULL joint indicates the end of the list.
 	 * @return the head of the world joint list.
 	 */
-    public Joint getJointList() {
-        return m_jointList;
-    }
+	public Joint getJointList() {
+		return m_jointList;
+	}
 
-    /**
-     * Construct a world object.
-     * @param worldAABB a bounding box that completely encompasses all your shapes.
+	/**
+	 * Construct a world object.
+	 * @param worldAABB a bounding box that completely encompasses all your shapes.
 	 * @param gravity the world gravity vector.
 	 * @param doSleep improve performance by not simulating inactive bodies.
-     */
-	public World(AABB worldAABB, Vec2 gravity, boolean doSleep) {
+	 */
+	public World(final AABB worldAABB, final Vec2 gravity, final boolean doSleep) {
 		m_positionCorrection = true;
 		m_warmStarting = true;
 		m_continuousPhysics = true;
@@ -182,83 +189,83 @@ public class World {
 		m_contactFilter = ContactFilter.DEFAULT_FILTER;//&b2_defaultFilter;
 		m_contactListener = null;
 		m_debugDraw = null;
-		
+
 		m_inv_dt0 = 0.0f;
-		
-        m_bodyList = null;
-        m_contactList = null;
-        m_jointList = null;
 
-        m_bodyCount = 0;
-        m_contactCount = 0;
-        m_jointCount = 0;
-        
-        m_lock = false;
+		m_bodyList = null;
+		m_contactList = null;
+		m_jointList = null;
 
-        m_allowSleep = doSleep;
+		m_bodyCount = 0;
+		m_contactCount = 0;
+		m_jointCount = 0;
 
-        m_gravity = gravity;
+		m_lock = false;
 
-        m_contactManager = new ContactManager();
-        m_contactManager.m_world = this;
-        m_broadPhase = new BroadPhase(worldAABB, m_contactManager);
+		m_allowSleep = doSleep;
 
-        BodyDef bd = new BodyDef();
-        m_groundBody = createBody(bd);
-        postStepList = new ArrayList<Steppable>();
-        setDrawDebugData(true);
-    }
+		m_gravity = gravity;
+
+		m_contactManager = new ContactManager();
+		m_contactManager.m_world = this;
+		m_broadPhase = new BroadPhase(worldAABB, m_contactManager);
+
+		final BodyDef bd = new BodyDef();
+		m_groundBody = createBody(bd);
+		postStepList = new ArrayList<Steppable>();
+		setDrawDebugData(true);
+	}
 
 	/** Register a destruction listener. */
-    public void setDestructionListener(DestructionListener listener) {
-        m_destructionListener = listener;
-    }
-    
-    /** Register a broad-phase boundary listener. */
-    public void setBoundaryListener(BoundaryListener listener) {
-    	m_boundaryListener = listener;
-    }
+	public void setDestructionListener(final DestructionListener listener) {
+		m_destructionListener = listener;
+	}
 
-    /** Register a contact event listener */
-    public void setContactListener(ContactListener listener) {
-    	m_contactListener = listener;
-    }
-    
+	/** Register a broad-phase boundary listener. */
+	public void setBoundaryListener(final BoundaryListener listener) {
+		m_boundaryListener = listener;
+	}
 
-    /**
-     *  Register a contact filter to provide specific control over collision.
+	/** Register a contact event listener */
+	public void setContactListener(final ContactListener listener) {
+		m_contactListener = listener;
+	}
+
+
+	/**
+	 *  Register a contact filter to provide specific control over collision.
 	 *  Otherwise the default filter is used (b2_defaultFilter).
-     */
-    public void setContactFilter(ContactFilter filter) {
-    	m_contactFilter = filter;
-    }
-    
-    /**
+	 */
+	public void setContactFilter(final ContactFilter filter) {
+		m_contactFilter = filter;
+	}
+
+	/**
 	 * Register a routine for debug drawing. The debug draw functions are called
 	 * inside the World.step() method, so make sure your renderer is ready to
 	 * consume draw commands when you call step().
 	 */
-    public void setDebugDraw(DebugDraw debugDraw) {
-    	m_debugDraw = debugDraw;
-    }
-    
-    public DebugDraw getDebugDraw() {
-    	return m_debugDraw;
-    }
-    
-	
-	/** 
+	public void setDebugDraw(final DebugDraw debugDraw) {
+		m_debugDraw = debugDraw;
+	}
+
+	public DebugDraw getDebugDraw() {
+		return m_debugDraw;
+	}
+
+
+	/**
 	 * Create a body given a definition. No reference to the definition
 	 * is retained.  Body will be static unless mass is nonzero.
 	 * <BR><em>Warning</em>: This function is locked during callbacks.
 	 */
-	public Body createBody(BodyDef def) {
+	public Body createBody(final BodyDef def) {
 		assert(m_lock == false);
 		if (m_lock == true) {
 			return null;
 		}
 
-		Body b = new Body(def, this);
+		final Body b = new Body(def, this);
 
 		// Add to world doubly linked list.
 		b.m_prev = null;
@@ -271,14 +278,14 @@ public class World {
 
 		return b;
 	}
-    
+
 	/**
 	 * Destroy a rigid body given a definition. No reference to the definition
 	 * is retained. This function is locked during callbacks.
 	 * <BR><em>Warning</em>: This automatically deletes all associated shapes and joints.
 	 * <BR><em>Warning</em>: This function is locked during callbacks.
 	 */
-	public void destroyBody(Body b) {
+	public void destroyBody(final Body b) {
 		assert(m_bodyCount > 0);
 		assert(m_lock == false);
 		if (m_lock == true) {
@@ -288,7 +295,7 @@ public class World {
 		// Delete the attached joints.
 		JointEdge jn = b.m_jointList;
 		while (jn != null) {
-			JointEdge jn0 = jn;
+			final JointEdge jn0 = jn;
 			jn = jn.next;
 
 			if (m_destructionListener != null){
@@ -302,7 +309,7 @@ public class World {
 		// proxies and pairs, leading to the destruction of contacts.
 		Shape s = b.m_shapeList;
 		while (s != null) {
-			Shape s0 = s;
+			final Shape s0 = s;
 			s = s.m_next;
 
 			if (m_destructionListener != null) {
@@ -329,212 +336,214 @@ public class World {
 		--m_bodyCount;
 		//b->~b2Body();
 	}
-	
+
 	/**
 	 * Create a joint to constrain bodies together. No reference to the definition
 	 * is retained. This may cause the connected bodies to cease colliding.
 	 * <BR><em>Warning</em> This function is locked during callbacks.
 	 */
-    public Joint createJoint(JointDef def) {
-    	assert(m_lock == false);
-    	
-        Joint j = Joint.create(def);
+	public Joint createJoint(final JointDef def) {
+		assert(m_lock == false);
 
-        // Connect to the world list.
-        j.m_prev = null;
-        j.m_next = m_jointList;
-        if (m_jointList != null) {
-            m_jointList.m_prev = j;
-        }
-        m_jointList = j;
-        ++m_jointCount;
+		final Joint j = Joint.create(def);
 
-        // Connect to the bodies' doubly linked lists
-        j.m_node1.joint = j;
-        j.m_node1.other = j.m_body2;
-        j.m_node1.prev = null;
-        j.m_node1.next = j.m_body1.m_jointList;
-        if (j.m_body1.m_jointList != null) {
-            j.m_body1.m_jointList.prev = j.m_node1;
-        }
-        j.m_body1.m_jointList = j.m_node1;
+		// Connect to the world list.
+		j.m_prev = null;
+		j.m_next = m_jointList;
+		if (m_jointList != null) {
+			m_jointList.m_prev = j;
+		}
+		m_jointList = j;
+		++m_jointCount;
 
-        j.m_node2.joint = j;
-        j.m_node2.other = j.m_body1;
-        j.m_node2.prev = null;
-        j.m_node2.next = j.m_body2.m_jointList;
-        if (j.m_body2.m_jointList != null) {
-            j.m_body2.m_jointList.prev = j.m_node2;
-        }
-        j.m_body2.m_jointList = j.m_node2;
+		// Connect to the bodies' doubly linked lists
+		j.m_node1.joint = j;
+		j.m_node1.other = j.m_body2;
+		j.m_node1.prev = null;
+		j.m_node1.next = j.m_body1.m_jointList;
+		if (j.m_body1.m_jointList != null) {
+			j.m_body1.m_jointList.prev = j.m_node1;
+		}
+		j.m_body1.m_jointList = j.m_node1;
 
-        // If the joint prevents collisions, then reset collision filtering
-        if (def.collideConnected == false) {
-            // Reset the proxies on the body with the minimum number of shapes.
-            Body b = def.body1.m_shapeCount < def.body2.m_shapeCount ? def.body1
-                    : def.body2;
-            for (Shape s = b.m_shapeList; s != null; s = s.m_next) {
-                s.refilterProxy(m_broadPhase, b.getMemberXForm());
-            }
-        }
+		j.m_node2.joint = j;
+		j.m_node2.other = j.m_body1;
+		j.m_node2.prev = null;
+		j.m_node2.next = j.m_body2.m_jointList;
+		if (j.m_body2.m_jointList != null) {
+			j.m_body2.m_jointList.prev = j.m_node2;
+		}
+		j.m_body2.m_jointList = j.m_node2;
 
-        return j;
-    }
-    
+		// If the joint prevents collisions, then reset collision filtering
+		if (def.collideConnected == false) {
+			// Reset the proxies on the body with the minimum number of shapes.
+			final Body b = def.body1.m_shapeCount < def.body2.m_shapeCount ? def.body1
+			                                                               : def.body2;
+			for (Shape s = b.m_shapeList; s != null; s = s.m_next) {
+				s.refilterProxy(m_broadPhase, b.getMemberXForm());
+			}
+		}
+
+		return j;
+	}
+
 	/**
 	 * Destroy a joint. This may cause the connected bodies to begin colliding.
 	 * <BR><em>Warning</em>: This function is locked during callbacks.
 	 */
-	public void destroyJoint(Joint j) {
-    	assert(m_lock == false);
-    	
-        boolean collideConnected = j.m_collideConnected;
+	public void destroyJoint(final Joint j) {
+		assert(m_lock == false);
 
-        // Remove from the doubly linked list.
-        if (j.m_prev != null) {
-            j.m_prev.m_next = j.m_next;
-        }
+		final boolean collideConnected = j.m_collideConnected;
 
-        if (j.m_next != null) {
-            j.m_next.m_prev = j.m_prev;
-        }
+		// Remove from the doubly linked list.
+		if (j.m_prev != null) {
+			j.m_prev.m_next = j.m_next;
+		}
 
-        if (j == m_jointList) {
-            m_jointList = j.m_next;
-        }
+		if (j.m_next != null) {
+			j.m_next.m_prev = j.m_prev;
+		}
 
-        // Disconnect from island graph.
-        Body body1 = j.m_body1;
-        Body body2 = j.m_body2;
+		if (j == m_jointList) {
+			m_jointList = j.m_next;
+		}
 
-        // Wake up connected bodies.
-        body1.wakeUp();
-        body2.wakeUp();
+		// Disconnect from island graph.
+		final Body body1 = j.m_body1;
+		final Body body2 = j.m_body2;
 
-        // Remove from body 1
-        if (j.m_node1.prev != null) {
-            j.m_node1.prev.next = j.m_node1.next;
-        }
+		// Wake up connected bodies.
+		body1.wakeUp();
+		body2.wakeUp();
 
-        if (j.m_node1.next != null) {
-            j.m_node1.next.prev = j.m_node1.prev;
-        }
+		// Remove from body 1
+		if (j.m_node1.prev != null) {
+			j.m_node1.prev.next = j.m_node1.next;
+		}
 
-        if (j.m_node1 == body1.m_jointList) {
-            body1.m_jointList = j.m_node1.next;
-        }
+		if (j.m_node1.next != null) {
+			j.m_node1.next.prev = j.m_node1.prev;
+		}
 
-        j.m_node1.prev = null;
-        j.m_node1.next = null;
+		if (j.m_node1 == body1.m_jointList) {
+			body1.m_jointList = j.m_node1.next;
+		}
 
-        // Remove from body 2
-        if (j.m_node2.prev != null) {
-            j.m_node2.prev.next = j.m_node2.next;
-        }
+		j.m_node1.prev = null;
+		j.m_node1.next = null;
 
-        if (j.m_node2.next != null) {
-            j.m_node2.next.prev = j.m_node2.prev;
-        }
+		// Remove from body 2
+		if (j.m_node2.prev != null) {
+			j.m_node2.prev.next = j.m_node2.next;
+		}
 
-        if (j.m_node2 == body2.m_jointList) {
-            body2.m_jointList = j.m_node2.next;
-        }
+		if (j.m_node2.next != null) {
+			j.m_node2.next.prev = j.m_node2.prev;
+		}
 
-        j.m_node2.prev = null;
-        j.m_node2.next = null;
+		if (j.m_node2 == body2.m_jointList) {
+			body2.m_jointList = j.m_node2.next;
+		}
 
-        Joint.destroy(j);
+		j.m_node2.prev = null;
+		j.m_node2.next = null;
 
-        assert m_jointCount > 0;
-        --m_jointCount;
+		Joint.destroy(j);
 
-        // If the joint prevents collisions, then reset collision filtering.
-        if (collideConnected == false) {
-            // Reset the proxies on the body with the minimum number of shapes.
-            Body b = body1.m_shapeCount < body2.m_shapeCount ? body1 : body2;
-            for (Shape s = b.m_shapeList; s != null; s = s.m_next) {
-                s.refilterProxy(m_broadPhase, b.getMemberXForm());
-            }
-        }
-    }
-	
+		assert m_jointCount > 0;
+		--m_jointCount;
+
+		// If the joint prevents collisions, then reset collision filtering.
+		if (collideConnected == false) {
+			// Reset the proxies on the body with the minimum number of shapes.
+			final Body b = body1.m_shapeCount < body2.m_shapeCount ? body1 : body2;
+			for (Shape s = b.m_shapeList; s != null; s = s.m_next) {
+				s.refilterProxy(m_broadPhase, b.getMemberXForm());
+			}
+		}
+	}
+
 	/**
 	 * Take a time step. This performs collision detection, integration,
 	 * and constraint solution.
 	 * @param dt the amount of time to simulate, this should not vary.
 	 * @param iterations the number of iterations to be used by the constraint solver.
 	 */
-    public void step(float dt, int iterations) {
-    	m_lock = true;
+	public void step(final float dt, final int iterations) {
+		m_lock = true;
 
-    	TimeStep step = new TimeStep();
-    	step.dt = dt;
-    	step.maxIterations	= iterations;
-    	if (dt > 0.0f) {
-    		step.inv_dt = 1.0f / dt;
-    	} else {
-    		step.inv_dt = 0.0f;
-    	}
+		final TimeStep step = new TimeStep();
+		step.dt = dt;
+		step.maxIterations	= iterations;
+		if (dt > 0.0f) {
+			step.inv_dt = 1.0f / dt;
+		} else {
+			step.inv_dt = 0.0f;
+		}
 
-    	step.dtRatio = m_inv_dt0 * dt;
+		step.dtRatio = m_inv_dt0 * dt;
 
-    	step.positionCorrection = m_positionCorrection;
-    	step.warmStarting = m_warmStarting;
-    	
-    	// Update contacts.
-    	m_contactManager.collide();
+		step.positionCorrection = m_positionCorrection;
+		step.warmStarting = m_warmStarting;
 
-    	// Integrate velocities, solve velocity constraints, and integrate positions.
-    	if (step.dt > 0.0f) {
-    		solve(step);
-    	}
+		// Update contacts.
+		m_contactManager.collide();
 
-    	// Handle TOI events.
-    	if (m_continuousPhysics && step.dt > 0.0f) {
-    		solveTOI(step);
-    	}
+		// Integrate velocities, solve velocity constraints, and integrate positions.
+		if (step.dt > 0.0f) {
+			solve(step);
+		}
 
-    	// Draw debug information.
-    	drawDebugData();
+		// Handle TOI events.
+		if (m_continuousPhysics && step.dt > 0.0f) {
+			solveTOI(step);
+		}
 
-    	m_inv_dt0 = step.inv_dt;
-    	m_lock = false;
-    	
-    	postStep(dt,iterations);
-    }
-    
-    
-    /** Goes through the registered postStep functions and calls them. */
-    private void postStep(float dt, int iterations) {
-    	for (Steppable s:postStepList) {
-    		s.step(dt,iterations);
-    	}
-    }
-    
-    /**
-     * Registers a Steppable object to be stepped
-     * immediately following the physics step, once
-     * the locks are lifted.
-     * @param s
-     */
-    public void registerPostStep(Steppable s) {
-    	postStepList.add(s);
-    }
-    
-    /**
-     * Unregisters a method from post-stepping.
-     * Fails silently if method is not found.
-     * @param s
-     */
-    public void unregisterPostStep(Steppable s) {
-    	if (postStepList != null) postStepList.remove(s);
-    }
-    
-    /** Re-filter a shape. This re-runs contact filtering on a shape. */
-    public void refilter(Shape shape) {
-    	shape.refilterProxy(m_broadPhase, shape.getBody().getMemberXForm());
-    }
-	
+		// Draw debug information.
+		drawDebugData();
+
+		m_inv_dt0 = step.inv_dt;
+		m_lock = false;
+
+		postStep(dt,iterations);
+	}
+
+
+	/** Goes through the registered postStep functions and calls them. */
+	private void postStep(final float dt, final int iterations) {
+		for (final Steppable s:postStepList) {
+			s.step(dt,iterations);
+		}
+	}
+
+	/**
+	 * Registers a Steppable object to be stepped
+	 * immediately following the physics step, once
+	 * the locks are lifted.
+	 * @param s
+	 */
+	public void registerPostStep(final Steppable s) {
+		postStepList.add(s);
+	}
+
+	/**
+	 * Unregisters a method from post-stepping.
+	 * Fails silently if method is not found.
+	 * @param s
+	 */
+	public void unregisterPostStep(final Steppable s) {
+		if (postStepList != null) {
+			postStepList.remove(s);
+		}
+	}
+
+	/** Re-filter a shape. This re-runs contact filtering on a shape. */
+	public void refilter(final Shape shape) {
+		shape.refilterProxy(m_broadPhase, shape.getBody().getMemberXForm());
+	}
+
 	/**
 	 * Query the world for all shapes that potentially overlap the
 	 * provided AABB up to max count.
@@ -543,748 +552,748 @@ public class World {
 	 * @param maxCount the capacity of the shapes array.
 	 * @return array of shapes overlapped, up to maxCount in length
 	 */
-    public Shape[] query(AABB aabb, int maxCount) {
-        Object[] objs = m_broadPhase.query(aabb, maxCount);
-        Shape[] ret = new Shape[objs.length];
-        System.arraycopy(objs, 0, ret, 0, objs.length);
-        //for (int i=0; i<ret.length; ++i) {
-        //	ret[i] = (Shape)(objs[i]);
-        //}
+	public Shape[] query(final AABB aabb, final int maxCount) {
+		final Object[] objs = m_broadPhase.query(aabb, maxCount);
+		final Shape[] ret = new Shape[objs.length];
+		System.arraycopy(objs, 0, ret, 0, objs.length);
+		//for (int i=0; i<ret.length; ++i) {
+		//	ret[i] = (Shape)(objs[i]);
+		//}
 
-        return ret;
-    }
+		return ret;
+	}
 
 
 	//--------------- Internals Below -------------------
 	// Internal yet public to make life easier.
-	
+
 	// Java note: sorry, guys, we have to keep this stuff public until
 	// the C++ version does otherwise so that we can maintain the engine...
-    
-    /** For internal use */
-    public void solve(TimeStep step) {
-    	m_positionIterationCount = 0;
-    	
-        // Size the island for the worst case.
-    	Island island = new Island(m_bodyCount, m_contactCount, m_jointCount, m_contactListener);
 
-        // Clear all the island flags.
-        for (Body b = m_bodyList; b != null; b = b.m_next) {
-            b.m_flags &= ~Body.e_islandFlag;
-        }
-        for (Contact c = m_contactList; c != null; c = c.m_next) {
-            c.m_flags &= ~Contact.e_islandFlag;
-        }
-        for (Joint j = m_jointList; j != null; j = j.m_next) {
-            j.m_islandFlag = false;
-        }
+	/** For internal use */
+	public void solve(final TimeStep step) {
+		m_positionIterationCount = 0;
 
-        // Build and simulate all awake islands.
-        int stackSize = m_bodyCount;
-        Body[] stack = new Body[stackSize];
-        for (Body seed = m_bodyList; seed != null; seed = seed.m_next) {
-            if ( (seed.m_flags & (Body.e_islandFlag | Body.e_sleepFlag | Body.e_frozenFlag)) > 0){
-                continue;
-            }
-            
-            if (seed.isStatic()) {
-    			continue;
-    		}
+		// Size the island for the worst case.
+		final Island island = new Island(m_bodyCount, m_contactCount, m_jointCount, m_contactListener);
 
-            // Reset island and stack.
-            island.clear();
-            int stackCount = 0;
-            stack[stackCount++] = seed;
-            seed.m_flags |= Body.e_islandFlag;
+		// Clear all the island flags.
+		for (Body b = m_bodyList; b != null; b = b.m_next) {
+			b.m_flags &= ~Body.e_islandFlag;
+		}
+		for (Contact c = m_contactList; c != null; c = c.m_next) {
+			c.m_flags &= ~Contact.e_islandFlag;
+		}
+		for (Joint j = m_jointList; j != null; j = j.m_next) {
+			j.m_islandFlag = false;
+		}
 
-            // Perform a depth first search (DFS) on the constraint graph.
-            while (stackCount > 0) {
-                // Grab the next body off the stack and add it to the island.
-                Body b = stack[--stackCount];
-                island.add(b);
+		// Build and simulate all awake islands.
+		final int stackSize = m_bodyCount;
+		final Body[] stack = new Body[stackSize];
+		for (Body seed = m_bodyList; seed != null; seed = seed.m_next) {
+			if ( (seed.m_flags & (Body.e_islandFlag | Body.e_sleepFlag | Body.e_frozenFlag)) > 0){
+				continue;
+			}
 
-                // Make sure the body is awake.
-                b.m_flags &= ~Body.e_sleepFlag;
+			if (seed.isStatic()) {
+				continue;
+			}
 
-                // To keep islands as small as possible, we don't
-                // propagate islands across static bodies.
-                if (b.isStatic()) {
-                    continue;
-                }
+			// Reset island and stack.
+			island.clear();
+			int stackCount = 0;
+			stack[stackCount++] = seed;
+			seed.m_flags |= Body.e_islandFlag;
 
-                // Search all contacts connected to this body.
-                for ( ContactEdge cn = b.m_contactList; cn != null; cn = cn.next) {
-                    // Has this contact already been added to an island?
-                	if ( (cn.contact.m_flags & (Contact.e_islandFlag | Contact.e_nonSolidFlag)) > 0) {
-                        continue;
-                    }
-                	
-                	// Is this contact touching?
-    				if (cn.contact.getManifoldCount() == 0) {
-    					continue;
-    				}
-    				
-                    island.add(cn.contact);
-                    cn.contact.m_flags |= Contact.e_islandFlag;
+			// Perform a depth first search (DFS) on the constraint graph.
+			while (stackCount > 0) {
+				// Grab the next body off the stack and add it to the island.
+				final Body b = stack[--stackCount];
+				island.add(b);
 
-                    // Was the other body already added to this island?
-    				Body other = cn.other;
-                    if ((other.m_flags & Body.e_islandFlag) > 0) {
-                        continue;
-                    }
+				// Make sure the body is awake.
+				b.m_flags &= ~Body.e_sleepFlag;
 
-                    assert stackCount < stackSize;
-                    stack[stackCount++] = other;
-                    other.m_flags |= Body.e_islandFlag;
-                }
+				// To keep islands as small as possible, we don't
+				// propagate islands across static bodies.
+				if (b.isStatic()) {
+					continue;
+				}
 
-                // Search all joints connect to this body.
-                for ( JointEdge jn = b.m_jointList; jn != null; jn = jn.next) {
-                    if (jn.joint.m_islandFlag == true) {
-                        continue;
-                    }
+				// Search all contacts connected to this body.
+				for ( ContactEdge cn = b.m_contactList; cn != null; cn = cn.next) {
+					// Has this contact already been added to an island?
+					if ( (cn.contact.m_flags & (Contact.e_islandFlag | Contact.e_nonSolidFlag)) > 0) {
+						continue;
+					}
 
-                    island.add(jn.joint);
-                    jn.joint.m_islandFlag = true;
+					// Is this contact touching?
+					if (cn.contact.getManifoldCount() == 0) {
+						continue;
+					}
 
-                    Body other = jn.other;
-                    if ((other.m_flags & Body.e_islandFlag) > 0) {
-                        continue;
-                    }
+					island.add(cn.contact);
+					cn.contact.m_flags |= Contact.e_islandFlag;
 
-                    assert (stackCount < stackSize);
-                    stack[stackCount++] = other;
-                    other.m_flags |= Body.e_islandFlag;
-                }
-            }
+					// Was the other body already added to this island?
+					final Body other = cn.other;
+					if ((other.m_flags & Body.e_islandFlag) > 0) {
+						continue;
+					}
 
-            island.solve(step, m_gravity, m_positionCorrection, m_allowSleep);
-    		
-            m_positionIterationCount = Math.max(m_positionIterationCount, Island.m_positionIterationCount); 
+					assert stackCount < stackSize;
+					stack[stackCount++] = other;
+					other.m_flags |= Body.e_islandFlag;
+				}
 
-            // Post solve cleanup.
-    		for (int i = 0; i < island.m_bodyCount; ++i) {
-    			// Allow static bodies to participate in other islands.
-    			Body b = island.m_bodies[i];
-    			if (b.isStatic()) {
-    				b.m_flags &= ~Body.e_islandFlag;
-    			}
-    		}
-        }
+				// Search all joints connect to this body.
+				for ( JointEdge jn = b.m_jointList; jn != null; jn = jn.next) {
+					if (jn.joint.m_islandFlag == true) {
+						continue;
+					}
 
-        //m_broadPhase.commit();
-        
-        // Synchronize shapes, check for out of range bodies.
-    	for (Body b = m_bodyList; b != null; b = b.getNext()) {
-    		if ( (b.m_flags & (Body.e_sleepFlag | Body.e_frozenFlag)) != 0) {
-    			continue;
-    		}
+					island.add(jn.joint);
+					jn.joint.m_islandFlag = true;
 
-    		if (b.isStatic()) {
-    			continue;
-    		}
-    		
-    		// Update shapes (for broad-phase). If the shapes go out of
-    		// the world AABB then shapes and contacts may be destroyed,
-    		// including contacts that are
-    		boolean inRange = b.synchronizeShapes();
+					final Body other = jn.other;
+					if ((other.m_flags & Body.e_islandFlag) > 0) {
+						continue;
+					}
 
-    		// Did the body's shapes leave the world?
-    		if (inRange == false && m_boundaryListener != null) {
-    			m_boundaryListener.violation(b);
-    		}
-    	}
+					assert (stackCount < stackSize);
+					stack[stackCount++] = other;
+					other.m_flags |= Body.e_islandFlag;
+				}
+			}
 
-    	// Commit shape proxy movements to the broad-phase so that new contacts are created.
-    	// Also, some contacts can be destroyed.
-    	m_broadPhase.commit();
-        
-    }
-    
-    /** For internal use: find TOI contacts and solve them. */
-    public void solveTOI(TimeStep step) {
-    	// Reserve an island and a stack for TOI island solution.
-    	// djm do we always have to make a new island? or can we make
-    	// it static?
-    	Island island = new Island(m_bodyCount, Settings.maxTOIContactsPerIsland, Settings.maxTOIJointsPerIsland, m_contactListener);
-    	
-    	//Simple one pass queue
-    	//Relies on the fact that we're only making one pass
-    	//through and each body can only be pushed/popped once.
-    	//To push: 
-    	//  queue[queueStart+queueSize++] = newElement
-    	//To pop: 
-    	//	poppedElement = queue[queueStart++];
+			island.solve(step, m_gravity, m_positionCorrection, m_allowSleep);
+
+			m_positionIterationCount = Math.max(m_positionIterationCount, Island.m_positionIterationCount);
+
+			// Post solve cleanup.
+			for (int i = 0; i < island.m_bodyCount; ++i) {
+				// Allow static bodies to participate in other islands.
+				final Body b = island.m_bodies[i];
+				if (b.isStatic()) {
+					b.m_flags &= ~Body.e_islandFlag;
+				}
+			}
+		}
+
+		//m_broadPhase.commit();
+
+		// Synchronize shapes, check for out of range bodies.
+		for (Body b = m_bodyList; b != null; b = b.getNext()) {
+			if ( (b.m_flags & (Body.e_sleepFlag | Body.e_frozenFlag)) != 0) {
+				continue;
+			}
+
+			if (b.isStatic()) {
+				continue;
+			}
+
+			// Update shapes (for broad-phase). If the shapes go out of
+			// the world AABB then shapes and contacts may be destroyed,
+			// including contacts that are
+			final boolean inRange = b.synchronizeShapes();
+
+			// Did the body's shapes leave the world?
+			if (inRange == false && m_boundaryListener != null) {
+				m_boundaryListener.violation(b);
+			}
+		}
+
+		// Commit shape proxy movements to the broad-phase so that new contacts are created.
+		// Also, some contacts can be destroyed.
+		m_broadPhase.commit();
+
+	}
+
+	/** For internal use: find TOI contacts and solve them. */
+	public void solveTOI(final TimeStep step) {
+		// Reserve an island and a stack for TOI island solution.
+		// djm do we always have to make a new island? or can we make
+		// it static?
+		final Island island = new Island(m_bodyCount, Settings.maxTOIContactsPerIsland, Settings.maxTOIJointsPerIsland, m_contactListener);
+
+		//Simple one pass queue
+		//Relies on the fact that we're only making one pass
+		//through and each body can only be pushed/popped once.
+		//To push:
+		//  queue[queueStart+queueSize++] = newElement
+		//To pop:
+		//	poppedElement = queue[queueStart++];
 		//  --queueSize;
-    	int queueCapacity = m_bodyCount;
-    	Body[] queue = new Body[queueCapacity];
+		final int queueCapacity = m_bodyCount;
+		final Body[] queue = new Body[queueCapacity];
 
-    	for (Body b = m_bodyList; b != null; b = b.m_next) {
-    		b.m_flags &= ~Body.e_islandFlag;
-    		b.m_sweep.t0 = 0.0f;
-    	}
+		for (Body b = m_bodyList; b != null; b = b.m_next) {
+			b.m_flags &= ~Body.e_islandFlag;
+			b.m_sweep.t0 = 0.0f;
+		}
 
-    	for (Contact c = m_contactList; c != null; c = c.m_next) {
-    		// Invalidate TOI
-    		c.m_flags &= ~(Contact.e_toiFlag | Contact.e_islandFlag);
-    	}
-    	
-    	for (Joint j = m_jointList; j != null; j = j.m_next) {
-            j.m_islandFlag = false;
-        }
+		for (Contact c = m_contactList; c != null; c = c.m_next) {
+			// Invalidate TOI
+			c.m_flags &= ~(Contact.e_toiFlag | Contact.e_islandFlag);
+		}
 
-    	// Find TOI events and solve them.
-    	while (true) {
-    		// Find the first TOI.
-    		Contact minContact = null;
-    		float minTOI = 1.0f;
+		for (Joint j = m_jointList; j != null; j = j.m_next) {
+			j.m_islandFlag = false;
+		}
 
-    		for (Contact c = m_contactList; c != null; c = c.m_next) {
-    			if ((c.m_flags & (Contact.e_slowFlag | Contact.e_nonSolidFlag)) != 0) {
-    				continue;
-    			}
+		// Find TOI events and solve them.
+		while (true) {
+			// Find the first TOI.
+			Contact minContact = null;
+			float minTOI = 1.0f;
 
-    			// TODO_ERIN keep a counter on the contact, only respond to M TOIs per contact.
-    			float toi = 1.0f;
-    			if ((c.m_flags & Contact.e_toiFlag) != 0) {
-    				// This contact has a valid cached TOI.
-    				toi = c.m_toi;
-    			} else {
-    				// Compute the TOI for this contact.
-    				Shape s1 = c.getShape1();
-    				Shape s2 = c.getShape2();
-    				Body b1 = s1.getBody();
-    				Body b2 = s2.getBody();
+			for (Contact c = m_contactList; c != null; c = c.m_next) {
+				if ((c.m_flags & (Contact.e_slowFlag | Contact.e_nonSolidFlag)) != 0) {
+					continue;
+				}
 
-    				if ((b1.isStatic() || b1.isSleeping()) && (b2.isStatic() || b2.isSleeping())) {
-    					continue;
-    				}
+				// TODO_ERIN keep a counter on the contact, only respond to M TOIs per contact.
+				float toi = 1.0f;
+				if ((c.m_flags & Contact.e_toiFlag) != 0) {
+					// This contact has a valid cached TOI.
+					toi = c.m_toi;
+				} else {
+					// Compute the TOI for this contact.
+					final Shape s1 = c.getShape1();
+					final Shape s2 = c.getShape2();
+					final Body b1 = s1.getBody();
+					final Body b2 = s2.getBody();
 
-    				// Put the sweeps onto the same time interval.
-    				float t0 = b1.m_sweep.t0;
-    				
-    				if (b1.m_sweep.t0 < b2.m_sweep.t0) {
-    					t0 = b2.m_sweep.t0;
-    					b1.m_sweep.advance(t0);
-    				} else if (b2.m_sweep.t0 < b1.m_sweep.t0) {
-    					t0 = b1.m_sweep.t0;
-    					b2.m_sweep.advance(t0);
-    				}
-    				assert(t0 < 1.0f);
+					if ((b1.isStatic() || b1.isSleeping()) && (b2.isStatic() || b2.isSleeping())) {
+						continue;
+					}
 
-    				// Compute the time of impact.
-    				toi = TOI.timeOfImpact(c.m_shape1, b1.m_sweep, c.m_shape2, b2.m_sweep);
-    				//System.out.println(toi);
-    				assert(0.0f <= toi && toi <= 1.0f);
-    				
-    				if (toi > 0.0f && toi < 1.0f) {
-    					toi = Math.min((1.0f - toi) * t0 + toi, 1.0f);
-    				}
+					// Put the sweeps onto the same time interval.
+					float t0 = b1.m_sweep.t0;
 
-    				c.m_toi = toi;
-    				c.m_flags |= Contact.e_toiFlag;
-    			}
+					if (b1.m_sweep.t0 < b2.m_sweep.t0) {
+						t0 = b2.m_sweep.t0;
+						b1.m_sweep.advance(t0);
+					} else if (b2.m_sweep.t0 < b1.m_sweep.t0) {
+						t0 = b1.m_sweep.t0;
+						b2.m_sweep.advance(t0);
+					}
+					assert(t0 < 1.0f);
 
-    			if (Settings.EPSILON < toi && toi < minTOI) {
-    				// This is the minimum TOI found so far.
-    				minContact = c;
-    				minTOI = toi;
-    				
-    			}
+					// Compute the time of impact.
+					toi = TOI.timeOfImpact(c.m_shape1, b1.m_sweep, c.m_shape2, b2.m_sweep);
+					//System.out.println(toi);
+					assert(0.0f <= toi && toi <= 1.0f);
 
-        		
-    		}
+					if (toi > 0.0f && toi < 1.0f) {
+						toi = Math.min((1.0f - toi) * t0 + toi, 1.0f);
+					}
 
-    		if (minContact == null || 1.0f - 100.0f * Settings.EPSILON < minTOI) {
-    			// No more TOI events. Done!
-    			break;
-    		}
-    		
-    		// Advance the bodies to the TOI.
-    		Shape s1 = minContact.getShape1();
-    		Shape s2 = minContact.getShape2();
-    		Body b1 = s1.getBody();
-    		Body b2 = s2.getBody();
-    		b1.advance(minTOI);
-    		b2.advance(minTOI);
+					c.m_toi = toi;
+					c.m_flags |= Contact.e_toiFlag;
+				}
 
-    		// The TOI contact likely has some new contact points.
-    		minContact.update(m_contactListener);
-    		minContact.m_flags &= ~Contact.e_toiFlag;
+				if (Settings.EPSILON < toi && toi < minTOI) {
+					// This is the minimum TOI found so far.
+					minContact = c;
+					minTOI = toi;
 
-    		if (minContact.getManifoldCount() == 0) {
-    			// This shouldn't happen. Numerical error?
-    			//b2Assert(false);
-    			continue;
-    		}
+				}
 
-    		// Build the TOI island. We need a dynamic seed.
-    		Body seed = b1;
-    		if (seed.isStatic()) {
-    			seed = b2;
-    		}
 
-    		// Reset island and queue.
-    		island.clear();
-    		//int stackCount = 0;
-    		int queueStart = 0; //starting index for queue
-        	int queueSize = 0;  //elements in queue
-    		queue[queueStart+queueSize++] = seed;
-    		seed.m_flags |= Body.e_islandFlag;
+			}
 
-    		// Perform a breadth first search (BFS) on the contact/joint graph.
-    		while (queueSize > 0) {
-    			// Grab the head body off the queue and add it to the island.
-    			Body b = queue[queueStart++];
-    			--queueSize;
-    			
-    			island.add(b);
-    			
-    			// Make sure the body is awake.
-    			b.m_flags &= ~Body.e_sleepFlag;
+			if (minContact == null || 1.0f - 100.0f * Settings.EPSILON < minTOI) {
+				// No more TOI events. Done!
+				break;
+			}
 
-    			// To keep islands as small as possible, we don't
-    			// propagate islands across static bodies.
-    			if (b.isStatic()) {
-    				continue;
-    			}
+			// Advance the bodies to the TOI.
+			final Shape s1 = minContact.getShape1();
+			final Shape s2 = minContact.getShape2();
+			final Body b1 = s1.getBody();
+			final Body b2 = s2.getBody();
+			b1.advance(minTOI);
+			b2.advance(minTOI);
 
-    			// Search all contacts connected to this body.
-    			for (ContactEdge cn = b.m_contactList; cn != null; cn = cn.next) {
-    				// Does the TOI island still have space for contacts?
-    				if (island.m_contactCount == island.m_contactCapacity) {
-    					continue;
-    				}
+			// The TOI contact likely has some new contact points.
+			minContact.update(m_contactListener);
+			minContact.m_flags &= ~Contact.e_toiFlag;
 
-    				// Has this contact already been added to an island? Skip slow or non-solid contacts.
-    				if ( (cn.contact.m_flags & (Contact.e_islandFlag | Contact.e_slowFlag | Contact.e_nonSolidFlag)) != 0) {
-    					continue;
-    				}
+			if (minContact.getManifoldCount() == 0) {
+				// This shouldn't happen. Numerical error?
+				//b2Assert(false);
+				continue;
+			}
 
-    				// Is this contact touching? For performance we are not updating this contact.
-    				if (cn.contact.getManifoldCount() == 0) {
-    					continue;
-    				}
+			// Build the TOI island. We need a dynamic seed.
+			Body seed = b1;
+			if (seed.isStatic()) {
+				seed = b2;
+			}
 
-    				island.add(cn.contact);
-    				cn.contact.m_flags |= Contact.e_islandFlag;
-    				// Update other body.
-    				Body other = cn.other;
+			// Reset island and queue.
+			island.clear();
+			//int stackCount = 0;
+			int queueStart = 0; //starting index for queue
+			int queueSize = 0;  //elements in queue
+			queue[queueStart+queueSize++] = seed;
+			seed.m_flags |= Body.e_islandFlag;
 
-    				// Was the other body already added to this island?
-    				if ((other.m_flags & Body.e_islandFlag) != 0) {
-    					continue;
-    				}
+			// Perform a breadth first search (BFS) on the contact/joint graph.
+			while (queueSize > 0) {
+				// Grab the head body off the queue and add it to the island.
+				final Body b = queue[queueStart++];
+				--queueSize;
 
-    				// March forward, this can do no harm since this is the min TOI.
-    				if (other.isStatic() == false) {
-    					other.advance(minTOI);
-    					other.wakeUp();
-    				}
+				island.add(b);
 
-    				//push to the queue
-    				assert(queueSize < queueCapacity);
-    				queue[queueStart+queueSize++] = other;
-    				other.m_flags |= Body.e_islandFlag;
+				// Make sure the body is awake.
+				b.m_flags &= ~Body.e_sleepFlag;
 
-    			}
-    			
-    			// Search all joints connect to this body.
-                for ( JointEdge jn = b.m_jointList; jn != null; jn = jn.next) {
-                	if (island.m_jointCount == island.m_jointCapacity) {
-    					continue;
-    				}
-                	
-                	if (jn.joint.m_islandFlag == true) {
-                        continue;
-                    }
+				// To keep islands as small as possible, we don't
+				// propagate islands across static bodies.
+				if (b.isStatic()) {
+					continue;
+				}
 
-                    island.add(jn.joint);
+				// Search all contacts connected to this body.
+				for (ContactEdge cn = b.m_contactList; cn != null; cn = cn.next) {
+					// Does the TOI island still have space for contacts?
+					if (island.m_contactCount == island.m_contactCapacity) {
+						continue;
+					}
 
-                    jn.joint.m_islandFlag = true;
+					// Has this contact already been added to an island? Skip slow or non-solid contacts.
+					if ( (cn.contact.m_flags & (Contact.e_islandFlag | Contact.e_slowFlag | Contact.e_nonSolidFlag)) != 0) {
+						continue;
+					}
 
-                    Body other = jn.other;
-                    if ((other.m_flags & Body.e_islandFlag) > 0) {
-                        continue;
-                    }
-                    
-                    if (other.isStatic() == false) {
-                    	//System.out.println(minTOI);
-                    	other.advance(minTOI);
-                    	other.wakeUp();
-                    }
+					// Is this contact touching? For performance we are not updating this contact.
+					if (cn.contact.getManifoldCount() == 0) {
+						continue;
+					}
 
-                    assert (queueSize < queueCapacity);
-                    queue[queueStart+queueSize++] = other;
-                    other.m_flags |= Body.e_islandFlag;
-                }
-    			
-    		}
+					island.add(cn.contact);
+					cn.contact.m_flags |= Contact.e_islandFlag;
+					// Update other body.
+					final Body other = cn.other;
 
-    		// djm do we need to create one every time?
-    		TimeStep subStep = new TimeStep();
-    		subStep.warmStarting = false;
-    		subStep.dt = (1.0f - minTOI) * step.dt;
-    		assert(subStep.dt > Settings.EPSILON);
-    		subStep.inv_dt = 1.0f / subStep.dt;
-    		subStep.maxIterations = step.maxIterations;
+					// Was the other body already added to this island?
+					if ((other.m_flags & Body.e_islandFlag) != 0) {
+						continue;
+					}
 
-    		island.solveTOI(subStep);
-    		
-    		// Post solve cleanup.
-    		for (int i = 0; i < island.m_bodyCount; ++i) {
-    			// Allow bodies to participate in future TOI islands.
-    			Body b = island.m_bodies[i];
-    			b.m_flags &= ~Body.e_islandFlag;
+					// March forward, this can do no harm since this is the min TOI.
+					if (other.isStatic() == false) {
+						other.advance(minTOI);
+						other.wakeUp();
+					}
 
-    			if ( (b.m_flags & (Body.e_sleepFlag | Body.e_frozenFlag)) != 0) {
-    				continue;
-    			}
+					//push to the queue
+					assert(queueSize < queueCapacity);
+					queue[queueStart+queueSize++] = other;
+					other.m_flags |= Body.e_islandFlag;
 
-    			if (b.isStatic()) {
-    				continue;
-    			}
+				}
 
-    			// Update shapes (for broad-phase). If the shapes go out of
-    			// the world AABB then shapes and contacts may be destroyed,
-    			// including contacts that are
-    			boolean inRange = b.synchronizeShapes();
+				// Search all joints connect to this body.
+				for ( JointEdge jn = b.m_jointList; jn != null; jn = jn.next) {
+					if (island.m_jointCount == island.m_jointCapacity) {
+						continue;
+					}
 
-    			// Did the body's shapes leave the world?
-    			if (inRange == false && m_boundaryListener != null) {
-    				m_boundaryListener.violation(b);
-    			}
+					if (jn.joint.m_islandFlag == true) {
+						continue;
+					}
 
-    			// Invalidate all contact TOIs associated with this body. Some of these
-    			// may not be in the island because they were not touching.
-    			for (ContactEdge cn = b.m_contactList; cn != null; cn = cn.next) {
-    				cn.contact.m_flags &= ~Contact.e_toiFlag;
-    			}
-    			
-    		}
+					island.add(jn.joint);
 
-    		for (int i = 0; i < island.m_contactCount; ++i) {
-    			// Allow contacts to participate in future TOI islands.
+					jn.joint.m_islandFlag = true;
 
-    			Contact c = island.m_contacts[i];
-    			c.m_flags &= ~(Contact.e_toiFlag | Contact.e_islandFlag);
-    		}
-    		
-    		for (int i=0; i < island.m_jointCount; ++i) {
-    			Joint j = island.m_joints[i];
-    			j.m_islandFlag = false;
-    		}
+					final Body other = jn.other;
+					if ((other.m_flags & Body.e_islandFlag) > 0) {
+						continue;
+					}
 
-    		// Commit shape proxy movements to the broad-phase so that new contacts are created.
-    		// Also, some contacts can be destroyed.
-    		m_broadPhase.commit();
-    	}
+					if (other.isStatic() == false) {
+						//System.out.println(minTOI);
+						other.advance(minTOI);
+						other.wakeUp();
+					}
 
-    }
-    // djm pooled
-    private Color3f coreColor = new Color3f(255f*0.9f, 255f*0.6f, 255f*0.6f);
-    private Vec2 drawingCenter = new Vec2();
-    private Vec2 circCenterMoved = new Vec2();
-    private Color3f liquidColor = new Color3f(80.0f,80.0f,255f);
-    private Vec2 segLeft = new Vec2();
-    private Vec2 segRight = new Vec2();
-    /** For internal use */
-    public void drawShape(Shape shape, XForm xf, Color3f color, boolean core) {
-    	
-    	if (shape.getType() == ShapeType.CIRCLE_SHAPE) {
-    			CircleShape circle = (CircleShape)shape;
+					assert (queueSize < queueCapacity);
+					queue[queueStart+queueSize++] = other;
+					other.m_flags |= Body.e_islandFlag;
+				}
 
-    			XForm.mulToOut(xf, circle.getMemberLocalPosition(), drawingCenter);
-    			float radius = circle.getRadius();
-    			Vec2 axis = xf.R.col1;
-    			
-    			circCenterMoved.x = drawingCenter.x + .01f;
-    			circCenterMoved.y = drawingCenter.y + .01f;
-    			if (circle.getUserData() != null && circle.getUserData() == LiquidTest.LIQUID_INT) {
-    				m_debugDraw.drawSegment(drawingCenter, circCenterMoved, liquidColor);
-    				return;
-    			}
-    			
-    			m_debugDraw.drawSolidCircle(drawingCenter, radius, axis, color);
+			}
 
-    			if (core) {
-    				m_debugDraw.drawCircle(drawingCenter, radius - Settings.toiSlop, coreColor);
-    			}
-    	} else if (shape.getType() == ShapeType.POINT_SHAPE) {
-    			PointShape point = (PointShape)shape;
+			// djm do we need to create one every time?
+			final TimeStep subStep = new TimeStep();
+			subStep.warmStarting = false;
+			subStep.dt = (1.0f - minTOI) * step.dt;
+			assert(subStep.dt > Settings.EPSILON);
+			subStep.inv_dt = 1.0f / subStep.dt;
+			subStep.maxIterations = step.maxIterations;
 
-				XForm.mulToOut(xf, point.getLocalPosition(), drawingCenter);
+			island.solveTOI(subStep);
 
-				//m_debugDraw.drawSolidCircle(center, radius, axis, color);
-				m_debugDraw.drawPoint(drawingCenter, 0.0f, color);
+			// Post solve cleanup.
+			for (int i = 0; i < island.m_bodyCount; ++i) {
+				// Allow bodies to participate in future TOI islands.
+				final Body b = island.m_bodies[i];
+				b.m_flags &= ~Body.e_islandFlag;
 
-    	} else if (shape.getType() == ShapeType.POLYGON_SHAPE) {
-    			PolygonShape poly = (PolygonShape)shape;
-    			int vertexCount = poly.getVertexCount();
-    			Vec2[] localVertices = poly.getVertices();
-    			
-    			assert(vertexCount <= Settings.maxPolygonVertices);
-    			Vec2[] vertices = new Vec2[vertexCount];
+				if ( (b.m_flags & (Body.e_sleepFlag | Body.e_frozenFlag)) != 0) {
+					continue;
+				}
 
-    			for (int i = 0; i < vertexCount; ++i) {
-    				// djm these aren't instantiated so we need to be creating
-    				// these.  To get rid of these instantiations, we would need
-    				// to change the DebugDraw so you give it local vertices and the
-    				// XForm to transform them with
-    				vertices[i] = XForm.mul(xf, localVertices[i]);
-    			}
+				if (b.isStatic()) {
+					continue;
+				}
 
-    			m_debugDraw.drawSolidPolygon(vertices, vertexCount, color);
+				// Update shapes (for broad-phase). If the shapes go out of
+				// the world AABB then shapes and contacts may be destroyed,
+				// including contacts that are
+				final boolean inRange = b.synchronizeShapes();
 
-    			if (core) {
-    				Vec2[] localCoreVertices = poly.getCoreVertices();
-    				for (int i = 0; i < vertexCount; ++i) {
-    					// djm same as above
-    					vertices[i] = XForm.mul(xf, localCoreVertices[i]);
-    				}
-    				m_debugDraw.drawPolygon(vertices, vertexCount, coreColor);
-    			}
-    		
-    	} else if (shape.getType() == ShapeType.EDGE_SHAPE) {
-    		EdgeShape edge = (EdgeShape) shape;
-    		XForm.mulToOut( xf, edge.getVertex1(), segLeft);
-    		XForm.mulToOut( xf, edge.getVertex2(), segRight);
-    		m_debugDraw.drawSegment(segLeft, segRight, color);
-    		
+				// Did the body's shapes leave the world?
+				if (inRange == false && m_boundaryListener != null) {
+					m_boundaryListener.violation(b);
+				}
+
+				// Invalidate all contact TOIs associated with this body. Some of these
+				// may not be in the island because they were not touching.
+				for (ContactEdge cn = b.m_contactList; cn != null; cn = cn.next) {
+					cn.contact.m_flags &= ~Contact.e_toiFlag;
+				}
+
+			}
+
+			for (int i = 0; i < island.m_contactCount; ++i) {
+				// Allow contacts to participate in future TOI islands.
+
+				final Contact c = island.m_contacts[i];
+				c.m_flags &= ~(Contact.e_toiFlag | Contact.e_islandFlag);
+			}
+
+			for (int i=0; i < island.m_jointCount; ++i) {
+				final Joint j = island.m_joints[i];
+				j.m_islandFlag = false;
+			}
+
+			// Commit shape proxy movements to the broad-phase so that new contacts are created.
+			// Also, some contacts can be destroyed.
+			m_broadPhase.commit();
+		}
+
+	}
+	// djm pooled
+	private final Color3f coreColor = new Color3f(255f*0.9f, 255f*0.6f, 255f*0.6f);
+	private final Vec2 drawingCenter = new Vec2();
+	private final Vec2 circCenterMoved = new Vec2();
+	private final Color3f liquidColor = new Color3f(80.0f,80.0f,255f);
+	private final Vec2 segLeft = new Vec2();
+	private final Vec2 segRight = new Vec2();
+	/** For internal use */
+	public void drawShape(final Shape shape, final XForm xf, final Color3f color, final boolean core) {
+
+		if (shape.getType() == ShapeType.CIRCLE_SHAPE) {
+			final CircleShape circle = (CircleShape)shape;
+
+			XForm.mulToOut(xf, circle.getMemberLocalPosition(), drawingCenter);
+			final float radius = circle.getRadius();
+			final Vec2 axis = xf.R.col1;
+
+			circCenterMoved.x = drawingCenter.x + .01f;
+			circCenterMoved.y = drawingCenter.y + .01f;
+			if (circle.getUserData() != null && circle.getUserData() == LiquidTest.LIQUID_INT) {
+				m_debugDraw.drawSegment(drawingCenter, circCenterMoved, liquidColor);
+				return;
+			}
+
+			m_debugDraw.drawSolidCircle(drawingCenter, radius, axis, color);
+
+			if (core) {
+				m_debugDraw.drawCircle(drawingCenter, radius - Settings.toiSlop, coreColor);
+			}
+		} else if (shape.getType() == ShapeType.POINT_SHAPE) {
+			final PointShape point = (PointShape)shape;
+
+			XForm.mulToOut(xf, point.getMemberLocalPosition(), drawingCenter);
+
+			//m_debugDraw.drawSolidCircle(center, radius, axis, color);
+			m_debugDraw.drawPoint(drawingCenter, 0.0f, color);
+
+		} else if (shape.getType() == ShapeType.POLYGON_SHAPE) {
+			final PolygonShape poly = (PolygonShape)shape;
+			final int vertexCount = poly.getVertexCount();
+			final Vec2[] localVertices = poly.getVertices();
+
+			assert(vertexCount <= Settings.maxPolygonVertices);
+			final Vec2[] vertices = new Vec2[vertexCount];
+
+			for (int i = 0; i < vertexCount; ++i) {
+				// djm these aren't instantiated so we need to be creating
+				// these.  To get rid of these instantiations, we would need
+				// to change the DebugDraw so you give it local vertices and the
+				// XForm to transform them with
+				vertices[i] = XForm.mul(xf, localVertices[i]);
+			}
+
+			m_debugDraw.drawSolidPolygon(vertices, vertexCount, color);
+
+			if (core) {
+				final Vec2[] localCoreVertices = poly.getCoreVertices();
+				for (int i = 0; i < vertexCount; ++i) {
+					// djm same as above
+					vertices[i] = XForm.mul(xf, localCoreVertices[i]);
+				}
+				m_debugDraw.drawPolygon(vertices, vertexCount, coreColor);
+			}
+
+		} else if (shape.getType() == ShapeType.EDGE_SHAPE) {
+			final EdgeShape edge = (EdgeShape) shape;
+			XForm.mulToOut( xf, edge.getVertex1(), segLeft);
+			XForm.mulToOut( xf, edge.getVertex2(), segRight);
+			m_debugDraw.drawSegment(segLeft, segRight, color);
+
 			if (core) {
 				XForm.mulToOut( xf, edge.getCoreVertex1(), segLeft);
-	    		XForm.mulToOut( xf, edge.getCoreVertex2(), segRight);
+				XForm.mulToOut( xf, edge.getCoreVertex2(), segRight);
 				m_debugDraw.drawSegment(segLeft, segRight, coreColor);
 			}
-    		
-    	}
-    }
-    
-    // djm pooled
-    private Color3f jointColor = new Color3f(255f*0.5f, 255f*0.8f, 255f*0.8f);
-    /** For internal use */
-    public void drawJoint(Joint joint) {
-    	Body b1 = joint.getBody1();
-    	Body b2 = joint.getBody2();
-    	XForm xf1 = b1.getMemberXForm();
-    	XForm xf2 = b2.getMemberXForm();
-    	Vec2 x1 = xf1.position;
-    	Vec2 x2 = xf2.position;
-    	Vec2 p1 = joint.getAnchor1();
-    	Vec2 p2 = joint.getAnchor2();
 
-    	JointType type = joint.getType();
-    	
-    	if (type == JointType.DISTANCE_JOINT) {
-    		m_debugDraw.drawSegment(p1, p2, jointColor);
-    	} else if (type == JointType.PULLEY_JOINT) {
-    		PulleyJoint pulley = (PulleyJoint)joint;
-    		Vec2 s1 = pulley.getGroundAnchor1();
-    		Vec2 s2 = pulley.getGroundAnchor2();
-    		m_debugDraw.drawSegment(s1, p1, jointColor);
-    		m_debugDraw.drawSegment(s2, p2, jointColor);
-    		m_debugDraw.drawSegment(s1, s2, jointColor);
-    	} else if (type == JointType.MOUSE_JOINT) {
-    		//Don't draw mouse joint
-    	} else if (type == JointType.CONSTANT_VOLUME_JOINT) {
-    		ConstantVolumeJoint cvj = (ConstantVolumeJoint)joint;
-    		Body[] bodies = cvj.getBodies();
-    		for (int i=0; i<bodies.length; ++i) {
-    			int next = (i==bodies.length-1)?0:i+1;
-    			// TODO decide how to handle these calls
-    			Vec2 first = bodies[i].getMemberWorldCenter();
-    			Vec2 nextV = bodies[next].getMemberWorldCenter();
-    			m_debugDraw.drawSegment(first, nextV, jointColor);
-    		}
-    		
-    	} else {
-    		m_debugDraw.drawSegment(x1, p1, jointColor);
-    		m_debugDraw.drawSegment(p1, p2, jointColor);
-    		m_debugDraw.drawSegment(x2, p2, jointColor);
-    	}
-    }
+		}
+	}
 
-    // djm pooled
-    private Color3f staticColor = new Color3f(255f*0.5f, 255f*0.9f, 255f*0.5f);
-    private Color3f sleepingColor = new Color3f(255f*0.5f, 255f*0.5f, 255f*0.9f);
-    private Color3f activeColor = new Color3f(255f*0.9f, 255f*0.9f, 255f*0.9f);
-    private Color3f pairColor = new Color3f(255f*0.9f, 255f*0.9f, 255f*0.3f);
-    private Color3f aabbColor = new Color3f(255f*0.9f, 255f*0.3f,255f* 0.9f);
-    private Color3f obbColor =  new Color3f(0.5f, 0.3f, 0.5f);
-    private Color3f worldColor = new Color3f(255.0f*0.3f, 255.0f*0.9f, 255.0f*0.9f);
-    private AABB pairB1 = new AABB();
-    private AABB pairB2 = new AABB();
-    private Vec2 pairX1 = new Vec2();
-    private Vec2 pairX2 = new Vec2();
-    private AABB aabbB = new AABB();
-    private Vec2[] cornerVecs = {
-    		new Vec2(),
-    		new Vec2(),
-    		new Vec2(),
-    		new Vec2()
-    };
-    /** For internal use */
-    public void drawDebugData() {
-    	if (m_debugDraw == null || m_drawDebugData == false) {
-    		return;
-    	}
-    	
-    	int flags = m_debugDraw.getFlags();
+	// djm pooled
+	private final Color3f jointColor = new Color3f(255f*0.5f, 255f*0.8f, 255f*0.8f);
+	/** For internal use */
+	public void drawJoint(final Joint joint) {
+		final Body b1 = joint.getBody1();
+		final Body b2 = joint.getBody2();
+		final XForm xf1 = b1.getMemberXForm();
+		final XForm xf2 = b2.getMemberXForm();
+		final Vec2 x1 = xf1.position;
+		final Vec2 x2 = xf2.position;
+		final Vec2 p1 = joint.getAnchor1();
+		final Vec2 p2 = joint.getAnchor2();
 
-    	if ( (flags & DebugDraw.e_shapeBit) != 0) {
+		final JointType type = joint.getType();
 
-    		boolean core = (flags & DebugDraw.e_coreShapeBit) == DebugDraw.e_coreShapeBit;
+		if (type == JointType.DISTANCE_JOINT) {
+			m_debugDraw.drawSegment(p1, p2, jointColor);
+		} else if (type == JointType.PULLEY_JOINT) {
+			final PulleyJoint pulley = (PulleyJoint)joint;
+			final Vec2 s1 = pulley.getGroundAnchor1();
+			final Vec2 s2 = pulley.getGroundAnchor2();
+			m_debugDraw.drawSegment(s1, p1, jointColor);
+			m_debugDraw.drawSegment(s2, p2, jointColor);
+			m_debugDraw.drawSegment(s1, s2, jointColor);
+		} else if (type == JointType.MOUSE_JOINT) {
+			//Don't draw mouse joint
+		} else if (type == JointType.CONSTANT_VOLUME_JOINT) {
+			final ConstantVolumeJoint cvj = (ConstantVolumeJoint)joint;
+			final Body[] bodies = cvj.getBodies();
+			for (int i=0; i<bodies.length; ++i) {
+				final int next = (i==bodies.length-1)?0:i+1;
+				// TODO decide how to handle these calls
+				final Vec2 first = bodies[i].getMemberWorldCenter();
+				final Vec2 nextV = bodies[next].getMemberWorldCenter();
+				m_debugDraw.drawSegment(first, nextV, jointColor);
+			}
 
-    		for (Body b = m_bodyList; b != null; b = b.getNext()) {
-    			// TODO change the way this is handled
-    			XForm xf = b.getMemberXForm();
+		} else {
+			m_debugDraw.drawSegment(x1, p1, jointColor);
+			m_debugDraw.drawSegment(p1, p2, jointColor);
+			m_debugDraw.drawSegment(x2, p2, jointColor);
+		}
+	}
 
-    			for (Shape s = b.getShapeList(); s != null; s = s.getNext()) {
-    				//if (s.isSensor()) continue;
-    				
-    				if (b.isStatic()) {
-    					drawShape(s, xf, staticColor, core);
-    				}
-    				else if (b.isSleeping()) {
-    					drawShape(s, xf, sleepingColor, core);
-    				} else {
-    					drawShape(s, xf, activeColor, core);
-    				}
-    			}
-    		}
-    	}
+	// djm pooled
+	private final Color3f staticColor = new Color3f(255f*0.5f, 255f*0.9f, 255f*0.5f);
+	private final Color3f sleepingColor = new Color3f(255f*0.5f, 255f*0.5f, 255f*0.9f);
+	private final Color3f activeColor = new Color3f(255f*0.9f, 255f*0.9f, 255f*0.9f);
+	private final Color3f pairColor = new Color3f(255f*0.9f, 255f*0.9f, 255f*0.3f);
+	private final Color3f aabbColor = new Color3f(255f*0.9f, 255f*0.3f,255f* 0.9f);
+	private final Color3f obbColor =  new Color3f(0.5f, 0.3f, 0.5f);
+	private final Color3f worldColor = new Color3f(255.0f*0.3f, 255.0f*0.9f, 255.0f*0.9f);
+	private final AABB pairB1 = new AABB();
+	private final AABB pairB2 = new AABB();
+	private final Vec2 pairX1 = new Vec2();
+	private final Vec2 pairX2 = new Vec2();
+	private final AABB aabbB = new AABB();
+	private final Vec2[] cornerVecs = {
+			new Vec2(),
+			new Vec2(),
+			new Vec2(),
+			new Vec2()
+	};
+	/** For internal use */
+	public void drawDebugData() {
+		if (m_debugDraw == null || m_drawDebugData == false) {
+			return;
+		}
 
-    	if ( (flags & DebugDraw.e_jointBit) != 0) {
-    		for (Joint j = m_jointList; j != null; j = j.getNext()) {
-    			if (j.getType() != JointType.MOUSE_JOINT) {
-    				drawJoint(j);
-    			}
-    		}
-    	}
+		final int flags = m_debugDraw.getFlags();
 
-    	if ( (flags & DebugDraw.e_pairBit) != 0) {
-    		BroadPhase bp = m_broadPhase;
-    		// djm eh just keep this
-    		Vec2 invQ = new Vec2(0.0f, 0.0f);
-    		invQ.set(1.0f / bp.m_quantizationFactor.x, 1.0f / bp.m_quantizationFactor.y);
+		if ( (flags & DebugDraw.e_shapeBit) != 0) {
 
-    		for (int i = 0; i < PairManager.TABLE_CAPACITY; ++i) {
-    			int index = bp.m_pairManager.m_hashTable[i];
-    			while (index != PairManager.NULL_PAIR) {
-    				Pair pair = bp.m_pairManager.m_pairs[index];
-    				Proxy p1 = bp.m_proxyPool[pair.proxyId1];
-    				Proxy p2 = bp.m_proxyPool[pair.proxyId2];
+			final boolean core = (flags & DebugDraw.e_coreShapeBit) == DebugDraw.e_coreShapeBit;
 
-    				
-    				pairB1.lowerBound.x = bp.m_worldAABB.lowerBound.x + invQ.x * bp.m_bounds[0][p1.lowerBounds[0]].value;
-    				pairB1.lowerBound.y = bp.m_worldAABB.lowerBound.y + invQ.y * bp.m_bounds[1][p1.lowerBounds[1]].value;
-    				pairB1.upperBound.x = bp.m_worldAABB.lowerBound.x + invQ.x * bp.m_bounds[0][p1.upperBounds[0]].value;
-    				pairB1.upperBound.y = bp.m_worldAABB.lowerBound.y + invQ.y * bp.m_bounds[1][p1.upperBounds[1]].value;
-    				pairB2.lowerBound.x = bp.m_worldAABB.lowerBound.x + invQ.x * bp.m_bounds[0][p2.lowerBounds[0]].value;
-    				pairB2.lowerBound.y = bp.m_worldAABB.lowerBound.y + invQ.y * bp.m_bounds[1][p2.lowerBounds[1]].value;
-    				pairB2.upperBound.x = bp.m_worldAABB.lowerBound.x + invQ.x * bp.m_bounds[0][p2.upperBounds[0]].value;
-    				pairB2.upperBound.y = bp.m_worldAABB.lowerBound.y + invQ.y * bp.m_bounds[1][p2.upperBounds[1]].value;
+			for (Body b = m_bodyList; b != null; b = b.getNext()) {
+				// TODO change the way this is handled
+				final XForm xf = b.getMemberXForm();
 
-    				pairX1.x = 0.5f * (pairB1.lowerBound.x + pairB1.upperBound.x);
-    				pairX1.y = 0.5f * (pairB1.lowerBound.y + pairB1.upperBound.y);
-    				pairX2.x = 0.5f * (pairB2.lowerBound.x + pairB2.upperBound.x);
-    				pairX2.y = 0.5f * (pairB2.lowerBound.y + pairB2.upperBound.y);
+				for (Shape s = b.getShapeList(); s != null; s = s.getNext()) {
+					//if (s.isSensor()) continue;
 
-    				m_debugDraw.drawSegment(pairX1, pairX1, pairColor);
+					if (b.isStatic()) {
+						drawShape(s, xf, staticColor, core);
+					}
+					else if (b.isSleeping()) {
+						drawShape(s, xf, sleepingColor, core);
+					} else {
+						drawShape(s, xf, activeColor, core);
+					}
+				}
+			}
+		}
 
-    				index = pair.next;
-    			}
-    		}
-    	}
+		if ( (flags & DebugDraw.e_jointBit) != 0) {
+			for (Joint j = m_jointList; j != null; j = j.getNext()) {
+				if (j.getType() != JointType.MOUSE_JOINT) {
+					drawJoint(j);
+				}
+			}
+		}
+
+		if ( (flags & DebugDraw.e_pairBit) != 0) {
+			final BroadPhase bp = m_broadPhase;
+			// djm eh just keep this
+			final Vec2 invQ = new Vec2(0.0f, 0.0f);
+			invQ.set(1.0f / bp.m_quantizationFactor.x, 1.0f / bp.m_quantizationFactor.y);
+
+			for (int i = 0; i < PairManager.TABLE_CAPACITY; ++i) {
+				int index = bp.m_pairManager.m_hashTable[i];
+				while (index != PairManager.NULL_PAIR) {
+					final Pair pair = bp.m_pairManager.m_pairs[index];
+					final Proxy p1 = bp.m_proxyPool[pair.proxyId1];
+					final Proxy p2 = bp.m_proxyPool[pair.proxyId2];
 
 
-		BroadPhase bp = m_broadPhase;
-		Vec2 worldLower = bp.m_worldAABB.lowerBound;
-		Vec2 worldUpper = bp.m_worldAABB.upperBound;
-		
-    	if ( (flags & DebugDraw.e_aabbBit) != 0) {
+					pairB1.lowerBound.x = bp.m_worldAABB.lowerBound.x + invQ.x * bp.m_bounds[0][p1.lowerBounds[0]].value;
+					pairB1.lowerBound.y = bp.m_worldAABB.lowerBound.y + invQ.y * bp.m_bounds[1][p1.lowerBounds[1]].value;
+					pairB1.upperBound.x = bp.m_worldAABB.lowerBound.x + invQ.x * bp.m_bounds[0][p1.upperBounds[0]].value;
+					pairB1.upperBound.y = bp.m_worldAABB.lowerBound.y + invQ.y * bp.m_bounds[1][p1.upperBounds[1]].value;
+					pairB2.lowerBound.x = bp.m_worldAABB.lowerBound.x + invQ.x * bp.m_bounds[0][p2.lowerBounds[0]].value;
+					pairB2.lowerBound.y = bp.m_worldAABB.lowerBound.y + invQ.y * bp.m_bounds[1][p2.lowerBounds[1]].value;
+					pairB2.upperBound.x = bp.m_worldAABB.lowerBound.x + invQ.x * bp.m_bounds[0][p2.upperBounds[0]].value;
+					pairB2.upperBound.y = bp.m_worldAABB.lowerBound.y + invQ.y * bp.m_bounds[1][p2.upperBounds[1]].value;
 
-    		Vec2 invQ = new Vec2();
-    		invQ.set(1.0f / bp.m_quantizationFactor.x, 1.0f / bp.m_quantizationFactor.y);
+					pairX1.x = 0.5f * (pairB1.lowerBound.x + pairB1.upperBound.x);
+					pairX1.y = 0.5f * (pairB1.lowerBound.y + pairB1.upperBound.y);
+					pairX2.x = 0.5f * (pairB2.lowerBound.x + pairB2.upperBound.x);
+					pairX2.y = 0.5f * (pairB2.lowerBound.y + pairB2.upperBound.y);
 
-    		for (int i = 0; i < Settings.maxProxies; ++i) {
-    			Proxy p = bp.m_proxyPool[i];
-    			if (p.isValid() == false) {
-    				continue;
-    			}
+					m_debugDraw.drawSegment(pairX1, pairX1, pairColor);
 
-    			
-    			aabbB.lowerBound.x = worldLower.x + invQ.x * bp.m_bounds[0][p.lowerBounds[0]].value;
-    			aabbB.lowerBound.y = worldLower.y + invQ.y * bp.m_bounds[1][p.lowerBounds[1]].value;
-    			aabbB.upperBound.x = worldLower.x + invQ.x * bp.m_bounds[0][p.upperBounds[0]].value;
-    			aabbB.upperBound.y = worldLower.y + invQ.y * bp.m_bounds[1][p.upperBounds[1]].value;
+					index = pair.next;
+				}
+			}
+		}
 
-    			cornerVecs[0].set(aabbB.lowerBound.x, aabbB.lowerBound.y);
-    			cornerVecs[1].set(aabbB.upperBound.x, aabbB.lowerBound.y);
-    			cornerVecs[2].set(aabbB.upperBound.x, aabbB.upperBound.y);
-    			cornerVecs[3].set(aabbB.lowerBound.x, aabbB.upperBound.y);
 
-    			m_debugDraw.drawPolygon(cornerVecs, 4, aabbColor);
-    		}
-    	}
-    	
-    	cornerVecs[0].set(worldLower.x, worldLower.y);
-    	cornerVecs[1].set(worldUpper.x, worldLower.y);
-    	cornerVecs[2].set(worldUpper.x, worldUpper.y);
-    	cornerVecs[3].set(worldLower.x, worldUpper.y);
+		final BroadPhase bp = m_broadPhase;
+		final Vec2 worldLower = bp.m_worldAABB.lowerBound;
+		final Vec2 worldUpper = bp.m_worldAABB.upperBound;
+
+		if ( (flags & DebugDraw.e_aabbBit) != 0) {
+
+			final Vec2 invQ = new Vec2();
+			invQ.set(1.0f / bp.m_quantizationFactor.x, 1.0f / bp.m_quantizationFactor.y);
+
+			for (int i = 0; i < Settings.maxProxies; ++i) {
+				final Proxy p = bp.m_proxyPool[i];
+				if (p.isValid() == false) {
+					continue;
+				}
+
+
+				aabbB.lowerBound.x = worldLower.x + invQ.x * bp.m_bounds[0][p.lowerBounds[0]].value;
+				aabbB.lowerBound.y = worldLower.y + invQ.y * bp.m_bounds[1][p.lowerBounds[1]].value;
+				aabbB.upperBound.x = worldLower.x + invQ.x * bp.m_bounds[0][p.upperBounds[0]].value;
+				aabbB.upperBound.y = worldLower.y + invQ.y * bp.m_bounds[1][p.upperBounds[1]].value;
+
+				cornerVecs[0].set(aabbB.lowerBound.x, aabbB.lowerBound.y);
+				cornerVecs[1].set(aabbB.upperBound.x, aabbB.lowerBound.y);
+				cornerVecs[2].set(aabbB.upperBound.x, aabbB.upperBound.y);
+				cornerVecs[3].set(aabbB.lowerBound.x, aabbB.upperBound.y);
+
+				m_debugDraw.drawPolygon(cornerVecs, 4, aabbColor);
+			}
+		}
+
+		cornerVecs[0].set(worldLower.x, worldLower.y);
+		cornerVecs[1].set(worldUpper.x, worldLower.y);
+		cornerVecs[2].set(worldUpper.x, worldUpper.y);
+		cornerVecs[3].set(worldLower.x, worldUpper.y);
 		m_debugDraw.drawPolygon(cornerVecs, 4, worldColor);
 
-    	if ( (flags & DebugDraw.e_obbBit) != 0) {
+		if ( (flags & DebugDraw.e_obbBit) != 0) {
 
-    		for (Body b = m_bodyList; b != null; b = b.getNext()) {
-    			// TODO figure out a better way to handle this
-    			XForm xf = b.getMemberXForm();
-    			
-    			for (Shape s = b.getShapeList(); s != null; s = s.getNext()) {
-    				if (s.getType() != ShapeType.POLYGON_SHAPE) {
-    					continue;
-    				}
+			for (Body b = m_bodyList; b != null; b = b.getNext()) {
+				// TODO figure out a better way to handle this
+				final XForm xf = b.getMemberXForm();
 
-    				PolygonShape poly = (PolygonShape)s;
-    				OBB obb = poly.getOBB();
-    				Vec2 h = obb.extents;
-    				
-    				cornerVecs[0].set(-h.x, -h.y);
-    				cornerVecs[1].set( h.x, -h.y);
-    				cornerVecs[2].set( h.x,  h.y);
-    				cornerVecs[3].set(-h.x,  h.y);
+				for (Shape s = b.getShapeList(); s != null; s = s.getNext()) {
+					if (s.getType() != ShapeType.POLYGON_SHAPE) {
+						continue;
+					}
 
-    				for (int i = 0; i < cornerVecs.length; ++i) {
-    					Mat22.mulToOut(obb.R, cornerVecs[i], cornerVecs[i]);
-    					XForm.mulToOut( xf, cornerVecs[i], cornerVecs[i]);
-    					//vs[i] = obb.center.add(Mat22.mul(obb.R, vs[i]));
-    					//vs[i] = XForm.mul(xf, vs[i]);
-    				}
+					final PolygonShape poly = (PolygonShape)s;
+					final OBB obb = poly.getOBB();
+					final Vec2 h = obb.extents;
 
-    				m_debugDraw.drawPolygon(cornerVecs, 4, obbColor);
-    			}
-    		}
-    	}
+					cornerVecs[0].set(-h.x, -h.y);
+					cornerVecs[1].set( h.x, -h.y);
+					cornerVecs[2].set( h.x,  h.y);
+					cornerVecs[3].set(-h.x,  h.y);
 
-    	if ( (flags & DebugDraw.e_centerOfMassBit) != 0) {
-    		for (Body b = m_bodyList; b != null; b = b.getNext()) {
-    			// TODO handle this differently
-    			XForm xf = b.getMemberXForm();
-    			xf.position = b.getMemberWorldCenter();
-    			m_debugDraw.drawXForm(xf);
-    		}
-    	}
-    }
+					for (int i = 0; i < cornerVecs.length; ++i) {
+						Mat22.mulToOut(obb.R, cornerVecs[i], cornerVecs[i]);
+						XForm.mulToOut( xf, cornerVecs[i], cornerVecs[i]);
+						//vs[i] = obb.center.add(Mat22.mul(obb.R, vs[i]));
+						//vs[i] = XForm.mul(xf, vs[i]);
+					}
 
-    /** Enable/disable warm starting. For testing. */
-	public void setWarmStarting(boolean flag) { m_warmStarting = flag; }
+					m_debugDraw.drawPolygon(cornerVecs, 4, obbColor);
+				}
+			}
+		}
+
+		if ( (flags & DebugDraw.e_centerOfMassBit) != 0) {
+			for (Body b = m_bodyList; b != null; b = b.getNext()) {
+				// TODO handle this differently
+				final XForm xf = b.getMemberXForm();
+				xf.position = b.getMemberWorldCenter();
+				m_debugDraw.drawXForm(xf);
+			}
+		}
+	}
+
+	/** Enable/disable warm starting. For testing. */
+	public void setWarmStarting(final boolean flag) { m_warmStarting = flag; }
 
 	/** Enable/disable position correction. For testing. */
-	public void setPositionCorrection(boolean flag) { m_positionCorrection = flag; }
+	public void setPositionCorrection(final boolean flag) { m_positionCorrection = flag; }
 
 	/** Enable/disable continuous physics. For testing. */
-	public void setContinuousPhysics(boolean flag) { m_continuousPhysics = flag; }
-	
+	public void setContinuousPhysics(final boolean flag) { m_continuousPhysics = flag; }
+
 	/** Perform validation of internal data structures. */
 	public void validate() {
 		m_broadPhase.validate();
@@ -1299,14 +1308,14 @@ public class World {
 	public int getPairCount() {
 		return m_broadPhase.m_pairManager.m_pairCount;
 	}
-	
+
 	/** Get the world bounding box. */
 	public AABB getWorldAABB() {
 		return m_broadPhase.m_worldAABB;
 	}
-	
+
 	/** Return true if the bounding box is within range of the world AABB. */
-	public boolean inRange(AABB aabb) {
+	public boolean inRange(final AABB aabb) {
 		return m_broadPhase.inRange(aabb);
 	}
 }

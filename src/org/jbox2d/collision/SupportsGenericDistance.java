@@ -38,6 +38,6 @@ import org.jbox2d.common.XForm;
  */
 public interface SupportsGenericDistance {
 	public void support(Vec2 dest, XForm xf, Vec2 v);
-	public void getFirstVertex(Vec2 dest, XForm xf);
+	public void getFirstVertexToOut(XForm xf, Vec2 out);
 
 }

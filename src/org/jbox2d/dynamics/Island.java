@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -28,7 +28,10 @@ import java.util.List;
 import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
-import org.jbox2d.common.*;
+import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.Settings;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactConstraint;
 import org.jbox2d.dynamics.contacts.ContactConstraintPoint;
@@ -43,292 +46,298 @@ import org.jbox2d.dynamics.joints.Joint;
  * Handles much of the heavy lifting of physics solving - for internal use.
  */
 public class Island {
-    public Body[] m_bodies;
+	public Body[] m_bodies;
 
-    public Contact[] m_contacts;
+	public Contact[] m_contacts;
 
-    public Joint[] m_joints;
+	public Joint[] m_joints;
 
-    public int m_bodyCount;
+	public int m_bodyCount;
 
-    public int m_jointCount;
+	public int m_jointCount;
 
-    public int m_contactCount;
+	public int m_contactCount;
 
-    public int m_bodyCapacity;
+	public int m_bodyCapacity;
 
-    public int m_contactCapacity;
+	public int m_contactCapacity;
 
-    public int m_jointCapacity;
+	public int m_jointCapacity;
 
-    public static int m_positionIterationCount = 0;
+	public static int m_positionIterationCount = 0;
 
-    public float m_positionError;
-    
-    public ContactListener m_listener;
+	public float m_positionError;
 
-    //begin .h methods
-    public void clear() {
+	public ContactListener m_listener;
+
+	//begin .h methods
+	public void clear() {
 		m_bodyCount = 0;
 		m_contactCount = 0;
 		m_jointCount = 0;
 	}
-    
-    void add(Body body) {
-        assert m_bodyCount < m_bodyCapacity;
-        m_bodies[m_bodyCount++] = body;
-    }
 
-    void add(Contact contact) {
-        assert (m_contactCount < m_contactCapacity);
-        m_contacts[m_contactCount++] = contact; //no clone, botches CCD if cloned!
-    }
+	void add(final Body body) {
+		assert m_bodyCount < m_bodyCapacity;
+		m_bodies[m_bodyCount++] = body;
+	}
 
-    void add(Joint joint) {
-        assert (m_jointCount < m_jointCapacity);
-        m_joints[m_jointCount++] = joint;
-    }
-    //end .h methods
-    
-    //begin .cpp methods
-    public Island(int bodyCapacity,
-    			  int contactCapacity,
-    			  int jointCapacity,
-    			  ContactListener listener) {
-    	
-    	m_bodyCapacity = bodyCapacity;
-    	m_contactCapacity = contactCapacity;
-    	m_jointCapacity	 = jointCapacity;
-    	m_bodyCount = 0;
-    	m_contactCount = 0;
-    	m_jointCount = 0;
+	void add(final Contact contact) {
+		assert (m_contactCount < m_contactCapacity);
+		m_contacts[m_contactCount++] = contact; //no clone, botches CCD if cloned!
+	}
 
-    	m_listener = listener;
+	void add(final Joint joint) {
+		assert (m_jointCount < m_jointCapacity);
+		m_joints[m_jointCount++] = joint;
+	}
+	//end .h methods
 
-    	m_bodies = new Body[bodyCapacity];
-    	m_contacts = new Contact[contactCapacity];
-    	m_joints = new Joint[jointCapacity];
+	//begin .cpp methods
+	/**
+	 * TODO djm: make this so it isn't created every time step
+	 */
+	public Island(final int bodyCapacity,
+	              final int contactCapacity,
+	              final int jointCapacity,
+	              final ContactListener listener) {
 
-    	m_positionIterationCount = 0;
-    }
+		m_bodyCapacity = bodyCapacity;
+		m_contactCapacity = contactCapacity;
+		m_jointCapacity	 = jointCapacity;
+		m_bodyCount = 0;
+		m_contactCount = 0;
+		m_jointCount = 0;
 
+		m_listener = listener;
 
-    public void solve(TimeStep step, Vec2 gravity, boolean correctPositions, boolean allowSleep) {
-    	// Integrate velocities and apply damping.
-    	for (int i = 0; i < m_bodyCount; ++i) {
-    		Body b = m_bodies[i];
+		m_bodies = new Body[bodyCapacity];
+		m_contacts = new Contact[contactCapacity];
+		m_joints = new Joint[jointCapacity];
 
-    		if (b.isStatic())
-    			continue;
-
-    		// Integrate velocities.
-    		b.m_linearVelocity.x += step.dt * (gravity.x + b.m_invMass * b.m_force.x);
-    		b.m_linearVelocity.y += step.dt * (gravity.y + b.m_invMass * b.m_force.y);
-    		b.m_angularVelocity += step.dt * b.m_invI * b.m_torque;
-
-    		// Reset forces.
-    		b.m_force.set(0.0f, 0.0f);
-    		b.m_torque = 0.0f;
-
-    		// Apply damping.
-    		// ODE: dv/dt + c * v = 0
-    		// Solution: v(t) = v0 * exp(-c * t)
-    		// Time step: v(t + dt) = v0 * exp(-c * (t + dt)) = v0 * exp(-c * t) * exp(-c * dt) = v * exp(-c * dt)
-    		// v2 = exp(-c * dt) * v1
-    		// Taylor expansion:
-    		// v2 = (1.0f - c * dt) * v1
-    		b.m_linearVelocity.mulLocal(MathUtils.clamp(1.0f - step.dt * b.m_linearDamping, 0.0f, 1.0f));
-    		b.m_angularVelocity *= MathUtils.clamp(1.0f - step.dt * b.m_angularDamping, 0.0f, 1.0f);
-
-    		// Check for large velocities.
-    		if (Vec2.dot(b.m_linearVelocity, b.m_linearVelocity) > Settings.maxLinearVelocitySquared) {
-    			b.m_linearVelocity.normalize();
-    			b.m_linearVelocity.mulLocal(Settings.maxLinearVelocity);
-    		}
-
-    		if (b.m_angularVelocity * b.m_angularVelocity > Settings.maxAngularVelocitySquared) {
-    			if (b.m_angularVelocity < 0.0f) {
-    				b.m_angularVelocity = -Settings.maxAngularVelocity;
-    			} else {
-    				b.m_angularVelocity = Settings.maxAngularVelocity;
-    			}
-    		}
-    	}
-
-    	ContactSolver contactSolver = new ContactSolver(step, m_contacts, m_contactCount);
-
-    	// Initialize velocity constraints.
-    	contactSolver.initVelocityConstraints(step);
-
-    	for (int i = 0; i < m_jointCount; ++i) {
-    		m_joints[i].initVelocityConstraints(step);
-    	}
-
-    	// Solve velocity constraints.
-    	for (int i = 0; i < step.maxIterations; ++i) {
-    		contactSolver.solveVelocityConstraints();
-
-    		for (int j = 0; j < m_jointCount; ++j) {
-    			m_joints[j].solveVelocityConstraints(step);
-    		}
-    	}
+		m_positionIterationCount = 0;
+	}
 
 
-    	// Post-solve (store impulses for warm starting).
-    	contactSolver.finalizeVelocityConstraints();
+	public void solve(final TimeStep step, final Vec2 gravity, final boolean correctPositions, final boolean allowSleep) {
+		// Integrate velocities and apply damping.
+		for (int i = 0; i < m_bodyCount; ++i) {
+			final Body b = m_bodies[i];
 
-    	// Integrate positions.
-    	for (int i = 0; i < m_bodyCount; ++i) {
-    		Body b = m_bodies[i];
+			if (b.isStatic()) {
+				continue;
+			}
 
-    		if (b.isStatic())
-    			continue;
+			// Integrate velocities.
+			b.m_linearVelocity.x += step.dt * (gravity.x + b.m_invMass * b.m_force.x);
+			b.m_linearVelocity.y += step.dt * (gravity.y + b.m_invMass * b.m_force.y);
+			b.m_angularVelocity += step.dt * b.m_invI * b.m_torque;
 
-    		// Store positions for continuous collision.
-    		b.m_sweep.c0.set(b.m_sweep.c);
-    		b.m_sweep.a0 = b.m_sweep.a;
+			// Reset forces.
+			b.m_force.set(0.0f, 0.0f);
+			b.m_torque = 0.0f;
 
-    		// Integrate
-    		b.m_sweep.c.x += step.dt * b.m_linearVelocity.x;
-    		b.m_sweep.c.y += step.dt * b.m_linearVelocity.y;
-    		b.m_sweep.a += step.dt * b.m_angularVelocity;
+			// Apply damping.
+			// ODE: dv/dt + c * v = 0
+			// Solution: v(t) = v0 * exp(-c * t)
+			// Time step: v(t + dt) = v0 * exp(-c * (t + dt)) = v0 * exp(-c * t) * exp(-c * dt) = v * exp(-c * dt)
+			// v2 = exp(-c * dt) * v1
+			// Taylor expansion:
+			// v2 = (1.0f - c * dt) * v1
+			b.m_linearVelocity.mulLocal(MathUtils.clamp(1.0f - step.dt * b.m_linearDamping, 0.0f, 1.0f));
+			b.m_angularVelocity *= MathUtils.clamp(1.0f - step.dt * b.m_angularDamping, 0.0f, 1.0f);
 
-    		// Compute new transform
-    		b.synchronizeTransform();
+			// Check for large velocities.
+			if (Vec2.dot(b.m_linearVelocity, b.m_linearVelocity) > Settings.maxLinearVelocitySquared) {
+				b.m_linearVelocity.normalize();
+				b.m_linearVelocity.mulLocal(Settings.maxLinearVelocity);
+			}
 
-    		// Note: shapes are synchronized later.
-    	}
+			if (b.m_angularVelocity * b.m_angularVelocity > Settings.maxAngularVelocitySquared) {
+				if (b.m_angularVelocity < 0.0f) {
+					b.m_angularVelocity = -Settings.maxAngularVelocity;
+				} else {
+					b.m_angularVelocity = Settings.maxAngularVelocity;
+				}
+			}
+		}
 
-    	if (correctPositions) {
-    		// Initialize position constraints.
-    		// Contacts don't need initialization.
+		final ContactSolver contactSolver = new ContactSolver(step, m_contacts, m_contactCount);
 
-      		for (int i = 0; i < m_jointCount; ++i) {
-    			m_joints[i].initPositionConstraints();
-    		}
+		// Initialize velocity constraints.
+		contactSolver.initVelocityConstraints(step);
+
+		for (int i = 0; i < m_jointCount; ++i) {
+			m_joints[i].initVelocityConstraints(step);
+		}
+
+		// Solve velocity constraints.
+		for (int i = 0; i < step.maxIterations; ++i) {
+			contactSolver.solveVelocityConstraints();
+
+			for (int j = 0; j < m_jointCount; ++j) {
+				m_joints[j].solveVelocityConstraints(step);
+			}
+		}
 
 
-        	// Iterate over constraints.
-    		for (m_positionIterationCount = 0; m_positionIterationCount < step.maxIterations; ++m_positionIterationCount) {
-    			boolean contactsOkay = contactSolver.solvePositionConstraints(Settings.contactBaumgarte);
+		// Post-solve (store impulses for warm starting).
+		contactSolver.finalizeVelocityConstraints();
 
-    			boolean jointsOkay = true;
-    			for (int i = 0; i < m_jointCount; ++i) {
-    				boolean jointOkay = m_joints[i].solvePositionConstraints();
-    				jointsOkay = jointsOkay && jointOkay;
-    			}
+		// Integrate positions.
+		for (int i = 0; i < m_bodyCount; ++i) {
+			final Body b = m_bodies[i];
 
-    			if (contactsOkay && jointsOkay) {
-    				break;
-    			}
-    		}
+			if (b.isStatic()) {
+				continue;
+			}
 
-    	}
+			// Store positions for continuous collision.
+			b.m_sweep.c0.set(b.m_sweep.c);
+			b.m_sweep.a0 = b.m_sweep.a;
 
-    	report(contactSolver.m_constraints);
+			// Integrate
+			b.m_sweep.c.x += step.dt * b.m_linearVelocity.x;
+			b.m_sweep.c.y += step.dt * b.m_linearVelocity.y;
+			b.m_sweep.a += step.dt * b.m_angularVelocity;
 
-    	if (allowSleep) {
-    		float minSleepTime = Float.MAX_VALUE;
+			// Compute new transform
+			b.synchronizeTransform();
 
-    		final float linTolSqr = Settings.linearSleepTolerance * Settings.linearSleepTolerance;
-    		final float angTolSqr = Settings.angularSleepTolerance * Settings.angularSleepTolerance;
+			// Note: shapes are synchronized later.
+		}
 
-    		for (int i = 0; i < m_bodyCount; ++i) {
-    			Body b = m_bodies[i];
-    			if (b.m_invMass == 0.0f) {
-    				continue;
-    			}
+		if (correctPositions) {
+			// Initialize position constraints.
+			// Contacts don't need initialization.
 
-    			if ((b.m_flags & Body.e_allowSleepFlag) == 0) {
-    				b.m_sleepTime = 0.0f;
-    				minSleepTime = 0.0f;
-    			}
+			for (int i = 0; i < m_jointCount; ++i) {
+				m_joints[i].initPositionConstraints();
+			}
 
-    			if ((b.m_flags & Body.e_allowSleepFlag) == 0 ||
-    				b.m_angularVelocity * b.m_angularVelocity > angTolSqr ||
-    				Vec2.dot(b.m_linearVelocity, b.m_linearVelocity) > linTolSqr) {
-    				b.m_sleepTime = 0.0f;
-    				minSleepTime = 0.0f;
-    			} else {
-    				b.m_sleepTime += step.dt;
-    				minSleepTime = MathUtils.min(minSleepTime, b.m_sleepTime);
-    			}
-    		}
 
-    		if (minSleepTime >= Settings.timeToSleep) {
-    			for (int i = 0; i < m_bodyCount; ++i) {
-    				Body b = m_bodies[i];
-    				b.m_flags |= Body.e_sleepFlag;
-    				b.m_linearVelocity = new Vec2(0.0f, 0.0f);
-    				b.m_angularVelocity = 0.0f;
-    			}
-    		}
-    	}
-    	
-    }
+			// Iterate over constraints.
+			for (m_positionIterationCount = 0; m_positionIterationCount < step.maxIterations; ++m_positionIterationCount) {
+				final boolean contactsOkay = contactSolver.solvePositionConstraints(Settings.contactBaumgarte);
 
-    public void solveTOI(TimeStep subStep) {
-    	ContactSolver contactSolver = new ContactSolver(subStep, m_contacts, m_contactCount);
+				boolean jointsOkay = true;
+				for (int i = 0; i < m_jointCount; ++i) {
+					final boolean jointOkay = m_joints[i].solvePositionConstraints();
+					jointsOkay = jointsOkay && jointOkay;
+				}
 
-    	// No warm starting needed for TOI contact events.
-    	
-    	// For joints, initialize with the last full step warm starting values
-    	if (Settings.maxTOIJointsPerIsland > 0) {
-    		subStep.warmStarting = true;
-    		//for (int i=0; i<m_jointCount; ++i) {
-    		for (int i = m_jointCount-1; i >= 0; --i) {
-    			m_joints[i].initVelocityConstraints(subStep);
-    		}
-    		
-    		// ...but don't update the warm starting value during solving
-    		subStep.warmStarting = false;
-    	}
-    	    	
-    	// Solve velocity constraints.
-    	for (int i = 0; i < subStep.maxIterations; ++i) {
-    		contactSolver.solveVelocityConstraints();
-    		//for (int j = 0; j < m_jointCount; ++j) {
-    		for (int j = m_jointCount-1; j >= 0; --j) {
-    			m_joints[j].solveVelocityConstraints(subStep);
-    		}
-    	}
+				if (contactsOkay && jointsOkay) {
+					break;
+				}
+			}
 
-    	// Don't store the TOI contact forces for warm starting
-    	// because they can be quite large.
+		}
 
-    	// Integrate positions.
-    	for (int i = 0; i < m_bodyCount; ++i) {
-    		Body b = m_bodies[i];
+		report(contactSolver.m_constraints);
 
-    		if (b.isStatic())
-    			continue;
-    		//System.out.println("(Island::SolveTOI 1) :"+b.m_sweep);
-    		// Store positions for continuous collision.
-    		b.m_sweep.c0.set(b.m_sweep.c);
-    		b.m_sweep.a0 = b.m_sweep.a;
+		if (allowSleep) {
+			float minSleepTime = Float.MAX_VALUE;
 
-    		// Integrate
-    		b.m_sweep.c.x += subStep.dt * b.m_linearVelocity.x;
-    		b.m_sweep.c.y += subStep.dt * b.m_linearVelocity.y;
-    		b.m_sweep.a += subStep.dt * b.m_angularVelocity;
+			final float linTolSqr = Settings.linearSleepTolerance * Settings.linearSleepTolerance;
+			final float angTolSqr = Settings.angularSleepTolerance * Settings.angularSleepTolerance;
 
-    		//System.out.println("(Island::SolveTOI 2) :"+b.m_sweep);
-    		// Compute new transform
-    		b.synchronizeTransform();
+			for (int i = 0; i < m_bodyCount; ++i) {
+				final Body b = m_bodies[i];
+				if (b.m_invMass == 0.0f) {
+					continue;
+				}
 
-    		//	System.out.println("(Island::SolveTOI 3) :"+b.m_sweep);
-    		// Note: shapes are synchronized later.
-    	}
+				if ((b.m_flags & Body.e_allowSleepFlag) == 0) {
+					b.m_sleepTime = 0.0f;
+					minSleepTime = 0.0f;
+				}
 
-    	// Solve position constraints.
-    	final float k_toiBaumgarte = 0.75f;
-    	for (int i = 0; i < subStep.maxIterations; ++i) {
-    		boolean contactsOkay = contactSolver.solvePositionConstraints(k_toiBaumgarte);
-    		
-    		boolean jointsOkay = true;
-    		//for (int j = 0; j < m_jointCount; ++j) {
-    		for (int j = m_jointCount-1; j >= 0; --j) {
-				boolean jointOkay = m_joints[j].solvePositionConstraints();
+				if ((b.m_flags & Body.e_allowSleepFlag) == 0 ||
+						b.m_angularVelocity * b.m_angularVelocity > angTolSqr ||
+						Vec2.dot(b.m_linearVelocity, b.m_linearVelocity) > linTolSqr) {
+					b.m_sleepTime = 0.0f;
+					minSleepTime = 0.0f;
+				} else {
+					b.m_sleepTime += step.dt;
+					minSleepTime = MathUtils.min(minSleepTime, b.m_sleepTime);
+				}
+			}
+
+			if (minSleepTime >= Settings.timeToSleep) {
+				for (int i = 0; i < m_bodyCount; ++i) {
+					final Body b = m_bodies[i];
+					b.m_flags |= Body.e_sleepFlag;
+					b.m_linearVelocity = new Vec2(0.0f, 0.0f);
+					b.m_angularVelocity = 0.0f;
+				}
+			}
+		}
+
+	}
+
+	public void solveTOI(final TimeStep subStep) {
+		final ContactSolver contactSolver = new ContactSolver(subStep, m_contacts, m_contactCount);
+
+		// No warm starting needed for TOI contact events.
+
+		// For joints, initialize with the last full step warm starting values
+		if (Settings.maxTOIJointsPerIsland > 0) {
+			subStep.warmStarting = true;
+			//for (int i=0; i<m_jointCount; ++i) {
+			for (int i = m_jointCount-1; i >= 0; --i) {
+				m_joints[i].initVelocityConstraints(subStep);
+			}
+
+			// ...but don't update the warm starting value during solving
+			subStep.warmStarting = false;
+		}
+
+		// Solve velocity constraints.
+		for (int i = 0; i < subStep.maxIterations; ++i) {
+			contactSolver.solveVelocityConstraints();
+			//for (int j = 0; j < m_jointCount; ++j) {
+			for (int j = m_jointCount-1; j >= 0; --j) {
+				m_joints[j].solveVelocityConstraints(subStep);
+			}
+		}
+
+		// Don't store the TOI contact forces for warm starting
+		// because they can be quite large.
+
+		// Integrate positions.
+		for (int i = 0; i < m_bodyCount; ++i) {
+			final Body b = m_bodies[i];
+
+			if (b.isStatic()) {
+				continue;
+			}
+			//System.out.println("(Island::SolveTOI 1) :"+b.m_sweep);
+			// Store positions for continuous collision.
+			b.m_sweep.c0.set(b.m_sweep.c);
+			b.m_sweep.a0 = b.m_sweep.a;
+
+			// Integrate
+			b.m_sweep.c.x += subStep.dt * b.m_linearVelocity.x;
+			b.m_sweep.c.y += subStep.dt * b.m_linearVelocity.y;
+			b.m_sweep.a += subStep.dt * b.m_angularVelocity;
+
+			//System.out.println("(Island::SolveTOI 2) :"+b.m_sweep);
+			// Compute new transform
+			b.synchronizeTransform();
+
+			//	System.out.println("(Island::SolveTOI 3) :"+b.m_sweep);
+			// Note: shapes are synchronized later.
+		}
+
+		// Solve position constraints.
+		final float k_toiBaumgarte = 0.75f;
+		for (int i = 0; i < subStep.maxIterations; ++i) {
+			final boolean contactsOkay = contactSolver.solvePositionConstraints(k_toiBaumgarte);
+
+			boolean jointsOkay = true;
+			//for (int j = 0; j < m_jointCount; ++j) {
+			for (int j = m_jointCount-1; j >= 0; --j) {
+				final boolean jointOkay = m_joints[j].solvePositionConstraints();
 				//System.out.println("iter "+i + ": "+j + " " + jointOkay);
 				jointsOkay = jointsOkay && jointOkay;
 			}
@@ -336,51 +345,51 @@ public class Island {
 			if (contactsOkay && jointsOkay) {
 				break;
 			}
-    	}
+		}
 
-    	report(contactSolver.m_constraints);
-    }
-    
-    public void report(List<ContactConstraint> constraints) {
-    	//TODO: optimize this, it's crummy
-    	ContactConstraint[] cc = new ContactConstraint[constraints.size()];
-    	for (int i=0; i<cc.length; ++i) {
-    		cc[i] = constraints.get(i);
-    	}
-    	report(cc);
-    }
+		report(contactSolver.m_constraints);
+	}
 
-    public void report(ContactConstraint[] constraints) {
-    	if (m_listener == null) {
-    		return;
-    	}
+	public void report(final List<ContactConstraint> constraints) {
+		//TODO: optimize this, it's crummy
+		final ContactConstraint[] cc = new ContactConstraint[constraints.size()];
+		for (int i=0; i<cc.length; ++i) {
+			cc[i] = constraints.get(i);
+		}
+		report(cc);
+	}
 
-    	for (int i = 0; i < m_contactCount; ++i) {
-    		Contact c = m_contacts[i];
-    		ContactConstraint cc = constraints[i];
-    		ContactResult cr = new ContactResult();
-    		cr.shape1 = c.getShape1();
-    		cr.shape2 = c.getShape2();
-    		Body b1 = cr.shape1.getBody();
-    		int manifoldCount = c.getManifoldCount();
-    		List<Manifold> manifolds = c.getManifolds();
-    		for (int j = 0; j < manifoldCount; ++j) {
-    			Manifold manifold = manifolds.get(j);
-    			cr.normal.set(manifold.normal);
-    			for (int k = 0; k < manifold.pointCount; ++k) {
-    				ManifoldPoint point = manifold.points[k];
-    				ContactConstraintPoint ccp = cc.points[k];
-    				XForm.mulToOut(b1.getMemberXForm(), point.localPoint1, cr.position);
-    				
-    				// TOI constraint results are not stored, so get
-    				// the result from the constraint.
-    				cr.normalImpulse = ccp.normalImpulse;
-    				cr.tangentImpulse = ccp.tangentImpulse;
-    				cr.id = new ContactID(point.id);
+	public void report(final ContactConstraint[] constraints) {
+		if (m_listener == null) {
+			return;
+		}
 
-    				m_listener.result(cr);
-    			}
-    		}
-    	}
-    }
+		for (int i = 0; i < m_contactCount; ++i) {
+			final Contact c = m_contacts[i];
+			final ContactConstraint cc = constraints[i];
+			final ContactResult cr = new ContactResult();
+			cr.shape1 = c.getShape1();
+			cr.shape2 = c.getShape2();
+			final Body b1 = cr.shape1.getBody();
+			final int manifoldCount = c.getManifoldCount();
+			final List<Manifold> manifolds = c.getManifolds();
+			for (int j = 0; j < manifoldCount; ++j) {
+				final Manifold manifold = manifolds.get(j);
+				cr.normal.set(manifold.normal);
+				for (int k = 0; k < manifold.pointCount; ++k) {
+					final ManifoldPoint point = manifold.points[k];
+					final ContactConstraintPoint ccp = cc.points[k];
+					XForm.mulToOut(b1.getMemberXForm(), point.localPoint1, cr.position);
+
+					// TOI constraint results are not stored, so get
+					// the result from the constraint.
+					cr.normalImpulse = ccp.normalImpulse;
+					cr.tangentImpulse = ccp.tangentImpulse;
+					cr.id = new ContactID(point.id);
+
+					m_listener.result(cr);
+				}
+			}
+		}
+	}
 }
