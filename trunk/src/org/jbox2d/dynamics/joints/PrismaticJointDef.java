@@ -27,7 +27,12 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
 //Updated to rev 56->130 of b2PrismaticJoint.cpp/.h
-
+/**
+ * A prismatic joint definition. This joint provides one degree of freedom: translation
+ * along an axis fixed in body1. Relative rotation is prevented. You can
+ * use a joint limit to restrict the range of motion and a joint motor to
+ * drive the motion or to model joint friction.
+ */
 public class PrismaticJointDef extends JointDef {
 	public PrismaticJointDef() {
 		type = JointType.PRISMATIC_JOINT;

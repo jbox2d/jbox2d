@@ -2,6 +2,10 @@ package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.dynamics.Body;
 
+/**
+ * Definition for a {@link ConstantVolumeJoint}, which connects a group a bodies together
+ * so they maintain a constant volume within them.
+ */
 public class ConstantVolumeJointDef extends JointDef {
 	Body[] bodies;
 	public float frequencyHz;

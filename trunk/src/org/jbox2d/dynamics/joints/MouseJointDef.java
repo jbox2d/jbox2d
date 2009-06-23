@@ -27,6 +27,10 @@ import org.jbox2d.common.Vec2;
 
 //Updated to rev 130 of b2MouseJoint.cpp/.h
 
+/**
+ * This joint is used to add force to an object to accelerate to a position,
+ * normally used with the mouse.
+ */
 public class MouseJointDef extends JointDef {
 	/**
 	 * The initial world target point. This is assumed
