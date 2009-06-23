@@ -42,15 +42,15 @@ import org.jbox2d.dynamics.TimeStep;
 
 public class MouseJoint extends Joint {
 
-	public Vec2 m_localAnchor;
+	public final Vec2 m_localAnchor;
 
-	public Vec2 m_target;
+	public final Vec2 m_target;
 
-	public Vec2 m_force;
+	public final Vec2 m_force;
 
-	public Mat22 m_mass; // effective mass for point-to-point constraint.
+	public final Mat22 m_mass; // effective mass for point-to-point constraint.
 
-	public Vec2 m_C; // position error
+	public final Vec2 m_C; // position error
 
 	public float m_maxForce;
 
@@ -65,7 +65,7 @@ public class MouseJoint extends Joint {
 		m_target = new Vec2();
 		m_C = new Vec2();
 		m_mass = new Mat22();
-		m_target = def.target;
+		m_target.set(def.target);
 		m_localAnchor = XForm.mulTrans(m_body2.m_xf, m_target);
 
 		m_maxForce = def.maxForce;
@@ -91,7 +91,7 @@ public class MouseJoint extends Joint {
 	public void setTarget(Vec2 target) {
 		if (m_body2.isSleeping())
 			m_body2.wakeUp();
-		m_target = target;
+		m_target.set(target);
 	}
 
 	@Override
@@ -143,7 +143,7 @@ public class MouseJoint extends Joint {
 		K1.col2.y += m_gamma;
 
 		m_mass.set(K1);
-		m_mass = m_mass.invert();
+		m_mass.invertLocal();
 
 		m_C.set(b.m_sweep.c.x + r.x - m_target.x, b.m_sweep.c.y + r.y
 				- m_target.y);

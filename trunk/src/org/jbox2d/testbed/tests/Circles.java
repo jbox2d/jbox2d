@@ -81,7 +81,7 @@ public class Circles extends AbstractExample {
             cd.restitution = 0.9f;
             float xPos = radius * (float)Math.cos(2f*Math.PI * (i / (float)(numPieces)));
             float yPos = radius * (float)Math.sin(2f*Math.PI * (i / (float)(numPieces)));
-            cd.localPosition = new Vec2(xPos,yPos);
+            cd.localPosition.set(xPos,yPos);
             body.createShape(cd);   
         }
         body.setMassFromShapes();

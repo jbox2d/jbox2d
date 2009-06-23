@@ -43,9 +43,9 @@ import org.jbox2d.dynamics.TimeStep;
 
 public class DistanceJoint extends Joint {
     
-    public Vec2 m_localAnchor1;
-    public Vec2 m_localAnchor2;
-	public Vec2 m_u;
+    public final Vec2 m_localAnchor1;
+    public final Vec2 m_localAnchor2;
+	public final Vec2 m_u;
 	public float m_impulse;
 	public float m_mass;		// effective mass for the constraint.
 	public float m_length;
@@ -196,7 +196,7 @@ public class DistanceJoint extends Joint {
     	C = MathUtils.clamp(C, -Settings.maxLinearCorrection, Settings.maxLinearCorrection);
 
     	float impulse = -m_mass * C;
-    	m_u = d;
+    	m_u.set(d);
     	float Px = impulse * m_u.x;
     	float Py = impulse * m_u.y;
 

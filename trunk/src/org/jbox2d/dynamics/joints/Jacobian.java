@@ -26,11 +26,11 @@ package org.jbox2d.dynamics.joints;
 import org.jbox2d.common.Vec2;
 
 public class Jacobian {
-    public Vec2 linear1;
+    public final Vec2 linear1;
 
     public float angular1;
 
-    public Vec2 linear2;
+    public final Vec2 linear2;
 
     public float angular2;
 

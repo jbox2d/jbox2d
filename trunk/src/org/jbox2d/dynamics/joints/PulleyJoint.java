@@ -65,13 +65,13 @@ public class PulleyJoint extends Joint {
     public static final float MIN_PULLEY_LENGTH = 2.0f;//Settings.lengthUnitsPerMeter;
 
     public Body m_ground;
-	public Vec2 m_groundAnchor1;
-	public Vec2 m_groundAnchor2;
-	public Vec2 m_localAnchor1;
-	public Vec2 m_localAnchor2;
+	public final Vec2 m_groundAnchor1;
+	public final Vec2 m_groundAnchor2;
+	public final Vec2 m_localAnchor1;
+	public final Vec2 m_localAnchor2;
 
-	public Vec2 m_u1;
-	public Vec2 m_u2;
+	public final Vec2 m_u1;
+	public final Vec2 m_u2;
 	
 	public float m_constant;
 	public float m_ratio;

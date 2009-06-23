@@ -76,11 +76,11 @@ public class GearJoint extends Joint {
 	public RevoluteJoint m_revolute2;
 	public PrismaticJoint m_prismatic2;
 
-	public Vec2 m_groundAnchor1;
-	public Vec2 m_groundAnchor2;
+	public final Vec2 m_groundAnchor1;
+	public final Vec2 m_groundAnchor2;
 
-	public Vec2 m_localAnchor1;
-	public Vec2 m_localAnchor2;
+	public final Vec2 m_localAnchor1;
+	public final Vec2 m_localAnchor2;
 
 	public Jacobian m_J;
 
@@ -171,8 +171,10 @@ public class GearJoint extends Joint {
         	Mat22.mulToOut(g1.getMemberXForm().R, m_prismatic1.m_localXAxis1, ug);
         	Mat22.mulToOut(b1.getMemberXForm().R, m_localAnchor1.sub(b1.getMemberLocalCenter()), r);
     		float crug = Vec2.cross(r, ug);
-            m_J.linear1 = ug.negate();
-            m_J.angular1 = -crug;
+            //m_J.linear1 = ug.negate();
+    		m_J.linear1.set(ug);
+    		m_J.linear1.negateLocal();
+    		m_J.angular1 = -crug;
             K += b1.m_invMass + b1.m_invI * crug * crug;
         }
 
@@ -184,7 +186,9 @@ public class GearJoint extends Joint {
             Mat22.mulToOut(g2.getMemberXForm().R, m_prismatic2.m_localXAxis1, ug);
     		Mat22.mulToOut(b2.getMemberXForm().R, m_localAnchor2.sub(b2.getMemberLocalCenter()), r);
             float crug = Vec2.cross(r, ug);
-            m_J.linear2 = ug.mulLocal(-m_ratio);
+            //m_J.linear2 = ug.mulLocal(-m_ratio);
+            m_J.linear2.set(ug);
+            m_J.linear2.mulLocal(-m_ratio);
             m_J.angular2 = -m_ratio * crug;
             K += m_ratio * m_ratio * (b2.m_invMass + b2.m_invI * crug * crug);
         }

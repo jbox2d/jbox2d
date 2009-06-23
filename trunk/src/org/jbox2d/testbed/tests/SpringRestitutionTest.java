@@ -71,8 +71,8 @@ public class SpringRestitutionTest extends AbstractExample {
     
     public void createWorld() {
 		m_worldAABB = new AABB();
-		m_worldAABB.lowerBound = new Vec2(-200.0f, -100.0f);
-		m_worldAABB.upperBound = new Vec2(200.0f, 200.0f);
+		m_worldAABB.lowerBound.set(-200.0f, -100.0f);
+		m_worldAABB.upperBound.set(200.0f, 200.0f);
 		// Set gravity to zero for this test
 		Vec2 gravity = new Vec2(0.0f, -0.0f);
 		boolean doSleep = true;

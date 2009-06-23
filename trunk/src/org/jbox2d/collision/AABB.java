@@ -30,9 +30,9 @@ import org.jbox2d.common.Vec2;
 /** An axis-aligned bounding box. */
 public class AABB {
 	/** Bottom left vertex of bounding box. */
-	public Vec2 lowerBound;
+	public final Vec2 lowerBound;
 	/** Top right vertex of bounding box. */
-	public Vec2 upperBound;
+	public final Vec2 upperBound;
 
 	/**
 	 * Creates the default object, with vertices at 0,0 and 0,0.

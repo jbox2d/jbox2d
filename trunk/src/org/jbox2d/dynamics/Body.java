@@ -70,15 +70,15 @@ public class Body {
 	public int m_type;
 
 	/** The body origin transform */
-	public XForm m_xf;
+	public final XForm m_xf;
 
 	/** The swept motion for CCD */
 	public Sweep m_sweep;
 
-	public Vec2 m_linearVelocity;
+	public final Vec2 m_linearVelocity;
 	public float m_angularVelocity;
 
-	public Vec2 m_force;
+	public final Vec2 m_force;
 	public float m_torque;
 
 	public World m_world;
@@ -108,8 +108,11 @@ public class Body {
 	 */
 	public Object m_userData;
 
+	/**
+	 * Empty body, with no world
+	 */
 	public Body() {
-
+		this( new BodyDef(), null);
 	}
 
 	/**

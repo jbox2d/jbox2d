@@ -29,8 +29,8 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 
 class BoundValues {
-	public int[] lowerValues;
-	public int[] upperValues;
+	public final int[] lowerValues;
+	public final int[] upperValues;
 
 	public BoundValues() {
 		lowerValues = new int[2];

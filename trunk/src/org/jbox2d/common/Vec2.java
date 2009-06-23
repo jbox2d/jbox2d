@@ -25,8 +25,7 @@ package org.jbox2d.common;
 
 /**
  * A 2-dimensional vector class.  Used heavily in JBox2d.
- * djm: added ToOut methods, added modifiers, and a
- * few optimizations
+ * djm: added ToOut methods
  */
 public class Vec2 {
 	/** Should we count Vec2 creations? */

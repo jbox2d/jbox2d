@@ -47,14 +47,14 @@ import org.jbox2d.dynamics.TimeStep;
 //K = invI1 + invI2
 
 public class RevoluteJoint extends Joint {
-	public Vec2 m_localAnchor1;	// relative
-	public Vec2 m_localAnchor2;
-	public Vec2 m_pivotForce;
+	public final Vec2 m_localAnchor1;	// relative
+	public final Vec2 m_localAnchor2;
+	public final Vec2 m_pivotForce;
 	public float m_motorForce;
 	public float m_limitForce;
 	public float m_limitPositionImpulse;
 
-	public Mat22 m_pivotMass;		// effective mass for point-to-point constraint.
+	public final Mat22 m_pivotMass;		// effective mass for point-to-point constraint.
 	public float m_motorMass;	// effective mass for motor/limit angular constraint.
 	
 	public boolean m_enableMotor;
@@ -126,8 +126,10 @@ public class RevoluteJoint extends Joint {
     	//Mat22 K = K1.addLocal(K2).addLocal(K3);
     	K1.addLocal(K2).addLocal(K3);
     	
-    	m_pivotMass = K1.invert();
-
+    	//m_pivotMass = K1.invert();
+    	m_pivotMass.set(K1);
+    	m_pivotMass.invertLocal();
+    	
     	m_motorMass = 1.0f / (invI1 + invI2);
 
     	if (m_enableMotor == false) {

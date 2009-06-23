@@ -41,8 +41,8 @@ import org.jbox2d.dynamics.ContactListener;
 
 public class PointAndCircleContact extends Contact implements ContactCreateFcn {
 
-    Manifold m_manifold;
-    ArrayList<Manifold> manifoldList = new ArrayList<Manifold>();
+    public final Manifold m_manifold;
+    public final ArrayList<Manifold> manifoldList = new ArrayList<Manifold>();
 
     public Contact create(Shape shape1, Shape shape2) {
         return new PointAndCircleContact(shape1, shape2);

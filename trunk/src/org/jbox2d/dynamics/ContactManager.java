@@ -38,7 +38,7 @@ import org.jbox2d.dynamics.contacts.NullContact;
 //Updated to rev 56->104->142 of b2ContactManager.cpp/.h
 
 /** Delegate of World - for internal use. */
-public class ContactManager extends PairCallback {
+public class ContactManager implements PairCallback {
 	World m_world;
 
 	// This lets us provide broadphase proxy pair user data for

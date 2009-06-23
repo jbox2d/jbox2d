@@ -17,8 +17,8 @@ public class EdgeTest extends AbstractExample {
 	@Override
 	public void createWorld() {
 		m_worldAABB = new AABB();
-		m_worldAABB.lowerBound = new Vec2(-10000.0f, -10000.0f);
-		m_worldAABB.upperBound = new Vec2(10000.0f, 10000.0f);
+		m_worldAABB.lowerBound.set(-10000.0f, -10000.0f);
+		m_worldAABB.upperBound.set(10000.0f, 10000.0f);
 		Vec2 gravity = new Vec2(0.0f, -10.0f);
 		boolean doSleep = true;
 		m_world = new World(m_worldAABB, gravity, doSleep);

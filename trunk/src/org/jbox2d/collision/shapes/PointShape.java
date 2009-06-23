@@ -13,7 +13,7 @@ import org.jbox2d.common.XForm;
  *
  */
 public class PointShape extends Shape {
-	public Vec2 m_localPosition;
+	public final Vec2 m_localPosition;
 	public float m_mass;
 
 	public PointShape(final ShapeDef def) {
