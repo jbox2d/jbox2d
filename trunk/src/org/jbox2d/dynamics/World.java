@@ -51,8 +51,6 @@ import org.jbox2d.dynamics.joints.JointDef;
 import org.jbox2d.dynamics.joints.JointEdge;
 import org.jbox2d.dynamics.joints.JointType;
 import org.jbox2d.dynamics.joints.PulleyJoint;
-import org.jbox2d.testbed.tests.LiquidTest;
-
 
 
 //Updated to rev 56->118->142->150 of b2World.cpp/.h
@@ -1009,7 +1007,7 @@ public class World {
 
 			circCenterMoved.x = drawingCenter.x + .01f;
 			circCenterMoved.y = drawingCenter.y + .01f;
-			if (circle.getUserData() != null && circle.getUserData() == LiquidTest.LIQUID_INT) {
+			if (circle.getUserData() != null) {
 				m_debugDraw.drawSegment(drawingCenter, circCenterMoved, liquidColor);
 				return;
 			}

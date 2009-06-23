@@ -142,8 +142,7 @@ public class MouseJoint extends Joint {
 		K1.col1.x += m_gamma;
 		K1.col2.y += m_gamma;
 
-		m_mass.set(K1);
-		m_mass.invertLocal();
+		K1.invertToOut( m_mass);
 
 		m_C.set(b.m_sweep.c.x + r.x - m_target.x, b.m_sweep.c.y + r.y
 				- m_target.y);

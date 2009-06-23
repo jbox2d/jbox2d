@@ -52,7 +52,6 @@ public class ContactManager implements PairCallback {
 		m_destroyImmediate = false;
 	}
 
-	@Override
 	public Object pairAdded(final Object proxyUserData1, final Object proxyUserData2) {
 		Shape shape1 = (Shape) proxyUserData1;
 		Shape shape2 = (Shape) proxyUserData2;
@@ -127,7 +126,6 @@ public class ContactManager implements PairCallback {
 
 	// This is a callback from the broadphase when two AABB proxies cease
 	// to overlap. We retire the b2Contact.
-	@Override
 	public void pairRemoved(final Object proxyUserData1, final Object proxyUserData2,
 	                        final Object pairUserData) {
 		//B2_NOT_USED(proxyUserData1);
