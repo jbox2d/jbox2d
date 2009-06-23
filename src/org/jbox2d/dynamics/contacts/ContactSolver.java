@@ -95,7 +95,9 @@ public class ContactSolver {
                 
                 c.body1 = b1;
                 c.body2 = b2;
-                c.manifold.set(manifold); //no copy here!
+                // DO NOT USE SET METHOD this object needs to be
+                // referenced in the list
+                c.manifold = manifold; //no copy here!
                 c.normal.set(normal);// = normal.clone();
                 c.pointCount = manifold.pointCount;
                 

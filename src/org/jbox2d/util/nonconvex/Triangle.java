@@ -1,6 +1,6 @@
 package org.jbox2d.util.nonconvex;
 
-class Triangle{
+public class Triangle{
     
     public float[] x;
     public float[] y;

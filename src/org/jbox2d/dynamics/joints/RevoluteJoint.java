@@ -127,8 +127,7 @@ public class RevoluteJoint extends Joint {
     	K1.addLocal(K2).addLocal(K3);
     	
     	//m_pivotMass = K1.invert();
-    	m_pivotMass.set(K1);
-    	m_pivotMass.invertLocal();
+    	K1.invertToOut(m_pivotMass);
     	
     	m_motorMass = 1.0f / (invI1 + invI2);
 

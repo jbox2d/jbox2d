@@ -36,7 +36,7 @@ public class ContactConstraint {
 
     public final Vec2 normal;
 
-    public final Manifold manifold;
+    public Manifold manifold;
 
     public Body body1;
 

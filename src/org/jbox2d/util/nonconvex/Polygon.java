@@ -419,18 +419,18 @@ public class Polygon {
 		return true;
 	}
 	    
-	    /*
+	    /**
 	     * Tries to add a triangle to the polygon. Returns null if it can't connect
 	     * properly, otherwise returns a pointer to the new Polygon. Assumes bitwise
 	     * equality of joined vertex positions.
 		 *
 		 * Remember to delete the pointer afterwards.
-		 * Todo: Make this return a Polygon instead
+		 * TODO: Make this return a Polygon instead
 		 * of a pointer to a heap-allocated one.
 		 *
 		 * For internal use.
 	     */
-	private Polygon add(Triangle t) {
+	public Polygon add(Triangle t) {
 //			float equalTol = .001f;
 	        // First, find vertices that connect
 	        int firstP = -1;
