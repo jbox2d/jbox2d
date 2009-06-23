@@ -31,11 +31,11 @@ import org.jbox2d.common.Vec2;
 /** An oriented bounding box. */
 public class OBB {
 	/** The rotation matrix. */
-	public Mat22 R;
+	public final Mat22 R;
 	/** The local centroid. */
-	public Vec2 center;
+	public final Vec2 center;
 	/** The half-widths. */
-	public Vec2 extents;
+	public final Vec2 extents;
 
 	/**
 	 * creates OBB with the given data.  The arguments are cloned

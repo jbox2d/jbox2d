@@ -3,6 +3,8 @@
 	<property file="building.properties"/>
 	
 	<target name="dist-library" depends="copyLibraryToTemp">
+		<description>creates the library jar</description>
+		
 		<mkdir dir="${dist}"/>
 		
 		<echo>Copying appropriate class files</echo>
@@ -23,6 +25,8 @@
 	</target>
 		
 	<target name="dist-full" depends="copyFullToTemp">
+		<description>creates the full jar (includes the processing core.jar classes, and the testbed+examples)</description>
+
 		<mkdir dir="${dist}"/>
 		
 		<echo>unpacking dependency jar classes</echo>
@@ -50,13 +54,20 @@
 		<delete file="Full.mf"/>
 	</target>
 	
-	<target name="dist" depends="dist-library,dist-full"/>
+	<target name="dist" depends="dist-library,dist-full">
+		<description>creates both jars</description>
+	</target>
 	
-	<target name="copyLibraryToTemp" depends="copyLibraryClassesToTemp,copyLibrarySourceToTemp"/>
+	<target name="copyLibraryToTemp" depends="copyLibraryClassesToTemp,copyLibrarySourceToTemp">
+		<description>copies the library jar's classes to the temp folder, and optionally the source files too</description>
+	</target>
 	
-	<target name="copyFullToTemp" depends="copyAllClassesToTemp,copyAllSourceToTemp"/>
+	<target name="copyFullToTemp" depends="copyAllClassesToTemp,copyAllSourceToTemp">
+		<description>copies all the classes to the temp folder, and optionally the source files too</description>
+	</target>
 	
 	<target name="copyLibraryClassesToTemp">
+		<description>copies the library class to the temp folder</description>
 		<echo>Everything should be built already, and in the ${build} directory</echo>
 
 		<mkdir dir="temp"/>
@@ -73,6 +84,8 @@
 	</target>
 	
 	<target name="copyLibrarySourceToTemp" if="includeSource">
+		<description>copies the library source files to the temp folder</description>
+
 		<echo>Copying library source files to temp</echo>
 		<mkdir dir="temp"/>
 		
@@ -87,6 +100,7 @@
 	</target>
 	
 	<target name="copyAllClassesToTemp">
+		<description>copies all classes to the temp folder</description>
 		<echo>Everything should be built already, and in the ${build} directory</echo>
 
 		<mkdir dir="temp"/>
@@ -100,6 +114,7 @@
 	</target>
 	
 	<target name="copyAllSourceToTemp" if="includeSource">
+		<description>copies all source files to the temp folder</description>
 		<echo>Copying all source files to temp</echo>
 		<mkdir dir="temp"/>
 		

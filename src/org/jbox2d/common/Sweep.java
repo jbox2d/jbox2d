@@ -35,9 +35,9 @@ package org.jbox2d.common;
 public class Sweep {
 
 	/** Local center of mass position */
-	public Vec2 localCenter; 
+	public final Vec2 localCenter; 
 	/** Center world positions */
-	public Vec2 c0, c;
+	public final Vec2 c0, c;
 	/** World angles */
 	public float a0, a; 
 	/** Time interval = [t0,1], where t0 is in [0,1] */

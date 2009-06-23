@@ -175,7 +175,7 @@ public class ContactManager extends PairCallback {
 					b1.getWorldLocationToOut(mp.localPoint1, cp.position);
 					b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
 					// velocity isn't initialized in the contact point
-					cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+					b2.getLinearVelocityFromLocalPointToOut(mp.localPoint2, cp.velocity);
 					cp.velocity.subLocal(v1);
 					cp.separation = mp.separation;
 					cp.id.set(mp.id);

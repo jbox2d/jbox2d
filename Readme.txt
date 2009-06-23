@@ -10,6 +10,8 @@ There is also an Actionscript 3 version of this engine for Flash programmers, ma
 
 Issues can be discussed at the Box2d forums at http://www.box2d.org/forum/
 
+In the dist folder, you will find two jars. The Library jar only has the physics library included, while the Full jar includes the processing jar classes (core.jar) and the tests and testbed.  You should really only need the library.
+
 It is highly recommended that you enable assertions when debugging a JBox2d program.  In Eclipse, this is done by adding -ea to the "Run"->"Open Run Dialog"->"Arguments"->"VM arguments" entry for your run configuration.
 The assertions in JBox2d are generally lightweight, so shouldn't cause much of a runtime hit.  If you encounter one, it's probably because you've done something wrong, and the engine will likely not work properly with that input.  If you're sure you haven't done anything bad (please follow the assert to the source code so you can see if there is an explanatory comment), please let us know at the forums.
 

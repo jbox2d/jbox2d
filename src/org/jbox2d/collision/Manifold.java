@@ -31,9 +31,9 @@ import org.jbox2d.common.Vec2;
 /** A manifold for two touching convex shapes. */
 public class Manifold {
 	/** The points of contact. */
-    public ManifoldPoint[] points;
+    public final ManifoldPoint[] points;
     /** The shared unit normal vector. */
-    public Vec2 normal;
+    public final Vec2 normal;
     /** The number of manifold points. */
     public int pointCount;
 

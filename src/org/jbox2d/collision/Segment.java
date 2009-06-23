@@ -29,7 +29,8 @@ import org.jbox2d.common.*;
 // djm: is this used?
 public class Segment {
 	
-	public Vec2 p1, p2;
+	public final Vec2 p1 = new Vec2();
+	public final Vec2 p2 = new Vec2();
 	
 	/*
 	// Collision Detection in Interactive 3D Environments by Gino van den Bergen

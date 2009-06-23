@@ -559,7 +559,7 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		// Center of mass
 		assert(area > Settings.EPSILON);
 		center.mulLocal(1.0f / area);
-		massData.center = center.clone();
+		massData.center.set(center);
 
 		// Inertia tensor relative to the local origin.
 		massData.I = I*m_density;

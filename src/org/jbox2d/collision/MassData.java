@@ -32,7 +32,7 @@ public class MassData {
 	/** The mass of the shape, usually in kilograms. */
     public float mass;
     /** The position of the shape's centroid relative to the shape's origin. */
-    public Vec2 center;
+    public final Vec2 center;
     /** The rotational inertia of the shape. */
     public float I;
 

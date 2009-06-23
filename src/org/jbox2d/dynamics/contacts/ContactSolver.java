@@ -35,7 +35,7 @@ import org.jbox2d.dynamics.TimeStep;
 
 
 //Updated to rev 131->149 of b2ContactSolver.cpp/.h
-
+// TODO djm: make this not be created all the time
 public class ContactSolver {
 	public TimeStep m_step;
 	
@@ -44,7 +44,7 @@ public class ContactSolver {
 	 * a plain array is faster than a List...
 	 */
     //*
-	public ContactConstraint[] m_constraints;
+	public final ContactConstraint[] m_constraints;
 	/*/
 	public List<ContactConstraint> m_constraints;
 	//*/
@@ -95,7 +95,7 @@ public class ContactSolver {
                 
                 c.body1 = b1;
                 c.body2 = b2;
-                c.manifold = manifold; //no copy here!
+                c.manifold.set(manifold); //no copy here!
                 c.normal.set(normal);// = normal.clone();
                 c.pointCount = manifold.pointCount;
                 

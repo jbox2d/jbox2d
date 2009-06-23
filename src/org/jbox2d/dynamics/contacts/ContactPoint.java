@@ -34,11 +34,11 @@ public class ContactPoint {
 		/** The second shape */
 		public Shape shape2;		
 		/** Position in world coordinates */
-		public Vec2 position;
+		public final Vec2 position;
 		/** Velocity of point on body2 relative to point on body1 (pre-solver) */
-		public Vec2 velocity;
+		public final Vec2 velocity;
 		/** Points from shape1 to shape2 */
-		public Vec2 normal;
+		public final Vec2 normal;
 		/** The separation is negative when shapes are touching */
 		public float separation;
 		/** The combined friction coefficient */
@@ -51,6 +51,7 @@ public class ContactPoint {
 		public ContactPoint() {
 			position = new Vec2();
 			normal = new Vec2();
+			velocity = new Vec2();
 			id = new ContactID();
 		}
 }
