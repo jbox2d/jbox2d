@@ -25,7 +25,10 @@ package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.dynamics.Body;
 
-public class JointDef {
+/**
+ * Base class for all joint definitions
+ */
+public abstract class JointDef {
     public JointType type;
 
     public Body body1;

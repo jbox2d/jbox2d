@@ -28,17 +28,20 @@ import org.jbox2d.dynamics.Body;
 
 //Updated to rev. 56->108 of b2RevoluteJoint.cpp/.h
 
-/// Revolute joint definition. This requires defining an
-/// anchor point where the bodies are joined. The definition
-/// uses local anchor points so that the initial configuration
-/// can violate the constraint slightly. You also need to
-/// specify the initial relative angle for joint limits. This
-/// helps when saving and loading a game.
-/// The local anchor points are measured from the body's origin
-/// rather than the center of mass because:
-/// 1. you might not know where the center of mass will be.
-/// 2. if you add/remove shapes from a body and recompute the mass,
-///    the joints will be broken.
+/**
+ *  Revolute joint definition. This requires defining an
+ *  anchor point where the bodies are joined. The definition
+ *  uses local anchor points so that the initial configuration
+ *  can violate the constraint slightly. You also need to
+ *  specify the initial relative angle for joint limits. This
+ *  helps when saving and loading a game.
+ *  The local anchor points are measured from the body's origin
+ *  rather than the center of mass because:<br/>
+ *  <ul>
+ *  <li>you might not know where the center of mass will be.</li>
+ *  <li>if you add/remove shapes from a body and recompute the mass,
+ *     the joints will be broken.</li></ul>
+ */
 public class RevoluteJointDef extends JointDef {
 	public RevoluteJointDef() {
 		type = JointType.REVOLUTE_JOINT;
@@ -63,31 +66,49 @@ public class RevoluteJointDef extends JointDef {
 		referenceAngle = body2.getAngle() - body1.getAngle();
 	}
 
-	/// The local anchor point relative to body1's origin.
+	/**
+	 *  The local anchor point relative to body1's origin.
+	 */
 	public Vec2 localAnchor1;
 
-	/// The local anchor point relative to body2's origin.
+	/**
+	 *  The local anchor point relative to body2's origin.
+	 */
 	public Vec2 localAnchor2;
 
-	/// The body2 angle minus body1 angle in the reference state (radians).
+	/**
+	 *  The body2 angle minus body1 angle in the reference state (radians).
+	 */
 	public float referenceAngle;
 
-	/// A flag to enable joint limits.
+	/**
+	 *  A flag to enable joint limits.
+	 */
 	public boolean enableLimit;
 
-	/// The lower angle for the joint limit (radians).
+	/**
+	 *  The lower angle for the joint limit (radians).
+	 */
 	public float lowerAngle;
 
-	/// The upper angle for the joint limit (radians).
+	/**
+	 *  The upper angle for the joint limit (radians).
+	 */
 	public float upperAngle;
 
-	/// A flag to enable the joint motor.
+	/**
+	 *  A flag to enable the joint motor.
+	 */
 	public boolean enableMotor;
 
-	/// The desired motor speed. Usually in radians per second.
+	/**
+	 *  The desired motor speed. Usually in radians per second.
+	 */
 	public float motorSpeed;
 
-	/// The maximum motor torque used to achieve the desired motor speed.
-	/// Usually in N-m.
+	/**
+	 *  The maximum motor torque used to achieve the desired motor speed.
+	 *  Usually in N-m.
+	 */
 	public float maxMotorTorque;
 }

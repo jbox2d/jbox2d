@@ -30,6 +30,9 @@ import org.jbox2d.dynamics.TimeStep;
 
 //Updated to rev 56->97->144 of b2Joint.cpp/.h
 
+/**
+ * Base class for all Joints
+ */
 public abstract class Joint {
 
     public JointType m_type;
