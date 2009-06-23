@@ -187,7 +187,7 @@ public class CircleShape extends Shape {
 	@Override
 	public void computeMass(final MassData massData) {
 		massData.mass = m_density * (float)Math.PI * m_radius * m_radius;
-		massData.center = m_localPosition.clone();
+		massData.center.set(m_localPosition);
 
 		// inertia about the local origin
 		massData.I = massData.mass * (0.5f * m_radius * m_radius + Vec2.dot(m_localPosition, m_localPosition));

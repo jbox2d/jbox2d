@@ -32,11 +32,11 @@ import org.jbox2d.dynamics.Body;
 
 // Updated to rev 139 of b2ContactSolver.h
 public class ContactConstraint {
-    public ContactConstraintPoint points[];
+    public final ContactConstraintPoint points[];
 
-    public Vec2 normal;
+    public final Vec2 normal;
 
-    public Manifold manifold;
+    public final Manifold manifold;
 
     public Body body1;
 
@@ -58,7 +58,7 @@ public class ContactConstraint {
         manifold = new Manifold();
     }
     
-    public void set(ContactConstraint cp){
+    public void set(final ContactConstraint cp){
     	pointCount = cp.pointCount;
     	normal.set(cp.normal);
     	manifold.set(cp.manifold);

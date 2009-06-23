@@ -188,7 +188,7 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 	@Override
 	public void computeMass(final MassData massData) {
 		massData.mass = 0;
-		massData.center = m_v1;
+		massData.center.set(m_v1);
 
 		// inertia about the local origin
 		massData.I = 0;

@@ -43,4 +43,11 @@ public class ContactEdge {
     public ContactEdge prev;
     /** The next contact edge in the body's contact list. */
     public ContactEdge next;
+    
+    public void set(final ContactEdge argToCopy){
+    	other = argToCopy.other;
+    	contact = argToCopy.contact;
+    	prev = argToCopy.prev;
+    	next = argToCopy.next;
+    }
 }

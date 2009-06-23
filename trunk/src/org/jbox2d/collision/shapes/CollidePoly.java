@@ -432,7 +432,7 @@ public class CollidePoly {
 				cp.localPoint2.x = (u1x * xfB.R.col1.x + u1y * xfB.R.col1.y);
 				cp.localPoint2.y = (u1x * xfB.R.col2.x + u1y * xfB.R.col2.y);
 
-				cp.id = new ContactID(clipPoints2[i].id);
+				cp.id.set(clipPoints2[i].id);
 				cp.id.features.flip = flip;
 				++pointCount;
 			}
@@ -494,7 +494,7 @@ public class CollidePoly {
 		// If the center is inside the polygon ...
 		if (separation < Settings.EPSILON) {
 			manifold.pointCount = 1;
-			manifold.normal = Mat22.mul(xf1.R, normals[normalIndex]);
+			Mat22.mulToOut(xf1.R, normals[normalIndex], manifold.normal);
 			manifold.points[0].id.features.incidentEdge = normalIndex;
 			manifold.points[0].id.features.incidentVertex = Collision.NULL_FEATURE;
 			manifold.points[0].id.features.referenceEdge = 0;

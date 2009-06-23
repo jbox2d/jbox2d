@@ -40,8 +40,8 @@ import org.jbox2d.dynamics.ContactListener;
 
 public class CircleContact extends Contact implements ContactCreateFcn {
 
-	Manifold m_manifold;
-	ArrayList<Manifold> manifoldList = new ArrayList<Manifold>();
+	public final Manifold m_manifold;
+	public final ArrayList<Manifold> manifoldList = new ArrayList<Manifold>();
 
 	public Contact create(final Shape shape1, final Shape shape2) {
 		return new CircleContact(shape1, shape2);
@@ -72,8 +72,8 @@ public class CircleContact extends Contact implements ContactCreateFcn {
 		m_manifold.pointCount = 0;
 		m_manifold.points[0].normalImpulse = 0.0f;
 		m_manifold.points[0].tangentImpulse = 0.0f;
-		m_manifold.points[0].localPoint1 = new Vec2();
-		m_manifold.points[0].localPoint2 = new Vec2();
+		m_manifold.points[0].localPoint1.setZero();
+		m_manifold.points[0].localPoint2.setZero();
 	}
 
 	public void destructor() {
@@ -125,9 +125,7 @@ public class CircleContact extends Contact implements ContactCreateFcn {
 					b1.getWorldLocationToOut(mp.localPoint1, cp.position);
 					//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
 					b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
-					// djm cp.velocity isn't instantiated in the constructor,
-					// so we just create it here
-					cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+					b2.getLinearVelocityFromLocalPointToOut(mp.localPoint2, cp.velocity);
 					//cp.velocity = v2.sub(v1);
 					cp.velocity.subLocal(v1);
 					cp.normal.set(m_manifold.normal);
@@ -146,7 +144,7 @@ public class CircleContact extends Contact implements ContactCreateFcn {
 					//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
 					b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
 					//Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
-					cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+					b2.getLinearVelocityFromLocalPointToOut(mp.localPoint2, cp.velocity);
 					cp.velocity.subLocal(v1);
 					cp.normal.set(m_manifold.normal);
 					cp.separation = mp.separation;
@@ -162,7 +160,7 @@ public class CircleContact extends Contact implements ContactCreateFcn {
 				//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp0.localPoint1);
 				b1.getLinearVelocityFromLocalPointToOut(mp0.localPoint1, v1);
 				//Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
-				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp0.localPoint2);
+				 b2.getLinearVelocityFromLocalPointToOut(mp0.localPoint2, cp.velocity);
 				cp.velocity.subLocal(v1);
 				cp.normal.set(m0.normal);
 				cp.separation = mp0.separation;

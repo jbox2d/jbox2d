@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -50,219 +50,223 @@ public abstract class Contact {
 
 	static ArrayList<ContactRegister> s_registers;
 
-    static boolean s_initialized;
+	static boolean s_initialized;
 
-    /** The parent world. */
-    public World m_world;
+	/** The parent world. */
+	public World m_world;
 
-    /* World pool and list pointers. */
-    public Contact m_prev;
-    public Contact m_next;
+	/* World pool and list pointers. */
+	public Contact m_prev;
+	public Contact m_next;
 
-    /** Node for connecting bodies. */
-    public ContactEdge m_node1;
-    /** Node for connecting bodies. */
-    public ContactEdge m_node2;
+	/** Node for connecting bodies. */
+	public final ContactEdge m_node1;
+	/** Node for connecting bodies. */
+	public final ContactEdge m_node2;
 
-    public Shape m_shape1;
-    public Shape m_shape2;
+	public Shape m_shape1;
+	public Shape m_shape2;
 
-    /** Combined friction */
-    public float m_friction;
-    /** Combined restitution */
-    public float m_restitution;
+	/** Combined friction */
+	public float m_friction;
+	/** Combined restitution */
+	public float m_restitution;
 
-    // public boolean m_islandFlag;
-    public int m_flags;
-    public int m_manifoldCount;
-    
-    public float m_toi;
-	
-    public abstract void evaluate(ContactListener listener);
-    
+	// public boolean m_islandFlag;
+	public int m_flags;
+	public int m_manifoldCount;
+
+	public float m_toi;
+
+	public abstract void evaluate(ContactListener listener);
+
 	/** Get the manifold array. */
-    public abstract List<Manifold> getManifolds();
+	public abstract List<Manifold> getManifolds();
 
-    /**
-     * Get the number of manifolds. This is 0 or 1 between convex shapes.
+	/**
+	 * Get the number of manifolds. This is 0 or 1 between convex shapes.
 	 * This may be greater than 1 for convex-vs-concave shapes. Each
 	 * manifold holds up to two contact points with a shared contact normal.
 	 */
-    public int getManifoldCount() {
-        /*
-         * List<Manifold> m = GetManifolds(); if (m == null) return 0; else
-         * return GetManifolds().size();
-         */
-        return m_manifoldCount;
-    }
+	public int getManifoldCount() {
+		/*
+		 * List<Manifold> m = GetManifolds(); if (m == null) return 0; else
+		 * return GetManifolds().size();
+		 */
+		return m_manifoldCount;
+	}
 
-    public boolean isSolid() {
-    	return (m_flags & e_nonSolidFlag) == 0;
-    }
-	
-    
-	
-    public Contact() {
-        m_node1 = new ContactEdge();
-        m_node2 = new ContactEdge();
-    }
+	public boolean isSolid() {
+		return (m_flags & e_nonSolidFlag) == 0;
+	}
 
-    public Contact(Shape s1, Shape s2) {
-        this();
 
-        m_flags = 0;
-        
-        if (s1.isSensor() || s2.isSensor()) {
-    		m_flags |= e_nonSolidFlag;
-    	}
-        
-        m_shape1 = s1;
-        m_shape2 = s2;
 
-        m_manifoldCount = 0;
-        //getManifolds().clear(); //unnecessary, I think// djm now causes error
+	public Contact() {
+		m_node1 = new ContactEdge();
+		m_node2 = new ContactEdge();
+	}
 
-        m_friction = (float) Math.sqrt(m_shape1.m_friction * m_shape2.m_friction);
-        m_restitution = MathUtils.max(m_shape1.m_restitution, m_shape2.m_restitution);
-        //m_world = s1.m_body.m_world;
-        m_prev = null;
-        m_next = null;
-        m_node1.contact = null;
-        m_node1.prev = null;
-        m_node1.next = null;
-        m_node1.other = null;
-        
-        m_node2.contact = null;
-        m_node2.prev = null;
-        m_node2.next = null;
-        m_node2.other = null;
-    }
+	public Contact(final Shape s1, final Shape s2) {
+		this();
 
-    public Contact getNext() {
-        return m_next;
-    }
+		m_flags = 0;
 
-    public Shape getShape1() {
-        return m_shape1;
-    }
+		if (s1.isSensor() || s2.isSensor()) {
+			m_flags |= e_nonSolidFlag;
+		}
 
-    public Shape getShape2() {
-        return m_shape2;
-    }
-    
-    
-    public void update(ContactListener listener) {
-    	int oldCount = getManifoldCount();
-    	evaluate(listener);
-    	int newCount = getManifoldCount();
+		m_shape1 = s1;
+		m_shape2 = s2;
 
-    	Body body1 = m_shape1.getBody();
-    	Body body2 = m_shape2.getBody();
-    	
-    	if (newCount == 0 && oldCount > 0) {
-    		body1.wakeUp();
-    		body2.wakeUp();
-    	}
+		m_manifoldCount = 0;
+		//getManifolds().clear(); //unnecessary, I think// djm now causes error
 
-    	// Slow contacts don't generate TOI events.
-    	if (body1.isStatic() || body1.isBullet() || body2.isStatic() || body2.isBullet()) {
-    		m_flags &= ~e_slowFlag;
-    	} else {
-    		m_flags |= e_slowFlag;
-    	}
-    }
+		m_friction = (float) Math.sqrt(m_shape1.m_friction * m_shape2.m_friction);
+		m_restitution = MathUtils.max(m_shape1.m_restitution, m_shape2.m_restitution);
+		//m_world = s1.m_body.m_world;
+		m_prev = null;
+		m_next = null;
+		m_node1.contact = null;
+		m_node1.prev = null;
+		m_node1.next = null;
+		m_node1.other = null;
 
-    public abstract Contact clone();
+		m_node2.contact = null;
+		m_node2.prev = null;
+		m_node2.next = null;
+		m_node2.other = null;
+	}
 
-    static void initializeRegisters() {
-        s_registers = new ArrayList<ContactRegister>();
-        addType(new CircleContact(), ShapeType.CIRCLE_SHAPE,
-                ShapeType.CIRCLE_SHAPE);
-        addType(new PolyAndCircleContact(), ShapeType.POLYGON_SHAPE,
-                ShapeType.CIRCLE_SHAPE);
-        addType(new PolyContact(), ShapeType.POLYGON_SHAPE, 
-        		ShapeType.POLYGON_SHAPE);
-        addType(new PolyAndEdgeContact(), ShapeType.POLYGON_SHAPE,
-        		ShapeType.EDGE_SHAPE);
-        addType(new EdgeAndCircleContact(), ShapeType.EDGE_SHAPE,
-        		ShapeType.CIRCLE_SHAPE);
-        addType(new PointAndCircleContact(), ShapeType.POINT_SHAPE,
-        		ShapeType.CIRCLE_SHAPE);
-        addType(new PointAndPolyContact(), ShapeType.POLYGON_SHAPE, 
-        		ShapeType.POINT_SHAPE);
-    }
+	public Contact getNext() {
+		return m_next;
+	}
 
-    static void addType(ContactCreateFcn createFcn, ShapeType type1,
-            ShapeType type2) {
-        ContactRegister cr = new ContactRegister();
-        cr.s1 = type1;
-        cr.s2 = type2;
-        cr.createFcn = createFcn;
-        cr.primary = true;
-        s_registers.add(cr);
+	public Shape getShape1() {
+		return m_shape1;
+	}
 
-        if (type1 != type2) {
-            ContactRegister cr2 = new ContactRegister();
-            cr2.s2 = type1;
-            cr2.s1 = type2;
-            cr2.createFcn = createFcn;
-            cr2.primary = false;
-            s_registers.add(cr2);
-        }
-    }
+	public Shape getShape2() {
+		return m_shape2;
+	}
 
-    /* Java note:
-     * This function is called "create" in C++ version.
-     * Doing this in Java causes problems, so leave it as is.
-     */
-    public static Contact createContact(Shape shape1, Shape shape2) {
-        if (s_initialized == false) {
-            initializeRegisters();
-            s_initialized = true;
-        }
 
-        ShapeType type1 = shape1.m_type;
-        ShapeType type2 = shape2.m_type;
+	public void update(final ContactListener listener) {
+		final int oldCount = getManifoldCount();
+		evaluate(listener);
+		final int newCount = getManifoldCount();
 
-        // assert ShapeType.UNKNOWN_SHAPE< type1 && type1 <
-        // ShapeType.SHAPE_TYPE_COUNT;
-        // assert ShapeType.UNKNOWN_SHAPE < type2 && type2 <
-        // ShapeType.SHAPE_TYPE_COUNT;
-        ContactRegister register = getContactRegister(type1, type2);
-        if (register != null) {
-            if (register.primary) {
-                return register.createFcn.create(shape1, shape2);
-            } else {
-                Contact c = register.createFcn.create(shape2, shape1);
-                for (int i = 0; i < c.getManifoldCount(); ++i) {
-                    Manifold m = c.getManifolds().get(i);
-                    m.normal.negateLocal();
-                }
-                return c;
-            }
-        } else {
-            return null;
-        }
-    }
+		final Body body1 = m_shape1.getBody();
+		final Body body2 = m_shape2.getBody();
 
-    private static ContactRegister getContactRegister(ShapeType type1,
-            ShapeType type2) {
-        for (int i=0; i<s_registers.size(); ++i) {//ContactRegister cr : s_registers) {
-            ContactRegister cr = s_registers.get(i);
-        	if (cr.s1 == type1 && cr.s2 == type2) {
-                return cr;
-            }
-        }
+		if (newCount == 0 && oldCount > 0) {
+			body1.wakeUp();
+			body2.wakeUp();
+		}
 
-        return null;
-    }
+		// Slow contacts don't generate TOI events.
+		if (body1.isStatic() || body1.isBullet() || body2.isStatic() || body2.isBullet()) {
+			m_flags &= ~e_slowFlag;
+		} else {
+			m_flags |= e_slowFlag;
+		}
+	}
 
-    public static void destroy(Contact contact) {
-        assert (s_initialized == true);
+	/**
+	 * returns a clone of this contact.  rev 166: not used in the engine
+	 */
+	@Override
+	public abstract Contact clone();
 
-        if (contact.getManifoldCount() > 0) {
-            contact.getShape1().getBody().wakeUp();
-            contact.getShape2().getBody().wakeUp();
-        }
-    }
+	public static final void initializeRegisters() {
+		s_registers = new ArrayList<ContactRegister>();
+		Contact.addType(new CircleContact(), ShapeType.CIRCLE_SHAPE,
+		                ShapeType.CIRCLE_SHAPE);
+		Contact.addType(new PolyAndCircleContact(), ShapeType.POLYGON_SHAPE,
+		                ShapeType.CIRCLE_SHAPE);
+		Contact.addType(new PolyContact(), ShapeType.POLYGON_SHAPE,
+		                ShapeType.POLYGON_SHAPE);
+		Contact.addType(new PolyAndEdgeContact(), ShapeType.POLYGON_SHAPE,
+		                ShapeType.EDGE_SHAPE);
+		Contact.addType(new EdgeAndCircleContact(), ShapeType.EDGE_SHAPE,
+		                ShapeType.CIRCLE_SHAPE);
+		Contact.addType(new PointAndCircleContact(), ShapeType.POINT_SHAPE,
+		                ShapeType.CIRCLE_SHAPE);
+		Contact.addType(new PointAndPolyContact(), ShapeType.POLYGON_SHAPE,
+		                ShapeType.POINT_SHAPE);
+	}
+
+	public static final void addType(final ContactCreateFcn createFcn, final ShapeType type1,
+	                                 final ShapeType type2) {
+		final ContactRegister cr = new ContactRegister();
+		cr.s1 = type1;
+		cr.s2 = type2;
+		cr.createFcn = createFcn;
+		cr.primary = true;
+		s_registers.add(cr);
+
+		if (type1 != type2) {
+			final ContactRegister cr2 = new ContactRegister();
+			cr2.s2 = type1;
+			cr2.s1 = type2;
+			cr2.createFcn = createFcn;
+			cr2.primary = false;
+			s_registers.add(cr2);
+		}
+	}
+
+	/* Java note:
+	 * This function is called "create" in C++ version.
+	 * Doing this in Java causes problems, so leave it as is.
+	 */
+	public static final Contact createContact(final Shape shape1, final Shape shape2) {
+		if (s_initialized == false) {
+			Contact.initializeRegisters();
+			s_initialized = true;
+		}
+
+		final ShapeType type1 = shape1.m_type;
+		final ShapeType type2 = shape2.m_type;
+
+		// assert ShapeType.UNKNOWN_SHAPE< type1 && type1 <
+		// ShapeType.SHAPE_TYPE_COUNT;
+		// assert ShapeType.UNKNOWN_SHAPE < type2 && type2 <
+		// ShapeType.SHAPE_TYPE_COUNT;
+		final ContactRegister register = Contact.getContactRegister(type1, type2);
+		if (register != null) {
+			if (register.primary) {
+				return register.createFcn.create(shape1, shape2);
+			} else {
+				final Contact c = register.createFcn.create(shape2, shape1);
+				for (int i = 0; i < c.getManifoldCount(); ++i) {
+					final Manifold m = c.getManifolds().get(i);
+					m.normal.negateLocal();
+				}
+				return c;
+			}
+		} else {
+			return null;
+		}
+	}
+
+	private static final ContactRegister getContactRegister(final ShapeType type1,
+	                                                        final ShapeType type2) {
+		for (int i=0; i<s_registers.size(); ++i) {//ContactRegister cr : s_registers) {
+			final ContactRegister cr = s_registers.get(i);
+			if (cr.s1 == type1 && cr.s2 == type2) {
+				return cr;
+			}
+		}
+
+		return null;
+	}
+
+	public static final void destroy(final Contact contact) {
+		assert (s_initialized == true);
+
+		if (contact.getManifoldCount() > 0) {
+			contact.getShape1().getBody().wakeUp();
+			contact.getShape2().getBody().wakeUp();
+		}
+	}
 }

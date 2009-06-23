@@ -106,7 +106,7 @@ public class BodyDef {
 	 */
 	public BodyDef() {
 		massData = new MassData();
-        massData.center = new Vec2(0.0f, 0.0f);
+        massData.center.setZero();// = new Vec2(0.0f, 0.0f);
         massData.mass = 0.0f;
         massData.I = 0.0f;
         userData = null;

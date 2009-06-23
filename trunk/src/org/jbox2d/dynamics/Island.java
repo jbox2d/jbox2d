@@ -25,7 +25,6 @@ package org.jbox2d.dynamics;
 
 import java.util.List;
 
-import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.common.MathUtils;
@@ -247,10 +246,11 @@ public class Island {
 					continue;
 				}
 
-				if ((b.m_flags & Body.e_allowSleepFlag) == 0) {
+				/*if ((b.m_flags & Body.e_allowSleepFlag) == 0) {
 					b.m_sleepTime = 0.0f;
 					minSleepTime = 0.0f;
-				}
+					djm: we don't need this, as the next if statement takes care of it.  thanks Edge!
+				}*/
 
 				if ((b.m_flags & Body.e_allowSleepFlag) == 0 ||
 						b.m_angularVelocity * b.m_angularVelocity > angTolSqr ||
@@ -267,7 +267,8 @@ public class Island {
 				for (int i = 0; i < m_bodyCount; ++i) {
 					final Body b = m_bodies[i];
 					b.m_flags |= Body.e_sleepFlag;
-					b.m_linearVelocity = new Vec2(0.0f, 0.0f);
+					// thanks Edge!
+					b.m_linearVelocity.setZero(); // no new creation = new Vec2(0.0f, 0.0f);
 					b.m_angularVelocity = 0.0f;
 				}
 			}
@@ -385,7 +386,7 @@ public class Island {
 					// the result from the constraint.
 					cr.normalImpulse = ccp.normalImpulse;
 					cr.tangentImpulse = ccp.tangentImpulse;
-					cr.id = new ContactID(point.id);
+					cr.id.set(point.id);
 
 					m_listener.result(cr);
 				}

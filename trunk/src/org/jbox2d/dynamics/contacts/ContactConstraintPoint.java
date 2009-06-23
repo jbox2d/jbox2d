@@ -27,13 +27,13 @@ import org.jbox2d.common.Vec2;
 
 //Updated to rev 89->139 of b2ContactSolver.h/.cpp
 public class ContactConstraintPoint {
-    public Vec2 localAnchor1;
+    public final Vec2 localAnchor1;
 
-    public Vec2 localAnchor2;
+    public final Vec2 localAnchor2;
     
-    public Vec2 r1;
+    public final Vec2 r1;
     
-    public Vec2 r2;
+    public final Vec2 r2;
 
     public float normalImpulse;
 
@@ -58,8 +58,7 @@ public class ContactConstraintPoint {
         r2 = new Vec2();
     }
     
-    // djm added for object reusability
-    public void set( ContactConstraintPoint cp){
+    public void set(final ContactConstraintPoint cp){
     	localAnchor1.set(cp.localAnchor1);
     	localAnchor2.set(cp.localAnchor2);
     	r1.set(cp.r1);

@@ -79,8 +79,8 @@ class PointAndPolyContact extends Contact implements ContactCreateFcn {
         newC.m_next = this.m_next;
 
         // Nodes for connecting bodies.
-        newC.m_node1 = this.m_node1;
-        newC.m_node2 = this.m_node2;
+        newC.m_node1.set(m_node1);
+        newC.m_node2.set(m_node2);
 
         // Combined friction
         newC.m_friction = this.m_friction;
@@ -162,9 +162,8 @@ class PointAndPolyContact extends Contact implements ContactCreateFcn {
     						b1.getWorldLocationToOut(mp.localPoint1, cp.position);
     						//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
     	    				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
-    	    				// djm cp.velocity isn't instantiated in the constructor,
-    	    				// so we just create it here
-    	    				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+    	    				//Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+    	    				b2.getLinearVelocityFromLocalPointToOut(mp.localPoint2, cp.velocity);
     	    				//cp.velocity = v2.sub(v1);
     	    				cp.velocity.subLocal(v1);
     	    				
@@ -182,9 +181,8 @@ class PointAndPolyContact extends Contact implements ContactCreateFcn {
     				b1.getWorldLocationToOut(mp.localPoint1, cp.position);
 					//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
     				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
-    				// djm cp.velocity isn't instantiated in the constructor,
-    				// so we just create it here
-    				cp.velocity = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+    				//Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+    				b2.getLinearVelocityFromLocalPointToOut(mp.localPoint2, cp.velocity);
     				//cp.velocity = v2.sub(v1);
     				cp.velocity.subLocal(v1);
     				
@@ -214,9 +212,8 @@ class PointAndPolyContact extends Contact implements ContactCreateFcn {
     		b1.getWorldLocationToOut(mp0.localPoint1, cp.position);
 			//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
 			b1.getLinearVelocityFromLocalPointToOut(mp0.localPoint1, v1);
-			// djm cp.velocity isn't instantiated in the constructor,
-			// so we just create it here
-			cp.velocity = b2.getLinearVelocityFromLocalPoint(mp0.localPoint2);
+			//Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+			b2.getLinearVelocityFromLocalPointToOut(mp0.localPoint2, cp.velocity);
 			//cp.velocity = v2.sub(v1);
 			cp.velocity.subLocal(v1);
 			

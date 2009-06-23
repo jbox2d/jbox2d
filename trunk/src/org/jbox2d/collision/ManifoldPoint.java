@@ -36,9 +36,9 @@ import org.jbox2d.common.Vec2;
  */
 public class ManifoldPoint {
 	/** Local position of the contact point in body1 */
-    public Vec2 localPoint1;
+    public final Vec2 localPoint1;
     /** Local position of the contact point in body2 */
-    public Vec2 localPoint2;
+    public final Vec2 localPoint2;
     /** The separation of the shapes along the normal vector */
     public float separation;
     /** The non-penetration force */
@@ -46,7 +46,7 @@ public class ManifoldPoint {
     /** The friction force */
     public float tangentImpulse;
     /** Uniquely identifies a contact point between two shapes */
-    public ContactID id;
+    public final ContactID id;
 
     /**
      * Blank manifold point with everything zeroed out.

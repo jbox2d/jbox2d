@@ -37,7 +37,7 @@ public class PairManager {
 	public static final int TABLE_CAPACITY = Settings.maxPairs;
 	public static final int TABLE_MASK = PairManager.TABLE_CAPACITY - 1;
 
-	public Pair m_pairs[];
+	public final Pair m_pairs[];
 
 	public int m_pairCount;
 
@@ -51,7 +51,7 @@ public class PairManager {
 
 	public int m_freePair;
 
-	public BufferedPair[] m_pairBuffer;
+	public final BufferedPair[] m_pairBuffer;
 	public int m_pairBufferCount;
 
 	public PairManager() {
