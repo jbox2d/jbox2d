@@ -19,15 +19,15 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 	//private updatesweepradius
 	private final Vec2 m_v1;
 	private final Vec2 m_v2;
-	private Vec2 m_coreV1;
-	private Vec2 m_coreV2;
+	private final Vec2 m_coreV1;
+	private final Vec2 m_coreV2;
 	private final float m_length;
 	private final Vec2 m_normal;
 	private final Vec2 m_direction;
 	// Unit vector halfway between m_direction and m_prevEdge.m_direction:
-	private Vec2 m_cornerDir1;
+	private final Vec2 m_cornerDir1;
 	// Unit vector halfway between m_direction and m_nextEdge.m_direction:
-	private Vec2 m_cornerDir2;
+	private final Vec2 m_cornerDir2;
 	private boolean m_cornerConvex1;
 	private boolean m_cornerConvex2;
 	EdgeShape m_nextEdge;
@@ -208,15 +208,15 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 
 	public void setPrevEdge(final EdgeShape edge, final Vec2 core, final Vec2 cornerDir, final boolean convex) {
 		m_prevEdge = edge;
-		m_coreV1 = core;
-		m_cornerDir1 = cornerDir;
+		m_coreV1.set(core);
+		m_cornerDir1.set(cornerDir);
 		m_cornerConvex1 = convex;
 	}
 
 	public void setNextEdge(final EdgeShape edge, final Vec2 core, final Vec2 cornerDir, final boolean convex) {
 		m_nextEdge = edge;
-		m_coreV2 = core;
-		m_cornerDir2 = cornerDir;
+		m_coreV2.set(core);
+		m_cornerDir2.set(cornerDir);
 		m_cornerConvex2 = convex;
 	}
 

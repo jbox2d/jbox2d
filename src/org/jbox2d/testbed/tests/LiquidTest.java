@@ -233,7 +233,7 @@ public class LiquidTest extends AbstractExample {
 			
 			CircleDef cd = new CircleDef();
 			cd.radius = 0.5f;
-			cd.localPosition = new Vec2(-0.5f,-4.0f);
+			cd.localPosition.set(-0.5f,-4.0f);
 			ground.createShape(cd);
 			
 		}

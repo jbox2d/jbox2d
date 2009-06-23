@@ -44,17 +44,17 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 	private static boolean m_debug = false;
 
 	/** Local position of the shape centroid in parent body frame. */
-	public Vec2 m_centroid;
+	public final Vec2 m_centroid;
 
 	/** The oriented bounding box of the shape. */
-	public OBB m_obb;
+	public final OBB m_obb;
 
 	/** The vertices of the shape.  Note: use getVertexCount(), not m_vertices.length, to get number of active vertices. */
-	public Vec2 m_vertices[];
+	public final Vec2 m_vertices[];
 	/** The normals of the shape.  Note: use getVertexCount(), not m_normals.length, to get number of active normals. */
-	public Vec2 m_normals[];
+	public final Vec2 m_normals[];
 	/** The normals of the shape.  Note: use getVertexCount(), not m_coreVertices.length, to get number of active vertices. */
-	public Vec2 m_coreVertices[];
+	public final Vec2 m_coreVertices[];
 	/** Number of active vertices in the shape. */
 	public int m_vertexCount;
 

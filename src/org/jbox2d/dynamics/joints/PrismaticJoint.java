@@ -53,10 +53,10 @@ import org.jbox2d.dynamics.TimeStep;
  */
 public class PrismaticJoint extends Joint {
 
-	public Vec2 m_localAnchor1;
-	public Vec2 m_localAnchor2;
-	public Vec2 m_localXAxis1;
-	public Vec2 m_localYAxis1;
+	public final Vec2 m_localAnchor1;
+	public final Vec2 m_localAnchor2;
+	public final Vec2 m_localXAxis1;
+	public final Vec2 m_localYAxis1;
 	public float m_refAngle;
 
 	public Jacobian m_linearJacobian;

@@ -25,7 +25,7 @@ package org.jbox2d.common;
 
 /**
  * A 2x2 matrix class.
- * djm: added ToOut methods, optimized, and added modifiers
+ * djm: added ToOut methods
  * @author ewjordan
  *
  */
@@ -173,6 +173,18 @@ public class Mat22 {
 		B.col1.y = -det * c;
 		B.col2.y = det * a;
 		return B;
+	}
+	
+	public final Mat22 invertLocal() {
+		final float a = col1.x, b = col2.x, c = col1.y, d = col2.y;
+		float det = a * d - b * c;
+		// b2Assert(det != 0.0f);
+		det = 1.0f / det;
+		col1.x = det * d;
+		col2.x = -det * b;
+		col1.y = -det * c;
+		col2.y = det * a;
+		return this;
 	}
 
 	public final void invertToOut(final Mat22 out){

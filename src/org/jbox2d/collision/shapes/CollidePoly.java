@@ -37,9 +37,9 @@ import org.jbox2d.common.XForm;
 /** Polygon overlap solver - for internal use. */
 public class CollidePoly {
 	static class ClipVertex {
-		Vec2 v;
+		public final Vec2 v;
 
-		ContactID id;
+		public final ContactID id;
 
 		public ClipVertex() {
 			v = new Vec2();
@@ -59,13 +59,13 @@ public class CollidePoly {
 		// If the points are behind the plane
 		if (distance0 <= 0.0f) {
 			vOut[numOut] = new ClipVertex();
-			vOut[numOut].id = new ContactID(vIn[0].id);
-			vOut[numOut++].v = vIn[0].v.clone();
+			vOut[numOut].id.set(vIn[0].id);
+			vOut[numOut++].v.set(vIn[0].v);
 		}
 		if (distance1 <= 0.0f) {
 			vOut[numOut] = new ClipVertex();
-			vOut[numOut].id = new ContactID(vIn[1].id);
-			vOut[numOut++].v = vIn[1].v.clone();
+			vOut[numOut].id.set(vIn[1].id);
+			vOut[numOut++].v.set(vIn[1].v);
 		}
 
 		// If the points are on different sides of the plane
@@ -77,10 +77,10 @@ public class CollidePoly {
 			vOut[numOut].v.y = vIn[0].v.y + interp * (vIn[1].v.y - vIn[0].v.y);
 
 			if (distance0 > 0.0f) {
-				vOut[numOut].id = new ContactID(vIn[0].id);
+				vOut[numOut].id.set(vIn[0].id);
 			}
 			else {
-				vOut[numOut].id = new ContactID(vIn[1].id);
+				vOut[numOut].id.set(vIn[1].id);
 			}
 			++numOut;
 		}

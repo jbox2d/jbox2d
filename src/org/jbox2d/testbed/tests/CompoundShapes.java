@@ -43,8 +43,8 @@ public class CompoundShapes extends AbstractExample {
 	// Default world AABB is too small, make a bigger one
 	public void createWorld() {
 		m_worldAABB = new AABB();
-		m_worldAABB.lowerBound = new Vec2(-200.0f, -100.0f);
-		m_worldAABB.upperBound = new Vec2(200.0f, 500.0f);
+		m_worldAABB.lowerBound.set(-200.0f, -100.0f);
+		m_worldAABB.upperBound.set(200.0f, 500.0f);
 		Vec2 gravity = new Vec2(0.0f, -10.0f);
 		boolean doSleep = true;
 		m_world = new World(m_worldAABB, gravity, doSleep);

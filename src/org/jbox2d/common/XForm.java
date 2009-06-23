@@ -26,7 +26,6 @@ package org.jbox2d.common;
 /**
  * A transform contains translation and rotation. It is used to represent
  * the position and orientation of rigid frames.
- * djm: added ToOut methods, and added final where appropriate
  */
 public class XForm {
 	/** The translation caused by the transform */

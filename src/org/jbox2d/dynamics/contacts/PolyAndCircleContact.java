@@ -41,8 +41,8 @@ import org.jbox2d.dynamics.ContactListener;
 //Updated to rev 144 of b2PolyAndCircleContact.h/cpp
 class PolyAndCircleContact extends Contact implements ContactCreateFcn {
 
-    Manifold m_manifold;
-    ArrayList<Manifold> manifoldList = new ArrayList<Manifold>();
+	public final Manifold m_manifold;
+	public final ArrayList<Manifold> manifoldList = new ArrayList<Manifold>();
 
     public PolyAndCircleContact(Shape s1, Shape s2) {
         super(s1, s2);

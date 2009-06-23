@@ -43,7 +43,7 @@ import org.jbox2d.dynamics.Body;
 public class CircleShape extends Shape {
 
 	public float m_radius;
-	public Vec2 m_localPosition;
+	public final Vec2 m_localPosition;
 
 	/**
 	 * this is used internally, instead use {@link Body#createShape(ShapeDef)} with a {@link CircleDef}

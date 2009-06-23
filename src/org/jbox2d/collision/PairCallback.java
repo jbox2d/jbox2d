@@ -25,12 +25,12 @@ package org.jbox2d.collision;
 
 //Updated to rev 56->136 of b2PairManager.h
 
-public abstract class PairCallback {
+public abstract interface PairCallback {
 	/**
 	 * This should return the new pair user data. It is okay if the
 	 * user data is null.
 	 */
-	public abstract Object pairAdded(Object proxyUserData1,
+	public Object pairAdded(Object proxyUserData1,
 	                                 Object proxyUserData2);
 
 	/**
@@ -41,6 +41,6 @@ public abstract class PairCallback {
 	 * @param proxyUserData2
 	 * @param pairUserData
 	 */
-	public abstract void pairRemoved(Object proxyUserData1,
+	public void pairRemoved(Object proxyUserData1,
 	                                 Object proxyUserData2, Object pairUserData);
 }

@@ -25,7 +25,7 @@ package org.jbox2d.common;
 
 /**
  * A few math methods that don't fit very well anywhere else.
- * djm: added ToOut method, and added modifier where appropriate
+ * djm: added ToOut method
  */
 public class MathUtils {
 	// Max/min rewritten here because for some reason Math.max/min

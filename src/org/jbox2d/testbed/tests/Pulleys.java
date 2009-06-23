@@ -95,6 +95,13 @@ public class Pulleys extends AbstractExample {
 		float L = m_joint1.getLength1() + ratio * m_joint1.getLength2();
 		m_debugDraw.drawString(5, m_textLine, "L1 + "+ratio+" * L2 = "+L,white);
 		m_textLine += textLineHeight;
+		if(L < m_joint1.m_constant){
+			m_debugDraw.drawString(5, m_textLine, "Joint is slack",white);
+			m_textLine += textLineHeight;
+		}else{
+			m_debugDraw.drawString(5, m_textLine, "Joint is active",white);
+			m_textLine += textLineHeight;
+		}
 	}
 
     public String getName() {
