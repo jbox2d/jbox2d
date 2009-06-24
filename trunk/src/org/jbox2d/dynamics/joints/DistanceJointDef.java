@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -36,17 +36,17 @@ import org.jbox2d.dynamics.Body;
 public class DistanceJointDef extends JointDef {
 	/** The local anchor point relative to body1's origin. */
 	public Vec2 localAnchor1;
-	
+
 	/** The local anchor point relative to body2's origin. */
 	public Vec2 localAnchor2;
-	
+
 	/** The equilibrium length between the anchor points. */
 	public float length;
-	
+
 	public float frequencyHz;
 
 	public float dampingRatio;
-    
+
 	public DistanceJointDef() {
 		type = JointType.DISTANCE_JOINT;
 		localAnchor1 = new Vec2(0.0f, 0.0f);
@@ -55,7 +55,7 @@ public class DistanceJointDef extends JointDef {
 		frequencyHz = 0.0f;
 		dampingRatio = 0.0f;
 	}
-	
+
 	/**
 	 * Initialize the bodies, anchors, and length using the world
 	 * anchors.
@@ -64,12 +64,12 @@ public class DistanceJointDef extends JointDef {
 	 * @param anchor1 World anchor on first body
 	 * @param anchor2 World anchor on second body
 	 */
-    public void initialize(Body b1, Body b2, Vec2 anchor1, Vec2 anchor2) {	
-    	body1 = b1;
-    	body2 = b2;
-    	localAnchor1.set(body1.getLocalPoint(anchor1));
-    	localAnchor2.set(body2.getLocalPoint(anchor2));
-    	Vec2 d = anchor2.sub(anchor1);
+	public void initialize(final Body b1, final Body b2, final Vec2 anchor1, final Vec2 anchor2) {
+		body1 = b1;
+		body2 = b2;
+		localAnchor1.set(body1.getLocalPoint(anchor1));
+		localAnchor2.set(body2.getLocalPoint(anchor2));
+		final Vec2 d = anchor2.sub(anchor1);
 		length = d.length();
 	}
 }

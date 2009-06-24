@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -53,12 +53,12 @@ public class GearJointDef extends JointDef {
 	 * @see org.jbox2d.dynamics.joints.GearJoint for explanation.
 	 */
 	public float ratio;
-	
+
 	public GearJointDef() {
 		type = JointType.GEAR_JOINT;
 		joint1 = null;
 		joint2 = null;
 		ratio = 1.0f;
 	}
-	
+
 }

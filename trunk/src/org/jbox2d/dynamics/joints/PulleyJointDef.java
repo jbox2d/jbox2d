@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -54,27 +54,27 @@ public class PulleyJointDef extends JointDef {
 	}
 
 	/// Initialize the bodies, anchors, lengths, max lengths, and ratio using the world anchors.
-	public void initialize(Body b1, Body b2,
-					Vec2 ga1, Vec2 ga2,
-					Vec2 anchor1, Vec2 anchor2,
-					float r){
+	public void initialize(final Body b1, final Body b2,
+	                       final Vec2 ga1, final Vec2 ga2,
+	                       final Vec2 anchor1, final Vec2 anchor2,
+	                       final float r){
 		body1 = b1;
 		body2 = b2;
 		groundAnchor1 = ga1;
 		groundAnchor2 = ga2;
 		localAnchor1 = body1.getLocalPoint(anchor1);
 		localAnchor2 = body2.getLocalPoint(anchor2);
-		Vec2 d1 = anchor1.sub(ga1);
+		final Vec2 d1 = anchor1.sub(ga1);
 		length1 = d1.length();
-		Vec2 d2 = anchor2.sub(ga2);
+		final Vec2 d2 = anchor2.sub(ga2);
 		length2 = d2.length();
 		ratio = r;
 		assert(ratio > Settings.EPSILON);
-		float C = length1 + ratio * length2;
+		final float C = length1 + ratio * length2;
 		maxLength1 = C - ratio * PulleyJoint.MIN_PULLEY_LENGTH;
 		maxLength2 = (C - PulleyJoint.MIN_PULLEY_LENGTH) / ratio;
 	}
-	
+
 	/// The first ground anchor in world coordinates. This point never moves.
 	public Vec2 groundAnchor1;
 

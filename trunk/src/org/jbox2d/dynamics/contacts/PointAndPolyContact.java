@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -40,188 +40,190 @@ import org.jbox2d.dynamics.ContactListener;
 //Updated to rev 144 of b2PolyAndCircleContact.h/cpp
 class PointAndPolyContact extends Contact implements ContactCreateFcn {
 
-    public final Manifold m_manifold;
-    public final ArrayList<Manifold> manifoldList = new ArrayList<Manifold>();
+	public final Manifold m_manifold;
+	public final ArrayList<Manifold> manifoldList = new ArrayList<Manifold>();
 
-    public PointAndPolyContact(Shape s1, Shape s2) {
-        super(s1, s2);
-        assert (m_shape1.getType() == ShapeType.POLYGON_SHAPE);
-        assert (m_shape2.getType() == ShapeType.POINT_SHAPE);
-        m_manifold = new Manifold();
-        manifoldList.add(m_manifold);
+	public PointAndPolyContact(final Shape s1, final Shape s2) {
+		super(s1, s2);
+		assert (m_shape1.getType() == ShapeType.POLYGON_SHAPE);
+		assert (m_shape2.getType() == ShapeType.POINT_SHAPE);
+		m_manifold = new Manifold();
+		manifoldList.add(m_manifold);
 
-        m_manifoldCount = 0;
-        // These should not be necessary, manifold was
-        // just created...
-        m_manifold.points[0].normalImpulse = 0.0f;
-    	m_manifold.points[0].tangentImpulse = 0.0f;
-    }
+		m_manifoldCount = 0;
+		// These should not be necessary, manifold was
+		// just created...
+		m_manifold.points[0].normalImpulse = 0.0f;
+		m_manifold.points[0].tangentImpulse = 0.0f;
+	}
 
-    public PointAndPolyContact() {
-        super();
-        m_manifold = new Manifold();
-        manifoldList.add(m_manifold);
+	public PointAndPolyContact() {
+		super();
+		m_manifold = new Manifold();
+		manifoldList.add(m_manifold);
 
-        m_manifoldCount = 0;
-    }
+		m_manifoldCount = 0;
+	}
 
-    public Contact clone() {
-        PointAndPolyContact newC = new PointAndPolyContact(this.m_shape1,
-                this.m_shape2);
-        newC.m_manifold.set(this.m_manifold);
-        
-        newC.m_manifoldCount = this.m_manifoldCount;
-        // The parent world.
-        newC.m_world = this.m_world;
+	@Override
+	public Contact clone() {
+		final PointAndPolyContact newC = new PointAndPolyContact(this.m_shape1,
+		                                                         this.m_shape2);
+		newC.m_manifold.set(this.m_manifold);
 
-        // World pool and list pointers.
-        newC.m_prev = this.m_prev;
-        newC.m_next = this.m_next;
+		newC.m_manifoldCount = this.m_manifoldCount;
+		// The parent world.
+		newC.m_world = this.m_world;
 
-        // Nodes for connecting bodies.
-        newC.m_node1.set(m_node1);
-        newC.m_node2.set(m_node2);
+		// World pool and list pointers.
+		newC.m_prev = this.m_prev;
+		newC.m_next = this.m_next;
 
-        // Combined friction
-        newC.m_friction = this.m_friction;
-        newC.m_restitution = this.m_restitution;
+		// Nodes for connecting bodies.
+		newC.m_node1.set(m_node1);
+		newC.m_node2.set(m_node2);
 
-        newC.m_flags = this.m_flags;
-        return newC;
-    }
+		// Combined friction
+		newC.m_friction = this.m_friction;
+		newC.m_restitution = this.m_restitution;
 
-    public Contact create(Shape shape1, Shape shape2) {
-        return new PointAndPolyContact(shape1, shape2);
-    }
+		newC.m_flags = this.m_flags;
+		return newC;
+	}
 
-    @Override
-    public List<Manifold> getManifolds() {
-        List<Manifold> ret = new ArrayList<Manifold>(1);
-        if (m_manifold != null) {
-            ret.add(m_manifold);
-        }
-        return ret;
-    }
-    
-    public Manifold getFirstManifold(){
-    	return m_manifold;
-    }
+	public Contact create(final Shape shape1, final Shape shape2) {
+		return new PointAndPolyContact(shape1, shape2);
+	}
 
-    // djm pooled
-    private Manifold m0 = new Manifold();
-    private Vec2 v1 = new Vec2();
-    public void evaluate(ContactListener listener) {
-    	
-    	Body b1 = m_shape1.getBody();
-    	Body b2 = m_shape2.getBody();
+	@Override
+	public List<Manifold> getManifolds() {
+		final List<Manifold> ret = new ArrayList<Manifold>(1);
+		if (m_manifold != null) {
+			ret.add(m_manifold);
+		}
+		return ret;
+	}
 
-    	//memcpy(&m0, &m_manifold, sizeof(b2Manifold));
-    	m0.set(m_manifold);
-        
-    	
-        CollidePoly.collidePolygonAndPoint(m_manifold, (PolygonShape)m_shape1, b1.getMemberXForm(), (PointShape)m_shape2, b2.getMemberXForm());
-    	//CollideCircle.collidePolygonAndCircle(m_manifold, (PolygonShape)m_shape1, b1.getXForm(), (CircleShape)m_shape2, b2.getXForm());
+	public Manifold getFirstManifold(){
+		return m_manifold;
+	}
 
-    	boolean[] persisted= {false, false};
+	// djm pooled
+	private final Manifold m0 = new Manifold();
+	private final Vec2 v1 = new Vec2();
+	@Override
+	public void evaluate(final ContactListener listener) {
 
-    	ContactPoint cp = new ContactPoint();
-    	cp.shape1 = m_shape1;
-    	cp.shape2 = m_shape2;
-    	cp.friction = m_friction;
-    	cp.restitution = m_restitution;
-    	
-    	// Match contact ids to facilitate warm starting.
-    	if (m_manifold.pointCount > 0) {
-    		// Match old contact ids to new contact ids and copy the
-    		// stored impulses to warm start the solver.
-    		for (int i = 0; i < m_manifold.pointCount; ++i)
-    		{
-    			ManifoldPoint mp = m_manifold.points[i];
-    			mp.normalImpulse = 0.0f;
-    			mp.tangentImpulse = 0.0f;
-    			boolean found = false;
-    			cp.id.set(mp.id);
+		final Body b1 = m_shape1.getBody();
+		final Body b2 = m_shape2.getBody();
 
-    			for (int j = 0; j < m0.pointCount; ++j) {
-    				if (persisted[j] == true) {
-    					continue;
-    				}
+		//memcpy(&m0, &m_manifold, sizeof(b2Manifold));
+		m0.set(m_manifold);
 
-    				ManifoldPoint mp0 = m0.points[j];
 
-    				if (mp0.id.isEqual( cp.id)) {
-    					persisted[j] = true;
-    					mp.normalImpulse = mp0.normalImpulse;
-    					mp.tangentImpulse = mp0.tangentImpulse;
+		CollidePoly.collidePolygonAndPoint(m_manifold, (PolygonShape)m_shape1, b1.getMemberXForm(), (PointShape)m_shape2, b2.getMemberXForm());
+		//CollideCircle.collidePolygonAndCircle(m_manifold, (PolygonShape)m_shape1, b1.getXForm(), (CircleShape)m_shape2, b2.getXForm());
 
-    					// A persistent point.
-    					found = true;
+		final boolean[] persisted= {false, false};
 
-    					// Report persistent point.
-    					if (listener != null) {
-    						b1.getWorldLocationToOut(mp.localPoint1, cp.position);
-    						//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
-    	    				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
-    	    				//Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
-    	    				b2.getLinearVelocityFromLocalPointToOut(mp.localPoint2, cp.velocity);
-    	    				//cp.velocity = v2.sub(v1);
-    	    				cp.velocity.subLocal(v1);
-    	    				
-    						cp.normal.set(m_manifold.normal);
-    						cp.separation = mp.separation;
-    						//cp.id = new ContactID(id);
-    						listener.persist(cp);
-    					}
-    					break;
-    				}
-    			}
+		final ContactPoint cp = new ContactPoint();
+		cp.shape1 = m_shape1;
+		cp.shape2 = m_shape2;
+		cp.friction = m_friction;
+		cp.restitution = m_restitution;
 
-    			// Report added point.
-    			if (found == false && listener != null) {
-    				b1.getWorldLocationToOut(mp.localPoint1, cp.position);
+		// Match contact ids to facilitate warm starting.
+		if (m_manifold.pointCount > 0) {
+			// Match old contact ids to new contact ids and copy the
+			// stored impulses to warm start the solver.
+			for (int i = 0; i < m_manifold.pointCount; ++i)
+			{
+				final ManifoldPoint mp = m_manifold.points[i];
+				mp.normalImpulse = 0.0f;
+				mp.tangentImpulse = 0.0f;
+				boolean found = false;
+				cp.id.set(mp.id);
+
+				for (int j = 0; j < m0.pointCount; ++j) {
+					if (persisted[j] == true) {
+						continue;
+					}
+
+					final ManifoldPoint mp0 = m0.points[j];
+
+					if (mp0.id.isEqual( cp.id)) {
+						persisted[j] = true;
+						mp.normalImpulse = mp0.normalImpulse;
+						mp.tangentImpulse = mp0.tangentImpulse;
+
+						// A persistent point.
+						found = true;
+
+						// Report persistent point.
+						if (listener != null) {
+							b1.getWorldLocationToOut(mp.localPoint1, cp.position);
+							//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
+							b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
+							//Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+							b2.getLinearVelocityFromLocalPointToOut(mp.localPoint2, cp.velocity);
+							//cp.velocity = v2.sub(v1);
+							cp.velocity.subLocal(v1);
+
+							cp.normal.set(m_manifold.normal);
+							cp.separation = mp.separation;
+							//cp.id = new ContactID(id);
+							listener.persist(cp);
+						}
+						break;
+					}
+				}
+
+				// Report added point.
+				if (found == false && listener != null) {
+					b1.getWorldLocationToOut(mp.localPoint1, cp.position);
 					//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
-    				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
-    				//Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
-    				b2.getLinearVelocityFromLocalPointToOut(mp.localPoint2, cp.velocity);
-    				//cp.velocity = v2.sub(v1);
-    				cp.velocity.subLocal(v1);
-    				
+					b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
+					//Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+					b2.getLinearVelocityFromLocalPointToOut(mp.localPoint2, cp.velocity);
+					//cp.velocity = v2.sub(v1);
+					cp.velocity.subLocal(v1);
+
 					cp.normal.set(m_manifold.normal);
 					cp.separation = mp.separation;
 					//cp.id = new ContactID(id);
-    				listener.add(cp);
-    			}
-    		}
+					listener.add(cp);
+				}
+			}
 
-    		m_manifoldCount = 1;
-    	} else {
-    		m_manifoldCount = 0;
-    	}
+			m_manifoldCount = 1;
+		} else {
+			m_manifoldCount = 0;
+		}
 
-    	if (listener == null) {
-    		return;
-    	}
+		if (listener == null) {
+			return;
+		}
 
-    	// Report removed points.
-    	for (int i = 0; i < m0.pointCount; ++i) {
-    		if (persisted[i]) {
-    			continue;
-    		}
+		// Report removed points.
+		for (int i = 0; i < m0.pointCount; ++i) {
+			if (persisted[i]) {
+				continue;
+			}
 
-    		ManifoldPoint mp0 = m0.points[i];
-    		b1.getWorldLocationToOut(mp0.localPoint1, cp.position);
+			final ManifoldPoint mp0 = m0.points[i];
+			b1.getWorldLocationToOut(mp0.localPoint1, cp.position);
 			//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
 			b1.getLinearVelocityFromLocalPointToOut(mp0.localPoint1, v1);
 			//Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
 			b2.getLinearVelocityFromLocalPointToOut(mp0.localPoint2, cp.velocity);
 			//cp.velocity = v2.sub(v1);
 			cp.velocity.subLocal(v1);
-			
+
 			cp.normal.set(m_manifold.normal);
 			cp.separation = mp0.separation;
 			cp.id.set(mp0.id);
-    		listener.remove(cp);
-    	}
-    	
-    }
+			listener.remove(cp);
+		}
+
+	}
 }

@@ -72,9 +72,10 @@ public class Vec2 {
 	}
 
 	/** Set this vector to another vector. */
-	public final void set(Vec2 v) {
+	public final Vec2 set(Vec2 v) {
 		this.x = v.x;
 		this.y = v.y;
+		return this;
 	}
 
 	/** Return the sum of this vector and another; does not alter either one. */

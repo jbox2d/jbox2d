@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -58,7 +58,7 @@ public class RevoluteJointDef extends JointDef {
 
 	/// Initialize the bodies, anchors, and reference angle using the world
 	/// anchor.
-	public void initialize(Body b1, Body b2, Vec2 anchor) {
+	public void initialize(final Body b1, final Body b2, final Vec2 anchor) {
 		body1 = b1;
 		body2 = b2;
 		localAnchor1 = body1.getLocalPoint(anchor);

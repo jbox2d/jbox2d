@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -56,7 +56,7 @@ public class RevoluteJoint extends Joint {
 
 	public final Mat22 m_pivotMass;		// effective mass for point-to-point constraint.
 	public float m_motorMass;	// effective mass for motor/limit angular constraint.
-	
+
 	public boolean m_enableMotor;
 	public float m_maxMotorTorque;
 	public float m_motorSpeed;
@@ -67,377 +67,383 @@ public class RevoluteJoint extends Joint {
 	public float m_upperAngle;
 	public LimitState m_limitState;
 
-    public RevoluteJoint(RevoluteJointDef def) {
-        super(def);
-        m_localAnchor1 = def.localAnchor1.clone();
-    	m_localAnchor2 = def.localAnchor2.clone();
-    	m_referenceAngle = def.referenceAngle;
+	public RevoluteJoint(final RevoluteJointDef def) {
+		super(def);
+		m_localAnchor1 = def.localAnchor1.clone();
+		m_localAnchor2 = def.localAnchor2.clone();
+		m_referenceAngle = def.referenceAngle;
 
-    	m_pivotForce = new Vec2(0.0f, 0.0f);
-    	m_motorForce = 0.0f;
-    	m_limitForce = 0.0f;
-    	m_limitPositionImpulse = 0.0f;
-    	m_pivotMass = new Mat22();
+		m_pivotForce = new Vec2(0.0f, 0.0f);
+		m_motorForce = 0.0f;
+		m_limitForce = 0.0f;
+		m_limitPositionImpulse = 0.0f;
+		m_pivotMass = new Mat22();
 
-    	m_lowerAngle = def.lowerAngle;
-    	m_upperAngle = def.upperAngle;
-    	m_maxMotorTorque = def.maxMotorTorque;
-    	m_motorSpeed = def.motorSpeed;
-    	m_enableLimit = def.enableLimit;
-    	m_enableMotor = def.enableMotor;
-    }
+		m_lowerAngle = def.lowerAngle;
+		m_upperAngle = def.upperAngle;
+		m_maxMotorTorque = def.maxMotorTorque;
+		m_motorSpeed = def.motorSpeed;
+		m_enableLimit = def.enableLimit;
+		m_enableMotor = def.enableMotor;
+	}
 
-    // djm pooled
-    private Vec2 r1 = new Vec2();
-    private Vec2 r2 = new Vec2();
-    private Mat22 K1 = new Mat22();
-    private Mat22 K2 = new Mat22();
-    private Mat22 K3 = new Mat22();
-    @Override
-    public void initVelocityConstraints(TimeStep step) {
-    	Body b1 = m_body1;
-    	Body b2 = m_body2;
+	// djm pooled
+	private final Vec2 r1 = new Vec2();
+	private final Vec2 r2 = new Vec2();
+	private final Mat22 K1 = new Mat22();
+	private final Mat22 K2 = new Mat22();
+	private final Mat22 K3 = new Mat22();
+	@Override
+	public void initVelocityConstraints(final TimeStep step) {
+		final Body b1 = m_body1;
+		final Body b2 = m_body2;
 
-    	// Compute the effective mass matrix.
-    	//Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
-    	//Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
-    	r1.set(b1.getMemberLocalCenter());
-    	r2.set(b2.getMemberLocalCenter());
-    	r1.subLocal(m_localAnchor1).negateLocal();
-    	r2.subLocal(m_localAnchor2).negateLocal();
-    	Mat22.mulToOut(b1.m_xf.R, r1, r1);
-    	Mat22.mulToOut(b2.m_xf.R, r2, r2);
+		// Compute the effective mass matrix.
+		//Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
+		//Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
+		r1.set(b1.getMemberLocalCenter());
+		r2.set(b2.getMemberLocalCenter());
+		r1.subLocal(m_localAnchor1).negateLocal();
+		r2.subLocal(m_localAnchor2).negateLocal();
+		Mat22.mulToOut(b1.m_xf.R, r1, r1);
+		Mat22.mulToOut(b2.m_xf.R, r2, r2);
 
-    	// K    = [(1/m1 + 1/m2) * eye(2) - skew(r1) * invI1 * skew(r1) - skew(r2) * invI2 * skew(r2)]
-    	//      = [1/m1+1/m2     0    ] + invI1 * [r1.y*r1.y -r1.x*r1.y] + invI2 * [r1.y*r1.y -r1.x*r1.y]
-    	//        [    0     1/m1+1/m2]           [-r1.x*r1.y r1.x*r1.x]           [-r1.x*r1.y r1.x*r1.x]
-    	float invMass1 = b1.m_invMass, invMass2 = b2.m_invMass;
-    	float invI1 = b1.m_invI, invI2 = b2.m_invI;
+		// K    = [(1/m1 + 1/m2) * eye(2) - skew(r1) * invI1 * skew(r1) - skew(r2) * invI2 * skew(r2)]
+		//      = [1/m1+1/m2     0    ] + invI1 * [r1.y*r1.y -r1.x*r1.y] + invI2 * [r1.y*r1.y -r1.x*r1.y]
+		//        [    0     1/m1+1/m2]           [-r1.x*r1.y r1.x*r1.x]           [-r1.x*r1.y r1.x*r1.x]
+		final float invMass1 = b1.m_invMass, invMass2 = b2.m_invMass;
+		final float invI1 = b1.m_invI, invI2 = b2.m_invI;
 
-    	K1.col1.x = invMass1 + invMass2;	K1.col2.x = 0.0f;
-    	K1.col1.y = 0.0f;					K1.col2.y = invMass1 + invMass2;
+		K1.col1.x = invMass1 + invMass2;	K1.col2.x = 0.0f;
+		K1.col1.y = 0.0f;					K1.col2.y = invMass1 + invMass2;
 
-    	K2.col1.x =  invI1 * r1.y * r1.y;	K2.col2.x = -invI1 * r1.x * r1.y;
-    	K2.col1.y = -invI1 * r1.x * r1.y;	K2.col2.y =  invI1 * r1.x * r1.x;
+		K2.col1.x =  invI1 * r1.y * r1.y;	K2.col2.x = -invI1 * r1.x * r1.y;
+		K2.col1.y = -invI1 * r1.x * r1.y;	K2.col2.y =  invI1 * r1.x * r1.x;
 
-    	K3.col1.x =  invI2 * r2.y * r2.y;	K3.col2.x = -invI2 * r2.x * r2.y;
-    	K3.col1.y = -invI2 * r2.x * r2.y;	K3.col2.y =  invI2 * r2.x * r2.x;
+		K3.col1.x =  invI2 * r2.y * r2.y;	K3.col2.x = -invI2 * r2.x * r2.y;
+		K3.col1.y = -invI2 * r2.x * r2.y;	K3.col2.y =  invI2 * r2.x * r2.x;
 
-    	//Mat22 K = K1.addLocal(K2).addLocal(K3);
-    	K1.addLocal(K2).addLocal(K3);
-    	
-    	//m_pivotMass = K1.invert();
-    	K1.invertToOut(m_pivotMass);
-    	
-    	m_motorMass = 1.0f / (invI1 + invI2);
+		//Mat22 K = K1.addLocal(K2).addLocal(K3);
+		K1.addLocal(K2).addLocal(K3);
 
-    	if (m_enableMotor == false) {
-    		m_motorForce = 0.0f;
-    	}
+		//m_pivotMass = K1.invert();
+		K1.invertToOut(m_pivotMass);
 
-    	if (m_enableLimit) {
-    		float jointAngle = b2.m_sweep.a - b1.m_sweep.a - m_referenceAngle;
-    		if (Math.abs(m_upperAngle - m_lowerAngle) < 2.0f * Settings.angularSlop) {
-    			m_limitState = LimitState.EQUAL_LIMITS;
-    		} else if (jointAngle <= m_lowerAngle) {
-    			if (m_limitState != LimitState.AT_LOWER_LIMIT) {
-    				m_limitForce = 0.0f;
-    			}
-    			m_limitState = LimitState.AT_LOWER_LIMIT;
-    		} else if (jointAngle >= m_upperAngle) {
-    			if (m_limitState != LimitState.AT_UPPER_LIMIT) {
-    				m_limitForce = 0.0f;
-    			}
-    			m_limitState = LimitState.AT_UPPER_LIMIT;
-    		}else {
-    			m_limitState = LimitState.INACTIVE_LIMIT;
-    			m_limitForce = 0.0f;
-    		}
-    	} else {
-    		m_limitForce = 0.0f;
-    	}
+		m_motorMass = 1.0f / (invI1 + invI2);
 
-    	if (step.warmStarting) {
-    		b1.m_linearVelocity.x -= step.dt * invMass1 * m_pivotForce.x;
-    		b1.m_linearVelocity.y -= step.dt * invMass1 * m_pivotForce.y;
-    		b1.m_angularVelocity -= step.dt * invI1 * (Vec2.cross(r1, m_pivotForce) + m_motorForce + m_limitForce);
+		if (m_enableMotor == false) {
+			m_motorForce = 0.0f;
+		}
 
-    		b2.m_linearVelocity.x += step.dt * invMass2 * m_pivotForce.x;
-    		b2.m_linearVelocity.y += step.dt * invMass2 * m_pivotForce.y;
-    		b2.m_angularVelocity += step.dt * invI2 * (Vec2.cross(r2, m_pivotForce) + m_motorForce + m_limitForce);
-    	} else {
-    		m_pivotForce.setZero();
-    		m_motorForce = 0.0f;
-    		m_limitForce = 0.0f;
-    	}
+		if (m_enableLimit) {
+			final float jointAngle = b2.m_sweep.a - b1.m_sweep.a - m_referenceAngle;
+			if (Math.abs(m_upperAngle - m_lowerAngle) < 2.0f * Settings.angularSlop) {
+				m_limitState = LimitState.EQUAL_LIMITS;
+			} else if (jointAngle <= m_lowerAngle) {
+				if (m_limitState != LimitState.AT_LOWER_LIMIT) {
+					m_limitForce = 0.0f;
+				}
+				m_limitState = LimitState.AT_LOWER_LIMIT;
+			} else if (jointAngle >= m_upperAngle) {
+				if (m_limitState != LimitState.AT_UPPER_LIMIT) {
+					m_limitForce = 0.0f;
+				}
+				m_limitState = LimitState.AT_UPPER_LIMIT;
+			}else {
+				m_limitState = LimitState.INACTIVE_LIMIT;
+				m_limitForce = 0.0f;
+			}
+		} else {
+			m_limitForce = 0.0f;
+		}
 
-    	m_limitPositionImpulse = 0.0f;
-    }
+		if (step.warmStarting) {
+			b1.m_linearVelocity.x -= step.dt * invMass1 * m_pivotForce.x;
+			b1.m_linearVelocity.y -= step.dt * invMass1 * m_pivotForce.y;
+			b1.m_angularVelocity -= step.dt * invI1 * (Vec2.cross(r1, m_pivotForce) + m_motorForce + m_limitForce);
 
-    private Vec2 m_lastWarmStartingPivotForce = new Vec2(0.0f,0.0f);
-    //private float m_lastWarmStartingMotorForce = 0.0f; djm not used
-    //private float m_lastWarmStartingLimitForce = 0.0f;
-    //private boolean m_warmStartingOld = true;
-    
-    // djm pooled, some from above
-    private Vec2 temp = new Vec2();
-    private Vec2 pivotCdot = new Vec2();
-    private Vec2 pivotForce = new Vec2();
-    @Override
-    public void solveVelocityConstraints(TimeStep step) {
-    	Body b1 = m_body1;
-    	Body b2 = m_body2;
+			b2.m_linearVelocity.x += step.dt * invMass2 * m_pivotForce.x;
+			b2.m_linearVelocity.y += step.dt * invMass2 * m_pivotForce.y;
+			b2.m_angularVelocity += step.dt * invI2 * (Vec2.cross(r2, m_pivotForce) + m_motorForce + m_limitForce);
+		} else {
+			m_pivotForce.setZero();
+			m_motorForce = 0.0f;
+			m_limitForce = 0.0f;
+		}
 
-    	//Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
-    	//Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
-    	r1.set(b1.getMemberLocalCenter());
-    	r2.set(b2.getMemberLocalCenter());
-    	r1.subLocal(m_localAnchor1).negateLocal();
-    	r2.subLocal(m_localAnchor2).negateLocal();
-    	Mat22.mulToOut(b1.m_xf.R, r1, r1);
-    	Mat22.mulToOut(b2.m_xf.R, r2, r2);
+		m_limitPositionImpulse = 0.0f;
+	}
 
-    	// Solve point-to-point constraint
-    	//Vec2 pivotCdot = b2.m_linearVelocity.add( Vec2.cross(b2.m_angularVelocity, r2).subLocal(b1.m_linearVelocity).subLocal(Vec2.cross(b1.m_angularVelocity, r1)));
-    	//Vec2 pivotForce = Mat22.mul(m_pivotMass, pivotCdot).mulLocal(-step.inv_dt);
-    	Vec2.crossToOut(b1.m_angularVelocity, r1, temp);
-    	Vec2.crossToOut(b2.m_angularVelocity, r2, pivotCdot);
-    	pivotCdot.subLocal(b1.m_linearVelocity).subLocal(temp).addLocal(b2.m_linearVelocity);
-    	
-    	Mat22.mulToOut(m_pivotMass, pivotCdot, pivotForce);
-    	pivotForce.mulLocal(-step.inv_dt);
-    	
-    	//if (!step.warmStarting) m_pivotForce.set(pivotForce);
-    	//else m_pivotForce.addLocal(pivotForce);
-    	//if (step.warmStarting && (!m_warmStartingOld)) m_pivotForce = m_lastWarmStartingPivotForce;
-    	if (step.warmStarting) {
-    		m_pivotForce.addLocal(pivotForce);
-    		m_lastWarmStartingPivotForce.set(m_pivotForce);
-    	} else {
-    		m_pivotForce.set(m_lastWarmStartingPivotForce);
-    	}
-    	
-    	//Vec2 P = pivotForce.mul(step.dt);
-    	Vec2 P = pivotForce.mulLocal(step.dt);
-    	
-    	b1.m_linearVelocity.x -= b1.m_invMass * P.x;
-    	b1.m_linearVelocity.y -= b1.m_invMass * P.y;
-    	b1.m_angularVelocity -= b1.m_invI * Vec2.cross(r1, P);
+	private final Vec2 m_lastWarmStartingPivotForce = new Vec2(0.0f,0.0f);
+	//private float m_lastWarmStartingMotorForce = 0.0f; djm not used
+	//private float m_lastWarmStartingLimitForce = 0.0f;
+	//private boolean m_warmStartingOld = true;
 
-    	b2.m_linearVelocity.x += b2.m_invMass * P.x;
-    	b2.m_linearVelocity.y += b2.m_invMass * P.y;
-    	b2.m_angularVelocity += b2.m_invI * Vec2.cross(r2, P);
+	// djm pooled, some from above
+	private final Vec2 temp = new Vec2();
+	private final Vec2 pivotCdot = new Vec2();
+	private final Vec2 pivotForce = new Vec2();
+	@Override
+	public void solveVelocityConstraints(final TimeStep step) {
+		final Body b1 = m_body1;
+		final Body b2 = m_body2;
 
-    	if (m_enableMotor && m_limitState != LimitState.EQUAL_LIMITS) {
-    		float motorCdot = b2.m_angularVelocity - b1.m_angularVelocity - m_motorSpeed;
-    		float motorForce = -step.inv_dt * m_motorMass * motorCdot;
-    		float oldMotorForce = m_motorForce;
-    		m_motorForce = MathUtils.clamp(m_motorForce + motorForce, -m_maxMotorTorque, m_maxMotorTorque);
-    		motorForce = m_motorForce - oldMotorForce;
-    		
-    		if (!step.warmStarting) m_motorForce = oldMotorForce;
-    		
-    		float P2 = step.dt * motorForce;
-    		b1.m_angularVelocity -= b1.m_invI * P2;
-    		b2.m_angularVelocity += b2.m_invI * P2;
-    	}
+		//Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
+		//Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
+		r1.set(b1.getMemberLocalCenter());
+		r2.set(b2.getMemberLocalCenter());
+		r1.subLocal(m_localAnchor1).negateLocal();
+		r2.subLocal(m_localAnchor2).negateLocal();
+		Mat22.mulToOut(b1.m_xf.R, r1, r1);
+		Mat22.mulToOut(b2.m_xf.R, r2, r2);
 
-    	if (m_enableLimit && m_limitState != LimitState.INACTIVE_LIMIT) {
-    		float limitCdot = b2.m_angularVelocity - b1.m_angularVelocity;
-    		float limitForce = -step.inv_dt * m_motorMass * limitCdot;
+		// Solve point-to-point constraint
+		//Vec2 pivotCdot = b2.m_linearVelocity.add( Vec2.cross(b2.m_angularVelocity, r2).subLocal(b1.m_linearVelocity).subLocal(Vec2.cross(b1.m_angularVelocity, r1)));
+		//Vec2 pivotForce = Mat22.mul(m_pivotMass, pivotCdot).mulLocal(-step.inv_dt);
+		Vec2.crossToOut(b1.m_angularVelocity, r1, temp);
+		Vec2.crossToOut(b2.m_angularVelocity, r2, pivotCdot);
+		pivotCdot.subLocal(b1.m_linearVelocity).subLocal(temp).addLocal(b2.m_linearVelocity);
 
-    		if (m_limitState == LimitState.EQUAL_LIMITS) {
-    			m_limitForce += limitForce;
-    		} else if (m_limitState == LimitState.AT_LOWER_LIMIT) {
-    			float oldLimitForce = m_limitForce;
-    			m_limitForce = Math.max(m_limitForce + limitForce, 0.0f);
-    			limitForce = m_limitForce - oldLimitForce;
-    		} else if (m_limitState == LimitState.AT_UPPER_LIMIT) {
-    			float oldLimitForce = m_limitForce;
-    			m_limitForce = Math.min(m_limitForce + limitForce, 0.0f);
-    			limitForce = m_limitForce - oldLimitForce;
-    		}
+		Mat22.mulToOut(m_pivotMass, pivotCdot, pivotForce);
+		pivotForce.mulLocal(-step.inv_dt);
 
-    		float P2 = step.dt * limitForce;
-    		b1.m_angularVelocity -= b1.m_invI * P2;
-    		b2.m_angularVelocity += b2.m_invI * P2;
-    	}
-    }
+		//if (!step.warmStarting) m_pivotForce.set(pivotForce);
+		//else m_pivotForce.addLocal(pivotForce);
+		//if (step.warmStarting && (!m_warmStartingOld)) m_pivotForce = m_lastWarmStartingPivotForce;
+		if (step.warmStarting) {
+			m_pivotForce.addLocal(pivotForce);
+			m_lastWarmStartingPivotForce.set(m_pivotForce);
+		} else {
+			m_pivotForce.set(m_lastWarmStartingPivotForce);
+		}
 
-    // djm pooled, some from above
-    private Vec2 p1 = new Vec2();
-    private Vec2 p2 = new Vec2();
-    private Vec2 ptpC = new Vec2();
-    private Vec2 impulse = new Vec2();
-    @Override
-    public boolean solvePositionConstraints() {
-        Body b1 = m_body1;
-        Body b2 = m_body2;
-        
-        float positionError = 0f;
+		//Vec2 P = pivotForce.mul(step.dt);
+		final Vec2 P = pivotForce.mulLocal(step.dt);
 
-        // Solve point-to-point position error.
-    	//Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
-    	//Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
-    	r1.set(b1.getMemberLocalCenter());
-    	r2.set(b2.getMemberLocalCenter());
-    	r1.subLocal(m_localAnchor1).negateLocal();
-    	r2.subLocal(m_localAnchor2).negateLocal();
-    	Mat22.mulToOut(b1.m_xf.R, r1, r1);
-    	Mat22.mulToOut(b2.m_xf.R, r2, r2);
-    	
-    	
-    	p1.set(b1.m_sweep.c);
-    	p1.addLocal(r1);
-    	p2.set(b2.m_sweep.c);
-    	p2.addLocal(r2);
-    	ptpC.set(p2);
-    	ptpC.subLocal(p1);
+		b1.m_linearVelocity.x -= b1.m_invMass * P.x;
+		b1.m_linearVelocity.y -= b1.m_invMass * P.y;
+		b1.m_angularVelocity -= b1.m_invI * Vec2.cross(r1, P);
 
-    	positionError = ptpC.length();
+		b2.m_linearVelocity.x += b2.m_invMass * P.x;
+		b2.m_linearVelocity.y += b2.m_invMass * P.y;
+		b2.m_angularVelocity += b2.m_invI * Vec2.cross(r2, P);
 
-    	// Prevent overly large corrections.
-    	//public b2Vec2 dpMax(b2_maxLinearCorrection, b2_maxLinearCorrection);
-    	//ptpC = b2Clamp(ptpC, -dpMax, dpMax);
+		if (m_enableMotor && m_limitState != LimitState.EQUAL_LIMITS) {
+			final float motorCdot = b2.m_angularVelocity - b1.m_angularVelocity - m_motorSpeed;
+			float motorForce = -step.inv_dt * m_motorMass * motorCdot;
+			final float oldMotorForce = m_motorForce;
+			m_motorForce = MathUtils.clamp(m_motorForce + motorForce, -m_maxMotorTorque, m_maxMotorTorque);
+			motorForce = m_motorForce - oldMotorForce;
 
-    	float invMass1 = b1.m_invMass, invMass2 = b2.m_invMass;
-    	float invI1 = b1.m_invI, invI2 = b2.m_invI;
+			if (!step.warmStarting) {
+				m_motorForce = oldMotorForce;
+			}
 
-        K1.col1.x = invMass1 + invMass2;    K1.col2.x = 0.0f;
-        K1.col1.y = 0.0f;                   K1.col2.y = invMass1 + invMass2;
-        
-        K2.col1.x =  invI1 * r1.y * r1.y;   K2.col2.x = -invI1 * r1.x * r1.y;
-        K2.col1.y = -invI1 * r1.x * r1.y;   K2.col2.y =  invI1 * r1.x * r1.x;
+			final float P2 = step.dt * motorForce;
+			b1.m_angularVelocity -= b1.m_invI * P2;
+			b2.m_angularVelocity += b2.m_invI * P2;
+		}
 
-        K3.col1.x =  invI2 * r2.y * r2.y;   K3.col2.x = -invI2 * r2.x * r2.y;
-        K3.col1.y = -invI2 * r2.x * r2.y;   K3.col2.y =  invI2 * r2.x * r2.x;
+		if (m_enableLimit && m_limitState != LimitState.INACTIVE_LIMIT) {
+			final float limitCdot = b2.m_angularVelocity - b1.m_angularVelocity;
+			float limitForce = -step.inv_dt * m_motorMass * limitCdot;
 
-        Mat22 K = K1.addLocal(K2).addLocal(K3);
-        K.solveToOut(ptpC.negateLocal(), impulse);
+			if (m_limitState == LimitState.EQUAL_LIMITS) {
+				m_limitForce += limitForce;
+			} else if (m_limitState == LimitState.AT_LOWER_LIMIT) {
+				final float oldLimitForce = m_limitForce;
+				m_limitForce = Math.max(m_limitForce + limitForce, 0.0f);
+				limitForce = m_limitForce - oldLimitForce;
+			} else if (m_limitState == LimitState.AT_UPPER_LIMIT) {
+				final float oldLimitForce = m_limitForce;
+				m_limitForce = Math.min(m_limitForce + limitForce, 0.0f);
+				limitForce = m_limitForce - oldLimitForce;
+			}
 
-    	b1.m_sweep.c.x -= b1.m_invMass * impulse.x;
-    	b1.m_sweep.c.y -= b1.m_invMass * impulse.y;
-    	b1.m_sweep.a -= b1.m_invI * Vec2.cross(r1, impulse);
+			final float P2 = step.dt * limitForce;
+			b1.m_angularVelocity -= b1.m_invI * P2;
+			b2.m_angularVelocity += b2.m_invI * P2;
+		}
+	}
 
-    	b2.m_sweep.c.x += b2.m_invMass * impulse.x;
-    	b2.m_sweep.c.y += b2.m_invMass * impulse.y;
-    	b2.m_sweep.a += b2.m_invI * Vec2.cross(r2, impulse);
+	// djm pooled, some from above
+	private final Vec2 p1 = new Vec2();
+	private final Vec2 p2 = new Vec2();
+	private final Vec2 ptpC = new Vec2();
+	private final Vec2 impulse = new Vec2();
+	@Override
+	public boolean solvePositionConstraints() {
+		final Body b1 = m_body1;
+		final Body b2 = m_body2;
 
-    	b1.synchronizeTransform();
-    	b2.synchronizeTransform();
+		float positionError = 0f;
 
-    	// Handle limits.
-    	float angularError = 0.0f;
+		// Solve point-to-point position error.
+		//Vec2 r1 = Mat22.mul(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()));
+		//Vec2 r2 = Mat22.mul(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()));
+		r1.set(b1.getMemberLocalCenter());
+		r2.set(b2.getMemberLocalCenter());
+		r1.subLocal(m_localAnchor1).negateLocal();
+		r2.subLocal(m_localAnchor2).negateLocal();
+		Mat22.mulToOut(b1.m_xf.R, r1, r1);
+		Mat22.mulToOut(b2.m_xf.R, r2, r2);
 
 
-    	if (m_enableLimit && m_limitState != LimitState.INACTIVE_LIMIT) {
-    		float angle = b2.m_sweep.a - b1.m_sweep.a - m_referenceAngle;
-    		float limitImpulse = 0.0f;
+		p1.set(b1.m_sweep.c);
+		p1.addLocal(r1);
+		p2.set(b2.m_sweep.c);
+		p2.addLocal(r2);
+		ptpC.set(p2);
+		ptpC.subLocal(p1);
 
-    		if (m_limitState == LimitState.EQUAL_LIMITS) {
-    			// Prevent large angular corrections
-    			float limitC = MathUtils.clamp(angle, -Settings.maxAngularCorrection, Settings.maxAngularCorrection);
-    			limitImpulse = -m_motorMass * limitC;
-    			angularError = Math.abs(limitC);
-    		} else if (m_limitState == LimitState.AT_LOWER_LIMIT) {
-    			float limitC = angle - m_lowerAngle;
-    			angularError = Math.max(0.0f, -limitC);
+		positionError = ptpC.length();
 
-    			// Prevent large angular corrections and allow some slop.
-    			limitC = MathUtils.clamp(limitC + Settings.angularSlop, -Settings.maxAngularCorrection, 0.0f);
-    			limitImpulse = -m_motorMass * limitC;
-    			float oldLimitImpulse = m_limitPositionImpulse;
-    			m_limitPositionImpulse = Math.max(m_limitPositionImpulse + limitImpulse, 0.0f);
-    			limitImpulse = m_limitPositionImpulse - oldLimitImpulse;
-    		} else if (m_limitState == LimitState.AT_UPPER_LIMIT) {
-    			float limitC = angle - m_upperAngle;
-    			angularError = Math.max(0.0f, limitC);
+		// Prevent overly large corrections.
+		//public b2Vec2 dpMax(b2_maxLinearCorrection, b2_maxLinearCorrection);
+		//ptpC = b2Clamp(ptpC, -dpMax, dpMax);
 
-    			// Prevent large angular corrections and allow some slop.
-    			limitC = MathUtils.clamp(limitC - Settings.angularSlop, 0.0f, Settings.maxAngularCorrection);
-    			limitImpulse = -m_motorMass * limitC;
-    			float oldLimitImpulse = m_limitPositionImpulse;
-    			m_limitPositionImpulse = Math.min(m_limitPositionImpulse + limitImpulse, 0.0f);
-    			limitImpulse = m_limitPositionImpulse - oldLimitImpulse;
-    		}
+		final float invMass1 = b1.m_invMass, invMass2 = b2.m_invMass;
+		final float invI1 = b1.m_invI, invI2 = b2.m_invI;
 
-    		b1.m_sweep.a -= b1.m_invI * limitImpulse;
-    		b2.m_sweep.a += b2.m_invI * limitImpulse;
+		K1.col1.x = invMass1 + invMass2;    K1.col2.x = 0.0f;
+		K1.col1.y = 0.0f;                   K1.col2.y = invMass1 + invMass2;
 
-    		b1.synchronizeTransform();
-    		b2.synchronizeTransform();
-    	}
+		K2.col1.x =  invI1 * r1.y * r1.y;   K2.col2.x = -invI1 * r1.x * r1.y;
+		K2.col1.y = -invI1 * r1.x * r1.y;   K2.col2.y =  invI1 * r1.x * r1.x;
 
-    	return positionError <= Settings.linearSlop && angularError <= Settings.angularSlop;
-    }
+		K3.col1.x =  invI2 * r2.y * r2.y;   K3.col2.x = -invI2 * r2.x * r2.y;
+		K3.col1.y = -invI2 * r2.x * r2.y;   K3.col2.y =  invI2 * r2.x * r2.x;
 
-    public Vec2 getAnchor1() {
-    	return m_body1.getWorldLocation(m_localAnchor1);
-    }
+		final Mat22 K = K1.addLocal(K2).addLocal(K3);
+		K.solveToOut(ptpC.negateLocal(), impulse);
 
-    public Vec2 getAnchor2() {
-    	return m_body2.getWorldLocation(m_localAnchor2);
-    }
+		b1.m_sweep.c.x -= b1.m_invMass * impulse.x;
+		b1.m_sweep.c.y -= b1.m_invMass * impulse.y;
+		b1.m_sweep.a -= b1.m_invI * Vec2.cross(r1, impulse);
 
-    public Vec2 getReactionForce() {
-    	return m_pivotForce;
-    }
+		b2.m_sweep.c.x += b2.m_invMass * impulse.x;
+		b2.m_sweep.c.y += b2.m_invMass * impulse.y;
+		b2.m_sweep.a += b2.m_invI * Vec2.cross(r2, impulse);
 
-    public float getReactionTorque() {
-    	return m_limitForce;
-    }
+		b1.synchronizeTransform();
+		b2.synchronizeTransform();
 
-    public float getJointAngle() {
-    	Body b1 = m_body1;
-    	Body b2 = m_body2;
-    	return b2.m_sweep.a - b1.m_sweep.a - m_referenceAngle;
-    }
+		// Handle limits.
+		float angularError = 0.0f;
 
-    public float getJointSpeed() {
-    	Body b1 = m_body1;
-    	Body b2 = m_body2;
-    	return b2.m_angularVelocity - b1.m_angularVelocity;
-    }
 
-    public boolean isMotorEnabled() {
-    	return m_enableMotor;
-    }
+		if (m_enableLimit && m_limitState != LimitState.INACTIVE_LIMIT) {
+			final float angle = b2.m_sweep.a - b1.m_sweep.a - m_referenceAngle;
+			float limitImpulse = 0.0f;
 
-    public void enableMotor(boolean flag) {
-    	m_enableMotor = flag;
-    }
+			if (m_limitState == LimitState.EQUAL_LIMITS) {
+				// Prevent large angular corrections
+				final float limitC = MathUtils.clamp(angle, -Settings.maxAngularCorrection, Settings.maxAngularCorrection);
+				limitImpulse = -m_motorMass * limitC;
+				angularError = Math.abs(limitC);
+			} else if (m_limitState == LimitState.AT_LOWER_LIMIT) {
+				float limitC = angle - m_lowerAngle;
+				angularError = Math.max(0.0f, -limitC);
 
-    public float getMotorTorque() {
-    	return m_motorForce;
-    }
+				// Prevent large angular corrections and allow some slop.
+				limitC = MathUtils.clamp(limitC + Settings.angularSlop, -Settings.maxAngularCorrection, 0.0f);
+				limitImpulse = -m_motorMass * limitC;
+				final float oldLimitImpulse = m_limitPositionImpulse;
+				m_limitPositionImpulse = Math.max(m_limitPositionImpulse + limitImpulse, 0.0f);
+				limitImpulse = m_limitPositionImpulse - oldLimitImpulse;
+			} else if (m_limitState == LimitState.AT_UPPER_LIMIT) {
+				float limitC = angle - m_upperAngle;
+				angularError = Math.max(0.0f, limitC);
 
-    public void setMotorSpeed(float speed) {
-    	m_motorSpeed = speed;
-    }
+				// Prevent large angular corrections and allow some slop.
+				limitC = MathUtils.clamp(limitC - Settings.angularSlop, 0.0f, Settings.maxAngularCorrection);
+				limitImpulse = -m_motorMass * limitC;
+				final float oldLimitImpulse = m_limitPositionImpulse;
+				m_limitPositionImpulse = Math.min(m_limitPositionImpulse + limitImpulse, 0.0f);
+				limitImpulse = m_limitPositionImpulse - oldLimitImpulse;
+			}
 
-    public void setMaxMotorTorque(float torque) {
-    	m_maxMotorTorque = torque;
-    }
+			b1.m_sweep.a -= b1.m_invI * limitImpulse;
+			b2.m_sweep.a += b2.m_invI * limitImpulse;
 
-    public boolean isLimitEnabled() {
-    	return m_enableLimit;
-    }
+			b1.synchronizeTransform();
+			b2.synchronizeTransform();
+		}
 
-    public void enableLimit(boolean flag) {
-    	m_enableLimit = flag;
-    }
+		return positionError <= Settings.linearSlop && angularError <= Settings.angularSlop;
+	}
 
-    public float getLowerLimit() {
-    	return m_lowerAngle;
-    }
+	@Override
+	public Vec2 getAnchor1() {
+		return m_body1.getWorldLocation(m_localAnchor1);
+	}
 
-    public float getUpperLimit() {
-    	return m_upperAngle;
-    }
+	@Override
+	public Vec2 getAnchor2() {
+		return m_body2.getWorldLocation(m_localAnchor2);
+	}
 
-    public void setLimits(float lower, float upper) {
-    	assert(lower <= upper);
-    	m_lowerAngle = lower;
-    	m_upperAngle = upper;
-    }
+	@Override
+	public Vec2 getReactionForce() {
+		return m_pivotForce;
+	}
+
+	@Override
+	public float getReactionTorque() {
+		return m_limitForce;
+	}
+
+	public float getJointAngle() {
+		final Body b1 = m_body1;
+		final Body b2 = m_body2;
+		return b2.m_sweep.a - b1.m_sweep.a - m_referenceAngle;
+	}
+
+	public float getJointSpeed() {
+		final Body b1 = m_body1;
+		final Body b2 = m_body2;
+		return b2.m_angularVelocity - b1.m_angularVelocity;
+	}
+
+	public boolean isMotorEnabled() {
+		return m_enableMotor;
+	}
+
+	public void enableMotor(final boolean flag) {
+		m_enableMotor = flag;
+	}
+
+	public float getMotorTorque() {
+		return m_motorForce;
+	}
+
+	public void setMotorSpeed(final float speed) {
+		m_motorSpeed = speed;
+	}
+
+	public void setMaxMotorTorque(final float torque) {
+		m_maxMotorTorque = torque;
+	}
+
+	public boolean isLimitEnabled() {
+		return m_enableLimit;
+	}
+
+	public void enableLimit(final boolean flag) {
+		m_enableLimit = flag;
+	}
+
+	public float getLowerLimit() {
+		return m_lowerAngle;
+	}
+
+	public float getUpperLimit() {
+		return m_upperAngle;
+	}
+
+	public void setLimits(final float lower, final float upper) {
+		assert(lower <= upper);
+		m_lowerAngle = lower;
+		m_upperAngle = upper;
+	}
 }

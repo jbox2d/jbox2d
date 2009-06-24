@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -50,7 +50,7 @@ public class PrismaticJointDef extends JointDef {
 
 	/// Initialize the bodies, anchors, axis, and reference angle using the world
 	/// anchor and world axis.
-	public void initialize(Body b1, Body b2, Vec2 anchor, Vec2 axis) {
+	public void initialize(final Body b1, final Body b2, final Vec2 anchor, final Vec2 axis) {
 		body1 = b1;
 		body2 = b2;
 		body1.getLocalPointToOut(anchor, localAnchor1);

@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -23,36 +23,35 @@
 
 package org.jbox2d.collision.shapes;
 
-import org.jbox2d.common.*;
-//updated to rev 139 of b2CircleShape.h/.cpp
+import org.jbox2d.common.Vec2;
 
-/** 
- * A circle shape definition.  Set the radius and localPosition 
+/**
+ * A circle shape definition.  Set the radius and localPosition
  * ( (0,0) by default ), and then call Body.createShape(ShapeDef)
  * to add the shape to a body.
  */
 public class CircleDef extends ShapeDef {
 
-    public float radius;
-    public Vec2 localPosition;
+	public float radius;
+	public Vec2 localPosition;
 
-    /**
-     * creates a circle definition at (0,0) with a radius of 1.
-     */
-    public CircleDef() {
-        type = ShapeType.CIRCLE_SHAPE;
+	/**
+	 * creates a circle definition at (0,0) with a radius of 1.
+	 */
+	public CircleDef() {
+		type = ShapeType.CIRCLE_SHAPE;
 		localPosition = new Vec2(0.0f, 0.0f);
 		radius = 1.0f;
-    }
-    
-    /**
-     * creates the circle definition at the given point with
-     * a radius of 1
-     * @param argVec
-     */
-    public CircleDef(final Vec2 argVec){
-    	localPosition = argVec.clone();
-        type = ShapeType.CIRCLE_SHAPE;
+	}
+
+	/**
+	 * creates the circle definition at the given point with
+	 * a radius of 1
+	 * @param argVec
+	 */
+	public CircleDef(final Vec2 argVec){
+		localPosition = argVec.clone();
+		type = ShapeType.CIRCLE_SHAPE;
 		radius = 1.0f;
-    }
+	}
 }

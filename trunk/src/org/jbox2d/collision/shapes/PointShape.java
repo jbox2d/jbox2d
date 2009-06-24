@@ -2,7 +2,10 @@ package org.jbox2d.collision.shapes;
 
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.MassData;
+import org.jbox2d.collision.Segment;
+import org.jbox2d.collision.SegmentCollide;
 import org.jbox2d.common.Mat22;
+import org.jbox2d.common.RaycastResult;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
@@ -82,6 +85,57 @@ public class PointShape extends Shape {
 		// TODO djm: could use more optimization.
 		// we could probably use bit shifting
 		return false;
+	}
+
+	// Collision Detection in Interactive 3D Environments by Gino van den Bergen
+	// From Section 3.1.2
+	// x = s + a * r
+	// norm(x) = radius
+	// djm pooled
+	private final Vec2 position = new Vec2();
+	private final Vec2 s = new Vec2();
+	private final Vec2 r = new Vec2();
+	/**
+	 * @see Shape#testSegment(XForm, RaycastResult, Segment, float)
+	 */
+	@Override
+	public SegmentCollide testSegment(final XForm xf, final RaycastResult out, final Segment segment, final float maxLambda){
+
+		Mat22.mulToOut( xf.R, m_localPosition, position);
+		position.addLocal(xf.position);
+		s.set(segment.p1);
+		s.subLocal(position);
+		final float b = Vec2.dot(s, s);
+
+		// Does the segment start inside the circle?
+		if (b < 0.0f){
+			return SegmentCollide.STARTS_INSIDE_COLLIDE;
+		}
+
+		// Solve quadratic equation.
+		r.set(segment.p2).subLocal(segment.p1);
+		final float c =  Vec2.dot(s, r);
+		final float rr = Vec2.dot(r, r);
+		final float sigma = c * c - rr * b;
+
+		// Check for negative discriminant and short segment.
+		if (sigma < 0.0f || rr < Settings.EPSILON){
+			return SegmentCollide.MISS_COLLIDE;
+		}
+
+		// Find the point of intersection of the line with the circle.
+		float a = -(c + (float)Math.sqrt(sigma));
+
+		// Is the intersection point on the segment?
+		if (0.0f <= a && a <= maxLambda * rr){
+			a /= rr;
+			out.lambda = a;
+			out.normal.set(r).mulLocal(a).addLocal(s);
+			out.normal.normalize();
+			return SegmentCollide.HIT_COLLIDE;
+		}
+
+		return SegmentCollide.MISS_COLLIDE;
 	}
 
 	/**

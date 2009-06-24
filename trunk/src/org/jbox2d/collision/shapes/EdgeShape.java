@@ -2,7 +2,10 @@ package org.jbox2d.collision.shapes;
 
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.MassData;
+import org.jbox2d.collision.Segment;
+import org.jbox2d.collision.SegmentCollide;
 import org.jbox2d.collision.SupportsGenericDistance;
+import org.jbox2d.common.RaycastResult;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
@@ -91,45 +94,51 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 		return false;
 	}
 
-	//	b2SegmentCollide b2EdgeShape::TestSegment(const b2XForm& transform,
-	//			float32* lambda,
-	//			b2Vec2* normal,
-	//			const b2Segment& segment,
-	//			float32 maxLambda) const
-	//{
-	//b2Vec2 r = segment.p2 - segment.p1;
-	//b2Vec2 v1 = b2Mul(transform, m_v1);
-	//b2Vec2 d = b2Mul(transform, m_v2); - v1;
-	//b2Vec2 n = b2Cross(d, 1.0f);
-	//
-	//const float32 k_slop = 100.0f * B2_FLT_EPSILON;
-	//float32 denom = -b2Dot(r, n);
-	//
-	//// Cull back facing collision and ignore parallel segments.
-	//if (denom > k_slop)
-	//{
-	//// Does the segment intersect the infinite line associated with this segment?
-	//b2Vec2 b = segment.p1 - v1;
-	//float32 a = b2Dot(b, n);
-	//
-	//if (0.0f <= a && a <= maxLambda * denom)
-	//{
-	//float32 mu2 = -r.x * b.y + r.y * b.x;
-	//
-	//// Does the segment intersect this segment?
-	//if (-k_slop * denom <= mu2 && mu2 <= denom * (1.0f + k_slop))
-	//{
-	//a /= denom;
-	//n.Normalize();
-	//*lambda = a;
-	//*normal = n;
-	//return e_hitCollide;
-	//}
-	//}
-	//}
-	//
-	//return e_missCollide;
-	//}
+	// djm pooled
+	private final Vec2 r = new Vec2();
+	private final Vec2 v1 = new Vec2();
+	private final Vec2 d = new Vec2();
+	private final Vec2 n = new Vec2();
+	private final Vec2 b = new Vec2();
+	/**
+	 * @see Shape#testSegment(XForm, RaycastResult, Segment, float)
+	 */
+	@Override
+	public SegmentCollide testSegment(final XForm xf, final RaycastResult out, final Segment segment, final float maxLambda){
+		r.set(segment.p2).subLocal(segment.p1);
+		XForm.mulToOut( xf, m_v1, v1);
+		XForm.mulToOut( xf, m_v2, d);
+		d.subLocal(v1);
+		Vec2.crossToOut(d, 1.0f, n);
+
+		final float k_slop = 100.0f * Settings.EPSILON;
+		final float denom = -Vec2.dot(r, n);
+
+		// Cull back facing collision and ignore parallel segments.
+		if (denom > k_slop)
+		{
+			// Does the segment intersect the infinite line associated with this segment?
+			b.set(segment.p1).subLocal(v1);
+			float a = Vec2.dot(b, n);
+
+			if (0.0f <= a && a <= maxLambda * denom)
+			{
+				final float mu2 = -r.x * b.y + r.y * b.x;
+
+				// Does the segment intersect this segment?
+				if (-k_slop * denom <= mu2 && mu2 <= denom * (1.0f + k_slop))
+				{
+					a /= denom;
+					n.normalize();
+					out.lambda = a;
+					out.normal.set(n);
+					return SegmentCollide.HIT_COLLIDE;
+				}
+			}
+		}
+
+		return SegmentCollide.MISS_COLLIDE;
+	}
 
 	/**
 	 * @see Shape#computeAABB(AABB, XForm)
