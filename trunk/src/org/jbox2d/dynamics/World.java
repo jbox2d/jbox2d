@@ -988,6 +988,11 @@ public class World {
 		}
 
 	}
+	
+	// NOTE this corresponds to the liquid test, so the debugdraw can draw
+	// the liquid particles correctly.  They should be the same.
+	private static Integer LIQUID_INT = new Integer(12345);
+	private float liquidLength = .02f;
 	// djm pooled
 	private final Color3f coreColor = new Color3f(255f*0.9f, 255f*0.6f, 255f*0.6f);
 	private final Vec2 drawingCenter = new Vec2();
@@ -1004,10 +1009,13 @@ public class World {
 			XForm.mulToOut(xf, circle.getMemberLocalPosition(), drawingCenter);
 			final float radius = circle.getRadius();
 			final Vec2 axis = xf.R.col1;
-
-			circCenterMoved.x = drawingCenter.x + .01f;
-			circCenterMoved.y = drawingCenter.y + .01f;
-			if (circle.getUserData() != null) {
+			
+			if (circle.getUserData() != null && circle.getUserData().equals(LIQUID_INT)) {
+				Body b = circle.getBody();
+				circCenterMoved.set(b.m_linearVelocity);
+				circCenterMoved.normalize();
+				circCenterMoved.mulLocal( liquidLength);
+				circCenterMoved.addLocal( drawingCenter);
 				m_debugDraw.drawSegment(drawingCenter, circCenterMoved, liquidColor);
 				return;
 			}
@@ -1143,7 +1151,6 @@ public class World {
 			final boolean core = (flags & DebugDraw.e_coreShapeBit) == DebugDraw.e_coreShapeBit;
 
 			for (Body b = m_bodyList; b != null; b = b.getNext()) {
-				// TODO change the way this is handled
 				final XForm xf = b.getMemberXForm();
 
 				for (Shape s = b.getShapeList(); s != null; s = s.getNext()) {

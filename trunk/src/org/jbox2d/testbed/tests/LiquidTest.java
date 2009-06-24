@@ -278,6 +278,7 @@ public class LiquidTest extends AbstractExample {
 		
 	}
 	
+	// IF YOU CHANGE THIS change the corresponding value in World
 	public static Integer LIQUID_INT = new Integer(12345);
 	
 	private Body bod;
