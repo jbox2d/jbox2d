@@ -28,6 +28,9 @@ import org.jbox2d.collision.BroadPhase;
 import org.jbox2d.collision.FilterData;
 import org.jbox2d.collision.MassData;
 import org.jbox2d.collision.PairManager;
+import org.jbox2d.collision.Segment;
+import org.jbox2d.collision.SegmentCollide;
+import org.jbox2d.common.RaycastResult;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.Body;
@@ -183,21 +186,23 @@ public abstract class Shape {
 	 */
 	public abstract boolean testPoint(XForm xf, Vec2 p);
 
-	/*
-    /// Perform a ray cast against this shape.
-	/// @param xf the shape world transform.
-	/// @param lambda returns the hit fraction. You can use this to compute the contact point
-	/// p = (1 - lambda) * segment.p1 + lambda * segment.p2.
-	/// @param normal returns the normal at the contact point. If there is no intersection, the normal
-	/// is not set.
-	/// @param segment defines the begin and end point of the ray cast.
-	/// @param maxLambda a number typically in the range [0,1].
-	/// @return true if there was an intersection.
-	public  boolean TestSegment(	const b2XForm& xf,
-								float32* lambda,
-								b2Vec2* normal,
-								const b2Segment& segment,
-								float32 maxLambda) const = 0;*/
+
+	/**
+	 *  Perform a ray cast against this shape.
+	 *  @param xf the shape world transform.
+	 *  @param out is where the results are placed: <ul><li>lambda returns the hit fraction, based on
+	 *  the distance between the two points. You can use this to compute the contact point
+	 *  p = (1 - lambda) * segment.p1 + lambda * segment.p2.</li>
+	 *  <li>normal returns the normal at the contact point. If there is no intersection, the normal
+	 *  is not set.</li></ul>
+	 *  @param segment defines the begin and end point of the ray cast.
+	 *  @param maxLambda a number typically in the range [0,1].
+	 *  @return true if there was an intersection.
+	 */
+	public abstract SegmentCollide testSegment(XForm xf,
+	                                    RaycastResult out,
+	                                    Segment segment,
+	                                    float maxLambda);
 
 	/**
 	 * Given a transform, compute the associated axis aligned bounding box for this shape.

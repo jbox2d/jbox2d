@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -24,5 +24,5 @@
 package org.jbox2d.dynamics.joints;
 
 public enum JointType {
-    UNKNOWN_JOINT, REVOLUTE_JOINT, PRISMATIC_JOINT, DISTANCE_JOINT, PULLEY_JOINT, MOUSE_JOINT, GEAR_JOINT, CONSTANT_VOLUME_JOINT
+	UNKNOWN_JOINT, REVOLUTE_JOINT, PRISMATIC_JOINT, DISTANCE_JOINT, PULLEY_JOINT, MOUSE_JOINT, GEAR_JOINT, CONSTANT_VOLUME_JOINT
 }

@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -39,9 +39,9 @@ import org.jbox2d.dynamics.ContactListener;
 
 public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 	public final Manifold m_manifold;
-    public final ArrayList<Manifold> manifoldList = new ArrayList<Manifold>();
+	public final ArrayList<Manifold> manifoldList = new ArrayList<Manifold>();
 
-	
+
 	public EdgeAndCircleContact() {
 		// TODO Auto-generated constructor stub
 		super();
@@ -50,7 +50,7 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 		m_manifoldCount = 0;
 	}
 
-	public EdgeAndCircleContact(Shape s1, Shape s2) {
+	public EdgeAndCircleContact(final Shape s1, final Shape s2) {
 		super(s1, s2);
 		assert(m_shape1.getType() == ShapeType.EDGE_SHAPE);
 		assert(m_shape2.getType() == ShapeType.CIRCLE_SHAPE);
@@ -62,30 +62,30 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 	@Override
 	public Contact clone() {
 		assert false: "Not yet implemented.";
-    	return this;
+	return this;
 	}
-	
-	public static void Destroy(Contact contact) {
-        ((EdgeAndCircleContact) contact).destructor();
-    }
-	
+
+	public static void Destroy(final Contact contact) {
+		((EdgeAndCircleContact) contact).destructor();
+	}
+
 	public void destructor() {
-		
+
 	}
 
 	// djm pooled
-	private Manifold m0 = new Manifold();
-	private Vec2 v1 = new Vec2();
+	private final Manifold m0 = new Manifold();
+	private final Vec2 v1 = new Vec2();
 	@Override
-	public void evaluate(ContactListener listener) {
-		Body b1 = m_shape1.getBody();
-		Body b2 = m_shape2.getBody();
+	public void evaluate(final ContactListener listener) {
+		final Body b1 = m_shape1.getBody();
+		final Body b2 = m_shape2.getBody();
 
 		m0.set(m_manifold);
 
 		CollideCircle.collideEdgeAndCircle(m_manifold, (EdgeShape)m_shape1, b1.getMemberXForm(), (CircleShape)m_shape2, b2.getMemberXForm());
 
-		ContactPoint cp = new ContactPoint();
+		final ContactPoint cp = new ContactPoint();
 		cp.shape1 = m_shape1;
 		cp.shape2 = m_shape2;
 		//TODO
@@ -96,7 +96,7 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 
 		if (m_manifold.pointCount > 0) {
 			m_manifoldCount = 1;
-			ManifoldPoint mp = m_manifold.points[0];
+			final ManifoldPoint mp = m_manifold.points[0];
 
 			if (m0.pointCount == 0) {
 				mp.normalImpulse = 0.0f;
@@ -105,19 +105,19 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 				if (listener != null) {
 					b1.getWorldLocationToOut(mp.localPoint1, cp.position);
 					//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
-    				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
-    				//Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
-    				b2.getLinearVelocityFromLocalPointToOut(mp.localPoint2, cp.velocity);
-    				//cp.velocity = v2.sub(v1);
-    				cp.velocity.subLocal(v1);
-    				
+					b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
+					//Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+					b2.getLinearVelocityFromLocalPointToOut(mp.localPoint2, cp.velocity);
+					//cp.velocity = v2.sub(v1);
+					cp.velocity.subLocal(v1);
+
 					cp.normal.set(m_manifold.normal);
 					cp.separation = mp.separation;
 					cp.id.set(mp.id);
 					listener.add(cp);
 				}
 			} else {
-				ManifoldPoint mp0 = m0.points[0];
+				final ManifoldPoint mp0 = m0.points[0];
 				mp.normalImpulse = mp0.normalImpulse;
 				mp.tangentImpulse = mp0.tangentImpulse;
 
@@ -125,12 +125,12 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 					b1.getWorldLocationToOut(mp.localPoint1, cp.position);
 					//cp.position = b1.getWorldLocation(mp.localPoint1);
 					//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
-    				b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
-    				//Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
-    				b2.getLinearVelocityFromLocalPointToOut(mp.localPoint2, cp.velocity);
-    				//cp.velocity = v2.sub(v1);
-    				cp.velocity.subLocal(v1);
-    				
+					b1.getLinearVelocityFromLocalPointToOut(mp.localPoint1, v1);
+					//Vec2 v2 = b2.getLinearVelocityFromLocalPoint(mp.localPoint2);
+					b2.getLinearVelocityFromLocalPointToOut(mp.localPoint2, cp.velocity);
+					//cp.velocity = v2.sub(v1);
+					cp.velocity.subLocal(v1);
+
 					cp.normal.set(m_manifold.normal);
 					cp.separation = mp.separation;
 					cp.id.set(mp.id);
@@ -140,7 +140,7 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 		} else {
 			m_manifoldCount = 0;
 			if (m0.pointCount > 0 && (listener != null)) {
-				ManifoldPoint mp0 = m0.points[0];
+				final ManifoldPoint mp0 = m0.points[0];
 				b1.getWorldLocationToOut(mp0.localPoint1, cp.position);
 				//cp.position = b1.getWorldLocation(mp0.localPoint1);
 				//Vec2 v1 = b1.getLinearVelocityFromLocalPoint(mp.localPoint1);
@@ -149,7 +149,7 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 				b2.getLinearVelocityFromLocalPointToOut(mp0.localPoint2, cp.velocity);
 				//cp.velocity = v2.sub(v1);
 				cp.velocity.subLocal(v1);
-				
+
 				cp.normal.set(m_manifold.normal);
 				cp.separation = mp0.separation;
 				cp.id.set(mp0.id);
@@ -158,14 +158,14 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 		}
 
 	}
-	
+
 	@Override
 	public List<Manifold> getManifolds() {
 		return manifoldList;
 	}
 
-	public Contact create(Shape s1, Shape s2) {
-		
+	public Contact create(final Shape s1, final Shape s2) {
+
 		return new EdgeAndCircleContact(s1,s2);
 	}
 

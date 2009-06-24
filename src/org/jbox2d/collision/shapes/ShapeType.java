@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -25,5 +25,5 @@ package org.jbox2d.collision.shapes;
 
 // Updated to rev 144 of b2Shape.h
 public enum ShapeType {
-    UNKNOWN_SHAPE, CIRCLE_SHAPE, POLYGON_SHAPE, POINT_SHAPE, EDGE_SHAPE, SHAPE_TYPE_COUNT
+	UNKNOWN_SHAPE, CIRCLE_SHAPE, POLYGON_SHAPE, POINT_SHAPE, EDGE_SHAPE, SHAPE_TYPE_COUNT
 }

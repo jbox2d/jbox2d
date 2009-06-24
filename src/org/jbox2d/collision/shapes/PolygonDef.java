@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -30,7 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jbox2d.collision.FilterData;
-import org.jbox2d.common.*;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.common.XForm;
 
 /**
  * Convex polygon. The vertices must be in CCW order for a right-handed
@@ -40,7 +41,7 @@ import org.jbox2d.common.*;
  */
 public class PolygonDef extends ShapeDef {
 
-	/** 
+	/**
 	 * The polygon vertices in local coordinates.
 	 * <BR><BR>
 	 * Accessing this field is discouraged - it remains
@@ -48,81 +49,81 @@ public class PolygonDef extends ShapeDef {
 	 * Please use addVertex(Vec2) and getVertexList/Array
 	 * instead to add to or inspect the current vertices.
 	 */
-    public List<Vec2> vertices;
-    
-    public void set(PolygonDef copyMe) {
-    	this.density = copyMe.density;
-    	this.filter = new FilterData();
-    	this.filter.set(copyMe.filter);
-    	this.friction = copyMe.friction;
-    	this.isSensor = copyMe.isSensor;
-    	this.restitution = copyMe.restitution;
-    	this.type = copyMe.type;
-    	this.userData = copyMe.userData;
-    	this.vertices = new ArrayList<Vec2>();
-    	for(int i=0; i<copyMe.vertices.size(); ++i) {
-    		this.addVertex(copyMe.vertices.get(i).clone());
-    	}
-    }
+	public List<Vec2> vertices;
 
-    public PolygonDef() {
-        type = ShapeType.POLYGON_SHAPE;
-        vertices = new ArrayList<Vec2>();
-    }
-    
-    /** Add a vertex to the polygon. */
-    public void addVertex(Vec2 v) {
-    	vertices.add(v);
-    }
-    
-    /** Removes all vertices. */
-    public void clearVertices() {
-    	vertices.clear();
-    }
-    
-    /** Return the vertex list as an array. */
-    public Vec2[] getVertexArray() {
-    	return vertices.toArray(new Vec2[0]);
-    }
-    
-    /** Return the vertex list as a List<Vec2>. */
-    public List<Vec2> getVertexList() {
-    	return vertices;
-    }
-    
-    /**
-     * Build vertices to represent an axis-aligned box.
+	public void set(final PolygonDef copyMe) {
+		this.density = copyMe.density;
+		this.filter = new FilterData();
+		this.filter.set(copyMe.filter);
+		this.friction = copyMe.friction;
+		this.isSensor = copyMe.isSensor;
+		this.restitution = copyMe.restitution;
+		this.type = copyMe.type;
+		this.userData = copyMe.userData;
+		this.vertices = new ArrayList<Vec2>();
+		for(int i=0; i<copyMe.vertices.size(); ++i) {
+			this.addVertex(copyMe.vertices.get(i).clone());
+		}
+	}
+
+	public PolygonDef() {
+		type = ShapeType.POLYGON_SHAPE;
+		vertices = new ArrayList<Vec2>();
+	}
+
+	/** Add a vertex to the polygon. */
+	public void addVertex(final Vec2 v) {
+		vertices.add(v);
+	}
+
+	/** Removes all vertices. */
+	public void clearVertices() {
+		vertices.clear();
+	}
+
+	/** Return the vertex list as an array. */
+	public Vec2[] getVertexArray() {
+		return vertices.toArray(new Vec2[0]);
+	}
+
+	/** Return the vertex list as a List<Vec2>. */
+	public List<Vec2> getVertexList() {
+		return vertices;
+	}
+
+	/**
+	 * Build vertices to represent an axis-aligned box.
 	 * @param hx the half-width.
 	 * @param hy the half-height.
 	 */
-    public void setAsBox(float hx, float hy) {
-    	vertices.clear();
-    	vertices.add(new Vec2(-hx, -hy));
-    	vertices.add(new Vec2(hx, -hy));
-    	vertices.add(new Vec2(hx, hy));
-    	vertices.add(new Vec2(-hx, hy));
-    }
+	public void setAsBox(final float hx, final float hy) {
+		vertices.clear();
+		vertices.add(new Vec2(-hx, -hy));
+		vertices.add(new Vec2(hx, -hy));
+		vertices.add(new Vec2(hx, hy));
+		vertices.add(new Vec2(-hx, hy));
+	}
 
-    /**
-     * Build vertices to represent an oriented box.
+	/**
+	 * Build vertices to represent an oriented box.
 	 * @param hx the half-width.
 	 * @param hy the half-height.
 	 * @param center the center of the box in local coordinates.
 	 * @param angle the rotation of the box in local coordinates.
 	 */
-    public void setAsBox(float hx, float hy, Vec2 center, float angle) {
-    	setAsBox(hx, hy);
-    	XForm xf = new XForm();
-    	xf.position.set(center);
-    	xf.R.set(angle);
-    	// djm optimized. I'm leaving the XForm creation, it doesn't matter here
-    	for (int i = 0; i < vertices.size(); ++i) {
-    		XForm.mulToOut(xf, vertices.get(i), vertices.get(i));
-    	}
-    }
+	public void setAsBox(final float hx, final float hy, final Vec2 center, final float angle) {
+		setAsBox(hx, hy);
+		final XForm xf = new XForm();
+		xf.position.set(center);
+		xf.R.set(angle);
+		// djm optimized. I'm leaving the XForm creation, it doesn't matter here
+		for (int i = 0; i < vertices.size(); ++i) {
+			XForm.mulToOut(xf, vertices.get(i), vertices.get(i));
+		}
+	}
 
-    /** Return the number of vertices. */
-    public int getVertexCount() {
-        return vertices.size();
-    }
+	/** Return the number of vertices. */
+	public int getVertexCount() {
+		return vertices.size();
+	}
 }

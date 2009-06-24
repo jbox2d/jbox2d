@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -38,28 +38,28 @@ public class MouseJointDef extends JointDef {
 	 */
 	public Vec2 target;
 
-    /** 
-     * The maximum constraint force that can be exerted
+	/**
+	 * The maximum constraint force that can be exerted
 	 * to move the candidate body. Usually you will express
 	 * as some multiple of the weight (multiplier * mass * gravity).
 	 */
-    public float maxForce;
+	public float maxForce;
 
-    /** The response speed. */
-    public float frequencyHz;
-  
-    /** The damping ratio. 0 = no damping, 1 = critical damping. */
+	/** The response speed. */
+	public float frequencyHz;
+
+	/** The damping ratio. 0 = no damping, 1 = critical damping. */
 	public float dampingRatio;
-    
-    /** The time step used in the simulation. */
-    public float timeStep;
 
-    public MouseJointDef() {
-        type = JointType.MOUSE_JOINT;
-        target = new Vec2(0.0f, 0.0f);
-        maxForce = 0.0f;
-        frequencyHz = 5.0f;
-        dampingRatio = 0.7f;
-        timeStep = 1.0f / 60.0f;
-    }
+	/** The time step used in the simulation. */
+	public float timeStep;
+
+	public MouseJointDef() {
+		type = JointType.MOUSE_JOINT;
+		target = new Vec2(0.0f, 0.0f);
+		maxForce = 0.0f;
+		frequencyHz = 5.0f;
+		dampingRatio = 0.7f;
+		timeStep = 1.0f / 60.0f;
+	}
 }

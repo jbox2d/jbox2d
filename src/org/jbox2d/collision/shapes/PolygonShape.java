@@ -28,9 +28,12 @@ import java.util.List;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.MassData;
 import org.jbox2d.collision.OBB;
+import org.jbox2d.collision.Segment;
+import org.jbox2d.collision.SegmentCollide;
 import org.jbox2d.collision.SupportsGenericDistance;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.RaycastResult;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
@@ -236,67 +239,76 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 	}
 
 
-	//TODO eric: get raycasts working - need to
-	//     create a class for a raycast result
+	// djm pooling
+	private final Vec2 p1 = new Vec2();
+	private final Vec2 p2 = new Vec2();
+	private final Vec2 tsd = new Vec2();
+	private final Vec2 temp2 = new Vec2();
+	/**
+	 * @see Shape#testSegment(XForm, RaycastResult, Segment, float)
+	 */
+	@Override
+	public SegmentCollide testSegment(final XForm xf, final RaycastResult out, final Segment segment, final float maxLambda){
+		float lower = 0.0f, upper = maxLambda;
 
-	//    bool b2PolygonShape::TestSegment(
-	//    		const b2XForm& xf,
-	//    		float32* lambda,
-	//    		b2Vec2* normal,
-	//    		const b2Segment& segment,
-	//    		float32 maxLambda) const
-	//    	{
-	//    		float32 lower = 0.0f, upper = maxLambda;
-	//
-	//    		b2Vec2 p1 = b2MulT(xf.R, segment.p1 - xf.position);
-	//    		b2Vec2 p2 = b2MulT(xf.R, segment.p2 - xf.position);
-	//    		b2Vec2 d = p2 - p1;
-	//    		int32 index = -1;
-	//
-	//    		for (int32 i = 0; i < m_vertexCount; ++i)
-	//    		{
-	//    			// p = p1 + a * d
-	//    			// dot(normal, p - v) = 0
-	//    			// dot(normal, p1 - v) + a * dot(normal, d) = 0
-	//    			float32 numerator = b2Dot(m_normals[i], m_vertices[i] - p1);
-	//    			float32 denominator = b2Dot(m_normals[i], d);
-	//
-	//    			// Note: we want this predicate without division:
-	//    			// lower < numerator / denominator, where denominator < 0
-	//    			// Since denominator < 0, we have to flip the inequality:
-	//    			// lower < numerator / denominator <==> denominator * lower > numerator.
-	//
-	//    			if (denominator < 0.0f && numerator < lower * denominator)
-	//    			{
-	//    				// Increase lower.
-	//    				// The segment enters this half-space.
-	//    				lower = numerator / denominator;
-	//    				index = i;
-	//    			}
-	//    			else if (denominator > 0.0f && numerator < upper * denominator)
-	//    			{
-	//    				// Decrease upper.
-	//    				// The segment exits this half-space.
-	//    				upper = numerator / denominator;
-	//    			}
-	//
-	//    			if (upper < lower)
-	//    			{
-	//    				return false;
-	//    			}
-	//    		}
-	//
-	//    		b2Assert(0.0f <= lower && lower <= maxLambda);
-	//
-	//    		if (index >= 0)
-	//    		{
-	//    			*lambda = lower;
-	//    			*normal = b2Mul(xf.R, m_normals[index]);
-	//    			return true;
-	//    		}
-	//
-	//    		return false;
-	//    	}
+		p1.set(segment.p1);
+		p1.subLocal( xf.position);
+		Mat22.mulTransToOut(xf.R, p1, p1 );
+		p2.set(segment.p2);
+		p2.subLocal(xf.position);
+		Mat22.mulTransToOut(xf.R, p2, p2);
+		tsd.set(p2);
+		tsd.subLocal( p1);
+
+		int index = -1;
+
+		for (int i = 0; i < m_vertexCount; ++i)
+		{
+			// p = p1 + a * d
+			// dot(normal, p - v) = 0
+			// dot(normal, p1 - v) + a * dot(normal, d) = 0
+			temp2.set(m_vertices[i]);
+			temp2.subLocal( p1);
+			final float numerator = Vec2.dot(m_normals[i], temp2);
+			final float denominator = Vec2.dot(m_normals[i], tsd);
+
+			// Note: we want this predicate without division:
+			// lower < numerator / denominator, where denominator < 0
+			// Since denominator < 0, we have to flip the inequality:
+			// lower < numerator / denominator <==> denominator * lower > numerator.
+
+			if (denominator < 0.0f && numerator < lower * denominator)
+			{
+				// Increase lower.
+				// The segment enters this half-space.
+				lower = numerator / denominator;
+				index = i;
+			}
+			else if (denominator > 0.0f && numerator < upper * denominator)
+			{
+				// Decrease upper.
+				// The segment exits this half-space.
+				upper = numerator / denominator;
+			}
+
+			if (upper < lower)
+			{
+				return SegmentCollide.MISS_COLLIDE;
+			}
+		}
+
+		assert(0.0f <= lower && lower <= maxLambda);
+
+		if (index >= 0)
+		{
+			out.lambda = lower;
+			Mat22.mulToOut(xf.R, m_normals[index], out.normal);
+			return SegmentCollide.HIT_COLLIDE;
+		}
+
+		return SegmentCollide.STARTS_INSIDE_COLLIDE;
+	}
+
 
 	// djm pooling, somewhat hot
 	private final Vec2 supportDLocal = new Vec2();

@@ -12,25 +12,25 @@ public class ConstantVolumeJoint extends Joint {
 	float targetVolume;
 	//float relaxationFactor;//1.0 is perfectly stiff (but doesn't work, unstable)
 	World world;
-	
+
 	Vec2[] normals;
-	
+
 	TimeStep m_step;
-	
+
 	DistanceJoint[] distanceJoints;
-	
+
 	public Body[] getBodies() {
 		return bodies;
 	}
-	
-	public void inflate(float factor) {
+
+	public void inflate(final float factor) {
 		targetVolume *= factor;
 	}
-	
+
 	// djm this is not a hot method, so no pool. no one wants
 	// to swim when it's cold out.  except when you have a hot
 	// tub.....then its amazing.....hmmmm......
-	public ConstantVolumeJoint(ConstantVolumeJointDef def) {
+	public ConstantVolumeJoint(final ConstantVolumeJointDef def) {
 		super(def);
 		if (def.bodies.length <= 2) {
 			throw new IllegalArgumentException("You cannot create a constant volume joint with less than three bodies.");
@@ -40,128 +40,130 @@ public class ConstantVolumeJoint extends Joint {
 		//relaxationFactor = def.relaxationFactor;
 		targetLengths = new float[bodies.length];
 		for (int i=0; i<targetLengths.length; ++i) {
-			int next = (i == targetLengths.length-1)?0:i+1;
-			float dist = bodies[i].getMemberWorldCenter().sub(bodies[next].getMemberWorldCenter()).length();
+			final int next = (i == targetLengths.length-1)?0:i+1;
+			final float dist = bodies[i].getMemberWorldCenter().sub(bodies[next].getMemberWorldCenter()).length();
 			targetLengths[i] = dist;
 		}
 		targetVolume = getArea();
-		
+
 		distanceJoints = new DistanceJoint[bodies.length];
 		for (int i=0; i<targetLengths.length; ++i) {
-			int next = (i == targetLengths.length-1)?0:i+1;
-			DistanceJointDef djd = new DistanceJointDef();
+			final int next = (i == targetLengths.length-1)?0:i+1;
+			final DistanceJointDef djd = new DistanceJointDef();
 			djd.frequencyHz = def.frequencyHz;//20.0f;
 			djd.dampingRatio = def.dampingRatio;//50.0f;
 			djd.initialize(bodies[i], bodies[next], bodies[i].getMemberWorldCenter(), bodies[next].getMemberWorldCenter());
 			distanceJoints[i] = (DistanceJoint)world.createJoint(djd);
 		}
-		
+
 		normals = new Vec2[bodies.length];
 		for (int i=0; i<normals.length; ++i) {
 			normals[i] = new Vec2();
 		}
-		
+
 		this.m_body1 = bodies[0];
 		this.m_body2 = bodies[1];
 		this.m_collideConnected = false;
-		
+
 		d = new Vec2[bodies.length];
 		// init pooled array
 		for(int i=0; i<bodies.length; i++){
 			d[i] = new Vec2();
 		}
 	}
-	
+
 	@Override
 	public void destructor() {
 		for (int i=0; i<distanceJoints.length; ++i) {
 			world.destroyJoint(distanceJoints[i]);
 		}
 	}
-	
+
 	private float getArea() {
-		  float area = 0.0f;
-		  // i'm glad i changed these all to member access
-		  area += bodies[bodies.length-1].getMemberWorldCenter().x * bodies[0].getMemberWorldCenter().y -
-		  		  bodies[0].getMemberWorldCenter().x * bodies[bodies.length-1].getMemberWorldCenter().y;
-		  for (int i=0; i<bodies.length-1; ++i){
-		    area += bodies[i].getMemberWorldCenter().x * bodies[i+1].getMemberWorldCenter().y - 
-		    		bodies[i+1].getMemberWorldCenter().x * bodies[i].getMemberWorldCenter().y;
-		  }
-		  area *= .5f;
-		  return area;
+		float area = 0.0f;
+		// i'm glad i changed these all to member access
+		area += bodies[bodies.length-1].getMemberWorldCenter().x * bodies[0].getMemberWorldCenter().y -
+		bodies[0].getMemberWorldCenter().x * bodies[bodies.length-1].getMemberWorldCenter().y;
+		for (int i=0; i<bodies.length-1; ++i){
+			area += bodies[i].getMemberWorldCenter().x * bodies[i+1].getMemberWorldCenter().y -
+			bodies[i+1].getMemberWorldCenter().x * bodies[i].getMemberWorldCenter().y;
+		}
+		area *= .5f;
+		return area;
 	}
-	
+
 	/**
 	 * Apply the position correction to the particles.
 	 * @param step
 	 */
-	public boolean constrainEdges(TimeStep step) {
-		  float perimeter = 0.0f;
-		  for (int i=0; i<bodies.length; ++i) {
-		    int next = (i==bodies.length-1)?0:i+1;
-		    float dx = bodies[next].getMemberWorldCenter().x-bodies[i].getMemberWorldCenter().x;
-		    float dy = bodies[next].getMemberWorldCenter().y-bodies[i].getMemberWorldCenter().y;
-		    float dist = (float)Math.sqrt(dx*dx+dy*dy);
-		    if (dist < Settings.EPSILON) dist = 1.0f;
-		    normals[i].x = dy / dist;
-		    normals[i].y = -dx / dist;
-		    perimeter += dist;
-		  }
-		  
-		  float deltaArea = targetVolume - getArea();
-		  float toExtrude = 0.5f*deltaArea / perimeter; //*relaxationFactor
-		  //float sumdeltax = 0.0f;
-		  boolean done = true;
-		  for (int i=0; i<bodies.length; ++i) {
-		    int next = (i==bodies.length-1)?0:i+1;
-		    Vec2 delta = new Vec2(toExtrude * (normals[i].x + normals[next].x),
-		    					  toExtrude * (normals[i].y + normals[next].y));
-		    //sumdeltax += dx;
-		    float norm = delta.length();
-		    if (norm > Settings.maxLinearCorrection){
-		    	delta.mulLocal(Settings.maxLinearCorrection/norm);
-		    }
-		    if (norm > Settings.linearSlop){
-		    	done = false;
-		    }
-		    bodies[next].m_sweep.c.x += delta.x;
-		    bodies[next].m_sweep.c.y += delta.y;
-		    bodies[next].synchronizeTransform();
-		    //bodies[next].m_linearVelocity.x += delta.x * step.inv_dt;
-		    //bodies[next].m_linearVelocity.y += delta.y * step.inv_dt;
-		  }
-		  //System.out.println(sumdeltax);
-		  return done;
+	public boolean constrainEdges(final TimeStep step) {
+		float perimeter = 0.0f;
+		for (int i=0; i<bodies.length; ++i) {
+			final int next = (i==bodies.length-1)?0:i+1;
+			final float dx = bodies[next].getMemberWorldCenter().x-bodies[i].getMemberWorldCenter().x;
+			final float dy = bodies[next].getMemberWorldCenter().y-bodies[i].getMemberWorldCenter().y;
+			float dist = (float)Math.sqrt(dx*dx+dy*dy);
+			if (dist < Settings.EPSILON) {
+				dist = 1.0f;
+			}
+			normals[i].x = dy / dist;
+			normals[i].y = -dx / dist;
+			perimeter += dist;
+		}
+
+		final float deltaArea = targetVolume - getArea();
+		final float toExtrude = 0.5f*deltaArea / perimeter; //*relaxationFactor
+		//float sumdeltax = 0.0f;
+		boolean done = true;
+		for (int i=0; i<bodies.length; ++i) {
+			final int next = (i==bodies.length-1)?0:i+1;
+			final Vec2 delta = new Vec2(toExtrude * (normals[i].x + normals[next].x),
+			                            toExtrude * (normals[i].y + normals[next].y));
+			//sumdeltax += dx;
+			final float norm = delta.length();
+			if (norm > Settings.maxLinearCorrection){
+				delta.mulLocal(Settings.maxLinearCorrection/norm);
+			}
+			if (norm > Settings.linearSlop){
+				done = false;
+			}
+			bodies[next].m_sweep.c.x += delta.x;
+			bodies[next].m_sweep.c.y += delta.y;
+			bodies[next].synchronizeTransform();
+			//bodies[next].m_linearVelocity.x += delta.x * step.inv_dt;
+			//bodies[next].m_linearVelocity.y += delta.y * step.inv_dt;
+		}
+		//System.out.println(sumdeltax);
+		return done;
 	}
-	
+
 	// djm pooled
-	private Vec2[] d;
+	private final Vec2[] d;
 	private float m_impulse = 0.0f;
 	@Override
-	public void initVelocityConstraints(TimeStep step) {
+	public void initVelocityConstraints(final TimeStep step) {
 		m_step = step;
-		
+
 		for (int i=0; i<bodies.length; ++i) {
-			int prev = (i==0)?bodies.length-1:i-1;
-			int next = (i==bodies.length-1)?0:i+1;
+			final int prev = (i==0)?bodies.length-1:i-1;
+			final int next = (i==bodies.length-1)?0:i+1;
 			d[i].set(bodies[next].getMemberWorldCenter());
 			d[i].subLocal(bodies[prev].getMemberWorldCenter());
 		}
-		
+
 		if (step.warmStarting) {
-    		m_impulse *= step.dtRatio;
-    		//float lambda = -2.0f * crossMassSum / dotMassSum;
-    		//System.out.println(crossMassSum + " " +dotMassSum);
-    		//lambda = MathUtils.clamp(lambda, -Settings.maxLinearCorrection, Settings.maxLinearCorrection);
-    		//m_impulse = lambda;
-    		for (int i=0; i<bodies.length; ++i) {
-    			bodies[i].m_linearVelocity.x += bodies[i].m_invMass * d[i].y * .5f * m_impulse;
-    			bodies[i].m_linearVelocity.y += bodies[i].m_invMass * -d[i].x * .5f * m_impulse;
-    		}
-    	} else {
-    		m_impulse = 0.0f;
-    	}
+			m_impulse *= step.dtRatio;
+			//float lambda = -2.0f * crossMassSum / dotMassSum;
+			//System.out.println(crossMassSum + " " +dotMassSum);
+			//lambda = MathUtils.clamp(lambda, -Settings.maxLinearCorrection, Settings.maxLinearCorrection);
+			//m_impulse = lambda;
+			for (int i=0; i<bodies.length; ++i) {
+				bodies[i].m_linearVelocity.x += bodies[i].m_invMass * d[i].y * .5f * m_impulse;
+				bodies[i].m_linearVelocity.y += bodies[i].m_invMass * -d[i].x * .5f * m_impulse;
+			}
+		} else {
+			m_impulse = 0.0f;
+		}
 	}
 
 	@Override
@@ -170,19 +172,19 @@ public class ConstantVolumeJoint extends Joint {
 	}
 
 	@Override
-	public void solveVelocityConstraints(TimeStep step) {
+	public void solveVelocityConstraints(final TimeStep step) {
 		float crossMassSum = 0.0f;
 		float dotMassSum = 0.0f;
-		
+
 		for (int i=0; i<bodies.length; ++i) {
-			int prev = (i==0)?bodies.length-1:i-1;
-			int next = (i==bodies.length-1)?0:i+1;
+			final int prev = (i==0)?bodies.length-1:i-1;
+			final int next = (i==bodies.length-1)?0:i+1;
 			d[i].set(bodies[next].getMemberWorldCenter());
 			d[i].subLocal(bodies[prev].getMemberWorldCenter());
 			dotMassSum += (d[i].lengthSquared())/bodies[i].getMass();
 			crossMassSum += Vec2.cross(bodies[i].getLinearVelocity(),d[i]);
 		}
-		float lambda = -2.0f * crossMassSum / dotMassSum;
+		final float lambda = -2.0f * crossMassSum / dotMassSum;
 		//System.out.println(crossMassSum + " " +dotMassSum);
 		//lambda = MathUtils.clamp(lambda, -Settings.maxLinearCorrection, Settings.maxLinearCorrection);
 		m_impulse += lambda;
@@ -198,19 +200,19 @@ public class ConstantVolumeJoint extends Joint {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	@Override
 	public Vec2 getAnchor2() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	@Override
 	public Vec2 getReactionForce() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	@Override
 	public float getReactionTorque() {
 		// TODO Auto-generated method stub

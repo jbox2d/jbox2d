@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -29,21 +29,21 @@ import org.jbox2d.dynamics.Body;
  * Base class for all joint definitions
  */
 public abstract class JointDef {
-    public JointType type;
+	public JointType type;
 
-    public Body body1;
+	public Body body1;
 
-    public Body body2;
+	public Body body2;
 
-    public Object userData;
+	public Object userData;
 
-    public boolean collideConnected;
+	public boolean collideConnected;
 
-    public JointDef() {
-        type = JointType.UNKNOWN_JOINT;
-        body1 = null;
-        body2 = null;
-        userData = null;
-        collideConnected = false;
-    }
+	public JointDef() {
+		type = JointType.UNKNOWN_JOINT;
+		body1 = null;
+		body2 = null;
+		userData = null;
+		collideConnected = false;
+	}
 }

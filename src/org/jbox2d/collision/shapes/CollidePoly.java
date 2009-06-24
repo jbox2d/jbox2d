@@ -48,7 +48,7 @@ public class CollidePoly {
 	}
 
 	public final static int clipSegmentToLine(final ClipVertex vOut[], final ClipVertex vIn[],
-	                             final Vec2 normal, final float offset) {
+	                                          final Vec2 normal, final float offset) {
 		// Start with no output points
 		int numOut = 0;
 
@@ -91,8 +91,8 @@ public class CollidePoly {
 	// djm pooled
 	private final static Vec2 normal1World = new Vec2();
 	public final static float edgeSeparation(final PolygonShape poly1, final XForm xf1,
-	                            final int edge1,
-	                            final PolygonShape poly2, final XForm xf2) {
+	                                         final int edge1,
+	                                         final PolygonShape poly2, final XForm xf2) {
 
 		final int count1 = poly1.getVertexCount();
 		final Vec2[] vertices1 = poly1.getVertices();
@@ -146,7 +146,7 @@ public class CollidePoly {
 	 * @return
 	 */
 	public final static MaxSeparation findMaxSeparation(final PolygonShape poly1, final XForm xf1,
-	                                       final PolygonShape poly2, final XForm xf2) {
+	                                                    final PolygonShape poly2, final XForm xf2) {
 		final MaxSeparation separation = new MaxSeparation();
 
 		final int count1 = poly1.getVertexCount();
@@ -253,8 +253,8 @@ public class CollidePoly {
 	private static Vec2 normal1 = new Vec2();
 	// djm optimized
 	public final static void findIncidentEdge(final ClipVertex c[],
-	                             final PolygonShape poly1, final XForm xf1, final int edge1,
-	                             final PolygonShape poly2, final XForm xf2) {
+	                                          final PolygonShape poly1, final XForm xf1, final int edge1,
+	                                          final PolygonShape poly2, final XForm xf2) {
 
 		final int count1 = poly1.getVertexCount();
 		final Vec2[] normals1 = poly1.getNormals();
@@ -311,8 +311,8 @@ public class CollidePoly {
 	// The normal points from 1 to 2
 	// djm optimized
 	public final static void collidePolygons(final Manifold manif,
-	                                   final PolygonShape polyA, final XForm xfA,
-	                                   final PolygonShape polyB, final XForm xfB) {
+	                                         final PolygonShape polyA, final XForm xfA,
+	                                         final PolygonShape polyB, final XForm xfB) {
 
 		//testbed.PTest.debugCount++;
 		manif.pointCount = 0; // Fixed a problem with contacts
@@ -461,8 +461,8 @@ public class CollidePoly {
 	 * @param xf2
 	 */
 	public final static void collidePolygonAndPoint(final Manifold manifold,
-	                                          final PolygonShape polygon, final XForm xf1,
-	                                          final PointShape point, final XForm xf2) {
+	                                                final PolygonShape polygon, final XForm xf1,
+	                                                final PointShape point, final XForm xf2) {
 
 		manifold.pointCount = 0;
 

@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -26,11 +26,11 @@ package org.jbox2d.dynamics.joints;
 import org.jbox2d.dynamics.Body;
 
 public class JointEdge {
-    public Body other;
+	public Body other;
 
-    public Joint joint;
+	public Joint joint;
 
-    public JointEdge prev;
+	public JointEdge prev;
 
-    public JointEdge next;
+	public JointEdge next;
 }

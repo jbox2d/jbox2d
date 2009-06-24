@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -58,7 +58,7 @@ public class MouseJoint extends Joint {
 
 	public float m_gamma; // softness
 
-	public MouseJoint(MouseJointDef def) {
+	public MouseJoint(final MouseJointDef def) {
 		super(def);
 
 		m_force = new Vec2();
@@ -70,16 +70,16 @@ public class MouseJoint extends Joint {
 
 		m_maxForce = def.maxForce;
 
-		float mass = m_body2.m_mass;
+		final float mass = m_body2.m_mass;
 
 		// Frequency
-		float omega = 2.0f * Settings.pi * def.frequencyHz;
+		final float omega = 2.0f * Settings.pi * def.frequencyHz;
 
 		// Damping coefficient
-		float d = 2.0f * mass * def.dampingRatio * omega;
+		final float d = 2.0f * mass * def.dampingRatio * omega;
 
 		// Spring stiffness
-		float k = mass * omega * omega;
+		final float k = mass * omega * omega;
 
 		// magic formulas
 		m_gamma = 1.0f / (d + def.timeStep * k);
@@ -88,9 +88,10 @@ public class MouseJoint extends Joint {
 	}
 
 	/** Use this to update the target point. */
-	public void setTarget(Vec2 target) {
-		if (m_body2.isSleeping())
+	public void setTarget(final Vec2 target) {
+		if (m_body2.isSleeping()) {
 			m_body2.wakeUp();
+		}
 		m_target.set(target);
 	}
 
@@ -100,7 +101,7 @@ public class MouseJoint extends Joint {
 	}
 
 	// djm pooled
-	private Vec2 anchor2 = new Vec2();
+	private final Vec2 anchor2 = new Vec2();
 
 	@Override
 	public Vec2 getAnchor2() {
@@ -109,13 +110,13 @@ public class MouseJoint extends Joint {
 	}
 
 	// djm pooled
-	private Vec2 r = new Vec2();
-	private Mat22 K1 = new Mat22();
-	private Mat22 K2 = new Mat22();
+	private final Vec2 r = new Vec2();
+	private final Mat22 K1 = new Mat22();
+	private final Mat22 K2 = new Mat22();
 
 	@Override
-	public void initVelocityConstraints(TimeStep step) {
-		Body b = m_body2;
+	public void initVelocityConstraints(final TimeStep step) {
+		final Body b = m_body2;
 
 		// Compute the effective mass matrix.
 		r.set(m_localAnchor);
@@ -129,13 +130,13 @@ public class MouseJoint extends Joint {
 		// = [1/m1+1/m2 0 ] + invI1 * [r1.y*r1.y -r1.x*r1.y] + invI2 *
 		// [r1.y*r1.y -r1.x*r1.y]
 		// [ 0 1/m1+1/m2] [-r1.x*r1.y r1.x*r1.x] [-r1.x*r1.y r1.x*r1.x]
-		float invMass = b.m_invMass;
-		float invI = b.m_invI;
+		final float invMass = b.m_invMass;
+		final float invI = b.m_invI;
 
 		K1.set(invMass, 0.0f, 0.0f, invMass);
 
 		K2.set(invI * r.y * r.y, -invI * r.x * r.y, -invI * r.x * r.y, invI
-				* r.x * r.x);
+		       * r.x * r.x);
 
 		// Mat22 K = K1.add(K2);
 		K1.addLocal(K2);
@@ -145,14 +146,14 @@ public class MouseJoint extends Joint {
 		K1.invertToOut( m_mass);
 
 		m_C.set(b.m_sweep.c.x + r.x - m_target.x, b.m_sweep.c.y + r.y
-				- m_target.y);
+		        - m_target.y);
 
 		// Cheat with some damping
 		b.m_angularVelocity *= 0.98f;
 
 		// Warm starting.
-		float Px = step.dt * m_force.x;
-		float Py = step.dt * m_force.y;
+		final float Px = step.dt * m_force.x;
+		final float Py = step.dt * m_force.y;
 		b.m_linearVelocity.x += invMass * Px;
 		b.m_linearVelocity.y += invMass * Py;
 		b.m_angularVelocity += invI * (r.x * Py - r.y * Px);
@@ -164,14 +165,14 @@ public class MouseJoint extends Joint {
 	}
 
 	// djm pooled, from above too
-	private Vec2 Cdot = new Vec2();
-	private Vec2 force = new Vec2();
-	private Vec2 oldForce = new Vec2();
-	private Vec2 P = new Vec2();
+	private final Vec2 Cdot = new Vec2();
+	private final Vec2 force = new Vec2();
+	private final Vec2 oldForce = new Vec2();
+	private final Vec2 P = new Vec2();
 
 	@Override
-	public void solveVelocityConstraints(TimeStep step) {
-		Body b = m_body2;
+	public void solveVelocityConstraints(final TimeStep step) {
+		final Body b = m_body2;
 
 		r.set(m_localAnchor);
 		r.subLocal(b.getMemberLocalCenter());
@@ -187,17 +188,17 @@ public class MouseJoint extends Joint {
 		// Vec2 force = -step.inv_dt * Mat22.mul(m_mass, Cdot + (m_beta *
 		// step.inv_dt) * m_C + m_gamma * step.dt * m_force);
 		/*Vec2 force = new Vec2(Cdot.x + (m_beta * step.inv_dt) * m_C.x + m_gamma
-				* step.dt * m_force.x, Cdot.y + (m_beta * step.inv_dt) * m_C.y
+		 * step.dt * m_force.x, Cdot.y + (m_beta * step.inv_dt) * m_C.y
 				+ m_gamma * step.dt * m_force.y);*/
 		force.set(Cdot.x + (m_beta * step.inv_dt) * m_C.x + m_gamma
-				* step.dt * m_force.x, Cdot.y + (m_beta * step.inv_dt) * m_C.y
-				+ m_gamma * step.dt * m_force.y);
+		          * step.dt * m_force.x, Cdot.y + (m_beta * step.inv_dt) * m_C.y
+		          + m_gamma * step.dt * m_force.y);
 		Mat22.mulToOut(m_mass, force, force);
 		force.mulLocal(-step.inv_dt);
 
 		oldForce.set(m_force);
 		m_force.addLocal(force);
-		float forceMagnitude = m_force.length();
+		final float forceMagnitude = m_force.length();
 		if (forceMagnitude > m_maxForce) {
 			m_force.mulLocal(m_maxForce / forceMagnitude);
 		}
@@ -205,7 +206,7 @@ public class MouseJoint extends Joint {
 
 		P.x = step.dt * force.x;
 		P.y = step.dt * force.y;
-		
+
 		b.m_angularVelocity += b.m_invI * Vec2.cross(r, P);
 		b.m_linearVelocity.addLocal(P.mulLocal(b.m_invMass));
 	}

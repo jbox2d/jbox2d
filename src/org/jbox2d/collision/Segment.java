@@ -29,7 +29,13 @@ import org.jbox2d.common.*;
 // djm: is this used?
 public class Segment {
 	
+	/**
+	 * The starting point
+	 */
 	public final Vec2 p1 = new Vec2();
+	/**
+	 * The ending point
+	 */
 	public final Vec2 p2 = new Vec2();
 	
 	/*
@@ -47,36 +53,41 @@ public class Segment {
 	// Cramer's rule:
 	// denom = det[-r d]
 	// a = det[b d] / denom
-	// mu2 = det[-r b] / denom
+	// mu2 = det[-r b] / denom*/
 	
-	//Currently unimplemented in Java port
-	public boolean testSegment(float32* lambda, b2Vec2* normal, const b2Segment& segment, float32 maxLambda) {
-		b2Vec2 s = segment.p1;
-		b2Vec2 r = segment.p2 - s;
-		b2Vec2 d = p2 - p1;
-		b2Vec2 n = b2Cross(d, 1.0f);
+	// djm: pooled
+	private final Vec2 r = new Vec2();
+	private final Vec2 d = new Vec2();
+	private final Vec2 n = new Vec2();
+	private final Vec2 b = new Vec2();
+	public boolean testSegment(RaycastResult out, Segment segment, float maxLambda) {
+		Vec2 s = segment.p1;
+		r.set(segment.p2);
+		r.subLocal(s);
+		d.set(p2);
+		d.subLocal(p1);
+		Vec2.crossToOut(d, 1.0f, n);
 
-		const float32 k_slop = 100.0f * FLT_EPSILON;
-		float32 denom = -b2Dot(r, n);
+		float k_slop = 100.0f * Settings.EPSILON;
+		float denom = -Vec2.dot(r, n);
 
 		// Cull back facing collision and ignore parallel segments.
-		if (denom > k_slop)
-		{
+		if (denom > k_slop){
+			
 			// Does the segment intersect the infinite line associated with this segment?
-			b2Vec2 b = s - p1;
-			float32 a = b2Dot(b, n);
+			b.set(s);
+			b.subLocal(p1);
+			float a = Vec2.dot(b, n);
 
-			if (0.0f <= a && a <= maxLambda * denom)
-			{
-				float32 mu2 = -r.x * b.y + r.y * b.x;
+			if (0.0f <= a && a <= maxLambda * denom){
+				float mu2 = -r.x * b.y + r.y * b.x;
 
 				// Does the segment intersect this segment?
-				if (-k_slop * denom <= mu2 && mu2 <= denom * (1.0f + k_slop))
-				{
+				if (-k_slop * denom <= mu2 && mu2 <= denom * (1.0f + k_slop)){
 					a /= denom;
-					n.Normalize();
-					*lambda = a;
-					*normal = n;
+					n.normalize();
+					out.lambda = a;
+					out.normal.set(n);
 					return true;
 				}
 			}
@@ -84,5 +95,4 @@ public class Segment {
 
 		return false;
 	}
-	*/
 }

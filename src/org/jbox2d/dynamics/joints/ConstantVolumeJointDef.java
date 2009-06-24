@@ -11,7 +11,7 @@ public class ConstantVolumeJointDef extends JointDef {
 	public float frequencyHz;
 	public float dampingRatio;
 	//public float relaxationFactor;//1.0 is perfectly stiff (but doesn't work, unstable)
-	
+
 	public ConstantVolumeJointDef() {
 		type = JointType.CONSTANT_VOLUME_JOINT;
 		bodies = new Body[0];
@@ -20,13 +20,17 @@ public class ConstantVolumeJointDef extends JointDef {
 		frequencyHz = 0.0f;
 		dampingRatio = 0.0f;
 	}
-	
-	public void addBody(Body b) {
-		Body[] tmp = new Body[bodies.length+1];
+
+	public void addBody(final Body b) {
+		final Body[] tmp = new Body[bodies.length+1];
 		System.arraycopy(bodies, 0, tmp, 0, bodies.length);
 		tmp[bodies.length] = b;
 		bodies = tmp;
-		if (tmp.length == 1) body1 = b;
-		if (tmp.length == 2) body2 = b;
+		if (tmp.length == 1) {
+			body1 = b;
+		}
+		if (tmp.length == 2) {
+			body2 = b;
+		}
 	}
 }
