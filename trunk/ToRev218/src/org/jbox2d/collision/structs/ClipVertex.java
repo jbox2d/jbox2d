@@ -1,6 +1,5 @@
 package org.jbox2d.collision.structs;
 
-import org.jbox2d.collision.ContactID;
 import org.jbox2d.common.Vec2;
 
 

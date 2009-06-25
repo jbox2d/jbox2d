@@ -1,7 +1,7 @@
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
  * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ 
+ * JBox2D homepage: http://jbox2d.sourceforge.net/
  * Box2D homepage: http://www.box2d.org
  * 
  * This software is provided 'as-is', without any express or implied
@@ -21,44 +21,46 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package org.jbox2d.collision;
+package org.jbox2d.collision.structs;
 
-//Updated to rev 139 of b2Broadphase.h
-public class Proxy {
-    public final int lowerBounds[];
+//Updated to rev 139 of b2PairManager.h
 
-    public final int upperBounds[];
+/**
+ * Used in pair manager.
+ */
+public class BufferedPair implements Comparable<BufferedPair> {
+	public int proxyId1;
 
-    int overlapCount;
+	public int proxyId2;
 
-    int timeStamp;
+	private boolean equals(final BufferedPair other) {
+		return proxyId1 == other.proxyId1 && proxyId2 == other.proxyId2;
+	}
 
-    int categoryBits;
+	private boolean minor(final BufferedPair other) {
+		if (proxyId1 < other.proxyId1) {
+			return true;
+		}
 
-    int maskBits;
+		if (proxyId1 == other.proxyId1) {
+			return proxyId2 < other.proxyId2;
+		}
 
-    int groupIndex;
+		return false;
+	}
 
-    Object userData;
-
-    public Proxy() {
-        lowerBounds = new int[2];
-        upperBounds = new int[2];
-        lowerBounds[0] = lowerBounds[1] = 0;
-        upperBounds[0] = upperBounds[1] = 0;
-        overlapCount = BroadPhase.INVALID;
-        timeStamp = 0;
-    }
-
-    int getNext() {
-        return lowerBounds[0];
-    }
-
-    void setNext(int next) {
-        lowerBounds[0] = next;
-    }
-
-    public boolean isValid() {
-        return overlapCount != BroadPhase.INVALID;
-    }
+	/**
+	 * for sorting, just returns -1, 0, or 1
+	 */
+	public int compareTo(final BufferedPair p) {
+		if (minor(p)) {
+			return -1;
+		}
+		else if (equals(p)) {
+			return 0;
+		}
+		else {
+			return 1;
+		}
+	}
 }

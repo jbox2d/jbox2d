@@ -23,6 +23,8 @@
 
 package org.jbox2d.collision;
 
+import org.jbox2d.collision.structs.BufferedPair;
+import org.jbox2d.collision.structs.Proxy;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 
@@ -37,29 +39,26 @@ public class PairManager {
 	public static final int TABLE_CAPACITY = Settings.maxPairs;
 	public static final int TABLE_MASK = PairManager.TABLE_CAPACITY - 1;
 
-	public final Pair m_pairs[];
 
-	public int m_pairCount;
-
-	public int m_hashTable[];
-
-	//int m_next[];
 
 	public BroadPhase m_broadPhase;
-
 	public PairCallback m_callback;
 
+	public final Pair m_pairs[];
 	public int m_freePair;
+	public int m_pairCount;
 
 	public final BufferedPair[] m_pairBuffer;
 	public int m_pairBufferCount;
+	
+	public final int[] m_hashTable;
 
 	public PairManager() {
 		m_pairs = new Pair[Settings.maxPairs];
-		m_hashTable = new int[PairManager.TABLE_CAPACITY];
-		//m_next = new int[Settings.maxPairs];
+		m_hashTable = new int[TABLE_CAPACITY];
 		m_pairBuffer = new BufferedPair[Settings.maxPairs];
 
+		
 		assert MathUtils.isPowerOfTwo(PairManager.TABLE_CAPACITY) == true;
 		assert PairManager.TABLE_CAPACITY >= Settings.maxPairs;
 
@@ -82,39 +81,96 @@ public class PairManager {
 		m_pairCount = 0;
 		m_pairBufferCount = 0;
 	}
-
-	public void initialize(final BroadPhase broadPhase, final PairCallback callback) {
+	
+	public void initialize(BroadPhase broadPhase, PairCallback callback){
 		m_broadPhase = broadPhase;
 		m_callback = callback;
 	}
+	
+	// Thomas Wang's hash, see: http://www.concentric.net/~Ttwang/tech/inthash.htm
+	// This assumes proxyId1 and proxyId2 are 16-bit.
+	private int hash(int proxyId1, int proxyId2){
+		int key = (proxyId2 << 16) | proxyId1;
+		key = ~key + (key << 15);
+		key = key ^ (key >> 12);
+		key = key + (key << 2);
+		key = key ^ (key >> 4);
+		key = key * 2057;
+		key = key ^ (key >> 16);
+		return key;
+	}
+	
 
-	// Add a pair and return the new pair. If the pair already exists,
-	// no new pair is created and the old one is returned.
-	public Pair addPair(int proxyId1, int proxyId2) {
-		// System.out.printf("PairManager.Add(%d, %d)\n", proxyId1, proxyId2);
+	/**
+	 * finds the pair with the given hash
+	 * @param proxyId1
+	 * @param proxyId2
+	 * @param hash
+	 * @return
+	 */
+	private Pair find(final int proxyId1, final int proxyId2, final int hash) {
+
+		int index = m_hashTable[hash];
+
+		while (index != PairManager.NULL_PAIR
+				&& equals(m_pairs[index], proxyId1, proxyId2) == false) {
+			index = m_pairs[index].next;
+		}
+
+		//System.out.println("Found at index "+index);
+		if (index == PairManager.NULL_PAIR) {
+			//System.out.println("Which is null...");
+			return null;
+		}
+
+		assert index < Settings.maxPairs;
+		return m_pairs[index];
+	}
+	
+
+	/**
+	 * finds the pair, creates hash and uses {@link #find(int, int, int)}
+	 * @param proxyId1
+	 * @param proxyId2
+	 * @return
+	 */
+	private Pair find(int proxyId1, int proxyId2) {		
 		if (proxyId1 > proxyId2) {
-			// integer primitive swap
-			proxyId1 += proxyId2;
-			proxyId2 = proxyId1 - proxyId2;
-			proxyId1 -= proxyId2;
+			final int tmp = proxyId1;
+			proxyId1 = proxyId2;
+			proxyId2 = tmp;
 		}
 
 		final int hash = hash(proxyId1, proxyId2) & PairManager.TABLE_MASK;
 
+		return find(proxyId1, proxyId2, hash);
+	}
+
+
+	// Add a pair and return the new pair. If the pair already exists,
+	// no new pair is created and the old one is returned.
+	private Pair addPair(int proxyId1, int proxyId2) {
+		if (proxyId1 > proxyId2){
+			int temp = proxyId1;
+			proxyId1 = proxyId2;
+			proxyId2 = temp;
+		}
+
+		int hash = hash(proxyId1, proxyId2) & TABLE_MASK;
+
 		Pair pair = find(proxyId1, proxyId2, hash);
-		if (pair != null) {
+		if (pair != null){
 			return pair;
 		}
 
-		assert(m_pairCount < Settings.maxPairs):"Too many pairs ("+m_pairCount+" shape AABB overlaps) - this usually means you have too many bodies, or you need to increase Settings.maxPairs.";
-		assert(m_freePair != PairManager.NULL_PAIR);
+		assert(m_pairCount < Settings.maxPairs && m_freePair != NULL_PAIR);
 
-		final int pairIndex = m_freePair;
+		int pairIndex = m_freePair;
 		pair = m_pairs[pairIndex];
 		m_freePair = pair.next;
 
-		pair.proxyId1 = proxyId1;
-		pair.proxyId2 = proxyId2;
+		pair.proxyId1 = (int)proxyId1;
+		pair.proxyId2 = (int)proxyId2;
 		pair.status = 0;
 		pair.userData = null;
 		pair.next = m_hashTable[hash];
@@ -127,54 +183,42 @@ public class PairManager {
 	}
 
 	// Remove a pair, return the pair's userData.
-	public Object removePair(int proxyId1, int proxyId2) {
+	private Object removePair(int proxyId1, int proxyId2) {
 		assert(m_pairCount > 0);
 
-		if (proxyId1 > proxyId2) {
-			// integer primitive swap (safe for small ints)
-			proxyId1 += proxyId2;
-			proxyId2 = proxyId1 - proxyId2;
-			proxyId1 -= proxyId2;
+		if (proxyId1 > proxyId2){
+			int temp = proxyId1;
+			proxyId1 = proxyId2;
+			proxyId2 = temp;
 		}
 
-		final int hash = hash(proxyId1, proxyId2) & PairManager.TABLE_MASK;
-		//int* node = &m_hashTable[hash];
-		int derefnode = m_hashTable[hash];
-		boolean isHash = true;
-		int pderefnode = 0;
-		while (derefnode != PairManager.NULL_PAIR) {
-			if (equals(m_pairs[derefnode], proxyId1, proxyId2)) {
-				//int index = *node;
-				final int index = derefnode;
-				//*node = m_pairs[*node].next;
-				if (isHash) {
-					m_hashTable[hash] = m_pairs[m_hashTable[hash]].next;
-				} else {
-					m_pairs[pderefnode].next = m_pairs[derefnode].next;
-				}
+		int hash = hash(proxyId1, proxyId2) & TABLE_MASK;
 
-				final Pair pair = m_pairs[index];
-				final Object userData = pair.userData;
+		int node = m_hashTable[hash];
+		while (node != NULL_PAIR){
+			if (equals(m_pairs[node], proxyId1, proxyId2)){
+				int index = node;
+				node = m_pairs[node].next;
+				
+				Pair pair = m_pairs[index];
+				Object userData = pair.userData;
 
 				// Scrub
 				pair.next = m_freePair;
-				pair.proxyId1 = PairManager.NULL_PROXY;
-				pair.proxyId2 = PairManager.NULL_PROXY;
+				pair.proxyId1 = NULL_PROXY;
+				pair.proxyId2 = NULL_PROXY;
 				pair.userData = null;
 				pair.status = 0;
 
 				m_freePair = index;
 				--m_pairCount;
-
 				return userData;
-			} else {
-				//node = &m_pairs[*node].next;
-				pderefnode = derefnode;
-				derefnode = m_pairs[derefnode].next;
-				isHash = false;
+			}
+			else{
+				node = m_pairs[node].next;
 			}
 		}
-
+		
 		assert(false) : "Attempted to remove a pair that does not exist";
 		return null;
 	}
@@ -302,29 +346,11 @@ public class PairManager {
 					pair.userData = m_callback.pairAdded(proxy1.userData, proxy2.userData);
 					pair.setFinal();
 				}
-
-				//                if ( ((Shape)proxy1.userData).getBody().isStatic() &&
-						//                     ((Shape)proxy2.userData).getBody().isStatic() ) {
-				//                	if (pair.isFinal() == true) {
-				//                        m_callback.pairRemoved(proxy1.userData, proxy2.userData, pair.userData);
-				//                    }
-				//
-				//                    // Store the ids so we can actually remove the pair below.
-				//                    m_pairBuffer[removeCount].proxyId1 = pair.proxyId1;
-				//                    m_pairBuffer[removeCount].proxyId2 = pair.proxyId2;
-				//                    //System.out.println("Buffering "+pair.proxyId1 + ", "+pair.proxyId2 + " for removal");
-				//                    ++removeCount;
-				//                }
 			}
 		}
 
 		for (int i = 0; i < removeCount; ++i) {
-
 			removePair(m_pairBuffer[i].proxyId1, m_pairBuffer[i].proxyId2);
-			//            System.out.println("Remaining pairs: ");
-			//            for (int j=0; j<m_pairCount; ++j) {
-			//                System.out.println("  "+m_pairs[j].proxyId1 + ", " + m_pairs[j].proxyId2);
-			//            }
 		}
 
 		m_pairBufferCount = 0;
@@ -397,50 +423,6 @@ public class PairManager {
 		//    #endif
 	}
 
-	/**
-	 * finds the pair with the given hash
-	 * @param proxyId1
-	 * @param proxyId2
-	 * @param hash
-	 * @return
-	 */
-	public Pair find(final int proxyId1, final int proxyId2, final int hash) {
-
-		int index = m_hashTable[hash];
-
-		while (index != PairManager.NULL_PAIR
-				&& equals(m_pairs[index], proxyId1, proxyId2) == false) {
-			index = m_pairs[index].next;
-		}
-
-		//System.out.println("Found at index "+index);
-		if (index == PairManager.NULL_PAIR) {
-			//System.out.println("Which is null...");
-			return null;
-		}
-
-		assert index < Settings.maxPairs;
-		return m_pairs[index];
-	}
-
-	/**
-	 * finds the pair, creates hash and uses {@link #find(int, int, int)}
-	 * @param proxyId1
-	 * @param proxyId2
-	 * @return
-	 */
-	public Pair find(int proxyId1, int proxyId2) {
-		if (proxyId1 > proxyId2) {
-			final int tmp = proxyId1;
-			proxyId1 = proxyId2;
-			proxyId2 = tmp;
-		}
-
-		final int hash = hash(proxyId1, proxyId2) & PairManager.TABLE_MASK;
-
-		return find(proxyId1, proxyId2, hash);
-	}
-
 	//    public int findIndex(int proxyId1, int proxyId2) {
 	//        // System.out.printf("PairManager.FindIndex(%d, %d)\n", proxyId1,
 	//        // proxyId2);
@@ -494,20 +476,6 @@ public class PairManager {
 	//
 	//        return index;
 	//    }
-
-	private final int hash(final int proxyId1, final int proxyId2) {
-		// djm: this operation here is pretty self explanitory,
-		// so i don't think I need to describe what's happening,
-		// or what the result is
-		int key = (proxyId2 << 16) | proxyId1;
-		key = ~key + (key << 15);
-		key = key ^ (key >>> 12);
-		key = key + (key << 2);
-		key = key ^ (key >>> 4);
-		key = key * 2057;
-		key = key ^ (key >>> 16);
-		return key;
-	}
 
 	/**
 	 * returns if the pair has the two proxy id's
