@@ -24,6 +24,8 @@
 package org.jbox2d.collision;
 
 import org.jbox2d.collision.structs.ClipVertex;
+import org.jbox2d.collision.structs.ContactID;
+import org.jbox2d.collision.structs.PointState;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 

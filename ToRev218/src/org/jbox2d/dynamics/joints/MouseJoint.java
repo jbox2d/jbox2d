@@ -73,7 +73,7 @@ public class MouseJoint extends Joint {
 		final float mass = m_body2.m_mass;
 
 		// Frequency
-		final float omega = 2.0f * Settings.pi * def.frequencyHz;
+		final float omega = 2.0f * Settings.PI * def.frequencyHz;
 
 		// Damping coefficient
 		final float d = 2.0f * mass * def.dampingRatio * omega;

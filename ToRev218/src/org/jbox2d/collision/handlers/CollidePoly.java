@@ -24,11 +24,11 @@
 package org.jbox2d.collision.handlers;
 
 import org.jbox2d.collision.Collision;
-import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.collision.structs.ContactID;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;

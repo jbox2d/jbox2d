@@ -24,6 +24,8 @@
 package org.jbox2d.collision;
 
 //Version: b2BroadPhase.h/.cpp rev 108->139
+import org.jbox2d.collision.structs.BufferedPair;
+import org.jbox2d.collision.structs.Proxy;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;

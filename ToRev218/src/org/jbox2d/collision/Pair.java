@@ -67,6 +67,7 @@ public class Pair implements Comparable<Pair> {
 	public boolean isBuffered() {
 		return (status & Pair.PAIR_BUFFERED) == Pair.PAIR_BUFFERED;
 	}
+	
 
 	public void clearRemoved() {
 		status &= ~Pair.PAIR_REMOVED;
@@ -79,6 +80,7 @@ public class Pair implements Comparable<Pair> {
 	public boolean isRemoved() {
 		return (status & Pair.PAIR_REMOVED) == Pair.PAIR_REMOVED;
 	}
+	
 
 	public void setFinal() {
 		status |= Pair.PAIR_FINAL;
@@ -87,6 +89,7 @@ public class Pair implements Comparable<Pair> {
 	public boolean isFinal() {
 		return (status & Pair.PAIR_FINAL) == Pair.PAIR_FINAL;
 	}
+	
 
 	public int compareTo(final Pair p) {
 		// XXX check
