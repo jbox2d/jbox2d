@@ -32,9 +32,9 @@ import org.jbox2d.common.Settings;
 
 public class PairManager {
 
-	public static final int NULL_PAIR = Integer.MAX_VALUE;
+	public static final short NULL_PAIR = Short.MAX_VALUE;
 
-	public static final int NULL_PROXY = Integer.MAX_VALUE;
+	public static final short NULL_PROXY = Short.MAX_VALUE;
 
 	public static final int TABLE_CAPACITY = Settings.maxPairs;
 	public static final int TABLE_MASK = PairManager.TABLE_CAPACITY - 1;
@@ -45,17 +45,17 @@ public class PairManager {
 	public PairCallback m_callback;
 
 	public final Pair m_pairs[];
-	public int m_freePair;
+	public short m_freePair;
 	public int m_pairCount;
 
 	public final BufferedPair[] m_pairBuffer;
 	public int m_pairBufferCount;
 	
-	public final int[] m_hashTable;
+	public final short[] m_hashTable;
 
 	public PairManager() {
 		m_pairs = new Pair[Settings.maxPairs];
-		m_hashTable = new int[TABLE_CAPACITY];
+		m_hashTable = new short[TABLE_CAPACITY];
 		m_pairBuffer = new BufferedPair[Settings.maxPairs];
 
 		
@@ -73,7 +73,7 @@ public class PairManager {
 			m_pairs[i].proxyId2 = PairManager.NULL_PROXY;
 			m_pairs[i].userData = null;
 			m_pairs[i].status = 0;
-			m_pairs[i].next = i+1;
+			m_pairs[i].next = (short)(i+1);
 
 			m_pairBuffer[i] = new BufferedPair();
 		}
@@ -165,12 +165,12 @@ public class PairManager {
 
 		assert(m_pairCount < Settings.maxPairs && m_freePair != NULL_PAIR);
 
-		int pairIndex = m_freePair;
+		short pairIndex = m_freePair;
 		pair = m_pairs[pairIndex];
 		m_freePair = pair.next;
 
-		pair.proxyId1 = (int)proxyId1;
-		pair.proxyId2 = (int)proxyId2;
+		pair.proxyId1 = (short) proxyId1;
+		pair.proxyId2 = (short) proxyId2;
 		pair.status = 0;
 		pair.userData = null;
 		pair.next = m_hashTable[hash];
@@ -194,10 +194,10 @@ public class PairManager {
 
 		int hash = hash(proxyId1, proxyId2) & TABLE_MASK;
 
-		int node = m_hashTable[hash];
+		short node = m_hashTable[hash];
 		while (node != NULL_PAIR){
 			if (equals(m_pairs[node], proxyId1, proxyId2)){
-				int index = node;
+				short index = node;
 				node = m_pairs[node].next;
 				
 				Pair pair = m_pairs[index];
@@ -398,7 +398,7 @@ public class PairManager {
 	public void validateTable() {
 		//    #ifdef _DEBUG
 		for (int i = 0; i < PairManager.TABLE_CAPACITY; ++i) {
-			int index = m_hashTable[i];
+			short index = m_hashTable[i];
 			while (index != PairManager.NULL_PAIR) {
 				final Pair pair = m_pairs[index];
 				assert(pair.isBuffered() == false);

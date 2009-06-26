@@ -29,9 +29,9 @@ package org.jbox2d.collision.structs;
  * Used in pair manager.
  */
 public class BufferedPair implements Comparable<BufferedPair> {
-	public int proxyId1;
+	public short proxyId1;
 
-	public int proxyId2;
+	public short proxyId2;
 
 	private boolean equals(final BufferedPair other) {
 		return proxyId1 == other.proxyId1 && proxyId2 == other.proxyId2;
