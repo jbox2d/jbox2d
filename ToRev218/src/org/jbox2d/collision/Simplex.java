@@ -66,14 +66,19 @@ public class Simplex {
 		cache.metric = getMetric();
 		cache.count = (short)m_count;
 		for (int i = 0; i < m_count; ++i){
-			cache.indexA[i] = (int)(vertices[i].indexA);
-			cache.indexB[i] = (int)(vertices[i].indexB);
+			cache.indexA[i] = (vertices[i].indexA);
+			cache.indexB[i] = (vertices[i].indexB);
 		}
 	}
 	
 	// djm pooled
 	private static final Vec2 case2 = new Vec2();
 	private static final Vec2 case22 = new Vec2();
+	
+	/**
+	 * this returns pooled objects. don't keep or modify them
+	 * @return
+	 */
 	public Vec2 getClosestPoint() {
 		switch (m_count)
 		{

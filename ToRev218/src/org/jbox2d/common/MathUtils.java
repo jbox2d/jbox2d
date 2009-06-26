@@ -87,4 +87,9 @@ public class MathUtils {
 		return dx*dx + dy*dy;
 	}
 
+	public final static float distance(Vec2 a, Vec2 b) {
+		float dx = a.x - b.x;
+		float dy = a.y - b.y;
+		return (float) Math.sqrt(dx*dx + dy*dy);
+	}
 }

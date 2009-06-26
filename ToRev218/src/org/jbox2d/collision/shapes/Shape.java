@@ -147,4 +147,6 @@ public abstract class Shape {
 	public abstract void destructor();
 
 	public abstract Vec2 getVertex(int indexA);
+	
+	public abstract int getSupport(Vec2 direction);
 }

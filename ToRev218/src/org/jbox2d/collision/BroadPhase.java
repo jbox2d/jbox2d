@@ -951,8 +951,7 @@ public class BroadPhase {
 	}
 
 	// This one is only used for validation.
-	@SuppressWarnings("unused")
-	private boolean testOverlap( final Proxy p1, final Proxy p2) {
+	protected boolean testOverlap( final Proxy p1, final Proxy p2) {
 		for ( int axis = 0; axis < 2; ++axis) {
 			final Bound[] bounds = m_bounds[axis];
 
