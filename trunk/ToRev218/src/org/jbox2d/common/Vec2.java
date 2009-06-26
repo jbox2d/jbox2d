@@ -30,6 +30,8 @@ package org.jbox2d.common;
 public class Vec2 {
 	/** Should we count Vec2 creations? */
 	static public boolean watchCreations = true;
+	
+	public static final Vec2 zero = new Vec2();
 	/**
 	 * Running count of Vec2 creations.  Must be zeroed out
 	 * manually (perhaps at start of time step).  Incremented
@@ -66,9 +68,10 @@ public class Vec2 {
 	}
 
 	/** Set the vector component-wise. */
-	public final void set(float x, float y) {
+	public final Vec2 set(float x, float y) {
 		this.x = x;
 		this.y = y;
+		return this;
 	}
 
 	/** Set this vector to another vector. */

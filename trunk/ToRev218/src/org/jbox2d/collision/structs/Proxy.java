@@ -27,36 +27,30 @@ import org.jbox2d.collision.BroadPhase;
 
 //Updated to rev 139 of b2Broadphase.h
 public class Proxy {
-	public final int lowerBounds[];
+	public final short lowerBounds[];
 
-	public final int upperBounds[];
+	public final short upperBounds[];
 
-	int overlapCount;
+	public short overlapCount;
 
-	int timeStamp;
-
-	int categoryBits;
-
-	int maskBits;
-
-	int groupIndex;
+	public short timeStamp;
 
 	public Object userData;
 
 	public Proxy() {
-		lowerBounds = new int[2];
-		upperBounds = new int[2];
+		lowerBounds = new short[2];
+		upperBounds = new short[2];
 		lowerBounds[0] = lowerBounds[1] = 0;
 		upperBounds[0] = upperBounds[1] = 0;
 		overlapCount = BroadPhase.INVALID;
 		timeStamp = 0;
 	}
 
-	int getNext() {
+	public short getNext() {
 		return lowerBounds[0];
 	}
 
-	void setNext(final int next) {
+	public void setNext(final short next) {
 		lowerBounds[0] = next;
 	}
 

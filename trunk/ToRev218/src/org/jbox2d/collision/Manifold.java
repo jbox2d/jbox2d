@@ -48,7 +48,7 @@ import org.jbox2d.common.Vec2;
  */
 public class Manifold {
 	
-	public enum Type{
+	public static enum ManifoldType{
 		e_circles,
 		e_faceA,
 		e_faceB
@@ -63,7 +63,7 @@ public class Manifold {
     /** usage depends on manifold type */
     public final Vec2 m_localPoint;
     
-    Type m_type;
+    public ManifoldType m_type;
     
     /** The number of manifold points. */
     public int m_pointCount;

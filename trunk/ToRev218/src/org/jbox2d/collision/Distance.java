@@ -23,30 +23,14 @@
 
 package org.jbox2d.collision;
 
-/*
- * Copyright (c) 2007 Erin Catto http://www.gphysics.com
- *
- * This software is provided 'as-is', without any express or implied
- * warranty.  In no event will the authors be held liable for any damages
- * arising from the use of this software.
- * Permission is granted to anyone to use this software for any purpose,
- * including commercial applications, and to alter it and redistribute it
- * freely, subject to the following restrictions:
- * 1. The origin of this software must not be misrepresented; you must not
- * claim that you wrote the original software. If you use this software
- * in a product, an acknowledgment in the product documentation would be
- * appreciated but is not required.
- * 2. Altered source versions must be plainly marked as such, and must not be
- * misrepresented as being the original software.
- * 3. This notice may not be removed or altered from any source distribution.
- */
-
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.EdgeShape;
-import org.jbox2d.collision.shapes.PointShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.collision.structs.DistanceInput;
+import org.jbox2d.collision.structs.DistanceOutput;
 import org.jbox2d.collision.structs.ShapeType;
+import org.jbox2d.collision.structs.SimplexCache;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
@@ -609,6 +593,25 @@ public class Distance{
 		return 0.0f;
 	}
 
+	
+	
+	/**
+	 * Compute the closest points between two shapes. Supports any combination of:
+	 * b2CircleShape, b2PolygonShape, b2EdgeShape. The simplex cache is input/output.
+	 * On the first call set b2SimplexCache.count to zero.
+	 * @param output
+	 * @param cache
+	 * @param input
+	 * @param shapeA
+	 * @param shapeB
+	 */
+	public static final void distance(DistanceOutput output,
+					SimplexCache cache, 
+					DistanceInput input,
+					Shape shapeA,
+					Shape shapeB){
+		
+	}
 	/**
 	 * Find the closest distance between shapes shape1 and shape2,
 	 * and load the closest points into x1 and x2.

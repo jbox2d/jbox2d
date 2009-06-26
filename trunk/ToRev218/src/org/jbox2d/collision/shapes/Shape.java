@@ -145,4 +145,6 @@ public abstract class Shape {
 	public abstract float computeSweepRadius(Vec2 pivot);
 	
 	public abstract void destructor();
+
+	public abstract Vec2 getVertex(int indexA);
 }
