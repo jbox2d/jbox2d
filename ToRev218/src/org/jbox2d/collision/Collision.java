@@ -87,7 +87,7 @@ public class Collision {
 	 * @param offset
 	 * @return
 	 */
-	public final static int ClipSegmentToLine(final ClipVertex[] vOut, final ClipVertex[] vIn,
+	public final static int clipSegmentToLine(final ClipVertex[] vOut, final ClipVertex[] vIn,
 	                                          final Vec2 normal, final float offset){
 		assert(vOut.length == 2);
 		assert(vIn.length == 2);
