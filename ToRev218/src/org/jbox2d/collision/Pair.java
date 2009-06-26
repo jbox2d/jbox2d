@@ -34,13 +34,13 @@ public class Pair implements Comparable<Pair> {
 
 	public Object userData;
 
-	public int proxyId1;
+	public short proxyId1;
 
-	public int proxyId2;
+	public short proxyId2;
 
-	public int status;
+	public short status;
 
-	public int next;
+	public short next;
 
 	public Pair() {
 
