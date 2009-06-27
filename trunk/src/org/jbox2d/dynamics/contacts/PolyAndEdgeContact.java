@@ -78,8 +78,9 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 	}
 
 	// djm pooled
-	private final Manifold m0 = new Manifold();
-	private final Vec2 v1 = new Vec2();
+	private final static Manifold m0 = new Manifold();
+	private final static Vec2 v1 = new Vec2();
+	private final static ContactPoint cp = new ContactPoint();
 	@Override
 	public void evaluate(final ContactListener listener) {
 		final Body b1 = m_shape1.getBody();
@@ -91,7 +92,6 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 
 		final boolean[] persisted = {false, false};
 
-		final ContactPoint cp = new ContactPoint();
 		cp.shape1 = m_shape1;
 		cp.shape2 = m_shape2;
 		cp.friction = m_friction;

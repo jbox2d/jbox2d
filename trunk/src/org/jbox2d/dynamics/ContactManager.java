@@ -147,6 +147,7 @@ public class ContactManager implements PairCallback {
 
 	// djm pooled
 	private final Vec2 v1 = new Vec2();
+	private final ContactPoint cp = new ContactPoint();
 	public void destroy(final Contact c) {
 		final Shape shape1 = c.getShape1();
 		final Shape shape2 = c.getShape2();
@@ -158,7 +159,6 @@ public class ContactManager implements PairCallback {
 			final Body b1 = shape1.getBody();
 			final Body b2 = shape2.getBody();
 			final List<Manifold> manifolds = c.getManifolds();
-			final ContactPoint cp = new ContactPoint();
 			cp.shape1 = c.getShape1();
 			cp.shape2 = c.getShape2();
 			cp.friction = c.m_friction;
