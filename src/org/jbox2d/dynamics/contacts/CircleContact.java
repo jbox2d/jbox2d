@@ -81,8 +81,9 @@ public class CircleContact extends Contact implements ContactCreateFcn {
 	}
 
 	//djm pooled lets see if this workds
-	private final Manifold m0 = new Manifold();
-	private final Vec2 v1 = new Vec2();
+	private static final Manifold m0 = new Manifold();
+	private static final Vec2 v1 = new Vec2();
+	private static final ContactPoint cp = new ContactPoint();
 	@Override
 	public void evaluate(final ContactListener listener) {
 		//CollideCircle.collideCircle(m_manifold, (CircleShape) m_shape1,
@@ -106,8 +107,6 @@ public class CircleContact extends Contact implements ContactCreateFcn {
 
 		CollideCircle.collideCircles(m_manifold, (CircleShape)m_shape1, b1.m_xf, (CircleShape)m_shape2, b2.m_xf);
 
-		// we use this, so allocation is needed
-		final ContactPoint cp = new ContactPoint();
 		cp.shape1 = m_shape1;
 		cp.shape2 = m_shape2;
 		cp.friction = m_friction;
