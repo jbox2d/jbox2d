@@ -25,8 +25,10 @@ package org.jbox2d.common;
 
 //Updated to rev. 142 of b2Settings.cpp/.h
 
-
-/** Global tuning constants based on MKS units and various integer maximums (vertices per shape, pairs, etc.). */
+/**
+ * Global tuning constants based on MKS units and various integer maximums
+ * (vertices per shape, pairs, etc.).
+ */
 public class Settings {
 
 	/** A "close to zero" float epsilon value for use */
@@ -35,10 +37,13 @@ public class Settings {
 	/** Pi. */
 	public static final float PI = (float) Math.PI;
 
-
-	//###################
-	//#### COLLISION ####
-	//###################
+	// ###################
+	// #### COLLISION ####
+	// ###################
+	
+	/// @file
+	/// Global tuning constants based on meters-kilograms-seconds (MKS) units.
+	///
 
 	/**
 	 * The maximum number of contact points between two convex shapes.
@@ -51,15 +56,15 @@ public class Settings {
 	public static final int maxPolygonVertices = 8;
 
 	/**
-	 * Factor used to fatten AABBs in b2DynamicTree. This allows client
-	 * objects to move a small amount without needing to adjust the tree.
+	 * Factor used to fatten AABBs in b2DynamicTree. This allows client objects
+	 * to move a small amount without needing to adjust the tree.
 	 */
 	public static final float fatAABBFactor = 1.5f;
 
 	/**
 	 * The initial pool size for the dynamic tree.
 	 */
-	public static final int nodePoolSize	= 50;
+	public static final int nodePoolSize = 50;
 
 	/** Must be a power of two. */
 	public static final int maxProxies = 512;
@@ -68,28 +73,28 @@ public class Settings {
 	public static final int maxPairs = 8 * maxProxies;
 
 	/**
-	 * A small length used as a collision and constraint tolerance. Usually it is
-	 * chosen to be numerically significant, but visually insignificant.
+	 * A small length used as a collision and constraint tolerance. Usually it
+	 * is chosen to be numerically significant, but visually insignificant.
 	 */
-	public static final float linearSlop	= 0.005f;
+	public static final float linearSlop = 0.005f;
 
 	/**
 	 * A small angle used as a collision and constraint tolerance. Usually it is
 	 * chosen to be numerically significant, but visually insignificant.
 	 */
-	public static final float angularSlop = (2.0f / 180.0f * PI);
+	public static final float angularSlop = 2.0f / 180.0f * PI;
 
 	/**
-	 * The radius of the polygon/edge shape skin. This should not be modified. Making
-	 * this smaller means polygons will have and insufficient for continuous collision.
-	 * Making it larger may create artifacts for vertex collision.
+	 * The radius of the polygon/edge shape skin. This should not be modified.
+	 * Making this smaller means polygons will have and insufficient for
+	 * continuous collision. Making it larger may create artifacts for vertex
+	 * collision.
 	 */
-	public static final float polygonRadius = (2.0f * PI);
+	public static final float polygonRadius = 2.0f * PI;
 
-
-	//##################
-	//#### DYNAMICS ####
-	//##################
+	// ##################
+	// #### DYNAMICS ####
+	// ##################
 
 	/**
 	 * Maximum number of contacts to be handled to solve a TOI island.
@@ -102,47 +107,48 @@ public class Settings {
 	public static final int maxTOIJointsPerIsland = 32;
 
 	/**
-	 * A velocity threshold for elastic collisions. Any collision with a relative linear
-	 * velocity below this threshold will be treated as inelastic.
+	 * A velocity threshold for elastic collisions. Any collision with a
+	 * relative linear velocity below this threshold will be treated as
+	 * inelastic.
 	 */
 	public static final float velocityThreshold = 1.0f;
 
 	/**
-	 *  The maximum linear position correction used when solving constraints. This helps to
-	 * prevent overshoot.
+	 * The maximum linear position correction used when solving constraints.
+	 * This helps to prevent overshoot.
 	 */
 	public static final float maxLinearCorrection = 0.2f;
 
 	/**
-	 * The maximum angular position correction used when solving constraints. This helps to
-	 * prevent overshoot.
+	 * The maximum angular position correction used when solving constraints.
+	 * This helps to prevent overshoot.
 	 */
-	public static final float maxAngularCorrection = (8.0f / 180.0f * PI);
+	public static final float maxAngularCorrection = 8.0f / 180.0f * PI;
 
 	/**
-	 *  The maximum linear velocity of a body. This limit is very large and is used
-	 * to prevent numerical problems. You shouldn't need to adjust this.
+	 * The maximum linear velocity of a body. This limit is very large and is
+	 * used to prevent numerical problems. You shouldn't need to adjust this.
 	 */
 	public static final float maxTranslation = 2.0f;
-	public static final float maxTranslationSquared = (maxTranslation * maxTranslation);
+	public static final float maxTranslationSquared = maxTranslation * maxTranslation;
 
 	/**
-	 *  The maximum angular velocity of a body. This limit is very large and is used
-	 * to prevent numerical problems. You shouldn't need to adjust this.
+	 * The maximum angular velocity of a body. This limit is very large and is
+	 * used to prevent numerical problems. You shouldn't need to adjust this.
 	 */
-	public static final float maxRotation = (0.5f * PI);
-	public static final float maxRotationSquared = (maxRotation * maxRotation);
+	public static final float maxRotation = 0.5f * PI;
+	public static final float maxRotationSquared = maxRotation * maxRotation;
 
 	/**
-	 *  This scale factor controls how fast overlap is resolved. Ideally this would be 1 so
-	 * that overlap is removed in one time step. However using values close to 1 often lead
-	 * to overshoot.
+	 * This scale factor controls how fast overlap is resolved. Ideally this
+	 * would be 1 so that overlap is removed in one time step. However using
+	 * values close to 1 often lead to overshoot.
 	 */
 	public static final float contactBaumgarte = 0.2f;
 
-	//###################
-	//###### SLEEP ######
-	//###################
+	// ###################
+	// ###### SLEEP ######
+	// ###################
 
 	/**
 	 * The time that a body must be still before it will go to sleep.
@@ -157,5 +163,5 @@ public class Settings {
 	/**
 	 * A body cannot sleep if its angular velocity is above this tolerance.
 	 */
-	public static final float angularSleepTolerance = (2.0f / 180.0f * PI);
+	public static final float angularSleepTolerance = 2.0f / 180.0f * PI;
 }
