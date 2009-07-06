@@ -25,69 +25,75 @@ package org.jbox2d.common;
 
 // djm created from build 218
 public class Mat33 {
-	public Vec3 col1,col2,col3;
-	
-	public Mat33(){
+	public Vec3 col1, col2, col3;
+
+	public Mat33() {
 		col1 = new Vec3();
 		col2 = new Vec3();
 		col3 = new Vec3();
 	}
-	
-	public Mat33(Vec3 argCol1, Vec3 argCol2, Vec3 argCol3){
+
+	public Mat33( final Vec3 argCol1, final Vec3 argCol2, final Vec3 argCol3) {
 		col1 = argCol1.clone();
 		col2 = argCol2.clone();
 		col3 = argCol3.clone();
 	}
-	
-	public void setZero(){
+
+	public void setZero() {
 		col1.setZero();
 		col2.setZero();
 		col3.setZero();
 	}
-	
-	/// Multiply a matrix times a vector.
-	public static final Vec3 mul( Mat33 A,  Vec3 v){
-		return new Vec3(v.x * A.col1.x + v.y * A.col2.x + v.z + A.col3.x,
-		                v.x * A.col1.y + v.y * A.col2.y + v.z * A.col3.y,
-		                v.x * A.col1.z + v.y * A.col2.z + v.z * A.col3.z);
+
+	// / Multiply a matrix times a vector.
+	public static final Vec3 mul( final Mat33 A, final Vec3 v) {
+		return new Vec3( v.x * A.col1.x + v.y * A.col2.x + v.z + A.col3.x, v.x * A.col1.y + v.y
+																			* A.col2.y + v.z
+																			* A.col3.y, v.x
+																						* A.col1.z
+																						+ v.y
+																						* A.col2.z
+																						+ v.z
+																						* A.col3.z);
 	}
-	
-	public static final void mulToOut(Mat33 A, Vec3 v, Vec3 out){
+
+	public static final void mulToOut( final Mat33 A, final Vec3 v, final Vec3 out) {
 		final float tempy = v.x * A.col1.y + v.y * A.col2.y + v.z * A.col3.y;
 		final float tempz = v.x * A.col1.z + v.y * A.col2.z + v.z * A.col3.z;
 		out.x = v.x * A.col1.x + v.y * A.col2.x + v.z + A.col3.x;
 		out.y = tempy;
 		out.z = tempz;
 	}
-	
-	//djm pooled
-	private Vec3 temp = new Vec3();
-	public Vec3 solve(Vec3 b) {
+
+	// djm pooled
+	private final Vec3 temp = new Vec3();
+
+	public Vec3 solve( final Vec3 b) {
 		Vec3.crossToOut( col1, col2, temp);
-		float det = Vec3.dot(col1, temp);
-		assert(det != 0.0f);
+		float det = Vec3.dot( col1, temp);
+		assert det != 0.0f;
 		det = 1.0f / det;
-		Vec3 x = new Vec3();
+		final Vec3 x = new Vec3();
 		Vec3.crossToOut( col2, col3, temp);
-		x.x = det * Vec3.dot(b, temp);
+		x.x = det * Vec3.dot( b, temp);
 		Vec3.crossToOut( b, col3, temp);
-		x.y = det * Vec3.dot(col1, temp);
+		x.y = det * Vec3.dot( col1, temp);
 		Vec3.crossToOut( col2, b, temp);
-		x.z = det * Vec3.dot(col1, temp);
+		x.z = det * Vec3.dot( col1, temp);
 		return x;
 	}
-	
-	public void solveToOut(Vec3 b, Vec3 out){
+
+	public void solveToOut( final Vec3 b, final Vec3 out) {
 		Vec3.crossToOut( col1, col2, out);
-		float det = Vec3.dot(col1, out);
-		assert(det != 0.0f);
+		float det = Vec3.dot( col1, out);
+		assert det != 0.0f;
 		det = 1.0f / det;
 		Vec3.crossToOut( col2, col3, out);
-		final float tempx = det * Vec3.dot(b, out);
+		final float tempx = det * Vec3.dot( b, out);
 		Vec3.crossToOut( b, col3, out);
-		final float tempy = det * Vec3.dot(col1, out);
+		final float tempy = det * Vec3.dot( col1, out);
 		Vec3.crossToOut( col2, b, out);
-		final float tempz = det * Vec3.dot(col1, out);
+		final float tempz = det * Vec3.dot( col1, out);
 		out.x = tempx;
 		out.y = tempy;
 		out.z = tempz;
