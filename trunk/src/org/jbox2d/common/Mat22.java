@@ -49,15 +49,6 @@ public class Mat22 {
 	}
 
 	/**
-	 * Create a matrix representing a rotation.
-	 * @param angle Rotation (in radians) that matrix represents.
-	 */
-	public Mat22(final float angle) {
-		this();
-		setAngle(angle);
-	}
-
-	/**
 	 * Create a matrix with given vectors as columns.
 	 * @param c1 Column 1 of matrix
 	 * @param c2 Column 2 of matrix
@@ -134,19 +125,6 @@ public class Mat22 {
 		col2.x = 0.0f;
 		col1.y = 0.0f;
 		col2.y = 0.0f;
-	}
-
-	/**
-	 * Set as a matrix representing a rotation.
-	 * @param angle Rotation (in radians) that matrix represents.
-	 */
-	public final void setAngle(final float angle) {
-		final float c = (float) Math.cos(angle);
-		final float s = (float) Math.sin(angle);
-		col1.x = c;
-		col2.x = -s;
-		col1.y = s;
-		col2.y = c;
 	}
 
 	/**
@@ -241,7 +219,7 @@ public class Mat22 {
 		return new Vec2(col1.x * v.x + col2.x * v.y, col1.y * v.x + col2.y
 		                * v.y);
 	}
-
+	
 	/* djm added */
 	public final void mulToOut(final Vec2 v, final Vec2 out){
 		final float tempy = col1.y * v.x + col2.y * v.y;
@@ -269,15 +247,22 @@ public class Mat22 {
 		//C.set(col1,col2);
 		return C;
 	}
+	
+	public final Mat22 mulLocal(final Mat22 R){
+		mulToOut(R, this);
+		return this;
+	}
 
 	/* djm: created */
 	public final void mulToOut(final Mat22 R, final Mat22 out){
-		final float tempy = this.col1.y * R.col1.x + this.col2.y * R.col1.y;
-		out.col1.x = this.col1.x * R.col1.x + this.col2.x * R.col1.y;
-		out.col1.y = tempy;
-		final float tempy1 = this.col1.y * R.col2.x + this.col2.y * R.col2.y;
-		out.col2.x = this.col1.x * R.col2.x + this.col2.x * R.col2.y;
-		out.col2.y = tempy1;
+		final float tempy1 = this.col1.y * R.col1.x + this.col2.y * R.col1.y;
+		final float tempx1 = this.col1.x * R.col1.x + this.col2.x * R.col1.y;
+		out.col1.x = tempx1;
+		out.col1.y = tempy1;
+		final float tempy2 = this.col1.y * R.col2.x + this.col2.y * R.col2.y;
+		final float tempx2 = this.col1.x * R.col2.x + this.col2.x * R.col2.y;
+		out.col2.x = tempx2;
+		out.col2.y = tempy2;
 	}
 
 	/**
@@ -305,6 +290,11 @@ public class Mat22 {
 		C.col2.y = Vec2.dot(this.col2, B.col2);
 		return C;
 	}
+	
+	public final Mat22 mulTransLocal(final Mat22 B){
+		mulTransToOut(B, this);
+		return this;
+	}
 
 	/* djm added */
 	public final void mulTransToOut(final Mat22 B, final Mat22 out){
@@ -312,10 +302,14 @@ public class Mat22 {
 		out.col1.y = Vec2.dot(this.col2, B.col1);
 		out.col2.x = Vec2.dot(this.col1, B.col2);
 		out.col2.y = Vec2.dot(this.col2, B.col2);*/
-		out.col1.x = this.col1.x * B.col1.x + this.col1.y * B.col1.y;
-		out.col1.y = this.col2.x * B.col1.x + this.col2.y * B.col1.y;
-		out.col2.x = this.col1.x * B.col2.x + this.col1.y * B.col2.y;
-		out.col2.y = this.col2.x * B.col2.x + this.col2.y * B.col2.y;
+		final float x1 = this.col1.x * B.col1.x + this.col1.y * B.col1.y;
+		final float y1 = this.col2.x * B.col1.x + this.col2.y * B.col1.y;
+		final float x2 = this.col1.x * B.col2.x + this.col1.y * B.col2.y;
+		final float y2 = this.col2.x * B.col2.x + this.col2.y * B.col2.y;
+		out.col1.x = x1;
+		out.col2.x = x2;
+		out.col1.y = y1;
+		out.col2.y = y2;
 	}
 
 	/**
@@ -417,12 +411,14 @@ public class Mat22 {
 
 	/* djm added */
 	public final static void mulToOut(final Mat22 A, final Mat22 B, final Mat22 out){
-		final float tempy = A.col1.y * B.col1.x + A.col2.y * B.col1.y;
-		out.col1.x = A.col1.x * B.col1.x + A.col2.x * B.col1.y;
-		out.col1.y = tempy;
-		final float tempy1 = A.col1.y * B.col2.x + A.col2.y * B.col2.y;
-		out.col2.x = A.col1.x * B.col2.x + A.col2.x * B.col2.y;
-		out.col2.y = tempy1;
+		final float tempy1 = A.col1.y * B.col1.x + A.col2.y * B.col1.y;
+		final float tempx1 = A.col1.x * B.col1.x + A.col2.x * B.col1.y;
+		final float tempy2 = A.col1.y * B.col2.x + A.col2.y * B.col2.y;
+		final float tempx2 = A.col1.x * B.col2.x + A.col2.x * B.col2.y;
+		out.col1.x = tempx1;
+		out.col1.y = tempy1;
+		out.col2.x = tempx2;
+		out.col2.y = tempy2;
 	}
 
 	public final static Vec2 mulTrans(final Mat22 R, final Vec2 v) {
@@ -448,9 +444,46 @@ public class Mat22 {
 
 	/* djm added */
 	public final static void mulTransToOut(final Mat22 A, final Mat22 B, final Mat22 out){
-		out.col1.x = A.col1.x * B.col1.x + A.col1.y * B.col1.y;
-		out.col1.y = A.col2.x * B.col1.x + A.col2.y * B.col1.y;
-		out.col2.x = A.col1.x * B.col2.x + A.col1.y * B.col2.y;
-		out.col2.y = A.col2.x * B.col2.x + A.col2.y * B.col2.y;
+		final float x1 = A.col1.x * B.col1.x + A.col1.y * B.col1.y;
+		final float y1 = A.col2.x * B.col1.x + A.col2.y * B.col1.y;
+		final float x2 = A.col1.x * B.col2.x + A.col1.y * B.col2.y;
+		final float y2 = A.col2.x * B.col2.x + A.col2.y * B.col2.y;
+		
+		out.col1.x = x1;
+		out.col1.y = y1;
+		out.col2.x = x2;
+		out.col2.y = y2;
+	}
+	
+	public final static Mat22 getRotationalTransform(float angle){
+		Mat22 mat = new Mat22();
+		final float c = (float) Math.cos(angle);
+		final float s = (float) Math.sin(angle);
+		mat.col1.x = c;
+		mat.col2.x = -s;
+		mat.col1.y = s;
+		mat.col2.y = c;
+		return mat;
+	}
+	
+	public final static void getRotationalTransform(float angle, Mat22 out){
+		final float c = (float) Math.cos(angle);
+		final float s = (float) Math.sin(angle);
+		out.col1.x = c;
+		out.col2.x = -s;
+		out.col1.y = s;
+		out.col2.y = c;
+	}
+	
+	public final static Mat22 getScaleTransform(float scale){
+		Mat22 mat = new Mat22();
+		mat.col1.x = scale;
+		mat.col2.y = scale;
+		return mat;
+	}
+	
+	public final static void getScaleTransform(float scale, Mat22 out){
+		out.col1.x = scale;
+		out.col2.y = scale;
 	}
 }
