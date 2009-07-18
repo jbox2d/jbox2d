@@ -318,6 +318,22 @@ public class TestbedMain extends PApplet {
     	if (key == 's') currentTest.settings.drawStats = !currentTest.settings.drawStats;
     	if (key == 'c') currentTest.settings.drawContactPoints = !currentTest.settings.drawContactPoints;
     	if (key == 'b') currentTest.settings.drawAABBs = !currentTest.settings.drawAABBs;
+    	
+    	// Testing joint walking
+//    	if (key == '0') {
+//    		Body bodyAtPoint = currentTest.getBodyAtPoint(currentTest.getMouseWorld());
+//    		if (bodyAtPoint != null) {
+//    			System.out.println(bodyAtPoint.getConnectedDynamicBodyIsland().size());
+//    		}
+//    	}
+    	
+    	// Testing contact graph walking
+//    	if (key == '0') {
+//    		Body bodyAtPoint = currentTest.getBodyAtPoint(currentTest.getMouseWorld());
+//    		if (bodyAtPoint != null) {
+//    			System.out.println(bodyAtPoint.getTouchingDynamicBodyIsland().size());
+//    		}
+//    	}
     		
     	currentTest.keyPressed(key);
     }
