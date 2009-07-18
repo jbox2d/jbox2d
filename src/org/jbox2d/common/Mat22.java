@@ -455,7 +455,7 @@ public class Mat22 {
 		out.col2.y = y2;
 	}
 	
-	public final static Mat22 getRotationalTransform(float angle){
+	public final static Mat22 createRotationalTransform(float angle){
 		Mat22 mat = new Mat22();
 		final float c = (float) Math.cos(angle);
 		final float s = (float) Math.sin(angle);
@@ -466,7 +466,7 @@ public class Mat22 {
 		return mat;
 	}
 	
-	public final static void getRotationalTransform(float angle, Mat22 out){
+	public final static void createRotationalTransform(float angle, Mat22 out){
 		final float c = (float) Math.cos(angle);
 		final float s = (float) Math.sin(angle);
 		out.col1.x = c;
@@ -475,14 +475,14 @@ public class Mat22 {
 		out.col2.y = c;
 	}
 	
-	public final static Mat22 getScaleTransform(float scale){
+	public final static Mat22 createScaleTransform(float scale){
 		Mat22 mat = new Mat22();
 		mat.col1.x = scale;
 		mat.col2.y = scale;
 		return mat;
 	}
 	
-	public final static void getScaleTransform(float scale, Mat22 out){
+	public final static void createScaleTransform(float scale, Mat22 out){
 		out.col1.x = scale;
 		out.col2.y = scale;
 	}

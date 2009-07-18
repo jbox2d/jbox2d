@@ -7,6 +7,7 @@ import org.jbox2d.collision.shapes.CircleDef;
 import org.jbox2d.collision.shapes.PolygonDef;
 import org.jbox2d.collision.shapes.ShapeDef;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.common.ViewportTransform;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.DebugDraw;
@@ -379,10 +380,10 @@ public class Physics {
 		float wxs = Math.abs(x1-x0);
 		float wys = Math.abs(y1-y0);
 		//System.out.println("Screen: ("+cxs + ","+cys+")");
-		Vec2 center = m_draw.screenToWorld(cxs, cys);
+		Vec2 center = screenToWorld(cxs, cys);
 		//System.out.println("World: "+center);
-		float halfWidthWorld = .5f*m_draw.screenToWorld(wxs);
-		float halfHeightWorld = .5f*m_draw.screenToWorld(wys);
+		float halfWidthWorld = .5f* screenToWorld(wxs, new Vec2(1,0));
+		float halfHeightWorld = .5f* screenToWorld(wys, new Vec2(1,0));
 		//System.out.println("Half Width world: "+halfWidthWorld);
 		PolygonDef pd = new PolygonDef();
 		pd.setAsBox(halfWidthWorld, halfHeightWorld);
@@ -408,8 +409,8 @@ public class Physics {
 	 * @return
 	 */
 	public Body createCircle(float x, float y, float r) {
-		Vec2 center = m_draw.screenToWorld(x,y);
-		float rad = m_draw.screenToWorld(r);
+		Vec2 center = screenToWorld(x,y);
+		float rad = screenToWorld(r, new Vec2(1,0));
 		
 		CircleDef cd = new CircleDef();
 		cd.radius = rad;
@@ -499,8 +500,8 @@ public class Physics {
 	 * @return Newly created DistanceJoint
 	 */
 	public DistanceJoint createDistanceJoint(Body a, Body b, float xa, float ya, float xb, float yb) {
-		Vec2 va = m_draw.screenToWorld(xa,ya);
-		Vec2 vb = m_draw.screenToWorld(xb,yb);
+		Vec2 va = screenToWorld(xa,ya);
+		Vec2 vb = screenToWorld(xb,yb);
 		DistanceJointDef jd = new DistanceJointDef();
 		jd.initialize(a, b, va, vb);
 		return (DistanceJoint)m_world.createJoint(jd);
@@ -518,7 +519,7 @@ public class Physics {
 	 * @return Newly created RevoluteJoint
 	 */
 	public RevoluteJoint createRevoluteJoint(Body a, Body b, float x, float y) {
-		Vec2 v = m_draw.screenToWorld(x,y);
+		Vec2 v = screenToWorld(x,y);
 		return JointUtils.createRevoluteJoint(a, b, v);
 	}
 	
@@ -573,10 +574,10 @@ public class Physics {
 														 float anchorAx, float anchorAy,
 														 float anchorBx, float anchorBy,
 														 float ratio) {
-		Vec2 gA = m_draw.screenToWorld(groundAnchorAx,groundAnchorAy);
-		Vec2 gB = m_draw.screenToWorld(groundAnchorBx,groundAnchorBy);
-		Vec2 aA = m_draw.screenToWorld(anchorAx,anchorAy);
-		Vec2 aB = m_draw.screenToWorld(anchorBx,anchorBy);
+		Vec2 gA = screenToWorld(groundAnchorAx,groundAnchorAy);
+		Vec2 gB = screenToWorld(groundAnchorBx,groundAnchorBy);
+		Vec2 aA = screenToWorld(anchorAx,anchorAy);
+		Vec2 aB = screenToWorld(anchorBx,anchorBy);
 		PulleyJointDef pjd = new PulleyJointDef();
 		pjd.initialize(a, b, gA, gB, aA, aB, ratio);
 		return (PulleyJoint)m_world.createJoint(pjd);
@@ -683,6 +684,15 @@ public class Physics {
 	 */
 	public float getFriction() {
 		return m_friction;
+	}
+	
+	/**
+	 * Get the viewport transform, which transforms (moves, scales, and rotates)
+	 * the world to show us what we see in our window.
+	 * @return
+	 */
+	public ViewportTransform getViewportTransform(){
+		return m_draw.getViewportTranform();
 	}
 	
 	/**
@@ -852,67 +862,93 @@ public class Physics {
 	
 	/** Screen space to world space conversion for position. */
 	public float screenToWorldX(float x, float y) {
-		return m_draw.screenToWorld(x,y).x;
+		return m_draw.getViewportTranform().getScreenToWorld(x,y).x;
 	}
 	
 	/** Screen space to world space conversion for position. */
 	public float screenToWorldY(float x, float y) {
-		return m_draw.screenToWorld(x,y).y;
+		return m_draw.getViewportTranform().getScreenToWorld(x,y).y;
 	}
 	
 	/** Screen space to world space conversion for position. */
 	public Vec2 screenToWorld(float x, float y) {
-		return m_draw.screenToWorld(x,y);
+		return m_draw.getViewportTranform().getScreenToWorld(x,y);
 	}
 	
 	/** Screen space to world space conversion for position. */
 	public Vec2 screenToWorld(Vec2 v) {
-		return m_draw.screenToWorld(v);
+		return m_draw.getViewportTranform().getScreenToWorld(v);
+	}
+	
+	/** Screen length to world length, on the given vector direction*/
+	public float screenToWorld(float length, Vec2 vector){
+		Vec2 ret = new Vec2(vector);
+		ret.normalize();
+		ret.mulLocal( length);
+		m_draw.getViewportTranform().getTransform().mulToOut(ret, ret);
+		return ret.length();
 	}
 	
 	/** World space to screen space conversion for position. */
 	public float worldToScreenX(float x, float y) {
-		return m_draw.worldToScreen(x, y).x;
+		return m_draw.getViewportTranform().getWorldToScreen(x, y).x;
 	}
 	
 	/** World space to screen space conversion for position. */
 	public float worldToScreenY(float x, float y) {
-		return m_draw.worldToScreen(x, y).y;
+		return m_draw.getViewportTranform().getWorldToScreen(x, y).y;
 	}
 	
 	/** World space to screen space conversion for position. */
 	public Vec2 worldToScreen(float x, float y) {
-		return m_draw.worldToScreen(x, y);
-	}
-	
-	/** World space to screen space conversion for length. */
-	public float worldToScreen(float length) {
-		return m_draw.worldToScreen(length);
+		return m_draw.getViewportTranform().getWorldToScreen(x, y);
 	}
 	
 	/** World space to screen space conversion for position. */
 	public Vec2 worldToScreen(Vec2 v) {
-		return m_draw.worldToScreen(v);
+		return m_draw.getViewportTranform().getWorldToScreen(v);
 	}
 	
-	/** Screen space to world space conversion for length. */
-	public float screenToWorld(float length) {
-		return m_draw.screenToWorld(length);
+	/** World length to screen length, on the given vector direction*/
+	public float worldToScreen(float length, Vec2 vector){
+		Vec2 ret = new Vec2(vector);
+		ret.normalize();
+		ret.mulLocal( length);
+		m_draw.getViewportTranform().getTransform().invert().mulToOut(ret, ret);
+		return ret.length();
 	}
 	
 	public Vec2 screenToWorldVector(Vec2 screenV) {
-		return m_draw.screenToWorldVector(screenV);
+		Vec2 ret = m_draw.getViewportTranform().getTransform().invert().mul(screenV);
+		if(m_draw.getViewportTranform().yFlip){
+			ret.y *= -1;
+		}
+		return ret;
 	}
 	
 	public Vec2 screenToWorldVector(float sx, float sy) {
-		return m_draw.screenToWorldVector(sx, sy);
+		Vec2 ret = new Vec2(sx, sy);
+		m_draw.getViewportTranform().getTransform().invert().mulToOut(ret, ret);
+		if(m_draw.getViewportTranform().yFlip){
+			ret.y *= -1;
+		}
+		return ret;
 	}
 	
 	public Vec2 worldToScreenVector(Vec2 worldV) {
-		return m_draw.worldToScreenVector(worldV);
+		Vec2 ret = m_draw.getViewportTranform().getTransform().mul(worldV);
+		if(m_draw.getViewportTranform().yFlip){
+			ret.y *= -1;
+		}
+		return ret;
 	}
 	
 	public Vec2 worldToScreenVector(float wx, float wy) {
-		return m_draw.worldToScreenVector(wx, wy);
+		Vec2 ret = new Vec2(wx, wy);
+		m_draw.getViewportTranform().getTransform().mulToOut(ret, ret);
+		if(m_draw.getViewportTranform().yFlip){
+			ret.y *= -1;
+		}
+		return ret;
 	}
 }

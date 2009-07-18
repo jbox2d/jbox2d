@@ -25,7 +25,9 @@ package org.jbox2d.testbed;
 
 
 import org.jbox2d.common.Color3f;
+import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.common.ViewportTransform;
 import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.DebugDraw;
 
@@ -47,61 +49,27 @@ public class ProcessingDebugDraw extends DebugDraw {
 	public PFont m_font;
 	public float fontHeight;
 	// World 0,0 maps to transX, transY on screen
-    public float transX = 320.0f;
-    public float transY = 240.0f;
-    public float scaleFactor = 20.0f;
-    public float yFlip = -1.0f; //flip y coordinate
-    
-    public void setCamera(float x, float y, float scale) {
-    	transX = PApplet.map(x,0.0f,-1.0f,g.width*.5f,g.width*.5f+scale);
-    	transY = PApplet.map(y,0.0f,yFlip*1.0f,g.height*.5f,g.height*.5f+scale);
-    	//System.out.println(transX+ " " +transY + " "+scale);
-    	scaleFactor = scale;
-    }
 	
 	public ProcessingDebugDraw(PApplet pApplet) {
-		screen = this;
+		super(new ViewportTransform());
 		g = pApplet;
+		screen = this;
 		m_font = g.createFont("LucidaGrande-Bold",12);//-Bold-14.vlw");
 		fontHeight = 14.0f;
-	}
-	
-	public float worldToScreen(float worldScale) {
-		return scaleFactor*worldScale;
-	}
-	
-	public float screenToWorld(float screenScale) {
-		return screenScale / scaleFactor;
-	}
-	
-	public Vec2 worldToScreen(Vec2 world) {
-		float x = PApplet.map(world.x, 0f, 1f, transX, transX+scaleFactor);
-		float y = PApplet.map(world.y, 0f, 1f, transY, transY+scaleFactor);
-		if (yFlip == -1.0f) y = PApplet.map(y,0f,g.height, g.height,0f);
-		return new Vec2(x, y);
-	}
-	public Vec2 worldToScreen(float x, float y) {
-		return worldToScreen(new Vec2(x,y));
-	}
-	
-	public Vec2 screenToWorld(Vec2 screen) {
-		float x = PApplet.map(screen.x, transX, transX+scaleFactor, 0f, 1f);
-		float y = screen.y;
-		if (yFlip == -1.0f) y = PApplet.map(y,g.height,0f,0f,g.height);
-		y = PApplet.map(y, transY, transY+scaleFactor, 0f, 1f);
-		return new Vec2(x,y);
-	}
-	public Vec2 screenToWorld(float x, float y) {
-		return screenToWorld(new Vec2(x,y));
+		viewportTransform.setCenter( 320 + g.width/2, 240 + g.height/2);
+    	viewportTransform.setExtents( g.width/2, g.height/2);
+		viewportTransform.setTransform( Mat22.createScaleTransform( 20));
+		viewportTransform.yFlip = true;
 	}
 
+	private static final Vec2 circlePt = new Vec2();
 	/* (non-Javadoc)
 	 * @see org.jbox2d.dynamics.DebugDraw#drawCircle(org.jbox2d.common.Vec2, float, javax.vecmath.Color3f)
 	 */
 	@Override
-	public void drawCircle(Vec2 center, float radius, Color3f color) {
-		center = worldToScreen(center);
-		radius *= scaleFactor;
+	public void drawCircle(Vec2 argCenter, float radius, Color3f color) {
+		viewportTransform.getWorldToScreenToOut(argCenter, center);
+
 		g.noFill();
 		float k_segments = 16.0f;
 		float k_increment = 2.0f * (float)Math.PI / k_segments;
@@ -112,7 +80,9 @@ public class ProcessingDebugDraw extends DebugDraw {
 		for (int i = 0; i < k_segments; ++i) {
 			float vx = center.x + radius * (float)Math.cos(theta);
 			float vy = center.y + radius * (float)Math.sin(theta);
-			g.vertex(vx, vy);
+			circlePt.set( vx, vy);
+			Mat22.mulToOut( viewportTransform.getTransform(), circlePt, circlePt);
+			g.vertex(circlePt.x, circlePt.y);
 			theta += k_increment;
 		}
 		g.vertex(center.x + radius, center.y);
@@ -120,15 +90,15 @@ public class ProcessingDebugDraw extends DebugDraw {
 	}
 
 	
+	// djm pooling
+	private static final Vec2 p = new Vec2();
+	private static final Vec2 center = new Vec2();
 	/* (non-Javadoc)
 	 * @see org.jbox2d.dynamics.DebugDraw#drawSolidCircle(org.jbox2d.common.Vec2, float, org.jbox2d.common.Vec2, javax.vecmath.Color3f)
 	 */
 	@Override
-	public void drawSolidCircle(Vec2 center, float radius, Vec2 axis,
-			Color3f color) {
-		center = worldToScreen(center);
-		radius = radius * scaleFactor;
-		axis = new Vec2(axis.x, axis.y*yFlip);
+	public void drawSolidCircle(Vec2 argCenter, float radius, Vec2 axis, Color3f color) {
+		viewportTransform.getWorldToScreenToOut(argCenter, center);
 		
 		float k_segments = 16.0f;
 		float k_increment = 2.0f * (float)Math.PI / k_segments;
@@ -137,42 +107,53 @@ public class ProcessingDebugDraw extends DebugDraw {
 		g.stroke(color.x,color.y,color.z, 255.0f);
 		g.beginShape(PApplet.POLYGON);
 		for (int i = 0; i < k_segments; ++i) {
-			float vx = center.x + radius * (float)Math.cos(theta);
-			float vy = center.y + radius * (float)Math.sin(theta);
-			g.vertex(vx, vy);
+			float vx = radius * (float)Math.cos(theta);
+			float vy = radius * (float)Math.sin(theta);
+			circlePt.set( vx, vy);
+			Mat22.mulToOut( viewportTransform.getTransform(), circlePt, circlePt);
+			circlePt.addLocal( center);
+			g.vertex(circlePt.x, circlePt.y);
 			theta += k_increment;
 		}
-		g.vertex(center.x+radius, center.y);
+		circlePt.set( radius, 0);
+		Mat22.mulToOut( viewportTransform.getTransform(), circlePt, circlePt);
+		circlePt.addLocal( center);
+		g.vertex(circlePt.x, circlePt.y);
+		
 		g.endShape();
 
-		Vec2 p = new Vec2(center.x + radius * axis.x, center.y + radius * axis.y);
+		p.set(center.x + radius * axis.x, center.y + radius * axis.y);
 		g.beginShape(PApplet.LINES);
 		g.vertex(center.x, center.y);
 		g.vertex(p.x, p.y);
 		g.endShape();
 	}
 
+	// djm pooling
+	private static final Vec2 v1 = new Vec2();
+	private static final Vec2 v2 = new Vec2();
 	@Override
 	public void drawPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
 		g.stroke(color.x, color.y, color.z);
 		g.noFill();
 		for (int i = 0; i < vertexCount; ++i) {
 			int ind = (i+1<vertexCount)?i+1:(i+1-vertexCount);
-			Vec2 v1 = worldToScreen(vertices[i]);
-			Vec2 v2 = worldToScreen(vertices[ind]);
+			viewportTransform.getWorldToScreenToOut(vertices[i], v1);
+			viewportTransform.getWorldToScreenToOut(vertices[ind], v2);
 			//System.out.println(v1 + " -> "+v2);
 			g.line(v1.x, v1.y, v2.x, v2.y);
 		}
-
 	}
 	
+	// djm pooling, and from above
+	private static final Vec2 v = new Vec2();
 	@Override
 	public void drawSolidPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
 		g.noStroke();
 		g.fill(0.5f * color.x, 0.5f * color.y, 0.5f * color.z, 0.5f*255.0f);
 		g.beginShape(PApplet.POLYGON);
 		for (int i = 0; i < vertexCount; ++i) {
-			Vec2 v = worldToScreen(vertices[i]);
+			viewportTransform.getWorldToScreenToOut(vertices[i], v);
 			g.vertex(v.x, v.y);
 		}
 		g.endShape();
@@ -180,49 +161,54 @@ public class ProcessingDebugDraw extends DebugDraw {
 		g.stroke(color.x, color.y, color.z, 255.0f);
 		for (int i = 0; i < vertexCount; ++i) {
 			int ind = (i+1<vertexCount)?i+1:(i+1-vertexCount);
-			Vec2 v1 = worldToScreen(vertices[i]);
-			Vec2 v2 = worldToScreen(vertices[ind]);
+			viewportTransform.getWorldToScreenToOut(vertices[i], v1);
+			viewportTransform.getWorldToScreenToOut(vertices[ind], v2);
 			//System.out.println("Drawing: "+v1+" to "+v2);
 			g.line(v1.x, v1.y, v2.x, v2.y);
 		}
 	}
 
 	@Override
-	public void drawSegment(Vec2 p1, Vec2 p2, Color3f color) {
-		p1 = worldToScreen(p1);
-		p2 = worldToScreen(p2);
+	public void drawSegment(Vec2 argP1, Vec2 argP2, Color3f color) {
+		viewportTransform.getWorldToScreenToOut(argP1, p1);
+		viewportTransform.getWorldToScreenToOut(argP2, p2);
 		g.stroke(color.x, color.y, color.z);
 		g.beginShape(PApplet.LINES);
 		g.vertex(p1.x, p1.y);
 		g.vertex(p2.x, p2.y);
 		g.endShape();
 	}
-		
+	
+	// djm pooling
+	private static final Vec2 p1 = new Vec2();
+	private static final Vec2 p2 = new Vec2();
+	private static final Vec2 p1world = new Vec2();
+	private static final Vec2 p2world = new Vec2();
 	/* (non-Javadoc)
 	 * @see org.jbox2d.dynamics.DebugDraw#drawXForm(org.jbox2d.common.XForm)
 	 */
 	@Override
 	public void drawXForm(XForm xf) {
-		Vec2 p1 = xf.position.clone(), p2 = new Vec2();
+		p1.set(xf.position);
+		p2.setZero();
 		float k_axisScale = 0.4f;
 		g.beginShape(PApplet.LINES);
-		Vec2 p1world = worldToScreen(p1);
+		viewportTransform.getWorldToScreenToOut(p1, p1world);
 		g.stroke(255.0f, 0.0f, 0.0f);
 		g.vertex(p1world.x, p1world.y);
 		p2.x = p1.x + k_axisScale * xf.R.col1.x;
 		p2.y = p1.y + k_axisScale * xf.R.col1.y;
-		Vec2 p2world = worldToScreen(p2);
+		viewportTransform.getWorldToScreenToOut(p2, p2world);
 		g.vertex(p2world.x, p2world.y);
 
 		g.stroke(0.0f, 255.0f, 0.0f);
 		g.vertex(p1world.x, p1world.y);
 		p2.x = p1.x + k_axisScale * xf.R.col2.x;
 		p2.y = p1.y + k_axisScale * xf.R.col2.y;
-		p2world = worldToScreen(p2);
+		viewportTransform.getWorldToScreenToOut(p2, p2world);
 		g.vertex(p2world.x, p2world.y);
 
 		g.endShape();
-
 	}
 	
 	@Override
@@ -239,9 +225,10 @@ public class ProcessingDebugDraw extends DebugDraw {
 		g.text(s, x, y);
 	}
 
+	private static final Vec2 position = new Vec2();
 	@Override
-	public void drawPoint(Vec2 position, float f, Color3f color) {
-		position = worldToScreen(position);
+	public void drawPoint(Vec2 argPosition, float f, Color3f color) {
+		viewportTransform.getWorldToScreenToOut(argPosition, position);
 		float k_segments = 5.0f;
 		float k_increment = 2.0f * (float)Math.PI / k_segments;
 		float k_radius = 3.0f;
@@ -258,10 +245,11 @@ public class ProcessingDebugDraw extends DebugDraw {
 		g.endShape();
 	}
 	
+	private static final Vec2 localOffset = new Vec2();
 	/**
 	 * First image is centered on position, then
-	 * localScale is applied, then localOffset, and
-     * lastly rotation.
+	 * rotation, then localOffset is applied, and
+     * lastly localScale.
      * <BR><BR>
      * Thus localOffset should be specified in world
      * units before scaling is applied.
@@ -271,33 +259,21 @@ public class ProcessingDebugDraw extends DebugDraw {
      * <BR><BR>
      * 
      */
-	public void drawImage(PImage image, Vec2 position, float rotation, float localScale,
-						  Vec2 localOffset, float halfImageWidth, float halfImageHeight) {
-		position = worldToScreen(position);
-		localOffset = worldToScreenVector(localOffset);
-		localScale *= scaleFactor;
+	public void drawImage(PImage image, Vec2 argPosition, float rotation, float localScale,
+						  Vec2 argLocalOffset, float halfImageWidth, float halfImageHeight) {
+		viewportTransform.getWorldToScreenToOut(argPosition, position);
+		viewportTransform.getTransform().mulToOut(argLocalOffset, localOffset);
         g.pushMatrix();
         g.translate(position.x, position.y);
         g.rotate(-rotation);
         g.translate(localOffset.x, localOffset.y);
-        g.scale(localScale);
+        g.scale( localScale);
+        Mat22 mat = viewportTransform.getTransform();
+        g.applyMatrix( mat.col1.x, mat.col2.x, 0, 0,
+                       mat.col1.y, mat.col2.y, 0, 0,
+                       0, 0, 1, 0,
+                       0, 0, 0, 1);
         g.image(image, -halfImageWidth, -halfImageHeight);
         g.popMatrix();
     }
-	
-	public Vec2 worldToScreenVector(Vec2 world) {
-		return world.mul(scaleFactor);
-	}
-	public Vec2 worldToScreenVector(float x, float y) {
-		return worldToScreenVector(new Vec2(x,y));
-	}
-	
-	public Vec2 screenToWorldVector(Vec2 screen) {
-		return screen.mul(1.0f/scaleFactor);
-	}
-	
-	public Vec2 screenToWorldVector(float x, float y) {
-		return screenToWorldVector(new Vec2(x,y));
-	}
-	
 }
