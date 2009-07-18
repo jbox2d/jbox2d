@@ -28,11 +28,11 @@ import processing.core.PImage;
 
 import org.jbox2d.common.Color3f;
 import org.jbox2d.collision.AABB;
-import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.shapes.CircleDef;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.common.ViewportTransform;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BoundaryListener;
@@ -102,6 +102,8 @@ public abstract class AbstractExample {
 	/** Listener for contact events. */
 	protected ContactListener m_contactListener;
 	
+	protected ViewportTransform viewport;
+	
 	public static Color3f white = new Color3f(255.0f,255.0f,255.0f);
 	public static Color3f black = new Color3f(0.0f*255.0f,0.0f*255.0f,0.0f*255.0f);
 	public static Color3f gray = new Color3f(0.5f*255.0f,0.5f*255.0f,0.5f*255.0f);
@@ -165,6 +167,7 @@ public abstract class AbstractExample {
 	public AbstractExample(TestbedMain _parent) {
 		parent = _parent;
 		m_debugDraw = parent.g;
+		viewport = m_debugDraw.getViewportTranform();
 		needsReset = true;
 	}
 	
@@ -248,6 +251,8 @@ public abstract class AbstractExample {
 	private Color3f color_persistContactPoint = new Color3f(255.0f, 0.0f, 0.0f);
 	private Color3f color_removeContactPoint = new Color3f(0.0f, 155.0f, 155.0f);
 	private Color3f color_contactNormal = new Color3f(0.4f*255f, 0.9f*255f, 0.4f*255f);
+	private final Vec2 p1 = new Vec2();
+	private final Vec2 p2 = new Vec2();
 	/**
 	 * Take a physics step.  This is the guts of the simulation loop.
 	 * When creating your own game, the most important thing to have
@@ -255,7 +260,7 @@ public abstract class AbstractExample {
 	 */
 	public void step() {
 		preStep();
-		mouseWorld.set(m_debugDraw.screenToWorld(mouseScreen));
+		viewport.getScreenToWorldToOut(mouseScreen, mouseWorld);
 		
 		float timeStep = settings.hz > 0.0f ? 1.0f / settings.hz : 0.0f;
 		
@@ -314,7 +319,7 @@ public abstract class AbstractExample {
 
 		if (m_mouseJoint != null) {
 			Body body = m_mouseJoint.m_body2;
-			Vec2 p1 = body.getWorldLocation(m_mouseJoint.m_localAnchor);
+			body.getWorldLocationToOut(m_mouseJoint.m_localAnchor, p1);
 			Vec2 p2 = m_mouseJoint.m_target;
 
 			m_debugDraw.drawSegment(p1, p2, color_mouseJoint);
@@ -348,7 +353,7 @@ public abstract class AbstractExample {
 
 				if (settings.drawContactNormals) {
 					Vec2 p1 = point.position;
-					Vec2 p2 = new Vec2( p1.x + k_axisScale * point.normal.x,
+					p2.set( p1.x + k_axisScale * point.normal.x,
 										p1.y + k_axisScale * point.normal.y);
 					m_debugDraw.drawSegment(p1, p2, color_contactNormal);
 				} 
@@ -457,7 +462,8 @@ public abstract class AbstractExample {
     public void completeBombSpawn() {
     	if (!bombSpawning) return;
     	final float multiplier = 30.0f;
-    	Vec2 mouseW = m_debugDraw.screenToWorld(mouseScreen);
+    	Vec2 mouseW = new Vec2();
+    	viewport.getScreenToWorldToOut(mouseScreen, mouseW);
     	Vec2 vel = bombSpawnPoint.sub(mouseW);
     	vel.mulLocal(multiplier);
     	launchBomb(bombSpawnPoint,vel);
@@ -516,11 +522,13 @@ public abstract class AbstractExample {
     public void mouseDown(Vec2 p) {
     	
     	if (parent.shiftKey) {
-    		spawnBomb(m_debugDraw.screenToWorld(p));
+    		Vec2 vec = new Vec2();
+    		viewport.getScreenToWorldToOut(p, vec);
+    		spawnBomb(vec);
     		return;
     	}
     	
-    	p = m_debugDraw.screenToWorld(p);
+    	viewport.getScreenToWorldToOut(p, p);
     	
     	if (m_mouseJoint != null) return;
 
@@ -580,7 +588,9 @@ public abstract class AbstractExample {
     public void mouseMove(Vec2 p) {
     	mouseScreen.set(p);
         if (m_mouseJoint != null) {
-            m_mouseJoint.setTarget(m_debugDraw.screenToWorld(p));
+        	Vec2 target = new Vec2();
+        	viewport.getScreenToWorldToOut(p, target);
+            m_mouseJoint.setTarget(target);
         }
     }
     
@@ -673,10 +683,10 @@ public abstract class AbstractExample {
     		ExampleContactPoint cp = test.m_points[test.m_pointCount];
     		cp.shape1 = point.shape1;
     		cp.shape2 = point.shape2;
-    		cp.position = point.position.clone();
-    		cp.normal = point.normal.clone();
-    		cp.id = new ContactID(point.id);
-    		cp.velocity = point.velocity.clone();
+    		cp.position.set(point.position);
+    		cp.normal.set(point.normal);
+    		cp.id.set(point.id);
+    		cp.velocity.set(point.velocity);
     		cp.state = 0;
 
     		++test.m_pointCount;	
@@ -689,10 +699,10 @@ public abstract class AbstractExample {
     		ExampleContactPoint cp = test.m_points[test.m_pointCount];
     		cp.shape1 = point.shape1;
     		cp.shape2 = point.shape2;
-    		cp.position = point.position.clone();
-    		cp.normal = point.normal.clone();
-    		cp.id = new ContactID(point.id);
-    		cp.velocity = point.velocity.clone();
+    		cp.position.set(point.position);
+    		cp.normal.set(point.normal);
+    		cp.id.set(point.id);
+    		cp.velocity.set(point.velocity);
     		cp.state = 1;
 
     		++test.m_pointCount;
@@ -705,10 +715,10 @@ public abstract class AbstractExample {
     		ExampleContactPoint cp = test.m_points[test.m_pointCount];
     		cp.shape1 = point.shape1;
     		cp.shape2 = point.shape2;
-    		cp.position = point.position.clone();
-    		cp.normal = point.normal.clone();
-    		cp.id = new ContactID(point.id);
-    		cp.velocity = point.velocity.clone();
+    		cp.position.set(point.position);
+    		cp.normal.set(point.normal);
+    		cp.id.set(point.id);
+    		cp.velocity.set(point.velocity);
     		cp.state = 2;
 
     		++test.m_pointCount;

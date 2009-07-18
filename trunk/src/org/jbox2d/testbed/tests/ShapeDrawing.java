@@ -131,7 +131,7 @@ public class ShapeDrawing extends AbstractExample {
 	
 	public void mouseDown(Vec2 p){
     	mouseScreen.set(p);
-		mouseWorld.set(m_debugDraw.screenToWorld(p));
+    	m_debugDraw.getViewportTranform().getScreenToWorldToOut(p, mouseWorld);
 		if (parent.mouseButton == PApplet.RIGHT) return;
 		if (parent.shiftKey) {
     		spawnBomb(mouseWorld);
@@ -153,7 +153,7 @@ public class ShapeDrawing extends AbstractExample {
 	
 	public void mouseMove(Vec2 p){
     	mouseScreen.set(p);
-		mouseWorld.set(m_debugDraw.screenToWorld(p));
+    	m_debugDraw.getViewportTranform().getScreenToWorldToOut(p, mouseWorld);
 		if (activeMouseStroke) {
 			addStrokeSegment();
 		}

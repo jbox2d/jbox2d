@@ -10,9 +10,9 @@ import org.jbox2d.common.Vec2;
 public class ExampleContactPoint {
 	public Shape shape1;
 	public Shape shape2;
-	public Vec2 normal;
-	public Vec2 position;
-	public Vec2 velocity;
-	ContactID id;
+	public final Vec2 normal = new Vec2();
+	public final Vec2 position = new Vec2();
+	public final Vec2 velocity = new Vec2();
+	public final ContactID id = new ContactID();
 	public int state; // 0-add, 1-persist, 2-remove
 }

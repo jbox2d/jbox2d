@@ -28,6 +28,7 @@ import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.DebugDraw;
 
@@ -116,7 +117,7 @@ public class TestbedMain extends PApplet {
 //    	smooth();
     	frameRate(targetFPS);
     	g = new ProcessingDebugDraw(this);
-    	//smooth();
+    	
     	for (int i=0; i<100; ++i) {
     		this.requestFocus();
     	}
@@ -130,23 +131,22 @@ public class TestbedMain extends PApplet {
             	if (currentTest != null) {
             		ProcessingDebugDraw d = (ProcessingDebugDraw)(currentTest.m_debugDraw);
             		int notches = e.getWheelRotation();
-                	Vec2 oldCenter = d.screenToWorld(mouseX, mouseY);
-                	//Change the zoom and clamp it to reasonable values 
+            		
+                	Vec2 oldCenter = new Vec2();
+                	d.getViewportTranform().getScreenToWorldToOut(mouseX, mouseY, oldCenter);
+                	//Change the zoom and clamp it to reasonable values - can't clamp now.
                 	if (notches < 0) {
-                		d.scaleFactor = min(300f, d.scaleFactor * 1.05f);
+                		d.getViewportTranform().mulByTransform( Mat22.createScaleTransform( 1.05f ));
                 	}
                 	else if (notches > 0) {
-                		d.scaleFactor = max(.02f, d.scaleFactor / 1.05f);
+                		d.getViewportTranform().mulByTransform( Mat22.createScaleTransform( .95f ));
                 	}
-                	Vec2 newCenter = d.screenToWorld(mouseX, mouseY);
-                	d.transX -= (oldCenter.x - newCenter.x) * d.scaleFactor;
-                	d.transY -= (oldCenter.y - newCenter.y) * d.scaleFactor;
-                	float camX = PApplet.map(d.transX,d.g.width*.5f,	d.g.width*.5f+d.scaleFactor,	0.0f,	-1.0f);
-                	float camY = PApplet.map(d.transY,d.g.height*.5f,	d.g.height*.5f+d.scaleFactor,	0.0f,	d.yFlip*1.0f);
-                	currentTest.setCamera(camX, camY, d.scaleFactor);
-//                	currentTest.cachedCamScale = d.scaleFactor;
-//                	currentTest.cachedCamX = d.transX;
-//                	currentTest.cachedCamY = d.transY;
+                	
+                	Vec2 newCenter = new Vec2();
+                	d.getViewportTranform().getScreenToWorldToOut(mouseX, mouseY, newCenter);
+                	
+                	Vec2 transformedMove = oldCenter.subLocal(newCenter);
+                	d.getViewportTranform().getCenter().addLocal(transformedMove);
             	}
             }
         });
@@ -242,9 +242,11 @@ public class TestbedMain extends PApplet {
         //Vec2 mouseWorld = d.screenToWorld(mouseX, mouseY);
         if (mouseButton == RIGHT) {
             if (mousePressed) {
-                d.transX += mouseX - pmouseX;
-                d.transY -= mouseY - pmouseY;
-                Vec2 v = d.screenToWorld(width*.5f,height*.5f);
+            	Vec2 dif = new Vec2(- mouseX + pmouseX, mouseY - pmouseY);
+                d.getViewportTranform().getTransform().invert().mulToOut( dif, dif);
+                d.getViewportTranform().getCenter().addLocal(dif);
+                Vec2 v = new Vec2();
+                d.getViewportTranform().getScreenToWorldToOut(width*.5f,height*.5f, v);
                 currentTest.cachedCamX = v.x;
                 currentTest.cachedCamY = v.y;
             }
