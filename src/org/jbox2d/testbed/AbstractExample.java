@@ -24,12 +24,11 @@
 package org.jbox2d.testbed;
 
 import java.util.ArrayList;
-import processing.core.PImage;
 
-import org.jbox2d.common.Color3f;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.shapes.CircleDef;
 import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.ViewportTransform;
@@ -44,6 +43,8 @@ import org.jbox2d.dynamics.contacts.ContactResult;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.MouseJoint;
 import org.jbox2d.dynamics.joints.MouseJointDef;
+
+import processing.core.PImage;
 
 public abstract class AbstractExample {
 	/** The controller that the AbstractExample runs in */
@@ -489,6 +490,31 @@ public abstract class AbstractExample {
         boundImages.add(new BoundImage(p, localOffset, localRotation, localScale, b));
     }
     
+    private final AABB aabb1 = new AABB();
+    public Body getBodyAtPoint(Vec2 worldPoint) {
+    	aabb1.lowerBound.set(worldPoint);
+        aabb1.lowerBound.subLocal(d);
+        aabb1.upperBound.set(worldPoint);
+        aabb1.upperBound.addLocal(d);
+        
+        // Query the world for overlapping shapes.
+        int k_maxCount = 1;
+        Shape shapes[] = m_world.query(aabb1, k_maxCount);
+        
+        Body body = null;
+        for (int j = 0; j < shapes.length; j++) {
+            Body shapeBody = shapes[j].getBody();
+            if (shapeBody.isStatic() == false) {
+                boolean inside = shapes[j].testPoint(shapeBody.getMemberXForm(),worldPoint);
+                if (inside) {
+                    body = shapes[j].m_body;
+                    break;
+                }
+            }
+        }
+        return body;
+    }
+    
     
     /**
      * Set keyDown and newKeyDown arrays when we get a keypress.
@@ -592,6 +618,13 @@ public abstract class AbstractExample {
         	viewport.getScreenToWorldToOut(p, target);
             m_mouseJoint.setTarget(target);
         }
+    }
+    
+    /**
+     * @return the current world coordinates of the mouse.
+     */
+    public Vec2 getMouseWorld() {
+    	return viewport.getScreenToWorld(mouseScreen.x, mouseScreen.y);
     }
     
     /**

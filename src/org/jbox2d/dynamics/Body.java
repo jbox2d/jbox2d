@@ -23,6 +23,9 @@
 
 package org.jbox2d.dynamics;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.jbox2d.collision.MassData;
 import org.jbox2d.collision.shapes.EdgeChainDef;
 import org.jbox2d.collision.shapes.EdgeShape;
@@ -53,6 +56,9 @@ import org.jbox2d.dynamics.joints.JointEdge;
  * internal variables, and their use is generally unsupported.
  */
 public class Body {
+	private static volatile int nextID = 0;
+	private static Object idLock = new Object();
+	private int m_uniqueID;
 
 	//m_flags
 	public static final int e_frozenFlag = 0x0002;
@@ -126,6 +132,10 @@ public class Body {
 	 */
 	public Body(final BodyDef bd, final World world) {
 		assert(world.m_lock == false);
+		
+		synchronized(idLock) {
+			m_uniqueID = nextID++;
+		}
 
 		m_flags = 0;
 
@@ -201,6 +211,7 @@ public class Body {
 		m_shapeList = null;
 		m_shapeCount = 0;
 
+//		System.out.println("Body hash code: " + this.hashCode());
 	}
 
 	// djm this isn't a hot method, allocation is just fine
@@ -1101,6 +1112,181 @@ public class Body {
 	public World getWorld() {
 		return m_world;
 	}
+	
+	/**
+	 * Get the contact list, represented as a linked list of ContactEdges. Will
+	 * return null if no contacts are present.
+	 * 
+	 * @return the head of the linked list of contacts
+	 */
+	public ContactEdge getContactList() {
+		return m_contactList;
+	}
+	
+	/**
+	 * Get the set of bodies in contact with this body.
+	 * 
+	 * @return all bodies touching this one
+	 */
+	public Set<Body> getBodiesInContact() {
+		Set<Body> mySet = new HashSet<Body>();
+		ContactEdge edge = getContactList();
+		while (edge != null) {
+			if (edge.contact.getManifoldCount() > 0) {
+				mySet.add(edge.other);
+			}
+			edge = edge.next;
+		}
+		return mySet;
+	}
+	
+	/**
+	 * Get the set of bodies connected to this one by a joint.
+	 * Note: this does not return the entire island of connected bodies,
+	 * only those directly connected to this one.
+	 * @return all bodies connected directly to this body by a joint
+	 */
+	public Set<Body> getConnectedBodies() {
+		Set<Body> mySet = new HashSet<Body>();
+		JointEdge edge = getJointList();
+		while (edge != null) {
+			mySet.add(edge.other);
+			edge = edge.next;
+		}
+		return mySet;
+	}
+	
+	/**
+	 * Get the set of dynamic bodies connected to this one by a joint.
+	 * Note: this does not return the entire island of connected bodies,
+	 * only those directly connected to this one.
+	 * @return all bodies connected directly to this body by a joint
+	 */
+	public Set<Body> getConnectedDynamicBodies() {
+		Set<Body> mySet = new HashSet<Body>();
+		JointEdge edge = getJointList();
+		while (edge != null) {
+			if (edge.other.isDynamic()) mySet.add(edge.other);
+			edge = edge.next;
+		}
+		return mySet;
+	}
+	
+	/**
+	 * Get the island of connected bodies, including the current body.
+	 * <em>Warning</em>: will continue walking the joint tree past static bodies,
+	 * which may lead to unwanted results esp. if bodies are connected to the ground
+	 * body.
+	 * @return Set<Body> of all bodies accessible from this one by walking the joint tree
+	 */
+	public Set<Body> getConnectedBodyIsland() {
+		Set<Body> result = new HashSet<Body>();
+		result.add(this);
+		return getConnectedBodyIsland_impl(this, result);
+	}
+	
+	/* Recursive implementation. */
+	private Set<Body> getConnectedBodyIsland_impl(final Body parent, final Set<Body> parentResult) {
+		Set<Body> connected = getConnectedBodies();
+		for (Body b:connected) {
+			if (b == parent || parentResult.contains(b)) continue; //avoid infinite recursion
+			parentResult.add(b);
+			parentResult.addAll(b.getConnectedBodyIsland_impl(b, parentResult));
+		}
+		return parentResult;
+	}
+	
+	/**
+	 * Get the island of joint-connected dynamic bodies, including the current body.
+	 * Stops walking tree if it encounters a static body.
+	 * @see Body#getConnectedBodyIsland()
+	 * @return Set<Body> of all bodies accessible from this one by walking the joint tree
+	 */
+	public Set<Body> getConnectedDynamicBodyIsland() {
+		Set<Body> result = new HashSet<Body>();
+		if (!this.isDynamic()) return result;
+		result.add(this);
+		return getConnectedDynamicBodyIsland_impl(this, result);
+	}
+	
+	private Set<Body> getConnectedDynamicBodyIsland_impl(final Body parent, final Set<Body> parentResult) {
+		Set<Body> connected = getConnectedBodies();
+		for (Body b:connected) {
+			if (b == parent || !b.isDynamic() || parentResult.contains(b)) continue; //avoid infinite recursion
+			parentResult.add(b);
+			parentResult.addAll(b.getConnectedDynamicBodyIsland_impl(b, parentResult));
+		}
+		return parentResult;
+	}
+	
+	/**
+	 * Get the island of bodies in contact, including the current body.
+	 * <em>Warning</em>: will continue walking the contact tree past static bodies,
+	 * which may lead to unwanted results esp. if bodies are touching the ground
+	 * body.
+	 * @return Set<Body> of all bodies accessible from this one by walking the contact tree
+	 */
+	public Set<Body> getTouchingBodyIsland() {
+		Set<Body> result = new HashSet<Body>();
+		result.add(this);
+		return getTouchingBodyIsland_impl(this, result);
+	}
+	
+	/* Recursive implementation. */
+	private Set<Body> getTouchingBodyIsland_impl(final Body parent, final Set<Body> parentResult) {
+		Set<Body> touching = getBodiesInContact();
+		for (Body b:touching) {
+			if (b == parent || parentResult.contains(b)) continue; //avoid infinite recursion
+			parentResult.add(b);
+			parentResult.addAll(b.getTouchingBodyIsland_impl(b, parentResult));
+		}
+		return parentResult;
+	}
+	
+	/**
+	 * Get the island of dynamic bodies in contact, including the current body.
+	 * Stops walking tree if it encounters a static body.
+	 * @return Set<Body> of all bodies accessible from this one by walking the contact tree
+	 */
+	public Set<Body> getTouchingDynamicBodyIsland() {
+		Set<Body> result = new HashSet<Body>();
+		result.add(this);
+		return getTouchingDynamicBodyIsland_impl(this, result);
+	}
+	
+	/* Recursive implementation. */
+	private Set<Body> getTouchingDynamicBodyIsland_impl(final Body parent, final Set<Body> parentResult) {
+		Set<Body> touching = getBodiesInContact();
+		for (Body b:touching) {
+			if (b == parent || !b.isDynamic() || parentResult.contains(b)) continue; //avoid infinite recursion
+			parentResult.add(b);
+			parentResult.addAll(b.getTouchingDynamicBodyIsland_impl(b, parentResult));
+		}
+		return parentResult;
+	}
+	
+	/**
+	 * @return true if this Body is currently in contact with the passed body
+	 */
+	public boolean isTouching(Body other) {
+		ContactEdge edge = getContactList();
+		while (edge != null) {
+			if(edge.other == other && edge.contact.getManifoldCount() > 0) return true;
+			edge = edge.next;
+		}
+		return false;
+	}
 
+	//defaults seem fine
+//	@Override
+//	public boolean equals(Object obj) {
+//	    return (obj == this);
+//	}
+//
+//	@Override
+//	public int hashCode() { 
+//		return m_uniqueID;
+//	}
+	
 }
 
