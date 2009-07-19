@@ -56,9 +56,9 @@ public class ProcessingDebugDraw extends DebugDraw {
 		screen = this;
 		m_font = g.createFont("LucidaGrande-Bold",12);//-Bold-14.vlw");
 		fontHeight = 14.0f;
-		viewportTransform.setCenter( 320 + g.width/2, 240 + g.height/2);
-    	viewportTransform.setExtents( g.width/2, g.height/2);
 		viewportTransform.setTransform( Mat22.createScaleTransform( 20));
+		viewportTransform.setCenter(320 + g.width/2, 240 + g.height/2);
+		viewportTransform.setExtents( g.width/2, g.height/2);
 		viewportTransform.yFlip = true;
 	}
 

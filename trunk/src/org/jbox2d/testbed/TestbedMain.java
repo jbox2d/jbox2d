@@ -223,9 +223,13 @@ public class TestbedMain extends PApplet {
     			currentTest.m_textLine += AbstractExample.textLineHeight;
     			g.drawString(5, currentTest.m_textLine, "Average FPS (entire test): "+totalFPS, AbstractExample.white);
     			currentTest.m_textLine += AbstractExample.textLineHeight;
+    			g.drawString(5, currentTest.m_textLine, "World mouse location: " + currentTest.getMouseWorld(), AbstractExample.white);
+    			currentTest.m_textLine += AbstractExample.textLineHeight;
     		}
+
     	}
 
+    	
 		/* Store whether the mouse was pressed this step */
 		pmousePressed = mousePressed;
     }
