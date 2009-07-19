@@ -47,6 +47,7 @@ public abstract class DebugDraw {
 	public static final int e_obbBit				= 0x0010; ///< draw oriented bounding boxes
 	public static final int e_pairBit				= 0x0020; ///< draw broad-phase pairs
 	public static final int e_centerOfMassBit		= 0x0040; ///< draw center of mass frame
+	public static final int e_controllerBit			= 0x0080; ///< draw controllers
 
 	protected int m_drawFlags;
 	protected final ViewportTransform viewportTransform;

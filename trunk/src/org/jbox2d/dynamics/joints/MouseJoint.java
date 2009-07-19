@@ -39,7 +39,7 @@ import org.jbox2d.dynamics.TimeStep;
 //J = [I r_skew]
 //Identity used:
 //w k % (rx i + ry j) = w * (-ry i + rx j)
-
+//
 public class MouseJoint extends Joint {
 
 	public final Vec2 m_localAnchor;
@@ -221,3 +221,4 @@ public class MouseJoint extends Joint {
 		return 0.0f;
 	}
 }
+

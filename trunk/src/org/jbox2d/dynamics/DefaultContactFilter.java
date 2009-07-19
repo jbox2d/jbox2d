@@ -49,5 +49,16 @@ public class DefaultContactFilter implements ContactFilter {
 		boolean collide = (filter1.maskBits & filter2.categoryBits) != 0 && (filter1.categoryBits & filter2.maskBits) != 0;
 		return collide;
 	}
+	
+	public boolean rayCollide(Object userData, Shape shape)
+	{
+		// By default, cast userData as a fixture, and then collide if the shapes would collide
+		if (userData == null)
+		{
+			return true;
+		}
+
+		return shouldCollide((Shape)userData,shape);
+	}
 
 }

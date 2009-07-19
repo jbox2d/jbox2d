@@ -31,6 +31,9 @@ import org.jbox2d.collision.OBB;
 import org.jbox2d.collision.Pair;
 import org.jbox2d.collision.PairManager;
 import org.jbox2d.collision.Proxy;
+import org.jbox2d.collision.Segment;
+import org.jbox2d.collision.SegmentCollide;
+import org.jbox2d.collision.SortKeyFunc;
 import org.jbox2d.collision.TOI;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.EdgeShape;
@@ -40,11 +43,15 @@ import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Mat22;
+import org.jbox2d.common.RaycastResult;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
+import org.jbox2d.dynamics.controllers.Controller;
+import org.jbox2d.dynamics.controllers.ControllerDef;
+import org.jbox2d.dynamics.controllers.ControllerEdge;
 import org.jbox2d.dynamics.joints.ConstantVolumeJoint;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.JointDef;
@@ -78,6 +85,10 @@ public class World {
 	Contact m_contactList;
 
 	Joint m_jointList;
+	
+	Controller m_controllerList;
+	
+	int m_controllerCount;
 
 	int m_bodyCount;
 
@@ -193,10 +204,12 @@ public class World {
 		m_bodyList = null;
 		m_contactList = null;
 		m_jointList = null;
+		m_controllerList = null;
 
 		m_bodyCount = 0;
 		m_contactCount = 0;
 		m_jointCount = 0;
+		m_controllerCount = 0;
 
 		m_lock = false;
 
@@ -301,6 +314,15 @@ public class World {
 			}
 
 			destroyJoint(jn0.joint);
+		}
+		
+		//Detach controllers attached to this body
+		ControllerEdge ce = b.m_controllerList;
+		while(ce != null) {
+			ControllerEdge ce0 = ce;
+			ce = ce.nextController;
+
+			ce0.controller.removeBody(b);
 		}
 
 		// Delete the attached shapes. This destroys broad-phase
@@ -462,6 +484,45 @@ public class World {
 			}
 		}
 	}
+	
+	public Controller createController( final ControllerDef def) {
+		Controller controller = def.create();
+
+		controller.m_next = m_controllerList;
+		controller.m_prev = null;
+
+		if (m_controllerList != null) {
+			m_controllerList.m_prev = controller;
+		}
+		
+		m_controllerList = controller;
+		++m_controllerCount;
+
+		controller.m_world = this;
+
+		return controller;
+	}
+	
+	public void destroyController(Controller controller) {
+		assert(m_controllerCount>0);
+		
+		if(controller.m_next != null)
+		{
+			controller.m_next.m_prev = controller.m_prev;
+		}
+
+		if(controller.m_prev != null)
+		{
+			controller.m_prev.m_next = controller.m_next;
+		}
+
+		if(controller == m_controllerList)
+		{
+			m_controllerList = controller.m_next;
+		}
+
+		--m_controllerCount;
+	}
 
 	/**
 	 * Take a time step. This performs collision detection, integration,
@@ -571,6 +632,11 @@ public class World {
 	/** For internal use */
 	public void solve(final TimeStep step) {
 		m_positionIterationCount = 0;
+		
+		// Step all controllers
+		for(Controller controller = m_controllerList; controller != null; controller = controller.m_next) {
+			controller.step(step);
+		}
 
 		// Size the island for the worst case.
 		final Island island = new Island(m_bodyCount, m_contactCount, m_jointCount, m_contactListener);
@@ -1211,6 +1277,13 @@ public class World {
 			}
 		}
 
+		if ( (flags & DebugDraw.e_controllerBit) != 0)
+		{
+			for (Controller c = m_controllerList; c!=null; c= c.getNext())
+			{
+				c.draw(m_debugDraw);
+			}
+		}
 
 		final BroadPhase bp = m_broadPhase;
 		final Vec2 worldLower = bp.m_worldAABB.lowerBound;
@@ -1322,5 +1395,84 @@ public class World {
 	/** Return true if the bounding box is within range of the world AABB. */
 	public boolean inRange(final AABB aabb) {
 		return m_broadPhase.inRange(aabb);
+	}
+	
+	Segment m_raycastSegment;
+	Vec2 m_raycastNormal;
+	Object m_raycastUserData;
+	boolean m_raycastSolidShape;
+	
+	public int raycast(Segment segment, Shape[] shapes, int maxCount, boolean solidShapes, Object userData)
+	{
+		m_raycastSegment = segment;
+		m_raycastUserData = userData;
+		m_raycastSolidShape = solidShapes;
+
+		Object[] results = new Object[maxCount];
+
+		int count = m_broadPhase.querySegment(segment,results,maxCount, raycastSortKey);
+
+		for (int i = 0; i < count; ++i)
+		{
+			shapes[i] = (Shape)results[i];
+		}
+
+		return count;
+	}
+
+	public Shape raycastOne(Segment segment, RaycastResult result, boolean solidShapes, Object userData)
+	{
+		int maxCount = 1;
+		Shape[] shapes = new Shape[maxCount];
+
+		int count = raycast(segment, shapes, maxCount, solidShapes, userData);
+
+		if(count==0)
+			return null;
+
+		assert(count==1);
+
+		//Redundantly do TestSegment a second time, as the previous one's results are inaccessible
+//		System.out.println("Before final test, testing shape  " + shapes[0].getType());
+//		System.out.println(Arrays.toString(shapes));
+		shapes[0].testSegment(shapes[0].getBody().getXForm(),result,segment,1.0f);
+//		System.out.println("Got here, lambda = " + result.lambda);
+		//We already know it returns true
+		return shapes[0];
+	}
+	
+	private SortKeyFunc raycastSortKey = new SortKeyFunc() {
+		public float apply(Object shape) {
+			return raycastSortKeyFunc(shape);
+		}
+	};
+	
+	private float raycastSortKeyFunc(Object data)
+	{
+		Shape shape = (Shape)data;
+		Body body = shape.getBody();
+		World world = body.getWorld();
+
+		if (world.m_contactFilter!=null && !world.m_contactFilter.rayCollide(world.m_raycastUserData,shape))
+		{
+			return -1;
+		}
+
+		RaycastResult result = new RaycastResult();
+		SegmentCollide collide = shape.testSegment(body.getMemberXForm(),result, world.m_raycastSegment, 1.0f);
+				//&lambda, &world->m_raycastNormal, *world->m_raycastSegment, 1);
+		float lambda = result.lambda;
+		
+		if (world.m_raycastSolidShape && collide == SegmentCollide.MISS_COLLIDE)
+		{
+			return -1;
+		}
+
+		if (!world.m_raycastSolidShape && collide != SegmentCollide.HIT_COLLIDE)
+		{
+			return -1;
+		}
+
+		return lambda;
 	}
 }

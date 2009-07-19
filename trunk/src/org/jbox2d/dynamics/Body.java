@@ -38,6 +38,7 @@ import org.jbox2d.common.Sweep;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.contacts.ContactEdge;
+import org.jbox2d.dynamics.controllers.ControllerEdge;
 import org.jbox2d.dynamics.joints.JointEdge;
 
 // Updated to rev. 54->118->142 of b2Body.cpp/.h
@@ -74,6 +75,8 @@ public class Body {
 	public static final int e_dynamicType = 1;
 	public static final int e_maxTypes = 2;
 	public int m_type;
+	
+	public ControllerEdge m_controllerList;
 
 	/** The body origin transform */
 	public final XForm m_xf;
@@ -943,6 +946,7 @@ public class Body {
 	public void computeMass(){
 		//seems to be missing from C++ version...
 	}
+
 
 	// djm pooled
 	private final XForm xf1 = new XForm();
