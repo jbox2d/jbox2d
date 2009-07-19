@@ -341,4 +341,33 @@ public abstract class Shape {
 			m_proxyId = PairManager.NULL_PROXY;
 		}
 	}
+
+	/**
+	 * Compute the volume and centroid of this fixture intersected with a half plane
+	 * @param normal the surface normal
+	 * @param offset the surface offset along normal
+	 * @param c returns the centroid
+	 * @return the total volume less than offset along normal
+	 */
+	public float computeSubmergedArea(Vec2 normal, float offset, Vec2 c) {
+		return this.computeSubmergedArea(normal, offset, m_body.getXForm(), c);
+	}
+
+	/**
+	 * @param normal
+	 * @param offset
+	 * @param form
+	 * @param c
+	 * @return
+	 */
+	public float computeSubmergedArea(Vec2 normal, float offset, XForm form, Vec2 c) {
+		return 0;
+	}
+
+	/**
+	 * @return shape density
+	 */
+	public float getDensity() {
+		return m_density;
+	}
 }

@@ -296,5 +296,53 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 	public boolean corner2IsConvex() {
 		return m_cornerConvex2;
 	}
+	
+	public float computeSubmergedArea(final Vec2 normal,float offset,XForm xf,Vec2 c) {
+		//Note that v0 is independent of any details of the specific edge
+		//We are relying on v0 being consistent between multiple edges of the same body
+		Vec2 v0 = normal.mul(offset);
+		//b2Vec2 v0 = xf.position + (offset - b2Dot(normal, xf.position)) * normal;
+
+		Vec2 v1 = XForm.mul(xf, m_v1);
+		Vec2 v2 = XForm.mul(xf, m_v2);
+
+		float d1 = Vec2.dot(normal, v1) - offset;
+		float d2 = Vec2.dot(normal, v2) - offset;
+
+		if (d1 > 0.0f)
+		{
+			if (d2 > 0.0f)
+			{
+				return 0.0f;
+			}
+			else
+			{
+				v1 = v1.mul(-d2 / (d1 - d2)).add(v2.mul(d1 / (d1 - d2)));
+			}
+		}
+		else
+		{
+			if (d2 > 0.0f)
+			{
+				v2 = v1.mul(-d2 / (d1 - d2)).add(v2.mul(d1 / (d1 - d2)));
+			}
+			else
+			{
+				//Nothing
+			}
+		}
+
+		// v0,v1,v2 represents a fully submerged triangle
+		float k_inv3 = 1.0f / 3.0f;
+
+		// Area weighted centroid
+		c.x = k_inv3 * (v0.x + v1.x + v2.x);
+		c.y = k_inv3 * (v0.y + v1.y + v2.y);
+
+		Vec2 e1 = v1.sub(v0);
+		Vec2 e2 = v2.sub(v0);
+
+		return 0.5f * Vec2.cross(e1, e2);
+	}
 
 }

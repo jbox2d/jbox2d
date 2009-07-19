@@ -77,7 +77,7 @@ public class BroadPhase {
 	// PairCallback pairCallback;
 
 	int m_queryResults[];
-
+	float m_querySortKeys[];
 	int m_queryResultCount;
 
 	public AABB m_worldAABB;
@@ -107,6 +107,8 @@ public class BroadPhase {
 		}
 
 		// array initialization
+
+		m_querySortKeys = new float[Settings.maxProxies];
 		m_proxyPool = new Proxy[Settings.maxProxies];
 		pairBuffer = new BufferedPair[Settings.maxPairs];
 		m_bounds = new Bound[2][2 * Settings.maxProxies];
@@ -832,5 +834,279 @@ public class BroadPhase {
 		final float dx = MathUtils.max( ax, bx);
 		final float dy = MathUtils.max( ay, by);
 		return (Math.max( dx, dy) < 0.0f);
+	}
+	
+	
+	public int querySegment(Segment segment, Object[] userData, int maxCount, SortKeyFunc sortKey)
+	{
+		float maxLambda = 1;
+
+		float dx = (segment.p2.x-segment.p1.x)*m_quantizationFactor.x;
+		float dy = (segment.p2.y-segment.p1.y)*m_quantizationFactor.y;
+
+		int sx = dx<-Settings.EPSILON ? -1 : (dx>Settings.EPSILON ? 1 : 0);
+		int sy = dy<-Settings.EPSILON ? -1 : (dy>Settings.EPSILON ? 1 : 0);
+
+		assert(sx!=0||sy!=0);
+
+		float p1x = (segment.p1.x-m_worldAABB.lowerBound.x)*m_quantizationFactor.x;
+		float p1y = (segment.p1.y-m_worldAABB.lowerBound.y)*m_quantizationFactor.y;
+
+		int[] startValues = new int[2];
+		int[] startValues2 = new int[2];
+
+		int xIndex;
+		int yIndex;
+
+		int proxyId;
+		Proxy proxy = null;
+		
+		// TODO_ERIN implement fast float to int conversion.
+		startValues[0] = (int)(p1x) & (Integer.MAX_VALUE - 1);
+		startValues2[0] = (int)(p1x) | 1;
+
+		startValues[1] = (int)(p1y) & (Integer.MAX_VALUE - 1);
+		startValues2[1] = (int)(p1y) | 1;
+
+		//First deal with all the proxies that contain segment.p1
+//		int lowerIndex;
+//		int upperIndex;
+		int[] results = new int[2];
+		query(results,startValues[0],startValues2[0],m_bounds[0],2*m_proxyCount,0);
+		if(sx>=0)	xIndex = results[1]-1;
+		else		xIndex = results[0];
+		query(results,startValues[1],startValues2[1],m_bounds[1],2*m_proxyCount,1);
+		if(sy>=0)	yIndex = results[1]-1;
+		else		yIndex = results[0];
+
+//		System.out.println(m_queryResultCount);
+		//If we are using sortKey, then sort what we have so far, filtering negative keys
+		if(sortKey != null)
+		{
+			//Fill keys
+			for(int i=0;i<m_queryResultCount;i++)
+			{
+				m_querySortKeys[i] = sortKey.apply(m_proxyPool[m_queryResults[i]].userData);
+			}
+			//Bubble sort keys
+			//Sorting negative values to the top, so we can easily remove them
+			int i = 0;
+			while(i<m_queryResultCount-1)
+			{
+				float a = m_querySortKeys[i];
+				float b = m_querySortKeys[i+1];
+				if((a<0)?(b>=0):(a>b&&b>=0))
+				{
+					m_querySortKeys[i+1] = a;
+					m_querySortKeys[i]   = b;
+					int tempValue = m_queryResults[i+1];
+					m_queryResults[i+1] = m_queryResults[i];
+					m_queryResults[i] = tempValue;
+					i--;
+					if(i==-1) i=1;
+				}
+				else
+				{
+					i++;
+				}
+			}
+			//Skim off negative values
+			while(m_queryResultCount>0 && m_querySortKeys[m_queryResultCount-1]<0)
+				m_queryResultCount--;
+		}
+
+		//Now work through the rest of the segment
+		for (;;)
+		{
+			float xProgress = 0;
+			float yProgress = 0;
+			//Move on to the next bound
+			xIndex += sx>=0?1:-1;
+			if(xIndex<0||xIndex>=m_proxyCount*2)
+				break;
+			if(sx!=0)
+				xProgress = ((float)m_bounds[0][xIndex].value-p1x)/dx;
+			//Move on to the next bound
+			yIndex += sy>=0?1:-1;
+			if(yIndex<0||yIndex>=m_proxyCount*2)
+				break;
+			if(sy!=0)
+				yProgress = ((float)m_bounds[1][yIndex].value-p1y)/dy;
+			for(;;)
+			{
+				if(sy==0||(sx!=0&&xProgress<yProgress))
+				{
+					if(xProgress>maxLambda)
+						break;
+
+					//Check that we are entering a proxy, not leaving
+					if(sx>0?m_bounds[0][xIndex].isLower():m_bounds[0][xIndex].isUpper()){
+						//Check the other axis of the proxy
+						proxyId = m_bounds[0][xIndex].proxyId;
+						proxy = m_proxyPool[proxyId];
+						if(sy>=0)
+						{
+							if(proxy.lowerBounds[1]<=yIndex-1&&proxy.upperBounds[1]>=yIndex)
+							{
+								//Add the proxy
+								if(sortKey!=null)
+								{
+									addProxyResult(proxyId,proxy,maxCount,sortKey);
+								}
+								else
+								{
+									m_queryResults[m_queryResultCount] = proxyId;
+									++m_queryResultCount;
+								}
+							}
+						}
+						else
+						{
+							if(proxy.lowerBounds[1]<=yIndex&&proxy.upperBounds[1]>=yIndex+1)
+							{
+								//Add the proxy
+								if(sortKey!=null)
+								{
+									addProxyResult(proxyId,proxy,maxCount,sortKey);
+								}
+								else
+								{
+									m_queryResults[m_queryResultCount] = proxyId;
+									++m_queryResultCount;
+								}
+							}
+						}
+					}
+
+					//Early out
+					if(sortKey != null && m_queryResultCount==maxCount && m_queryResultCount>0 && xProgress>m_querySortKeys[m_queryResultCount-1])
+						break;
+
+					//Move on to the next bound
+					if(sx>0)
+					{
+						xIndex++;
+						if(xIndex==m_proxyCount*2)
+							break;
+					}
+					else
+					{
+						xIndex--;
+						if(xIndex<0)
+							break;
+					}
+					xProgress = ((float)m_bounds[0][xIndex].value - p1x) / dx;
+				}
+				else
+				{
+					if(yProgress>maxLambda)
+						break;
+
+					//Check that we are entering a proxy, not leaving
+					if(sy>0?m_bounds[1][yIndex].isLower():m_bounds[1][yIndex].isUpper()){
+						//Check the other axis of the proxy
+						proxyId = m_bounds[1][yIndex].proxyId;
+						proxy = m_proxyPool[proxyId];
+						if(sx>=0)
+						{
+							if(proxy.lowerBounds[0]<=xIndex-1&&proxy.upperBounds[0]>=xIndex)
+							{
+								//Add the proxy
+								if(sortKey!=null)
+								{
+									addProxyResult(proxyId,proxy,maxCount,sortKey);
+								}
+								else
+								{
+									m_queryResults[m_queryResultCount] = proxyId;
+									++m_queryResultCount;
+								}
+							}
+						}
+						else
+						{
+							if(proxy.lowerBounds[0]<=xIndex&&proxy.upperBounds[0]>=xIndex+1)
+							{
+								//Add the proxy
+								if(sortKey!=null)
+								{
+									addProxyResult(proxyId,proxy,maxCount,sortKey);
+								}
+								else
+								{
+									m_queryResults[m_queryResultCount] = proxyId;
+									++m_queryResultCount;
+								}
+							}
+						}
+					}
+
+					//Early out
+					if(sortKey != null && m_queryResultCount==maxCount && m_queryResultCount>0 && yProgress>m_querySortKeys[m_queryResultCount-1])
+						break;
+
+					//Move on to the next bound
+					if(sy>0)
+					{
+						yIndex++;
+						if(yIndex==m_proxyCount*2)
+							break;
+					}
+					else
+					{
+						yIndex--;
+						if(yIndex<0)
+							break;
+					}
+					yProgress = ((float)m_bounds[1][yIndex].value - p1y) / dy;
+				}
+			}
+
+			break;
+		}
+
+		int count = 0;
+		for(int i=0;i < m_queryResultCount && count<maxCount; ++i, ++count)
+		{
+			assert(m_queryResults[i] < Settings.maxProxies);
+			Proxy proxya = m_proxyPool[m_queryResults[i]];
+			assert(proxya.isValid());
+			userData[i] = proxya.userData;
+		}
+
+		// Prepare for next query.
+		m_queryResultCount = 0;
+		incrementTimeStamp();
+		
+		return count;
+
+	}
+	
+	private void addProxyResult(int proxyId, Proxy proxy, int maxCount, SortKeyFunc sortKey)
+	{
+		float key = sortKey.apply(proxy.userData);
+		//Filter proxies on positive keys
+		if(key<0)
+			return;
+		//Merge the new key into the sorted list.
+		//float32* p = std::lower_bound(m_querySortKeys,m_querySortKeys+m_queryResultCount,key);
+		int i = 0;
+		while(i<m_queryResultCount && m_querySortKeys[i]<key) ++i;
+		
+		float tempKey = key;
+		Proxy tempProxy = proxy;
+		
+		if(maxCount==m_queryResultCount&&i==m_queryResultCount)
+			return;
+		if(maxCount==m_queryResultCount)
+			m_queryResultCount--;
+		//std::copy_backward
+		for(int j=m_queryResultCount+1;j>i;--j){
+			m_querySortKeys[j] = m_querySortKeys[j-1];
+			m_queryResults[j]  = m_queryResults[j-1];
+		}
+		m_querySortKeys[i] = key;
+		m_queryResults[i] = proxyId;
+		m_queryResultCount++;
 	}
 }

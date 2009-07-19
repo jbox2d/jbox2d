@@ -108,12 +108,38 @@ public class Vec3 {
 		return new Vec3(this);
 	}
 	
-	public boolean equals(Object argOther){
-		if(argOther instanceof Vec3){
-			Vec3 other = (Vec3) argOther;
-			return other.x == x && other.y == y && other.z == z;
-		}
-		return false;
+	/**
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Float.floatToIntBits(x);
+		result = prime * result + Float.floatToIntBits(y);
+		result = prime * result + Float.floatToIntBits(z);
+		return result;
+	}
+
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Vec3 other = (Vec3) obj;
+		if (Float.floatToIntBits(x) != Float.floatToIntBits(other.x))
+			return false;
+		if (Float.floatToIntBits(y) != Float.floatToIntBits(other.y))
+			return false;
+		if (Float.floatToIntBits(z) != Float.floatToIntBits(other.z))
+			return false;
+		return true;
 	}
 	
 	public final static float dot(Vec3 a, Vec3 b){

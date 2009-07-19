@@ -23,11 +23,16 @@
 
 package org.jbox2d.collision;
 
-import org.jbox2d.common.*;
+import org.jbox2d.common.RaycastResult;
+import org.jbox2d.common.Settings;
+import org.jbox2d.common.Vec2;
 
 //See b2Collision.h/.cpp
 // djm: is this used?
 public class Segment {
+	public String toString() {
+		return "p1: "+p1+"; p2: " + p2;
+	}
 	
 	/**
 	 * The starting point

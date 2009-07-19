@@ -122,7 +122,7 @@ public class ProcessingDebugDraw extends DebugDraw {
 		
 		g.endShape();
 
-		p.set(center.x + radius * axis.x, center.y + radius * axis.y);
+		viewportTransform.getWorldToScreenToOut(argCenter.x + radius * axis.x, argCenter.y + radius * axis.y, p);
 		g.beginShape(PApplet.LINES);
 		g.vertex(center.x, center.y);
 		g.vertex(p.x, p.y);

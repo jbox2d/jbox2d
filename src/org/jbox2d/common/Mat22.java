@@ -428,8 +428,9 @@ public class Mat22 {
 	/* djm added */
 	public final static void mulTransToOut(final Mat22 R, final Vec2 v, final Vec2 out) {
 		//R.mulTransToOut(v, out);
-		out.x = v.x * R.col1.x + v.y * R.col1.y;
+		float outx = v.x * R.col1.x + v.y * R.col1.y;
 		out.y = v.x * R.col2.x + v.y * R.col2.y;
+		out.x = outx;
 	}
 
 	public final static Mat22 mulTrans(final Mat22 A, final Mat22 B){

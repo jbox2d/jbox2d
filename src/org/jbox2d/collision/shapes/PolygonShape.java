@@ -240,25 +240,32 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 
 
 	// djm pooling
-	private final Vec2 p1 = new Vec2();
-	private final Vec2 p2 = new Vec2();
-	private final Vec2 tsd = new Vec2();
-	private final Vec2 temp2 = new Vec2();
+//	private final Vec2 p1 = new Vec2();
+//	private final Vec2 p2 = new Vec2();
+//	private final Vec2 p1b = new Vec2();
+//	private final Vec2 p2b = new Vec2();	
+//	private final Vec2 tsd = new Vec2();
+//	private final Vec2 temp2 = new Vec2();
+	
+	// ewj: un-inlined this fn's vector ops, had some problems with it, not sure where it went wrong TODO
 	/**
 	 * @see Shape#testSegment(XForm, RaycastResult, Segment, float)
 	 */
 	@Override
 	public SegmentCollide testSegment(final XForm xf, final RaycastResult out, final Segment segment, final float maxLambda){
-		float lower = 0.0f, upper = maxLambda;
 
-		p1.set(segment.p1);
-		p1.subLocal( xf.position);
-		Mat22.mulTransToOut(xf.R, p1, p1 );
-		p2.set(segment.p2);
-		p2.subLocal(xf.position);
-		Mat22.mulTransToOut(xf.R, p2, p2);
-		tsd.set(p2);
-		tsd.subLocal( p1);
+		float lower = 0.0f, upper = maxLambda;
+//		p1.set(segment.p1);
+//		p1.subLocal( xf.position);
+//		Mat22.mulTransToOut(xf.R, p1, p1b );
+//		p2.set(segment.p2);
+//		p2.subLocal(xf.position);
+//		Mat22.mulTransToOut(xf.R, p2, p2b);
+//		tsd.set(p2);
+//		tsd.subLocal( p1);
+		Vec2 p1 = Mat22.mulTrans(xf.R, segment.p1.sub(xf.position));
+		Vec2 p2 = Mat22.mulTrans(xf.R, segment.p2.sub(xf.position));
+		Vec2 d = p2.sub(p1);
 
 		int index = -1;
 
@@ -267,11 +274,21 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 			// p = p1 + a * d
 			// dot(normal, p - v) = 0
 			// dot(normal, p1 - v) + a * dot(normal, d) = 0
-			temp2.set(m_vertices[i]);
-			temp2.subLocal( p1);
-			final float numerator = Vec2.dot(m_normals[i], temp2);
-			final float denominator = Vec2.dot(m_normals[i], tsd);
+//			temp2.set(m_vertices[i]);
+//			temp2.subLocal( p1);
+//			final float numerator = Vec2.dot(m_normals[i], temp2);
+//			final float denominator = Vec2.dot(m_normals[i], tsd);
+			float numerator = Vec2.dot(m_normals[i],m_vertices[i].sub(p1));
+			float denominator = Vec2.dot(m_normals[i],d);
 
+			if (denominator == 0.0f)
+			{	
+				if (numerator < 0.0f)
+				{
+					return SegmentCollide.MISS_COLLIDE;
+				}
+			}
+			
 			// Note: we want this predicate without division:
 			// lower < numerator / denominator, where denominator < 0
 			// Since denominator < 0, we have to flip the inequality:
@@ -302,10 +319,12 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		if (index >= 0)
 		{
 			out.lambda = lower;
-			Mat22.mulToOut(xf.R, m_normals[index], out.normal);
+//			Mat22.mulToOut(xf.R, m_normals[index], out.normal);
+			out.normal.set(Mat22.mul(xf.R,m_normals[index]));
 			return SegmentCollide.HIT_COLLIDE;
 		}
-
+		
+		out.lambda = 0.0f;
 		return SegmentCollide.STARTS_INSIDE_COLLIDE;
 	}
 
@@ -489,12 +508,15 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		//System.out.println("poly sweepaabb: "+aabb.lowerBound+" "+aabb.upperBound);
 	}
 
+	@Override
+	public void computeMass(final MassData massData) {
+		computeMass(massData, m_density);
+	}
 	/**
 	 * @see Shape#computeMass(MassData)
 	 */
 	// djm not very hot method so I'm not pooling.  still optimized though
-	@Override
-	public void computeMass(final MassData massData) {
+	public void computeMass(final MassData massData, float density) {
 		// Polygon mass, centroid, and inertia.
 		// Let rho be the polygon density in mass per unit area.
 		// Then:
@@ -566,7 +588,7 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		}
 
 		// Total mass
-		massData.mass = m_density * area;
+		massData.mass = density * area;
 
 		// Center of mass
 		assert(area > Settings.EPSILON);
@@ -574,7 +596,7 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		massData.center.set(center);
 
 		// Inertia tensor relative to the local origin.
-		massData.I = I*m_density;
+		massData.I = I*density;
 	}
 
 	/** Get the first vertex and apply the supplied transform. */
@@ -619,5 +641,129 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 	/** Get the centroid and apply the supplied transform. */
 	public Vec2 centroid(final XForm xf) {
 		return XForm.mul(xf, m_centroid);
+	}
+	
+	public float computeSubmergedArea(final Vec2 normal,float offset,XForm xf,Vec2 c) {
+		//Transform plane into shape co-ordinates
+		Vec2 normalL = Mat22.mulTrans(xf.R,normal);
+		float offsetL = offset - Vec2.dot(normal,xf.position);
+		
+		float[] depths = new float[Settings.maxPolygonVertices];
+		int diveCount = 0;
+		int intoIndex = -1;
+		int outoIndex = -1;
+		
+		boolean lastSubmerged = false;
+		int i = 0;
+		for (i = 0; i < m_vertexCount; ++i)
+		{
+			depths[i] = Vec2.dot(normalL,m_vertices[i]) - offsetL;
+			boolean isSubmerged = depths[i]<-Settings.EPSILON;
+			if (i > 0)
+			{
+				if (isSubmerged)
+				{
+					if (!lastSubmerged)
+					{
+						intoIndex = i-1;
+						diveCount++;
+					}
+				}
+				else
+				{
+					if (lastSubmerged)
+					{
+						outoIndex = i-1;
+						diveCount++;
+					}
+				}
+			}
+			lastSubmerged = isSubmerged;
+		}
+
+		switch(diveCount)
+		{
+		case 0:
+			if (lastSubmerged)
+			{
+				//Completely submerged
+				MassData md = new MassData();
+				computeMass(md, 1.0f);
+				c.set(XForm.mul(xf,md.center));
+				return md.mass;
+			}
+			else
+			{
+				//Completely dry
+				return 0;
+			}
+
+		case 1:
+			if(intoIndex==-1)
+			{
+				intoIndex = m_vertexCount-1;
+			}
+			else
+			{
+				outoIndex = m_vertexCount-1;
+			}
+			break;
+		}
+
+		int intoIndex2 = (intoIndex+1) % m_vertexCount;
+		int outoIndex2 = (outoIndex+1) % m_vertexCount;
+		
+		float intoLambda = (0 - depths[intoIndex]) / (depths[intoIndex2] - depths[intoIndex]);
+		float outoLambda = (0 - depths[outoIndex]) / (depths[outoIndex2] - depths[outoIndex]);
+		
+		Vec2 intoVec = new Vec2(	m_vertices[intoIndex].x*(1-intoLambda)+m_vertices[intoIndex2].x*intoLambda,
+						m_vertices[intoIndex].y*(1-intoLambda)+m_vertices[intoIndex2].y*intoLambda);
+		Vec2 outoVec = new Vec2(	m_vertices[outoIndex].x*(1-outoLambda)+m_vertices[outoIndex2].x*outoLambda,
+						m_vertices[outoIndex].y*(1-outoLambda)+m_vertices[outoIndex2].y*outoLambda);
+		
+		// Initialize accumulator
+		float area = 0;
+		Vec2 center = new Vec2(0,0);
+		Vec2 p2b = m_vertices[intoIndex2];
+		Vec2 p3 = new Vec2();
+		
+		float k_inv3 = 1.0f / 3.0f;
+		
+		// An awkward loop from intoIndex2+1 to outIndex2
+		i = intoIndex2;
+		while (i != outoIndex2)
+		{
+			i = (i+1) % m_vertexCount;
+			if (i == outoIndex2)
+				p3 = outoVec;
+			else
+				p3 = m_vertices[i];
+			
+			// Add the triangle formed by intoVec,p2,p3
+			{
+				Vec2 e1 = p2b.sub(intoVec);
+				Vec2 e2 = p3.sub(intoVec);
+				
+				float D = Vec2.cross(e1, e2);
+				
+				float triangleArea = 0.5f * D;
+
+				area += triangleArea;
+				
+				// Area weighted centroid
+				center.x += triangleArea * k_inv3 * (intoVec.x + p2b.x + p3.x);
+				center.y += triangleArea * k_inv3 * (intoVec.y + p2b.y + p3.y);
+			}
+			//
+			p2b = p3;
+		}
+		
+		// Normalize and transform centroid
+		center.x *= 1.0f / area;
+		center.y *= 1.0f / area;
+		
+		c.set(XForm.mul(xf,center));
+		
+		return area;
 	}
 }

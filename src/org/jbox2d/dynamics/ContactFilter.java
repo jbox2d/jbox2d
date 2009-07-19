@@ -44,4 +44,7 @@ public interface ContactFilter {
 	 * <BR><BR><em>Warning</em>: for performance reasons this is only called when the AABBs begin to overlap.
 	 */
 	public boolean shouldCollide(Shape shape1, Shape shape2);
+	
+	/** Return true if the given shape should be considered for ray intersection */
+	public boolean rayCollide(Object userData, Shape shape);
 }
