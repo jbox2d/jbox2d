@@ -54,6 +54,7 @@ public class TestSettings {
 	public boolean drawContactNormals;
 	public boolean drawContactForces;
 	public boolean drawFrictionForces;
+	public boolean drawControllers;
 
     public TestSettings() {
         hz = 60;
@@ -73,6 +74,7 @@ public class TestSettings {
         enableWarmStarting = true;
         enablePositionCorrection = true;
         enableTOI = true;
+        drawControllers = true;
         pause = false;
         singleStep = false;
     }

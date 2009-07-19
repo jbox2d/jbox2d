@@ -113,8 +113,10 @@ public class BuoyancyController extends Controller {
 		Vec2 p1 = normal.mul(offset).add(Vec2.cross(normal, r));
 		Vec2 p2 = normal.mul(offset).sub(Vec2.cross(normal, r));
 
-		Color3f color = new Color3f(0,0,0.8f);
+		Color3f color = new Color3f(0,0,255*0.8f);
 
-		debugDraw.drawSegment(p1, p2, color);
+//		debugDraw.drawSegment(p1, p2, color);
+		Vec2[] vertices = new Vec2[] { p1, p2, p2.sub(normal.mul(r)), p1.sub(normal.mul(r))};
+		debugDraw.drawSolidPolygon(vertices, 4, color);
 	}
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.jbox2d.testbed.tests.BipedTest;
 import org.jbox2d.testbed.tests.Bridge;
+import org.jbox2d.testbed.tests.BuoyancyTest;
 import org.jbox2d.testbed.tests.Chain;
 import org.jbox2d.testbed.tests.CompoundShapes;
 import org.jbox2d.testbed.tests.Domino;
@@ -27,6 +28,7 @@ public class ExampleList {
     	//
     	ArrayList<AbstractExample> exampleList = new ArrayList<AbstractExample>();
     	//*
+    	exampleList.add(new BuoyancyTest(testbed));
     	exampleList.add(new RaycastTest(testbed));
 //    	exampleList.add(new ScratchPad(testbed));
     	exampleList.add(new SensorTest(testbed));

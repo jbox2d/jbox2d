@@ -137,16 +137,22 @@ public class TestbedMain extends PApplet {
                 	//Change the zoom and clamp it to reasonable values - can't clamp now.
                 	if (notches < 0) {
                 		d.getViewportTranform().mulByTransform( Mat22.createScaleTransform( 1.05f ));
+                		currentTest.cachedCamScale *= 1.05;
                 	}
                 	else if (notches > 0) {
                 		d.getViewportTranform().mulByTransform( Mat22.createScaleTransform( .95f ));
+                		currentTest.cachedCamScale *= .95f;
                 	}
                 	
                 	Vec2 newCenter = new Vec2();
                 	d.getViewportTranform().getScreenToWorldToOut(mouseX, mouseY, newCenter);
                 	
+                	
                 	Vec2 transformedMove = oldCenter.subLocal(newCenter);
                 	d.getViewportTranform().getCenter().addLocal(transformedMove);
+
+                	currentTest.cachedCamX = d.getViewportTranform().getCenter().x;
+                	currentTest.cachedCamY = d.getViewportTranform().getCenter().y;
             	}
             }
         });

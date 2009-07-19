@@ -284,6 +284,7 @@ public abstract class AbstractExample {
 		if (settings.drawOBBs) m_debugDraw.appendFlags(DebugDraw.e_obbBit);
 		if (settings.drawPairs) m_debugDraw.appendFlags(DebugDraw.e_pairBit);
 		if (settings.drawCOMs) m_debugDraw.appendFlags(DebugDraw.e_centerOfMassBit);
+		if (settings.drawControllers) m_debugDraw.appendFlags(DebugDraw.e_controllerBit);
 
 		m_world.setWarmStarting(settings.enableWarmStarting);
 		m_world.setPositionCorrection(settings.enablePositionCorrection);
