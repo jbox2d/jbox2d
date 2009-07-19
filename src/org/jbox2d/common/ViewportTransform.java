@@ -5,8 +5,6 @@
 package org.jbox2d.common;
 
 import org.jbox2d.collision.OBB;
-import org.jbox2d.common.Mat22;
-import org.jbox2d.common.Vec2;
 
 /**
  * This is the viewport transform used from drawing.
@@ -60,7 +58,7 @@ public class ViewportTransform {
 	 * @param argHalfHeight
 	 */
 	public void setExtents(float argHalfWidth, float argHalfHeight){
-		box.extents.set(argHalfHeight, argHalfHeight);
+		box.extents.set(argHalfWidth, argHalfHeight);
 	}
 	
 	/**
