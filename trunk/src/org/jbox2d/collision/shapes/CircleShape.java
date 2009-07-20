@@ -238,10 +238,15 @@ public class CircleShape extends Shape {
 	public Vec2 getMemberLocalPosition() {
 		return m_localPosition;
 	}
+	
+	private final Vec2 p = new Vec2();
 
+	/**
+	 * @see Shape#computeSubmergedArea(Vec2, float, XForm, Vec2)
+	 */
 	public float computeSubmergedArea(final Vec2 normal, float offset,
 			XForm xf, Vec2 c) {
-		Vec2 p = XForm.mul(xf, m_localPosition);
+		XForm.mulToOut(xf, m_localPosition, p);
 		float l = -(Vec2.dot(normal, p) - offset);
 		if (l < -m_radius + Settings.EPSILON) {
 			// Completely dry

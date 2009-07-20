@@ -643,9 +643,20 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		return XForm.mul(xf, m_centroid);
 	}
 	
-	public float computeSubmergedArea(final Vec2 normal,float offset,XForm xf,Vec2 c) {
+	// djm pooled
+	private final Vec2 normalL = new Vec2();
+	private final MassData md = new MassData();
+	private final Vec2 intoVec = new Vec2();
+	private final Vec2 outoVec = new Vec2();
+	private final Vec2 e1 = new Vec2();
+	private final Vec2 e2 = new Vec2();
+
+	/**
+	 * @see Shape#computeSubmergedArea(Vec2, float, XForm, Vec2)
+	 */
+	public float computeSubmergedArea(final Vec2 normal, float offset, XForm xf, Vec2 c) {
 		//Transform plane into shape co-ordinates
-		Vec2 normalL = Mat22.mulTrans(xf.R,normal);
+		Mat22.mulTransToOut(xf.R,normal, normalL);
 		float offsetL = offset - Vec2.dot(normal,xf.position);
 		
 		float[] depths = new float[Settings.maxPolygonVertices];
@@ -687,9 +698,8 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 			if (lastSubmerged)
 			{
 				//Completely submerged
-				MassData md = new MassData();
 				computeMass(md, 1.0f);
-				c.set(XForm.mul(xf,md.center));
+				XForm.mulToOut(xf,md.center, c);
 				return md.mass;
 			}
 			else
@@ -716,9 +726,9 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		float intoLambda = (0 - depths[intoIndex]) / (depths[intoIndex2] - depths[intoIndex]);
 		float outoLambda = (0 - depths[outoIndex]) / (depths[outoIndex2] - depths[outoIndex]);
 		
-		Vec2 intoVec = new Vec2(	m_vertices[intoIndex].x*(1-intoLambda)+m_vertices[intoIndex2].x*intoLambda,
+		intoVec.set(m_vertices[intoIndex].x*(1-intoLambda)+m_vertices[intoIndex2].x*intoLambda,
 						m_vertices[intoIndex].y*(1-intoLambda)+m_vertices[intoIndex2].y*intoLambda);
-		Vec2 outoVec = new Vec2(	m_vertices[outoIndex].x*(1-outoLambda)+m_vertices[outoIndex2].x*outoLambda,
+		outoVec.set(m_vertices[outoIndex].x*(1-outoLambda)+m_vertices[outoIndex2].x*outoLambda,
 						m_vertices[outoIndex].y*(1-outoLambda)+m_vertices[outoIndex2].y*outoLambda);
 		
 		// Initialize accumulator
@@ -741,8 +751,8 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 			
 			// Add the triangle formed by intoVec,p2,p3
 			{
-				Vec2 e1 = p2b.sub(intoVec);
-				Vec2 e2 = p3.sub(intoVec);
+				e1.set(p2b).subLocal(intoVec);
+				e2.set(p3).subLocal(intoVec);
 				
 				float D = Vec2.cross(e1, e2);
 				
@@ -762,7 +772,7 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		center.x *= 1.0f / area;
 		center.y *= 1.0f / area;
 		
-		c.set(XForm.mul(xf,center));
+		XForm.mulToOut(xf,center, c);
 		
 		return area;
 	}
