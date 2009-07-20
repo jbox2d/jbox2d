@@ -297,14 +297,21 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 		return m_cornerConvex2;
 	}
 	
+	// djm pooled, and from above
+	private Vec2 v0 = new Vec2();
+	private Vec2 v2 = new Vec2();
+	private Vec2 e1 = new Vec2();
+	private Vec2 e2 = new Vec2();
+	private Vec2 temp = new Vec2();
+	
 	public float computeSubmergedArea(final Vec2 normal,float offset,XForm xf,Vec2 c) {
 		//Note that v0 is independent of any details of the specific edge
 		//We are relying on v0 being consistent between multiple edges of the same body
-		Vec2 v0 = normal.mul(offset);
+		v0.set(normal).mul(offset);
 		//b2Vec2 v0 = xf.position + (offset - b2Dot(normal, xf.position)) * normal;
 
-		Vec2 v1 = XForm.mul(xf, m_v1);
-		Vec2 v2 = XForm.mul(xf, m_v2);
+		XForm.mulToOut(xf, m_v1, v1);
+		XForm.mulToOut(xf, m_v2, v2);
 
 		float d1 = Vec2.dot(normal, v1) - offset;
 		float d2 = Vec2.dot(normal, v2) - offset;
@@ -317,14 +324,16 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 			}
 			else
 			{
-				v1 = v1.mul(-d2 / (d1 - d2)).add(v2.mul(d1 / (d1 - d2)));
+				temp.set(v2).mulLocal(d1 / (d1 - d2));
+				v1.mulLocal(-d2 / (d1 - d2)).addLocal(temp);
 			}
 		}
 		else
 		{
 			if (d2 > 0.0f)
 			{
-				v2 = v1.mul(-d2 / (d1 - d2)).add(v2.mul(d1 / (d1 - d2)));
+				temp.set(v1).mulLocal( -d2 / (d1 - d2));
+				v2.mulLocal(d1 / (d1 - d2)).addLocal( temp);
 			}
 			else
 			{
@@ -339,8 +348,8 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 		c.x = k_inv3 * (v0.x + v1.x + v2.x);
 		c.y = k_inv3 * (v0.y + v1.y + v2.y);
 
-		Vec2 e1 = v1.sub(v0);
-		Vec2 e2 = v2.sub(v0);
+		e1.set(v1).subLocal(v0);
+		e2.set(v2).subLocal(v0);
 
 		return 0.5f * Vec2.cross(e1, e2);
 	}
