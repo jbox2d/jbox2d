@@ -1435,7 +1435,7 @@ public class World {
 		//Redundantly do TestSegment a second time, as the previous one's results are inaccessible
 //		System.out.println("Before final test, testing shape  " + shapes[0].getType());
 //		System.out.println(Arrays.toString(shapes));
-		shapes[0].testSegment(shapes[0].getBody().getXForm(),result,segment,1.0f);
+		shapes[0].testSegment(shapes[0].getBody().getMemberXForm(),result,segment,1.0f);
 //		System.out.println("Got here, lambda = " + result.lambda);
 		//We already know it returns true
 		return shapes[0];
