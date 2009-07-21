@@ -74,18 +74,20 @@ public class Mat22 {
 	 * Set as a copy of another matrix.
 	 * @param m Matrix to copy
 	 */
-	public final void set(final Mat22 m) {
+	public final Mat22 set(final Mat22 m) {
 		col1.x = m.col1.x;
 		col1.y = m.col1.y;
 		col2.x = m.col2.x;
 		col2.y = m.col2.y;
+		return this;
 	}
 
-	public final void set(final float col1x, final float col2x, final float col1y, final float col2y) {
+	public final Mat22 set(final float col1x, final float col2x, final float col1y, final float col2y) {
 		col1.x = col1x;
 		col1.y = col1y;
 		col2.x = col2x;
 		col2.y = col2y;
+		return this;
 	}
 
 	/**

@@ -61,9 +61,10 @@ public class XForm {
 	}
 
 	/** Set this to equal another transform. */
-	public final void set(final XForm xf) {
+	public final XForm set(final XForm xf) {
 		position.set(xf.position);
 		R.set(xf.R);
+		return this;
 	}
 
 	/** Set this to the identity transform. */
