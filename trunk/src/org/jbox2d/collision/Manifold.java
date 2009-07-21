@@ -69,7 +69,7 @@ public class Manifold {
      * copies this manifold from the given one
      * @param cp manifold to copy from
      */
-    public void set(Manifold cp){
+    public Manifold set(Manifold cp){
     	// will this work?
     	//System.arraycopy(cp.points, 0, points, 0, cp.pointCount);
     	// just do this for now
@@ -79,5 +79,6 @@ public class Manifold {
     	
     	normal.set(cp.normal);
     	pointCount = cp.pointCount;
+    	return this;
     }
 }
