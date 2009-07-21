@@ -33,6 +33,7 @@ import org.jbox2d.collision.shapes.CollidePoly;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.ShapeType;
+import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.ContactListener;
@@ -130,7 +131,7 @@ public class PolyContact extends Contact implements ContactCreateFcn {
         }
         m0.pointCount = m_manifold.pointCount;*/
 
-		CollidePoly.collidePolygons(m_manifold, (PolygonShape) m_shape1,b1.getMemberXForm(),(PolygonShape) m_shape2, b2.getMemberXForm());
+		ObjectPool.getCollidePoly().collidePolygons(m_manifold, (PolygonShape) m_shape1,b1.getMemberXForm(),(PolygonShape) m_shape2, b2.getMemberXForm());
 
 		final boolean[] persisted = {false, false};
 

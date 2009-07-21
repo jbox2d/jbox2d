@@ -32,10 +32,11 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
 
-//Updated to rev 55->108->139 of b2CollidePoly.cpp
+//Updated to rev 55->108->139 of b2cpp
 
 /** Polygon overlap solver - for internal use. */
 public class CollidePoly {
+	
 	static class ClipVertex {
 		public final Vec2 v;
 
@@ -47,7 +48,7 @@ public class CollidePoly {
 		}
 	}
 
-	public final static int clipSegmentToLine(final ClipVertex vOut[], final ClipVertex vIn[],
+	public final int clipSegmentToLine(final ClipVertex vOut[], final ClipVertex vIn[],
 	                                          final Vec2 normal, final float offset) {
 		// Start with no output points
 		int numOut = 0;
@@ -89,8 +90,8 @@ public class CollidePoly {
 	}
 
 	// djm pooled
-	private final static Vec2 normal1World = new Vec2();
-	public final static float edgeSeparation(final PolygonShape poly1, final XForm xf1,
+	private final Vec2 normal1World = new Vec2();
+	public final float edgeSeparation(final PolygonShape poly1, final XForm xf1,
 	                                         final int edge1,
 	                                         final PolygonShape poly2, final XForm xf2) {
 
@@ -135,7 +136,7 @@ public class CollidePoly {
 	}
 
 	// djm pooled
-	private static Vec2 dLocal1 = new Vec2();
+	private Vec2 dLocal1 = new Vec2();
 	/**
 	 * Find the max separation between poly1 and poly2 using face normals
 	 * from poly1.
@@ -145,7 +146,7 @@ public class CollidePoly {
 	 * @param xf2
 	 * @return
 	 */
-	public final static MaxSeparation findMaxSeparation(final PolygonShape poly1, final XForm xf1,
+	public final MaxSeparation findMaxSeparation(final PolygonShape poly1, final XForm xf1,
 	                                                    final PolygonShape poly2, final XForm xf2) {
 		final MaxSeparation separation = new MaxSeparation();
 
@@ -179,7 +180,7 @@ public class CollidePoly {
 		}
 
 		// Get the separation for the edge normal.
-		float s = CollidePoly.edgeSeparation(poly1, xf1, edge, poly2, xf2);
+		float s = edgeSeparation(poly1, xf1, edge, poly2, xf2);
 		if (s > 0.0f){
 			separation.bestSeparation = s;
 			return separation;
@@ -187,14 +188,14 @@ public class CollidePoly {
 
 		// Check the separation for the previous edge normal.
 		final int prevEdge = edge - 1 >= 0 ? edge - 1 : count1 - 1;
-		final float sPrev = CollidePoly.edgeSeparation(poly1, xf1, prevEdge, poly2, xf2);
+		final float sPrev = edgeSeparation(poly1, xf1, prevEdge, poly2, xf2);
 		if (sPrev > 0.0f) {
 			separation.bestSeparation = sPrev;
 			return separation;
 		}
 
 		final int nextEdge = edge + 1 < count1 ? edge + 1 : 0;
-		final float sNext = CollidePoly.edgeSeparation(poly1, xf1, nextEdge, poly2, xf2);
+		final float sNext = edgeSeparation(poly1, xf1, nextEdge, poly2, xf2);
 		if (sNext > 0.0f){
 			separation.bestSeparation = sNext;
 			return separation;
@@ -228,7 +229,7 @@ public class CollidePoly {
 				edge = bestEdge + 1 < count1 ? bestEdge + 1 : 0;
 			}
 
-			s = CollidePoly.edgeSeparation(poly1, xf1, edge, poly2, xf2);
+			s = edgeSeparation(poly1, xf1, edge, poly2, xf2);
 			if (s > 0.0f) {
 				separation.bestSeparation = s;
 				return separation;
@@ -249,10 +250,10 @@ public class CollidePoly {
 	}
 
 	// djm pooled
-	private static Vec2 mulTemp = new Vec2();
-	private static Vec2 normal1 = new Vec2();
+	private Vec2 mulTemp = new Vec2();
+	private Vec2 normal1 = new Vec2();
 	// djm optimized
-	public final static void findIncidentEdge(final ClipVertex c[],
+	public final void findIncidentEdge(final ClipVertex c[],
 	                                          final PolygonShape poly1, final XForm xf1, final int edge1,
 	                                          final PolygonShape poly2, final XForm xf2) {
 
@@ -310,18 +311,18 @@ public class CollidePoly {
 
 	// The normal points from 1 to 2
 	// djm optimized
-	public final static void collidePolygons(final Manifold manif,
+	public final void collidePolygons(final Manifold manif,
 	                                         final PolygonShape polyA, final XForm xfA,
 	                                         final PolygonShape polyB, final XForm xfB) {
 
 		//testbed.PTest.debugCount++;
 		manif.pointCount = 0; // Fixed a problem with contacts
-		final MaxSeparation sepA = CollidePoly.findMaxSeparation(polyA, xfA, polyB, xfB);
+		final MaxSeparation sepA = findMaxSeparation(polyA, xfA, polyB, xfB);
 		if (sepA.bestSeparation > 0.0f) {
 			return;
 		}
 
-		final MaxSeparation sepB = CollidePoly.findMaxSeparation(polyB, xfB, polyA, xfA);
+		final MaxSeparation sepB = findMaxSeparation(polyB, xfB, polyA, xfA);
 		if (sepB.bestSeparation > 0.0f) {
 			return;
 		}
@@ -355,7 +356,7 @@ public class CollidePoly {
 		}
 
 		final ClipVertex incidentEdge[] = new ClipVertex[2];
-		CollidePoly.findIncidentEdge(incidentEdge, poly1, xf1, edge1, poly2, xf2);
+		findIncidentEdge(incidentEdge, poly1, xf1, edge1, poly2, xf2);
 
 		final int count1 = poly1.getVertexCount();
 		final Vec2[] vertices1 = poly1.getVertices();
@@ -391,14 +392,14 @@ public class CollidePoly {
 		int np;
 
 		// Clip to box side 1
-		np = CollidePoly.clipSegmentToLine(clipPoints1, incidentEdge, sideNormal.negate(), sideOffset1);
+		np = clipSegmentToLine(clipPoints1, incidentEdge, sideNormal.negate(), sideOffset1);
 
 		if (np < 2) {
 			return;
 		}
 
 		// Clip to negative box side 1
-		np = CollidePoly.clipSegmentToLine(clipPoints2, clipPoints1, sideNormal,
+		np = clipSegmentToLine(clipPoints2, clipPoints1, sideNormal,
 		                                   sideOffset2);
 
 		if (np < 2) {
@@ -445,12 +446,12 @@ public class CollidePoly {
 
 
 	// djm pooled
-	private final static Vec2 colPPc = new Vec2();
-	private final static Vec2 colPPcLocal = new Vec2();
-	private final static Vec2 colPPsub = new Vec2();
-	private final static Vec2 colPPe = new Vec2();
-	private final static Vec2 colPPp = new Vec2();
-	private final static Vec2 colPPd = new Vec2();
+	private final Vec2 colPPc = new Vec2();
+	private final Vec2 colPPcLocal = new Vec2();
+	private final Vec2 colPPsub = new Vec2();
+	private final Vec2 colPPe = new Vec2();
+	private final Vec2 colPPp = new Vec2();
+	private final Vec2 colPPd = new Vec2();
 
 	/**
 	 * puts collision information into the manifold about the collision between a polygon and a point
@@ -460,7 +461,7 @@ public class CollidePoly {
 	 * @param point
 	 * @param xf2
 	 */
-	public final static void collidePolygonAndPoint(final Manifold manifold,
+	public final void collidePolygonAndPoint(final Manifold manifold,
 	                                                final PolygonShape polygon, final XForm xf1,
 	                                                final PointShape point, final XForm xf2) {
 
@@ -558,14 +559,14 @@ public class CollidePoly {
 	}
 
 	// djm pooled
-	private final static Vec2 PEv1 = new Vec2();
-	private final static Vec2 PEv2 = new Vec2();
-	private final static Vec2 PEn = new Vec2();
-	private final static Vec2 PEv1Local = new Vec2();
-	private final static Vec2 PEv2Local = new Vec2();
-	private final static Vec2 PEnLocal = new Vec2();
-	private final static Vec2 temp = new Vec2();
-	private final static Vec2 temp2 = new Vec2();
+	private final Vec2 PEv1 = new Vec2();
+	private final Vec2 PEv2 = new Vec2();
+	private final Vec2 PEn = new Vec2();
+	private final Vec2 PEv1Local = new Vec2();
+	private final Vec2 PEv2Local = new Vec2();
+	private final Vec2 PEnLocal = new Vec2();
+	private final Vec2 temp = new Vec2();
+	private final Vec2 temp2 = new Vec2();
 	/**
 	 * puts collision information into the manifold about a collision between
 	 * a polygon and an edge
@@ -575,7 +576,7 @@ public class CollidePoly {
 	 * @param edge
 	 * @param xf2
 	 */
-	public static final void collidePolyAndEdge(final Manifold manifold,
+	public final void collidePolyAndEdge(final Manifold manifold,
 	                                            final PolygonShape polygon,
 	                                            final XForm xf1,
 	                                            final EdgeShape edge,
@@ -808,14 +809,14 @@ public class CollidePoly {
 	}
 
 	// "Pool" objects
-	static private final Vec2 sideNormal = new Vec2();
-	static private final Vec2 frontNormal = new Vec2();
+	private final Vec2 sideNormal = new Vec2();
+	private final Vec2 frontNormal = new Vec2();
 
-	static private final XForm p_xf1 = new XForm();
-	static private final XForm p_xf2 = new XForm();
+	private final XForm p_xf1 = new XForm();
+	private final XForm p_xf2 = new XForm();
 }
 
-/** Holder class used internally in CollidePoly. */
+/** Holder class used internally in CollidePoly */
 class MaxSeparation {
 	public int bestFaceIndex;
 	public float bestSeparation;

@@ -39,10 +39,10 @@ import org.jbox2d.common.XForm;
 public class CollideCircle {
 
 	// djm pooled
-	private final static Vec2 colCCP1 = new Vec2();
-	private final static Vec2 colCCP2 = new Vec2();
-	private final static Vec2 colCCD = new Vec2();
-	private final static Vec2 colCCP = new Vec2();
+	private final Vec2 colCCP1 = new Vec2();
+	private final Vec2 colCCP2 = new Vec2();
+	private final Vec2 colCCD = new Vec2();
+	private final Vec2 colCCP = new Vec2();
 
 	/**
 	 * puts collision information of the two circles in the manifold
@@ -53,7 +53,7 @@ public class CollideCircle {
 	 * @param xf2
 	 */
 	// djm optimized
-	public final static void collideCircles(final Manifold manifold,
+	public final void collideCircles(final Manifold manifold,
 	                                        final CircleShape circle1, final XForm xf1,
 	                                        final CircleShape circle2, final XForm xf2) {
 		manifold.pointCount = 0;
@@ -103,10 +103,10 @@ public class CollideCircle {
 	}
 
 	// djm pooled
-	private final static Vec2 colPCP1 = new Vec2();
-	private final static Vec2 colPCP2 = new Vec2();
-	private final static Vec2 colPCD = new Vec2();
-	private final static Vec2 colPCP = new Vec2();
+	private final Vec2 colPCP1 = new Vec2();
+	private final Vec2 colPCP2 = new Vec2();
+	private final Vec2 colPCD = new Vec2();
+	private final Vec2 colPCP = new Vec2();
 
 	/**
 	 * Puts collision information in the manifold about a collision between a point and a circle
@@ -117,7 +117,7 @@ public class CollideCircle {
 	 * @param xf2
 	 */
 	// djm optimized
-	public final static void collidePointAndCircle(final Manifold manifold,
+	public final void collidePointAndCircle(final Manifold manifold,
 	                                               final PointShape point1, final XForm xf1,
 	                                               final CircleShape circle2, final XForm xf2) {
 		manifold.pointCount = 0;
@@ -172,7 +172,7 @@ public class CollideCircle {
 	 * @param circle
 	 * @param xf2
 	 */
-	public final static void collidePolygonAndCircle(final Manifold manifold,
+	public final void collidePolygonAndCircle(final Manifold manifold,
 	                                                 final PolygonShape polygon, final XForm xf1,
 	                                                 final CircleShape circle, final XForm xf2) {
 
@@ -330,10 +330,10 @@ public class CollideCircle {
 		manifold.points[0].id.features.flip = 0;
 	}
 
-	private final static Vec2 ECd = new Vec2();
-	private final static Vec2 ECc = new Vec2();
-	//private static Vec2 ECcLocalSubV1 = new Vec2();
-	private final static Vec2 ECcLocal = new Vec2();
+	private final Vec2 ECd = new Vec2();
+	private final Vec2 ECc = new Vec2();
+	//private Vec2 ECcLocalSubV1 = new Vec2();
+	private final Vec2 ECcLocal = new Vec2();
 
 	/**
 	 * puts collision information into the manifold from a circle and edge collision
@@ -343,7 +343,7 @@ public class CollideCircle {
 	 * @param circle
 	 * @param xf2
 	 */
-	public final static void collideEdgeAndCircle(final Manifold manifold,
+	public final void collideEdgeAndCircle(final Manifold manifold,
 	                                              final EdgeShape edge, final XForm xf1,
 	                                              final CircleShape circle, final XForm xf2) {
 		manifold.pointCount = 0;

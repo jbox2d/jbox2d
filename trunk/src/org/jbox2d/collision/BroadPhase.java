@@ -25,18 +25,9 @@ package org.jbox2d.collision;
 
 //Version: b2BroadPhase.h/.cpp rev 108->139
 import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
-
-class BoundValues {
-	public final int[] lowerValues;
-	public final int[] upperValues;
-
-	public BoundValues() {
-		lowerValues = new int[2];
-		upperValues = new int[2];
-	}
-}
 
 /**
  * This broad phase uses the Sweep and Prune algorithm as described in:
@@ -424,9 +415,6 @@ public class BroadPhase {
 		}
 	}
 
-	private final BoundValues newValues = new BoundValues();
-	private final BoundValues oldValues = new BoundValues();
-
 	// Call MoveProxy as many times as you like, then when you are done
 	// call Flush to finalized the proxy pairs (for your time step).
 	/** internal */
@@ -434,6 +422,9 @@ public class BroadPhase {
 		if ( BroadPhase.debugPrint) {
 			System.out.println( "MoveProxy()");
 		}
+		
+		BoundValues newValues = ObjectPool.getBoundValues();
+		BoundValues oldValues = ObjectPool.getBoundValues();
 
 		if ( proxyId == PairManager.NULL_PROXY || Settings.maxProxies <= proxyId) { return; }
 
@@ -610,6 +601,8 @@ public class BroadPhase {
 		if ( BroadPhase.s_validate) {
 			validate();
 		}
+		ObjectPool.returnBoundValues( oldValues);
+		ObjectPool.returnBoundValues( newValues);
 	}
 
 	public void commit() {

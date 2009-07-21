@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jbox2d.common.Mat22;
+import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.DebugDraw;
 
@@ -117,6 +118,8 @@ public class TestbedMain extends PApplet {
 //    	smooth();
     	frameRate(targetFPS);
     	g = new ProcessingDebugDraw(this);
+    	
+    	ObjectPool.initPools();
     	
     	for (int i=0; i<100; ++i) {
     		this.requestFocus();

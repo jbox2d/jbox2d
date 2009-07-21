@@ -29,10 +29,10 @@ import java.util.List;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.collision.shapes.CircleShape;
-import org.jbox2d.collision.shapes.CollideCircle;
 import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.ShapeType;
+import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.ContactListener;
@@ -84,7 +84,7 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 
 		m0.set(m_manifold);
 
-		CollideCircle.collideEdgeAndCircle(m_manifold, (EdgeShape)m_shape1, b1.getMemberXForm(), (CircleShape)m_shape2, b2.getMemberXForm());
+		ObjectPool.getCollideCircle().collideEdgeAndCircle(m_manifold, (EdgeShape)m_shape1, b1.getMemberXForm(), (CircleShape)m_shape2, b2.getMemberXForm());
 
 		cp.shape1 = m_shape1;
 		cp.shape2 = m_shape2;
