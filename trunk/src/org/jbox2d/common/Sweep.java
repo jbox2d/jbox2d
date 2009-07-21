@@ -56,6 +56,16 @@ public class Sweep {
 		c0 = new Vec2();
 		c = new Vec2();
 	}
+	
+	public Sweep set(Sweep argCloneFrom){
+		localCenter.set(argCloneFrom.localCenter);
+		c0.set( argCloneFrom.c0);
+		c.set( argCloneFrom.c);
+		a0 = argCloneFrom.a0;
+		a = argCloneFrom.a;
+		t0 = argCloneFrom.t0;
+		return this;
+	}
 
 	/**
 	 * Get the interpolated transform at a specific time.
