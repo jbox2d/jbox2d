@@ -137,4 +137,39 @@ public final class ObjectPool {
 		pool.push(argToRecycle);
 	}
 
+	public static final Manifold getManifold() {
+		Stack<Manifold> pool = manifoldPool.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() for each thread";
+
+		if (pool.isEmpty()) {
+			pool.push(new Manifold());
+			pool.push(new Manifold());
+			pool.push(new Manifold());
+			pool.push(new Manifold());
+			pool.push(new Manifold());
+		}
+
+		return pool.pop();
+	}
+
+	public static final Manifold getManifold(Manifold toCopy) {
+		Stack<Manifold> pool = manifoldPool.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() for each thread";
+
+		if (pool.isEmpty()) {
+			pool.push(new Manifold());
+			pool.push(new Manifold());
+			pool.push(new Manifold());
+			pool.push(new Manifold());
+			pool.push(new Manifold());
+		}
+
+		return pool.pop().set(toCopy);
+	}
+
+	public static final void returnManifold(Manifold argToRecycle) {
+		Stack<Manifold> pool = manifoldPool.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() for each thread";
+		pool.push(argToRecycle);
+	}
 }
