@@ -145,9 +145,9 @@ public class TOI {
 			++iter;
 		}
 
+		ObjectPool.returnVec2(p1);
 		ObjectPool.returnVec2(p2);
-		ObjectPool.returnVec2(p2);
-		ObjectPool.returnXForm(xf2);
+		ObjectPool.returnXForm(xf1);
 		ObjectPool.returnXForm(xf2);
 		return alpha;
 	}
