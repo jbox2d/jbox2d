@@ -214,7 +214,7 @@ public class World {
 		m_lock = false;
 
 		m_allowSleep = doSleep;
-
+		
 		m_gravity = gravity;
 
 		m_contactManager = new ContactManager();
@@ -1058,10 +1058,12 @@ public class World {
 	// NOTE this corresponds to the liquid test, so the debugdraw can draw
 	// the liquid particles correctly.  They should be the same.
 	private static Integer LIQUID_INT = new Integer(12345);
-	private float liquidLength = .02f;
+	private float liquidLength = .1f;
+	private float averageLinearVel = -1;
 	// djm pooled
 	private final Color3f coreColor = new Color3f(255f*0.9f, 255f*0.6f, 255f*0.6f);
 	private final Vec2 drawingCenter = new Vec2();
+	private final Vec2 liquidOffset = new Vec2();
 	private final Vec2 circCenterMoved = new Vec2();
 	private final Color3f liquidColor = new Color3f(80.0f,80.0f,255f);
 	private final Vec2 segLeft = new Vec2();
@@ -1078,10 +1080,16 @@ public class World {
 			
 			if (circle.getUserData() != null && circle.getUserData().equals(LIQUID_INT)) {
 				Body b = circle.getBody();
-				circCenterMoved.set(b.m_linearVelocity);
-				circCenterMoved.normalize();
-				circCenterMoved.mulLocal( liquidLength);
-				circCenterMoved.addLocal( drawingCenter);
+				liquidOffset.set(b.m_linearVelocity);
+				float linVelLength = b.m_linearVelocity.length();
+				if(averageLinearVel == -1){
+					averageLinearVel = linVelLength;
+				}else{
+					averageLinearVel = .98f * averageLinearVel + .02f * linVelLength;
+				}
+				liquidOffset.mulLocal( liquidLength/averageLinearVel/2);
+				circCenterMoved.set(drawingCenter).addLocal( liquidOffset);
+				drawingCenter.subLocal(liquidOffset);
 				m_debugDraw.drawSegment(drawingCenter, circCenterMoved, liquidColor);
 				return;
 			}
