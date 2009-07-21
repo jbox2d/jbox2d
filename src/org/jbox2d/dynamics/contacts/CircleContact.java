@@ -29,9 +29,9 @@ import java.util.List;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.collision.shapes.CircleShape;
-import org.jbox2d.collision.shapes.CollideCircle;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.ShapeType;
+import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.ContactListener;
@@ -105,7 +105,7 @@ public class CircleContact extends Contact implements ContactCreateFcn {
         }
         m0.pointCount = m_manifold.pointCount;*/
 
-		CollideCircle.collideCircles(m_manifold, (CircleShape)m_shape1, b1.m_xf, (CircleShape)m_shape2, b2.m_xf);
+		ObjectPool.getCollideCircle().collideCircles(m_manifold, (CircleShape)m_shape1, b1.m_xf, (CircleShape)m_shape2, b2.m_xf);
 
 		cp.shape1 = m_shape1;
 		cp.shape2 = m_shape2;

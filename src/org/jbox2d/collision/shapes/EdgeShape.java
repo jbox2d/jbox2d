@@ -5,6 +5,7 @@ import org.jbox2d.collision.MassData;
 import org.jbox2d.collision.Segment;
 import org.jbox2d.collision.SegmentCollide;
 import org.jbox2d.collision.SupportsGenericDistance;
+import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.RaycastResult;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
@@ -94,17 +95,18 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 		return false;
 	}
 
-	// djm pooled
-	private final Vec2 r = new Vec2();
-	private final Vec2 v1 = new Vec2();
-	private final Vec2 d = new Vec2();
-	private final Vec2 n = new Vec2();
-	private final Vec2 b = new Vec2();
 	/**
 	 * @see Shape#testSegment(XForm, RaycastResult, Segment, float)
 	 */
 	@Override
 	public SegmentCollide testSegment(final XForm xf, final RaycastResult out, final Segment segment, final float maxLambda){
+		final Vec2 r = ObjectPool.getVec2();
+		final Vec2 v1 = ObjectPool.getVec2();
+		final Vec2 d = ObjectPool.getVec2();
+		final Vec2 n = ObjectPool.getVec2();
+		final Vec2 b = ObjectPool.getVec2();
+		
+		
 		r.set(segment.p2).subLocal(segment.p1);
 		XForm.mulToOut( xf, m_v1, v1);
 		XForm.mulToOut( xf, m_v2, d);
@@ -132,11 +134,21 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 					n.normalize();
 					out.lambda = a;
 					out.normal.set(n);
+					ObjectPool.returnVec2(r);
+					ObjectPool.returnVec2(v1);
+					ObjectPool.returnVec2(d);
+					ObjectPool.returnVec2(n);
+					ObjectPool.returnVec2(b);
 					return SegmentCollide.HIT_COLLIDE;
 				}
 			}
 		}
-
+		
+		ObjectPool.returnVec2(r);
+		ObjectPool.returnVec2(v1);
+		ObjectPool.returnVec2(d);
+		ObjectPool.returnVec2(n);
+		ObjectPool.returnVec2(b);
 		return SegmentCollide.MISS_COLLIDE;
 	}
 
@@ -150,21 +162,19 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 		aabb.lowerBound = Vec2.min(v1, v2);
 		aabb.upperBound = Vec2.max(v1, v2);*/
 
-		// djm we avoid one creation. crafty huh?  i won't bother
-		// pooling one creation, as this method isn't hot
+		// djm we avoid one creation. crafty huh?
 		XForm.mulToOut(transform, m_v1, aabb.lowerBound);
-		final Vec2 v2 = XForm.mul(transform, m_v2);
+		final Vec2 v2 = ObjectPool.getVec2();
+		XForm.mulToOut(transform, m_v2, v2);
 
 		Vec2.maxToOut(aabb.lowerBound, v2, aabb.upperBound);
 		Vec2.minToOut(aabb.lowerBound, v2, aabb.lowerBound);
+		ObjectPool.returnVec2(v2);
 	}
 
 	// djm pooling
 
-	private final Vec2 sweptV1 = new Vec2();
-	private final Vec2 sweptV2 = new Vec2();
-	private final Vec2 sweptV3 = new Vec2();
-	private final Vec2 sweptV4 = new Vec2();
+	
 
 	/**
 	 * @see Shape#computeSweptAABB(AABB, XForm, XForm)
@@ -172,7 +182,11 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 	@Override
 	public void computeSweptAABB(final AABB aabb, final XForm transform1, final XForm transform2) {
 		// djm this method is pretty hot (called every time step)
-
+		 final Vec2 sweptV1 = ObjectPool.getVec2();
+		 final Vec2 sweptV2 = ObjectPool.getVec2();
+		 final Vec2 sweptV3 = ObjectPool.getVec2();
+		 final Vec2 sweptV4 = ObjectPool.getVec2();
+		
 		XForm.mulToOut(transform1, m_v1, sweptV1);
 		XForm.mulToOut(transform1, m_v2, sweptV2);
 		XForm.mulToOut(transform2, m_v1, sweptV3);
@@ -189,6 +203,11 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 		Vec2.maxToOut( sweptV1, sweptV2, aabb.upperBound);
 		Vec2.maxToOut( aabb.upperBound, sweptV3, aabb.upperBound);
 		Vec2.maxToOut( aabb.upperBound, sweptV4, aabb.upperBound);
+		
+		ObjectPool.returnVec2(sweptV1);
+		ObjectPool.returnVec2(sweptV2);
+		ObjectPool.returnVec2(sweptV3);
+		ObjectPool.returnVec2(sweptV4);
 	}
 
 	/**
@@ -203,16 +222,20 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 		massData.I = 0;
 	}
 
-	// djm pooled
-	private final Vec2 supportV1 = new Vec2();
-	private final Vec2 supportV2 = new Vec2();
+	
 	/**
 	 * @see SupportsGenericDistance#support(Vec2, XForm, Vec2)
 	 */
 	public void support(final Vec2 dest, final XForm xf, final Vec2 d) {
+		 final Vec2 supportV1 = ObjectPool.getVec2();
+		 final Vec2 supportV2 = ObjectPool.getVec2();
+		
 		XForm.mulToOut(xf, m_coreV1, supportV1);
 		XForm.mulToOut(xf, m_coreV2, supportV2);
 		dest.set(Vec2.dot(supportV1, d) > Vec2.dot(supportV2, d) ? supportV1 : supportV2);
+		
+		ObjectPool.returnVec2(supportV1);
+		ObjectPool.returnVec2(supportV2);
 	}
 
 	public void setPrevEdge(final EdgeShape edge, final Vec2 core, final Vec2 cornerDir, final boolean convex) {
@@ -298,13 +321,15 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 	}
 	
 	// djm pooled, and from above
-	private Vec2 v0 = new Vec2();
-	private Vec2 v2 = new Vec2();
-	private Vec2 e1 = new Vec2();
-	private Vec2 e2 = new Vec2();
-	private Vec2 temp = new Vec2();
+	
 	
 	public float computeSubmergedArea(final Vec2 normal,float offset,XForm xf,Vec2 c) {
+		final Vec2 v0 = ObjectPool.getVec2();
+		final Vec2 v1 = ObjectPool.getVec2();
+		final Vec2 v2 = ObjectPool.getVec2();
+		final Vec2 temp = ObjectPool.getVec2();
+		
+		
 		//Note that v0 is independent of any details of the specific edge
 		//We are relying on v0 being consistent between multiple edges of the same body
 		v0.set(normal).mul(offset);
@@ -320,6 +345,10 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 		{
 			if (d2 > 0.0f)
 			{
+				ObjectPool.returnVec2(v0);
+				ObjectPool.returnVec2(v1);
+				ObjectPool.returnVec2(v2);
+				ObjectPool.returnVec2(temp);
 				return 0.0f;
 			}
 			else
@@ -341,6 +370,9 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 			}
 		}
 
+		final Vec2 e1 = ObjectPool.getVec2();
+		final Vec2 e2 = ObjectPool.getVec2();
+		
 		// v0,v1,v2 represents a fully submerged triangle
 		float k_inv3 = 1.0f / 3.0f;
 
@@ -350,8 +382,17 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 
 		e1.set(v1).subLocal(v0);
 		e2.set(v2).subLocal(v0);
-
-		return 0.5f * Vec2.cross(e1, e2);
+		
+		float ret = 0.5f * Vec2.cross(e1, e2);
+		
+		ObjectPool.returnVec2(v0);
+		ObjectPool.returnVec2(v1);
+		ObjectPool.returnVec2(v2);
+		ObjectPool.returnVec2(e1);
+		ObjectPool.returnVec2(e2);
+		ObjectPool.returnVec2(temp);
+		
+		return ret;
 	}
 
 }

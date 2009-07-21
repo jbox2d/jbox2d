@@ -34,6 +34,7 @@ import org.jbox2d.collision.shapes.CollideCircle;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.ShapeType;
+import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.ContactListener;
@@ -111,7 +112,7 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
 		//memcpy(&m0, &m_manifold, sizeof(b2Manifold));
 		m0.set(m_manifold);
 
-		CollideCircle.collidePolygonAndCircle(m_manifold, (PolygonShape)m_shape1, b1.getMemberXForm(), (CircleShape)m_shape2, b2.getMemberXForm());
+		ObjectPool.getCollideCircle().collidePolygonAndCircle(m_manifold, (PolygonShape)m_shape1, b1.getMemberXForm(), (CircleShape)m_shape2, b2.getMemberXForm());
 
 		final boolean[] persisted= {false, false};
 

@@ -23,6 +23,7 @@
 
 package org.jbox2d.collision;
 
+import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.RaycastResult;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
@@ -60,18 +61,15 @@ public class Segment {
 	// a = det[b d] / denom
 	// mu2 = det[-r b] / denom*/
 	
-	// djm: pooled
-	private final Vec2 r = new Vec2();
-	private final Vec2 d = new Vec2();
-	private final Vec2 n = new Vec2();
-	private final Vec2 b = new Vec2();
 	public boolean testSegment(RaycastResult out, Segment segment, float maxLambda) {
 		Vec2 s = segment.p1;
-		r.set(segment.p2);
+		Vec2 r = ObjectPool.getVec2(segment.p2);
 		r.subLocal(s);
-		d.set(p2);
+		Vec2 d = ObjectPool.getVec2(p2);
 		d.subLocal(p1);
+		Vec2 n = ObjectPool.getVec2();
 		Vec2.crossToOut(d, 1.0f, n);
+		Vec2 b = ObjectPool.getVec2();
 
 		float k_slop = 100.0f * Settings.EPSILON;
 		float denom = -Vec2.dot(r, n);
@@ -93,11 +91,19 @@ public class Segment {
 					n.normalize();
 					out.lambda = a;
 					out.normal.set(n);
+					ObjectPool.returnVec2(r);
+					ObjectPool.returnVec2(d);
+					ObjectPool.returnVec2(n);
+					ObjectPool.returnVec2(b);
 					return true;
 				}
 			}
 		}
 
+		ObjectPool.returnVec2(r);
+		ObjectPool.returnVec2(d);
+		ObjectPool.returnVec2(n);
+		ObjectPool.returnVec2(b);
 		return false;
 	}
 }

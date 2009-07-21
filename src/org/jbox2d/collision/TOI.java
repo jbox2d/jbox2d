@@ -24,6 +24,7 @@
 package org.jbox2d.collision;
 
 import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Sweep;
 import org.jbox2d.common.Vec2;
@@ -34,11 +35,6 @@ import org.jbox2d.common.XForm;
 /** Handles conservative advancement to compute time of impact between shapes. */
 public class TOI {
 
-	// These are used to avoid allocations on a hot path:
-	private static final Vec2 p1 = new Vec2();
-	private static final Vec2 p2 = new Vec2();
-	private static final XForm xf1 = new XForm();
-	private static final XForm xf2 = new XForm();
 
 	// This algorithm uses conservative advancement to compute the time of
 	// impact (TOI) of two shapes.
@@ -53,6 +49,10 @@ public class TOI {
 	public static final float timeOfImpact(final Shape shape1, final Sweep sweep1,
 	                                       final Shape shape2, final Sweep sweep2) {
 
+		final XForm xf1 = ObjectPool.getXForm();
+		final XForm xf2 = ObjectPool.getXForm();
+		final Vec2 p1 = ObjectPool.getVec2();
+		final Vec2 p2 = ObjectPool.getVec2();
 		final float r1 = shape1.getSweepRadius();
 		final float r2 = shape2.getSweepRadius();
 
@@ -78,11 +78,11 @@ public class TOI {
 		float targetDistance = 0.0f;
 		while(true){
 			final float t = (1.0f - alpha) * t0 + alpha;
-			sweep1.getXForm(TOI.xf1, t);
-			sweep2.getXForm(TOI.xf2, t);
+			sweep1.getXForm(xf1, t);
+			sweep2.getXForm(xf2, t);
 
 			// Get the distance between shapes.
-			distance = Distance.distance(TOI.p1, TOI.p2, shape1, TOI.xf1, shape2, TOI.xf2);
+			distance = ObjectPool.getDistance().distance(p1, p2, shape1, xf1, shape2, xf2);
 			//System.out.println("Distance: "+distance + " alpha: "+alpha);
 
 			if (iter == 0) {
@@ -103,8 +103,8 @@ public class TOI {
 			// INLINED
 			//normal = p2.sub(p1);
 			//normal.normalize();
-			float normalx = TOI.p2.x - TOI.p1.x;
-			float normaly = TOI.p2.y - TOI.p1.y;
+			float normalx = p2.x - p1.x;
+			float normaly = p2.y - p1.y;
 			final float lenSqrd = normalx * normalx + normaly * normaly;
 			if (lenSqrd >= Settings.EPSILON*Settings.EPSILON) {
 				final float length = (float) Math.sqrt(lenSqrd);
@@ -145,6 +145,10 @@ public class TOI {
 			++iter;
 		}
 
+		ObjectPool.returnVec2(p2);
+		ObjectPool.returnVec2(p2);
+		ObjectPool.returnXForm(xf2);
+		ObjectPool.returnXForm(xf2);
 		return alpha;
 	}
 }
