@@ -10,9 +10,11 @@ public final class ObjectPool {
 	private static final HashMap<Thread, Stack<Vec2>> vec2Pool = new HashMap<Thread, Stack<Vec2>>();
 	private static final HashMap<Thread, Stack<Mat22>> mat22Pool = new HashMap<Thread, Stack<Mat22>>();
 	private static final HashMap<Thread, Stack<XForm>> xFormPool = new HashMap<Thread, Stack<XForm>>();
+	private static final HashMap<Thread, Stack<Sweep>> sweepPool = new HashMap<Thread, Stack<Sweep>>();
 	private static final HashMap<Thread, Stack<Manifold>> manifoldPool = new HashMap<Thread, Stack<Manifold>>();
 	private static final HashMap<Thread, Stack<ContactPoint>> contactPointPool = new HashMap<Thread, Stack<ContactPoint>>();
-
+	private static final HashMap<Thread, Stack<RaycastResult>> raycastResultPool = new HashMap<Thread, Stack<RaycastResult>>();
+	
 	private ObjectPool() {
 	};
 
@@ -25,8 +27,10 @@ public final class ObjectPool {
 		vec2Pool.put(Thread.currentThread(), new Stack<Vec2>());
 		mat22Pool.put(Thread.currentThread(), new Stack<Mat22>());
 		xFormPool.put(Thread.currentThread(), new Stack<XForm>());
+		sweepPool.put(Thread.currentThread(), new Stack<Sweep>());
 		manifoldPool.put(Thread.currentThread(), new Stack<Manifold>());
 		contactPointPool.put(Thread.currentThread(), new Stack<ContactPoint>());
+		raycastResultPool.put(Thread.currentThread(), new Stack<RaycastResult>());
 	}
 
 	public static final Vec2 getVec2() {
@@ -136,6 +140,42 @@ public final class ObjectPool {
 		assert (pool != null) : "Pool was null, make sure you call initPools() for each thread";
 		pool.push(argToRecycle);
 	}
+	
+	public static final Sweep getSweep() {
+		Stack<Sweep> pool = sweepPool.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() for each thread";
+
+		if (pool.isEmpty()) {
+			pool.push(new Sweep());
+			pool.push(new Sweep());
+			pool.push(new Sweep());
+			pool.push(new Sweep());
+			pool.push(new Sweep());
+		}
+
+		return pool.pop();
+	}
+
+	public static final Sweep getSweep(Sweep toCopy) {
+		Stack<Sweep> pool = sweepPool.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() for each thread";
+
+		if (pool.isEmpty()) {
+			pool.push(new Sweep());
+			pool.push(new Sweep());
+			pool.push(new Sweep());
+			pool.push(new Sweep());
+			pool.push(new Sweep());
+		}
+
+		return pool.pop().set(toCopy);
+	}
+
+	public static final void returnSweep(Sweep argToRecycle) {
+		Stack<Sweep> pool = sweepPool.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() for each thread";
+		pool.push(argToRecycle);
+	}
 
 	public static final Manifold getManifold() {
 		Stack<Manifold> pool = manifoldPool.get(Thread.currentThread());
@@ -169,6 +209,42 @@ public final class ObjectPool {
 
 	public static final void returnManifold(Manifold argToRecycle) {
 		Stack<Manifold> pool = manifoldPool.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() for each thread";
+		pool.push(argToRecycle);
+	}
+	
+	public static final RaycastResult getRaycastResult() {
+		Stack<RaycastResult> pool = raycastResultPool.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() for each thread";
+
+		if (pool.isEmpty()) {
+			pool.push(new RaycastResult());
+			pool.push(new RaycastResult());
+			pool.push(new RaycastResult());
+			pool.push(new RaycastResult());
+			pool.push(new RaycastResult());
+		}
+
+		return pool.pop();
+	}
+
+	public static final RaycastResult getRaycastResult(RaycastResult toCopy) {
+		Stack<RaycastResult> pool = raycastResultPool.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() for each thread";
+
+		if (pool.isEmpty()) {
+			pool.push(new RaycastResult());
+			pool.push(new RaycastResult());
+			pool.push(new RaycastResult());
+			pool.push(new RaycastResult());
+			pool.push(new RaycastResult());
+		}
+
+		return pool.pop().set(toCopy);
+	}
+
+	public static final void returnRaycastResult(RaycastResult argToRecycle) {
+		Stack<RaycastResult> pool = raycastResultPool.get(Thread.currentThread());
 		assert (pool != null) : "Pool was null, make sure you call initPools() for each thread";
 		pool.push(argToRecycle);
 	}
