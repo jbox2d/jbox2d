@@ -3,9 +3,11 @@ package org.jbox2d.common;
 import java.util.HashMap;
 import java.util.Stack;
 
+import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.BoundValues;
 import org.jbox2d.collision.Distance;
 import org.jbox2d.collision.Manifold;
+import org.jbox2d.collision.MassData;
 import org.jbox2d.collision.shapes.CollideCircle;
 import org.jbox2d.collision.shapes.CollidePoly;
 import org.jbox2d.dynamics.contacts.ContactPoint;
@@ -15,6 +17,8 @@ public final class ObjectPool {
 	private static final HashMap<Thread, Stack<Mat22>> mat22Pool = new HashMap<Thread, Stack<Mat22>>();
 	private static final HashMap<Thread, Stack<XForm>> xFormPool = new HashMap<Thread, Stack<XForm>>();
 	private static final HashMap<Thread, Stack<Sweep>> sweepPool = new HashMap<Thread, Stack<Sweep>>();
+	private static final HashMap<Thread, Stack<AABB>> aabbPool = new HashMap<Thread, Stack<AABB>>();
+	private static final HashMap<Thread, Stack<MassData>> massPool = new HashMap<Thread, Stack<MassData>>();
 	private static final HashMap<Thread, Stack<Manifold>> manifoldPool = new HashMap<Thread, Stack<Manifold>>();
 	private static final HashMap<Thread, Stack<ContactPoint>> contactPointPool = new HashMap<Thread, Stack<ContactPoint>>();
 	private static final HashMap<Thread, Stack<RaycastResult>> raycastResultPool = new HashMap<Thread, Stack<RaycastResult>>();
@@ -36,6 +40,8 @@ public final class ObjectPool {
 		mat22Pool.put(Thread.currentThread(), new Stack<Mat22>());
 		xFormPool.put(Thread.currentThread(), new Stack<XForm>());
 		sweepPool.put(Thread.currentThread(), new Stack<Sweep>());
+		aabbPool.put(Thread.currentThread(), new Stack<AABB>());
+		massPool.put(Thread.currentThread(), new Stack<MassData>());
 		manifoldPool.put(Thread.currentThread(), new Stack<Manifold>());
 		contactPointPool.put(Thread.currentThread(), new Stack<ContactPoint>());
 		raycastResultPool.put(Thread.currentThread(), new Stack<RaycastResult>());
@@ -185,6 +191,78 @@ public final class ObjectPool {
 
 	public static final void returnSweep(Sweep argToRecycle) {
 		Stack<Sweep> pool = sweepPool.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() once in each thread";
+		pool.push(argToRecycle);
+	}
+	
+	public static final AABB getAABB() {
+		Stack<AABB> pool = aabbPool.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() once in each thread";
+
+		if (pool.isEmpty()) {
+			pool.push(new AABB());
+			pool.push(new AABB());
+			pool.push(new AABB());
+			pool.push(new AABB());
+			pool.push(new AABB());
+		}
+
+		return pool.pop();
+	}
+
+	public static final AABB getAABB(AABB toCopy) {
+		Stack<AABB> pool = aabbPool.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() once in each thread";
+
+		if (pool.isEmpty()) {
+			pool.push(new AABB());
+			pool.push(new AABB());
+			pool.push(new AABB());
+			pool.push(new AABB());
+			pool.push(new AABB());
+		}
+
+		return pool.pop().set(toCopy);
+	}
+
+	public static final void returnAABB(AABB argToRecycle) {
+		Stack<AABB> pool = aabbPool.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() once in each thread";
+		pool.push(argToRecycle);
+	}
+	
+	public static final MassData getMassData() {
+		Stack<MassData> pool = massPool.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() once in each thread";
+
+		if (pool.isEmpty()) {
+			pool.push(new MassData());
+			pool.push(new MassData());
+			pool.push(new MassData());
+			pool.push(new MassData());
+			pool.push(new MassData());
+		}
+
+		return pool.pop();
+	}
+
+	public static final MassData getMassData(MassData toCopy) {
+		Stack<MassData> pool = massPool.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() once in each thread";
+
+		if (pool.isEmpty()) {
+			pool.push(new MassData());
+			pool.push(new MassData());
+			pool.push(new MassData());
+			pool.push(new MassData());
+			pool.push(new MassData());
+		}
+
+		return pool.pop().set(toCopy);
+	}
+
+	public static final void returnMassData(MassData argToRecycle) {
+		Stack<MassData> pool = massPool.get(Thread.currentThread());
 		assert (pool != null) : "Pool was null, make sure you call initPools() once in each thread";
 		pool.push(argToRecycle);
 	}

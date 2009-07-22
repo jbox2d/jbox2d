@@ -246,6 +246,7 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 	}
 
 	public void setNextEdge(final EdgeShape edge, final Vec2 core, final Vec2 cornerDir, final boolean convex) {
+		// djm note: the vec2s are probably pooled, don't use them
 		m_nextEdge = edge;
 		m_coreV2.set(core);
 		m_cornerDir2.set(cornerDir);
