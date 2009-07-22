@@ -23,9 +23,6 @@
 
 package org.jbox2d.collision;
 
-//Version: b2BroadPhase.h/.cpp rev 108->139
-import java.util.LinkedList;
-
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.Settings;

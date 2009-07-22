@@ -24,8 +24,6 @@
 package org.jbox2d.dynamics;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.BroadPhase;
 import org.jbox2d.collision.OBB;
