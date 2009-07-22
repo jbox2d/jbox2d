@@ -24,6 +24,8 @@
 package org.jbox2d.collision;
 
 //Version: b2BroadPhase.h/.cpp rev 108->139
+import java.util.LinkedList;
+
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.Settings;
@@ -234,18 +236,18 @@ public class BroadPhase {
 
 		final int boundCount = 2 * m_proxyCount;
 
-		final int lowerValues[] = new int[2];
-		final int upperValues[] = new int[2];
+		final Integer lowerValues[] = ObjectPool.getTwoInts();
+		final Integer upperValues[] = ObjectPool.getTwoInts();
+		final Integer[] indexes = ObjectPool.getTwoInts();
 		computeBounds( lowerValues, upperValues, aabb);
 
 		for ( int axis = 0; axis < 2; ++axis) {
 			final Bound[] bounds = m_bounds[axis];
-			final int[] indexes = new int[2];
 
 			query( indexes, lowerValues[axis], upperValues[axis], bounds, boundCount, axis);
 			final int lowerIndex = indexes[0];
 			int upperIndex = indexes[1];
-
+			
 			// System.out.println(edgeCount + ", "+lowerValues[axis] + ",
 			// "+upperValues[axis]);
 			// memmove(bounds[upperIndex + 2], bounds[upperIndex],
@@ -327,6 +329,10 @@ public class BroadPhase {
 		m_queryResultCount = 0;
 		incrementTimeStamp();
 
+		ObjectPool.returnTwoInts(lowerValues);
+		ObjectPool.returnTwoInts(upperValues);
+		ObjectPool.returnTwoInts(indexes);
+		
 		return proxyId;
 	}
 
@@ -337,6 +343,8 @@ public class BroadPhase {
 
 		final int boundCount = 2 * m_proxyCount;
 
+		final Integer[] ignored = ObjectPool.getTwoInts();
+		
 		for ( int axis = 0; axis < 2; ++axis) {
 			final Bound[] bounds = m_bounds[axis];
 
@@ -380,10 +388,9 @@ public class BroadPhase {
 
 			// Query for pairs to be removed. lowerIndex and upperIndex are not
 			// needed.
-			final int[] ignored = new int[2];
 			query( ignored, lowerValue, upperValue, bounds, boundCount - 2, axis);
 		}
-
+		
 		assert (m_queryResultCount < Settings.maxProxies);
 
 		for ( int i = 0; i < m_queryResultCount; ++i) {
@@ -413,6 +420,8 @@ public class BroadPhase {
 		if ( BroadPhase.s_validate) {
 			validate();
 		}
+		
+		ObjectPool.returnTwoInts(ignored);
 	}
 
 	// Call MoveProxy as many times as you like, then when you are done
@@ -618,19 +627,18 @@ public class BroadPhase {
 			System.out.println( "Query(2 args)");
 		}
 
-		final int lowerValues[] = new int[2];
-		final int upperValues[] = new int[2];
+		final Integer lowerValues[] = ObjectPool.getTwoInts();
+		final Integer upperValues[] = ObjectPool.getTwoInts();
 		computeBounds( lowerValues, upperValues, aabb);
 
-		final int indexes[] = new int[2]; // lowerIndex, upperIndex;
+		final Integer indexes[] = ObjectPool.getTwoInts(); // lowerIndex, upperIndex;
 
 		query( indexes, lowerValues[0], upperValues[0], m_bounds[0], 2 * m_proxyCount, 0);
 		query( indexes, lowerValues[1], upperValues[1], m_bounds[1], 2 * m_proxyCount, 1);
 
 		assert m_queryResultCount < Settings.maxProxies;
 
-		final Object[] results = new Object[maxCount];
-
+		Object[] results = new Object[maxCount];
 		int count = 0;
 		for ( int i = 0; i < m_queryResultCount && count < maxCount; ++i, ++count) {
 			assert m_queryResults[i] < Settings.maxProxies;
@@ -645,7 +653,10 @@ public class BroadPhase {
 		// Prepare for next query.
 		m_queryResultCount = 0;
 		incrementTimeStamp();
-
+		
+		ObjectPool.returnTwoInts(lowerValues);
+		ObjectPool.returnTwoInts(upperValues);
+		ObjectPool.returnTwoInts(indexes);
 		return copy;// results;
 	}
 
@@ -682,7 +693,7 @@ public class BroadPhase {
 
 	}
 
-	private void computeBounds( final int[] lowerValues, final int[] upperValues, final AABB aabb) {
+	private void computeBounds( final Integer[] lowerValues, final Integer[] upperValues, final AABB aabb) {
 		if ( BroadPhase.debugPrint) {
 			System.out.println( "ComputeBounds()");
 		}
@@ -719,10 +730,10 @@ public class BroadPhase {
 	}
 
 	/**
-	 * @param results
+	 * @param indexes
 	 *            out variable
 	 */
-	private void query( final int[] results, final int lowerValue, final int upperValue, final Bound[] bounds,
+	private void query( final Integer[] indexes, final int lowerValue, final int upperValue, final Bound[] bounds,
 	                    final int boundCount, final int axis) {
 		if ( BroadPhase.debugPrint) {
 			System.out.println( "Query(6 args)");
@@ -757,8 +768,8 @@ public class BroadPhase {
 			}
 		}
 
-		results[0] = lowerQuery;
-		results[1] = upperQuery;
+		indexes[0] = lowerQuery;
+		indexes[1] = upperQuery;
 	}
 
 	private void incrementOverlapCount( final int proxyId) {
@@ -864,13 +875,14 @@ public class BroadPhase {
 		//First deal with all the proxies that contain segment.p1
 //		int lowerIndex;
 //		int upperIndex;
-		int[] results = new int[2];
+		Integer[] results = ObjectPool.getTwoInts();
 		query(results,startValues[0],startValues2[0],m_bounds[0],2*m_proxyCount,0);
 		if(sx>=0)	xIndex = results[1]-1;
 		else		xIndex = results[0];
 		query(results,startValues[1],startValues2[1],m_bounds[1],2*m_proxyCount,1);
 		if(sy>=0)	yIndex = results[1]-1;
 		else		yIndex = results[0];
+		ObjectPool.returnTwoInts(results);
 
 //		System.out.println(m_queryResultCount);
 		//If we are using sortKey, then sort what we have so far, filtering negative keys

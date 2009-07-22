@@ -10,6 +10,7 @@ import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.MassData;
 import org.jbox2d.collision.shapes.CollideCircle;
 import org.jbox2d.collision.shapes.CollidePoly;
+import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.contacts.ContactPoint;
 
 public final class ObjectPool {
@@ -23,6 +24,9 @@ public final class ObjectPool {
 	private static final HashMap<Thread, Stack<ContactPoint>> contactPointPool = new HashMap<Thread, Stack<ContactPoint>>();
 	private static final HashMap<Thread, Stack<RaycastResult>> raycastResultPool = new HashMap<Thread, Stack<RaycastResult>>();
 	private static final HashMap<Thread, Stack<BoundValues>> boundValuesPool = new HashMap<Thread, Stack<BoundValues>>();
+	private static final HashMap<Thread, Stack<TimeStep>> timeStepPool = new HashMap<Thread, Stack<TimeStep>>();
+	private static final HashMap<Thread, Stack<Integer[]>> twoIntStack = new HashMap<Thread, Stack<Integer[]>>();
+	
 	private static final HashMap<Thread, Distance> distances = new HashMap<Thread, Distance>();
 	private static final HashMap<Thread, CollideCircle> collideCircles = new HashMap<Thread, CollideCircle>();
 	private static final HashMap<Thread, CollidePoly> collidePolys = new HashMap<Thread, CollidePoly>();
@@ -46,9 +50,39 @@ public final class ObjectPool {
 		contactPointPool.put(Thread.currentThread(), new Stack<ContactPoint>());
 		raycastResultPool.put(Thread.currentThread(), new Stack<RaycastResult>());
 		boundValuesPool.put(Thread.currentThread(), new Stack<BoundValues>());
+		timeStepPool.put(Thread.currentThread(), new Stack<TimeStep>() );
+		twoIntStack.put(Thread.currentThread(), new Stack<Integer[]>() );
+		
 		distances.put(Thread.currentThread(), new Distance());
 		collideCircles.put(Thread.currentThread(), new CollideCircle());
 		collidePolys.put(Thread.currentThread(), new CollidePoly());
+	}
+	
+	public static final Integer[] getTwoInts(){
+		Stack<Integer[]> pool = twoIntStack.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() once in each thread";
+		
+		if(pool.isEmpty()){
+			Integer[] ints = {0,0};
+			pool.push(ints);
+			Integer[] ints2 = {0,0};
+			pool.push(ints2);
+			Integer[] ints3 = {0,0};
+			pool.push(ints3);
+			Integer[] ints4 = {0,0};
+			pool.push(ints4);
+			Integer[] ints5 = {0,0};
+			pool.push(ints5);
+		}
+		
+		return pool.pop();
+	}
+	
+	public static final void returnTwoInts(Integer[] argToRecycle){
+		Stack<Integer[]> pool = twoIntStack.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() once in each thread";
+		assert (argToRecycle.length == 2) : "Array has to be of 2 integers";
+		pool.push(argToRecycle);
 	}
 
 	public static final Vec2 getVec2() {
@@ -359,6 +393,30 @@ public final class ObjectPool {
 		assert (pool != null) : "Pool was null, make sure you call initPools() once in each thread";
 		pool.push(argToRecycle);
 	}
+	
+	public static final TimeStep getTimeStep() {
+		Stack<TimeStep> pool = timeStepPool.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() once in each thread";
+
+		if (pool.isEmpty()) {
+			pool.push(new TimeStep());
+			pool.push(new TimeStep());
+			pool.push(new TimeStep());
+			pool.push(new TimeStep());
+			pool.push(new TimeStep());
+		}
+
+		return pool.pop();
+	}
+
+	public static final void returnTimeStep(TimeStep argToRecycle) {
+		Stack<TimeStep> pool = timeStepPool.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() once in each thread";
+		pool.push(argToRecycle);
+	}
+	
+	
+	
 	
 	public static final Distance getDistance(){
 		Distance distance = distances.get(Thread.currentThread());
