@@ -1,0 +1,538 @@
+Index: src/org/jbox2d/p5/JointUtils.java
+===================================================================
+--- src/org/jbox2d/p5/JointUtils.java	(revision 198)
++++ src/org/jbox2d/p5/JointUtils.java	(working copy)
+@@ -1,5 +1,8 @@
+ package org.jbox2d.p5;
+ 
++import java.util.Iterator;
++import java.util.LinkedList;
++
+ import org.jbox2d.collision.AABB;
+ import org.jbox2d.collision.shapes.Shape;
+ import org.jbox2d.common.Vec2;
+@@ -107,11 +110,13 @@
+ 		AABB aabb1 = new AABB(new Vec2(pA.x - .001f, pA.y - .001f), new Vec2(pA.x + .001f, pA.y + .001f));
+ 		AABB aabb2 = new AABB(new Vec2(pB.x - .001f, pB.y - .001f), new Vec2(pB.x + .001f, pB.y + .001f));
+ 		int maxCount = 10;
+-		Shape[] shapes1 = w.query(aabb1, maxCount);
+-		if (shapes1[0] == null)
++		LinkedList<Object> shapes1 = new LinkedList<Object>();
++		w.query(aabb1, maxCount, shapes1);
++		if (shapes1.get(0) == null)
+ 			return null;
+-		Shape[] shapes2 = w.query(aabb2, maxCount);
+-		if (shapes2[0] == null)
++		LinkedList<Object> shapes2 = new LinkedList<Object>();
++		w.query(aabb2, maxCount, shapes2);
++		if (shapes2.get(0) == null)
+ 			return null;
+ 		boolean found = false;
+ 		int i = 0;
+@@ -122,27 +127,38 @@
+ 		// mess is just to catch the rare edge case where a single
+ 		// body overlaps both points, but another body is there, too.
+ 		// Which ones are selected are up to fate...
++		
+ 		while (!found)
+ 		{
+-			if (i >= shapes1.length || shapes1[i] == null)
+-				return null;
+-			if (shapes1[i].testPoint(shapes1[i].getBody().getMemberXForm(), pA))
+-				body1 = shapes1[i++].getBody();
+-			for (j = 0; j < shapes2.length; ++j)
+-			{
+-				if (shapes2[j] == null)
++			Shape s1i = (Shape) shapes1.get(i);
++			
++			if (i >= shapes1.size() || s1i == null){
++				return null;				
++			}
++			if (s1i.testPoint(s1i.getBody().getMemberXForm(), pA)){
++				i++;
++				s1i = (Shape) shapes1.get(i);
++				body1 = s1i.getBody();
++			}
++			for (j = 0; j < shapes2.size(); ++j){
++				
++				Shape s2j = (Shape) shapes2.get(j);
++				
++				if (s2j == null){
+ 					break;
+-				if (shapes2[j].testPoint(shapes2[j].getBody().getMemberXForm(), pB))
+-					body2 = shapes2[j].getBody();
+-				if (body2 != body1)
+-				{
++				}
++				if (s2j.testPoint(s2j.getBody().getMemberXForm(), pB)){
++					body2 = s2j.getBody();
++				}
++				if (body2 != body1){
+ 					found = true;
+ 					break;
+ 				}
+ 			}
+ 		}
+-		if (body1 == null || body2 == null)
++		if (body1 == null || body2 == null){
+ 			return null;
++		}
+ 		Body[] bodies = new Body[] { body1, body2 };
+ 		return bodies;
+ 	}
+Index: src/org/jbox2d/collision/BroadPhase.java
+===================================================================
+--- src/org/jbox2d/collision/BroadPhase.java	(revision 198)
++++ src/org/jbox2d/collision/BroadPhase.java	(working copy)
+@@ -24,6 +24,8 @@
+ package org.jbox2d.collision;
+ 
+ //Version: b2BroadPhase.h/.cpp rev 108->139
++import java.util.LinkedList;
++
+ import org.jbox2d.common.MathUtils;
+ import org.jbox2d.common.ObjectPool;
+ import org.jbox2d.common.Settings;
+@@ -234,18 +236,18 @@
+ 
+ 		final int boundCount = 2 * m_proxyCount;
+ 
+-		final int lowerValues[] = new int[2];
+-		final int upperValues[] = new int[2];
++		final Integer lowerValues[] = ObjectPool.getTwoInts();
++		final Integer upperValues[] = ObjectPool.getTwoInts();
++		final Integer[] indexes = ObjectPool.getTwoInts();
+ 		computeBounds( lowerValues, upperValues, aabb);
+ 
+ 		for ( int axis = 0; axis < 2; ++axis) {
+ 			final Bound[] bounds = m_bounds[axis];
+-			final int[] indexes = new int[2];
+ 
+ 			query( indexes, lowerValues[axis], upperValues[axis], bounds, boundCount, axis);
+ 			final int lowerIndex = indexes[0];
+ 			int upperIndex = indexes[1];
+-
++			
+ 			// System.out.println(edgeCount + ", "+lowerValues[axis] + ",
+ 			// "+upperValues[axis]);
+ 			// memmove(bounds[upperIndex + 2], bounds[upperIndex],
+@@ -327,6 +329,10 @@
+ 		m_queryResultCount = 0;
+ 		incrementTimeStamp();
+ 
++		ObjectPool.returnTwoInts(lowerValues);
++		ObjectPool.returnTwoInts(upperValues);
++		ObjectPool.returnTwoInts(indexes);
++		
+ 		return proxyId;
+ 	}
+ 
+@@ -337,6 +343,8 @@
+ 
+ 		final int boundCount = 2 * m_proxyCount;
+ 
++		final Integer[] ignored = ObjectPool.getTwoInts();
++		
+ 		for ( int axis = 0; axis < 2; ++axis) {
+ 			final Bound[] bounds = m_bounds[axis];
+ 
+@@ -380,10 +388,9 @@
+ 
+ 			// Query for pairs to be removed. lowerIndex and upperIndex are not
+ 			// needed.
+-			final int[] ignored = new int[2];
+ 			query( ignored, lowerValue, upperValue, bounds, boundCount - 2, axis);
+ 		}
+-
++		
+ 		assert (m_queryResultCount < Settings.maxProxies);
+ 
+ 		for ( int i = 0; i < m_queryResultCount; ++i) {
+@@ -413,6 +420,8 @@
+ 		if ( BroadPhase.s_validate) {
+ 			validate();
+ 		}
++		
++		ObjectPool.returnTwoInts(ignored);
+ 	}
+ 
+ 	// Call MoveProxy as many times as you like, then when you are done
+@@ -613,40 +622,41 @@
+ 	 * Query an AABB for overlapping proxies, returns the user data and the
+ 	 * count, up to the supplied maximum count.
+ 	 */
+-	public Object[] query( final AABB aabb, final int maxCount) {
++	public void query( final AABB aabb, final int maxCount, LinkedList<Object> results) {
+ 		if ( BroadPhase.debugPrint) {
+ 			System.out.println( "Query(2 args)");
+ 		}
+ 
+-		final int lowerValues[] = new int[2];
+-		final int upperValues[] = new int[2];
++		final Integer lowerValues[] = ObjectPool.getTwoInts();
++		final Integer upperValues[] = ObjectPool.getTwoInts();
+ 		computeBounds( lowerValues, upperValues, aabb);
+ 
+-		final int indexes[] = new int[2]; // lowerIndex, upperIndex;
++		final Integer indexes[] = ObjectPool.getTwoInts(); // lowerIndex, upperIndex;
+ 
+ 		query( indexes, lowerValues[0], upperValues[0], m_bounds[0], 2 * m_proxyCount, 0);
+ 		query( indexes, lowerValues[1], upperValues[1], m_bounds[1], 2 * m_proxyCount, 1);
+ 
+ 		assert m_queryResultCount < Settings.maxProxies;
+ 
+-		final Object[] results = new Object[maxCount];
+-
+ 		int count = 0;
+ 		for ( int i = 0; i < m_queryResultCount && count < maxCount; ++i, ++count) {
+ 			assert m_queryResults[i] < Settings.maxProxies;
+ 			final Proxy proxy = m_proxyPool[m_queryResults[i]];
+ 			proxy.isValid();
+-			results[i] = proxy.userData;
++			results.addLast(proxy.userData);
+ 		}
+ 
+-		final Object[] copy = new Object[count];
+-		System.arraycopy( results, 0, copy, 0, count);
++		//final Object[] copy = new Object[count];
++		//System.arraycopy( results, 0, copy, 0, count);
+ 
+ 		// Prepare for next query.
+ 		m_queryResultCount = 0;
+ 		incrementTimeStamp();
+-
+-		return copy;// results;
++		
++		ObjectPool.returnTwoInts(lowerValues);
++		ObjectPool.returnTwoInts(upperValues);
++		ObjectPool.returnTwoInts(indexes);
++		//return copy;// results;
+ 	}
+ 
+ 	public void validate() {
+@@ -682,7 +692,7 @@
+ 
+ 	}
+ 
+-	private void computeBounds( final int[] lowerValues, final int[] upperValues, final AABB aabb) {
++	private void computeBounds( final Integer[] lowerValues, final Integer[] upperValues, final AABB aabb) {
+ 		if ( BroadPhase.debugPrint) {
+ 			System.out.println( "ComputeBounds()");
+ 		}
+@@ -719,10 +729,10 @@
+ 	}
+ 
+ 	/**
+-	 * @param results
++	 * @param indexes
+ 	 *            out variable
+ 	 */
+-	private void query( final int[] results, final int lowerValue, final int upperValue, final Bound[] bounds,
++	private void query( final Integer[] indexes, final int lowerValue, final int upperValue, final Bound[] bounds,
+ 	                    final int boundCount, final int axis) {
+ 		if ( BroadPhase.debugPrint) {
+ 			System.out.println( "Query(6 args)");
+@@ -757,8 +767,8 @@
+ 			}
+ 		}
+ 
+-		results[0] = lowerQuery;
+-		results[1] = upperQuery;
++		indexes[0] = lowerQuery;
++		indexes[1] = upperQuery;
+ 	}
+ 
+ 	private void incrementOverlapCount( final int proxyId) {
+@@ -864,13 +874,14 @@
+ 		//First deal with all the proxies that contain segment.p1
+ //		int lowerIndex;
+ //		int upperIndex;
+-		int[] results = new int[2];
++		Integer[] results = ObjectPool.getTwoInts();
+ 		query(results,startValues[0],startValues2[0],m_bounds[0],2*m_proxyCount,0);
+ 		if(sx>=0)	xIndex = results[1]-1;
+ 		else		xIndex = results[0];
+ 		query(results,startValues[1],startValues2[1],m_bounds[1],2*m_proxyCount,1);
+ 		if(sy>=0)	yIndex = results[1]-1;
+ 		else		yIndex = results[0];
++		ObjectPool.returnTwoInts(results);
+ 
+ //		System.out.println(m_queryResultCount);
+ 		//If we are using sortKey, then sort what we have so far, filtering negative keys
+Index: src/org/jbox2d/collision/BoundValues.java
+===================================================================
+--- src/org/jbox2d/collision/BoundValues.java	(revision 198)
++++ src/org/jbox2d/collision/BoundValues.java	(working copy)
+@@ -1,11 +1,11 @@
+ package org.jbox2d.collision;
+ 
+ public class BoundValues {
+-	public final int[] lowerValues;
+-	public final int[] upperValues;
++	public final Integer[] lowerValues;
++	public final Integer[] upperValues;
+ 
+ 	public BoundValues() {
+-		lowerValues = new int[2];
+-		upperValues = new int[2];
++		lowerValues = new Integer[2];
++		upperValues = new Integer[2];
+ 	}
+ }
+Index: src/org/jbox2d/testbed/AbstractExample.java
+===================================================================
+--- src/org/jbox2d/testbed/AbstractExample.java	(revision 198)
++++ src/org/jbox2d/testbed/AbstractExample.java	(working copy)
+@@ -24,6 +24,8 @@
+ package org.jbox2d.testbed;
+ 
+ import java.util.ArrayList;
++import java.util.Iterator;
++import java.util.LinkedList;
+ 
+ import org.jbox2d.collision.AABB;
+ import org.jbox2d.collision.shapes.CircleDef;
+@@ -500,19 +502,24 @@
+         
+         // Query the world for overlapping shapes.
+         int k_maxCount = 1;
+-        Shape shapes[] = m_world.query(aabb1, k_maxCount);
++        LinkedList<Object> shapes = new LinkedList<Object>();
++        m_world.query(aabb1, k_maxCount, shapes);
+         
++        Iterator<Object> it = shapes.iterator();
++        
+         Body body = null;
+-        for (int j = 0; j < shapes.length; j++) {
+-            Body shapeBody = shapes[j].getBody();
+-            if (shapeBody.isStatic() == false) {
+-                boolean inside = shapes[j].testPoint(shapeBody.getMemberXForm(),worldPoint);
++        while(it.hasNext()){
++        	Shape shape = (Shape) it.next();
++        	Body shapeBody = shape.getBody();
++        	if (shapeBody.isStatic() == false) {
++                boolean inside = shape.testPoint(shapeBody.getMemberXForm(),worldPoint);
+                 if (inside) {
+-                    body = shapes[j].m_body;
++                    body = shape.m_body;
+                     break;
+                 }
+             }
+         }
++        
+         return body;
+     }
+     
+@@ -568,15 +575,19 @@
+ 
+         // Query the world for overlapping shapes.
+         int k_maxCount = 10;
+-        Shape shapes[] = m_world.query(aabb, k_maxCount);
++        LinkedList<Object> shapes = new LinkedList<Object>();
++        m_world.query(aabb1, k_maxCount, shapes);
+         
++        Iterator<Object> it = shapes.iterator();
++        
+         Body body = null;
+-        for (int j = 0; j < shapes.length; j++) {
+-            Body shapeBody = shapes[j].getBody();
+-            if (shapeBody.isStatic() == false) {
+-                boolean inside = shapes[j].testPoint(shapeBody.getMemberXForm(),p);
++        while(it.hasNext()){
++        	Shape shape = (Shape) it.next();
++        	Body shapeBody = shape.getBody();
++        	if (shapeBody.isStatic() == false) {
++                boolean inside = shape.testPoint(shapeBody.getMemberXForm(),p);
+                 if (inside) {
+-                    body = shapes[j].m_body;
++                    body = shape.m_body;
+                     break;
+                 }
+             }
+Index: src/org/jbox2d/common/ObjectPool.java
+===================================================================
+--- src/org/jbox2d/common/ObjectPool.java	(revision 198)
++++ src/org/jbox2d/common/ObjectPool.java	(working copy)
+@@ -10,6 +10,7 @@
+ import org.jbox2d.collision.MassData;
+ import org.jbox2d.collision.shapes.CollideCircle;
+ import org.jbox2d.collision.shapes.CollidePoly;
++import org.jbox2d.dynamics.TimeStep;
+ import org.jbox2d.dynamics.contacts.ContactPoint;
+ 
+ public final class ObjectPool {
+@@ -23,6 +24,9 @@
+ 	private static final HashMap<Thread, Stack<ContactPoint>> contactPointPool = new HashMap<Thread, Stack<ContactPoint>>();
+ 	private static final HashMap<Thread, Stack<RaycastResult>> raycastResultPool = new HashMap<Thread, Stack<RaycastResult>>();
+ 	private static final HashMap<Thread, Stack<BoundValues>> boundValuesPool = new HashMap<Thread, Stack<BoundValues>>();
++	private static final HashMap<Thread, Stack<TimeStep>> timeStepPool = new HashMap<Thread, Stack<TimeStep>>();
++	private static final HashMap<Thread, Stack<Integer[]>> twoIntStack = new HashMap<Thread, Stack<Integer[]>>();
++	
+ 	private static final HashMap<Thread, Distance> distances = new HashMap<Thread, Distance>();
+ 	private static final HashMap<Thread, CollideCircle> collideCircles = new HashMap<Thread, CollideCircle>();
+ 	private static final HashMap<Thread, CollidePoly> collidePolys = new HashMap<Thread, CollidePoly>();
+@@ -46,10 +50,40 @@
+ 		contactPointPool.put(Thread.currentThread(), new Stack<ContactPoint>());
+ 		raycastResultPool.put(Thread.currentThread(), new Stack<RaycastResult>());
+ 		boundValuesPool.put(Thread.currentThread(), new Stack<BoundValues>());
++		timeStepPool.put(Thread.currentThread(), new Stack<TimeStep>() );
++		twoIntStack.put(Thread.currentThread(), new Stack<Integer[]>() );
++		
+ 		distances.put(Thread.currentThread(), new Distance());
+ 		collideCircles.put(Thread.currentThread(), new CollideCircle());
+ 		collidePolys.put(Thread.currentThread(), new CollidePoly());
+ 	}
++	
++	public static final Integer[] getTwoInts(){
++		Stack<Integer[]> pool = twoIntStack.get(Thread.currentThread());
++		assert (pool != null) : "Pool was null, make sure you call initPools() once in each thread";
++		
++		if(pool.isEmpty()){
++			Integer[] ints = {0,0};
++			pool.push(ints);
++			Integer[] ints2 = {0,0};
++			pool.push(ints2);
++			Integer[] ints3 = {0,0};
++			pool.push(ints3);
++			Integer[] ints4 = {0,0};
++			pool.push(ints4);
++			Integer[] ints5 = {0,0};
++			pool.push(ints5);
++		}
++		
++		return pool.pop();
++	}
++	
++	public static final void returnTwoInts(Integer[] argToRecycle){
++		Stack<Integer[]> pool = twoIntStack.get(Thread.currentThread());
++		assert (pool != null) : "Pool was null, make sure you call initPools() once in each thread";
++		assert (argToRecycle.length == 2) : "Array has to be of 2 integers";
++		pool.push(argToRecycle);
++	}
+ 
+ 	public static final Vec2 getVec2() {
+ 		Stack<Vec2> pool = vec2Pool.get(Thread.currentThread());
+@@ -360,6 +394,30 @@
+ 		pool.push(argToRecycle);
+ 	}
+ 	
++	public static final TimeStep getTimeStep() {
++		Stack<TimeStep> pool = timeStepPool.get(Thread.currentThread());
++		assert (pool != null) : "Pool was null, make sure you call initPools() once in each thread";
++
++		if (pool.isEmpty()) {
++			pool.push(new TimeStep());
++			pool.push(new TimeStep());
++			pool.push(new TimeStep());
++			pool.push(new TimeStep());
++			pool.push(new TimeStep());
++		}
++
++		return pool.pop();
++	}
++
++	public static final void returnTimeStep(TimeStep argToRecycle) {
++		Stack<TimeStep> pool = timeStepPool.get(Thread.currentThread());
++		assert (pool != null) : "Pool was null, make sure you call initPools() once in each thread";
++		pool.push(argToRecycle);
++	}
++	
++	
++	
++	
+ 	public static final Distance getDistance(){
+ 		Distance distance = distances.get(Thread.currentThread());
+ 		assert (distance != null) : "Distance was null, make sure you call initPools() once in each thread";
+Index: src/org/jbox2d/dynamics/Body.java
+===================================================================
+--- src/org/jbox2d/dynamics/Body.java	(revision 198)
++++ src/org/jbox2d/dynamics/Body.java	(working copy)
+@@ -453,6 +453,7 @@
+ 		final MassData massData = ObjectPool.getMassData();
+ 		
+ 		for (Shape s = m_shapeList; s != null; s = s.m_next) {
++			massData.mass = 0;
+ 			s.computeMass(massData);
+ 			m_mass += massData.mass;
+ 			center.x += massData.mass * massData.center.x;
+Index: src/org/jbox2d/dynamics/World.java
+===================================================================
+--- src/org/jbox2d/dynamics/World.java	(revision 198)
++++ src/org/jbox2d/dynamics/World.java	(working copy)
+@@ -24,6 +24,7 @@
+ package org.jbox2d.dynamics;
+ 
+ import java.util.ArrayList;
++import java.util.LinkedList;
+ 
+ import org.jbox2d.collision.AABB;
+ import org.jbox2d.collision.BroadPhase;
+@@ -43,6 +44,7 @@
+ import org.jbox2d.collision.shapes.ShapeType;
+ import org.jbox2d.common.Color3f;
+ import org.jbox2d.common.Mat22;
++import org.jbox2d.common.ObjectPool;
+ import org.jbox2d.common.RaycastResult;
+ import org.jbox2d.common.Settings;
+ import org.jbox2d.common.Vec2;
+@@ -59,7 +61,6 @@
+ import org.jbox2d.dynamics.joints.JointType;
+ import org.jbox2d.dynamics.joints.PulleyJoint;
+ 
+-
+ //Updated to rev 56->118->142->150 of b2World.cpp/.h
+ 
+ /**
+@@ -533,7 +534,7 @@
+ 	public void step(final float dt, final int iterations) {
+ 		m_lock = true;
+ 
+-		final TimeStep step = new TimeStep();
++		final TimeStep step = ObjectPool.getTimeStep();
+ 		step.dt = dt;
+ 		step.maxIterations	= iterations;
+ 		if (dt > 0.0f) {
+@@ -565,7 +566,9 @@
+ 
+ 		m_inv_dt0 = step.inv_dt;
+ 		m_lock = false;
+-
++		
++		ObjectPool.returnTimeStep(step);
++		
+ 		postStep(dt,iterations);
+ 	}
+ 
+@@ -609,17 +612,17 @@
+ 	 * The number of shapes found is returned.
+ 	 * @param aabb the query box.
+ 	 * @param maxCount the capacity of the shapes array.
+-	 * @return array of shapes overlapped, up to maxCount in length
++	 * @param returning returning array of shapes overlapped, up to maxCount in length
+ 	 */
+-	public Shape[] query(final AABB aabb, final int maxCount) {
+-		final Object[] objs = m_broadPhase.query(aabb, maxCount);
+-		final Shape[] ret = new Shape[objs.length];
+-		System.arraycopy(objs, 0, ret, 0, objs.length);
++	public void query(final AABB aabb, final int maxCount, final LinkedList<Object> returning) {
++		/*final Object[] objs = */m_broadPhase.query(aabb, maxCount, returning);
++		//final Shape[] ret = new Shape[objs.length];
++		//System.arraycopy(objs, 0, ret, 0, objs.length);
+ 		//for (int i=0; i<ret.length; ++i) {
+ 		//	ret[i] = (Shape)(objs[i]);
+ 		//}
+-
+-		return ret;
++		
++		//return ret;
+ 	}
+ 
+ 
+@@ -639,6 +642,7 @@
+ 		}
+ 
+ 		// Size the island for the worst case.
++		// TODO make this able to be pooled
+ 		final Island island = new Island(m_bodyCount, m_contactCount, m_jointCount, m_contactListener);
+ 
+ 		// Clear all the island flags.

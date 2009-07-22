@@ -24,6 +24,7 @@
 package org.jbox2d.dynamics;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.BroadPhase;
@@ -43,6 +44,7 @@ import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Mat22;
+import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.RaycastResult;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
@@ -58,7 +60,6 @@ import org.jbox2d.dynamics.joints.JointDef;
 import org.jbox2d.dynamics.joints.JointEdge;
 import org.jbox2d.dynamics.joints.JointType;
 import org.jbox2d.dynamics.joints.PulleyJoint;
-
 
 //Updated to rev 56->118->142->150 of b2World.cpp/.h
 
@@ -533,7 +534,7 @@ public class World {
 	public void step(final float dt, final int iterations) {
 		m_lock = true;
 
-		final TimeStep step = new TimeStep();
+		final TimeStep step = ObjectPool.getTimeStep();
 		step.dt = dt;
 		step.maxIterations	= iterations;
 		if (dt > 0.0f) {
@@ -565,7 +566,9 @@ public class World {
 
 		m_inv_dt0 = step.inv_dt;
 		m_lock = false;
-
+		
+		ObjectPool.returnTimeStep(step);
+		
 		postStep(dt,iterations);
 	}
 
@@ -609,16 +612,16 @@ public class World {
 	 * The number of shapes found is returned.
 	 * @param aabb the query box.
 	 * @param maxCount the capacity of the shapes array.
-	 * @return array of shapes overlapped, up to maxCount in length
+	 * @param returning returning array of shapes overlapped, up to maxCount in length
 	 */
 	public Shape[] query(final AABB aabb, final int maxCount) {
 		final Object[] objs = m_broadPhase.query(aabb, maxCount);
 		final Shape[] ret = new Shape[objs.length];
 		System.arraycopy(objs, 0, ret, 0, objs.length);
-		//for (int i=0; i<ret.length; ++i) {
-		//	ret[i] = (Shape)(objs[i]);
-		//}
-
+//		for (int i=0; i<ret.length; ++i) {
+//			ret[i] = (Shape)(objs[i]);
+//		}
+		
 		return ret;
 	}
 
@@ -639,6 +642,7 @@ public class World {
 		}
 
 		// Size the island for the worst case.
+		// TODO make this able to be pooled
 		final Island island = new Island(m_bodyCount, m_contactCount, m_jointCount, m_contactListener);
 
 		// Clear all the island flags.
@@ -1058,7 +1062,7 @@ public class World {
 	// NOTE this corresponds to the liquid test, so the debugdraw can draw
 	// the liquid particles correctly.  They should be the same.
 	private static Integer LIQUID_INT = new Integer(12345);
-	private float liquidLength = .1f;
+	private float liquidLength = .12f;
 	private float averageLinearVel = -1;
 	// djm pooled
 	private final Color3f coreColor = new Color3f(255f*0.9f, 255f*0.6f, 255f*0.6f);
