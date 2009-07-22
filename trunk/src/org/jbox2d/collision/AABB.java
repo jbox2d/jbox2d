@@ -66,9 +66,10 @@ public class AABB {
 	 * Sets this object from the given object
 	 * @param aabb the object to copy from
 	 */
-	public final void set(final AABB aabb){
+	public final AABB set(final AABB aabb){
 		lowerBound.set( aabb.lowerBound);
 		upperBound.set( aabb.upperBound);
+		return this;
 	}
 
 	/** Verify that the bounds are sorted*/

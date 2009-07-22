@@ -30,6 +30,7 @@ import org.jbox2d.collision.MassData;
 import org.jbox2d.collision.PairManager;
 import org.jbox2d.collision.Segment;
 import org.jbox2d.collision.SegmentCollide;
+import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.RaycastResult;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
@@ -233,7 +234,6 @@ public abstract class Shape {
 	/** Internal */
 	public abstract void updateSweepRadius(Vec2 center);
 
-	private final AABB aabb = new AABB();
 	/** Internal */
 	public boolean synchronize(final BroadPhase broadPhase, final XForm transform1, final XForm transform2) {
 		if (m_proxyId == PairManager.NULL_PROXY) {
@@ -241,8 +241,7 @@ public abstract class Shape {
 		}
 
 		// Compute an AABB that covers the swept shape (may miss some rotation effect).
-		// INLINED
-		//AABB aabb = new AABB();
+		AABB aabb = ObjectPool.getAABB();
 		computeSweptAABB(aabb, transform1, transform2);
 		//if (this.getType() == ShapeType.CIRCLE_SHAPE){
 		//	System.out.println("Sweeping: "+transform1+" " +transform2);
@@ -250,8 +249,10 @@ public abstract class Shape {
 		//}
 		if (broadPhase.inRange(aabb)) {
 			broadPhase.moveProxy(m_proxyId, aabb);
+			ObjectPool.returnAABB(aabb);
 			return true;
 		} else {
+			ObjectPool.returnAABB(aabb);
 			return false;
 		}
 	}

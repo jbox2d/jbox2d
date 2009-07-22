@@ -44,6 +44,13 @@ public class MassData {
         center = new Vec2();
     }
     
+    public MassData set(MassData argOther){
+    	mass = argOther.mass;
+    	center.set(argOther.center);
+    	I = argOther.I;
+    	return this;
+    }
+    
     /**
      * Copies from the given mass data 
      * @param md mass data to copy from
