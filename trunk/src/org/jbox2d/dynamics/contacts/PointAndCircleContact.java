@@ -29,7 +29,6 @@ import java.util.List;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.collision.shapes.CircleShape;
-import org.jbox2d.collision.shapes.CollideCircle;
 import org.jbox2d.collision.shapes.PointShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.ShapeType;
