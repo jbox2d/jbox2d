@@ -26,8 +26,8 @@ package org.jbox2d.testbed;
 
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Mat22;
+import org.jbox2d.common.OBBViewportTransform;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.common.ViewportTransform;
 import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.DebugDraw;
 
@@ -48,18 +48,19 @@ public class ProcessingDebugDraw extends DebugDraw {
 	public PApplet g;
 	public PFont m_font;
 	public float fontHeight;
-	// World 0,0 maps to transX, transY on screen
-	
+	private final OBBViewportTransform transform;
+	// World 0,0 maps to transX, transY on screen	
 	public ProcessingDebugDraw(PApplet pApplet) {
-		super(new ViewportTransform());
+		super(new OBBViewportTransform());
+		transform = (OBBViewportTransform) super.getViewportTranform();
+		
 		g = pApplet;
 		screen = this;
 		m_font = g.createFont("LucidaGrande-Bold",12);//-Bold-14.vlw");
 		fontHeight = 14.0f;
-		viewportTransform.setTransform( Mat22.createScaleTransform( 20));
-		viewportTransform.setCenter(320 + g.width/2, 240 + g.height/2);
+		viewportTransform.setCamera(320 + g.width/2, 240 + g.height/2,  20);
 		viewportTransform.setExtents( g.width/2, g.height/2);
-		viewportTransform.yFlip = true;
+		viewportTransform.setYFlip(true);
 	}
 
 	private static final Vec2 circlePt = new Vec2();
@@ -68,7 +69,7 @@ public class ProcessingDebugDraw extends DebugDraw {
 	 */
 	@Override
 	public void drawCircle(Vec2 argCenter, float radius, Color3f color) {
-		viewportTransform.getWorldToScreenToOut(argCenter, center);
+		viewportTransform.getWorldToScreen(argCenter, center);
 
 		g.noFill();
 		float k_segments = 16.0f;
@@ -81,7 +82,7 @@ public class ProcessingDebugDraw extends DebugDraw {
 			float vx = center.x + radius * (float)Math.cos(theta);
 			float vy = center.y + radius * (float)Math.sin(theta);
 			circlePt.set( vx, vy);
-			Mat22.mulToOut( viewportTransform.getTransform(), circlePt, circlePt);
+			viewportTransform.vectorTransform(circlePt, circlePt);
 			g.vertex(circlePt.x, circlePt.y);
 			theta += k_increment;
 		}
@@ -98,7 +99,7 @@ public class ProcessingDebugDraw extends DebugDraw {
 	 */
 	@Override
 	public void drawSolidCircle(Vec2 argCenter, float radius, Vec2 axis, Color3f color) {
-		viewportTransform.getWorldToScreenToOut(argCenter, center);
+		viewportTransform.getWorldToScreen(argCenter, center);
 		
 		float k_segments = 16.0f;
 		float k_increment = 2.0f * (float)Math.PI / k_segments;
@@ -110,19 +111,19 @@ public class ProcessingDebugDraw extends DebugDraw {
 			float vx = radius * (float)Math.cos(theta);
 			float vy = radius * (float)Math.sin(theta);
 			circlePt.set( vx, vy);
-			Mat22.mulToOut( viewportTransform.getTransform(), circlePt, circlePt);
+			viewportTransform.vectorTransform(circlePt, circlePt);
 			circlePt.addLocal( center);
 			g.vertex(circlePt.x, circlePt.y);
 			theta += k_increment;
 		}
 		circlePt.set( radius, 0);
-		Mat22.mulToOut( viewportTransform.getTransform(), circlePt, circlePt);
+		viewportTransform.vectorTransform(circlePt, circlePt);
 		circlePt.addLocal( center);
 		g.vertex(circlePt.x, circlePt.y);
 		
 		g.endShape();
 
-		viewportTransform.getWorldToScreenToOut(argCenter.x + radius * axis.x, argCenter.y + radius * axis.y, p);
+		getWorldToScreenToOut(argCenter.x + radius * axis.x, argCenter.y + radius * axis.y, p);
 		g.beginShape(PApplet.LINES);
 		g.vertex(center.x, center.y);
 		g.vertex(p.x, p.y);
@@ -138,8 +139,8 @@ public class ProcessingDebugDraw extends DebugDraw {
 		g.noFill();
 		for (int i = 0; i < vertexCount; ++i) {
 			int ind = (i+1<vertexCount)?i+1:(i+1-vertexCount);
-			viewportTransform.getWorldToScreenToOut(vertices[i], v1);
-			viewportTransform.getWorldToScreenToOut(vertices[ind], v2);
+			viewportTransform.getWorldToScreen(vertices[i], v1);
+			viewportTransform.getWorldToScreen(vertices[ind], v2);
 			//System.out.println(v1 + " -> "+v2);
 			g.line(v1.x, v1.y, v2.x, v2.y);
 		}
@@ -153,7 +154,7 @@ public class ProcessingDebugDraw extends DebugDraw {
 		g.fill(0.5f * color.x, 0.5f * color.y, 0.5f * color.z, 0.5f*255.0f);
 		g.beginShape(PApplet.POLYGON);
 		for (int i = 0; i < vertexCount; ++i) {
-			viewportTransform.getWorldToScreenToOut(vertices[i], v);
+			viewportTransform.getWorldToScreen(vertices[i], v);
 			g.vertex(v.x, v.y);
 		}
 		g.endShape();
@@ -161,8 +162,8 @@ public class ProcessingDebugDraw extends DebugDraw {
 		g.stroke(color.x, color.y, color.z, 255.0f);
 		for (int i = 0; i < vertexCount; ++i) {
 			int ind = (i+1<vertexCount)?i+1:(i+1-vertexCount);
-			viewportTransform.getWorldToScreenToOut(vertices[i], v1);
-			viewportTransform.getWorldToScreenToOut(vertices[ind], v2);
+			viewportTransform.getWorldToScreen(vertices[i], v1);
+			viewportTransform.getWorldToScreen(vertices[ind], v2);
 			//System.out.println("Drawing: "+v1+" to "+v2);
 			g.line(v1.x, v1.y, v2.x, v2.y);
 		}
@@ -170,8 +171,8 @@ public class ProcessingDebugDraw extends DebugDraw {
 
 	@Override
 	public void drawSegment(Vec2 argP1, Vec2 argP2, Color3f color) {
-		viewportTransform.getWorldToScreenToOut(argP1, p1);
-		viewportTransform.getWorldToScreenToOut(argP2, p2);
+		viewportTransform.getWorldToScreen(argP1, p1);
+		viewportTransform.getWorldToScreen(argP2, p2);
 		g.stroke(color.x, color.y, color.z);
 		g.beginShape(PApplet.LINES);
 		g.vertex(p1.x, p1.y);
@@ -193,19 +194,19 @@ public class ProcessingDebugDraw extends DebugDraw {
 		p2.setZero();
 		float k_axisScale = 0.4f;
 		g.beginShape(PApplet.LINES);
-		viewportTransform.getWorldToScreenToOut(p1, p1world);
+		viewportTransform.getWorldToScreen(p1, p1world);
 		g.stroke(255.0f, 0.0f, 0.0f);
 		g.vertex(p1world.x, p1world.y);
 		p2.x = p1.x + k_axisScale * xf.R.col1.x;
 		p2.y = p1.y + k_axisScale * xf.R.col1.y;
-		viewportTransform.getWorldToScreenToOut(p2, p2world);
+		viewportTransform.getWorldToScreen(p2, p2world);
 		g.vertex(p2world.x, p2world.y);
 
 		g.stroke(0.0f, 255.0f, 0.0f);
 		g.vertex(p1world.x, p1world.y);
 		p2.x = p1.x + k_axisScale * xf.R.col2.x;
 		p2.y = p1.y + k_axisScale * xf.R.col2.y;
-		viewportTransform.getWorldToScreenToOut(p2, p2world);
+		viewportTransform.getWorldToScreen(p2, p2world);
 		g.vertex(p2world.x, p2world.y);
 
 		g.endShape();
@@ -228,7 +229,7 @@ public class ProcessingDebugDraw extends DebugDraw {
 	private static final Vec2 position = new Vec2();
 	@Override
 	public void drawPoint(Vec2 argPosition, float f, Color3f color) {
-		viewportTransform.getWorldToScreenToOut(argPosition, position);
+		viewportTransform.getWorldToScreen(argPosition, position);
 		float k_segments = 5.0f;
 		float k_increment = 2.0f * (float)Math.PI / k_segments;
 		float k_radius = 3.0f;
@@ -261,14 +262,14 @@ public class ProcessingDebugDraw extends DebugDraw {
      */
 	public void drawImage(PImage image, Vec2 argPosition, float rotation, float localScale,
 						  Vec2 argLocalOffset, float halfImageWidth, float halfImageHeight) {
-		viewportTransform.getWorldToScreenToOut(argPosition, position);
-		viewportTransform.getTransform().mulToOut(argLocalOffset, localOffset);
+		viewportTransform.getWorldToScreen(argPosition, position);
+		viewportTransform.vectorTransform(argLocalOffset, localOffset);
         g.pushMatrix();
         g.translate(position.x, position.y);
         g.rotate(-rotation);
         g.translate(localOffset.x, localOffset.y);
         g.scale( localScale);
-        Mat22 mat = viewportTransform.getTransform();
+        Mat22 mat = transform.getTransform();
         g.applyMatrix( mat.col1.x, mat.col2.x, 0, 0,
                        mat.col1.y, mat.col2.y, 0, 0,
                        0, 0, 1, 0,

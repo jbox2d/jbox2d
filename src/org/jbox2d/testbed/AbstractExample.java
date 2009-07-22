@@ -31,7 +31,7 @@ import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.common.ViewportTransform;
+import org.jbox2d.common.IViewportTransform;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BoundaryListener;
@@ -103,7 +103,7 @@ public abstract class AbstractExample {
 	/** Listener for contact events. */
 	protected ContactListener m_contactListener;
 	
-	protected ViewportTransform viewport;
+	protected IViewportTransform viewport;
 	
 	public static Color3f white = new Color3f(255.0f,255.0f,255.0f);
 	public static Color3f black = new Color3f(0.0f*255.0f,0.0f*255.0f,0.0f*255.0f);
@@ -261,7 +261,7 @@ public abstract class AbstractExample {
 	 */
 	public void step() {
 		preStep();
-		viewport.getScreenToWorldToOut(mouseScreen, mouseWorld);
+		viewport.getScreenToWorld(mouseScreen, mouseWorld);
 		
 		float timeStep = settings.hz > 0.0f ? 1.0f / settings.hz : 0.0f;
 		
@@ -465,7 +465,7 @@ public abstract class AbstractExample {
     	if (!bombSpawning) return;
     	final float multiplier = 30.0f;
     	Vec2 mouseW = new Vec2();
-    	viewport.getScreenToWorldToOut(mouseScreen, mouseW);
+    	viewport.getScreenToWorld(mouseScreen, mouseW);
     	Vec2 vel = bombSpawnPoint.sub(mouseW);
     	vel.mulLocal(multiplier);
     	launchBomb(bombSpawnPoint,vel);
@@ -550,12 +550,12 @@ public abstract class AbstractExample {
     	
     	if (parent.shiftKey) {
     		Vec2 vec = new Vec2();
-    		viewport.getScreenToWorldToOut(p, vec);
+    		viewport.getScreenToWorld(p, vec);
     		spawnBomb(vec);
     		return;
     	}
     	
-    	viewport.getScreenToWorldToOut(p, p);
+    	viewport.getScreenToWorld(p, p);
     	
     	if (m_mouseJoint != null) return;
 
@@ -616,7 +616,7 @@ public abstract class AbstractExample {
     	mouseScreen.set(p);
         if (m_mouseJoint != null) {
         	Vec2 target = new Vec2();
-        	viewport.getScreenToWorldToOut(p, target);
+        	viewport.getScreenToWorld(p, target);
             m_mouseJoint.setTarget(target);
         }
     }
@@ -625,7 +625,7 @@ public abstract class AbstractExample {
      * @return the current world coordinates of the mouse.
      */
     public Vec2 getMouseWorld() {
-    	return viewport.getScreenToWorld(mouseScreen.x, mouseScreen.y);
+    	return m_debugDraw.getScreenToWorld(mouseScreen.x, mouseScreen.y);
     }
     
     /**
