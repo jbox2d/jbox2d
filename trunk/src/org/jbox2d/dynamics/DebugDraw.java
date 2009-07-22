@@ -27,7 +27,7 @@ package org.jbox2d.dynamics;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.common.ViewportTransform;
+import org.jbox2d.common.IViewportTransform;
 import org.jbox2d.common.XForm;
 
 /**
@@ -50,16 +50,11 @@ public abstract class DebugDraw {
 	public static final int e_controllerBit			= 0x0080; ///< draw controllers
 
 	protected int m_drawFlags;
-	protected final ViewportTransform viewportTransform;
-	
-	public DebugDraw(ViewportTransform viewport) {
+	protected final IViewportTransform viewportTransform;
+
+	public DebugDraw(IViewportTransform viewport) {
 		m_drawFlags = 0;
 		viewportTransform = viewport;
-	}
-	
-	public void setCamera(float x, float y, float scale){
-		viewportTransform.setCenter( x, y);
-		viewportTransform.setTransform( Mat22.createScaleTransform( scale));
 	}
 
 	public void setFlags(int flags) {
@@ -101,57 +96,107 @@ public abstract class DebugDraw {
 	public abstract void drawXForm(XForm xf);
 
 	public abstract void drawString(float x, float y, String s, Color3f color);
-
-	//All the following should be overridden if the concrete drawing
-	//class does any sort of camera movement
 	
-	public ViewportTransform getViewportTranform(){
+	public IViewportTransform getViewportTranform(){
 		return viewportTransform;
 	}
+
+	/**
+	 * @param x
+	 * @param y
+	 * @param scale
+	 * @see IViewportTransform#setCamera(float, float, float)
+	 */
+	public void setCamera(float x, float y, float scale){
+		viewportTransform.setCamera(x,y,scale);
+	}
 	
 	
-	/*
-	 * Stub method to overload for camera movement/zoom.
-	 * @param x - x coordinate of camera
-	 * @param y - y coordinate of camera
-	 * @param scale - zoom factor
-	 *
-	public void setCamera(float x, float y, float scale) {
-		
+	/**
+	 * @param argScreen
+	 * @param argWorld
+	 * @see org.jbox2d.common.IViewportTransform#getScreenToWorld(org.jbox2d.common.Vec2, org.jbox2d.common.Vec2)
+	 */
+	public void getScreenToWorldToOut(Vec2 argScreen, Vec2 argWorld) {
+		viewportTransform.getScreenToWorld(argScreen, argWorld);
 	}
 
 	/**
-	 * @param screenV Screen position
-	 * @return World position
-	 *
-	public Vec2 screenToWorld(Vec2 screenV) {
-		return screenToWorld(screenV.x, screenV.y);
+	 * @param argWorld
+	 * @param argScreen
+	 * @see org.jbox2d.common.IViewportTransform#getWorldToScreen(org.jbox2d.common.Vec2, org.jbox2d.common.Vec2)
+	 */
+	public void getWorldToScreenToOut(Vec2 argWorld, Vec2 argScreen) {
+		viewportTransform.getWorldToScreen(argWorld, argScreen);
 	}
 	
 	/**
-	 * @param screenx Screen x position
-	 * @param screeny Screey y position
-	 * @return World position
-	 *
-	public Vec2 screenToWorld(float screenx, float screeny) {
-		return new Vec2(screenx, screeny);
-	}
-
-	/**
-	 * @param worldV World position
-	 * @return Screen position
-	 *
-	public Vec2 worldToScreen(Vec2 worldV) {
-		if (worldV == null) return null;
-		return worldToScreen(worldV.x, worldV.y);
+	 * Takes the world coordinates and puts the corresponding screen
+	 * coordinates in argScreen.
+	 * @param worldX
+	 * @param worldY
+	 * @param argScreen
+	 */
+	public void getWorldToScreenToOut(float worldX, float worldY, Vec2 argScreen){
+		argScreen.set(worldX,worldY);
+		viewportTransform.getWorldToScreen(argScreen, argScreen);
 	}
 	
 	/**
-	 * @param worldx World x position
-	 * @param worldy World y position
-	 * @return Screen position
-	 *
-	public Vec2 worldToScreen(float worldx, float worldy) {
-		return new Vec2(worldx, worldy);
-	}*/
+	 * takes the world coordinate (argWorld) and returns
+	 * the screen coordinates.
+	 * @param argWorld
+	 */
+	public Vec2 getWorldToScreen(Vec2 argWorld){
+		Vec2 screen = new Vec2();
+		viewportTransform.getWorldToScreen( argWorld, screen);
+		return screen;
+	}
+	
+	/**
+	 * Takes the world coordinates and returns the screen
+	 * coordinates.
+	 * @param worldX
+	 * @param worldY
+	 */
+	public Vec2 getWorldToScreen(float worldX, float worldY){
+		Vec2 argScreen = new Vec2(worldX, worldY);
+		viewportTransform.getWorldToScreen( argScreen, argScreen);
+		return argScreen;
+	}
+	
+	/**
+	 * takes the screen coordinates and puts the corresponding 
+	 * world coordinates in argWorld.
+	 * @param screenX
+	 * @param screenY
+	 * @param argWorld
+	 */
+	public void getScreenToWorldToOut(float screenX, float screenY, Vec2 argWorld){
+		argWorld.set(screenX,screenY);
+		viewportTransform.getScreenToWorld(argWorld, argWorld);
+	}
+	
+	/**
+	 * takes the screen coordinates (argScreen) and returns
+	 * the world coordinates
+	 * @param argScreen
+	 */
+	public Vec2 getScreenToWorld(Vec2 argScreen){
+		Vec2 world = new Vec2();
+		viewportTransform.getScreenToWorld(argScreen, world);
+		return world;
+	}
+	
+	/**
+	 * takes the screen coordinates and returns the
+	 * world coordinates.
+	 * @param screenX
+	 * @param screenY
+	 */
+	public Vec2 getScreenToWorld(float screenX, float screenY){
+		Vec2 screen = new Vec2(screenX, screenY);
+		viewportTransform.getScreenToWorld( screen, screen);
+		return screen;
+	}
 }

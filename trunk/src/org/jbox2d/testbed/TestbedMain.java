@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jbox2d.common.Mat22;
+import org.jbox2d.common.OBBViewportTransform;
 import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.DebugDraw;
@@ -136,19 +137,20 @@ public class TestbedMain extends PApplet {
             		int notches = e.getWheelRotation();
             		
                 	Vec2 oldCenter = new Vec2();
-                	d.getViewportTranform().getScreenToWorldToOut(mouseX, mouseY, oldCenter);
+                	OBBViewportTransform trans = (OBBViewportTransform) d.getViewportTranform();
+                	d.getScreenToWorldToOut(mouseX, mouseY, oldCenter);
                 	//Change the zoom and clamp it to reasonable values - can't clamp now.
                 	if (notches < 0) {
-                		d.getViewportTranform().mulByTransform( Mat22.createScaleTransform( 1.05f ));
+                		trans.mulByTransform( Mat22.createScaleTransform( 1.05f ));
                 		currentTest.cachedCamScale *= 1.05;
                 	}
                 	else if (notches > 0) {
-                		d.getViewportTranform().mulByTransform( Mat22.createScaleTransform( .95f ));
+                		trans.mulByTransform( Mat22.createScaleTransform( .95f ));
                 		currentTest.cachedCamScale *= .95f;
                 	}
                 	
                 	Vec2 newCenter = new Vec2();
-                	d.getViewportTranform().getScreenToWorldToOut(mouseX, mouseY, newCenter);
+                	d.getScreenToWorldToOut(mouseX, mouseY, newCenter);
                 	
                 	
                 	Vec2 transformedMove = oldCenter.subLocal(newCenter);
@@ -256,10 +258,10 @@ public class TestbedMain extends PApplet {
         if (mouseButton == RIGHT) {
             if (mousePressed) {
             	Vec2 dif = new Vec2(- mouseX + pmouseX, mouseY - pmouseY);
-                d.getViewportTranform().getTransform().invert().mulToOut( dif, dif);
+                d.getViewportTranform().vectorInverseTransform(dif, dif);
                 d.getViewportTranform().getCenter().addLocal(dif);
                 Vec2 v = new Vec2();
-                d.getViewportTranform().getScreenToWorldToOut(width*.5f,height*.5f, v);
+                d.getScreenToWorldToOut(width*.5f,height*.5f, v);
                 currentTest.cachedCamX = v.x;
                 currentTest.cachedCamY = v.y;
             }

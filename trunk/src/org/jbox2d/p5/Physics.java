@@ -7,7 +7,7 @@ import org.jbox2d.collision.shapes.CircleDef;
 import org.jbox2d.collision.shapes.PolygonDef;
 import org.jbox2d.collision.shapes.ShapeDef;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.common.ViewportTransform;
+import org.jbox2d.common.IViewportTransform;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.DebugDraw;
@@ -691,7 +691,7 @@ public class Physics {
 	 * the world to show us what we see in our window.
 	 * @return
 	 */
-	public ViewportTransform getViewportTransform(){
+	public IViewportTransform getViewportTransform(){
 		return m_draw.getViewportTranform();
 	}
 	
@@ -862,22 +862,22 @@ public class Physics {
 	
 	/** Screen space to world space conversion for position. */
 	public float screenToWorldX(float x, float y) {
-		return m_draw.getViewportTranform().getScreenToWorld(x,y).x;
+		return m_draw.getScreenToWorld(x,y).x;
 	}
 	
 	/** Screen space to world space conversion for position. */
 	public float screenToWorldY(float x, float y) {
-		return m_draw.getViewportTranform().getScreenToWorld(x,y).y;
+		return m_draw.getScreenToWorld(x,y).y;
 	}
 	
 	/** Screen space to world space conversion for position. */
 	public Vec2 screenToWorld(float x, float y) {
-		return m_draw.getViewportTranform().getScreenToWorld(x,y);
+		return m_draw.getScreenToWorld(x,y);
 	}
 	
 	/** Screen space to world space conversion for position. */
 	public Vec2 screenToWorld(Vec2 v) {
-		return m_draw.getViewportTranform().getScreenToWorld(v);
+		return m_draw.getScreenToWorld(v);
 	}
 	
 	/** Screen length to world length, on the given vector direction*/
@@ -885,28 +885,28 @@ public class Physics {
 		Vec2 ret = new Vec2(vector);
 		ret.normalize();
 		ret.mulLocal( length);
-		m_draw.getViewportTranform().getTransform().mulToOut(ret, ret);
+		m_draw.getViewportTranform().vectorInverseTransform(ret, ret);
 		return ret.length();
 	}
 	
 	/** World space to screen space conversion for position. */
 	public float worldToScreenX(float x, float y) {
-		return m_draw.getViewportTranform().getWorldToScreen(x, y).x;
+		return m_draw.getWorldToScreen(x, y).x;
 	}
 	
 	/** World space to screen space conversion for position. */
 	public float worldToScreenY(float x, float y) {
-		return m_draw.getViewportTranform().getWorldToScreen(x, y).y;
+		return m_draw.getWorldToScreen(x, y).y;
 	}
 	
 	/** World space to screen space conversion for position. */
 	public Vec2 worldToScreen(float x, float y) {
-		return m_draw.getViewportTranform().getWorldToScreen(x, y);
+		return m_draw.getWorldToScreen(x, y);
 	}
 	
 	/** World space to screen space conversion for position. */
 	public Vec2 worldToScreen(Vec2 v) {
-		return m_draw.getViewportTranform().getWorldToScreen(v);
+		return m_draw.getWorldToScreen(v);
 	}
 	
 	/** World length to screen length, on the given vector direction*/
@@ -914,13 +914,14 @@ public class Physics {
 		Vec2 ret = new Vec2(vector);
 		ret.normalize();
 		ret.mulLocal( length);
-		m_draw.getViewportTranform().getTransform().invert().mulToOut(ret, ret);
+		m_draw.getViewportTranform().vectorTransform(ret, ret);
 		return ret.length();
 	}
 	
 	public Vec2 screenToWorldVector(Vec2 screenV) {
-		Vec2 ret = m_draw.getViewportTranform().getTransform().invert().mul(screenV);
-		if(m_draw.getViewportTranform().yFlip){
+		Vec2 ret = new Vec2();
+		m_draw.getViewportTranform().vectorInverseTransform(screenV, ret);
+		if(m_draw.getViewportTranform().isYFlip()){
 			ret.y *= -1;
 		}
 		return ret;
@@ -928,16 +929,17 @@ public class Physics {
 	
 	public Vec2 screenToWorldVector(float sx, float sy) {
 		Vec2 ret = new Vec2(sx, sy);
-		m_draw.getViewportTranform().getTransform().invert().mulToOut(ret, ret);
-		if(m_draw.getViewportTranform().yFlip){
+		m_draw.getViewportTranform().vectorInverseTransform(ret, ret);
+		if(m_draw.getViewportTranform().isYFlip()){
 			ret.y *= -1;
 		}
 		return ret;
 	}
 	
 	public Vec2 worldToScreenVector(Vec2 worldV) {
-		Vec2 ret = m_draw.getViewportTranform().getTransform().mul(worldV);
-		if(m_draw.getViewportTranform().yFlip){
+		Vec2 ret = new Vec2();
+		m_draw.getViewportTranform().vectorTransform(worldV, ret);
+		if(m_draw.getViewportTranform().isYFlip()){
 			ret.y *= -1;
 		}
 		return ret;
@@ -945,8 +947,8 @@ public class Physics {
 	
 	public Vec2 worldToScreenVector(float wx, float wy) {
 		Vec2 ret = new Vec2(wx, wy);
-		m_draw.getViewportTranform().getTransform().mulToOut(ret, ret);
-		if(m_draw.getViewportTranform().yFlip){
+		m_draw.getViewportTranform().vectorTransform(ret, ret);
+		if(m_draw.getViewportTranform().isYFlip()){
 			ret.y *= -1;
 		}
 		return ret;

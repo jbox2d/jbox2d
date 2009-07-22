@@ -29,6 +29,7 @@ import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.collision.PairCallback;
 import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactPoint;
@@ -145,10 +146,11 @@ public class ContactManager implements PairCallback {
 		destroy(c);
 	}
 
-	// djm pooled
-	private final Vec2 v1 = new Vec2();
-	private final ContactPoint cp = new ContactPoint();
 	public void destroy(final Contact c) {
+		
+		final Vec2 v1 = ObjectPool.getVec2();
+		final ContactPoint cp = ObjectPool.getContactPoint();
+		
 		final Shape shape1 = c.getShape1();
 		final Shape shape2 = c.getShape2();
 
@@ -227,6 +229,9 @@ public class ContactManager implements PairCallback {
 		// Call the factory.
 		Contact.destroy(c);
 		--m_world.m_contactCount;
+		
+		ObjectPool.returnVec2(v1);
+		ObjectPool.returnContactPoint(cp);
 	}
 
 	public void collide() {

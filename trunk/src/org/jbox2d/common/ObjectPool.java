@@ -337,6 +337,27 @@ public final class ObjectPool {
 		pool.push(argToRecycle);
 	}
 	
+	public static final ContactPoint getContactPoint() {
+		Stack<ContactPoint> pool = contactPointPool.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() once in each thread";
+
+		if (pool.isEmpty()) {
+			pool.push(new ContactPoint());
+			pool.push(new ContactPoint());
+			pool.push(new ContactPoint());
+			pool.push(new ContactPoint());
+			pool.push(new ContactPoint());
+		}
+
+		return pool.pop();
+	}
+
+	public static final void returnContactPoint(ContactPoint argToRecycle) {
+		Stack<ContactPoint> pool = contactPointPool.get(Thread.currentThread());
+		assert (pool != null) : "Pool was null, make sure you call initPools() once in each thread";
+		pool.push(argToRecycle);
+	}
+	
 	public static final RaycastResult getRaycastResult() {
 		Stack<RaycastResult> pool = raycastResultPool.get(Thread.currentThread());
 		assert (pool != null) : "Pool was null, make sure you call initPools() once in each thread";
