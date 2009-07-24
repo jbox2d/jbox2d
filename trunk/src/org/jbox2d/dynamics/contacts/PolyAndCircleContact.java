@@ -97,19 +97,15 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
 		return manifoldList;
 	}
 
-	// djm pooled
-	private final static Manifold m0 = new Manifold();
-	private final static Vec2 v1 = new Vec2();
-	private final static ContactPoint cp = new ContactPoint();
-
 	@Override
 	public void evaluate(final ContactListener listener) {
 
 		final Body b1 = m_shape1.getBody();
 		final Body b2 = m_shape2.getBody();
 
-		//memcpy(&m0, &m_manifold, sizeof(b2Manifold));
-		m0.set(m_manifold);
+		final Manifold m0 = ObjectPool.getManifold(m_manifold);
+		final Vec2 v1 = ObjectPool.getVec2();
+		final ContactPoint cp = ObjectPool.getContactPoint();
 
 		ObjectPool.getCollideCircle().collidePolygonAndCircle(m_manifold, (PolygonShape)m_shape1, b1.getMemberXForm(), (CircleShape)m_shape2, b2.getMemberXForm());
 
@@ -189,6 +185,9 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
 		}
 
 		if (listener == null) {
+			ObjectPool.returnManifold(m0);
+			ObjectPool.returnVec2(v1);
+			ObjectPool.returnContactPoint(cp);
 			return;
 		}
 
@@ -213,5 +212,8 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
 			listener.remove(cp);
 		}
 
+		ObjectPool.returnManifold(m0);
+		ObjectPool.returnVec2(v1);
+		ObjectPool.returnContactPoint(cp);
 	}
 }

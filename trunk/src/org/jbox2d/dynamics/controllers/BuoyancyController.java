@@ -110,8 +110,8 @@ public class BuoyancyController extends Controller {
 	@Override
 	public void draw(DebugDraw debugDraw) {
 		float r = 1000;
-		Vec2 p1 = normal.mul(offset).add(Vec2.cross(normal, r));
-		Vec2 p2 = normal.mul(offset).sub(Vec2.cross(normal, r));
+		Vec2 p1 = normal.mul(offset).addLocal(Vec2.cross(normal, r));
+		Vec2 p2 = normal.mul(offset).subLocal(Vec2.cross(normal, r));
 
 		Color3f color = new Color3f(0,0,255*0.8f);
 

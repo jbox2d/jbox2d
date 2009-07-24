@@ -25,7 +25,6 @@ package org.jbox2d.dynamics;
 
 
 import org.jbox2d.common.Color3f;
-import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.IViewportTransform;
 import org.jbox2d.common.XForm;
