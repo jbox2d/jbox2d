@@ -24,6 +24,7 @@
 package org.jbox2d.dynamics;
 
 import java.util.ArrayList;
+
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.BroadPhase;
 import org.jbox2d.collision.OBB;
@@ -58,6 +59,7 @@ import org.jbox2d.dynamics.joints.JointDef;
 import org.jbox2d.dynamics.joints.JointEdge;
 import org.jbox2d.dynamics.joints.JointType;
 import org.jbox2d.dynamics.joints.PulleyJoint;
+
 
 //Updated to rev 56->118->142->150 of b2World.cpp/.h
 
@@ -213,7 +215,7 @@ public class World {
 		m_lock = false;
 
 		m_allowSleep = doSleep;
-		
+
 		m_gravity = gravity;
 
 		m_contactManager = new ContactManager();
@@ -564,7 +566,7 @@ public class World {
 
 		m_inv_dt0 = step.inv_dt;
 		m_lock = false;
-		
+
 		ObjectPool.returnTimeStep(step);
 		
 		postStep(dt,iterations);
@@ -610,16 +612,16 @@ public class World {
 	 * The number of shapes found is returned.
 	 * @param aabb the query box.
 	 * @param maxCount the capacity of the shapes array.
-	 * @param returning returning array of shapes overlapped, up to maxCount in length
+	 * @return array of shapes overlapped, up to maxCount in length
 	 */
 	public Shape[] query(final AABB aabb, final int maxCount) {
 		final Object[] objs = m_broadPhase.query(aabb, maxCount);
 		final Shape[] ret = new Shape[objs.length];
 		System.arraycopy(objs, 0, ret, 0, objs.length);
-//		for (int i=0; i<ret.length; ++i) {
-//			ret[i] = (Shape)(objs[i]);
-//		}
-		
+		//for (int i=0; i<ret.length; ++i) {
+		//	ret[i] = (Shape)(objs[i]);
+		//}
+
 		return ret;
 	}
 
@@ -1056,7 +1058,7 @@ public class World {
 			// Commit shape proxy movements to the broad-phase so that new contacts are created.
 			// Also, some contacts can be destroyed.
 			m_broadPhase.commit();
-			
+
 			ObjectPool.returnIsland(island);
 		}
 	}
@@ -1416,6 +1418,17 @@ public class World {
 	Object m_raycastUserData;
 	boolean m_raycastSolidShape;
 	
+	/** 
+	 * Query the world for all fixtures that intersect a given segment. You provide a shape
+	 * pointer buffer of specified size. The number of shapes found is returned, and the buffer
+	 * is filled in order of intersection
+	 * @param segment defines the begin and end point of the ray cast, from p1 to p2.
+	 * @param shapes a user allocated shape pointer array of size maxCount (or greater).
+	 * @param maxCount the capacity of the shapes array
+	 * @param solidShapes determines if shapes that the ray starts in are counted as hits.
+	 * @param userData passed through the worlds contact filter, with method RayCollide. This can be used to filter valid shapes
+	 * @return the number of shapes found
+	 */
 	public int raycast(Segment segment, Shape[] shapes, int maxCount, boolean solidShapes, Object userData)
 	{
 		m_raycastSegment = segment;
@@ -1434,6 +1447,17 @@ public class World {
 		return count;
 	}
 
+	/** 
+	 * Performs a ray-cast as with {@link #raycast(Segment, Shape[], int, boolean, Object)}, finding the first intersecting shape
+	 * @param segment defines the begin and end point of the ray cast, from p1 to p2
+	 * @param lambda returns the hit fraction. You can use this to compute the contact point
+	 * p = (1 - lambda) * segment.p1 + lambda * segment.p2.
+	 * @param normal returns the normal at the contact point. If there is no intersection, the normal
+	 * is not set.
+	 * @param solidShapes determines if shapes that the ray starts in are counted as hits.
+	 * @returns the colliding shape shape, or null if not found
+	 * @see #raycast(Segment, Shape[], int, boolean, Object)
+	 */
 	public Shape raycastOne(Segment segment, RaycastResult result, boolean solidShapes, Object userData)
 	{
 		int maxCount = 1;
