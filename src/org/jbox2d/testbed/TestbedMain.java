@@ -114,7 +114,7 @@ public class TestbedMain extends PApplet {
     	 * is slow as hell and tends to drop frames.  I have no idea
     	 * why, but for now let's use P3D and live without the smoothing...
     	 */
-    	size(640,480,P3D);
+    	size(640,480,JAVA2D);
 //    	smooth();
     	frameRate(targetFPS);
     	g = new ProcessingDebugDraw(this);

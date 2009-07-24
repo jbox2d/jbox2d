@@ -29,9 +29,9 @@ import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.shapes.CircleDef;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Color3f;
+import org.jbox2d.common.IViewportTransform;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.common.IViewportTransform;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BoundaryListener;
@@ -150,7 +150,9 @@ public abstract class AbstractExample {
     /**
      * @return Title of example.
      */
-	abstract public String getName();
+	public String getName() {
+		return this.getClass().getSimpleName();
+	}
     
 	/**
 	 * Create the world geometry for each test.
@@ -447,6 +449,16 @@ public abstract class AbstractExample {
     	}
     }
     
+    /** @return true if the point is within the world AABB, false otherwise. */
+    public boolean inRange(Vec2 worldPoint) {
+    	Vec2 minV = worldPoint.sub(new Vec2(0.1f,0.1f));
+    	Vec2 maxV = worldPoint.add(new Vec2(0.1f,0.1f));
+    	//AABB aabb = new AABB(minV, maxV);
+    	boolean inRange = (minV.x > m_worldAABB.lowerBound.x && minV.y > m_worldAABB.lowerBound.y
+    					&& maxV.x < m_worldAABB.upperBound.x && maxV.y < m_worldAABB.upperBound.y);
+    	return inRange;
+    }
+    
     //Shift+drag "slingshots" a bomb from any point using these functions
     /**
      * Begins spawning a bomb, spawn finishes and bomb is created upon calling completeBombSpawn().
@@ -499,7 +511,7 @@ public abstract class AbstractExample {
         aabb1.upperBound.addLocal(d);
         
         // Query the world for overlapping shapes.
-        int k_maxCount = 1;
+        int k_maxCount = 10;
         Shape shapes[] = m_world.query(aabb1, k_maxCount);
         
         Body body = null;
@@ -514,6 +526,53 @@ public abstract class AbstractExample {
             }
         }
         return body;
+    }
+    
+    public Body getStaticBodyAtPoint(Vec2 worldPoint) {
+    	aabb1.lowerBound.set(worldPoint);
+        aabb1.lowerBound.subLocal(d);
+        aabb1.upperBound.set(worldPoint);
+        aabb1.upperBound.addLocal(d);
+        
+        // Query the world for overlapping shapes.
+        int k_maxCount = 10;
+        Shape shapes[] = m_world.query(aabb1, k_maxCount);
+        
+        Body body = null;
+        for (int j = 0; j < shapes.length; j++) {
+            Body shapeBody = shapes[j].getBody();
+            if (shapeBody.isStatic() == true) {
+                boolean inside = shapes[j].testPoint(shapeBody.getMemberXForm(),worldPoint);
+                if (inside) {
+                    body = shapes[j].m_body;
+                    break;
+                }
+            }
+        }
+        return body;
+    }
+    
+    public Shape getStaticShapeAtPoint(Vec2 worldPoint) {
+    	aabb1.lowerBound.set(worldPoint);
+        aabb1.lowerBound.subLocal(d);
+        aabb1.upperBound.set(worldPoint);
+        aabb1.upperBound.addLocal(d);
+        
+        // Query the world for overlapping shapes.
+        int k_maxCount = 10;
+        Shape shapes[] = m_world.query(aabb1, k_maxCount);
+        
+        Body body = null;
+        for (int j = 0; j < shapes.length; j++) {
+            Body shapeBody = shapes[j].getBody();
+            if (shapeBody.isStatic() == true) {
+                boolean inside = shapes[j].testPoint(shapeBody.getMemberXForm(),worldPoint);
+                if (inside) {
+                    return shapes[j];
+                }
+            }
+        }
+        return null;
     }
     
     
