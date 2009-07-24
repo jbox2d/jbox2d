@@ -33,7 +33,6 @@ import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.ShapeDef;
 import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Mat22;
-import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Sweep;
 import org.jbox2d.common.Vec2;
@@ -214,23 +213,23 @@ public class Body {
 
 		m_shapeList = null;
 		m_shapeCount = 0;
+
+//		System.out.println("Body hash code: " + this.hashCode());
 	}
 
+	// djm this isn't a hot method, allocation is just fine
 	private float connectEdges(final EdgeShape s1, final EdgeShape s2, final float angle1) {
 		final float angle2 = (float)Math.atan2(s2.getDirectionVector().y, s2.getDirectionVector().x);
 
-		final Vec2 core = ObjectPool.getVec2(s2.getDirectionVector()).mulLocal( (float)Math.tan((angle2 - angle1) * 0.5f)) ;
+		final Vec2 core = s2.getDirectionVector().mul( (float)Math.tan((angle2 - angle1) * 0.5f)) ;
 		(core.subLocal(s2.getNormalVector())).mulLocal(Settings.toiSlop).addLocal(s2.getVertex1());
 
-		final Vec2 cornerDir = ObjectPool.getVec2(s1.getDirectionVector()).addLocal(s2.getDirectionVector());
+		final Vec2 cornerDir = s1.getDirectionVector().add(s2.getDirectionVector());
 		cornerDir.normalize();
 
 		final boolean convex = Vec2.dot(s1.getDirectionVector(), s2.getNormalVector()) > 0.0f;
 		s1.setNextEdge(s2, core, cornerDir, convex);
 		s2.setPrevEdge(s1, core, cornerDir, convex);
-		
-		ObjectPool.returnVec2(core);
-		ObjectPool.returnVec2(cornerDir);
 		return angle2;
 	}
 
@@ -239,6 +238,7 @@ public class Body {
 	 * <BR><em>Warning</em>: This function is locked during callbacks.
 	 * @param def the shape definition.
 	 */
+	// djm not a hot method, allocations are fine
 	public Shape createShape(final ShapeDef def){
 		assert(m_world.m_lock == false);
 
@@ -448,11 +448,10 @@ public class Body {
 		m_I = 0.0f;
 		m_invI = 0.0f;
 
-		final Vec2 center = ObjectPool.getVec2();
-		center.setZero();
-		final MassData massData = ObjectPool.getMassData();
-		
+		// djm might as well allocate, not really a hot path
+		final Vec2 center = new Vec2();
 		for (Shape s = m_shapeList; s != null; s = s.m_next) {
+			final MassData massData = new MassData();
 			s.computeMass(massData);
 			m_mass += massData.mass;
 			center.x += massData.mass * massData.center.x;
@@ -500,9 +499,6 @@ public class Body {
 				s.refilterProxy(m_world.m_broadPhase, m_xf);
 			}
 		}
-		
-		ObjectPool.returnVec2(center);
-		ObjectPool.returnMassData(massData);
 	}
 
 	/**
@@ -952,15 +948,16 @@ public class Body {
 	}
 
 
+	// djm pooled
+	private final XForm xf1 = new XForm();
 	/** For internal use only. */
 	public boolean synchronizeShapes(){
 		// INLINED
-		//XForm xf1 = new XForm();
-		//xf1.R.set(m_sweep.a0);
-		//xf1.position.set(m_sweep.c0.sub(Mat22.mul(xf1.R, m_sweep.localCenter)));
-		final XForm xf1 = ObjectPool.getXForm();
 		xf1.R.set(m_sweep.a0);
-		xf1.position.set(m_sweep.c0.x - xf1.R.col1.x * m_sweep.localCenter.x + xf1.R.col2.x * m_sweep.localCenter.y, m_sweep.c0.y - xf1.R.col1.y * m_sweep.localCenter.x + xf1.R.col2.y * m_sweep.localCenter.y);
+		Mat22 R = xf1.R;
+		Vec2 v = m_sweep.localCenter;
+		xf1.position.set(m_sweep.c0.x - (R.col1.x * v.x + R.col2.x * v.y),
+						 m_sweep.c0.y - (R.col1.y * v.x + R.col2.y * v.y));
 
 		boolean inRange = true;
 		for (Shape s = m_shapeList; s != null; s = s.m_next) {
@@ -978,12 +975,10 @@ public class Body {
 				s.destroyProxy(m_world.m_broadPhase);
 			}
 
-			ObjectPool.returnXForm(xf1);
 			// Failure
 			return false;
 		}
 
-		ObjectPool.returnXForm(xf1);
 		// Success
 		return true;
 	}
@@ -1297,5 +1292,14 @@ public class Body {
 //		return m_uniqueID;
 //	}
 	
+	public void setLinearDamping(float damping) {
+		m_linearDamping = damping;
+	}
+	public float getLinearDamping() { return m_linearDamping; }
+	
+	public void setAngularDamping(float damping) {
+		m_angularDamping = damping;
+	}
+	public float getAngularDamping() { return m_angularDamping; }
 }
 
