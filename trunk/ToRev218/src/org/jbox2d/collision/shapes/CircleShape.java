@@ -36,47 +36,61 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.Body;
 
-//Updated to rev 56->108->139->[221 of groundzero] of Shape.cpp/.h
+
+//Updated to rev 56->108->139 of Shape.cpp/.h
 
 /**
  * A circle shape.
  */
 public class CircleShape extends Shape {
 
-	private final Vec2 m_localPosition = new Vec2();
-	private float m_radius;
+	public final Vec2 m_p; 
 
 	/**
-	 * This is used internally, instead use {@link Body#createShape(ShapeDef)} with a {@link CircleDef}
+	 * this is used internally, instead use {@link Body#createShape(ShapeDef)} with a {@link CircleDef}
 	 * @see Body#createShape(ShapeDef)
 	 * @see CircleDef
 	 * @param def
 	 */
-	protected CircleShape(ShapeDef def){
-		super(def);
-		assert(def.type == ShapeType.CIRCLE_SHAPE);
+	public CircleShape(){
 		m_type = ShapeType.CIRCLE_SHAPE;
-		
-		CircleDef circleDef = (CircleDef) def;
-		
-		m_localPosition.set(circleDef.localPosition);
-		m_radius = circleDef.radius;
+		m_p = new Vec2();
 	}
-	
+
 	/**
-	 * Gets the local position. not a copy.
+	 * Get the supporting vertex index in the given direction.
+	 * @param d
 	 * @return
 	 */
-	public Vec2 getLocalPosition(){
-		return m_localPosition;
+	public final int getSupport(final Vec2 d){
+		return 0;
 	}
-	
+
 	/**
-	 * returns the radius of this shape.
+	 * Get the supporting vertex in the given direction.
+	 * @param d
 	 * @return
 	 */
-	public float getRadius(){
-		return m_radius;
+	public final Vec2 getSupportVertex( final Vec2 d){
+		return m_p;
+	}
+
+	/**
+	 * Get the vertex count.
+	 * @return
+	 */
+	public final int getVertexCount()  {
+		return 1;
+	}
+
+	/**
+	 * Get a vertex by index. Used by Distance.
+	 * @param index
+	 * @return
+	 */
+	public final Vec2 getVertex(final int index){
+		assert(index == 0);
+		return m_p;
 	}
 
 	// djm pooling
@@ -86,7 +100,7 @@ public class CircleShape extends Shape {
 	 */
 	@Override
 	public final boolean testPoint(final XForm transform, final Vec2 p) {
-		Mat22.mulToOut(transform.R, m_localPosition, center);
+		Mat22.mulToOut(transform.R, m_p, center);
 		center.addLocal(transform.position);
 
 		final Vec2 d = center.subLocal(p).negateLocal();
@@ -107,7 +121,7 @@ public class CircleShape extends Shape {
 	 */
 	@Override
 	public final SegmentCollide testSegment(final XForm transform, final TestSegmentResult out, final Segment segment, final float maxLambda){
-		Mat22.mulToOut( transform.R, m_localPosition, position);
+		Mat22.mulToOut( transform.R, m_p, position);
 		position.addLocal( transform.position);
 		s.set( segment.p1).subLocal(position);
 		final float b = Vec2.dot( s, s) - m_radius * m_radius;
@@ -125,7 +139,8 @@ public class CircleShape extends Shape {
 		final float sigma = c * c - rr * b;
 
 		// Check for negative discriminant and short segment.
-		if (sigma < 0.0f || rr < Settings.EPSILON){
+		if (sigma < 0.0f || rr < Settings.EPSILON)
+		{
 			return SegmentCollide.MISS_COLLIDE;
 		}
 
@@ -153,7 +168,7 @@ public class CircleShape extends Shape {
 	 */
 	@Override
 	public final void computeAABB(final AABB aabb, final XForm transform) {
-		Mat22.mulToOut(transform.R, m_localPosition, p);
+		Mat22.mulToOut(transform.R, m_p, p);
 		p.addLocal(transform.position);
 
 		aabb.lowerBound.x = p.x - m_radius;
@@ -161,40 +176,17 @@ public class CircleShape extends Shape {
 		aabb.upperBound.x = p.x + m_radius;
 		aabb.upperBound.y = p.y + m_radius;
 	}
-	
-	// djm pooling
-	private static final Vec2 p1 = new Vec2();
-	private static final Vec2 p2 = new Vec2();
-	private static final Vec2 lower = new Vec2();
-	private static final Vec2 upper = new Vec2();
-	/**
-	 * @see Shape#computeSweptAABB(AABB, XForm, XForm)
-	 */
-	public final void computeSweptAABB(AABB aabb, XForm transform1, XForm transform2){
-		Mat22.mulToOut( transform1.R, m_localPosition, p1);
-		p1.addLocal(transform1.position);
-		
-		Mat22.mulToOut( transform2.R, m_localPosition, p2);
-		p1.addLocal(transform2.position);
-		
-		// TODO djm, create method to send max to one var and min to another
-		Vec2.minToOut( p1, p2, lower);
-		Vec2.maxToOut( p1, p2, upper);
-		
-		aabb.lowerBound.set(lower.x - m_radius, lower.y - m_radius);
-		aabb.upperBound.set(upper.x + m_radius, upper.y + m_radius);
-	}
 
 	/**
 	 * @see Shape#computeMass(MassData, float)
 	 */
 	@Override
 	public final void computeMass(final MassData massData, final float density) {
-		massData.mass = density * MathUtils.PI * m_radius * m_radius;
-		massData.center.set(m_localPosition);
+		massData.mass = density * (float)Math.PI * m_radius * m_radius;
+		massData.center.set(m_p);
 
 		// inertia about the local origin
-		massData.I = massData.mass * (0.5f * m_radius * m_radius + Vec2.dot(m_localPosition, m_localPosition));
+		massData.I = massData.mass * (0.5f * m_radius * m_radius + Vec2.dot(m_p, m_p));
 	}
 
 	// djm pooled from above
@@ -203,7 +195,7 @@ public class CircleShape extends Shape {
 	 */
 	@Override
 	public final float computeSubmergedArea( final Vec2 normal, final float offset, final XForm xf, final Vec2 c) {
-		XForm.mulToOut(xf,m_localPosition, p);
+		XForm.mulToOut(xf,m_p, p);
 		final float l = -( Vec2.dot(normal,p) - offset);
 		if( l < -m_radius + Settings.EPSILON){
 			//Completely dry
@@ -219,7 +211,7 @@ public class CircleShape extends Shape {
 		//Magic
 		final float r2 = m_radius*m_radius;
 		final float l2 = l*l;
-
+		//Erin TODO: write Sqrt to handle fixed point case.
 		final float area = (float) (r2 * (Math.asin(l/m_radius) + Math.PI/2)+ l * Math.sqrt(r2 - l2));
 		final float com = (float) (-2.0/3.0* Math.pow(r2-l2,1.5f)/area);
 
@@ -233,10 +225,10 @@ public class CircleShape extends Shape {
 	 * @see Shape#computeSweepRadius(Vec2)
 	 */
 	@Override
-	protected final void updateSweepRadius( final Vec2 center){
-		float dx = m_localPosition.x - center.x;
-		float dy = m_localPosition.y - center.y;
-		
-		m_sweepRadius = (float)Math.sqrt(dx*dx + dy*dy) + m_radius - Settings.toiSlop;
+	public final float computeSweepRadius( final Vec2 pivot) {
+		return (float) Math.sqrt(MathUtils.distanceSquared( m_p, pivot));
 	}
+
+	@Override
+	public void destructor() {}
 }

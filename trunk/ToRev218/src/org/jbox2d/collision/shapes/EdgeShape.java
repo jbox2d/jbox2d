@@ -6,6 +6,7 @@ import org.jbox2d.collision.Segment;
 import org.jbox2d.collision.structs.SegmentCollide;
 import org.jbox2d.collision.structs.ShapeType;
 import org.jbox2d.collision.structs.TestSegmentResult;
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
@@ -16,56 +17,80 @@ import org.jbox2d.common.XForm;
  */
 public class EdgeShape extends Shape {
 
-	protected final Vec2 m_v1 = new Vec2();
-	protected final Vec2 m_v2 = new Vec2();
+	private final Vec2 m_v1 = new Vec2();
+	private final Vec2 m_v2 = new Vec2(); 
 
-	protected final Vec2 m_coreV1 = new Vec2();
-	protected final Vec2 m_coreV2 = new Vec2();
-	
-	protected float m_length;
+	private float m_length;
 
-	protected final Vec2 m_normal = new Vec2();
+	private final Vec2 m_normal = new Vec2();
 
 	private final Vec2 m_direction = new Vec2();
 
 	/**
 	 * Unit vector halfway between m_direction and m_prevEdge.m_direction:
 	 */
-	protected final Vec2 m_cornerDir1 = new Vec2();
+	private final Vec2 m_cornerDir1 = new Vec2();
 
 	/**
 	 * Unit vector halfway between m_direction and m_nextEdge.m_direction:
 	 */
-	protected final Vec2 m_cornerDir2 = new Vec2();
+	private final Vec2 m_cornerDir2 = new Vec2();
 
-	protected boolean m_cornerConvex1;
-	protected boolean m_cornerConvex2;
+	private boolean m_cornerConvex1;
+	private boolean m_cornerConvex2;
 
-	protected EdgeShape m_nextEdge;
-	protected EdgeShape m_prevEdge;
+	EdgeShape m_nextEdge;
+	EdgeShape m_prevEdge;
 
-	public EdgeShape(final Vec2 v1, final Vec2 v2, ShapeDef def) {
-		super(def);
-		assert(def.type == ShapeType.EDGE_SHAPE);
+	public EdgeShape() {
 		m_type = ShapeType.EDGE_SHAPE;
-		
+		m_radius = Settings.polygonRadius;
 		m_prevEdge = null;
 		m_nextEdge = null;
-		
-		m_v1.set(v1);
-		m_v2.set(v2);
-		
-		m_direction.set(m_v2).subLocal(m_v1);
-		m_length = m_direction.normalize();
-		m_normal.set(m_direction.y, -m_direction.x);
-		
-		// = -b2_toiSlop * (m_normal - m_direction) + m_v1;
-		m_coreV1.set( m_normal).subLocal(m_direction).mulLocal( -Settings.toiSlop).addLocal(m_v1);
-		// = -b2_toiSlop * (m_normal + m_direction) + m_v2;
-		m_coreV2.set( m_normal).subLocal(m_direction).mulLocal( -Settings.toiSlop).addLocal(m_v2);
-		
-		m_cornerDir1.set(m_normal);
-		m_cornerDir2.set(m_normal).negateLocal();
+	}
+
+	@Override
+	public void destructor(){
+		if (m_prevEdge != null){
+			m_prevEdge.m_nextEdge = null;
+		}
+
+		if (m_nextEdge != null){
+			m_nextEdge.m_prevEdge = null;
+		}
+	}
+
+	/** Linear distance from vertex1 to vertex2 */
+	public float getLength() {
+		return m_length;
+	}
+
+	/** Local position of vertex in parent body */
+	public Vec2 getVertex1() {
+		return m_v1;
+	}
+
+	/** Local position of vertex in parent body */
+	public Vec2 getVertex2() {
+		return m_v2;
+	}
+
+	/** Perpendicular unit vector point, pointing from the solid side to the empty side. */
+	public Vec2 getNormalVector() {
+		return m_normal;
+	}
+
+	/** Parallel unit vector, pointing from vertex1 to vertex2 */
+	public Vec2 getDirectionVector() {
+		return m_direction;
+	}
+
+	public Vec2 getCorner1Vector() {
+		return m_cornerDir1;
+	}
+
+	public Vec2 getCorner2Vector() {
+		return m_cornerDir2;
 	}
 
 	/**
@@ -74,21 +99,13 @@ public class EdgeShape extends Shape {
 	 * @param v2
 	 */
 	public void set( final Vec2 v1,  final Vec2 v2){
-		m_prevEdge = null;
-		m_nextEdge = null;
-		
 		m_v1.set(v1);
 		m_v2.set(v2);
-		
+
 		m_direction.set(m_v2).subLocal(m_v1);
 		m_length = m_direction.normalize();
-		m_normal.set(m_direction.y, -m_direction.x);
-		
-		// = -b2_toiSlop * (m_normal - m_direction) + m_v1;
-		m_coreV1.set( m_normal).subLocal(m_direction).mulLocal( -Settings.toiSlop).addLocal(m_v1);
-		// = -b2_toiSlop * (m_normal + m_direction) + m_v2;
-		m_coreV2.set( m_normal).subLocal(m_direction).mulLocal( -Settings.toiSlop).addLocal(m_v2);
-		
+		Vec2.crossToOut( m_direction, 1f, m_normal);
+
 		m_cornerDir1.set(m_normal);
 		m_cornerDir2.set(m_normal).negateLocal();
 	}
@@ -171,28 +188,12 @@ public class EdgeShape extends Shape {
 
 		XForm.mulToOut( transform, m_v1, v1);
 		XForm.mulToOut( transform, m_v2, v2);
+		r.set(m_radius, m_radius);
 
 		Vec2.minToOut( v1, v2, aabb.lowerBound);
 		Vec2.maxToOut( v1, v2, aabb.upperBound);
-	}
-	
-	// djm pooled, and from above
-	private static final Vec2 v3 = new Vec2();
-	private static final Vec2 v4 = new Vec2();
-	
-	public void computeSweptAABB( AABB aabb, XForm transform1, XForm transform2){
-		XForm.mulToOut( transform1, m_v1, v1);
-		XForm.mulToOut( transform1, m_v2, v2);
-		XForm.mulToOut( transform2, m_v1, v3);
-		XForm.mulToOut( transform2, m_v2, v4);
-		
-		Vec2.minToOut( v1, v2, aabb.lowerBound);
-		Vec2.minToOut( aabb.lowerBound, v3, aabb.lowerBound);
-		Vec2.minToOut( aabb.lowerBound, v4, aabb.lowerBound);
-		
-		Vec2.maxToOut( v1, v2, aabb.upperBound);
-		Vec2.maxToOut( aabb.upperBound, v3, aabb.upperBound);
-		Vec2.maxToOut( aabb.upperBound, v4, aabb.upperBound);
+		aabb.lowerBound.subLocal(r);
+		aabb.upperBound.addLocal(r);
 	}
 
 	/**
@@ -272,82 +273,53 @@ public class EdgeShape extends Shape {
 
 		return 0.5f * Vec2.cross(e1, e2);
 	}
-	
-	/** Linear distance from vertex1 to vertex2 */
-	public float getLength() {
-		return m_length;
+
+	/**
+	 * @see Shape#computeSweepRadius(Vec2)
+	 * @param pivot
+	 * @return
+	 */
+	@Override
+	public final float computeSweepRadius( final Vec2 pivot){
+		final float ds1 = MathUtils.distanceSquared(m_v1, pivot);
+		final float ds2 = MathUtils.distanceSquared(m_v2, pivot);
+		return (float) Math.sqrt(MathUtils.max(ds1, ds2));
 	}
 
-	/** Local position of vertex in parent body */
-	public Vec2 getVertex1() {
-		return m_v1;
+
+	/**
+	 * Get the supporting vertex index in the given direction.
+	 * @param d
+	 * @return
+	 */
+	public final int getSupport( final Vec2 d){
+		return Vec2.dot(m_v1, d) > Vec2.dot(m_v2, d) ? 0 : 1;
 	}
 
-	/** Local position of vertex in parent body */
-	public Vec2 getVertex2() {
-		return m_v2;
+	/**
+	 * Get the supporting vertex in the given direction.
+	 * @param d
+	 * @return
+	 */
+	public final Vec2 getSupportVertex( final Vec2 d){
+		return Vec2.dot(m_v1, d) > Vec2.dot(m_v2, d) ? m_v1 : m_v2;
 	}
 
-	/** "Core" vertex with TOI slop for b2Distance functions: */
-	public Vec2 getCoreVertex1() {
-		return m_coreV1;
-	}
-	
-	/** "Core" vertex with TOI slop for b2Distance functions: */
-	public Vec2 getCoreVertex2() {
-		return m_coreV2;
+	/**
+	 * Get the vertex count.
+	 */
+	public final int getVertexCount()  {
+		return 2;
 	}
 
-	/** Perpendicular unit vector point, pointing from the solid side to the empty side. */
-	public Vec2 getNormalVector() {
-		return m_normal;
-	}
-
-	/** Parallel unit vector, pointing from vertex1 to vertex2 */
-	public Vec2 getDirectionVector() {
-		return m_direction;
-	}
-
-	public Vec2 getCorner1Vector() {
-		return m_cornerDir1;
-	}
-
-	public Vec2 getCorner2Vector() {
-		return m_cornerDir2;
-	}
-
-	public boolean corner1IsConvex() {
-		return m_cornerConvex1;
-	}
-
-	public boolean corner2IsConvex() {
-		return m_cornerConvex2;
-	}
-	
-	public Vec2 getFirstVertex( XForm xf){
-		return XForm.mul(xf, m_coreV1);
-	}
-	
-	public void getFirstVertexToOut( XForm xf, Vec2 out){
-		XForm.mulToOut( xf, m_coreV1, out);
-	}
-	
-	//djm pooled, from above
-	
-	public Vec2 support( XForm xf, Vec2 d){
-		XForm.mulToOut( xf, m_coreV1, v1);
-		XForm.mulToOut( xf, m_coreV2, v2);
-		return Vec2.dot(v1, d) > Vec2.dot( v2, d) ? v1 : v2;
-	}
-	
-	public void supportToOut( XForm xf, Vec2 d, Vec2 out){
-		XForm.mulToOut( xf, m_coreV1, v1);
-		XForm.mulToOut( xf, m_coreV2, v2);
-		if(Vec2.dot(v1, d) > Vec2.dot( v2, d) ){
-			out.set(v1);
-		}else{
-			out.set(v2);			
-		}
+	/**
+	 * Get a vertex by index. Used by Distance.
+	 * @param index
+	 * @return
+	 */
+	public final Vec2 getVertex(final int index){
+		assert(0 <= index && index < 2);
+		return index==0 ? m_v1 : m_v2;
 	}
 
 	/**
@@ -365,29 +337,23 @@ public class EdgeShape extends Shape {
 		return m_prevEdge;
 	}
 
-	public final void setPrevEdge(final EdgeShape edge,  final Vec2 core, final Vec2 cornerDir, final boolean convex){
+	public final void setPrevEdge(final EdgeShape edge,  final Vec2 cornerDir, final boolean convex){
 		m_prevEdge = edge;
-		m_coreV1.set(core);
 		m_cornerDir1.set(cornerDir);
 		m_cornerConvex1 = convex;
 	}
 
-	public final void setNextEdge(final EdgeShape edge,  final Vec2 core, final Vec2 cornerDir, final boolean convex){
+	public final void setNextEdge(final EdgeShape edge,  final Vec2 cornerDir, final boolean convex){
 		m_nextEdge = edge;
-		m_coreV2.set(core);
 		m_cornerDir2.set(cornerDir);
 		m_cornerConvex2 = convex;
 	}
-	
-	// djm pooled, from above
-	
-	protected void updateSweepRadius(Vec2 center){
-		// Update the sweep radius (maximum radius) as measured from
-		// a local center point.
-		d.set(m_coreV1).subLocal(center);
-		float d1 = Vec2.dot(d,d);
-		d.set(m_coreV2).subLocal(center);
-		float d2 = Vec2.dot(d,d);
-		m_sweepRadius = (float) Math.sqrt(d1 > d2 ? d1 : d2);
+
+	public boolean corner1IsConvex() {
+		return m_cornerConvex1;
+	}
+
+	public boolean corner2IsConvex() {
+		return m_cornerConvex2;
 	}
 }

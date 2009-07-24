@@ -14,7 +14,7 @@ public class DynamicTree {
 	public static final int k_stackSize = 32;
 	
 	private short m_root;
-	private final DynamicTreeNode[] m_nodes;
+	private DynamicTreeNode[] m_nodes;
 	
 	private int m_nodeCount;
 	
@@ -31,6 +31,16 @@ public class DynamicTree {
 		m_root = NULL_NODE;
 		m_nodeCount = Math.max( Settings.nodePoolSize, 1);
 		m_nodes = new DynamicTreeNode[m_nodeCount];
+		
+		for(int i=0; i<m_nodeCount - 1; i++){
+			m_nodes[i] = new DynamicTreeNode();
+			m_nodes[i].parent = (short)(i+1);
+		}
+		m_nodes[m_nodeCount-1] = new DynamicTreeNode();
+		m_nodes[m_nodeCount-1].parent = NULL_NODE;
+		m_freeList = 0;
+		
+		m_path = 0;
 	}
 	
 	/**
@@ -40,20 +50,42 @@ public class DynamicTree {
 		
 	}
 	
+	// djm pooled
+	private static final Vec2 center = new Vec2();
+	private static final Vec2 extents = new Vec2();
 	/**
-	 * Create a proxy. Provide a tight fitting AABB and a userData pointer.
+	 * Create a proxy in the tree as a leaf node. We return the index
+	 * of the node instead of a pointer so that we can grow
+	 * the node pool.
 	 */
 	public short createProxy(AABB aabb, Object userData){
+		short node = allocateNode();
 		
+		// Fatten the aabb.
+		aabb.getCenterToOut(center);
+		aabb.getExtentsToOut(extents);
+		extents.mulLocal(Settings.fatAABBFactor);
+		m_nodes[node].aabb.lowerBound.set(center).subLocal(extents);
+		m_nodes[node].aabb.upperBound.set(center).addLocal(extents);
+		m_nodes[node].userData = userData;
+		
+		insertLeaf(node);
+		
+		return node;
 	}
 	
 	/**
 	 * Destroy a proxy. This asserts if the id is invalid.
 	 */
 	public void destroyProxy(short proxyId){
-		
+		assert(proxyId < m_nodeCount);
+		assert(m_nodes[proxyId].isLeaf());
+
+		removeLeaf(proxyId);
+		freeNode(proxyId);
 	}
 	
+	// djm pooling, from above
 	/**
 	 * Move a proxy. If the proxy has moved outside of its fattened AABB,
 	 * then the proxy is removed from the tree and re-inserted. Otherwise
@@ -62,7 +94,23 @@ public class DynamicTree {
 	 * @param aabb
 	 */
 	public void moveProxy(short proxyId,  AABB aabb){
-		
+		assert(proxyId < m_nodeCount);
+
+		assert(m_nodes[proxyId].isLeaf());
+
+		if (m_nodes[proxyId].aabb.contains(aabb)){
+			return;
+		}
+
+		removeLeaf(proxyId);
+
+		aabb.getCenterToOut(center);
+		aabb.getExtentsToOut(extents);
+		extents.mulLocal(Settings.fatAABBFactor);
+		m_nodes[proxyId].aabb.lowerBound.set(center).subLocal(extents);
+		m_nodes[proxyId].aabb.upperBound.set(center).addLocal(extents);
+
+		insertLeaf(proxyId);
 	}
 
 	/**
@@ -70,16 +118,41 @@ public class DynamicTree {
 	 * @param iterations
 	 */
 	public void rebalance(int iterations){
-		
+		if (m_root == NULL_NODE){
+			return;
+		}
+
+		for (int i = 0; i < iterations; ++i)
+		{
+			short node = m_root;
+
+			int bit = 0;
+			while (m_nodes[node].isLeaf() == false){
+				short children = m_nodes[node].child1;
+				// REALLY not sure if this is right
+				node = (short) (children + ((m_path >> bit) & 1));
+				// this mods it so it only has 8 bits (from 0 to 255)
+				bit = (bit + 1) & (8 * 32 - 1);
+			}
+			++m_path;
+
+			removeLeaf(node);
+			insertLeaf(node);
+		}
 	}
 
 	/**
 	 * Get proxy user data.
 	 * @param proxyId
-	 * @return the proxy user data or NULL if the id is invalid.
+	 * @return the proxy user data or null if the id is invalid.
 	 */
-	public void getProxy(short proxyId){
-		
+	public Object getProxy(short proxyId){
+		if (proxyId < m_nodeCount){
+			return m_nodes[proxyId].userData;
+		}
+		else{
+			return null;
+		}
 	}
 
 	// djm pooling
@@ -97,7 +170,7 @@ public class DynamicTree {
 		stack[count++] = m_root;
 		
 		while(count > 0){
-			DynamicTreeNode node = m_nodes.get(stack[--count]);
+			DynamicTreeNode node = m_nodes[stack[--count]];
 			
 			if( AABB.testOverlap( node.aabb, aabb)){
 				if(node.isLeaf()){
@@ -163,7 +236,7 @@ public class DynamicTree {
 		stack[count++] = m_root;
 		
 		while(count > 0){
-			DynamicTreeNode node = m_nodes.get( stack[--count]);
+			DynamicTreeNode node = m_nodes[stack[--count]];
 			
 			if( AABB.testOverlap( node.aabb, segmentAABB) == false){
 				continue;
@@ -212,20 +285,183 @@ public class DynamicTree {
 		}
 	}
 	
+	// Allocate a node from the pool. Grow the pool if necessary.
 	private short allocateNode(){
+		// Peel a node off the free list.
+		if( m_freeList != NULL_NODE){
+			short node = m_freeList;
+			m_freeList = m_nodes[node].parent;
+			m_nodes[node].parent = NULL_NODE;
+			m_nodes[node].child1 = NULL_NODE;
+			m_nodes[node].child2 = NULL_NODE;
+			return node;
+		}
 		
+		// The free list is empty. Rebuild a bigger pool.
+		System.out.println("increasing node pool size");
+		int newPoolCount = Math.min(2 * m_nodeCount, Short.MAX_VALUE - 1);
+		assert(newPoolCount > m_nodeCount);
+		DynamicTreeNode[] newPool = new DynamicTreeNode[newPoolCount];
+		System.arraycopy(m_nodes, 0, newPool, 0, m_nodes.length);
+		
+		for(int i=m_nodeCount-1; i<newPoolCount-1; i++){
+			newPool[i] = new DynamicTreeNode();
+			newPool[i].parent = (short)(i-1);
+		}
+		newPool[newPoolCount-1] = new DynamicTreeNode();
+		newPool[newPoolCount-1].parent = NULL_NODE;
+
+		m_freeList = (short)m_nodeCount;
+		
+		m_nodes = newPool;
+		m_nodeCount = newPoolCount;
+		
+		// Finally peel a node off the new free list
+		short node = m_freeList;
+		m_freeList = m_nodes[node].parent;
+		return node;
 	}
 	
+	// Return a node to the pool.
 	private void freeNode(short node){
-		
+		assert(node < Short.MAX_VALUE);
+		m_nodes[node].parent = m_freeList;
+		m_freeList = node;
 	}
 	
-	private void insertLeaf(short node){
-		
+	// djm pooling, from above
+	private static final Vec2 delta1 = new Vec2();
+	private static final Vec2 delta2 = new Vec2();
+	
+	private void insertLeaf(short leaf){
+		if (m_root == NULL_NODE){
+			m_root = leaf;
+			m_nodes[m_root].parent = NULL_NODE;
+			return;
+		}
+
+		// Find the best sibling for this node.
+		m_nodes[leaf].aabb.getCenterToOut(center);
+		short sibling = m_root;
+		if (m_nodes[sibling].isLeaf() == false){
+			
+			do {
+				short child1 = m_nodes[sibling].child1;
+				short child2 = m_nodes[sibling].child2;
+
+				//b2Vec2 delta1 = b2Abs(m_nodes[child1].aabb.GetCenter() - center);
+				//b2Vec2 delta2 = b2Abs(m_nodes[child2].aabb.GetCenter() - center);
+				m_nodes[child1].aabb.getCenterToOut(delta1);
+				m_nodes[child2].aabb.getCenterToOut(delta2);
+				delta1.subLocal(center).absLocal();
+				delta2.subLocal(center).absLocal();
+				
+				
+				float norm1 = delta1.x + delta1.y;
+				float norm2 = delta2.x + delta2.y;
+
+				if (norm1 < norm2){
+					sibling = child1;
+				}
+				else{
+					sibling = child2;
+				}
+
+			}
+			while(m_nodes[sibling].isLeaf() == false);
+		}
+
+		// Create a parent for the siblings.
+		short node1 = m_nodes[sibling].parent;
+		short node2 = allocateNode(); // this is the new parent node
+		m_nodes[node2].parent = node1;
+		m_nodes[node2].userData = null;
+		m_nodes[node2].aabb.combine(m_nodes[leaf].aabb, m_nodes[sibling].aabb);
+
+		if (node1 != NULL_NODE){
+			// we set our sibling's old parent node's reference to sibling
+			// to our new parent node
+			if (m_nodes[m_nodes[sibling].parent].child1 == sibling){
+				m_nodes[node1].child1 = node2;
+			}
+			else{
+				m_nodes[node1].child2 = node2;
+			}
+
+			m_nodes[node2].child1 = sibling;
+			m_nodes[node2].child2 = leaf;
+			m_nodes[sibling].parent = node2;
+			m_nodes[leaf].parent = node2;
+
+			// expand the parent nodes aabb to our added aabb, all the way up
+			do {
+				if (m_nodes[node1].aabb.contains(m_nodes[node2].aabb)){
+					break;
+				}
+
+				m_nodes[node1].aabb.combine(m_nodes[m_nodes[node1].child1].aabb, m_nodes[m_nodes[node1].child2].aabb);
+				node2 = node1;
+				node1 = m_nodes[node1].parent;
+			}
+			while(node1 != NULL_NODE);
+		}
+		else{
+			// i guess this is the case of the second node added
+			m_nodes[node2].child1 = sibling;
+			m_nodes[node2].child2 = leaf;
+			m_nodes[sibling].parent = node2;
+			m_nodes[leaf].parent = node2;
+			m_root = node2;
+		}
 	}
 	
-	private void removeLeaf(short node){
-		
+	private void removeLeaf(short leaf){
+		if (leaf == m_root){
+			m_root = NULL_NODE;
+			return;
+		}
+
+		short node2 = m_nodes[leaf].parent;
+		short node1 = m_nodes[node2].parent;
+		short sibling;
+		if (m_nodes[node2].child1 == leaf){
+			sibling = m_nodes[node2].child2;
+		}
+		else{
+			sibling = m_nodes[node2].child1;
+		}
+
+		if (node1 != NULL_NODE)
+		{
+			// Destroy node2 and connect node1 to sibling.
+			if (m_nodes[node1].child1 == node2){
+				m_nodes[node1].child1 = sibling;
+			}
+			else{
+				m_nodes[node1].child2 = sibling;
+			}
+			m_nodes[sibling].parent = node1;
+			
+			freeNode(node2);
+
+			// Adjust ancestor bounds.
+			while (node1 != NULL_NODE)
+			{
+				AABB oldAABB = m_nodes[node1].aabb;
+				m_nodes[node1].aabb.combine(m_nodes[m_nodes[node1].child1].aabb, m_nodes[m_nodes[node1].child2].aabb);
+
+				if (oldAABB.contains(m_nodes[node1].aabb)){
+					break;
+				}
+
+				node1 = m_nodes[node1].parent;
+			}
+		}
+		else{
+			m_root = sibling;
+			m_nodes[sibling].parent = NULL_NODE;
+			freeNode(node2);
+		}
 	}
 }
 
