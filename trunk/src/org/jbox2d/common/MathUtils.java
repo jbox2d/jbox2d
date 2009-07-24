@@ -38,6 +38,12 @@ public class MathUtils {
 	public final static float min(final float a, final float b) {
 		return (a < b)?a:b;
 	}
+	
+	public final static float map(float val, float fromMin, float fromMax, float toMin, float toMax) {
+		float mult = (val - fromMin) / (fromMax-fromMin);
+		float res = toMin + mult*(toMax-toMin);
+		return res;
+	}
 
 	/** Returns the closest value to 'a' that is in between 'low' and 'high' */
 	public final static float clamp(final float a, final float low, final float high) {

@@ -23,6 +23,9 @@
 
 package org.jbox2d.collision.shapes;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.BroadPhase;
 import org.jbox2d.collision.FilterData;
@@ -35,6 +38,8 @@ import org.jbox2d.common.RaycastResult;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.contacts.Contact;
+import org.jbox2d.dynamics.contacts.ContactEdge;
 
 
 //Updated through rev. 56->139 of b2Shape.cpp/.h
@@ -370,5 +375,41 @@ public abstract class Shape {
 	 */
 	public float getDensity() {
 		return m_density;
+	}
+	
+	/**
+	 * @return a Set<Shape> of all shapes in contact with this one
+	 */
+	public Set<Shape> getShapesInContact() {
+		ContactEdge curr = this.m_body.getContactList();
+		Set<Shape> touching = new HashSet<Shape>();
+		while (curr != null) {
+			if (curr.contact.m_shape1 == this) {
+				touching.add(curr.contact.m_shape2);
+			} else if (curr.contact.m_shape2 == this) {
+				touching.add(curr.contact.m_shape1);
+			}
+			curr = curr.next;
+		}
+		return touching;
+	}
+	
+	/**
+	 * @return a Set<Contact> of all (active) contacts involving this shape
+	 */
+	public Set<Contact> getContacts() {
+		ContactEdge curr = this.m_body.getContactList();
+		Set<Contact> contacts = new HashSet<Contact>();
+		while (curr != null) {
+			if (curr.contact.getManifoldCount() > 0) {
+				if (curr.contact.m_shape1 == this) {
+					contacts.add(curr.contact);
+				} else if (curr.contact.m_shape2 == this) {
+					contacts.add(curr.contact);
+				}
+			}
+			curr = curr.next;
+		}
+		return contacts;
 	}
 }

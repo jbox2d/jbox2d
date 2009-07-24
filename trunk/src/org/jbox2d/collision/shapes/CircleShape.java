@@ -188,14 +188,14 @@ public class CircleShape extends Shape {
 	public void computeSweptAABB(final AABB aabb, final XForm transform1,
 			final XForm transform2) {
 		// INLINED
-		// Vec2 p1 = transform1.position.add(Mat22.mul(transform1.R,
-		// m_localPosition));
-		// Vec2 p2 = transform2.position.add(Mat22.mul(transform2.R,
-		// m_localPosition));
-		// Vec2 lower = Vec2.min(p1, p2);
-		// Vec2 upper = Vec2.max(p1, p2);
-		// aabb.lowerBound.set(lower.x - m_radius, lower.y - m_radius);
-		// aabb.upperBound.set(upper.x + m_radius, upper.y + m_radius);
+//		 Vec2 p1 = transform1.position.add(Mat22.mul(transform1.R,
+//		 m_localPosition));
+//		 Vec2 p2 = transform2.position.add(Mat22.mul(transform2.R,
+//		 m_localPosition));
+//		 Vec2 lower = Vec2.min(p1, p2);
+//		 Vec2 upper = Vec2.max(p1, p2);
+//		 aabb.lowerBound.set(lower.x - m_radius, lower.y - m_radius);
+//		 aabb.upperBound.set(upper.x + m_radius, upper.y + m_radius);
 		final float p1x = transform1.position.x + transform1.R.col1.x
 				* m_localPosition.x + transform1.R.col2.x * m_localPosition.y;
 		final float p1y = transform1.position.y + transform1.R.col1.y
@@ -212,8 +212,8 @@ public class CircleShape extends Shape {
 		aabb.lowerBound.y = lowery - m_radius;
 		aabb.upperBound.x = upperx + m_radius;
 		aabb.upperBound.y = uppery + m_radius;
-		// System.out.println("Circle swept AABB: " + aabb.lowerBound + " " +
-		// aabb.upperBound);
+//		 System.out.println("Circle swept AABB: " + aabb.lowerBound + " " +
+//		 aabb.upperBound);
 		// System.out.println("Transforms: "+transform1.position+ " " +
 		// transform2.position+"\n");
 

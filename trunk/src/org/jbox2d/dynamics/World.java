@@ -642,7 +642,6 @@ public class World {
 		}
 
 		// Size the island for the worst case.
-		// TODO make this able to be pooled
 		final Island island = ObjectPool.getIsland();
 		island.init(m_bodyCount, m_contactCount, m_jointCount, m_contactListener);
 
