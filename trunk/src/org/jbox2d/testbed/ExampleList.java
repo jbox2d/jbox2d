@@ -7,6 +7,7 @@ import org.jbox2d.testbed.tests.BipedTest;
 import org.jbox2d.testbed.tests.Bridge;
 import org.jbox2d.testbed.tests.BuoyancyTest;
 import org.jbox2d.testbed.tests.Chain;
+import org.jbox2d.testbed.tests.CharacterControlTest;
 import org.jbox2d.testbed.tests.CompoundShapes;
 import org.jbox2d.testbed.tests.Domino;
 import org.jbox2d.testbed.tests.DominoTower;
@@ -17,7 +18,6 @@ import org.jbox2d.testbed.tests.MotorsAndLimits;
 import org.jbox2d.testbed.tests.Pulleys;
 import org.jbox2d.testbed.tests.Pyramid;
 import org.jbox2d.testbed.tests.RaycastTest;
-import org.jbox2d.testbed.tests.SensorTest;
 import org.jbox2d.testbed.tests.SpriteBinding;
 import org.jbox2d.testbed.tests.VaryingFriction;
 import org.jbox2d.testbed.tests.VerticalStack;
@@ -28,10 +28,11 @@ public class ExampleList {
     	//
     	ArrayList<AbstractExample> exampleList = new ArrayList<AbstractExample>();
     	//*
+    	exampleList.add(new CharacterControlTest(testbed));
     	exampleList.add(new BuoyancyTest(testbed));
     	exampleList.add(new RaycastTest(testbed));
 //    	exampleList.add(new ScratchPad(testbed));
-    	exampleList.add(new SensorTest(testbed));
+//    	exampleList.add(new SensorTest(testbed));
     	exampleList.add(new EdgeTest(testbed));
 //    	exampleList.add(new CCDTest(testbed));
 //    	exampleList.add(new Motox(testbed));

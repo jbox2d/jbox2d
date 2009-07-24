@@ -270,10 +270,14 @@ public class ProcessingDebugDraw extends DebugDraw {
         g.translate(localOffset.x, localOffset.y);
         g.scale( localScale);
         Mat22 mat = transform.getTransform();
-        g.applyMatrix( mat.col1.x, mat.col2.x, 0, 0,
-                       mat.col1.y, mat.col2.y, 0, 0,
-                       0, 0, 1, 0,
-                       0, 0, 0, 1);
+        if (g.g instanceof PGraphics3D) {
+        	g.applyMatrix( mat.col1.x, mat.col2.x, 0, 0,
+        			mat.col1.y, mat.col2.y, 0, 0,
+        			0, 0, 1, 0,
+        			0, 0, 0, 1);
+        } else {
+        	g.applyMatrix(mat.col1.x, mat.col2.x, 0, mat.col1.y, mat.col2.y, 0);
+        }
         g.image(image, -halfImageWidth, -halfImageHeight);
         g.popMatrix();
     }
