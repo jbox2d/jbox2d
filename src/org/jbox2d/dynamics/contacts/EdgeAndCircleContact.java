@@ -73,16 +73,15 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 
 	}
 
-	// djm pooled
-	private static final Manifold m0 = new Manifold();
-	private static final Vec2 v1 = new Vec2();
-	private static final ContactPoint cp = new ContactPoint();
 	@Override
 	public void evaluate(final ContactListener listener) {
 		final Body b1 = m_shape1.getBody();
 		final Body b2 = m_shape2.getBody();
 
-		m0.set(m_manifold);
+		
+		final Manifold m0 = ObjectPool.getManifold(m_manifold);
+		final Vec2 v1 = ObjectPool.getVec2();
+		final ContactPoint cp = ObjectPool.getContactPoint();
 
 		ObjectPool.getCollideCircle().collideEdgeAndCircle(m_manifold, (EdgeShape)m_shape1, b1.getMemberXForm(), (CircleShape)m_shape2, b2.getMemberXForm());
 
@@ -157,6 +156,9 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 			}
 		}
 
+		ObjectPool.returnManifold(m0);
+		ObjectPool.returnVec2(v1);
+		ObjectPool.returnContactPoint(cp);
 	}
 
 	@Override

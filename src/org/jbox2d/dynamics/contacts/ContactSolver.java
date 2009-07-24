@@ -44,14 +44,18 @@ public class ContactSolver {
 	 * a plain array is faster than a List...
 	 */
 	//*
-	public final ContactConstraint[] m_constraints;
+	public ContactConstraint[] m_constraints;
 	/*/
 	public List<ContactConstraint> m_constraints;
 	//*/
 
 	public int m_constraintCount;
 
-	public ContactSolver(final TimeStep step, final Contact[] contacts, final int contactCount) {
+	public ContactSolver(){
+		
+	}
+	
+	public final void init(final TimeStep step, final Contact[] contacts, final int contactCount) {
 		m_step = step;
 
 		m_constraintCount = 0;

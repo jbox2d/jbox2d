@@ -28,6 +28,7 @@ import java.util.List;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
@@ -96,7 +97,11 @@ public class Island {
 	/**
 	 * TODO djm: make this so it isn't created every time step
 	 */
-	public Island(final int bodyCapacity,
+	public Island(){
+		
+	}
+	
+	public final void init(final int bodyCapacity,
 	              final int contactCapacity,
 	              final int jointCapacity,
 	              final ContactListener listener) {
@@ -161,7 +166,8 @@ public class Island {
 			}
 		}
 
-		final ContactSolver contactSolver = new ContactSolver(step, m_contacts, m_contactCount);
+		final ContactSolver contactSolver = ObjectPool.getContactSolver();
+		contactSolver.init(step, m_contacts, m_contactCount);
 
 		// Initialize velocity constraints.
 		contactSolver.initVelocityConstraints(step);
@@ -274,10 +280,12 @@ public class Island {
 			}
 		}
 
+		ObjectPool.returnContactSolver(contactSolver);
 	}
 
 	public void solveTOI(final TimeStep subStep) {
-		final ContactSolver contactSolver = new ContactSolver(subStep, m_contacts, m_contactCount);
+		final ContactSolver contactSolver = ObjectPool.getContactSolver();
+		contactSolver.init(subStep, m_contacts, m_contactCount);
 
 		// No warm starting needed for TOI contact events.
 
@@ -349,6 +357,8 @@ public class Island {
 		}
 
 		report(contactSolver.m_constraints);
+		
+		ObjectPool.returnContactSolver(contactSolver);
 	}
 
 	public void report(final List<ContactConstraint> constraints) {

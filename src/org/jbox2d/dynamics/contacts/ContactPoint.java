@@ -46,7 +46,7 @@ public class ContactPoint {
 		/** The combined restitution coefficient */
 		public float restitution;
 		/** The contact id identifies the features in contact */
-		public ContactID id;
+		public final ContactID id;
 		
 		public ContactPoint() {
 			position = new Vec2();

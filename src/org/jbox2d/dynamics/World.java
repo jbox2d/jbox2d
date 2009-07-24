@@ -641,7 +641,8 @@ public class World {
 
 		// Size the island for the worst case.
 		// TODO make this able to be pooled
-		final Island island = new Island(m_bodyCount, m_contactCount, m_jointCount, m_contactListener);
+		final Island island = ObjectPool.getIsland();
+		island.init(m_bodyCount, m_contactCount, m_jointCount, m_contactListener);
 
 		// Clear all the island flags.
 		for (Body b = m_bodyList; b != null; b = b.m_next) {
@@ -774,6 +775,7 @@ public class World {
 		// Also, some contacts can be destroyed.
 		m_broadPhase.commit();
 
+		ObjectPool.returnIsland(island);
 	}
 
 	/** For internal use: find TOI contacts and solve them. */
@@ -781,7 +783,8 @@ public class World {
 		// Reserve an island and a stack for TOI island solution.
 		// djm do we always have to make a new island? or can we make
 		// it static?
-		final Island island = new Island(m_bodyCount, Settings.maxTOIContactsPerIsland, Settings.maxTOIJointsPerIsland, m_contactListener);
+		final Island island = ObjectPool.getIsland();
+		island.init(m_bodyCount, Settings.maxTOIContactsPerIsland, Settings.maxTOIJointsPerIsland, m_contactListener);
 
 		//Simple one pass queue
 		//Relies on the fact that we're only making one pass
@@ -996,8 +999,7 @@ public class World {
 
 			}
 
-			// djm do we need to create one every time?
-			final TimeStep subStep = new TimeStep();
+			final TimeStep subStep  = ObjectPool.getTimeStep();
 			subStep.warmStarting = false;
 			subStep.dt = (1.0f - minTOI) * step.dt;
 			assert(subStep.dt > Settings.EPSILON);
@@ -1005,6 +1007,7 @@ public class World {
 			subStep.maxIterations = step.maxIterations;
 
 			island.solveTOI(subStep);
+			ObjectPool.returnTimeStep(subStep);
 
 			// Post solve cleanup.
 			for (int i = 0; i < island.m_bodyCount; ++i) {
@@ -1053,8 +1056,9 @@ public class World {
 			// Commit shape proxy movements to the broad-phase so that new contacts are created.
 			// Also, some contacts can be destroyed.
 			m_broadPhase.commit();
+			
+			ObjectPool.returnIsland(island);
 		}
-
 	}
 	
 	// NOTE this corresponds to the liquid test, so the debugdraw can draw

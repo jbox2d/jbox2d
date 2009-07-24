@@ -43,7 +43,6 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 	public final ArrayList<Manifold> manifoldList = new ArrayList<Manifold>();
 
 	public Contact create(final Shape s1, final Shape s2) {
-		// TODO Auto-generated method stub
 		return new PolyAndEdgeContact(s1,s2);
 	}
 
@@ -77,16 +76,14 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 	return this;
 	}
 
-	// djm pooled
-	private final static Manifold m0 = new Manifold();
-	private final static Vec2 v1 = new Vec2();
-	private final static ContactPoint cp = new ContactPoint();
 	@Override
 	public void evaluate(final ContactListener listener) {
 		final Body b1 = m_shape1.getBody();
 		final Body b2 = m_shape2.getBody();
 
-		m0.set( m_manifold);
+		final Manifold m0 = ObjectPool.getManifold(m_manifold);
+		final Vec2 v1 = ObjectPool.getVec2();
+		final ContactPoint cp = ObjectPool.getContactPoint();
 
 		ObjectPool.getCollidePoly().collidePolyAndEdge(m_manifold, (PolygonShape)m_shape1, b1.getMemberXForm(), (EdgeShape)m_shape2, b2.getMemberXForm());
 
@@ -169,6 +166,9 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 		}
 
 		if (listener == null){
+			ObjectPool.returnManifold(m0);
+			ObjectPool.returnVec2(v1);
+			ObjectPool.returnContactPoint(cp);
 			return;
 		}
 
@@ -192,6 +192,10 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 			cp.id.set(mp0.id);
 			listener.remove(cp);
 		}
+		
+		ObjectPool.returnManifold(m0);
+		ObjectPool.returnVec2(v1);
+		ObjectPool.returnContactPoint(cp);
 	}
 
 	@Override
