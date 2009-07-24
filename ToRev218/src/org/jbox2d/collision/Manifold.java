@@ -30,6 +30,21 @@ import org.jbox2d.common.Vec2;
 
 /**
  * A manifold for two touching convex shapes.
+ * Box2D supports multiple types of contact:
+ * <ul><li>clip point versus plane with radius</li>
+ * <li>point versus point with radius (circles)</li></ul>
+ * The local point usage depends on the manifold type:
+ * <ul><li>e_circles: the local center of circleA</li>
+ * <li>e_faceA: the center of faceA</li>
+ * <li>e_faceB: the center of faceB</li></ul>
+ * Similarly the local normal usage:
+ * <ul><li>e_circles: not used</li>
+ * <li>e_faceA: the normal on polygonA</li>
+ * <li>e_faceB: the normal on polygonB</li></ul>
+ * We store contacts in this way so that position correction can
+ * account for movement, which is critical for continuous physics.
+ * All contact scenarios must be expressed in one of these types.
+ * This structure is stored across time steps, so we keep it small.
  */
 public class Manifold {
 	

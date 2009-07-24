@@ -123,7 +123,7 @@ public class AABB {
 	 * @param aabb1
 	 * @param aab
 	 */
-	public final void Combine(final AABB aabb1, final AABB aab){
+	public final void combine(final AABB aabb1, final AABB aab){
 		Vec2.minToOut(aabb1.lowerBound, aab.lowerBound, lowerBound);
 		Vec2.maxToOut(aabb1.upperBound, aab.upperBound, upperBound);
 	}
@@ -133,7 +133,7 @@ public class AABB {
 	 * Does this aabb contain the provided AABB.
 	 * @return
 	 */
-	public final boolean Contains(final AABB aabb){
+	public final boolean contains(final AABB aabb){
 		/*boolean result = true;
 		result = result && lowerBound.x <= aabb.lowerBound.x;
 		result = result && lowerBound.y <= aabb.lowerBound.y;

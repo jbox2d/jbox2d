@@ -60,8 +60,8 @@ public class CollideCircle {
 	                                        final CircleShape circle2, final XForm xf2) {
 		manifold.m_pointCount = 0;
 
-		XForm.mulToOut(xf1, circle1.m_localPosition, colCCP1);
-		XForm.mulToOut(xf2, circle2.m_localPosition, colCCP2);
+		XForm.mulToOut(xf1, circle1.m_p, colCCP1);
+		XForm.mulToOut(xf2, circle2.m_p, colCCP2);
 
 		colCCD.x = colCCP2.x - colCCP1.x;
 		colCCD.y = colCCP2.y - colCCP1.y;
@@ -77,11 +77,11 @@ public class CollideCircle {
 		
 		// MB these sets
 		manifold.m_type = ManifoldType.e_circles;
-		manifold.m_localPoint.set(circle1.m_localPosition);
+		manifold.m_localPoint.set(circle1.m_p);
 		manifold.m_localPlaneNormal.setZero();
 		manifold.m_pointCount = 1;
 		
-		manifold.m_points[0].m_localPoint.set(circle2.m_localPosition);
+		manifold.m_points[0].m_localPoint.set(circle2.m_p);
 		manifold.m_points[0].m_id.key = 0;
 		
 		/*float separation;
@@ -134,8 +134,8 @@ public class CollideCircle {
 		//Vec2 c = XForm.mul(xf2, circle.getLocalPosition());
 		//Vec2 cLocal = XForm.mulT(xf1, c);
 
-		final float cx = xf2.position.x + xf2.R.col1.x * circle.m_localPosition.x + xf2.R.col2.x * circle.m_localPosition.y;
-		final float cy = xf2.position.y + xf2.R.col1.y * circle.m_localPosition.x + xf2.R.col2.y * circle.m_localPosition.y;
+		final float cx = xf2.position.x + xf2.R.col1.x * circle.m_p.x + xf2.R.col2.x * circle.m_p.y;
+		final float cy = xf2.position.y + xf2.R.col1.y * circle.m_p.x + xf2.R.col2.y * circle.m_p.y;
 		final float v1x = cx - xf1.position.x;
 		final float v1y = cy - xf1.position.y;
 		final float cLocalx = v1x * xf1.R.col1.x + v1y * xf1.R.col1.y;
@@ -178,7 +178,7 @@ public class CollideCircle {
 			manifold.m_localPlaneNormal.set(normals[normalIndex]);
 			manifold.m_localPoint.set(v1).addLocal(v2).mulLocal(.5f);
 			
-			manifold.m_points[0].m_localPoint.set(circle.m_localPosition);
+			manifold.m_points[0].m_localPoint.set(circle.m_p);
 			manifold.m_points[0].m_id.key = 0;
 			return;
 			// INLINED
@@ -243,7 +243,7 @@ public class CollideCircle {
 			manifold.m_localPlaneNormal.set(cLocalx,cLocaly).subLocal(v1);
 			manifold.m_localPlaneNormal.normalize();
 			manifold.m_localPoint.set(v1);
-			manifold.m_points[0].m_localPoint.set(circle.m_localPosition);
+			manifold.m_points[0].m_localPoint.set(circle.m_p);
 			manifold.m_points[0].m_id.key = 0;
 		}
 		else if (u2 <= 0.0f) {
@@ -258,7 +258,7 @@ public class CollideCircle {
 			manifold.m_localPlaneNormal.set(cLocalx,cLocaly).subLocal(v2);
 			manifold.m_localPlaneNormal.normalize();
 			manifold.m_localPoint.set(v2);
-			manifold.m_points[0].m_localPoint.set(circle.m_localPosition);
+			manifold.m_points[0].m_localPoint.set(circle.m_p);
 			manifold.m_points[0].m_id.key = 0;
 		}
 		else {
@@ -274,7 +274,7 @@ public class CollideCircle {
 			manifold.m_type = ManifoldType.e_faceA;
 			manifold.m_localPlaneNormal.set(normals[vertIndex1]);
 			manifold.m_localPoint.set(temp1);
-			manifold.m_points[0].m_localPoint.set(circle.m_localPosition);
+			manifold.m_points[0].m_localPoint.set(circle.m_p);
 			manifold.m_points[0].m_id.key = 0;
 		}
 
