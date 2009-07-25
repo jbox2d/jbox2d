@@ -24,9 +24,12 @@
 package org.jbox2d.collision;
 
 import org.jbox2d.common.MathUtils;
-import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.pooling.ThreadLocalBoundValues;
+import org.jbox2d.pooling.ThreadLocalTwoInts;
+
+import sun.awt.windows.ThemeReader;
 
 /**
  * This broad phase uses the Sweep and Prune algorithm as described in:
@@ -207,6 +210,11 @@ public class BroadPhase {
 		}
 	}
 
+	// djm pooling
+	private final static ThreadLocalTwoInts tlLowerValues = new ThreadLocalTwoInts();
+	private final static ThreadLocalTwoInts tlUpperValues = new ThreadLocalTwoInts();
+	private final static ThreadLocalTwoInts tlIndexes = new ThreadLocalTwoInts();
+	
 	// Create and destroy proxies. These call Flush first.
 	/** internal */
 	public int createProxy( final AABB aabb, // int groupIndex, int categoryBits, int
@@ -233,9 +241,11 @@ public class BroadPhase {
 
 		final int boundCount = 2 * m_proxyCount;
 
-		final Integer lowerValues[] = ObjectPool.getTwoInts();
-		final Integer upperValues[] = ObjectPool.getTwoInts();
-		final Integer[] indexes = ObjectPool.getTwoInts();
+		// pooling
+		final Integer lowerValues[] = tlLowerValues.get();
+		final Integer upperValues[] = tlUpperValues.get();
+		final Integer[] indexes = tlIndexes.get();
+		
 		computeBounds( lowerValues, upperValues, aabb);
 
 		for ( int axis = 0; axis < 2; ++axis) {
@@ -325,14 +335,13 @@ public class BroadPhase {
 		// Prepare for next query.
 		m_queryResultCount = 0;
 		incrementTimeStamp();
-
-		ObjectPool.returnTwoInts(lowerValues);
-		ObjectPool.returnTwoInts(upperValues);
-		ObjectPool.returnTwoInts(indexes);
 		
 		return proxyId;
 	}
-
+	
+	// djm pooling
+	private static final ThreadLocalTwoInts tlIgnored = new ThreadLocalTwoInts();
+	
 	public void destroyProxy( final int proxyId) {
 		assert (0 < m_proxyCount && m_proxyCount <= Settings.maxProxies);
 		final Proxy proxy = m_proxyPool[proxyId];
@@ -340,7 +349,7 @@ public class BroadPhase {
 
 		final int boundCount = 2 * m_proxyCount;
 
-		final Integer[] ignored = ObjectPool.getTwoInts();
+		final Integer[] ignored = tlIgnored.get();
 		
 		for ( int axis = 0; axis < 2; ++axis) {
 			final Bound[] bounds = m_bounds[axis];
@@ -417,10 +426,12 @@ public class BroadPhase {
 		if ( BroadPhase.s_validate) {
 			validate();
 		}
-		
-		ObjectPool.returnTwoInts(ignored);
 	}
 
+	// djm pooling
+	private static final ThreadLocalBoundValues tlNewValues = new ThreadLocalBoundValues();
+	private static final ThreadLocalBoundValues tlOldValues = new ThreadLocalBoundValues();
+	
 	// Call MoveProxy as many times as you like, then when you are done
 	// call Flush to finalized the proxy pairs (for your time step).
 	/** internal */
@@ -429,8 +440,8 @@ public class BroadPhase {
 			System.out.println( "MoveProxy()");
 		}
 		
-		BoundValues newValues = ObjectPool.getBoundValues();
-		BoundValues oldValues = ObjectPool.getBoundValues();
+		BoundValues newValues = tlNewValues.get();
+		BoundValues oldValues = tlOldValues.get();
 
 		if ( proxyId == PairManager.NULL_PROXY || Settings.maxProxies <= proxyId) { return; }
 
@@ -607,14 +618,13 @@ public class BroadPhase {
 		if ( BroadPhase.s_validate) {
 			validate();
 		}
-		ObjectPool.returnBoundValues( oldValues);
-		ObjectPool.returnBoundValues( newValues);
 	}
 
 	public void commit() {
 		m_pairManager.commit();
 	}
 
+		
 	/**
 	 * Query an AABB for overlapping proxies, returns the user data and the
 	 * count, up to the supplied maximum count.
@@ -623,12 +633,13 @@ public class BroadPhase {
 		if ( BroadPhase.debugPrint) {
 			System.out.println( "Query(2 args)");
 		}
-
-		final Integer lowerValues[] = ObjectPool.getTwoInts();
-		final Integer upperValues[] = ObjectPool.getTwoInts();
+		
+		// djm pooling from above
+		final Integer lowerValues[] = tlUpperValues.get();
+		final Integer upperValues[] = tlLowerValues.get();
 		computeBounds( lowerValues, upperValues, aabb);
 
-		final Integer indexes[] = ObjectPool.getTwoInts(); // lowerIndex, upperIndex;
+		final Integer indexes[] = tlIndexes.get(); // lowerIndex, upperIndex;
 
 		query( indexes, lowerValues[0], upperValues[0], m_bounds[0], 2 * m_proxyCount, 0);
 		query( indexes, lowerValues[1], upperValues[1], m_bounds[1], 2 * m_proxyCount, 1);
@@ -651,9 +662,6 @@ public class BroadPhase {
 		m_queryResultCount = 0;
 		incrementTimeStamp();
 		
-		ObjectPool.returnTwoInts(lowerValues);
-		ObjectPool.returnTwoInts(upperValues);
-		ObjectPool.returnTwoInts(indexes);
 		return copy;// results;
 	}
 
@@ -838,6 +846,9 @@ public class BroadPhase {
 	}
 	
 	
+	// djm pooling
+	private static final ThreadLocalTwoInts tlResults = new ThreadLocalTwoInts();
+	
 	public int querySegment(Segment segment, Object[] userData, int maxCount, SortKeyFunc sortKey)
 	{
 		float maxLambda = 1;
@@ -872,14 +883,13 @@ public class BroadPhase {
 		//First deal with all the proxies that contain segment.p1
 //		int lowerIndex;
 //		int upperIndex;
-		Integer[] results = ObjectPool.getTwoInts();
+		Integer[] results = tlResults.get();
 		query(results,startValues[0],startValues2[0],m_bounds[0],2*m_proxyCount,0);
 		if(sx>=0)	xIndex = results[1]-1;
 		else		xIndex = results[0];
 		query(results,startValues[1],startValues2[1],m_bounds[1],2*m_proxyCount,1);
 		if(sy>=0)	yIndex = results[1]-1;
 		else		yIndex = results[0];
-		ObjectPool.returnTwoInts(results);
 
 //		System.out.println(m_queryResultCount);
 		//If we are using sortKey, then sort what we have so far, filtering negative keys
