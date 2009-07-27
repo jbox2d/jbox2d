@@ -33,7 +33,7 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.Body;
-import org.jbox2d.pooling.ThreadLocalVec2;
+import org.jbox2d.pooling.TLVec2;
 
 //Updated to rev 56->108->139 of b2Shape.cpp/.h
 
@@ -81,7 +81,7 @@ public class CircleShape extends Shape {
 	}
 
 	// djm pooling
-	private static final ThreadLocalVec2 tlCenter = new ThreadLocalVec2();	
+	private static final TLVec2 tlCenter = new TLVec2();	
 	/**
 	 * checks to see if the point is in this shape.
 	 * 
@@ -100,9 +100,9 @@ public class CircleShape extends Shape {
 
 	
 	// djm pooling
-	private static final ThreadLocalVec2 tlS = new ThreadLocalVec2();
-	private static final ThreadLocalVec2 tlPosition = new ThreadLocalVec2();
-	private static final ThreadLocalVec2 tlR = new ThreadLocalVec2();
+	private static final TLVec2 tlS = new TLVec2();
+	private static final TLVec2 tlPosition = new TLVec2();
+	private static final TLVec2 tlR = new TLVec2();
 	// Collision Detection in Interactive 3D Environments by Gino van den Bergen
 	// From Section 3.1.2
 	// x = s + a * r
@@ -159,7 +159,7 @@ public class CircleShape extends Shape {
 	}
 
 	// djm pooling
-	private static final ThreadLocalVec2 tlP = new ThreadLocalVec2();
+	private static final TLVec2 tlP = new TLVec2();
 	/**
 	 * @see Shape#computeAABB(AABB, XForm)
 	 */

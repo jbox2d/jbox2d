@@ -5,11 +5,11 @@ import org.jbox2d.collision.MassData;
 import org.jbox2d.collision.Segment;
 import org.jbox2d.collision.SegmentCollide;
 import org.jbox2d.common.Mat22;
-import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.RaycastResult;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
+import org.jbox2d.pooling.TLVec2;
 
 /**
  * Point shape.  Like a circle shape of zero radius, except
@@ -28,19 +28,20 @@ public class PointShape extends Shape {
 		m_localPosition = pointDef.localPosition.clone();
 		m_mass = pointDef.mass;
 	}
-
+	
+	// djm pooling
+	private static final TLVec2 tlP = new TLVec2();
 	/**
 	 * @see Shape#computeAABB(AABB, XForm)
 	 */
 	@Override
 	public void computeAABB(final AABB aabb, final XForm transform) {
 		//Vec2 p = transform.position.add(Mat22.mul(transform.R, m_localPosition));
-		final Vec2 p = ObjectPool.getVec2();
+		final Vec2 p = tlP.get();
 		Mat22.mulToOut(transform.R, m_localPosition, p);
 		p.add(transform.position);
 		aabb.lowerBound.set(p.x-Settings.EPSILON, p.y-Settings.EPSILON);
 		aabb.upperBound.set(p.x+Settings.EPSILON, p.y+Settings.EPSILON);
-		ObjectPool.returnVec2(p);
 	}
 
 	/**
@@ -53,13 +54,16 @@ public class PointShape extends Shape {
 		massData.I = 0.0f;
 	}
 
+	// djm pooling
+	private static final TLVec2 tlSwept1 = new TLVec2();
+	private static final TLVec2 tlSwept2 = new TLVec2();
 	/**
 	 * @see Shape#computeSweptAABB(AABB, XForm, XForm)
 	 */
 	@Override
 	public void computeSweptAABB(final AABB aabb, final XForm transform1, final XForm transform2) {
-		final Vec2 sweptP1 = ObjectPool.getVec2();
-		final Vec2 sweptP2 = ObjectPool.getVec2();
+		final Vec2 sweptP1 = tlSwept1.get();
+		final Vec2 sweptP2 = tlSwept2.get();
 		//Vec2 p1 = transform1.position.add(Mat22.mul(transform1.R, m_localPosition));
 		//Vec2 p2 = transform2.position.add(Mat22.mul(transform2.R, m_localPosition));
 		Mat22.mulToOut( transform2.R, m_localPosition, sweptP1);
@@ -73,9 +77,6 @@ public class PointShape extends Shape {
 
 		aabb.upperBound.x += Settings.EPSILON;
 		aabb.upperBound.y += Settings.EPSILON;
-		
-		ObjectPool.returnVec2(sweptP1);
-		ObjectPool.returnVec2(sweptP2);
 	}
 
 	/**
@@ -93,14 +94,16 @@ public class PointShape extends Shape {
 	// x = s + a * r
 	// norm(x) = radius
 	// djm pooled
-	
+	private static final TLVec2 tlS = new TLVec2();
+	private static final TLVec2 tlPosition = new TLVec2();
+	private static final TLVec2 tlR = new TLVec2();
 	/**
 	 * @see Shape#testSegment(XForm, RaycastResult, Segment, float)
 	 */
 	@Override
 	public SegmentCollide testSegment(final XForm xf, final RaycastResult out, final Segment segment, final float maxLambda){
-		final Vec2 position = ObjectPool.getVec2();
-		final Vec2 s = ObjectPool.getVec2();
+		final Vec2 position = tlPosition.get();
+		final Vec2 s = tlS.get();
 		
 		Mat22.mulToOut( xf.R, m_localPosition, position);
 		position.addLocal(xf.position);
@@ -110,12 +113,10 @@ public class PointShape extends Shape {
 
 		// Does the segment start inside the circle?
 		if (b < 0.0f){
-			ObjectPool.returnVec2(position);
-			ObjectPool.returnVec2(s);
 			return SegmentCollide.STARTS_INSIDE_COLLIDE;
 		}
 
-		final Vec2 r = ObjectPool.getVec2();
+		final Vec2 r = tlR.get();
 
 		// Solve quadratic equation.
 		r.set(segment.p2).subLocal(segment.p1);
@@ -125,9 +126,6 @@ public class PointShape extends Shape {
 
 		// Check for negative discriminant and short segment.
 		if (sigma < 0.0f || rr < Settings.EPSILON){
-			ObjectPool.returnVec2(position);
-			ObjectPool.returnVec2(s);
-			ObjectPool.returnVec2(r);
 			return SegmentCollide.MISS_COLLIDE;
 		}
 
@@ -140,15 +138,9 @@ public class PointShape extends Shape {
 			out.lambda = a;
 			out.normal.set(r).mulLocal(a).addLocal(s);
 			out.normal.normalize();
-			ObjectPool.returnVec2(position);
-			ObjectPool.returnVec2(s);
-			ObjectPool.returnVec2(r);
 			return SegmentCollide.HIT_COLLIDE;
 		}
 
-		ObjectPool.returnVec2(position);
-		ObjectPool.returnVec2(s);
-		ObjectPool.returnVec2(r);
 		return SegmentCollide.MISS_COLLIDE;
 	}
 

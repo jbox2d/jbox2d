@@ -33,11 +33,14 @@ import org.jbox2d.collision.SegmentCollide;
 import org.jbox2d.collision.SupportsGenericDistance;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
-import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.RaycastResult;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
+import org.jbox2d.pooling.TLAABB;
+import org.jbox2d.pooling.TLMassData;
+import org.jbox2d.pooling.TLMat22;
+import org.jbox2d.pooling.TLVec2;
 
 
 //Updated to rev 142 of b2Shape.cpp/.h / b2PolygonShape.cpp/.h
@@ -62,6 +65,12 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 	/** Number of active vertices in the shape. */
 	public int m_vertexCount;
 
+	// djm pooling
+	private static final TLVec2 tlEdge = new TLVec2();
+	private static final TLVec2 tlV = new TLVec2();
+	private static final TLVec2 tlD = new TLVec2();
+	private static final TLMat22 tlA = new TLMat22();
+	
 	public PolygonShape(final ShapeDef def) {
 		super(def);
 
@@ -85,8 +94,7 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		}
 
 		// Compute normals. Ensure the edges have non-zero length.
-		final Vec2 edge = ObjectPool.getVec2();
-		
+		final Vec2 edge = tlEdge.get();
 		for (int i = 0; i < m_vertexCount; ++i) {
 			final int i1 = i;
 			final int i2 = i + 1 < m_vertexCount ? i + 1 : 0;
@@ -95,7 +103,6 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 			m_normals[i] = Vec2.cross(edge, 1.0f);
 			m_normals[i].normalize();
 		}
-		ObjectPool.returnVec2(edge);
 
 		if (m_debug) {
 			// Ensure the polygon is convex.
@@ -140,9 +147,10 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		PolygonShape.computeOBB(m_obb, m_vertices);
 
 		
-		final Vec2 v = ObjectPool.getVec2();
-		final Vec2 d = ObjectPool.getVec2();
-		final Mat22 A = ObjectPool.getMat22();
+		final Vec2 v = tlV.get();
+		final Vec2 d = tlD.get();
+		final Mat22 A = tlA.get();
+		
 		// Create core polygon shape by shifting edges inward.
 		// Also compute the min/max radius for CCD.
 		for (int i = 0; i < m_vertexCount; ++i) {
@@ -172,9 +180,6 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 			A.col1.y = n2.x; A.col2.y = n2.y;
 			m_coreVertices[i] = A.solve(d).addLocal(m_centroid);
 		}
-		ObjectPool.returnVec2(v);
-		ObjectPool.returnVec2(d);
-		ObjectPool.returnMat22(A);
 
 		if (m_debug) {
 			System.out.println("\nDumping polygon shape...");
@@ -195,6 +200,7 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		}
 	}
 
+	// djm pooling, from above
 	/**
 	 * @see Shape#updateSweepRadius(Vec2)
 	 */
@@ -202,23 +208,25 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 	public void updateSweepRadius(final Vec2 center) {
 		// Update the sweep radius (maximum radius) as measured from
 		// a local center point.
-		final Vec2 d = ObjectPool.getVec2();
+		final Vec2 d = tlD.get();
 		m_sweepRadius = 0.0f;
 		for (int i = 0; i < m_vertexCount; ++i) {
 			d.set(m_coreVertices[i]);
 			d.subLocal(center);
 			m_sweepRadius = MathUtils.max(m_sweepRadius, d.length());
 		}
-		ObjectPool.returnVec2(d);
 	}
 
+	// djm pooling
+	private static final TLVec2 tlTemp = new TLVec2();
+	private static final TLVec2 tlPLocal= new TLVec2();
 	/**
 	 * @see Shape#testPoint(XForm, Vec2)
 	 */
 	@Override
 	public boolean testPoint(final XForm xf, final Vec2 p) {
-		final Vec2 temp = ObjectPool.getVec2();
-		final Vec2 pLocal = ObjectPool.getVec2();
+		final Vec2 temp = tlTemp.get();
+		final Vec2 pLocal = tlPLocal.get();
 		
 		temp.set(p);
 		temp.subLocal(xf.position);
@@ -239,27 +247,17 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 			final float dot = Vec2.dot(m_normals[i], temp);
 
 			if (dot > 0.0f) {
-				ObjectPool.returnVec2(pLocal);
-				ObjectPool.returnVec2(temp);
 				return false;
 			}
 		}
 
-		ObjectPool.returnVec2(pLocal);
-		ObjectPool.returnVec2(temp);
 		return true;
 	}
 
 
-	// djm pooling
-//	private final Vec2 p1 = new Vec2();
-//	private final Vec2 p2 = new Vec2();
-//	private final Vec2 p1b = new Vec2();
-//	private final Vec2 p2b = new Vec2();	
-//	private final Vec2 tsd = new Vec2();
-//	private final Vec2 temp2 = new Vec2();
-	
-	// ewj: un-inlined this fn's vector ops, had some problems with it, not sure where it went wrong TODO
+	// djm pooling, and from above
+	private static final TLVec2 tlP1 = new TLVec2();
+	private static final TLVec2 tlP2 = new TLVec2();
 	/**
 	 * @see Shape#testSegment(XForm, RaycastResult, Segment, float)
 	 */
@@ -268,10 +266,10 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 
 		float lower = 0.0f, upper = maxLambda;
 		
-		final Vec2 p1 = ObjectPool.getVec2();
-		final Vec2 p2 = ObjectPool.getVec2();
-		final Vec2 d = ObjectPool.getVec2();
-		final Vec2 temp = ObjectPool.getVec2();
+		final Vec2 p1 = tlP1.get();
+		final Vec2 p2 = tlP2.get();
+		final Vec2 d = tlD.get();
+		final Vec2 temp = tlTemp.get();
 		
 		/*Vec2 p1 = Mat22.mulTrans(xf.R, segment.p1.sub(xf.position));
 		Vec2 p2 = Mat22.mulTrans(xf.R, segment.p2.sub(xf.position));
@@ -299,10 +297,6 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 			if (denominator == 0.0f){	
 				
 				if (numerator < 0.0f){
-					ObjectPool.returnVec2(p1);
-					ObjectPool.returnVec2(p2);
-					ObjectPool.returnVec2(d);
-					ObjectPool.returnVec2(temp);
 					return SegmentCollide.MISS_COLLIDE;
 				}
 			}
@@ -325,10 +319,6 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 			}
 
 			if (upper < lower){
-				ObjectPool.returnVec2(p1);
-				ObjectPool.returnVec2(p2);
-				ObjectPool.returnVec2(d);
-				ObjectPool.returnVec2(temp);
 				return SegmentCollide.MISS_COLLIDE;
 			}
 		}
@@ -339,28 +329,22 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 			out.lambda = lower;
 			Mat22.mulToOut(xf.R, m_normals[index], out.normal);
 			//out.normal.set(Mat22.mul(xf.R,m_normals[index]));
-			ObjectPool.returnVec2(p1);
-			ObjectPool.returnVec2(p2);
-			ObjectPool.returnVec2(d);
-			ObjectPool.returnVec2(temp);
 			return SegmentCollide.HIT_COLLIDE;
 		}
 		
 		out.lambda = 0.0f;
-		ObjectPool.returnVec2(p1);
-		ObjectPool.returnVec2(p2);
-		ObjectPool.returnVec2(d);
-		ObjectPool.returnVec2(temp);
 		return SegmentCollide.STARTS_INSIDE_COLLIDE;
 	}
 
+	// djm pooling
+	private static final TLVec2 tlSupDLocal = new TLVec2();
 	/**
 	 * Get the support point in the given world direction.
 	 * Use the supplied transform.
 	 * @see SupportsGenericDistance#support(Vec2, XForm, Vec2)
 	 */
 	public void support(final Vec2 dest, final XForm xf, final Vec2 d) {
-		final Vec2 supportDLocal = ObjectPool.getVec2();
+		final Vec2 supportDLocal = tlSupDLocal.get();
 		Mat22.mulTransToOut(xf.R, d, supportDLocal);
 
 		int bestIndex = 0;
@@ -374,9 +358,12 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		}
 
 		XForm.mulToOut(xf, m_coreVertices[bestIndex], dest);
-		ObjectPool.returnVec2(supportDLocal);
 	}
-
+	
+	// djm pooling, and from above
+	private static final TLVec2 tlPRef = new TLVec2();
+	private static final TLVec2 tlE1 = new TLVec2();
+	private static final TLVec2 tlE2 = new TLVec2();
 	public final static Vec2 computeCentroid(final List<Vec2> vs) {
 		final int count = vs.size();
 		assert(count >= 3);
@@ -386,7 +373,8 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 
 		// pRef is the reference point for forming triangles.
 		// It's location doesn't change the result (except for rounding error).
-		final Vec2 pRef = new Vec2();
+		final Vec2 pRef = tlPRef.get();
+		pRef.setZero();
 		//    #if 0
 		//        // This code would put the reference point inside the polygon.
 		//        for (int32 i = 0; i < count; ++i)
@@ -398,14 +386,18 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 
 		final float inv3 = 1.0f / 3.0f;
 
+		final Vec2 e1 = tlE1.get();
+		final Vec2 e2 = tlE2.get();
+		final Vec2 p1 = tlP1.get();
+		
 		for (int i = 0; i < count; ++i) {
 			// Triangle vertices.
-			final Vec2 p1 = pRef;
+			p1.set(pRef);
 			final Vec2 p2 = vs.get(i);
 			final Vec2 p3 = i + 1 < count ? vs.get(i+1) : vs.get(0);
 
-			final Vec2 e1 = p2.sub(p1);
-			final Vec2 e2 = p3.sub(p1);
+			e1.set(p2).subLocal(p1);
+			e2.set(p3).subLocal(p1);
 
 			final float D = Vec2.cross(e1, e2);
 
@@ -425,31 +417,38 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		return c;
 	}
 
+	// djm pooling, and from above
+	private static final TLVec2 tlUX = new TLVec2();
+	private static final TLVec2 tlUY = new TLVec2();
+	private static final TLVec2 tlLower = new TLVec2();
+	private static final TLVec2 tlUpper = new TLVec2();
+	private static final TLVec2 tlR = new TLVec2();
+	private static final TLVec2 tlCenter = new TLVec2();
+	
 	// http://www.geometrictools.com/Documentation/MinimumAreaRectangle.pdf
-	// djm this is only called in the constructor, so we can keep this
-	// unpooled.  I'll still make optimizations though
 	public static void computeOBB(final OBB obb, final Vec2[] vs){
 		final int count = vs.length;
 		assert(count <= Settings.maxPolygonVertices);
-		final Vec2[] p = new Vec2[Settings.maxPolygonVertices + 1];
+		
+		final Vec2 ux = tlUX.get();
+		final Vec2 uy = tlUY.get();
+		final Vec2 lower = tlLower.get();
+		final Vec2 upper = tlUpper.get();
+		final Vec2 d = tlD.get();
+		final Vec2 r = tlR.get();
+		final Vec2 center = tlCenter.get();
+		
+		final Vec2[] pRay = new Vec2[Settings.maxPolygonVertices + 1];
 		for (int i = 0; i < count; ++i){
-			p[i] = vs[i];
+			pRay[i] = vs[i];
 		}
-		p[count] = p[0];
+		pRay[count] = pRay[0];
 
 		float minArea = Float.MAX_VALUE;
-
-		final Vec2 ux = ObjectPool.getVec2();
-		final Vec2 uy = ObjectPool.getVec2();
-		final Vec2 lower = ObjectPool.getVec2();
-		final Vec2 upper = ObjectPool.getVec2();
-		final Vec2 d = ObjectPool.getVec2();
-		final Vec2 r = ObjectPool.getVec2();
-		final Vec2 center = ObjectPool.getVec2();
 		
 		for (int i = 1; i <= count; ++i){
-			final Vec2 root = p[i-1];
-			ux.set(p[i]);
+			final Vec2 root = pRay[i-1];
+			ux.set(pRay[i]);
 			ux.subLocal(root);
 			final float length = ux.normalize();
 			assert(length > Settings.EPSILON);
@@ -461,7 +460,7 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 			upper.y = -Float.MAX_VALUE;
 
 			for (int j = 0; j < count; ++j) {
-				d.set(p[j]);
+				d.set(pRay[j]);
 				d.subLocal(root);
 				r.x = Vec2.dot(ux, d);
 				r.y = Vec2.dot(uy, d);
@@ -486,16 +485,10 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		}
 
 		assert(minArea < Float.MAX_VALUE);
-		
-		ObjectPool.returnVec2(ux);
-		ObjectPool.returnVec2(uy);
-		ObjectPool.returnVec2(lower);
-		ObjectPool.returnVec2(upper);
-		ObjectPool.returnVec2(d);
-		ObjectPool.returnVec2(r);
-		ObjectPool.returnVec2(center);
 	}
 
+	private static final TLMat22 tlCaabbR = new TLMat22();
+	private static final TLVec2 tlCaabbH = new TLVec2();
 	/**
 	 * @see Shape#computeAABB(AABB, XForm)
 	 */
@@ -505,8 +498,8 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		Mat22 absR = Mat22.abs(R);
 		Vec2 h = Mat22.mul(absR, m_obb.extents);
 		Vec2 position = xf.position.add(Mat22.mul(xf.R, m_obb.center));*/
-		final Mat22 caabbR = ObjectPool.getMat22();
-		final Vec2 caabbH = ObjectPool.getVec2();
+		final Mat22 caabbR = tlCaabbR.get();
+		final Vec2 caabbH = tlCaabbH.get();
 
 		Mat22.mulToOut(xf.R, m_obb.R, caabbR);
 		caabbR.absLocal();
@@ -519,40 +512,36 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 
 		aabb.lowerBound.subLocal(caabbH);
 		aabb.upperBound.addLocal(caabbH);
-		
-		ObjectPool.returnMat22(caabbR);
-		ObjectPool.returnVec2(caabbH);
 	}
 
 	// djm pooling, hot method
-	
+	private static final TLAABB tlSwept1 = new TLAABB();
+	private static final TLAABB tlSwept2 = new TLAABB();
 	/**
 	 * @see Shape#computeSweptAABB(AABB, XForm, XForm)
 	 */
 	@Override
 	public void computeSweptAABB(final AABB aabb, final XForm transform1, final XForm transform2) {
 		
-		final AABB sweptAABB1 = ObjectPool.getAABB();
-		final AABB sweptAABB2 = ObjectPool.getAABB();
+		final AABB sweptAABB1 = tlSwept1.get();
+		final AABB sweptAABB2 = tlSwept2.get();
 		
 		computeAABB(sweptAABB1, transform1);
 		computeAABB(sweptAABB2, transform2);
 		Vec2.minToOut(sweptAABB1.lowerBound, sweptAABB2.lowerBound, aabb.lowerBound);
 		Vec2.maxToOut(sweptAABB1.upperBound, sweptAABB2.upperBound, aabb.upperBound);
 		//System.out.println("poly sweepaabb: "+aabb.lowerBound+" "+aabb.upperBound);
-		
-		ObjectPool.returnAABB(sweptAABB1);
-		ObjectPool.returnAABB(sweptAABB2);
 	}
 
 	@Override
 	public void computeMass(final MassData massData) {
 		computeMass(massData, m_density);
 	}
+	
+	//djm pooling, from above
 	/**
 	 * @see Shape#computeMass(MassData)
 	 */
-	// djm not very hot method so I'm not pooling.  still optimized though
 	public void computeMass(final MassData massData, float density) {
 		// Polygon mass, centroid, and inertia.
 		// Let rho be the polygon density in mass per unit area.
@@ -580,20 +569,20 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 
 		assert(m_vertexCount >= 3);
 
-		final Vec2 center = ObjectPool.getVec2();
+		final Vec2 center = tlCenter.get();
 		center.setZero();
 		float area = 0.0f;
 		float I = 0.0f;
 
 		// pRef is the reference point for forming triangles.
 		// It's location doesn't change the result (except for rounding error).
-		final Vec2 pRef = ObjectPool.getVec2();
+		final Vec2 pRef = tlPRef.get();
 		pRef.setZero();
 
 		final float k_inv3 = 1.0f / 3.0f;
 
-		final Vec2 e1 = ObjectPool.getVec2();
-		final Vec2 e2 = ObjectPool.getVec2();
+		final Vec2 e1 = tlE1.get();
+		final Vec2 e2 = tlE2.get();
 
 		for (int i = 0; i < m_vertexCount; ++i) {
 			// Triangle vertices.
@@ -636,11 +625,6 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 
 		// Inertia tensor relative to the local origin.
 		massData.I = I*density;
-		
-		ObjectPool.returnVec2(e1);
-		ObjectPool.returnVec2(e2);
-		ObjectPool.returnVec2(pRef);
-		ObjectPool.returnVec2(center);
 	}
 
 	/** Get the first vertex and apply the supplied transform. */
@@ -686,13 +670,20 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 	public Vec2 centroid(final XForm xf) {
 		return XForm.mul(xf, m_centroid);
 	}
-
+	
+	// djm pooling, and from above
+	private static final TLVec2 tlNormalL = new TLVec2();
+	private static final TLMassData tlMd = new TLMassData();
+	private static final TLVec2 tlIntoVec = new TLVec2();
+	private static final TLVec2 tlOutoVec = new TLVec2();
+	private static final TLVec2 tlP2b = new TLVec2();
+	private static final TLVec2 tlP3 = new TLVec2();
 	/**
 	 * @see Shape#computeSubmergedArea(Vec2, float, XForm, Vec2)
 	 */
 	public float computeSubmergedArea(final Vec2 normal, float offset, XForm xf, Vec2 c) {
-		final Vec2 normalL = ObjectPool.getVec2();
-		final MassData md = ObjectPool.getMassData();
+		final Vec2 normalL = tlNormalL.get();
+		final MassData md = tlMd.get();
 		
 		//Transform plane into shape co-ordinates
 		Mat22.mulTransToOut(xf.R,normal, normalL);
@@ -731,14 +722,9 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 				//Completely submerged
 				computeMass(md, 1.0f);
 				XForm.mulToOut(xf,md.center, c);
-				
-				ObjectPool.returnVec2(normalL);
-				ObjectPool.returnMassData(md);
 				return md.mass;
 			}
 			else{
-				ObjectPool.returnVec2(normalL);
-				ObjectPool.returnMassData(md);
 				return 0;
 			}
 
@@ -752,10 +738,10 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 			break;
 		}
 
-		final Vec2 intoVec = ObjectPool.getVec2();
-		final Vec2 outoVec = ObjectPool.getVec2();
-		final Vec2 e1 = ObjectPool.getVec2();
-		final Vec2 e2 = ObjectPool.getVec2();
+		final Vec2 intoVec = tlIntoVec.get();
+		final Vec2 outoVec = tlOutoVec.get();
+		final Vec2 e1 = tlE1.get();
+		final Vec2 e2 = tlE2.get();
 		
 		int intoIndex2 = (intoIndex+1) % m_vertexCount;
 		int outoIndex2 = (outoIndex+1) % m_vertexCount;
@@ -770,10 +756,10 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		
 		// Initialize accumulator
 		float area = 0;
-		final Vec2 center = ObjectPool.getVec2();
+		final Vec2 center = tlCenter.get();
 		center.setZero();
-		final Vec2 p2b = ObjectPool.getVec2(m_vertices[intoIndex2]);
-		final Vec2 p3 = ObjectPool.getVec2();
+		final Vec2 p2b = tlP2b.get().set(m_vertices[intoIndex2]);
+		final Vec2 p3 = tlP3.get();
 		p3.setZero();
 		
 		float k_inv3 = 1.0f / 3.0f;
@@ -813,16 +799,6 @@ public class PolygonShape extends Shape implements SupportsGenericDistance{
 		center.y *= 1.0f / area;
 		
 		XForm.mulToOut(xf, center, c);
-		
-		ObjectPool.returnVec2(normalL);
-		ObjectPool.returnMassData(md);
-		ObjectPool.returnVec2(intoVec);
-		ObjectPool.returnVec2(outoVec);
-		ObjectPool.returnVec2(e1);
-		ObjectPool.returnVec2(e2);
-		ObjectPool.returnVec2(p3);
-		ObjectPool.returnVec2(p2b);
-		ObjectPool.returnVec2(center);
 		
 		return area;
 	}
