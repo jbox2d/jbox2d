@@ -26,6 +26,7 @@ package org.jbox2d.collision.shapes;
 import org.jbox2d.collision.Collision;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.common.Mat22;
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
@@ -79,7 +80,7 @@ public class CollideCircle {
 			manifold.normal.set(0.0f, 1.0f);
 		}
 		else {
-			final float dist = (float) Math.sqrt(distSqr);
+			final float dist = MathUtils.sqrt(distSqr);
 			separation = dist - radiusSum;
 			final float a = 1.0f / dist;
 			manifold.normal.x = a * colCCD.x;
@@ -142,7 +143,7 @@ public class CollideCircle {
 			manifold.normal.set(0.0f, 1.0f);
 		}
 		else {
-			final float dist = (float) Math.sqrt(distSqr);
+			final float dist = MathUtils.sqrt(distSqr);
 			separation = dist - r2;
 			final float a = 1.0f / dist;
 			manifold.normal.x = a * colPCD.x;
@@ -254,7 +255,7 @@ public class CollideCircle {
 
 		float ex = vertices[vertIndex2].x - vertices[vertIndex1].x;
 		float ey = vertices[vertIndex2].y - vertices[vertIndex1].y;
-		final float length = (float) Math.sqrt(ex * ex + ey * ey);
+		final float length = MathUtils.sqrt(ex * ex + ey * ey);
 		assert(length > Settings.EPSILON);
 		final float invLength = 1.0f / length;
 		ex *= invLength;
@@ -294,7 +295,7 @@ public class CollideCircle {
 
 		float dx = cLocalx - px;
 		float dy = cLocaly - py;
-		final float dist = (float) Math.sqrt(dx * dx + dy * dy);
+		final float dist = MathUtils.sqrt(dx * dx + dy * dy);
 		if (dist > radius) {
 			return;
 		}

@@ -25,6 +25,7 @@ package org.jbox2d.testbed.tests;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.shapes.CircleDef;
 import org.jbox2d.collision.shapes.PolygonDef;
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
@@ -160,19 +161,19 @@ public class SpringRestitutionTest extends AbstractExample {
     }
     
     public void postStep() {
-    	float finalVA = .5f*Math.abs(bodyA0.getLinearVelocity().y + bodyA1.getLinearVelocity().y);
+    	float finalVA = .5f*MathUtils.abs(bodyA0.getLinearVelocity().y + bodyA1.getLinearVelocity().y);
     	float finalCORA = finalVA / initV;
     	m_debugDraw.drawString(5.0f,m_textLine,"BodyA: initial = "+initV+" , final = "+finalVA+"; COR A = "+finalCORA,white);
     	m_textLine += textLineHeight;
-    	float finalVB = .5f*Math.abs(bodyB0.getLinearVelocity().y + bodyB1.getLinearVelocity().y);
+    	float finalVB = .5f*MathUtils.abs(bodyB0.getLinearVelocity().y + bodyB1.getLinearVelocity().y);
     	float finalCORB = finalVB / initV;
     	m_debugDraw.drawString(5.0f,m_textLine,"BodyB: initial = "+initV+" , final = "+finalVB+"; COR B = "+finalCORB,white);
     	m_textLine += textLineHeight;
-    	float finalVC = .5f*Math.abs(bodyC0.getLinearVelocity().y + bodyC1.getLinearVelocity().y);
+    	float finalVC = .5f*MathUtils.abs(bodyC0.getLinearVelocity().y + bodyC1.getLinearVelocity().y);
     	float finalCORC = finalVC / initV;
     	m_debugDraw.drawString(5.0f,m_textLine,"BodyC: initial = "+initV+" , final = "+finalVC+"; COR C = "+finalCORC,white);
     	m_textLine += textLineHeight;
-    	float finalVD = .5f*Math.abs(bodyD0.getLinearVelocity().y + bodyD1.getLinearVelocity().y);
+    	float finalVD = .5f*MathUtils.abs(bodyD0.getLinearVelocity().y + bodyD1.getLinearVelocity().y);
     	float finalCORD = finalVD / initV;
     	m_debugDraw.drawString(5.0f,m_textLine,"BodyD: initial = "+initV+" , final = "+finalVD+"; COR D = "+finalCORD,white);
     	m_textLine += textLineHeight;

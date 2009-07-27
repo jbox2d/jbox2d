@@ -6,6 +6,7 @@ import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.shapes.CircleDef;
 import org.jbox2d.collision.shapes.PolygonDef;
 import org.jbox2d.collision.shapes.ShapeDef;
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.IViewportTransform;
 import org.jbox2d.dynamics.Body;
@@ -377,8 +378,8 @@ public class Physics {
 	public Body createRect(float x0, float y0, float x1, float y1) {
 		float cxs = (x0 + x1) * .5f;
 		float cys = (y0 + y1) * .5f;
-		float wxs = Math.abs(x1-x0);
-		float wys = Math.abs(y1-y0);
+		float wxs = MathUtils.abs(x1-x0);
+		float wys = MathUtils.abs(y1-y0);
 		//System.out.println("Screen: ("+cxs + ","+cys+")");
 		Vec2 center = screenToWorld(cxs, cys);
 		//System.out.println("World: "+center);

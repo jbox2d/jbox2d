@@ -28,6 +28,7 @@ import org.jbox2d.collision.MassData;
 import org.jbox2d.collision.Segment;
 import org.jbox2d.collision.SegmentCollide;
 import org.jbox2d.common.Mat22;
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.RaycastResult;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
@@ -76,7 +77,7 @@ public class CircleShape extends Shape {
 		// Vec2 d = m_localPosition.sub(center);
 		final float dx = m_localPosition.x - center.x;
 		final float dy = m_localPosition.y - center.y;
-		m_sweepRadius = (float) Math.sqrt(dx * dx + dy * dy) + m_radius
+		m_sweepRadius = MathUtils.sqrt(dx * dx + dy * dy) + m_radius
 				- Settings.toiSlop;
 	}
 
@@ -140,7 +141,7 @@ public class CircleShape extends Shape {
 		}
 
 		// Find the point of intersection of the line with the circle.
-		float a = -(c + (float) Math.sqrt(sigma));
+		float a = -(c + MathUtils.sqrt(sigma));
 
 //		 System.out.println(a + "; " + maxLambda + "; " + rr + "  ; " + (a <= maxLambda * rr));
 
@@ -278,7 +279,7 @@ public class CircleShape extends Shape {
 		float area = (float) (r2
 				* (Math.asin(l / m_radius) + Settings.pi / 2.0f) + l
 				* Math.sqrt(r2 - l2));
-		float com = (float) (-2.0f / 3.0f * Math.pow(r2 - l2, 1.5f) / area);
+		float com = (float) (-2.0f / 3.0f * MathUtils.pow(r2 - l2, 1.5f) / area);
 
 		c.x = p.x + normal.x * com;
 		c.y = p.y + normal.y * com;

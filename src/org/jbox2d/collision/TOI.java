@@ -24,6 +24,7 @@
 package org.jbox2d.collision;
 
 import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Sweep;
 import org.jbox2d.common.Vec2;
@@ -116,7 +117,7 @@ public class TOI {
 			float normaly = p2.y - p1.y;
 			final float lenSqrd = normalx * normalx + normaly * normaly;
 			if (lenSqrd >= Settings.EPSILON*Settings.EPSILON) {
-				final float length = (float) Math.sqrt(lenSqrd);
+				final float length = MathUtils.sqrt(lenSqrd);
 				final float invLength = 1.0f / length;
 				normalx *= invLength;
 				normaly *= invLength;
@@ -124,11 +125,11 @@ public class TOI {
 
 			// Compute upper bound on remaining movement.
 			// INLINED
-			//float approachVelocityBound = Vec2.dot(normal, v) + Math.abs(omega1) * r1 + Math.abs(omega2) * r2;
-			final float approachVelocityBound = (normalx * vx + normaly * vy) + Math.abs(omega1) * r1 + Math.abs(omega2) * r2;
+			//float approachVelocityBound = Vec2.dot(normal, v) + MathUtils.abs(omega1) * r1 + MathUtils.abs(omega2) * r2;
+			final float approachVelocityBound = (normalx * vx + normaly * vy) + MathUtils.abs(omega1) * r1 + MathUtils.abs(omega2) * r2;
 			//System.out.println("avb: "+approachVelocityBound);
 			//System.out.println("Normal" + normal);
-			if (Math.abs(approachVelocityBound) < Settings.EPSILON) {
+			if (MathUtils.abs(approachVelocityBound) < Settings.EPSILON) {
 				alpha = 1.0f;
 				break;
 			}
