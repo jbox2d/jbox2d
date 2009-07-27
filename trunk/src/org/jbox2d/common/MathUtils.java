@@ -194,11 +194,12 @@ public class MathUtils {
 		int i = Float.floatToRawIntBits(x);
 		i = 0x5f3759df - (i >> 1);
 		x = Float.intBitsToFloat(i);
-		x = x * (1.5f - xhalf * x * x);
+		x *= (1.5f - xhalf * x * x);
 		// REPEAT FOR ACCURACY (make sure at least 2 are here, too inaccurate
 		// otherwise)
-		x = x * (1.5f - xhalf * x * x);
-		x = x * (1.5f - xhalf * x * x);
+		x *= (1.5f - xhalf * x * x);
+		x *= (1.5f - xhalf * x * x);
+		x *= (1.5f - xhalf * x * x);
 		return x;
 	}
 }
