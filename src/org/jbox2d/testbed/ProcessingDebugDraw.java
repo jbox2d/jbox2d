@@ -79,14 +79,18 @@ public class ProcessingDebugDraw extends DebugDraw {
 		g.noFill();
 		g.beginShape(PApplet.POLYGON);
 		for (int i = 0; i < k_segments; ++i) {
-			float vx = center.x + radius * (float)Math.cos(theta);
-			float vy = center.y + radius * (float)Math.sin(theta);
+			float vx = radius * (float)Math.cos(theta);
+			float vy = radius * (float)Math.sin(theta);
 			circlePt.set( vx, vy);
 			viewportTransform.vectorTransform(circlePt, circlePt);
+			circlePt.addLocal( center);
 			g.vertex(circlePt.x, circlePt.y);
 			theta += k_increment;
 		}
-		g.vertex(center.x + radius, center.y);
+		circlePt.set( radius, 0);
+		viewportTransform.vectorTransform(circlePt, circlePt);
+		circlePt.addLocal( center);
+		g.vertex(circlePt.x, circlePt.y);
 		g.endShape();
 	}
 

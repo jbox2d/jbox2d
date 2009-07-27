@@ -26,7 +26,7 @@ package org.jbox2d.collision;
 import org.jbox2d.common.RaycastResult;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.pooling.ThreadLocalVec2;
+import org.jbox2d.pooling.TLVec2;
 
 //See b2Collision.h/.cpp
 // djm: is this used?
@@ -62,10 +62,10 @@ public class Segment {
 	// mu2 = det[-r b] / denom*/
 	
 	// djm pooling
-	private static final ThreadLocalVec2 tlR = new ThreadLocalVec2();
-	private static final ThreadLocalVec2 tlD = new ThreadLocalVec2();
-	private static final ThreadLocalVec2 tlN = new ThreadLocalVec2();
-	private static final ThreadLocalVec2 tlB = new ThreadLocalVec2();
+	private static final TLVec2 tlR = new TLVec2();
+	private static final TLVec2 tlD = new TLVec2();
+	private static final TLVec2 tlN = new TLVec2();
+	private static final TLVec2 tlB = new TLVec2();
 
 	
 	public boolean testSegment(RaycastResult out, Segment segment, float maxLambda) {

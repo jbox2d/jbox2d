@@ -1,7 +1,7 @@
 package org.jbox2d.common;
 
 import org.jbox2d.collision.OBB;
-import org.jbox2d.pooling.ThreadLocalMat22;
+import org.jbox2d.pooling.TLMat22;
 
 public class OBBViewportTransform implements IViewportTransform{
 	
@@ -111,7 +111,7 @@ public class OBBViewportTransform implements IViewportTransform{
 	}
 
 	// djm pooling
-	private static final ThreadLocalMat22 tlInv = new ThreadLocalMat22();
+	private static final TLMat22 tlInv = new TLMat22();
 	/**
 	 * @see IViewportTransform#vectorInverseTransform(Vec2, Vec2)
 	 */

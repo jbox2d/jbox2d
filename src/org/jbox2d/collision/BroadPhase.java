@@ -26,8 +26,8 @@ package org.jbox2d.collision;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.pooling.ThreadLocalBoundValues;
-import org.jbox2d.pooling.ThreadLocalTwoInts;
+import org.jbox2d.pooling.TLBoundValues;
+import org.jbox2d.pooling.TLIntegerArray;
 
 import sun.awt.windows.ThemeReader;
 
@@ -211,9 +211,9 @@ public class BroadPhase {
 	}
 
 	// djm pooling
-	private final static ThreadLocalTwoInts tlLowerValues = new ThreadLocalTwoInts();
-	private final static ThreadLocalTwoInts tlUpperValues = new ThreadLocalTwoInts();
-	private final static ThreadLocalTwoInts tlIndexes = new ThreadLocalTwoInts();
+	private final static TLIntegerArray tlLowerValues = new TLIntegerArray(2);
+	private final static TLIntegerArray tlUpperValues = new TLIntegerArray(2);
+	private final static TLIntegerArray tlIndexes = new TLIntegerArray(2);
 	
 	// Create and destroy proxies. These call Flush first.
 	/** internal */
@@ -340,7 +340,7 @@ public class BroadPhase {
 	}
 	
 	// djm pooling
-	private static final ThreadLocalTwoInts tlIgnored = new ThreadLocalTwoInts();
+	private static final TLIntegerArray tlIgnored = new TLIntegerArray(2);
 	
 	public void destroyProxy( final int proxyId) {
 		assert (0 < m_proxyCount && m_proxyCount <= Settings.maxProxies);
@@ -429,8 +429,8 @@ public class BroadPhase {
 	}
 
 	// djm pooling
-	private static final ThreadLocalBoundValues tlNewValues = new ThreadLocalBoundValues();
-	private static final ThreadLocalBoundValues tlOldValues = new ThreadLocalBoundValues();
+	private static final TLBoundValues tlNewValues = new TLBoundValues();
+	private static final TLBoundValues tlOldValues = new TLBoundValues();
 	
 	// Call MoveProxy as many times as you like, then when you are done
 	// call Flush to finalized the proxy pairs (for your time step).
@@ -847,7 +847,7 @@ public class BroadPhase {
 	
 	
 	// djm pooling
-	private static final ThreadLocalTwoInts tlResults = new ThreadLocalTwoInts();
+	private static final TLIntegerArray tlResults = new TLIntegerArray(2);
 	
 	public int querySegment(Segment segment, Object[] userData, int maxCount, SortKeyFunc sortKey)
 	{

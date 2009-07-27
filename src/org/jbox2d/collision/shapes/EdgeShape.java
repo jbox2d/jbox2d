@@ -10,7 +10,7 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.Body;
-import org.jbox2d.pooling.ThreadLocalVec2;
+import org.jbox2d.pooling.TLVec2;
 
 /**
  * An edge shape.  Create using {@link Body#createShape(ShapeDef)} with an {@link EdgeChainDef},
@@ -95,11 +95,11 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 		return false;
 	}
 
-	private static final ThreadLocalVec2 tlR = new ThreadLocalVec2();
-	private static final ThreadLocalVec2 tlV1 = new ThreadLocalVec2();
-	private static final ThreadLocalVec2 tlD= new ThreadLocalVec2();
-	private static final ThreadLocalVec2 tlN = new ThreadLocalVec2();
-	private static final ThreadLocalVec2 tlB = new ThreadLocalVec2();
+	private static final TLVec2 tlR = new TLVec2();
+	private static final TLVec2 tlV1 = new TLVec2();
+	private static final TLVec2 tlD= new TLVec2();
+	private static final TLVec2 tlN = new TLVec2();
+	private static final TLVec2 tlB = new TLVec2();
 
 	/**
 	 * @see Shape#testSegment(XForm, RaycastResult, Segment, float)
@@ -149,7 +149,7 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 	}
 
 	// djm pooling
-	private static final ThreadLocalVec2 tlV2 = new ThreadLocalVec2();
+	private static final TLVec2 tlV2 = new TLVec2();
 	/**
 	 * @see Shape#computeAABB(AABB, XForm)
 	 */
@@ -170,10 +170,10 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 	}
 
 	// djm pooling
-	private static final ThreadLocalVec2 tlSwept1 = new ThreadLocalVec2();
-	private static final ThreadLocalVec2 tlSwept2 = new ThreadLocalVec2();
-	private static final ThreadLocalVec2 tlSwept3 = new ThreadLocalVec2();
-	private static final ThreadLocalVec2 tlSwept4 = new ThreadLocalVec2();
+	private static final TLVec2 tlSwept1 = new TLVec2();
+	private static final TLVec2 tlSwept2 = new TLVec2();
+	private static final TLVec2 tlSwept3 = new TLVec2();
+	private static final TLVec2 tlSwept4 = new TLVec2();
 
 	/**
 	 * @see Shape#computeSweptAABB(AABB, XForm, XForm)
@@ -217,8 +217,8 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 	}
 
 	// djm pooling
-	private static final ThreadLocalVec2 tlSupportV1 = new ThreadLocalVec2();
-	private static final ThreadLocalVec2 tlSupportV2 = new ThreadLocalVec2();
+	private static final TLVec2 tlSupportV1 = new TLVec2();
+	private static final TLVec2 tlSupportV2 = new TLVec2();
 	/**
 	 * @see SupportsGenericDistance#support(Vec2, XForm, Vec2)
 	 */
@@ -315,10 +315,10 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 	}
 	
 	// djm pooled, and from above
-	private static final ThreadLocalVec2 tlV0 = new ThreadLocalVec2();
-	private static final ThreadLocalVec2 tlTemp = new ThreadLocalVec2();
-	private static final ThreadLocalVec2 tlE1 = new ThreadLocalVec2();
-	private static final ThreadLocalVec2 tlE2 = new ThreadLocalVec2();
+	private static final TLVec2 tlV0 = new TLVec2();
+	private static final TLVec2 tlTemp = new TLVec2();
+	private static final TLVec2 tlE1 = new TLVec2();
+	private static final TLVec2 tlE2 = new TLVec2();
 	
 	public float computeSubmergedArea(final Vec2 normal,float offset,XForm xf,Vec2 c) {
 		final Vec2 v0 = tlV0.get();
