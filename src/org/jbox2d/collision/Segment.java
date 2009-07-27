@@ -23,10 +23,10 @@
 
 package org.jbox2d.collision;
 
-import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.RaycastResult;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.pooling.ThreadLocalVec2;
 
 //See b2Collision.h/.cpp
 // djm: is this used?
@@ -61,15 +61,22 @@ public class Segment {
 	// a = det[b d] / denom
 	// mu2 = det[-r b] / denom*/
 	
+	// djm pooling
+	private static final ThreadLocalVec2 tlR = new ThreadLocalVec2();
+	private static final ThreadLocalVec2 tlD = new ThreadLocalVec2();
+	private static final ThreadLocalVec2 tlN = new ThreadLocalVec2();
+	private static final ThreadLocalVec2 tlB = new ThreadLocalVec2();
+
+	
 	public boolean testSegment(RaycastResult out, Segment segment, float maxLambda) {
 		Vec2 s = segment.p1;
-		Vec2 r = ObjectPool.getVec2(segment.p2);
+		Vec2 r = tlR.get().set(segment.p2);
 		r.subLocal(s);
-		Vec2 d = ObjectPool.getVec2(p2);
+		Vec2 d = tlD.get().set(p2);
 		d.subLocal(p1);
-		Vec2 n = ObjectPool.getVec2();
+		Vec2 n = tlN.get();
 		Vec2.crossToOut(d, 1.0f, n);
-		Vec2 b = ObjectPool.getVec2();
+		Vec2 b = tlB.get();
 
 		float k_slop = 100.0f * Settings.EPSILON;
 		float denom = -Vec2.dot(r, n);
@@ -91,19 +98,10 @@ public class Segment {
 					n.normalize();
 					out.lambda = a;
 					out.normal.set(n);
-					ObjectPool.returnVec2(r);
-					ObjectPool.returnVec2(d);
-					ObjectPool.returnVec2(n);
-					ObjectPool.returnVec2(b);
 					return true;
 				}
 			}
 		}
-
-		ObjectPool.returnVec2(r);
-		ObjectPool.returnVec2(d);
-		ObjectPool.returnVec2(n);
-		ObjectPool.returnVec2(b);
 		return false;
 	}
 }
