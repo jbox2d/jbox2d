@@ -177,7 +177,7 @@ public class PrismaticJoint extends Joint {
 				//Vec2 d = e.sub(r1); // p2 - p1
 				final float jointTranslation = Vec2.dot(ax1, d);
 
-				if (Math.abs(m_upperTranslation - m_lowerTranslation) < 2.0f * Settings.linearSlop) {
+				if (MathUtils.abs(m_upperTranslation - m_lowerTranslation) < 2.0f * Settings.linearSlop) {
 					m_limitState = LimitState.EQUAL_LIMITS;
 				}
 				else if (jointTranslation <= m_lowerTranslation) {
@@ -377,7 +377,7 @@ public class PrismaticJoint extends Joint {
 		b2.m_sweep.a += invI2 * linearImpulse * m_linearJacobian.angular2;
 		//b2.SynchronizeTransform(); // updated by angular constraint
 
-		float positionError = Math.abs(linearC);
+		float positionError = MathUtils.abs(linearC);
 
 		// Solve angular constraint.
 		float angularC = b2.m_sweep.a - b1.m_sweep.a - m_refAngle;
@@ -391,7 +391,7 @@ public class PrismaticJoint extends Joint {
 		b1.synchronizeTransform();
 		b2.synchronizeTransform();
 
-		final float angularError = Math.abs(angularC);
+		final float angularError = MathUtils.abs(angularC);
 
 		// Solve linear limit constraint.
 		if (m_enableLimit && m_limitState != LimitState.INACTIVE_LIMIT)
@@ -425,7 +425,7 @@ public class PrismaticJoint extends Joint {
 				// Prevent large angular corrections
 				final float limitC = MathUtils.clamp(translation, -Settings.maxLinearCorrection, Settings.maxLinearCorrection);
 				limitImpulse = -m_motorMass * limitC;
-				positionError = MathUtils.max(positionError, Math.abs(angularC));
+				positionError = MathUtils.max(positionError, MathUtils.abs(angularC));
 			} else if (m_limitState == LimitState.AT_LOWER_LIMIT) {
 				float limitC = translation - m_lowerTranslation;
 				positionError = MathUtils.max(positionError, -limitC);

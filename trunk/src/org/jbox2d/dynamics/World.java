@@ -24,6 +24,7 @@
 package org.jbox2d.dynamics;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.BroadPhase;
@@ -43,7 +44,6 @@ import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Mat22;
-import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.RaycastResult;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
@@ -59,6 +59,8 @@ import org.jbox2d.dynamics.joints.JointDef;
 import org.jbox2d.dynamics.joints.JointEdge;
 import org.jbox2d.dynamics.joints.JointType;
 import org.jbox2d.dynamics.joints.PulleyJoint;
+import org.jbox2d.pooling.TLStack;
+import org.jbox2d.pooling.TLTimeStep;
 
 
 //Updated to rev 56->118->142->150 of b2World.cpp/.h
@@ -123,6 +125,9 @@ public class World {
 	private float m_inv_dt0;
 
 	private final ArrayList<Steppable> postStepList;
+	
+	// djm pooling
+	private static final TLStack<Island> tlIslandStack = new TLStack<Island>();
 
 	public void setDrawDebugData(final boolean tf) {
 		m_drawDebugData = tf;
@@ -525,6 +530,8 @@ public class World {
 		--m_controllerCount;
 	}
 
+	// djm pooling
+	private static final TLTimeStep tlStep = new TLTimeStep();
 	/**
 	 * Take a time step. This performs collision detection, integration,
 	 * and constraint solution.
@@ -534,7 +541,7 @@ public class World {
 	public void step(final float dt, final int iterations) {
 		m_lock = true;
 
-		final TimeStep step = ObjectPool.getTimeStep();
+		final TimeStep step = tlStep.get();
 		step.dt = dt;
 		step.maxIterations	= iterations;
 		if (dt > 0.0f) {
@@ -566,8 +573,6 @@ public class World {
 
 		m_inv_dt0 = step.inv_dt;
 		m_lock = false;
-
-		ObjectPool.returnTimeStep(step);
 		
 		postStep(dt,iterations);
 	}
@@ -642,7 +647,14 @@ public class World {
 		}
 
 		// Size the island for the worst case.
-		final Island island = ObjectPool.getIsland();
+		Stack<Island> islands = tlIslandStack.get();
+		if( islands.isEmpty()){
+			islands.push(new Island());
+			islands.push(new Island());
+			islands.push(new Island());
+			islands.push(new Island());
+		}
+		final Island island = islands.pop();
 		island.init(m_bodyCount, m_contactCount, m_jointCount, m_contactListener);
 
 		// Clear all the island flags.
@@ -775,16 +787,29 @@ public class World {
 		// Commit shape proxy movements to the broad-phase so that new contacts are created.
 		// Also, some contacts can be destroyed.
 		m_broadPhase.commit();
-
-		ObjectPool.returnIsland(island);
+		
+		islands.push(island);
 	}
 
+	
+	// djm pooling
+	private static final TLStack<TimeStep> tlToiSteps = new TLStack<TimeStep>();
+	
 	/** For internal use: find TOI contacts and solve them. */
 	public void solveTOI(final TimeStep step) {
 		// Reserve an island and a stack for TOI island solution.
 		// djm do we always have to make a new island? or can we make
 		// it static?
-		final Island island = ObjectPool.getIsland();
+		
+		// Size the island for the worst case.
+		Stack<Island> islands = tlIslandStack.get();
+		if( islands.isEmpty()){
+			islands.push(new Island());
+			islands.push(new Island());
+			islands.push(new Island());
+			islands.push(new Island());
+		}
+		final Island island = islands.pop();
 		island.init(m_bodyCount, Settings.maxTOIContactsPerIsland, Settings.maxTOIJointsPerIsland, m_contactListener);
 
 		//Simple one pass queue
@@ -1000,7 +1025,12 @@ public class World {
 
 			}
 
-			final TimeStep subStep  = ObjectPool.getTimeStep();
+			final Stack<TimeStep> steps = tlToiSteps.get();
+			if(steps.isEmpty()){
+				steps.push(new TimeStep());
+				steps.push(new TimeStep());
+			}
+			final TimeStep subStep = steps.pop();
 			subStep.warmStarting = false;
 			subStep.dt = (1.0f - minTOI) * step.dt;
 			assert(subStep.dt > Settings.EPSILON);
@@ -1008,8 +1038,8 @@ public class World {
 			subStep.maxIterations = step.maxIterations;
 
 			island.solveTOI(subStep);
-			ObjectPool.returnTimeStep(subStep);
-
+			steps.push(subStep);
+			
 			// Post solve cleanup.
 			for (int i = 0; i < island.m_bodyCount; ++i) {
 				// Allow bodies to participate in future TOI islands.
@@ -1057,8 +1087,6 @@ public class World {
 			// Commit shape proxy movements to the broad-phase so that new contacts are created.
 			// Also, some contacts can be destroyed.
 			m_broadPhase.commit();
-
-			ObjectPool.returnIsland(island);
 		}
 	}
 	

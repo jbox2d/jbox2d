@@ -40,6 +40,8 @@ import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.dynamics.controllers.ControllerEdge;
 import org.jbox2d.dynamics.joints.JointEdge;
+import org.jbox2d.pooling.TLVec2;
+import org.jbox2d.pooling.TLXForm;
 
 // Updated to rev. 54->118->142 of b2Body.cpp/.h
 // Rewritten completely for rev. 118 (too many changes, needed reorganization for maintainability)
@@ -431,6 +433,7 @@ public class Body {
 		}
 	}
 
+	private static final TLVec2 tlCenter = new TLVec2();
 	/**
 	 * Compute the mass properties from the attached shapes. You typically call this
 	 * after adding all the shapes. If you add or remove shapes later, you may want
@@ -449,7 +452,8 @@ public class Body {
 		m_invI = 0.0f;
 
 		// djm might as well allocate, not really a hot path
-		final Vec2 center = new Vec2();
+		final Vec2 center = tlCenter.get();
+		center.setZero();
 		for (Shape s = m_shapeList; s != null; s = s.m_next) {
 			final MassData massData = new MassData();
 			s.computeMass(massData);
@@ -765,8 +769,6 @@ public class Body {
 	 * @param out where to put the same point expressed in world coordinates.
 	 */
 	public void getWorldLocationToOut(final Vec2 localPoint, final Vec2 out){
-		// TODO optimize engine methods that call
-		// getWorldLocation to use this one
 		XForm.mulToOut( m_xf, localPoint, out);
 	}
 
@@ -807,8 +809,6 @@ public class Body {
 	 * @param out where to put the same vector expressed in world coordinates.
 	 */
 	public void getWorldDirectionToOut(final Vec2 localDirection, final Vec2 out){
-		// TODO optimize engine methods that use
-		// getWorldDirection with this one
 		Mat22.mulToOut( m_xf.R, localDirection, out);
 	}
 
@@ -827,8 +827,6 @@ public class Body {
 	 * @param out where to put the the corresponding local point relative to the body's origin.
 	 */
 	public void getLocalPointToOut(final Vec2 worldPoint, final Vec2 out){
-		// TODO optimized engine methods that
-		// use getLocalPoint to use this one
 		XForm.mulTransToOut(m_xf, worldPoint, out);
 	}
 
@@ -847,8 +845,6 @@ public class Body {
 	 * @param out where to put the corresponding local vector.
 	 */
 	public void getLocalVectorToOut(final Vec2 worldVector, final Vec2 out){
-		// TODO optimized engine methods that
-		// use getLocalVector to use this one
 		Mat22.mulToOut( m_xf.R, worldVector, out);
 	}
 
@@ -949,10 +945,11 @@ public class Body {
 
 
 	// djm pooled
-	private final XForm xf1 = new XForm();
+	private static final TLXForm tlXf1 = new TLXForm();
 	/** For internal use only. */
 	public boolean synchronizeShapes(){
 		// INLINED
+		final XForm xf1 = tlXf1.get();
 		xf1.R.set(m_sweep.a0);
 		Mat22 R = xf1.R;
 		Vec2 v = m_sweep.localCenter;
@@ -1151,6 +1148,7 @@ public class Body {
 	 * @return all bodies connected directly to this body by a joint
 	 */
 	public Set<Body> getConnectedBodies() {
+		// TODO djm: pool this
 		Set<Body> mySet = new HashSet<Body>();
 		JointEdge edge = getJointList();
 		while (edge != null) {
@@ -1167,6 +1165,7 @@ public class Body {
 	 * @return all bodies connected directly to this body by a joint
 	 */
 	public Set<Body> getConnectedDynamicBodies() {
+		// TODO djm: pool this
 		Set<Body> mySet = new HashSet<Body>();
 		JointEdge edge = getJointList();
 		while (edge != null) {
@@ -1184,6 +1183,7 @@ public class Body {
 	 * @return Set<Body> of all bodies accessible from this one by walking the joint tree
 	 */
 	public Set<Body> getConnectedBodyIsland() {
+		// TODO djm: pool this
 		Set<Body> result = new HashSet<Body>();
 		result.add(this);
 		return getConnectedBodyIsland_impl(this, result);
@@ -1207,6 +1207,7 @@ public class Body {
 	 * @return Set<Body> of all bodies accessible from this one by walking the joint tree
 	 */
 	public Set<Body> getConnectedDynamicBodyIsland() {
+		// TODO djm: pool this
 		Set<Body> result = new HashSet<Body>();
 		if (!this.isDynamic()) return result;
 		result.add(this);
@@ -1214,6 +1215,7 @@ public class Body {
 	}
 	
 	private Set<Body> getConnectedDynamicBodyIsland_impl(final Body parent, final Set<Body> parentResult) {
+		// TODO djm: pool this
 		Set<Body> connected = getConnectedBodies();
 		for (Body b:connected) {
 			if (b == parent || !b.isDynamic() || parentResult.contains(b)) continue; //avoid infinite recursion
@@ -1231,6 +1233,7 @@ public class Body {
 	 * @return Set<Body> of all bodies accessible from this one by walking the contact tree
 	 */
 	public Set<Body> getTouchingBodyIsland() {
+		// TODO djm: pool this
 		Set<Body> result = new HashSet<Body>();
 		result.add(this);
 		return getTouchingBodyIsland_impl(this, result);
@@ -1253,6 +1256,7 @@ public class Body {
 	 * @return Set<Body> of all bodies accessible from this one by walking the contact tree
 	 */
 	public Set<Body> getTouchingDynamicBodyIsland() {
+		// TODO djm: pool this
 		Set<Body> result = new HashSet<Body>();
 		result.add(this);
 		return getTouchingDynamicBodyIsland_impl(this, result);
@@ -1260,6 +1264,7 @@ public class Body {
 	
 	/* Recursive implementation. */
 	private Set<Body> getTouchingDynamicBodyIsland_impl(final Body parent, final Set<Body> parentResult) {
+		// TODO djm: pool this
 		Set<Body> touching = getBodiesInContact();
 		for (Body b:touching) {
 			if (b == parent || !b.isDynamic() || parentResult.contains(b)) continue; //avoid infinite recursion

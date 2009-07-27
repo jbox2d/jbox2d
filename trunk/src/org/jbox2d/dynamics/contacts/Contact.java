@@ -122,7 +122,7 @@ public abstract class Contact {
 		m_manifoldCount = 0;
 		//getManifolds().clear(); //unnecessary, I think// djm now causes error
 
-		m_friction = (float) Math.sqrt(m_shape1.m_friction * m_shape2.m_friction);
+		m_friction = MathUtils.sqrt(m_shape1.m_friction * m_shape2.m_friction);
 		m_restitution = MathUtils.max(m_shape1.m_restitution, m_shape2.m_restitution);
 		//m_world = s1.m_body.m_world;
 		m_prev = null;

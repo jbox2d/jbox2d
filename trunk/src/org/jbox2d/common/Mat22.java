@@ -184,10 +184,10 @@ public class Mat22 {
 	 * @return Absolute value matrix
 	 */
 	public final Mat22 abs() {
-		return new Mat22(Math.abs(col1.x),
-		                 Math.abs(col2.x),
-		                 Math.abs(col1.y),
-		                 Math.abs(col2.y));
+		return new Mat22(MathUtils.abs(col1.x),
+		                 MathUtils.abs(col2.x),
+		                 MathUtils.abs(col1.y),
+		                 MathUtils.abs(col2.y));
 	}
 
 	/* djm: added */
@@ -206,10 +206,10 @@ public class Mat22 {
 
 	/* djm created */
 	public static void absToOut(final Mat22 R, final Mat22 out){
-		out.col1.x = Math.abs(R.col1.x);
-		out.col1.y = Math.abs(R.col1.y);
-		out.col2.x = Math.abs(R.col2.x);
-		out.col2.y = Math.abs(R.col2.y);
+		out.col1.x = MathUtils.abs(R.col1.x);
+		out.col1.y = MathUtils.abs(R.col1.y);
+		out.col2.x = MathUtils.abs(R.col2.x);
+		out.col2.y = MathUtils.abs(R.col2.y);
 	}
 
 	/**

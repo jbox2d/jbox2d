@@ -92,7 +92,7 @@ public class BodyUtils
 //		 */
 //		// Use some pythagorean theorem to decide how far down the bottom point of the V needs to be.
 //		float sagLength = sagginess * length;
-//		float height = (float) Math.sqrt(sagLength * sagLength - length
+//		float height = MathUtils.sqrt(sagLength * sagLength - length
 //				* length);
 //		Vec2 bottomPoint = middle.add(normal.mul(height)); // The bottom point of our V.
 //

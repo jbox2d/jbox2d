@@ -212,13 +212,13 @@ public final class Distance {
 			final Vec2 v = points[i];
 			// INLINED
 			// Vec2 d =Vec2.abs(w.sub(points[i]));
-			// new Vec2( Math.abs(w.x-points[i].x),
-			// Math.abs(w.y-points[i].y));//Vec2.abs(w - points[i]);
+			// new Vec2( MathUtils.abs(w.x-points[i].x),
+			// MathUtils.abs(w.y-points[i].y));//Vec2.abs(w - points[i]);
 			// Vec2 m = Vec2.max(Vec2.abs(w), Vec2.abs(points[i]));
-			final float dx = Math.abs(w.x - v.x);
-			final float dy = Math.abs(w.y - v.y);
-			final float mx = MathUtils.max(Math.abs(w.x), Math.abs(points[i].x));
-			final float my = MathUtils.max(Math.abs(w.y), Math.abs(points[i].y));
+			final float dx = MathUtils.abs(w.x - v.x);
+			final float dy = MathUtils.abs(w.y - v.y);
+			final float mx = MathUtils.max(MathUtils.abs(w.x), MathUtils.abs(points[i].x));
+			final float my = MathUtils.max(MathUtils.abs(w.y), MathUtils.abs(points[i].y));
 
 			if (dx < k_tolerance * (mx + 1.0f) && dy < k_tolerance * (my + 1.0f)) {
 				return true;
@@ -278,7 +278,7 @@ public final class Distance {
 					x2.set(w2);
 				}
 				g_GJK_Iterations = iter;
-				return (float) Math.sqrt(vSqr);
+				return MathUtils.sqrt(vSqr);
 			}
 
 			switch (pointCount) {
@@ -325,13 +325,13 @@ public final class Distance {
 				final float vy = x2.y - x1.y;
 				vSqr = vx * vx + vy * vy;
 
-				return (float) Math.sqrt(vSqr);
+				return MathUtils.sqrt(vSqr);
 				//
 			}
 		}
 
 		g_GJK_Iterations = maxIterations;
-		return (float) Math.sqrt(vSqr);
+		return MathUtils.sqrt(vSqr);
 		//
 	}
 
@@ -524,7 +524,7 @@ public final class Distance {
 			distance -= r;
 			float dx = x2.x - x1.x;
 			float dy = x2.y - x1.y;
-			final float length = (float) Math.sqrt(dx * dx + dy * dy);
+			final float length = MathUtils.sqrt(dx * dx + dy * dy);
 			if (length >= Settings.EPSILON) {
 				final float invLength = 1.0f / length;
 				dx *= invLength;
@@ -576,7 +576,7 @@ public final class Distance {
 			distance -= r;
 			float dx = x2.x - x1.x;
 			float dy = x2.y - x1.y;
-			final float length = (float) Math.sqrt(dx * dx + dy * dy);
+			final float length = MathUtils.sqrt(dx * dx + dy * dy);
 			if (length >= Settings.EPSILON) {
 				final float invLength = 1.0f / length;
 				dx *= invLength;

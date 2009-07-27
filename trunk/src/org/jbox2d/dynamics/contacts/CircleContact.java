@@ -79,7 +79,7 @@ public class CircleContact extends Contact implements ContactCreateFcn {
 	public void destructor() {
 
 	}
-
+	
 	@Override
 	public void evaluate(final ContactListener listener) {
 		//CollideCircle.collideCircle(m_manifold, (CircleShape) m_shape1,
