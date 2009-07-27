@@ -24,11 +24,13 @@
 package org.jbox2d.collision;
 
 import org.jbox2d.collision.shapes.Shape;
-import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Sweep;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
+import org.jbox2d.pooling.ThreadLocalDistance;
+import org.jbox2d.pooling.ThreadLocalVec2;
+import org.jbox2d.pooling.ThreadLocalXForm;
 
 //updated to rev 142 of b2TimeOfImpact.cpp
 
@@ -40,6 +42,13 @@ public class TOI {
 	// impact (TOI) of two shapes.
 	// Refs: Bullet, Young Kim
 
+	
+	// djm pooling
+	private static final ThreadLocalXForm tlxf1 = new ThreadLocalXForm();
+	private static final ThreadLocalXForm tlxf2 = new ThreadLocalXForm();
+	private static final ThreadLocalVec2 tlP1 = new ThreadLocalVec2();
+	private static final ThreadLocalVec2 tlP2 = new ThreadLocalVec2();
+	private static final ThreadLocalDistance tlDist = new ThreadLocalDistance();
 	/**
 	 * Compute the time when two shapes begin to touch or touch at a closer distance.
 	 * <BR><BR><em>Warning</em>: the sweeps must have the same time interval.
@@ -49,10 +58,10 @@ public class TOI {
 	public static final float timeOfImpact(final Shape shape1, final Sweep sweep1,
 	                                       final Shape shape2, final Sweep sweep2) {
 
-		final XForm xf1 = ObjectPool.getXForm();
-		final XForm xf2 = ObjectPool.getXForm();
-		final Vec2 p1 = ObjectPool.getVec2();
-		final Vec2 p2 = ObjectPool.getVec2();
+		final XForm xf1 = tlxf1.get();
+		final XForm xf2 = tlxf2.get();
+		final Vec2 p1 = tlP1.get();
+		final Vec2 p2 = tlP2.get();
 		final float r1 = shape1.getSweepRadius();
 		final float r2 = shape2.getSweepRadius();
 
@@ -82,7 +91,7 @@ public class TOI {
 			sweep2.getXForm(xf2, t);
 
 			// Get the distance between shapes.
-			distance = ObjectPool.getDistance().distance(p1, p2, shape1, xf1, shape2, xf2);
+			distance = tlDist.get().distance(p1, p2, shape1, xf1, shape2, xf2);
 			//System.out.println("Distance: "+distance + " alpha: "+alpha);
 
 			if (iter == 0) {
@@ -144,11 +153,7 @@ public class TOI {
 
 			++iter;
 		}
-
-		ObjectPool.returnVec2(p1);
-		ObjectPool.returnVec2(p2);
-		ObjectPool.returnXForm(xf1);
-		ObjectPool.returnXForm(xf2);
+		
 		return alpha;
 	}
 }

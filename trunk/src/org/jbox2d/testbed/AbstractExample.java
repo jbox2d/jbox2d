@@ -564,9 +564,9 @@ public abstract class AbstractExample {
         
         Body body = null;
         for (int j = 0; j < shapes.length; j++) {
-            Body shapeBody = shapes[j].getBody();
-            if (shapeBody.isStatic() == true) {
-                boolean inside = shapes[j].testPoint(shapeBody.getMemberXForm(),worldPoint);
+            body = shapes[j].getBody();
+            if (body.isStatic() == true) {
+                boolean inside = shapes[j].testPoint(body.getMemberXForm(),worldPoint);
                 if (inside) {
                     return shapes[j];
                 }

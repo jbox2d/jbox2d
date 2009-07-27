@@ -1,6 +1,7 @@
 package org.jbox2d.common;
 
 import org.jbox2d.collision.OBB;
+import org.jbox2d.pooling.ThreadLocalMat22;
 
 public class OBBViewportTransform implements IViewportTransform{
 	
@@ -109,14 +110,16 @@ public class OBBViewportTransform implements IViewportTransform{
 		this.yFlip = yFlip;
 	}
 
+	// djm pooling
+	private static final ThreadLocalMat22 tlInv = new ThreadLocalMat22();
 	/**
 	 * @see IViewportTransform#vectorInverseTransform(Vec2, Vec2)
 	 */
 	public void vectorInverseTransform(Vec2 argScreen, Vec2 argWorld) {
-		Mat22 inv = ObjectPool.getMat22(box.R);
+		Mat22 inv = tlInv.get();
+		inv.set(box.R);
 		inv.invertLocal();
 		inv.mulToOut(argScreen, argWorld);
-		ObjectPool.returnMat22(inv);
 	}
 
 	/**
