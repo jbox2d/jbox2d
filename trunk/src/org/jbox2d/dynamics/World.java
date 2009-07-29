@@ -60,8 +60,9 @@ import org.jbox2d.dynamics.joints.JointDef;
 import org.jbox2d.dynamics.joints.JointEdge;
 import org.jbox2d.dynamics.joints.JointType;
 import org.jbox2d.dynamics.joints.PulleyJoint;
-import org.jbox2d.pooling.TLStack;
 import org.jbox2d.pooling.TLTimeStep;
+import org.jbox2d.pooling.stacks.IslandStack;
+import org.jbox2d.pooling.stacks.TimeStepStack;
 
 
 //Updated to rev 56->118->142->150 of b2World.cpp/.h
@@ -127,9 +128,7 @@ public class World {
 
 	private final ArrayList<Steppable> postStepList;
 	
-	// djm pooling
-	private static final TLStack<Island> tlIslandStack = new TLStack<Island>();
-
+	
 	public void setDrawDebugData(final boolean tf) {
 		m_drawDebugData = tf;
 	}
@@ -638,6 +637,9 @@ public class World {
 	// Java note: sorry, guys, we have to keep this stuff public until
 	// the C++ version does otherwise so that we can maintain the engine...
 
+	// djm pooling
+	private static final IslandStack islands = new IslandStack();
+	
 	/** For internal use */
 	public void solve(final TimeStep step) {
 		m_positionIterationCount = 0;
@@ -648,14 +650,7 @@ public class World {
 		}
 
 		// Size the island for the worst case.
-		Stack<Island> islands = tlIslandStack.get();
-		if( islands.isEmpty()){
-			islands.push(new Island());
-			islands.push(new Island());
-			islands.push(new Island());
-			islands.push(new Island());
-		}
-		final Island island = islands.pop();
+		final Island island = islands.get();
 		island.init(m_bodyCount, m_contactCount, m_jointCount, m_contactListener);
 
 		// Clear all the island flags.
@@ -789,12 +784,12 @@ public class World {
 		// Also, some contacts can be destroyed.
 		m_broadPhase.commit();
 		
-		islands.push(island);
+		islands.recycle(island);
 	}
 
 	
 	// djm pooling
-	private static final TLStack<TimeStep> tlToiSteps = new TLStack<TimeStep>();
+	private static final TimeStepStack steps = new TimeStepStack();
 	
 	/** For internal use: find TOI contacts and solve them. */
 	public void solveTOI(final TimeStep step) {
@@ -803,14 +798,7 @@ public class World {
 		// it static?
 		
 		// Size the island for the worst case.
-		Stack<Island> islands = tlIslandStack.get();
-		if( islands.isEmpty()){
-			islands.push(new Island());
-			islands.push(new Island());
-			islands.push(new Island());
-			islands.push(new Island());
-		}
-		final Island island = islands.pop();
+		final Island island = islands.get();
 		island.init(m_bodyCount, Settings.maxTOIContactsPerIsland, Settings.maxTOIJointsPerIsland, m_contactListener);
 
 		//Simple one pass queue
@@ -1026,12 +1014,7 @@ public class World {
 
 			}
 
-			final Stack<TimeStep> steps = tlToiSteps.get();
-			if(steps.isEmpty()){
-				steps.push(new TimeStep());
-				steps.push(new TimeStep());
-			}
-			final TimeStep subStep = steps.pop();
+			final TimeStep subStep = steps.get();
 			subStep.warmStarting = false;
 			subStep.dt = (1.0f - minTOI) * step.dt;
 			assert(subStep.dt > Settings.EPSILON);
@@ -1039,7 +1022,7 @@ public class World {
 			subStep.maxIterations = step.maxIterations;
 
 			island.solveTOI(subStep);
-			steps.push(subStep);
+			steps.recycle(subStep);
 			
 			// Post solve cleanup.
 			for (int i = 0; i < island.m_bodyCount; ++i) {
@@ -1089,6 +1072,7 @@ public class World {
 			// Also, some contacts can be destroyed.
 			m_broadPhase.commit();
 		}
+		islands.recycle(island);
 	}
 	
 	// NOTE this corresponds to the liquid test, so the debugdraw can draw

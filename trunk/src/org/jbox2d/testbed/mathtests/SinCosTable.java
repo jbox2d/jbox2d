@@ -12,18 +12,18 @@ public class SinCosTable {
 	public final int tableLength;
 	
 	public final float[] sinLUT;
-	public final float[] cosLUT;
+	//public final float[] cosLUT;
 
 	public SinCosTable(float argPrecision){
 		precision = argPrecision;
 		tableLength = (int) Math.ceil(TWOPI / precision);
 		
 		sinLUT = new float[tableLength];
-		cosLUT = new float[tableLength];
+		//cosLUT = new float[tableLength];
 		
 		for(int i=0; i<tableLength; i++){
 			sinLUT[i] = (float) Math.sin( i * precision);
-			cosLUT[i] = (float) Math.cos( i * precision);
+			//cosLUT[i] = (float) Math.cos( i * precision);
 		}
 	}
 	

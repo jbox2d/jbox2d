@@ -29,7 +29,7 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Sweep;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
-import org.jbox2d.pooling.TLDistance;
+import org.jbox2d.pooling.SingletonPool;
 import org.jbox2d.pooling.TLVec2;
 import org.jbox2d.pooling.TLXForm;
 
@@ -49,7 +49,6 @@ public class TOI {
 	private static final TLXForm tlxf2 = new TLXForm();
 	private static final TLVec2 tlP1 = new TLVec2();
 	private static final TLVec2 tlP2 = new TLVec2();
-	private static final TLDistance tlDist = new TLDistance();
 	/**
 	 * Compute the time when two shapes begin to touch or touch at a closer distance.
 	 * <BR><BR><em>Warning</em>: the sweeps must have the same time interval.
@@ -92,7 +91,7 @@ public class TOI {
 			sweep2.getXForm(xf2, t);
 
 			// Get the distance between shapes.
-			distance = tlDist.get().distance(p1, p2, shape1, xf1, shape2, xf2);
+			distance = SingletonPool.getDistance().distance(p1, p2, shape1, xf1, shape2, xf2);
 			//System.out.println("Distance: "+distance + " alpha: "+alpha);
 
 			if (iter == 0) {

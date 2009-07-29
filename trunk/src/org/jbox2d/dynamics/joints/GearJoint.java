@@ -28,6 +28,7 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
+import org.jbox2d.pooling.TLVec2;
 
 
 //Updated to rev 56->97->137 of b2GearJoint.cpp/.h
@@ -152,8 +153,8 @@ public class GearJoint extends Joint {
 	}
 
 	// djm pooled
-	private final Vec2 ug = new Vec2();
-	private final Vec2 r = new Vec2();
+	private final TLVec2 tlug = new TLVec2();
+	private final TLVec2 tlr = new TLVec2();
 	@Override
 	public void initVelocityConstraints(final TimeStep step) {
 		final Body g1 = m_ground1;
@@ -161,6 +162,9 @@ public class GearJoint extends Joint {
 		final Body b1 = m_body1;
 		final Body b2 = m_body2;
 
+		final Vec2 ug = tlug.get();
+		final Vec2 r = tlr.get();
+		
 		float K = 0.0f;
 		m_J.setZero();
 

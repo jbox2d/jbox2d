@@ -29,6 +29,8 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
+import org.jbox2d.pooling.TLMat22;
+import org.jbox2d.pooling.TLVec2;
 
 //Updated to rev 56->130 of b2MouseJoint.cpp/.h
 
@@ -101,23 +103,31 @@ public class MouseJoint extends Joint {
 	}
 
 	// djm pooled
-	private final Vec2 anchor2 = new Vec2();
+	private static final TLVec2 tlanchor2 = new TLVec2();
 
+	/**
+	 * this comes from a pooled value
+	 */
 	@Override
 	public Vec2 getAnchor2() {
+		final Vec2 anchor2 = tlanchor2.get();
 		m_body2.getWorldLocationToOut(m_localAnchor, anchor2);
 		return anchor2;
 	}
 
 	// djm pooled
-	private final Vec2 r = new Vec2();
-	private final Mat22 K1 = new Mat22();
-	private final Mat22 K2 = new Mat22();
+	private static final TLVec2 tlr = new TLVec2();
+	private static final TLMat22 tlK1 = new TLMat22();
+	private static final TLMat22 tlK2 = new TLMat22();
 
 	@Override
 	public void initVelocityConstraints(final TimeStep step) {
 		final Body b = m_body2;
 
+		final Vec2 r = tlr.get();
+		final Mat22 K1 = tlK1.get();
+		final Mat22 K2 = tlK2.get();
+		
 		// Compute the effective mass matrix.
 		r.set(m_localAnchor);
 		r.subLocal(b.getMemberLocalCenter());
@@ -165,15 +175,21 @@ public class MouseJoint extends Joint {
 	}
 
 	// djm pooled, from above too
-	private final Vec2 Cdot = new Vec2();
-	private final Vec2 force = new Vec2();
-	private final Vec2 oldForce = new Vec2();
-	private final Vec2 P = new Vec2();
+	private static final TLVec2 tlCdot = new TLVec2();
+	private static final TLVec2 tlforce = new TLVec2();
+	private static final TLVec2 tloldForce = new TLVec2();
+	private static final TLVec2 tlP = new TLVec2();
 
 	@Override
 	public void solveVelocityConstraints(final TimeStep step) {
 		final Body b = m_body2;
-
+		
+		final Vec2 r = tlr.get();
+		final Vec2 Cdot = tlCdot.get();
+		final Vec2 force = tlforce.get();
+		final Vec2 oldForce = tloldForce.get();
+		final Vec2 P = tlP.get();
+		
 		r.set(m_localAnchor);
 		r.subLocal(b.getMemberLocalCenter());
 		Mat22.mulToOut(b.m_xf.R, r, r);

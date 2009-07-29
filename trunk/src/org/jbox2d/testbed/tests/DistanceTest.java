@@ -4,10 +4,10 @@ import org.jbox2d.collision.shapes.CircleDef;
 import org.jbox2d.collision.shapes.PolygonDef;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.MathUtils;
-import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.pooling.SingletonPool;
 import org.jbox2d.testbed.AbstractExample;
 import org.jbox2d.testbed.TestbedMain;
 
@@ -68,12 +68,12 @@ public class DistanceTest extends AbstractExample {
 
 		Vec2 x1 = new Vec2();
 		Vec2 x2 = new Vec2();
-		float distance = ObjectPool.getDistance().distance(x1, x2, m_shape1, m_body1.getMemberXForm(), m_shape2, m_body2.getMemberXForm());
+		float distance = SingletonPool.getDistance().distance(x1, x2, m_shape1, m_body1.getMemberXForm(), m_shape2, m_body2.getMemberXForm());
 
 		m_debugDraw.drawString(5, m_textLine, "distance = "+distance, white);
 		m_textLine += 15;
 
-		m_debugDraw.drawString(5, m_textLine, "iterations = "+ObjectPool.getDistance().g_GJK_Iterations, white);
+		m_debugDraw.drawString(5, m_textLine, "iterations = "+SingletonPool.getDistance().g_GJK_Iterations, white);
 		m_textLine += 15;
 
 		m_debugDraw.drawPoint(x1, 2.0f, white);
