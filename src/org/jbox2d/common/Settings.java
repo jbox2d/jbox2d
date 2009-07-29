@@ -23,6 +23,8 @@
 
 package org.jbox2d.common;
 
+import org.jbox2d.testbed.mathtests.SinCosTest;
+
 //Updated to rev. 142 of b2Settings.cpp/.h
 
 
@@ -45,7 +47,8 @@ public class Settings {
      * smaller the precision, the larger the table.  If
      * a small table is used (eg, precision is .006 or greater),
      * make sure you set the table to lerp it's results.  Accuracy chart
-     * is in the MathUtils source</br>
+     * is in the MathUtils source.  Or, run the tests
+     * yourself in {@link SinCosTest}.</br>
      * </br>
      * Good lerp precision values:
      * <ul><li>.0092</li>
@@ -55,15 +58,25 @@ public class Settings {
      * <li>.004305</li>
      * <li>.002807</li>
      * <li>.001508</li>
+     * <li>9.32500E-4</li>
+     * <li>7.48000E-4</li>
+     * <li>8.47000E-4</li>
      * <li>.0005095</li>
-     * <li>.0001098</li></ul>
+     * <li>.0001098</li>
+     * <li>9.50499E-5</li>
+     * <li>6.08500E-5</li>
+     * <li>3.07000E-5</li>
+     * <li>1.53999E-5</li></ul>
+     * 
      */
-    public static final float SINCOS_LUT_PRECISION = .0001098f;
+    public static final float SINCOS_LUT_PRECISION = .00131f;
 	public static final int SINCOS_LUT_LENGTH = (int) Math.ceil(Math.PI*2 / SINCOS_LUT_PRECISION);
     /**
      * Use if the table's precision is large (eg .006 or greater).
-     * Although it is a little more expensive, it greatly increases
-     * accuracy.
+     * Although it is more expensive, it greatly increases
+     * accuracy.  Look in the MathUtils source for some test results
+     * on the accuracy and speed of lerp vs non lerp.  Or, run the tests
+     * yourself in {@link SinCosTest}.
      */
     public static final boolean SINCOS_LUT_LERP = false;
     
