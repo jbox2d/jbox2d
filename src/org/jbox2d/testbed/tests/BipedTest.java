@@ -2,6 +2,7 @@ package org.jbox2d.testbed.tests;
 
 import org.jbox2d.collision.shapes.CircleDef;
 import org.jbox2d.collision.shapes.PolygonDef;
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
@@ -41,10 +42,10 @@ public class BipedTest extends AbstractExample {
 			sd.setAsBox(0.1f, 10.0f, new Vec2(10.0f, 0.0f), 0.0f);
 			body.createShape(sd);
 
-			sd.setAsBox(0.1f, 10.0f, new Vec2(0.0f, -10.0f), 0.5f * (float)Math.PI);
+			sd.setAsBox(0.1f, 10.0f, new Vec2(0.0f, -10.0f), 0.5f * MathUtils.PI);
 			body.createShape(sd);
 
-			sd.setAsBox(0.1f, 10.0f, new Vec2(0.0f, 10.0f), -0.5f * (float)Math.PI);
+			sd.setAsBox(0.1f, 10.0f, new Vec2(0.0f, 10.0f), -0.5f * MathUtils.PI);
 			body.createShape(sd);
 		}
 

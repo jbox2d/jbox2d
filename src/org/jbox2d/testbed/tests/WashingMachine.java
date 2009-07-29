@@ -74,7 +74,7 @@ public class WashingMachine extends AbstractExample {
             
             int loadSize = 15;
             for (int i=0; i < loadSize; i++) {
-                float ang = random(0f,2*(float)Math.PI);
+                float ang = random(0f,2*MathUtils.PI);
                 float rad = random(0f,.8f*radius);
                 float xPos = rad * (float)Math.cos(ang);
                 float yPos = bd.position.y + rad * (float)Math.sin(ang);
@@ -89,7 +89,7 @@ public class WashingMachine extends AbstractExample {
                 box.density = 5.0f;
                 box.friction = 0.5f;
                 box.restitution = 0.5f;
-                float ang = random(0f,2*(float)Math.PI);
+                float ang = random(0f,2*MathUtils.PI);
                 float rad = random(0f,.8f*radius);
                 float xPos = rad * (float)Math.cos(ang);
                 float yPos = bd.position.y + rad * (float)Math.sin(ang);
@@ -105,7 +105,7 @@ public class WashingMachine extends AbstractExample {
                 circ.density = 5.0f;
                 circ.friction = 0.5f;
                 circ.restitution = 0.5f;
-                float ang = random(0f,2*(float)Math.PI);
+                float ang = random(0f,2*MathUtils.PI);
                 float rad = random(0f,.8f*radius);
                 float xPos = rad * (float)Math.cos(ang);
                 float yPos = bd.position.y + rad * (float)Math.sin(ang);

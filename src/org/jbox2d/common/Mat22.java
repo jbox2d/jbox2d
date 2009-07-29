@@ -104,7 +104,7 @@ public class Mat22 {
 	 * @param angle Rotation (in radians) that matrix represents.
 	 */
 	public final void set(final float angle) {
-		final float c = (float)Math.cos(angle), s = (float)Math.sin(angle);
+		final float c = MathUtils.cos(angle), s = MathUtils.sin(angle);
 		col1.x = c; col2.x = -s;
 		col1.y = s; col2.y = c;
 	}
@@ -460,8 +460,8 @@ public class Mat22 {
 	
 	public final static Mat22 createRotationalTransform(float angle){
 		Mat22 mat = new Mat22();
-		final float c = (float) Math.cos(angle);
-		final float s = (float) Math.sin(angle);
+		final float c = MathUtils.cos(angle);
+		final float s = MathUtils.sin(angle);
 		mat.col1.x = c;
 		mat.col2.x = -s;
 		mat.col1.y = s;
@@ -470,8 +470,8 @@ public class Mat22 {
 	}
 	
 	public final static void createRotationalTransform(float angle, Mat22 out){
-		final float c = (float) Math.cos(angle);
-		final float s = (float) Math.sin(angle);
+		final float c = MathUtils.cos(angle);
+		final float s = MathUtils.sin(angle);
 		out.col1.x = c;
 		out.col2.x = -s;
 		out.col1.y = s;

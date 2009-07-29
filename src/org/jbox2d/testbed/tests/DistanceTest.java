@@ -3,6 +3,7 @@ package org.jbox2d.testbed.tests;
 import org.jbox2d.collision.shapes.CircleDef;
 import org.jbox2d.collision.shapes.PolygonDef;
 import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -106,11 +107,11 @@ public class DistanceTest extends AbstractExample {
 			break;
 
 		case 'q':
-			a += 0.1f * (float)Math.PI;
+			a += 0.1f * MathUtils.PI;
 			break;
 
 		case 'e':
-			a -= 0.1f * (float)Math.PI;
+			a -= 0.1f * MathUtils.PI;
 			break;
 		}
 

@@ -842,7 +842,7 @@ public class BroadPhase {
 		final float by = m_worldAABB.lowerBound.y - aabb.upperBound.y;
 		final float dx = MathUtils.max( ax, bx);
 		final float dy = MathUtils.max( ay, by);
-		return (Math.max( dx, dy) < 0.0f);
+		return (MathUtils.max( dx, dy) < 0.0f);
 	}
 	
 	

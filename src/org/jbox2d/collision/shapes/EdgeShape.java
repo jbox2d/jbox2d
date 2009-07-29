@@ -5,6 +5,7 @@ import org.jbox2d.collision.MassData;
 import org.jbox2d.collision.Segment;
 import org.jbox2d.collision.SegmentCollide;
 import org.jbox2d.collision.SupportsGenericDistance;
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.RaycastResult;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
@@ -83,7 +84,7 @@ public class EdgeShape extends Shape implements SupportsGenericDistance {
 		final float dx2 = m_coreV2.x - center.x;
 		final float dy2 = m_coreV2.y - center.y;
 		final float d2 = dx2*dx2+dy2*dy2;
-		m_sweepRadius = (float)Math.sqrt(d1 > d2 ? d1 : d2);
+		m_sweepRadius = MathUtils.sqrt(d1 > d2 ? d1 : d2);
 	}
 
 	/**

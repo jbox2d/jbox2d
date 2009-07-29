@@ -101,7 +101,7 @@ public class TOI {
 				if (distance > 2.0f * Settings.toiSlop) {
 					targetDistance = 1.5f * Settings.toiSlop;
 				} else {
-					targetDistance = Math.max(0.05f * Settings.toiSlop, distance - 0.5f * Settings.toiSlop);
+					targetDistance = MathUtils.max(0.05f * Settings.toiSlop, distance - 0.5f * Settings.toiSlop);
 				}
 			}
 

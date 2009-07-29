@@ -149,7 +149,7 @@ public class DistanceJoint extends Joint {
 			final float C = length - m_length;
 
 			// Frequency
-			final float omega = 2.0f * (float)Math.PI * m_frequencyHz;
+			final float omega = 2.0f * MathUtils.PI * m_frequencyHz;
 
 			// Damping coefficient
 			final float d = 2.0f * m_mass * m_dampingRatio * omega;

@@ -220,7 +220,7 @@ public class CircleShape extends Shape {
 	 */
 	@Override
 	public void computeMass(final MassData massData) {
-		massData.mass = m_density * (float) Math.PI * m_radius * m_radius;
+		massData.mass = m_density * MathUtils.PI * m_radius * m_radius;
 		massData.center.set(m_localPosition);
 
 		// inertia about the local origin
@@ -278,7 +278,7 @@ public class CircleShape extends Shape {
 		float l2 = l * l;
 		float area = (float) (r2
 				* (Math.asin(l / m_radius) + Settings.pi / 2.0f) + l
-				* Math.sqrt(r2 - l2));
+				* MathUtils.sqrt(r2 - l2));
 		float com = (float) (-2.0f / 3.0f * MathUtils.pow(r2 - l2, 1.5f) / area);
 
 		c.x = p.x + normal.x * com;

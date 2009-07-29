@@ -34,6 +34,40 @@ public class Settings {
 
     /** Pi. */
     public static final float pi = (float) Math.PI;
+    
+    // JBox2D specific settings
+    /**
+     * needs to be final, or will slow down math methods
+     */
+    public static final boolean FAST_MATH = true;
+    public static final boolean SINCOS_LUT_ENABLED = true;
+    /**
+     * smaller the precision, the larger the table.  If
+     * a small table is used (eg, precision is .006 or greater),
+     * make sure you set the table to lerp it's results.  Accuracy chart
+     * is in the MathUtils source</br>
+     * </br>
+     * Good lerp precision values:
+     * <ul><li>.0092</li>
+     * <li>.008201</li>
+     * <li>.005904</li>
+     * <li>.005204</li>
+     * <li>.004305</li>
+     * <li>.002807</li>
+     * <li>.001508</li>
+     * <li>.0005095</li>
+     * <li>.0001098</li></ul>
+     */
+    public static final float SINCOS_LUT_PRECISION = .0001098f;
+	public static final int SINCOS_LUT_LENGTH = (int) Math.ceil(Math.PI*2 / SINCOS_LUT_PRECISION);
+    /**
+     * Use if the table's precision is large (eg .006 or greater).
+     * Although it is a little more expensive, it greatly increases
+     * accuracy.
+     */
+    public static final boolean SINCOS_LUT_LERP = false;
+    
+    
 
     // Define your unit system here. The default system is
     // meters-kilograms-seconds. For the tuning to work well,

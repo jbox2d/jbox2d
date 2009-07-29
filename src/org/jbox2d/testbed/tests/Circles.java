@@ -8,6 +8,7 @@ package org.jbox2d.testbed.tests;
 
 import org.jbox2d.collision.shapes.CircleDef;
 import org.jbox2d.collision.shapes.PolygonDef;
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
@@ -90,7 +91,7 @@ public class Circles extends AbstractExample {
 
         RevoluteJointDef rjd = new RevoluteJointDef();
         rjd.initialize(body,ground,body.getMemberPosition());
-        rjd.motorSpeed = (float) Math.PI;
+        rjd.motorSpeed = MathUtils.PI;
         rjd.maxMotorTorque = 1000000.0f;
         rjd.enableMotor = true;
         m_world.createJoint(rjd);

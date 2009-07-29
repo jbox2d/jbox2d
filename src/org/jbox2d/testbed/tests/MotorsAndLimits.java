@@ -23,6 +23,7 @@
 package org.jbox2d.testbed.tests;
 
 import org.jbox2d.collision.shapes.PolygonDef;
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
@@ -85,7 +86,7 @@ public class MotorsAndLimits extends AbstractExample {
     		body.setMassFromShapes();
 
     		rjd.initialize(prevBody, body, new Vec2(0.0f, y));
-    		rjd.motorSpeed = 1.0f * (float)Math.PI;
+    		rjd.motorSpeed = 1.0f * MathUtils.PI;
     		rjd.maxMotorTorque = 10000.0f;
     		rjd.enableMotor = true;
 
@@ -99,17 +100,17 @@ public class MotorsAndLimits extends AbstractExample {
     		body.setMassFromShapes();
 
     		rjd.initialize(prevBody, body, new Vec2(6.0f, y));
-    		rjd.motorSpeed = 0.5f * (float)Math.PI;
+    		rjd.motorSpeed = 0.5f * MathUtils.PI;
     		rjd.maxMotorTorque = 2000.0f;
     		rjd.enableMotor = true;
-    		rjd.lowerAngle = - 0.5f * (float)Math.PI;
-    		rjd.upperAngle = 0.5f * (float)Math.PI;
+    		rjd.lowerAngle = - 0.5f * MathUtils.PI;
+    		rjd.upperAngle = 0.5f * MathUtils.PI;
     		rjd.enableLimit = true;
 
     		m_joint2 = (RevoluteJoint)m_world.createJoint(rjd);
 
     		bd.position.set(-10.0f, 10.0f);
-    		bd.angle = 0.5f * (float)Math.PI;
+    		bd.angle = 0.5f * MathUtils.PI;
     		body = m_world.createBody(bd);
     		body.createShape(sd);
     		body.setMassFromShapes();

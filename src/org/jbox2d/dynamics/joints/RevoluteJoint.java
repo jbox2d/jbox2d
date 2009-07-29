@@ -252,11 +252,11 @@ public class RevoluteJoint extends Joint {
 				m_limitForce += limitForce;
 			} else if (m_limitState == LimitState.AT_LOWER_LIMIT) {
 				final float oldLimitForce = m_limitForce;
-				m_limitForce = Math.max(m_limitForce + limitForce, 0.0f);
+				m_limitForce = MathUtils.max(m_limitForce + limitForce, 0.0f);
 				limitForce = m_limitForce - oldLimitForce;
 			} else if (m_limitState == LimitState.AT_UPPER_LIMIT) {
 				final float oldLimitForce = m_limitForce;
-				m_limitForce = Math.min(m_limitForce + limitForce, 0.0f);
+				m_limitForce = MathUtils.min(m_limitForce + limitForce, 0.0f);
 				limitForce = m_limitForce - oldLimitForce;
 			}
 
@@ -343,23 +343,23 @@ public class RevoluteJoint extends Joint {
 				angularError = MathUtils.abs(limitC);
 			} else if (m_limitState == LimitState.AT_LOWER_LIMIT) {
 				float limitC = angle - m_lowerAngle;
-				angularError = Math.max(0.0f, -limitC);
+				angularError = MathUtils.max(0.0f, -limitC);
 
 				// Prevent large angular corrections and allow some slop.
 				limitC = MathUtils.clamp(limitC + Settings.angularSlop, -Settings.maxAngularCorrection, 0.0f);
 				limitImpulse = -m_motorMass * limitC;
 				final float oldLimitImpulse = m_limitPositionImpulse;
-				m_limitPositionImpulse = Math.max(m_limitPositionImpulse + limitImpulse, 0.0f);
+				m_limitPositionImpulse = MathUtils.max(m_limitPositionImpulse + limitImpulse, 0.0f);
 				limitImpulse = m_limitPositionImpulse - oldLimitImpulse;
 			} else if (m_limitState == LimitState.AT_UPPER_LIMIT) {
 				float limitC = angle - m_upperAngle;
-				angularError = Math.max(0.0f, limitC);
+				angularError = MathUtils.max(0.0f, limitC);
 
 				// Prevent large angular corrections and allow some slop.
 				limitC = MathUtils.clamp(limitC - Settings.angularSlop, 0.0f, Settings.maxAngularCorrection);
 				limitImpulse = -m_motorMass * limitC;
 				final float oldLimitImpulse = m_limitPositionImpulse;
-				m_limitPositionImpulse = Math.min(m_limitPositionImpulse + limitImpulse, 0.0f);
+				m_limitPositionImpulse = MathUtils.min(m_limitPositionImpulse + limitImpulse, 0.0f);
 				limitImpulse = m_limitPositionImpulse - oldLimitImpulse;
 			}
 
