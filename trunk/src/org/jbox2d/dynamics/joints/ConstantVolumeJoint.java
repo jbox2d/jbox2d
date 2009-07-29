@@ -1,5 +1,6 @@
 package org.jbox2d.dynamics.joints;
 
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -102,7 +103,7 @@ public class ConstantVolumeJoint extends Joint {
 			final int next = (i==bodies.length-1)?0:i+1;
 			final float dx = bodies[next].getMemberWorldCenter().x-bodies[i].getMemberWorldCenter().x;
 			final float dy = bodies[next].getMemberWorldCenter().y-bodies[i].getMemberWorldCenter().y;
-			float dist = (float)Math.sqrt(dx*dx+dy*dy);
+			float dist = MathUtils.sqrt(dx*dx+dy*dy);
 			if (dist < Settings.EPSILON) {
 				dist = 1.0f;
 			}

@@ -238,7 +238,7 @@ public class BodyUtils
 //		 * Rotate the body.
 //		 */
 //		body.setXForm(body.getPosition(), angle);
-//		//		body.m_xf.R.setAngle((float)Math.PI);
+//		//		body.m_xf.R.setAngle(MathUtils.PI);
 //
 //		return body;
 //	}

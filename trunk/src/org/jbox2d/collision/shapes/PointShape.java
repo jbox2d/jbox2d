@@ -5,6 +5,7 @@ import org.jbox2d.collision.MassData;
 import org.jbox2d.collision.Segment;
 import org.jbox2d.collision.SegmentCollide;
 import org.jbox2d.common.Mat22;
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.RaycastResult;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
@@ -130,7 +131,7 @@ public class PointShape extends Shape {
 		}
 
 		// Find the point of intersection of the line with the circle.
-		float a = -(c + (float)Math.sqrt(sigma));
+		float a = -(c + MathUtils.sqrt(sigma));
 
 		// Is the intersection point on the segment?
 		if (0.0f <= a && a <= maxLambda * rr){
@@ -153,7 +154,7 @@ public class PointShape extends Shape {
 		//Vec2 d = m_localPosition.sub(center);
 		final float dx = m_localPosition.x - center.x;
 		final float dy = m_localPosition.y - center.y;
-		m_sweepRadius = (float)Math.sqrt(dx*dx + dy*dy) - Settings.toiSlop;
+		m_sweepRadius = MathUtils.sqrt(dx*dx + dy*dy) - Settings.toiSlop;
 	}
 
 	/**

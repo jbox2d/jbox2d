@@ -26,6 +26,7 @@ package org.jbox2d.testbed;
 
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Mat22;
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.OBBViewportTransform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.XForm;
@@ -73,14 +74,14 @@ public class ProcessingDebugDraw extends DebugDraw {
 
 		g.noFill();
 		float k_segments = 16.0f;
-		float k_increment = 2.0f * (float)Math.PI / k_segments;
+		float k_increment = 2.0f * MathUtils.PI / k_segments;
 		float theta = 0.0f;
 		g.stroke(color.x, color.y, color.z);
 		g.noFill();
 		g.beginShape(PApplet.POLYGON);
 		for (int i = 0; i < k_segments; ++i) {
-			float vx = radius * (float)Math.cos(theta);
-			float vy = radius * (float)Math.sin(theta);
+			float vx = radius * MathUtils.cos(theta);
+			float vy = radius * MathUtils.sin(theta);
 			circlePt.set( vx, vy);
 			viewportTransform.vectorTransform(circlePt, circlePt);
 			circlePt.addLocal( center);
@@ -106,14 +107,14 @@ public class ProcessingDebugDraw extends DebugDraw {
 		viewportTransform.getWorldToScreen(argCenter, center);
 		
 		float k_segments = 16.0f;
-		float k_increment = 2.0f * (float)Math.PI / k_segments;
+		float k_increment = 2.0f * MathUtils.PI / k_segments;
 		float theta = 0.0f;
 		g.fill(0.5f*color.x, 0.5f*color.y, 0.5f*color.z, 0.5f*255.0f);
 		g.stroke(color.x,color.y,color.z, 255.0f);
 		g.beginShape(PApplet.POLYGON);
 		for (int i = 0; i < k_segments; ++i) {
-			float vx = radius * (float)Math.cos(theta);
-			float vy = radius * (float)Math.sin(theta);
+			float vx = radius * MathUtils.cos(theta);
+			float vy = radius * MathUtils.sin(theta);
 			circlePt.set( vx, vy);
 			viewportTransform.vectorTransform(circlePt, circlePt);
 			circlePt.addLocal( center);
@@ -235,15 +236,15 @@ public class ProcessingDebugDraw extends DebugDraw {
 	public void drawPoint(Vec2 argPosition, float f, Color3f color) {
 		viewportTransform.getWorldToScreen(argPosition, position);
 		float k_segments = 5.0f;
-		float k_increment = 2.0f * (float)Math.PI / k_segments;
+		float k_increment = 2.0f * MathUtils.PI / k_segments;
 		float k_radius = 3.0f;
 		float theta = 0.0f;
 		g.fill(color.x, color.y, color.z);
 		g.noStroke();
 		g.beginShape(PApplet.POLYGON);
 		for (int i = 0; i < k_segments; ++i) {
-			float vx = position.x + k_radius * (float)Math.cos(theta);
-			float vy = position.y + k_radius * (float)Math.sin(theta);
+			float vx = position.x + k_radius * MathUtils.cos(theta);
+			float vy = position.y + k_radius * MathUtils.sin(theta);
 			g.vertex(vx, vy);
 			theta += k_increment;
 		}

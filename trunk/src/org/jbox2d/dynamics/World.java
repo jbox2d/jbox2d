@@ -44,6 +44,7 @@ import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Mat22;
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.RaycastResult;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
@@ -749,7 +750,7 @@ public class World {
 
 			island.solve(step, m_gravity, m_positionCorrection, m_allowSleep);
 
-			m_positionIterationCount = Math.max(m_positionIterationCount, Island.m_positionIterationCount);
+			m_positionIterationCount = MathUtils.max(m_positionIterationCount, Island.m_positionIterationCount);
 
 			// Post solve cleanup.
 			for (int i = 0; i < island.m_bodyCount; ++i) {
@@ -882,7 +883,7 @@ public class World {
 					assert(0.0f <= toi && toi <= 1.0f);
 
 					if (toi > 0.0f && toi < 1.0f) {
-						toi = Math.min((1.0f - toi) * t0 + toi, 1.0f);
+						toi = MathUtils.min((1.0f - toi) * t0 + toi, 1.0f);
 					}
 
 					c.m_toi = toi;
