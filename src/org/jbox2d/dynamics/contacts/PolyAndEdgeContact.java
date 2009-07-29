@@ -33,10 +33,13 @@ import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.ShapeType;
-import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.ContactListener;
+import org.jbox2d.pooling.SingletonPool;
+import org.jbox2d.pooling.TLContactPoint;
+import org.jbox2d.pooling.TLManifold;
+import org.jbox2d.pooling.TLVec2;
 
 public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 	public final Manifold m_manifold;
@@ -76,16 +79,21 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 	return this;
 	}
 
+	// djm pooling
+	private static final TLManifold tlm0 = new TLManifold();
+	private static final TLVec2 tlV1 = new TLVec2();
+	private static final TLContactPoint tlCp = new TLContactPoint();
 	@Override
 	public void evaluate(final ContactListener listener) {
 		final Body b1 = m_shape1.getBody();
 		final Body b2 = m_shape2.getBody();
 
-		final Manifold m0 = ObjectPool.getManifold(m_manifold);
-		final Vec2 v1 = ObjectPool.getVec2();
-		final ContactPoint cp = ObjectPool.getContactPoint();
+		
+		final Manifold m0 = tlm0.get();
+		final Vec2 v1 = tlV1.get();
+		final ContactPoint cp = tlCp.get();
 
-		ObjectPool.getCollidePoly().collidePolyAndEdge(m_manifold, (PolygonShape)m_shape1, b1.getMemberXForm(), (EdgeShape)m_shape2, b2.getMemberXForm());
+		SingletonPool.getCollidePoly().collidePolyAndEdge(m_manifold, (PolygonShape)m_shape1, b1.getMemberXForm(), (EdgeShape)m_shape2, b2.getMemberXForm());
 
 		final boolean[] persisted = {false, false};
 
@@ -166,9 +174,6 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 		}
 
 		if (listener == null){
-			ObjectPool.returnManifold(m0);
-			ObjectPool.returnVec2(v1);
-			ObjectPool.returnContactPoint(cp);
 			return;
 		}
 
@@ -192,10 +197,6 @@ public class PolyAndEdgeContact extends Contact implements ContactCreateFcn {
 			cp.id.set(mp0.id);
 			listener.remove(cp);
 		}
-		
-		ObjectPool.returnManifold(m0);
-		ObjectPool.returnVec2(v1);
-		ObjectPool.returnContactPoint(cp);
 	}
 
 	@Override

@@ -32,15 +32,17 @@ import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.ShapeType;
-import org.jbox2d.common.ObjectPool;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.ContactListener;
+import org.jbox2d.pooling.SingletonPool;
+import org.jbox2d.pooling.TLContactPoint;
+import org.jbox2d.pooling.TLManifold;
+import org.jbox2d.pooling.TLVec2;
 
 public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 	public final Manifold m_manifold;
 	public final ArrayList<Manifold> manifoldList = new ArrayList<Manifold>();
-
 
 	public EdgeAndCircleContact() {
 		// TODO Auto-generated constructor stub
@@ -73,17 +75,20 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 
 	}
 
+	private static final TLManifold tlm0 = new TLManifold();
+	private static final TLVec2 tlV1 = new TLVec2();
+	private static final TLContactPoint tlCp = new TLContactPoint();
 	@Override
 	public void evaluate(final ContactListener listener) {
 		final Body b1 = m_shape1.getBody();
 		final Body b2 = m_shape2.getBody();
 
 		
-		final Manifold m0 = ObjectPool.getManifold(m_manifold);
-		final Vec2 v1 = ObjectPool.getVec2();
-		final ContactPoint cp = ObjectPool.getContactPoint();
+		final Manifold m0 = tlm0.get();
+		final Vec2 v1 = tlV1.get();
+		final ContactPoint cp = tlCp.get();
 
-		ObjectPool.getCollideCircle().collideEdgeAndCircle(m_manifold, (EdgeShape)m_shape1, b1.getMemberXForm(), (CircleShape)m_shape2, b2.getMemberXForm());
+		SingletonPool.getCollideCircle().collideEdgeAndCircle(m_manifold, (EdgeShape)m_shape1, b1.getMemberXForm(), (CircleShape)m_shape2, b2.getMemberXForm());
 
 		cp.shape1 = m_shape1;
 		cp.shape2 = m_shape2;
@@ -155,10 +160,6 @@ public class EdgeAndCircleContact extends Contact implements ContactCreateFcn {
 				listener.remove(cp);
 			}
 		}
-
-		ObjectPool.returnManifold(m0);
-		ObjectPool.returnVec2(v1);
-		ObjectPool.returnContactPoint(cp);
 	}
 
 	@Override

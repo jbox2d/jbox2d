@@ -29,6 +29,7 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
+import org.jbox2d.pooling.TLVec2;
 
 
 //Updated to rev 56->130->142 of b2DistanceJoint.cpp/.h
@@ -98,9 +99,10 @@ public class DistanceJoint extends Joint {
 	}
 
 	// djm pooled
-	private final Vec2 reactionForce = new Vec2();
+	private static final TLVec2 tlReactionForce = new TLVec2();
 	@Override
 	public Vec2 getReactionForce() {
+		final Vec2 reactionForce = tlReactionForce.get();
 		reactionForce.x = m_impulse * m_u.x;
 		reactionForce.y = m_impulse * m_u.y;
 		return reactionForce;
@@ -112,12 +114,16 @@ public class DistanceJoint extends Joint {
 	}
 
 	// djm pooled
-	private final Vec2 r1 = new Vec2();
-	private final Vec2 r2 = new Vec2();
-	private final Vec2 P = new Vec2();
+	private static final TLVec2 tlr1 = new TLVec2();
+	private static final TLVec2 tlr2 = new TLVec2();
+	private static final TLVec2 tlP = new TLVec2();
 	@Override
 	public void initVelocityConstraints(final TimeStep step) {
 		m_inv_dt = step.inv_dt;
+		
+		final Vec2 r1 = tlr1.get();
+		final Vec2 r2 = tlr2.get();
+		final Vec2 P = tlP.get();
 
 		//TODO: fully inline temp Vec2 ops
 		final Body b1 = m_body1;
@@ -180,12 +186,17 @@ public class DistanceJoint extends Joint {
 	}
 
 	// djm pooled, and use pooled objects above
-	private final Vec2 d = new Vec2();
+	private static final TLVec2 tld = new TLVec2();
+	
 	@Override
 	public boolean solvePositionConstraints() {
 		if (m_frequencyHz > 0.0f) {
 			return true;
 		}
+		
+		final Vec2 d = tld.get();
+		final Vec2 r2 = tlr2.get();
+		final Vec2 r1 = tlr1.get();
 
 		final Body b1 = m_body1;
 		final Body b2 = m_body2;
@@ -219,13 +230,18 @@ public class DistanceJoint extends Joint {
 	}
 
 	// djm pooled, and use pool above
-	private final Vec2 v1 = new Vec2();
-	private final Vec2 v2 = new Vec2();
+	private static final TLVec2 tlv1 = new TLVec2();
+	private static final TLVec2 tlv2 = new TLVec2();
 	@Override
 	public void solveVelocityConstraints(final TimeStep step) {
 		final Body b1 = m_body1;
 		final Body b2 = m_body2;
 
+		final Vec2 v1 = tlv1.get();
+		final Vec2 v2 = tlv2.get();
+		final Vec2 r1 = tlr1.get();
+		final Vec2 r2 = tlr2.get();
+		
 		Mat22.mulToOut(b1.m_xf.R, m_localAnchor1.sub(b1.getMemberLocalCenter()), r1);
 		Mat22.mulToOut(b2.m_xf.R, m_localAnchor2.sub(b2.getMemberLocalCenter()), r2);
 

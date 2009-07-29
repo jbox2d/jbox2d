@@ -37,6 +37,7 @@ import org.jbox2d.dynamics.contacts.ContactConstraintPoint;
 import org.jbox2d.dynamics.contacts.ContactResult;
 import org.jbox2d.dynamics.contacts.ContactSolver;
 import org.jbox2d.dynamics.joints.Joint;
+import org.jbox2d.pooling.stacks.ContactSolverStack;
 
 //Updated to rev. 46->103->142 of b2Island.cpp/.h
 
@@ -121,7 +122,7 @@ public class Island {
 	}
 
 	// djm pooling
-	//private static final TLContactSolver tlCs = new TLContactSolver();
+	private static final ContactSolverStack contactSolvers = new ContactSolverStack();
 	
 	public void solve(final TimeStep step, final Vec2 gravity, final boolean correctPositions, final boolean allowSleep) {
 		// Integrate velocities and apply damping.
@@ -166,7 +167,7 @@ public class Island {
 			}
 		}
 
-		final ContactSolver contactSolver = new ContactSolver();
+		final ContactSolver contactSolver = contactSolvers.get();
 		contactSolver.init(step, m_contacts, m_contactCount);
 
 		// Initialize velocity constraints.
@@ -279,13 +280,15 @@ public class Island {
 				}
 			}
 		}
+		
+		contactSolvers.recycle(contactSolver);
 	}
 	
 	
 
 	// djm pooling, from above
 	public void solveTOI(final TimeStep subStep) {
-		final ContactSolver contactSolver = new ContactSolver();
+		final ContactSolver contactSolver = contactSolvers.get();
 		contactSolver.init(subStep, m_contacts, m_contactCount);
 
 		// No warm starting needed for TOI contact events.
@@ -358,6 +361,8 @@ public class Island {
 		}
 
 		report(contactSolver.m_constraints);
+		
+		contactSolvers.recycle(contactSolver);
 	}
 
 	public void report(final List<ContactConstraint> constraints) {
