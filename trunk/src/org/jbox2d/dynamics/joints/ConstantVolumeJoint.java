@@ -6,7 +6,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.World;
-import org.jbox2d.pooling.arrays.TLVec2Array;
+import org.jbox2d.pooling.arrays.Vec2Array;
 
 public class ConstantVolumeJoint extends Joint {
 	Body[] bodies;
@@ -136,7 +136,7 @@ public class ConstantVolumeJoint extends Joint {
 	}
 
 	// djm pooled
-	private static final TLVec2Array tlD = new TLVec2Array();
+	private static final Vec2Array tlD = new Vec2Array();
 	@Override
 	public void initVelocityConstraints(final TimeStep step) {
 		m_step = step;

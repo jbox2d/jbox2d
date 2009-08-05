@@ -127,8 +127,24 @@ public class World {
 	private float m_inv_dt0;
 
 	private final ArrayList<Steppable> postStepList;
+
+	private boolean autoDebugDraw = true;
 	
 	
+	/**
+	 * @return the autoDebugDraw
+	 */
+	public boolean isAutoDebugDraw() {
+		return autoDebugDraw;
+	}
+
+	/**
+	 * @param autoDebugDraw the autoDebugDraw to set
+	 */
+	public void setAutoDebugDraw(boolean autoDebugDraw) {
+		this.autoDebugDraw = autoDebugDraw;
+	}
+
 	public void setDrawDebugData(final boolean tf) {
 		m_drawDebugData = tf;
 	}
@@ -569,7 +585,9 @@ public class World {
 		}
 
 		// Draw debug information.
-		drawDebugData();
+		if(autoDebugDraw){
+			drawDebugData();			
+		}
 
 		m_inv_dt0 = step.inv_dt;
 		m_lock = false;

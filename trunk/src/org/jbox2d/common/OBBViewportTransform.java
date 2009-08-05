@@ -5,7 +5,7 @@ import org.jbox2d.pooling.TLMat22;
 
 public class OBBViewportTransform implements IViewportTransform{
 	
-	private final OBB box = new OBB();
+	protected final OBB box = new OBB();
 	private boolean yFlip = false;
 	private final Mat22 yFlipMat = new Mat22(1,0,0,-1);
 	private final Mat22 yFlipMatInv = yFlipMat.invert();
