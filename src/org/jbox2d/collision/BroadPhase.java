@@ -27,7 +27,7 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.TLBoundValues;
-import org.jbox2d.pooling.arrays.TLIntegerArray;
+import org.jbox2d.pooling.arrays.IntegerArray;
 
 
 /**
@@ -210,9 +210,9 @@ public class BroadPhase {
 	}
 
 	// djm pooling
-	private final static TLIntegerArray tlLowerValues = new TLIntegerArray();
-	private final static TLIntegerArray tlUpperValues = new TLIntegerArray();
-	private final static TLIntegerArray tlIndexes = new TLIntegerArray();
+	private final static IntegerArray tlLowerValues = new IntegerArray();
+	private final static IntegerArray tlUpperValues = new IntegerArray();
+	private final static IntegerArray tlIndexes = new IntegerArray();
 	
 	// Create and destroy proxies. These call Flush first.
 	/** internal */
@@ -339,7 +339,7 @@ public class BroadPhase {
 	}
 	
 	// djm pooling
-	private static final TLIntegerArray tlIgnored = new TLIntegerArray();
+	private static final IntegerArray tlIgnored = new IntegerArray();
 	
 	public void destroyProxy( final int proxyId) {
 		assert (0 < m_proxyCount && m_proxyCount <= Settings.maxProxies);
@@ -846,7 +846,7 @@ public class BroadPhase {
 	
 	
 	// djm pooling
-	private static final TLIntegerArray tlResults = new TLIntegerArray();
+	private static final IntegerArray tlResults = new IntegerArray();
 	
 	public int querySegment(Segment segment, Object[] userData, int maxCount, SortKeyFunc sortKey)
 	{

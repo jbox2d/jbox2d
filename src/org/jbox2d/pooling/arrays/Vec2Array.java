@@ -2,7 +2,7 @@ package org.jbox2d.pooling.arrays;
 
 import org.jbox2d.common.Vec2;
 
-public class TLVec2Array extends DynamicTLArray<Vec2> {
+public class Vec2Array extends DynamicTLArray<Vec2> {
 
 	@Override
 	protected Vec2[] getInitializedArray(int argLength) {

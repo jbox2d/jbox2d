@@ -29,6 +29,13 @@ package org.jbox2d.common;
  *
  */
 public class Color3f {
+	
+	public static final Color3f WHITE = new Color3f(255, 255, 255);
+	public static final Color3f BLACK = new Color3f(0, 0, 0);
+	public static final Color3f BLUE = new Color3f(0, 0, 255);
+	public static final Color3f GREEN = new Color3f(0, 255, 0);
+	public static final Color3f RED = new Color3f(255, 0, 0);
+	
 	public float x;
 	public float y;
 	public float z;

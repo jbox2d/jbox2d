@@ -40,6 +40,7 @@ import org.jbox2d.pooling.SingletonPool;
 import org.jbox2d.pooling.TLContactPoint;
 import org.jbox2d.pooling.TLManifold;
 import org.jbox2d.pooling.TLVec2;
+import org.jbox2d.pooling.arrays.BooleanArray;
 
 //Updated to rev 144 of b2PolyAndCircleContact.h/cpp
 class PolyAndCircleContact extends Contact implements ContactCreateFcn {
@@ -104,11 +105,11 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
 	private static final TLManifold tlm0 = new TLManifold();
 	private static final TLVec2 tlV1 = new TLVec2();
 	private static final TLContactPoint tlCp = new TLContactPoint();
+	private static final BooleanArray tlPersisted = new BooleanArray();
 	@Override
 	public void evaluate(final ContactListener listener) {
 		final Body b1 = m_shape1.getBody();
 		final Body b2 = m_shape2.getBody();
-
 		
 		final Manifold m0 = tlm0.get();
 		final Vec2 v1 = tlV1.get();
@@ -116,7 +117,9 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
 
 		SingletonPool.getCollideCircle().collidePolygonAndCircle(m_manifold, (PolygonShape)m_shape1, b1.getMemberXForm(), (CircleShape)m_shape2, b2.getMemberXForm());
 
-		final boolean[] persisted= {false, false};
+		final Boolean[] persisted = tlPersisted.get(2);
+		persisted[0] = false;
+		persisted[1] = false;
 
 		cp.shape1 = m_shape1;
 		cp.shape2 = m_shape2;
