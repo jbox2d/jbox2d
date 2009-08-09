@@ -136,7 +136,7 @@ class PolyAndCircleContact extends Contact implements ContactCreateFcn {
 				mp.normalImpulse = 0.0f;
 				mp.tangentImpulse = 0.0f;
 				boolean found = false;
-				final ContactID id = new ContactID(mp.id);
+				final ContactID id = mp.id;
 
 				for (int j = 0; j < m0.pointCount; ++j) {
 					if (persisted[j] == true) {
