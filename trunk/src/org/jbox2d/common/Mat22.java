@@ -485,8 +485,19 @@ public class Mat22 {
 		return mat;
 	}
 	
+	public final static Mat22 createScaleTransform(float scaleX, float scaleY){
+		Mat22 mat = new Mat22();
+		mat.col1.x = scaleX;
+		mat.col2.y = scaleY;
+		return mat;
+	}
+	
 	public final static void createScaleTransform(float scale, Mat22 out){
 		out.col1.x = scale;
 		out.col2.y = scale;
+	}
+	public final static void createScaleTransform(float scaleX, float scaleY, Mat22 out){
+		out.col1.x = scaleX;
+		out.col2.y = scaleY;
 	}
 }
