@@ -7,21 +7,33 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.pooling.TLVec2;
+import org.jbox2d.pooling.SingletonPool;
+import org.jbox2d.structs.ClipVertex;
 import org.jbox2d.structs.ContactID;
 import org.jbox2d.structs.Manifold;
+import org.jbox2d.structs.ManifoldPoint;
 import org.jbox2d.structs.PointState;
 import org.jbox2d.structs.Manifold.ManifoldType;
 
 /**
  * Functions used for computing contact points, distance
- * queries, and TOI queries.
- *
+ * queries, and TOI queries.  Collision methods are non-static for pooling speed, 
+ * retrieve a collision object from the {@link SingletonPool}.
+ * Should not be constructed.
  * @author daniel
  */
 public class Collision {
 	public static final int NULL_FEATURE = Integer.MAX_VALUE;
 	
+	
+	public Collision(){
+		incidentEdge[0] = new ClipVertex();
+		incidentEdge[1] = new ClipVertex();
+		clipPoints1[0] = new ClipVertex();
+		clipPoints1[1] = new ClipVertex();
+		clipPoints2[0] = new ClipVertex();
+		clipPoints2[1] = new ClipVertex();
+	}
 	/**
 	 * Compute the point states given two manifolds. The states pertain to the transition from manifold1
 	 * to manifold2. So state1 is either persist or remove while state2 is either add or persist.
@@ -70,9 +82,9 @@ public class Collision {
 	}
 	
 	// djm pooling
-	private static final TLVec2 tlp1 = new TLVec2();
-	private static final TLVec2 tlp2 = new TLVec2();
-	private static final TLVec2 tld = new TLVec2();
+	private final Vec2 p1 = new Vec2();
+	private final Vec2 p2 = new Vec2();
+	private final Vec2 d = new Vec2();
 
 	/**
 	 * Compute the collision manifold between two circles.
@@ -82,13 +94,9 @@ public class Collision {
 	 * @param circle2
 	 * @param xf2
 	 */
-	public static final void collideCircles(Manifold manifold, final CircleShape circle1, final Transform xf1,
+	public final void collideCircles(Manifold manifold, final CircleShape circle1, final Transform xf1,
 	                                        final CircleShape circle2, final Transform xf2){
 		manifold.m_pointCount = 0;
-		
-		final Vec2 p1 = tlp1.get();
-		final Vec2 p2 = tlp2.get();
-		final Vec2 d = tld.get();
 		
 		Transform.mulToOut( xf1, circle1.m_p, p1);
 		Transform.mulToOut( xf2, circle2.m_p, p2);
@@ -110,10 +118,10 @@ public class Collision {
 	}
 	
 	// djm pooling, and from above
-	private static final TLVec2 tlc = new TLVec2();
-	private static final TLVec2 tlcLocal = new TLVec2();
-	private static final TLVec2 tltemp = new TLVec2();
-	private static final TLVec2 tltemp2 = new TLVec2();
+	private final Vec2 c = new Vec2();
+	private final Vec2 cLocal = new Vec2();
+	private final Vec2 temp = new Vec2();
+	private final Vec2 temp2 = new Vec2();
 	/**
 	 * Compute the collision manifold between a polygon and a circle.
 	 * @param manifold
@@ -122,13 +130,9 @@ public class Collision {
 	 * @param circle
 	 * @param xf2
 	 */
-	public static final void collidePolygonAndCircle(Manifold manifold, final PolygonShape polygon, final Transform xf1,
+	public final void collidePolygonAndCircle(Manifold manifold, final PolygonShape polygon, final Transform xf1,
 	                                        final CircleShape circle, final Transform xf2){
 		manifold.m_pointCount = 0;
-		
-		final Vec2 c = tlc.get();
-		final Vec2 cLocal = tlcLocal.get();
-		final Vec2 temp = tltemp.get();
 		
 		// Compute circle position in the frame of the polygon.
 		Transform.mulToOut(xf2, circle.m_p, c);
@@ -174,8 +178,7 @@ public class Collision {
 			manifold.m_points[0].m_id.key = 0;
 			return;
 		}
-		
-		final Vec2 temp2 = tltemp2.get();
+	
 		
 		// Compute barycentric coordinates
 		temp.set(cLocal).subLocal(v1);
@@ -231,11 +234,10 @@ public class Collision {
 	}
 	
 	// djm pooling
-	private static final TLVec2 tlnormal1World = new TLVec2();
-	private static final TLVec2 tlnormal1 = new TLVec2();
-	private static final TLVec2 tlv1 = new TLVec2();
-	private static final TLVec2 tlv2 = new TLVec2();
-
+	private final Vec2 normal1World = new Vec2();
+	private final Vec2 normal1 = new Vec2();
+	private final Vec2 v1 = new Vec2();
+	private final Vec2 v2 = new Vec2();
 	/**
 	 * Find the separation between poly1 and poly2 for a given edge normal on poly1.
 	 * @param poly1
@@ -244,7 +246,7 @@ public class Collision {
 	 * @param poly2
 	 * @param xf2
 	 */
-	private static final float edgeSeparation( final PolygonShape poly1, final Transform xf1, final int edge1,
+	private final float edgeSeparation( final PolygonShape poly1, final Transform xf1, final int edge1,
 	                                          final PolygonShape poly2, final Transform xf2){
 		int count1 = poly1.m_vertexCount;
 		final Vec2[] vertices1 = poly1.m_vertices;
@@ -254,9 +256,6 @@ public class Collision {
 		final Vec2[] vertices2 = poly2.m_vertices;
 
 		assert(0 <= edge1 && edge1 < count1);
-
-		final Vec2 normal1World = tlnormal1World.get();
-		final Vec2 normal1 = tlnormal1.get();
 		
 		// Convert normal from poly1's frame into poly2's frame.
 		//Vec2 normal1World = Mul(xf1.R, normals1[edge1]);
@@ -275,9 +274,6 @@ public class Collision {
 				index = i;
 			}
 		}
-
-		final Vec2 v1 = tlv1.get();
-		final Vec2 v2 = tlv2.get();
 		
 		//Vec2 v1 = Mul(xf1, vertices1[edge1]);
 		//Vec2 v2 = Mul(xf2, vertices2[index]);
@@ -287,6 +283,155 @@ public class Collision {
 		float separation = Vec2.dot(v2.subLocal(v1), normal1World);
 		return separation;
 	}
+	
+	// djm pooling, and from above
+	private final Vec2 dLocal1 = new Vec2();
+	/**
+	 * Find the max separation between poly1 and poly2 using edge normals from poly1.
+	 * @param edgeIndex
+	 * @param poly1
+	 * @param xf1
+	 * @param poly2
+	 * @param xf2
+	 * @return
+	 */
+	private final void findMaxSeparation(EdgeResults results, final PolygonShape poly1, final Transform xf1,
+	                                       final PolygonShape poly2, final Transform xf2){
+		int count1 = poly1.m_vertexCount;
+		final Vec2[] normals1 = poly1.m_normals;
+		
+		// Vector pointing from the centroid of poly1 to the centroid of poly2.
+		Transform.mulToOut( xf2, poly2.m_centroid, d);
+		Transform.mulToOut( xf1, poly1.m_centroid, temp);
+		d.subLocal( temp);
+		
+		Mat22.mulToOut( xf1.R, d, dLocal1);
+		
+		// Find edge normal on poly1 that has the largest projection onto d.
+		int edge = 0;
+		float dot;
+		float maxDot = Float.MIN_VALUE;
+		for( int i=0; i<count1; i++){
+			dot = Vec2.dot(normals1[i], dLocal1);
+			if(dot > maxDot){
+				maxDot = dot;
+				edge = i;
+			}
+		}
+		
+		// Get the separation for the edge normal.
+		float s = edgeSeparation(poly1, xf1, edge, poly2, xf2);
+
+		// Check the separation for the previous edge normal.
+		int prevEdge = edge - 1 >= 0 ? edge - 1 : count1 - 1;
+		float sPrev = edgeSeparation(poly1, xf1, prevEdge, poly2, xf2);
+
+		// Check the separation for the next edge normal.
+		int nextEdge = edge + 1 < count1 ? edge + 1 : 0;
+		float sNext = edgeSeparation(poly1, xf1, nextEdge, poly2, xf2);
+
+		// Find the best edge and the search direction.
+		int bestEdge;
+		float bestSeparation;
+		int increment;
+		if (sPrev > s && sPrev > sNext){
+			increment = -1;
+			bestEdge = prevEdge;
+			bestSeparation = sPrev;
+		}
+		else if (sNext > s){
+			increment = 1;
+			bestEdge = nextEdge;
+			bestSeparation = sNext;
+		}
+		else{
+			results.edgeIndex = edge;
+			results.separation = s;
+			return;
+		}
+
+		// Perform a local search for the best edge normal.
+		for ( ; ; ){
+			if (increment == -1){
+				edge = bestEdge - 1 >= 0 ? bestEdge - 1 : count1 - 1;
+			}
+			else{
+				edge = bestEdge + 1 < count1 ? bestEdge + 1 : 0;
+			}
+
+			s = edgeSeparation(poly1, xf1, edge, poly2, xf2);
+
+			if (s > bestSeparation){
+				bestEdge = edge;
+				bestSeparation = s;
+			}
+			else{
+				break;
+			}
+		}
+
+		results.edgeIndex = bestEdge;
+		results.separation = bestSeparation;
+	}
+	
+	// djm pooling from above	
+	private final void findIncidentEdge(final ClipVertex[] c,
+	                                           final PolygonShape poly1, final Transform xf1, int edge1,
+	                                           final PolygonShape poly2, final Transform xf2){
+		assert( c.length == 2);
+		int count1 = poly1.m_vertexCount;
+		final Vec2[] normals1 = poly1.m_normals;
+		
+		int count2 = poly2.m_vertexCount;
+		final Vec2[] vertices2 = poly2.m_vertices;
+		final Vec2[] normals2 = poly2.m_normals;
+		
+		assert(0 <= edge1 && edge1 < count1);
+		
+		// Get the normal of the reference edge in poly2's frame.
+		Mat22.mulToOut(xf1.R, normals1[edge1], normal1); // temporary
+		//Mat22.mulToOut(xf2.R, Mul(xf1.R, normals1[edge1]));
+		Mat22.mulToOut(xf2.R, normal1, normal1);
+		
+		// Find the incident edge on poly2.
+		int index = 0;
+		float minDot = Float.MAX_VALUE;
+		for (int i = 0; i < count2; ++i){
+			float dot = Vec2.dot(normal1, normals2[i]);
+			if (dot < minDot){
+				minDot = dot;
+				index = i;
+			}
+		}
+
+		// Build the clip vertices for the incident edge.
+		int i1 = index;
+		int i2 = i1 + 1 < count2 ? i1 + 1 : 0;
+
+		Transform.mulToOut( xf2, vertices2[i1], c[0].v); // = Mul(xf2, vertices2[i1]);
+		c[0].id.features.referenceEdge = edge1;
+		c[0].id.features.incidentEdge = i1;
+		c[0].id.features.incidentVertex = 0;
+
+		Transform.mulToOut( xf2, vertices2[i2], c[1].v); // = Mul(xf2, vertices2[i2]);
+		c[1].id.features.referenceEdge = edge1;
+		c[1].id.features.incidentEdge = i2;
+		c[1].id.features.incidentVertex = 1;
+	}
+	                                           
+	
+	private final EdgeResults results1 = new EdgeResults();
+	private final EdgeResults results2 = new EdgeResults();
+	private final ClipVertex[] incidentEdge = new ClipVertex[2];
+	private final Vec2 dv = new Vec2();
+	private final Vec2 localNormal = new Vec2();
+	private final Vec2 planePoint = new Vec2();
+	private final Vec2 sideNormal = new Vec2();
+	private final Vec2 frontNormal = new Vec2();
+	private final Vec2 v11 = new Vec2();
+	private final Vec2 v12 = new Vec2();
+	private final ClipVertex[] clipPoints1 = new ClipVertex[2];
+	private final ClipVertex[] clipPoints2 = new ClipVertex[2];
 	/**
 	 * Compute the collision manifold between two polygons.
 	 * @param manifold
@@ -295,9 +440,121 @@ public class Collision {
 	 * @param polygon2
 	 * @param xf2
 	 */
-	public static final void collidePolygons(Manifold manifold, final PolygonShape polygon1, final Transform xf1,
-	                                        final PolygonShape polygon2, final Transform xf2){
+	public final void collidePolygons(Manifold manifold, final PolygonShape polyA, final Transform xfA,
+	                                        final PolygonShape polyB, final Transform xfB){
+		// Find edge normal of max separation on A - return if separating axis is found
+		// Find edge normal of max separation on B - return if separation axis is found
+		// Choose reference edge as min(minA, minB)
+		// Find incident edge
+		// Clip
+
+		// The normal points from 1 to 2
 		
+		manifold.m_pointCount = 0;
+		float totalRadius = polyA.m_radius + polyB.m_radius;
+		
+		findMaxSeparation(results1, polyA, xfA, polyB, xfB);
+		if (results1.separation > totalRadius){
+			return;
+		}
+
+		findMaxSeparation(results2, polyB, xfB, polyA, xfA);
+		if (results2.separation > totalRadius){
+			return;
+		}
+
+		final PolygonShape poly1;	// reference polygon
+		final PolygonShape poly2;	// incident polygon
+		Transform xf1, xf2;
+		int edge1;		// reference edge
+		int flip;
+		final float k_relativeTol = 0.98f;
+		final float k_absoluteTol = 0.001f;
+
+		if (results2.separation > k_relativeTol * results1.separation + k_absoluteTol){
+			poly1 = polyB;
+			poly2 = polyA;
+			xf1 = xfB;
+			xf2 = xfA;
+			edge1 = results2.edgeIndex;
+			manifold.m_type = ManifoldType.e_faceB;
+			flip = 1;
+		}
+		else{
+			poly1 = polyA;
+			poly2 = polyB;
+			xf1 = xfA;
+			xf2 = xfB;
+			edge1 = results1.edgeIndex;
+			manifold.m_type = ManifoldType.e_faceA;
+			flip = 0;
+		}
+
+		findIncidentEdge(incidentEdge, poly1, xf1, edge1, poly2, xf2);
+
+		int count1 = poly1.m_vertexCount;
+		final Vec2[] vertices1 = poly1.m_vertices;
+
+		v11.set(vertices1[edge1]);
+		v12.set(edge1 + 1 < count1 ? vertices1[edge1+1] : vertices1[0]);
+
+		dv.set(v12).subLocal(v11);
+
+		Vec2.crossToOut( dv, 1f, localNormal); //Vec2 localNormal = Cross(dv, 1.0f);
+		localNormal.normalize();
+		planePoint.set( v11).addLocal(v12).mulLocal(.5f); //Vec2 planePoint = 0.5f * (v11 + v12);
+
+		Mat22.mulToOut(xf1.R, dv, sideNormal); //Vec2 sideNormal = Mul(xf1.R, v12 - v11);
+		sideNormal.normalize();
+		Vec2.crossToOut( sideNormal, 1f, frontNormal); //Vec2 frontNormal = Cross(sideNormal, 1.0f);
+		
+		Transform.mulToOut( xf1, v11, v11);
+		Transform.mulToOut( xf1, v12, v12);
+		//v11 = Mul(xf1, v11);
+		//v12 = Mul(xf1, v12);
+
+		float frontOffset = Vec2.dot(frontNormal, v11);
+		float sideOffset1 = -Vec2.dot(sideNormal, v11);
+		float sideOffset2 = Vec2.dot(sideNormal, v12);
+
+		// Clip incident edge against extruded edge1 side edges.
+		//ClipVertex clipPoints1[2];
+		//ClipVertex clipPoints2[2];
+		int np;
+
+		// Clip to box side 1
+		//np = ClipSegmentToLine(clipPoints1, incidentEdge, -sideNormal, sideOffset1);
+		np = clipSegmentToLine(clipPoints1, incidentEdge, sideNormal.negateLocal(), sideOffset1);
+
+		if (np < 2)
+			return;
+
+		// Clip to negative box side 1
+		np = clipSegmentToLine(clipPoints2, clipPoints1,  sideNormal.negateLocal(), sideOffset2);
+
+		if (np < 2){
+			return;
+		}
+
+		// Now clipPoints2 contains the clipped points.
+		manifold.m_localPlaneNormal.set(localNormal);
+		manifold.m_localPoint.set(planePoint);
+
+		int pointCount = 0;
+		for (int i = 0; i < Settings.maxManifoldPoints; ++i){
+			float separation = Vec2.dot(frontNormal, clipPoints2[i].v) - frontOffset;
+
+			if (separation <= totalRadius){
+				ManifoldPoint cp = manifold.m_points[pointCount];
+				Transform.mulTransToOut( xf2, clipPoints2[i].v, cp.m_localPoint);
+				//cp.m_localPoint = MulT(xf2, clipPoints2[i].v);
+				cp.m_id.set(clipPoints2[i].id);
+				cp.m_id.features.flip = flip;
+				++pointCount;
+			}
+		}
+
+		manifold.m_pointCount = pointCount; 
 	}
 	
 	/**
@@ -344,5 +601,14 @@ public class Collision {
 		}
 
 		return numOut;
+	}
+	
+	
+	/**
+	 * Java-specific class for returning edge results
+	 */
+	private static class EdgeResults{
+		public float separation;
+		public int edgeIndex;
 	}
 }

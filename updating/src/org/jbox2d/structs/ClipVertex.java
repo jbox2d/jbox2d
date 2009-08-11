@@ -1,7 +1,6 @@
-package org.jbox2d.collision;
+package org.jbox2d.structs;
 
 import org.jbox2d.common.Vec2;
-import org.jbox2d.structs.ContactID;
 
 /**
  * Used for computing contact manifolds.
