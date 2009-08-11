@@ -148,7 +148,6 @@ public class AABB {
 		d.set(input.p2).subLocal(input.p1);
 		Vec2.absToOut( d, absD);
 
-
 		if (absD.x < Settings.EPSILON){
 			// Parallel.
 			if (p.x < lowerBound.x || upperBound.x < p.x){

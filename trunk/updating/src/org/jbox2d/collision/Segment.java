@@ -24,6 +24,7 @@
 package org.jbox2d.collision;
 
 import org.jbox2d.common.*;
+import org.jbox2d.pooling.TLVec2;
 import org.jbox2d.structs.TestSegmentResult;
 
 // Box2d rev 218 Collision.h/.cpp
@@ -60,10 +61,10 @@ public class Segment {
 	// mu2 = det[-r b] / denom*/
 	
 	// djm: pooled
-	private static final Vec2 r = new Vec2();
-	private static final Vec2 d = new Vec2();
-	private static final Vec2 n = new Vec2();
-	private static final Vec2 b = new Vec2();
+	private static final TLVec2 tlr = new TLVec2();
+	private static final TLVec2 tld = new TLVec2();
+	private static final TLVec2 tln = new TLVec2();
+	private static final TLVec2 tlb = new TLVec2();
 	/**
 	 * Ray cast against this segment with another segment.
 	 * @param out
@@ -72,6 +73,12 @@ public class Segment {
 	 * @return
 	 */
 	public boolean testSegment(TestSegmentResult out, Segment segment, float maxLambda){
+		
+		final Vec2 r = tlr.get();
+		final Vec2 d = tld.get();
+		final Vec2 n = tln.get();
+		final Vec2 b = tlb.get();
+		
 		Vec2 s = segment.p1;
 		r.set(segment.p2).subLocal(s);
 		d.set(p2).subLocal(p1);

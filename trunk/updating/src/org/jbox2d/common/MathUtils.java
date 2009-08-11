@@ -295,6 +295,10 @@ public class MathUtils {
 		x *= 1.5f - xhalf * x * x;
 		return x;
 	}
+
+	public final static float distanceSquared( Vec2 v1, Vec2 v2) {
+		return v1.x * v2.x + v1.y * v2.y;
+	}
 }
 // SINCOS accuracy and speed chart
 // 
