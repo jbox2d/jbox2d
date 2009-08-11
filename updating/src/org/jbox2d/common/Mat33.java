@@ -27,6 +27,9 @@ import org.jbox2d.pooling.TLVec3;
 
 // djm created from build 218
 public class Mat33 {
+	
+	public static final Mat33 IDENTITY = new Mat33(new Vec3(1,0,0), new Vec3(0,1,0), new Vec3(0,0,1));
+	
 	public Vec3 col1,col2,col3;
 	
 	public Mat33(){
