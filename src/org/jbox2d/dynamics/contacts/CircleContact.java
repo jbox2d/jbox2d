@@ -98,17 +98,6 @@ public class CircleContact extends Contact implements ContactCreateFcn {
 		final ContactPoint cp = tlCp.get();
 
 		m0.set(m_manifold);
-		//Manifold m0 = new Manifold(m_manifold);  djm all this should have been taken care of with set
-		/*for (int k = 0; k < m_manifold.pointCount; k++) {
-            m0.points[k] = new ManifoldPoint(m_manifold.points[k]);
-            m0.points[k].normalImpulse = m_manifold.points[k].normalImpulse;
-            m0.points[k].tangentImpulse = m_manifold.points[k].tangentImpulse;
-            m0.points[k].separation = m_manifold.points[k].separation;
-            //m0.points[k].id.key = m_manifold.points[k].id.key;
-            m0.points[k].id.features.set(m_manifold.points[k].id.features);
-            //System.out.println(m_manifold.points[k].id.key);
-        }
-        m0.pointCount = m_manifold.pointCount;*/
 
 		SingletonPool.getCollideCircle().collideCircles(m_manifold, (CircleShape)m_shape1, b1.m_xf, (CircleShape)m_shape2, b2.m_xf);
 
