@@ -98,6 +98,7 @@ public class PointAndCircleContact extends Contact implements ContactCreateFcn {
 		final Manifold m0 = tlm0.get();
 		final Vec2 v1 = tlV1.get();
 		final ContactPoint cp = tlCp.get();
+		m0.set(m_manifold);
 
 		SingletonPool.getCollideCircle().collidePointAndCircle(m_manifold, (PointShape)m_shape1, b1.m_xf, (CircleShape)m_shape2, b2.m_xf);
 		//        CollideCircle.collideCircles(m_manifold, (CircleShape)m_shape1, b1.m_xf, (CircleShape)m_shape2, b2.m_xf);

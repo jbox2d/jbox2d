@@ -126,6 +126,7 @@ class PointAndPolyContact extends Contact implements ContactCreateFcn {
 		final Manifold m0 = tlm0.get();
 		final Vec2 v1 = tlV1.get();
 		final ContactPoint cp = tlCp.get();
+		m0.set(m_manifold);
 
 		SingletonPool.getCollidePoly().collidePolygonAndPoint(m_manifold, (PolygonShape)m_shape1, b1.getMemberXForm(), (PointShape)m_shape2, b2.getMemberXForm());
 		//CollideCircle.collidePolygonAndCircle(m_manifold, (PolygonShape)m_shape1, b1.getXForm(), (CircleShape)m_shape2, b2.getXForm());
