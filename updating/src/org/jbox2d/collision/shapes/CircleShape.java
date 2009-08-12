@@ -32,10 +32,10 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.TLVec2;
-import org.jbox2d.structs.MassData;
-import org.jbox2d.structs.SegmentCollide;
-import org.jbox2d.structs.ShapeType;
-import org.jbox2d.structs.TestSegmentResult;
+import org.jbox2d.structs.collision.MassData;
+import org.jbox2d.structs.collision.SegmentCollide;
+import org.jbox2d.structs.collision.ShapeType;
+import org.jbox2d.structs.collision.TestSegmentResult;
 
 
 //Updated to rev 56->108->139 of Shape.cpp/.h

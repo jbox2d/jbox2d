@@ -21,9 +21,9 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package org.jbox2d.structs;
+package org.jbox2d.structs.collision;
 
-import org.jbox2d.structs.ContactID;
+import org.jbox2d.structs.collision.ContactID;
 import org.jbox2d.common.Vec2;
 
 //Updated to rev 56->108->139->218 of b2Collision.h

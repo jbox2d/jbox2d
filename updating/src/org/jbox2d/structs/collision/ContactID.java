@@ -20,7 +20,7 @@
  * misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  */
-package org.jbox2d.structs;
+package org.jbox2d.structs.collision;
 
 //Updated to rev 56->139-218 of b2Collision.h
 
