@@ -27,10 +27,10 @@ import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.Segment;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.structs.MassData;
-import org.jbox2d.structs.SegmentCollide;
-import org.jbox2d.structs.ShapeType;
-import org.jbox2d.structs.TestSegmentResult;
+import org.jbox2d.structs.collision.MassData;
+import org.jbox2d.structs.collision.SegmentCollide;
+import org.jbox2d.structs.collision.ShapeType;
+import org.jbox2d.structs.collision.TestSegmentResult;
 
 //Updated through rev. 56->139-218 of b2Shape.cpp/.h
 

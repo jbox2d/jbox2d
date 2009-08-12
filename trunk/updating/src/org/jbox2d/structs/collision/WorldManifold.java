@@ -1,4 +1,4 @@
-package org.jbox2d.structs;
+package org.jbox2d.structs.collision;
 
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;

@@ -21,7 +21,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package org.jbox2d.structs;
+package org.jbox2d.structs.collision;
 
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;

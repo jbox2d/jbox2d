@@ -5,11 +5,19 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.Transform;
-import org.jbox2d.structs.DistanceInput;
-import org.jbox2d.structs.DistanceOutput;
-import org.jbox2d.structs.DistanceProxy;
-import org.jbox2d.structs.SimplexCache;
+import org.jbox2d.pooling.SingletonPool;
+import org.jbox2d.structs.collision.distance.DistanceInput;
+import org.jbox2d.structs.collision.distance.DistanceOutput;
+import org.jbox2d.structs.collision.distance.DistanceProxy;
+import org.jbox2d.structs.collision.distance.SimplexCache;
 
+/**
+ * This is non-static for faster pooling. To get an instance,
+ * use the {@link SingletonPool}, don't construct a distance
+ * object.
+ *
+ * @author daniel
+ */
 public class Distance {
 
 	public int GJK_CALLS = 0;
@@ -19,7 +27,7 @@ public class Distance {
 	/**
 	 * GJK using Voronoi regions (Christer Ericson) and Barycentric coordinates.
 	 */
-	public class SimplexVertex {
+	private class SimplexVertex {
 		public final Vec2 wA = new Vec2();		// support point in shapeA
 		public final Vec2 wB = new Vec2();		// support point in shapeB
 		public final Vec2 w = new Vec2();		// wB - wA
@@ -37,7 +45,7 @@ public class Distance {
 		}
 	}
 	
-	public class Simplex {
+	private class Simplex {
 		public final SimplexVertex m_v1 = new SimplexVertex();
 		public final SimplexVertex m_v2 = new SimplexVertex();
 		public final SimplexVertex m_v3 = new SimplexVertex();

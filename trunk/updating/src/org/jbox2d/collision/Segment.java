@@ -25,7 +25,7 @@ package org.jbox2d.collision;
 
 import org.jbox2d.common.*;
 import org.jbox2d.pooling.TLVec2;
-import org.jbox2d.structs.TestSegmentResult;
+import org.jbox2d.structs.collision.TestSegmentResult;
 
 // Box2d rev 218 Collision.h/.cpp
 

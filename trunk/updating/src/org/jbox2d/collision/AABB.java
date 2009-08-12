@@ -4,8 +4,8 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.TLVec2;
-import org.jbox2d.structs.RayCastInput;
-import org.jbox2d.structs.RayCastOutput;
+import org.jbox2d.structs.collision.RayCastInput;
+import org.jbox2d.structs.collision.RayCastOutput;
 
 /** An axis-aligned bounding box. */
 public class AABB {

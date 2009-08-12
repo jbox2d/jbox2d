@@ -1,4 +1,4 @@
-package org.jbox2d.structs;
+package org.jbox2d.structs.collision.distance;
 
 import org.jbox2d.common.Vec2;
 
