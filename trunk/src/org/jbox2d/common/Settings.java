@@ -23,10 +23,7 @@
 
 package org.jbox2d.common;
 
-import org.jbox2d.testbed.mathtests.SinCosTest;
-
 //Updated to rev. 142 of b2Settings.cpp/.h
-
 
 /** Global tuning constants based on MKS units and various integer maximums (vertices per shape, pairs, etc.). */
 public class Settings {
@@ -48,7 +45,7 @@ public class Settings {
      * a small table is used (eg, precision is .006 or greater),
      * make sure you set the table to lerp it's results.  Accuracy chart
      * is in the MathUtils source.  Or, run the tests
-     * yourself in {@link SinCosTest}.</br>
+     * yourself in {@link org.jbox2d.testbed.mathtests.SinCosTest}.</br>
      * </br>
      * Good lerp precision values:
      * <ul><li>.0092</li>
