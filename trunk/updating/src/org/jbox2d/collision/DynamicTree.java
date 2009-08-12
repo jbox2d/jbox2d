@@ -1,10 +1,19 @@
 package org.jbox2d.collision;
 
+import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.Settings;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.pooling.TLAABB;
+import org.jbox2d.pooling.TLRayCastInput;
+import org.jbox2d.pooling.TLVec2;
+import org.jbox2d.pooling.stacks.AABBStack;
 import org.jbox2d.pooling.stacks.DynamicTreeNodeStack;
-import org.jbox2d.structs.collision.broadphase.QueryCallback;
-import org.jbox2d.structs.collision.tree.DynamicTreeNode;
+import org.jbox2d.pooling.stacks.TLRayCastOutput;
+import org.jbox2d.pooling.stacks.Vec2Stack;
+import org.jbox2d.structs.collision.RayCastCallback;
+import org.jbox2d.structs.collision.RayCastInput;
+import org.jbox2d.structs.collision.RayCastOutput;
 import org.jbox2d.structs.collision.tree.TreeQueryCallback;
-
 
 /**
  * A dynamic tree arranges data in a binary tree to accelerate
@@ -13,37 +22,426 @@ import org.jbox2d.structs.collision.tree.TreeQueryCallback;
  * so that the proxy AABB is bigger than the client object. This allows the client
  * object to move by small amounts without triggering a tree update.
  *
- * Nodes are pooled and relocatable, so we use node indices rather than pointers.
- *
  * @author daniel
  */
 public class DynamicTree {
-	
+	private static final DynamicTreeNodeStack stack = new DynamicTreeNodeStack();
+
 	private DynamicTreeNode m_root;
 	
 	private int m_nodeCount;
-	private int m_nodeCapacity;
+	
+	private DynamicTreeNode lastLeaf;
 	
 	public DynamicTree(){
 		m_root = null;
-		
-		m_nodeCapacity = 32;
 		m_nodeCount = 0;
+		lastLeaf = null;
 	}
 	
-	private static final DynamicTreeNodeStack stack = new DynamicTreeNodeStack();
-	
-	public final void query(TreeQueryCallback callback, AABB aabb){
-		assert( AABB.testOverlap( aabb, m_root.aabb));
+	/**
+	 * Create a proxy. Provide a tight fitting AABB and a userData pointer.
+	 * @param argAABB
+	 * @param userData
+	 * @return
+	 */
+	public final DynamicTreeNode createProxy( final AABB argAABB, Object argUserData){
+		DynamicTreeNode proxy = allocateNode();
 		
+		// Fatten the aabb
+		proxy.aabb.lowerBound.x = argAABB.lowerBound.x - Settings.aabbExtension;
+		proxy.aabb.lowerBound.y = argAABB.lowerBound.y - Settings.aabbExtension;
+		proxy.aabb.upperBound.x = argAABB.upperBound.x + Settings.aabbExtension;
+		proxy.aabb.upperBound.y = argAABB.upperBound.y + Settings.aabbExtension;
+		proxy.userData = argUserData;
+		
+		insertLeaf(proxy);
+		
+		return proxy;
 	}
 	
-	public final DynamicTreeNode allocateNode(){
+	/**
+	 * Destroy a proxy
+	 * @param argProxy
+	 */
+	public final void destroyProxy(DynamicTreeNode argProxy){
+		assert(argProxy.isLeaf());
+		
+		removeLeaf(argProxy);
+		freeNode(argProxy);
+	}
+	
+	/**
+	 * Move a proxy. If the proxy has moved outside of its fattened AABB,
+	 * then the proxy is removed from the tree and re-inserted. Otherwise
+	 * the function returns immediately.
+	 * @return true if the proxy was re-inserted.
+	 */
+	public final boolean moveProxy( DynamicTreeNode argProxy, final AABB argAABB){
+		assert( argProxy.isLeaf());
+		
+		if( argProxy.aabb.contains(argAABB)){
+			return false;
+		}
+		
+		removeLeaf(argProxy);
+		
+		argProxy.aabb.lowerBound.x = argAABB.lowerBound.x - Settings.aabbExtension;
+		argProxy.aabb.lowerBound.y = argAABB.lowerBound.y - Settings.aabbExtension;
+		argProxy.aabb.upperBound.x = argAABB.upperBound.x + Settings.aabbExtension;
+		argProxy.aabb.upperBound.y = argAABB.upperBound.y + Settings.aabbExtension;
+		
+		insertLeaf(argProxy);
+		return true;
+	}
+	
+	/**
+	 * Rebalances the tree for the given iterations.  Goes through
+	 * the tree by left-center-right (then back to root).  If given enough
+	 * iterations it will hit all the nodes.  It starts off at the last leaf
+	 * that it reinserted.
+	 * @param argIterations
+	 */
+	public final void rebalance(int argIterations){
+		if(m_nodeCount > argIterations){
+			argIterations = m_nodeCount;
+		}
+		
+		if(lastLeaf == null){
+			lastLeaf = m_root;
+		}
+		rebalance( argIterations, lastLeaf);
+	}
+	// recursive
+	private final int rebalance(int argIterations, DynamicTreeNode argNode){
+		if(argNode == null){
+			return argIterations;
+		}
+		if( argIterations == 0 ){
+			return 0;
+		}
+		
+		argIterations = rebalance(argIterations, argNode.child1);
+		
+		if( argIterations == 0 ){
+			return 0;
+		}
+		
+		if(argNode.isLeaf()){
+			lastLeaf = argNode;
+			removeLeaf(argNode);
+			insertLeaf(argNode);
+			return --argIterations;
+		}
+		
+		argIterations = rebalance(argIterations, argNode.child2);
+		
+		if( argIterations == 0 ){
+			return 0;
+		}
+		// and then back to root
+		argIterations = rebalance(argIterations, m_root);
+		
+		// I don't think we will ever get here
+		return argIterations;
+	}
+	
+	/**
+	 * Query an AABB for overlapping proxies. The callback class
+	 * is called for each proxy that overlaps the supplied AABB.
+	 * @param argCallback
+	 * @param argAABB
+	 */
+	public final void query(TreeQueryCallback argCallback, AABB argAABB){
+		query(argCallback, argAABB, m_root);
+	}
+	
+	// recursive query
+	private final void query(TreeQueryCallback argCallback, AABB argAABB, DynamicTreeNode argNode){
+		if(argNode == null){
+			return;
+		}
+		
+		if (AABB.testOverlap(argAABB, argNode.aabb)){
+			
+			if(argNode.isLeaf()){
+				argCallback.queryCallback(argNode);
+			}else{
+				query(argCallback, argAABB, argNode.child1);
+				query(argCallback, argAABB, argNode.child2);
+			}
+		}
+	}
+	
+	/**
+	 * Ray-cast against the proxies in the tree. This relies on the callback
+	 * to perform a exact ray-cast in the case were the proxy contains a shape.
+	 * The callback also performs the any collision filtering. This has performance
+	 * roughly equal to k * log(n), where k is the number of collisions and n is the
+	 * number of proxies in the tree.  The maxFraction in the input will change after callnig this
+	 * @param argInput the ray-cast input data. The ray extends from p1 to p1 + maxFraction * (p2 - p1).
+	 * @param argCallback a callback class that is called for each proxy that is hit by the ray.
+	 */
+	public void raycast( final RayCastCallback argCallback, final RayCastInput argInput){
+		raycast(argCallback, argInput, m_root);
+	}
+	
+	// stacks because it's recursive
+	private static final Vec2Stack vec2stack = new Vec2Stack();
+	private static final AABBStack aabbstack = new AABBStack();
+	private static final TLRayCastInput tlsubInput = new TLRayCastInput();
+	private static final TLRayCastOutput tloutput = new TLRayCastOutput();
+
+	private void raycast( final RayCastCallback argCallback, final RayCastInput argInput,
+						  final DynamicTreeNode argNode){
+		if(argNode == null){
+			return;
+		}
+		
+		final Vec2 r = vec2stack.get();
+		final Vec2 v = vec2stack.get();
+		final Vec2 absV = vec2stack.get();
+		
+		Vec2 p1 = argInput.p1;
+		Vec2 p2 = argInput.p2;
+		r.set(p2).subLocal(p1);
+		
+		// v is perpendicular to the segment.
+		Vec2.crossToOut(1f, r, v);
+		absV.set(v).absLocal();
+		
+		// Separating axis for segment (Gino, p80).
+		// |dot(v, p1 - c)| > dot(|v|, h)
+		
+		float maxFraction = argInput.maxFraction;
+		
+		// Build a bounding box for the segment.
+		final AABB segAABB = aabbstack.get();
+		//b2Vec2 t = p1 + maxFraction * (p2 - p1);
+		final Vec2 temp = vec2stack.get();
+		temp.set(r).mulLocal(maxFraction).addLocal(p1);
+		Vec2.minToOut(p1, temp, segAABB.lowerBound);
+		Vec2.maxToOut(p1, temp, segAABB.upperBound);
+		
+		
+		if ( AABB.testOverlap(argNode.aabb, segAABB) == false ){
+			return;
+		}
+			
+		final Vec2 c = vec2stack.get();
+		final Vec2 h = vec2stack.get();
+		argNode.aabb.getCenterToOut(c);
+		argNode.aabb.getExtentsToOut(h);
+		
+		temp.set(p1).subLocal(c);
+		float separation = MathUtils.abs( Vec2.dot(v, temp)) - Vec2.dot(absV, h);
+		
+		if(separation > 0f){
+			return;
+		}
+		
+		if( argNode.isLeaf()){
+			final RayCastInput subInput = tlsubInput.get();
+			subInput.p1.set(argInput.p1);
+			subInput.p2.set(argInput.p2);
+			subInput.maxFraction = maxFraction;
+			
+			final RayCastOutput output = tloutput.get();
+			
+			argCallback.raycastCallback(output, subInput, argNode);
+			
+			if(output.hit){
+				// exit early
+				if(output.fraction == 0f){
+					return;
+				}
+				
+				argInput.maxFraction = output.fraction;
+			}
+		}else{
+			raycast(argCallback, argInput, argNode.child1);
+			raycast(argCallback, argInput, argNode.child2);
+		}
+	}
+	
+	/**
+	 * Compute the height of the tree.
+	 */
+	public final int computeHeight(){
+		return computeHeight(m_root);
+	}
+	
+	private final int computeHeight(DynamicTreeNode argNode){
+		if(argNode == null){
+			return 0;
+		}
+		
+		int height1 = computeHeight(argNode.child1);
+		int height2 = computeHeight(argNode.child2);
+		return 1 + MathUtils.max(height1, height2);
+	}
+	
+	private final DynamicTreeNode allocateNode(){
 		DynamicTreeNode node = stack.get();
 		node.parent = null;
 		node.child1 = null;
 		node.child2 = null;
 		node.userData = null;
+		m_nodeCount++;
+		return node;
 	}
+	
+	/**
+	 * returns a node to the pool
+	 * @param argNode
+	 */
+	private final void freeNode(DynamicTreeNode argNode){
+		assert(argNode != null);
+		assert( 0 < m_nodeCount);
+		stack.recycle(argNode);
+		m_nodeCount--;
+	}
+	
+	private static final TLVec2 tlcenter = new TLVec2();
+	//private static final TLVec2 tltemp = new TLVec2();
+	private static final TLVec2 tldelta1 = new TLVec2();
+	private static final TLVec2 tldelta2 = new TLVec2();
+
+
+	private final void insertLeaf(DynamicTreeNode argNode){
+		if(m_root == null){
+			m_root = argNode;
+			argNode.parent = null;
+			return;
+		}
 		
+		// find the best sibling
+		final Vec2 center = tlcenter.get();
+		//final Vec2 temp = tltemp.get();
+		
+		argNode.aabb.getCenterToOut(center);
+		DynamicTreeNode sibling = m_root;
+		
+		DynamicTreeNode child1,child2;
+		if(sibling.isLeaf() == false){
+			final Vec2 delta1 = tldelta1.get();
+			final Vec2 delta2 = tldelta2.get();
+			do{
+				child1 = sibling.child1;
+				child2 = sibling.child2;
+				
+				child1.aabb.getCenterToOut(delta1);
+				child2.aabb.getCenterToOut(delta2);
+				delta1.subLocal(center);
+				delta2.subLocal(center);
+				
+				float norm1 = delta1.x + delta1.y;
+				float norm2 = delta2.x + delta2.y;
+				
+				if(norm1 < norm2){
+					sibling = child1;
+				}else {
+					sibling = child2;
+				}
+				
+			} while( sibling.isLeaf() == false);
+		}
+		
+		// Create a parent for the siblings
+		DynamicTreeNode node1 = sibling.parent;
+		DynamicTreeNode node2 = allocateNode();
+		node2.parent = node1;
+		node2.userData = null;
+		node2.aabb.combine(argNode.aabb, sibling.aabb);
+		
+		// was that the head node?
+		if(node1 != null){
+			if(node1.child1 == sibling){
+				node1.child1 = node2;
+			}else{
+				node1.child2 = node2;
+			}
+			
+			node2.child1 = sibling;
+			node2.child2 = argNode;
+			sibling.parent = node2;
+			argNode.parent = node2;
+			
+			// build the aabb's up in case we expanded them out
+			do {
+				if( node1.aabb.contains(node2.aabb)){
+					break;
+				}
+				
+				node1.aabb.combine(node1.child1.aabb, node1.child2.aabb);
+				node2 = node1;
+				node1 = node1.parent;
+			}while(node1 != null);
+		}else{
+			node2.child1 = sibling;
+			node2.child2 = argNode;
+			sibling.parent = node2;
+			argNode.parent = node2;
+			m_root = node2;
+		}
+	}
+	
+	private static final TLAABB tloldAABB = new TLAABB();
+	
+	private final void removeLeaf(DynamicTreeNode argNode){
+		if(argNode == m_root){
+			m_root = null;
+			
+			if(lastLeaf == argNode){
+				lastLeaf = null;
+			}
+			return;
+		}
+		
+		DynamicTreeNode node2 = argNode.parent;
+		DynamicTreeNode node1 = node2.parent;
+		DynamicTreeNode sibling;
+		if( node2.child1 == argNode){
+			sibling = node2.child2;
+		}else{
+			sibling = node2.child1;
+		}
+		
+		if(node1 != null){
+			// Destroy node2 and connect node1 to sibling.
+			if(node1.child1 == node2){
+				node1.child1 = sibling;
+			}else{
+				node1.child2 = sibling;
+			}
+			
+			sibling.parent = node1;
+			freeNode(node2);
+			
+			final AABB oldAABB = tloldAABB.get();
+			
+			// Adjust ancestor bounds.  if the old one was larger, we just keep it
+			while(node1 != null){
+				oldAABB.set(node1.aabb);
+				node1.aabb.combine(node1.child1.aabb, node1.child2.aabb);
+				
+				if(oldAABB.contains(node1.aabb)){
+					break;
+				}
+				
+				node1 = node1.parent;
+			}
+		}
+		else{
+			m_root = sibling;
+			sibling.parent = null;
+			freeNode(node2);
+		}
+		
+		// in case we just removed our last leaf
+		// (this is for rebalancing)
+		if(lastLeaf == argNode){
+			lastLeaf = m_root;
+		}
+	}
 }
