@@ -1,7 +1,7 @@
 package org.jbox2d.structs.collision.broadphase;
 
 import org.jbox2d.collision.DynamicTree;
-import org.jbox2d.structs.collision.tree.DynamicTreeNode;
+import org.jbox2d.collision.DynamicTreeNode;
 import org.jbox2d.structs.collision.tree.TreeQueryCallback;
 
 /**

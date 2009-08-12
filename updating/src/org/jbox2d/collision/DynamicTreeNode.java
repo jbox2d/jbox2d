@@ -1,6 +1,5 @@
-package org.jbox2d.structs.collision.tree;
+package org.jbox2d.collision;
 
-import org.jbox2d.collision.AABB;
 
 public class DynamicTreeNode {
 	/**
@@ -10,11 +9,10 @@ public class DynamicTreeNode {
 	
 	public Object userData;
 	
-	public DynamicTreeNode parent;
-	//public DynamicTreeNode next;
+	protected DynamicTreeNode parent;
 	
-	public DynamicTreeNode child1;
-	public DynamicTreeNode child2;
+	protected DynamicTreeNode child1;
+	protected DynamicTreeNode child2;
 	
 	public final boolean isLeaf(){
 		return child1 == null;
