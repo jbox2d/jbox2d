@@ -271,9 +271,6 @@ public class ProcessingDebugDraw extends DebugDraw {
 		viewportTransform.vectorTransform(argLocalOffset, localOffset);
         g.pushMatrix();
         g.translate(position.x, position.y);
-        g.rotate(-rotation);
-        g.translate(localOffset.x, localOffset.y);
-        g.scale( localScale);
         Mat22 mat = transform.getTransform();
         if (g.g instanceof PGraphics3D) {
         	g.applyMatrix( mat.col1.x, mat.col2.x, 0, 0,
@@ -283,6 +280,10 @@ public class ProcessingDebugDraw extends DebugDraw {
         } else {
         	g.applyMatrix(mat.col1.x, mat.col2.x, 0, mat.col1.y, mat.col2.y, 0);
         }
+        g.rotate(-rotation);
+        g.scale( localScale);
+        g.translate(localOffset.x, localOffset.y);
+       
         g.image(image, -halfImageWidth, -halfImageHeight);
         g.popMatrix();
     }

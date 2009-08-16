@@ -89,6 +89,17 @@ public class OBBViewportTransform implements IViewportTransform{
 	}
 	
 	/**
+	 * Lerps to the given transform
+	 * @param transform
+	 */
+	public void lerpTransform(Mat22 transform, float amt){
+		box.R.col1.x += (transform.col1.x - box.R.col1.x) * amt;
+		box.R.col1.y += (transform.col1.y - box.R.col1.y) * amt;
+		box.R.col2.x += (transform.col2.x - box.R.col2.x) * amt;
+		box.R.col2.y += (transform.col2.y - box.R.col2.y) * amt;
+	}
+	
+	/**
 	 * Multiplies the obb transform by the given transform
 	 * @param argTransform
 	 */
@@ -120,6 +131,9 @@ public class OBBViewportTransform implements IViewportTransform{
 		inv.set(box.R);
 		inv.invertLocal();
 		inv.mulToOut(argScreen, argWorld);
+		if(yFlip){
+			yFlipMatInv.mulToOut( argWorld, argWorld);
+		}
 	}
 
 	/**
@@ -127,6 +141,9 @@ public class OBBViewportTransform implements IViewportTransform{
 	 */
 	public void vectorTransform(Vec2 argWorld, Vec2 argScreen) {
 		box.R.mulToOut(argWorld, argScreen);
+		if(yFlip){
+			yFlipMat.mulToOut( argScreen, argScreen);
+		}
 	}
 	
 	/**
@@ -149,7 +166,8 @@ public class OBBViewportTransform implements IViewportTransform{
 	public void getScreenToWorld(Vec2 argScreen, Vec2 argWorld){
 		argWorld.set(argScreen);
 		argWorld.subLocal(box.extents);
-		Mat22 inv = box.R.invert();
+		Mat22 inv = tlInv.get();
+		box.R.invertToOut(inv);
 		inv.mulToOut(argWorld, argWorld);
 		if(yFlip){
 			yFlipMatInv.mulToOut( argWorld, argWorld);

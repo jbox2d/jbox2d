@@ -29,7 +29,7 @@ import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.shapes.CircleDef;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Color3f;
-import org.jbox2d.common.IViewportTransform;
+import org.jbox2d.common.OBBViewportTransform;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -103,7 +103,7 @@ public abstract class AbstractExample {
 	/** Listener for contact events. */
 	protected ContactListener m_contactListener;
 	
-	protected IViewportTransform viewport;
+	protected OBBViewportTransform viewport;
 	
 	public static Color3f white = new Color3f(255.0f,255.0f,255.0f);
 	public static Color3f black = new Color3f(0.0f*255.0f,0.0f*255.0f,0.0f*255.0f);
@@ -170,8 +170,12 @@ public abstract class AbstractExample {
 	public AbstractExample(TestbedMain _parent) {
 		parent = _parent;
 		m_debugDraw = parent.g;
-		viewport = m_debugDraw.getViewportTranform();
+		viewport = (OBBViewportTransform) m_debugDraw.getViewportTranform();
 		needsReset = true;
+	}
+	
+	public OBBViewportTransform getViewportTransform(){
+		return viewport;
 	}
 	
 	/** Override this if you need to create a different world AABB or gravity vector */
@@ -302,6 +306,10 @@ public abstract class AbstractExample {
 			m_world.destroyBody(m_bomb);
 			m_bomb = null;
 		}
+		
+		if (m_mouseJoint != null) {
+            m_mouseJoint.setTarget(mouseWorld);
+        }
 
 		if (settings.drawStats) {
 			m_debugDraw.drawString(5, m_textLine, "proxies(max) = "+m_world.getProxyCount()+
@@ -673,11 +681,6 @@ public abstract class AbstractExample {
      */
     public void mouseMove(Vec2 p) {
     	mouseScreen.set(p);
-        if (m_mouseJoint != null) {
-        	Vec2 target = new Vec2();
-        	viewport.getScreenToWorld(p, target);
-            m_mouseJoint.setTarget(target);
-        }
     }
     
     /**
