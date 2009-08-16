@@ -13,6 +13,7 @@ public class ExampleList {
     	//*
     	exampleList.add(new Overhang(testbed));
     	exampleList.add(new SpriteBinding(testbed));
+    	exampleList.add(new ViewportTest(testbed));
     	exampleList.add(new VaryingRestitution(testbed));
     	exampleList.add(new RestitutionCannon(testbed));
     	exampleList.add(new VaryingFriction(testbed));
