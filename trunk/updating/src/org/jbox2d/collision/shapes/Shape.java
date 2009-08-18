@@ -24,13 +24,12 @@
 package org.jbox2d.collision.shapes;
 
 import org.jbox2d.collision.AABB;
-import org.jbox2d.collision.Segment;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.structs.collision.MassData;
-import org.jbox2d.structs.collision.SegmentCollide;
+import org.jbox2d.structs.collision.RayCastInput;
+import org.jbox2d.structs.collision.RayCastOutput;
 import org.jbox2d.structs.collision.ShapeType;
-import org.jbox2d.structs.collision.TestSegmentResult;
 
 //Updated through rev. 56->139-218 of b2Shape.cpp/.h
 
@@ -72,19 +71,12 @@ public abstract class Shape {
 	public abstract boolean testPoint( final Transform xf, final Vec2 p);
 
 	/**
-	 * Perform a ray cast against this shape.
-	 * @param xf the shape world transform.
-	 * @param lambda returns the hit fraction. You can use this to compute the contact point
-	 * p = (1 - lambda) * segment.p1 + lambda * segment.p2.
-	 * @param normal returns the normal at the contact point. If there is no intersection, the normal
-	 * is not set.
-	 * @param segment defines the begin and end point of the ray cast.
-	 * @param maxLambda a number typically in the range [0,1].
+	 * Cast a ray against this shape.
+	 * @param output the ray-cast results.
+	 * @param input the ray-cast input parameters.
+	 * @param transform the transform to be applied to the shape.
 	 */
-	public abstract SegmentCollide testSegment(	final Transform xf,
-												final TestSegmentResult out,
-												final Segment segment,
-												final float maxLambda);
+	public abstract void raycast(RayCastOutput output, RayCastInput input, Transform transform);
 
 	/**
 	 * Given a transform, compute the associated axis aligned bounding box for this shape.

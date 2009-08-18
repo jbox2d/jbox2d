@@ -1,5 +1,6 @@
-package org.jbox2d.collision;
+package org.jbox2d.collision.broadphase;
 
+import org.jbox2d.collision.AABB;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
@@ -13,7 +14,7 @@ import org.jbox2d.pooling.stacks.Vec2Stack;
 import org.jbox2d.structs.collision.RayCastCallback;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;
-import org.jbox2d.structs.collision.tree.TreeQueryCallback;
+import org.jbox2d.structs.collision.broadphase.QueryCallback;
 
 /**
  * A dynamic tree arranges data in a binary tree to accelerate
@@ -152,12 +153,12 @@ public class DynamicTree {
 	 * @param argCallback
 	 * @param argAABB
 	 */
-	public final void query(TreeQueryCallback argCallback, AABB argAABB){
+	public final void query(QueryCallback argCallback, AABB argAABB){
 		query(argCallback, argAABB, m_root);
 	}
 	
 	// recursive query
-	private final void query(TreeQueryCallback argCallback, AABB argAABB, DynamicTreeNode argNode){
+	private final void query(QueryCallback argCallback, AABB argAABB, DynamicTreeNode argNode){
 		if(argNode == null){
 			return;
 		}
@@ -246,17 +247,17 @@ public class DynamicTree {
 			subInput.p2.set(argInput.p2);
 			subInput.maxFraction = maxFraction;
 			
-			final RayCastOutput output = tloutput.get();
+			maxFraction = argCallback.raycastCallback( subInput, argNode);
 			
-			argCallback.raycastCallback(output, subInput, argNode);
+			if(maxFraction == 0f){
+				return;
+			}
 			
-			if(output.hit){
-				// exit early
-				if(output.fraction == 0f){
-					return;
-				}
-				
-				argInput.maxFraction = output.fraction;
+			// update bounding box
+			{
+				temp.set(p2).subLocal(p1).mulLocal( maxFraction).addLocal( p1);
+				Vec2.minToOut( p1, temp, segAABB.lowerBound);
+				Vec2.maxToOut( p1, temp, segAABB.upperBound);
 			}
 		}else{
 			raycast(argCallback, argInput, argNode.child1);

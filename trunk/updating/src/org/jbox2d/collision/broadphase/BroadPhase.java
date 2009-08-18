@@ -1,10 +1,11 @@
-package org.jbox2d.collision;
+package org.jbox2d.collision.broadphase;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.jbox2d.pooling.TLBroadPhaseQueryWrapper;
+import org.jbox2d.collision.AABB;
+import org.jbox2d.structs.collision.RayCastCallback;
 import org.jbox2d.structs.collision.RayCastInput;
-import org.jbox2d.structs.collision.broadphase.BroadPhaseQueryWrapper;
 import org.jbox2d.structs.collision.broadphase.Pair;
 import org.jbox2d.structs.collision.broadphase.PairCallback;
 import org.jbox2d.structs.collision.broadphase.QueryCallback;
@@ -16,25 +17,32 @@ import org.jbox2d.structs.collision.broadphase.QueryCallback;
  *
  * @author daniel
  */
-public class BroadPhase {
+public class BroadPhase implements QueryCallback{
 	public static final int NULL_PROXY = -1;
 	
 	private final DynamicTree m_tree;
 	
 	private int m_proxyCount;
 	
-	private int[] m_moveBuffer;
-	private int	m_moveCapacity;
-	private int m_moveCount;
+	private ArrayList<DynamicTreeNode> m_moveBuffer;
 	
 	private Pair[] m_pairBuffer;
 	private int m_pairCapacity;
 	private int m_pairCount;
 	
-	private int m_queryProxyId;
+	private DynamicTreeNode m_queryProxy;
 	
 	public BroadPhase(){
+		m_tree = new DynamicTree();
+		m_proxyCount = 0;
+		m_pairCapacity = 16;
+		m_pairCount = 0;
+		m_pairBuffer = new Pair[m_pairCapacity];
+		for(int i=0; i<m_pairCapacity; i++){
+			m_pairBuffer[i] = new Pair();
+		}
 		
+		m_moveBuffer = new ArrayList<DynamicTreeNode>(16);
 	}
 	/**
 	 * Create a proxy with an initial AABB. Pairs are not reported until
@@ -43,55 +51,44 @@ public class BroadPhase {
 	 * @param userData
 	 * @return
 	 */
-	public final int createProxy(final AABB aabb, Object userData){
-		
+	public final DynamicTreeNode createProxy(final AABB aabb, Object userData){
+		DynamicTreeNode node = m_tree.createProxy( aabb, userData);
+		++m_proxyCount;
+		bufferMove( node);
+		return node;
 	}
 	
 	/**
 	 * Destroy a proxy. It is up to the client to remove any pairs.
-	 * @param proxyId
+	 * @param proxy
 	 */
-	public final void destroyProxy(int proxyId){
-		
+	public final void destroyProxy(DynamicTreeNode proxy){
+		unbufferMove( proxy);
+		--m_proxyCount;
+		m_tree.destroyProxy( proxy);
 	}
 	/**
 	 * Call MoveProxy as many times as you like, then when you are done
 	 * call UpdatePairs to finalized the proxy pairs (for your time step).
-	 * @param proxyId
+	 * @param proxy
 	 * @param aabb
 	 */
-	public final void moveProxy(int proxyId, final AABB aabb){
-		
-	}
-	
-	/**
-	 * Get the fat AABB for a proxy
-	 * @param proxyId
-	 * @return
-	 */
-	public final AABB getFatAABB(int proxyId){
-		return m_tree.getFatAABB(proxyId);
-	}
-	
-	/**
-	 * Gets the user data for a proxy.  Returns null if the 
-	 * id is invalid.
-	 * @param proxyId
-	 * @return
-	 */
-	public final Object getUserData(int proxyId){
-		return m_tree.getUserData(proxyId);
+	public final void moveProxy(DynamicTreeNode proxy, final AABB aabb){
+		boolean buffer = m_tree.moveProxy( proxy, aabb);
+		if(buffer){
+			bufferMove( proxy);
+		}
 	}
 	
 	/**
 	 * Test overlap of fat AABBs
-	 * @param proxyIdA
-	 * @param proxyIdB
+	 * @param proxyA
+	 * @param proxyB
 	 * @return
 	 */
-	public final boolean testOverlap(int proxyIdA, int proxyIdB){
-		final AABB a = m_tree.getFatAABB(proxyIdA);
-		final AABB b = m_tree.getFatAABB(proxyIdB);
+	public final boolean testOverlap(DynamicTreeNode proxyA, DynamicTreeNode proxyB){
+		final AABB a = proxyA.aabb;
+		final AABB b = proxyB.aabb;
 		return AABB.testOverlap( a, b);
 	}
 	
@@ -112,22 +109,23 @@ public class BroadPhase {
 		m_pairCount = 0;
 
 		// Perform tree queries for all moving proxies.
-		for (int i = 0; i < m_moveCount; ++i){
-			m_queryProxyId = m_moveBuffer[i];
-			if (m_queryProxyId == NULL_PROXY){
+		int size = m_moveBuffer.size();
+		for (int i = 0; i < size; ++i){
+			m_queryProxy = m_moveBuffer.get(i);
+			if (m_queryProxy == null){
 				continue;
 			}
 
 			// We have to query the tree with the fat AABB so that
 			// we don't fail to create a pair that may touch later.
-			final AABB fatAABB = m_tree.getFatAABB(m_queryProxyId);
+			final AABB fatAABB = m_queryProxy.aabb;
 
 			// Query tree, create pairs and add them pair buffer.
 			m_tree.query(this, fatAABB);
 		}
 
 		// Reset move buffer
-		m_moveCount = 0;
+		//m_moveCount = 0;
 		
 		// Sort the pair buffer to expose duplicates.
 		Arrays.sort(m_pairBuffer);
@@ -136,8 +134,8 @@ public class BroadPhase {
 		int i = 0;
 		while (i < m_pairCount){
 			Pair primaryPair = m_pairBuffer[i];
-			Object userDataA = m_tree.getUserData(primaryPair.proxyIdA);
-			Object userDataB = m_tree.getUserData(primaryPair.proxyIdB);
+			Object userDataA = primaryPair.proxyA.userData;
+			Object userDataB = primaryPair.proxyB.userData;
 
 			callback.addPair(userDataA, userDataB);
 			++i;
@@ -145,7 +143,7 @@ public class BroadPhase {
 			// Skip any duplicate pairs.
 			while (i < m_pairCount){
 				Pair pair = m_pairBuffer[i];
-				if (pair.proxyIdA != primaryPair.proxyIdA || pair.proxyIdB != primaryPair.proxyIdB){
+				if (pair.proxyA != primaryPair.proxyA || pair.proxyB != primaryPair.proxyB){
 					break;
 				}
 				++i;
@@ -153,7 +151,6 @@ public class BroadPhase {
 		}
 	}
 	
-	private static final TLBroadPhaseQueryWrapper tlwrapper = new TLBroadPhaseQueryWrapper();
 	/** 
 	 * Query an AABB for overlapping proxies. The callback class
 	 * is called for each proxy that overlaps the supplied AABB.
@@ -161,11 +158,7 @@ public class BroadPhase {
 	 * @param aabb
 	 */
 	public final void query(final QueryCallback callback, final AABB aabb){
-		BroadPhaseQueryWrapper wrapper = tlwrapper.get();
-		wrapper.tree = m_tree;
-		wrapper.callback = callback;
-		
-		m_tree.query(wrapper, aabb);
+		m_tree.query(callback, aabb);
 	}
 	
 	/**
@@ -177,8 +170,8 @@ public class BroadPhase {
 	 * @param input the ray-cast input data. The ray extends from p1 to p1 + maxFraction * (p2 - p1).
 	 * @param callback a callback class that is called for each proxy that is hit by the ray.
 	 */
-	public final void raycast(final Object callback, final RayCastInput input){
-		
+	public final void raycast(final RayCastCallback callback, final RayCastInput input){
+		m_tree.raycast( callback, input);
 	}
 	
 	/**
@@ -186,19 +179,48 @@ public class BroadPhase {
 	 * @return
 	 */
 	public final int computeHeight(){
-		
+		return m_tree.computeHeight();
 	}
 	
 	
-	protected final void bufferMove(int proxyId){
-		
+	protected final void bufferMove(DynamicTreeNode proxy){
+		m_moveBuffer.add( proxy);
 	}
 	
-	protected final void unbufferMove(int proxyId){
-		
+	protected final void unbufferMove(DynamicTreeNode proxy){
+		m_moveBuffer.remove( proxy);
 	}
 	
-	public final void queryCallback(int proxyId){
+	/**
+	 * This is called from DynamicTree.query when we are gathering pairs.
+	 */
+	public final void queryCallback(DynamicTreeNode proxy){
+		// A proxy cannot form a pair with itself.
+		if (proxy == m_queryProxy){
+			return;
+		}
 		
+		// grow if needed
+		if( m_pairCount == m_pairCapacity){
+			m_pairCapacity *= 2;
+			Pair[] newbuffer = new Pair[m_pairCapacity];
+			for(int i=0; i<m_pairCapacity; i++){
+				if(i < m_pairBuffer.length){
+					newbuffer[i] = m_pairBuffer[i];
+				}else{
+					newbuffer[i] = new Pair();
+				}
+			}
+			m_pairBuffer = newbuffer;
+		}
+		
+		if( proxy.compareTo( m_queryProxy) < 0	){
+			m_pairBuffer[m_pairCount].proxyA = proxy;
+			m_pairBuffer[m_pairCount].proxyB = m_queryProxy;
+		}else{
+			m_pairBuffer[m_pairCount].proxyB = proxy;
+			m_pairBuffer[m_pairCount].proxyA = m_queryProxy;
+		}
+		++m_pairCount;
 	}
 }

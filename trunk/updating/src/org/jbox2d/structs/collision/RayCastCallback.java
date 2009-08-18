@@ -1,7 +1,13 @@
 package org.jbox2d.structs.collision;
 
-import org.jbox2d.collision.DynamicTreeNode;
+import org.jbox2d.collision.broadphase.DynamicTreeNode;
 
 public interface RayCastCallback {
-	public void raycastCallback( RayCastOutput argOutput, RayCastInput argInput, DynamicTreeNode argNode);
+	/**
+	 * 
+	 * @param argInput
+	 * @param argNode
+	 * @return the fraction to the node
+	 */
+	public float raycastCallback( RayCastInput argInput, DynamicTreeNode argNode);
 }
