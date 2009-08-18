@@ -423,11 +423,11 @@ public class Collision {
 	private final EdgeResults results1 = new EdgeResults();
 	private final EdgeResults results2 = new EdgeResults();
 	private final ClipVertex[] incidentEdge = new ClipVertex[2];
-	private final Vec2 dv = new Vec2();
+	private final Vec2 localTangent = new Vec2();
 	private final Vec2 localNormal = new Vec2();
 	private final Vec2 planePoint = new Vec2();
-	private final Vec2 sideNormal = new Vec2();
-	private final Vec2 frontNormal = new Vec2();
+	private final Vec2 tangent = new Vec2();
+	private final Vec2 normal = new Vec2();
 	private final Vec2 v11 = new Vec2();
 	private final Vec2 v12 = new Vec2();
 	private final ClipVertex[] clipPoints1 = new ClipVertex[2];
@@ -498,24 +498,27 @@ public class Collision {
 		v11.set(vertices1[edge1]);
 		v12.set(edge1 + 1 < count1 ? vertices1[edge1+1] : vertices1[0]);
 
-		dv.set(v12).subLocal(v11);
-
-		Vec2.crossToOut( dv, 1f, localNormal); //Vec2 localNormal = Cross(dv, 1.0f);
-		localNormal.normalize();
+		localTangent.set(v12).subLocal(v11);
+		localTangent.normalize();
+		
+		Vec2.crossToOut( localTangent, 1f, localNormal); //Vec2 localNormal = Cross(dv, 1.0f);
+		
 		planePoint.set( v11).addLocal(v12).mulLocal(.5f); //Vec2 planePoint = 0.5f * (v11 + v12);
 
-		Mat22.mulToOut(xf1.R, dv, sideNormal); //Vec2 sideNormal = Mul(xf1.R, v12 - v11);
-		sideNormal.normalize();
-		Vec2.crossToOut( sideNormal, 1f, frontNormal); //Vec2 frontNormal = Cross(sideNormal, 1.0f);
+		Mat22.mulToOut(xf1.R, localTangent, tangent); //Vec2 sideNormal = Mul(xf1.R, v12 - v11);
+		Vec2.crossToOut( tangent, 1f, normal); //Vec2 frontNormal = Cross(sideNormal, 1.0f);
 		
 		Transform.mulToOut( xf1, v11, v11);
 		Transform.mulToOut( xf1, v12, v12);
 		//v11 = Mul(xf1, v11);
 		//v12 = Mul(xf1, v12);
 
-		float frontOffset = Vec2.dot(frontNormal, v11);
-		float sideOffset1 = -Vec2.dot(sideNormal, v11);
-		float sideOffset2 = Vec2.dot(sideNormal, v12);
+		// Face offset
+		float frontOffset = Vec2.dot(normal, v11);
+		
+		// Side offsets, extended by polytope skin thickness.
+		float sideOffset1 = -Vec2.dot(tangent, v11) + totalRadius;
+		float sideOffset2 = Vec2.dot(tangent, v12) + totalRadius;
 
 		// Clip incident edge against extruded edge1 side edges.
 		//ClipVertex clipPoints1[2];
@@ -524,13 +527,13 @@ public class Collision {
 
 		// Clip to box side 1
 		//np = ClipSegmentToLine(clipPoints1, incidentEdge, -sideNormal, sideOffset1);
-		np = clipSegmentToLine(clipPoints1, incidentEdge, sideNormal.negateLocal(), sideOffset1);
+		np = clipSegmentToLine(clipPoints1, incidentEdge, tangent.negateLocal(), sideOffset1);
 
 		if (np < 2)
 			return;
 
 		// Clip to negative box side 1
-		np = clipSegmentToLine(clipPoints2, clipPoints1,  sideNormal.negateLocal(), sideOffset2);
+		np = clipSegmentToLine(clipPoints2, clipPoints1,  tangent.negateLocal(), sideOffset2);
 
 		if (np < 2){
 			return;
@@ -542,7 +545,7 @@ public class Collision {
 
 		int pointCount = 0;
 		for (int i = 0; i < Settings.maxManifoldPoints; ++i){
-			float separation = Vec2.dot(frontNormal, clipPoints2[i].v) - frontOffset;
+			float separation = Vec2.dot(normal, clipPoints2[i].v) - frontOffset;
 
 			if (separation <= totalRadius){
 				ManifoldPoint cp = manifold.m_points[pointCount];

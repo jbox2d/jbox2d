@@ -33,7 +33,8 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.TLVec2;
 import org.jbox2d.structs.collision.MassData;
-import org.jbox2d.structs.collision.SegmentCollide;
+import org.jbox2d.structs.collision.RayCastInput;
+import org.jbox2d.structs.collision.RayCastOutput;
 import org.jbox2d.structs.collision.ShapeType;
 import org.jbox2d.structs.collision.TestSegmentResult;
 
@@ -130,24 +131,18 @@ public class CircleShape extends Shape {
 	 * @see Shape#testSegment(Transform, TestSegmentResult, Segment, float)
 	 */
 	@Override
-	public final SegmentCollide testSegment(final Transform transform, final TestSegmentResult out, final Segment segment, final float maxLambda){
+	public final void raycast(RayCastOutput output, RayCastInput input, Transform transform){
 		
 		final Vec2 position = tlposition.get();;
 		final Vec2 s = tls.get();
 		final Vec2 r = tlr.get();
 		Mat22.mulToOut( transform.R, m_p, position);
 		position.addLocal( transform.position);
-		s.set( segment.p1).subLocal(position);
+		s.set( input.p1).subLocal(position);
 		final float b = Vec2.dot( s, s) - m_radius * m_radius;
 
-		// Does the segment start inside the circle?
-		if (b < 0.0f){
-			out.lambda = 0;
-			return SegmentCollide.STARTS_INSIDE_COLLIDE;
-		}
-
 		// Solve quadratic equation.
-		r.set(segment.p2).subLocal(segment.p1);
+		r.set(input.p2).subLocal(input.p1);
 		final float c =  Vec2.dot(s, r);
 		final float rr = Vec2.dot(r, r);
 		final float sigma = c * c - rr * b;
@@ -155,23 +150,25 @@ public class CircleShape extends Shape {
 		// Check for negative discriminant and short segment.
 		if (sigma < 0.0f || rr < Settings.EPSILON)
 		{
-			return SegmentCollide.MISS_COLLIDE;
+			output.hit = false;
+			return;
 		}
 
 		// Find the point of intersection of the line with the circle.
 		float a = -(c + MathUtils.sqrt(sigma));
 
 		// Is the intersection point on the segment?
-		if (0.0f <= a && a <= maxLambda * rr){
+		if (0.0f <= a && a <= input.maxFraction * rr){
 			a /= rr;
-			out.lambda = a;
-			out.normal.set(r).mulLocal( a);
-			out.normal.addLocal(s);
-			out.normal.normalize();
-			return SegmentCollide.HIT_COLLIDE;
+			output.hit = true;
+			output.fraction = a;
+			output.normal.set(r).mulLocal( a);
+			output.normal.addLocal(s);
+			output.normal.normalize();
+			return;
 		}
 
-		return SegmentCollide.MISS_COLLIDE;
+		output.hit = false;
 	}
 
 

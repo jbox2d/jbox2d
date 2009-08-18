@@ -24,7 +24,6 @@
 package org.jbox2d.collision.shapes;
 
 import org.jbox2d.collision.AABB;
-import org.jbox2d.collision.Segment;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
@@ -34,9 +33,9 @@ import org.jbox2d.pooling.TLTransform;
 import org.jbox2d.pooling.TLVec2;
 import org.jbox2d.pooling.arrays.FloatArray;
 import org.jbox2d.structs.collision.MassData;
-import org.jbox2d.structs.collision.SegmentCollide;
+import org.jbox2d.structs.collision.RayCastInput;
+import org.jbox2d.structs.collision.RayCastOutput;
 import org.jbox2d.structs.collision.ShapeType;
-import org.jbox2d.structs.collision.TestSegmentResult;
 
 
 //Updated to rev 142 of Shape.cpp/.h / PolygonShape.cpp/.h
@@ -482,23 +481,25 @@ public class PolygonShape extends Shape{
 	private static final TLVec2 tlp2 = new TLVec2();
 	private static final TLVec2 tltsd = new TLVec2();
 	/**
-	 * @see Shape#testSegment(Transform, TestSegmentResult, Segment, float)
+	 * @see Shape#raycast(RayCastOutput, RayCastInput, Transform)
 	 */
 	@Override
-	public SegmentCollide testSegment(final Transform xf, final TestSegmentResult out, final Segment segment, final float maxLambda){
-		float lower = 0.0f, upper = maxLambda;
+	public void raycast(RayCastOutput output, RayCastInput input, Transform transform){
+		float lower = 0.0f, upper = input.maxFraction;
 
 		final Vec2 p1 = tlp1.get();
 		final Vec2 p2 = tlp2.get();
 		final Vec2 tsd = tltsd.get();
 		final Vec2 temp = tltemp.get();
 		
-		p1.set(segment.p1).subLocal( xf.position);
-		Mat22.mulTransToOut(xf.R, p1, p1);
-		p2.set(segment.p2).subLocal(xf.position);
-		Mat22.mulTransToOut(xf.R, p2, p2);
+		p1.set(input.p1).subLocal( transform.position);
+		p2.set(input.p2).subLocal( transform.position);
+		Mat22.mulTransToOut(transform.R, p1, p1);
+		Mat22.mulTransToOut(transform.R, p2, p2);
 		tsd.set(p2).subLocal(p1);
 		int index = -1;
+		
+		output.hit = false;
 
 		for (int i = 0; i < m_vertexCount; ++i){
 			// p = p1 + a * d
@@ -510,7 +511,7 @@ public class PolygonShape extends Shape{
 
 			if (denominator == 0.0f){
 				if (numerator < 0.0f){
-					return SegmentCollide.MISS_COLLIDE;
+					return;
 				}
 			}
 			else{
@@ -532,21 +533,19 @@ public class PolygonShape extends Shape{
 			}
 
 			if (upper < lower){
-				return SegmentCollide.MISS_COLLIDE;
+				return;
 			}
 		}
 
-		assert(0.0f <= lower && lower <= maxLambda);
+		assert(0.0f <= lower && lower <= input.maxFraction);
 
 		if (index >= 0){
-			out.lambda = lower;
-			Mat22.mulToOut(xf.R, m_normals[index], out.normal);
+			output.hit = true;
+			output.fraction = lower;
+			Mat22.mulToOut(transform.R, m_normals[index], output.normal);
 			//*normal = Mul(xf.R, m_normals[index]);
-			return SegmentCollide.HIT_COLLIDE;
+			return;
 		}
-
-		out.lambda = 0;
-		return SegmentCollide.STARTS_INSIDE_COLLIDE;
 	}
 
 
