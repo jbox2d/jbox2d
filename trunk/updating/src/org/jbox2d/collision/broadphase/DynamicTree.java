@@ -34,9 +34,12 @@ public class DynamicTree {
 	
 	private DynamicTreeNode lastLeaf;
 	
+	private int m_insertionCount;
+	
 	public DynamicTree(){
 		m_root = null;
 		m_nodeCount = 0;
+		m_insertionCount = 0;
 		lastLeaf = null;
 	}
 	
@@ -72,13 +75,15 @@ public class DynamicTree {
 		freeNode(argProxy);
 	}
 	
+	// djm pooling
+	private static final TLVec2 tld = new TLVec2();
 	/**
-	 * Move a proxy. If the proxy has moved outside of its fattened AABB,
+	 * Move a proxy with a swepted AABB. If the proxy has moved outside of its fattened AABB,
 	 * then the proxy is removed from the tree and re-inserted. Otherwise
 	 * the function returns immediately.
 	 * @return true if the proxy was re-inserted.
 	 */
-	public final boolean moveProxy( DynamicTreeNode argProxy, final AABB argAABB){
+	public final boolean moveProxy( DynamicTreeNode argProxy, final AABB argAABB, Vec2 displacement){
 		assert( argProxy.isLeaf());
 		
 		if( argProxy.aabb.contains(argAABB)){
@@ -87,10 +92,30 @@ public class DynamicTree {
 		
 		removeLeaf(argProxy);
 		
-		argProxy.aabb.lowerBound.x = argAABB.lowerBound.x - Settings.aabbExtension;
-		argProxy.aabb.lowerBound.y = argAABB.lowerBound.y - Settings.aabbExtension;
-		argProxy.aabb.upperBound.x = argAABB.upperBound.x + Settings.aabbExtension;
-		argProxy.aabb.upperBound.y = argAABB.upperBound.y + Settings.aabbExtension;
+		// Extend AABB
+		argAABB.lowerBound.x += Settings.aabbExtension;
+		argAABB.lowerBound.y += Settings.aabbExtension;
+		argAABB.upperBound.x += Settings.aabbExtension;
+		argAABB.upperBound.y += Settings.aabbExtension;
+
+		Vec2 d = tld.get();
+		// Predict AABB displacement.
+		d.set(displacement).mulLocal(Settings.aabbMultiplier);
+		if (d.x < 0.0f){
+			argAABB.lowerBound.x += d.x;
+		}
+		else{
+			argAABB.upperBound.x += d.x;
+		}
+
+		if (d.y < 0.0f){
+			argAABB.lowerBound.y += d.y;
+		}
+		else{
+			argAABB.upperBound.y += d.y;
+		}
+
+		argProxy.aabb.set(argAABB);
 		
 		insertLeaf(argProxy);
 		return true;
@@ -288,6 +313,8 @@ public class DynamicTree {
 		node.child1 = null;
 		node.child2 = null;
 		node.userData = null;
+		// not quite 100% guarantee of no duplicates, but close enough
+		node.key = (int)(Math.random()*100000000);
 		m_nodeCount++;
 		return node;
 	}
@@ -310,6 +337,8 @@ public class DynamicTree {
 
 
 	private final void insertLeaf(DynamicTreeNode argNode){
+		m_insertionCount++;
+		
 		if(m_root == null){
 			m_root = argNode;
 			argNode.parent = null;
