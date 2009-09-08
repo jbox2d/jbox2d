@@ -24,14 +24,13 @@
 package org.jbox2d.collision.shapes;
 
 import org.jbox2d.collision.AABB;
+import org.jbox2d.collision.Segment;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.structs.collision.MassData;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;
 import org.jbox2d.structs.collision.ShapeType;
-
-//Updated through rev. 56->139-218 of b2Shape.cpp/.h
 
 /**
  * A shape is used for collision detection. You can create a shape however you like.
@@ -76,7 +75,8 @@ public abstract class Shape {
 	 * @param input the ray-cast input parameters.
 	 * @param transform the transform to be applied to the shape.
 	 */
-	public abstract void raycast(RayCastOutput output, RayCastInput input, Transform transform);
+	public abstract void raycast( RayCastOutput output, RayCastInput input, Transform transform);
+
 
 	/**
 	 * Given a transform, compute the associated axis aligned bounding box for this shape.

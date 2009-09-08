@@ -24,6 +24,7 @@
 package org.jbox2d.collision.shapes;
 
 import org.jbox2d.collision.AABB;
+import org.jbox2d.collision.Segment;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
@@ -36,7 +37,6 @@ import org.jbox2d.structs.collision.MassData;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;
 import org.jbox2d.structs.collision.ShapeType;
-
 
 //Updated to rev 142 of Shape.cpp/.h / PolygonShape.cpp/.h
 
@@ -481,21 +481,22 @@ public class PolygonShape extends Shape{
 	private static final TLVec2 tlp2 = new TLVec2();
 	private static final TLVec2 tltsd = new TLVec2();
 	/**
-	 * @see Shape#raycast(RayCastOutput, RayCastInput, Transform)
+	 * @see Shape#testSegment(Transform, TestSegmentResult, Segment, float)
 	 */
 	@Override
-	public void raycast(RayCastOutput output, RayCastInput input, Transform transform){
+	public final void raycast( RayCastOutput output, RayCastInput input, Transform xf){
 		float lower = 0.0f, upper = input.maxFraction;
+
 
 		final Vec2 p1 = tlp1.get();
 		final Vec2 p2 = tlp2.get();
 		final Vec2 tsd = tltsd.get();
 		final Vec2 temp = tltemp.get();
 		
-		p1.set(input.p1).subLocal( transform.position);
-		p2.set(input.p2).subLocal( transform.position);
-		Mat22.mulTransToOut(transform.R, p1, p1);
-		Mat22.mulTransToOut(transform.R, p2, p2);
+		p1.set(input.p1).subLocal( xf.position);
+		Mat22.mulTransToOut(xf.R, p1, p1);
+		p2.set(input.p2).subLocal(xf.position);
+		Mat22.mulTransToOut(xf.R, p2, p2);
 		tsd.set(p2).subLocal(p1);
 		int index = -1;
 		
@@ -542,13 +543,11 @@ public class PolygonShape extends Shape{
 		if (index >= 0){
 			output.hit = true;
 			output.fraction = lower;
-			Mat22.mulToOut(transform.R, m_normals[index], output.normal);
+			Mat22.mulToOut(xf.R, m_normals[index], output.normal);
 			//*normal = Mul(xf.R, m_normals[index]);
 			return;
 		}
 	}
-
-
 
 	// djm pooled
 	private static final TLVec2 tlpRef = new TLVec2();
