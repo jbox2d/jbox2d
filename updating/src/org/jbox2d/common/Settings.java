@@ -99,6 +99,13 @@ public class Settings {
 	public static float aabbExtension = 0.1f;
 
 	/**
+	 * This is used to fatten AABBs in the dynamic tree. This is used to predict
+	 * the future position based on the current displacement.
+	 * This is a dimensionless multiplier.
+	 */
+	public static float aabbMultiplier = 2.0f;
+	
+	/**
 	 * A small length used as a collision and constraint tolerance. Usually it
 	 * is chosen to be numerically significant, but visually insignificant.
 	 */
