@@ -36,7 +36,6 @@ import org.jbox2d.structs.collision.MassData;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;
 import org.jbox2d.structs.collision.ShapeType;
-import org.jbox2d.structs.collision.TestSegmentResult;
 
 
 //Updated to rev 56->108->139 of Shape.cpp/.h
@@ -131,11 +130,12 @@ public class CircleShape extends Shape {
 	 * @see Shape#testSegment(Transform, TestSegmentResult, Segment, float)
 	 */
 	@Override
-	public final void raycast(RayCastOutput output, RayCastInput input, Transform transform){
+	public final void raycast( RayCastOutput output, RayCastInput input, Transform transform){
 		
 		final Vec2 position = tlposition.get();;
 		final Vec2 s = tls.get();
 		final Vec2 r = tlr.get();
+		
 		Mat22.mulToOut( transform.R, m_p, position);
 		position.addLocal( transform.position);
 		s.set( input.p1).subLocal(position);
@@ -148,8 +148,7 @@ public class CircleShape extends Shape {
 		final float sigma = c * c - rr * b;
 
 		// Check for negative discriminant and short segment.
-		if (sigma < 0.0f || rr < Settings.EPSILON)
-		{
+		if (sigma < 0.0f || rr < Settings.EPSILON){
 			output.hit = false;
 			return;
 		}
@@ -167,8 +166,9 @@ public class CircleShape extends Shape {
 			output.normal.normalize();
 			return;
 		}
-
+		
 		output.hit = false;
+		return;
 	}
 
 
