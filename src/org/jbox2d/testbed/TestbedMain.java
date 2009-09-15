@@ -254,7 +254,7 @@ public class TestbedMain extends PApplet {
         //Vec2 mouseWorld = d.screenToWorld(mouseX, mouseY);
         if (mouseButton == RIGHT) {
             if (mousePressed) {
-            	Vec2 dif = new Vec2(- mouseX + pmouseX, mouseY - pmouseY);
+            	Vec2 dif = new Vec2(- mouseX + pmouseX, - mouseY + pmouseY);
                 d.getViewportTranform().vectorInverseTransform(dif, dif);
                 d.getViewportTranform().getCenter().addLocal(dif);
                 Vec2 v = new Vec2();
