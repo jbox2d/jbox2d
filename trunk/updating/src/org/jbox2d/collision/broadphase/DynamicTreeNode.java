@@ -25,5 +25,8 @@ public class DynamicTreeNode {
 		return child1 == null;
 	}
 	
-	protected DynamicTreeNode(){}
+	/**
+	 * Should never be constructed outside the engine
+	 */
+	public DynamicTreeNode(){}
 }
