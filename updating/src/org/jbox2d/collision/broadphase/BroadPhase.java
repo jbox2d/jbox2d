@@ -199,11 +199,11 @@ public class BroadPhase implements QueryCallback{
 	/**
 	 * This is called from DynamicTree::query when we are gathering pairs.
 	 */
-	public final void queryCallback(DynamicTreeNode proxy){
+	public final boolean queryCallback(DynamicTreeNode proxy){
 		
 		// A proxy cannot form a pair with itself.
 		if (proxy == m_queryProxy){
-			return;
+			return true;
 		}
 		
 		// Grow the pair buffer as needed.
@@ -223,5 +223,6 @@ public class BroadPhase implements QueryCallback{
 		//m_pairBuffer[m_pairCount].proxyIdB = b2Max(proxyId, m_queryProxyId);
 		m_pairBuffer[m_pairCount] = p;
 		++m_pairCount;
+		return true;
 	}
 }

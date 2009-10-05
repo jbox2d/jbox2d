@@ -34,7 +34,6 @@ public class Fixture {
 	
 	public Shape m_shape;
 	
-	public float m_density;
 	public float m_friction;
 	public float m_restitution;
 	

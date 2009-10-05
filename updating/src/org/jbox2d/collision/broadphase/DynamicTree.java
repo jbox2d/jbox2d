@@ -191,7 +191,10 @@ public class DynamicTree {
 		if (AABB.testOverlap(argAABB, argNode.aabb)){
 			
 			if(argNode.isLeaf()){
-				argCallback.queryCallback(argNode);
+				boolean proceed = argCallback.queryCallback(argNode);
+				if( !proceed ){
+					return;
+				}
 			}else{
 				query(argCallback, argAABB, argNode.child1);
 				query(argCallback, argAABB, argNode.child2);

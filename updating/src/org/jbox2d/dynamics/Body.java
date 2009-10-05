@@ -39,7 +39,7 @@ public class Body {
 	
 	public final Vec2 m_linearVelocity = new Vec2();
 	
-	public float m_anglularVelocity;
+	public float m_angularVelocity;
 	
 	public final Vec2 m_force = new Vec2();
 	
