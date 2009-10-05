@@ -193,4 +193,26 @@ public class Settings {
 	 * A body cannot sleep if its angular velocity is above this tolerance.
 	 */
 	public static float angularSleepTolerance = (2.0f / 180.0f * PI);
+	
+	/**
+	 * Friction mixing law. Feel free to customize this.
+	 * TODO djm: add customization
+	 * @param friction1
+	 * @param friction2
+	 * @return
+	 */
+	public static final float mixFriction(float friction1, float friction2){
+		return MathUtils.sqrt(friction1 * friction2);
+	}
+
+	/**
+	 * Restitution mixing law. Feel free to customize this.
+	 * TODO djm: add customization
+	 * @param restitution1
+	 * @param restitution2
+	 * @return
+	 */
+	public static final float mixRestitution(float restitution1, float restitution2){
+		return restitution1 > restitution2 ? restitution1 : restitution2;
+	}
 }

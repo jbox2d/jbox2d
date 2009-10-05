@@ -13,16 +13,6 @@ import org.jbox2d.structs.collision.MassData;
 public class BodyDef {
 	
 	/**
-	 * You can use this to initialized the mass properties of the body.
-	 * If you prefer, you can set the mass properties after the shapes
-	 * have been added using b2Body::SetMassFromShapes.
-	 * By default the mass data is set to zero, meaning the body is seen
-	 * as static. If you intend the body to be dynamic, a small performance
-	 * gain can be had by setting the mass to some positive value.
-	 */
-	public MassData massData;
-	
-	/**
 	 * Use this to store application specific body data.
 	 */
 	public Object userData;
@@ -87,10 +77,6 @@ public class BodyDef {
 	public boolean isBullet;
 	
 	public BodyDef(){
-		massData = new MassData();
-		massData.center.setZero();
-		massData.mass = 0f;
-		massData.I = 0;
 		userData = null;
 		position = new Vec2();
 		angle = 0f;

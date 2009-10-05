@@ -1,13 +1,11 @@
 package org.jbox2d.structs.dynamics.contacts;
 
-import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.dynamics.contacts.Contact;
+import org.jbox2d.structs.collision.ShapeType;
 
-public interface ContactRegister {
-	
-	public Contact contactCreateFcn(Fixture fixtureA, Fixture fixtureB);
-	public void contactDestroyFcn(Contact contact);
-	
-	public boolean isPrimary();
-	public void setPrimary(boolean argPrimary);
+public class ContactRegister {
+	public ShapeType s1, s2;
+
+    public ContactCreateFcn createFcn;
+
+    public boolean primary;
 }
