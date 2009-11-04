@@ -13,6 +13,7 @@ import org.jbox2d.structs.collision.MassData;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;
 import org.jbox2d.structs.collision.ShapeType;
+import org.jbox2d.structs.dynamics.contacts.ContactEdge;
 
 /**
  * A fixture is used to attach a shape to a body for collision detection. A fixture
@@ -99,9 +100,9 @@ public class Fixture {
 			Fixture fixtureA = contact.getFixtureA();
 			Fixture fixtureB = contact.getFixtureB();
 			if (fixtureA == this || fixtureB == this){
-				contact.setAsSensor(m_isSensor);
+				contact.setAsSensor(fixtureA.m_isSensor || fixtureB.m_isSensor);
 			}
-			edge = edge.m_next;
+			edge = edge.next;
 		}
 	}
 	
@@ -125,9 +126,9 @@ public class Fixture {
 			Fixture fixtureA = contact.getFixtureA();
 			Fixture fixtureB = contact.getFixtureB();
 			if (fixtureA == this || fixtureB == this){
-				contact->flagForFiltering();
+				contact.flagForFiltering();
 			}
-			edge = edge.m_next;
+			edge = edge.next;
 		}
 	}
 	
