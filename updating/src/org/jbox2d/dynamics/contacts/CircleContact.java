@@ -1,5 +1,6 @@
 package org.jbox2d.dynamics.contacts;
 
+import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.pooling.SingletonPool;
@@ -8,6 +9,9 @@ import org.jbox2d.structs.dynamics.contacts.ContactCreateFcn;
 
 public class CircleContact extends Contact implements ContactCreateFcn {
 
+	public CircleContact(){
+		
+	}
 	public CircleContact(Fixture fixtureA, Fixture fixtureB){
 		super(fixtureA, fixtureB);
 		assert(m_fixtureA.getType() == ShapeType.CIRCLE_SHAPE);
@@ -20,8 +24,8 @@ public class CircleContact extends Contact implements ContactCreateFcn {
 		Body bodyB = m_fixtureB.getBody();
 		
 		SingletonPool.getCollision().collideCircles(m_manifold,
-				m_fixtureA.getShape(), bodyA.getTransform(),
-				m_fixtureB.getShape(), bodyB.getTransform());
+				(CircleShape)m_fixtureA.getShape(), bodyA.getTransform(),
+				(CircleShape)m_fixtureB.getShape(), bodyB.getTransform());
 	}
 	/**
 	 * Called to create a new circle contact, used from the static methods in {@link Contact}

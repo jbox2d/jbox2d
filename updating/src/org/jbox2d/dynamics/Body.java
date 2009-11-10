@@ -808,7 +808,7 @@ public class Body {
 		}
 	}
 	
-	protected final void synchronizeTransform(){
+	public final void synchronizeTransform(){
 		m_xf.R.set(m_sweep.a);
 		
 		//m_xf.position = m_sweep.c - Mul(m_xf.R, m_sweep.localCenter);
