@@ -1,5 +1,6 @@
 package org.jbox2d.dynamics.contacts;
 
+import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.pooling.SingletonPool;
@@ -8,6 +9,10 @@ import org.jbox2d.structs.dynamics.contacts.ContactCreateFcn;
 
 public class PolygonContact extends Contact implements ContactCreateFcn {
 
+	public PolygonContact(){
+		
+	}
+	
 	public PolygonContact(Fixture fixtureA, Fixture fixtureB) {
 		super(fixtureA, fixtureB);
 		assert(m_fixtureA.getType() == ShapeType.POLYGON_SHAPE);
@@ -20,8 +25,8 @@ public class PolygonContact extends Contact implements ContactCreateFcn {
 		Body bodyB = m_fixtureB.getBody();
 		
 		SingletonPool.getCollision().collidePolygons(m_manifold,
-				m_fixtureA.getShape(), bodyA.getTransform(),
-				m_fixtureB.getShape(), bodyB.getTransform());
+				(PolygonShape)m_fixtureA.getShape(), bodyA.getTransform(),
+				(PolygonShape)m_fixtureB.getShape(), bodyB.getTransform());
 	}
 
 	@Override

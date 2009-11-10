@@ -8,7 +8,6 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.TimeStep;
-import org.jbox2d.pooling.TLWorldManifold;
 import org.jbox2d.structs.collision.Manifold;
 import org.jbox2d.structs.collision.ManifoldPoint;
 import org.jbox2d.structs.collision.WorldManifold;
@@ -404,7 +403,7 @@ public class ContactSolver {
 				Mat22.mulToOut(c.K, a, temp2);
 				b.subLocal(temp2);
 
-				final float k_errorTol = 1e-3f;
+				//final float k_errorTol = 1e-3f;
 				//B2_NOT_USED(k_errorTol);
 
 				for (;;)
