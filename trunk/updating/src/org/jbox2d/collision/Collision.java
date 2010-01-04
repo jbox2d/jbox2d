@@ -2,6 +2,7 @@ package org.jbox2d.collision;
 
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
@@ -14,6 +15,9 @@ import org.jbox2d.structs.collision.Manifold;
 import org.jbox2d.structs.collision.ManifoldPoint;
 import org.jbox2d.structs.collision.PointState;
 import org.jbox2d.structs.collision.Manifold.ManifoldType;
+import org.jbox2d.structs.collision.distance.DistanceInput;
+import org.jbox2d.structs.collision.distance.DistanceOutput;
+import org.jbox2d.structs.collision.distance.SimplexCache;
 
 /**
  * Functions used for computing contact points, distance
@@ -34,6 +38,33 @@ public class Collision {
 		clipPoints2[0] = new ClipVertex();
 		clipPoints2[1] = new ClipVertex();
 	}
+	
+	private final DistanceInput input = new DistanceInput();
+	private final SimplexCache cache = new SimplexCache();
+	private final DistanceOutput output = new DistanceOutput();
+	/**
+	 * Determine if two generic shapes overlap.
+	 * @param shapeA
+	 * @param shapeB
+	 * @param xfA
+	 * @param xfB
+	 * @return
+	 */
+	public final boolean testOverlap(Shape shapeA, Shape shapeB,
+	                                        Transform xfA, Transform xfB){
+		input.proxyA.set(shapeA);
+		input.proxyB.set(shapeB);
+		input.transformA.set(xfA);
+		input.transformB.set(xfB);
+		input.useRadii = true;
+
+		cache.count = 0;
+		
+		SingletonPool.getDistance().distance( output, cache, input);
+		// djm note: anything significant about 10.0f?
+		return output.distance < 10.0f * Settings.EPSILON;
+	}
+	
 	/**
 	 * Compute the point states given two manifolds. The states pertain to the transition from manifold1
 	 * to manifold2. So state1 is either persist or remove while state2 is either add or persist.

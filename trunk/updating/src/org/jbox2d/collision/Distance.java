@@ -339,7 +339,7 @@ public class Distance {
 			if (d12_1 > 0.0f && d12_2 > 0.0f && d123_3 <= 0.0f){
 				float inv_d12 = 1.0f / (d12_1 + d12_2);
 				m_v1.a = d12_1 * inv_d12;
-				m_v2.a = d12_1 * inv_d12;
+				m_v2.a = d12_2 * inv_d12;
 				m_count = 2;
 				return;
 			}

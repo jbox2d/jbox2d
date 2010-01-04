@@ -24,7 +24,6 @@
 package org.jbox2d.collision.shapes;
 
 import org.jbox2d.collision.AABB;
-import org.jbox2d.collision.Segment;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.structs.collision.MassData;
@@ -74,8 +73,9 @@ public abstract class Shape {
 	 * @param output the ray-cast results.
 	 * @param input the ray-cast input parameters.
 	 * @param transform the transform to be applied to the shape.
+	 * @return if hit
 	 */
-	public abstract void raycast( RayCastOutput output, RayCastInput input, Transform transform);
+	public abstract boolean raycast( RayCastOutput output, RayCastInput input, Transform transform);
 
 
 	/**
