@@ -10,8 +10,6 @@ public class Pair implements Comparable<Pair>{
 	public DynamicTreeNode proxyA;
 	public DynamicTreeNode proxyB;
 	
-	
-	@Override
 	public int compareTo(Pair pair2) {
 		if (this.proxyA.key < pair2.proxyA.key){
 			return -1;

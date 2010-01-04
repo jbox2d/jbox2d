@@ -9,11 +9,9 @@ import org.jbox2d.pooling.TLRayCastInput;
 import org.jbox2d.pooling.TLVec2;
 import org.jbox2d.pooling.stacks.AABBStack;
 import org.jbox2d.pooling.stacks.DynamicTreeNodeStack;
-import org.jbox2d.pooling.stacks.TLRayCastOutput;
 import org.jbox2d.pooling.stacks.Vec2Stack;
 import org.jbox2d.structs.collision.RayCastCallback;
 import org.jbox2d.structs.collision.RayCastInput;
-import org.jbox2d.structs.collision.RayCastOutput;
 import org.jbox2d.structs.collision.broadphase.QueryCallback;
 
 /**
@@ -26,6 +24,8 @@ import org.jbox2d.structs.collision.broadphase.QueryCallback;
  * @author daniel
  */
 public class DynamicTree {
+	public static final int MAX_STACK_SIZE = 128;
+	
 	private static final DynamicTreeNodeStack stack = new DynamicTreeNodeStack();
 
 	private DynamicTreeNode m_root;
@@ -179,11 +179,11 @@ public class DynamicTree {
 	 * @param argAABB
 	 */
 	public final void query(QueryCallback argCallback, AABB argAABB){
-		query(argCallback, argAABB, m_root);
+		query(argCallback, argAABB, m_root, 1);
 	}
 	
 	// recursive query
-	private final void query(QueryCallback argCallback, AABB argAABB, DynamicTreeNode argNode){
+	private final void query(QueryCallback argCallback, AABB argAABB, DynamicTreeNode argNode, int count){
 		if(argNode == null){
 			return;
 		}
@@ -196,8 +196,12 @@ public class DynamicTree {
 					return;
 				}
 			}else{
-				query(argCallback, argAABB, argNode.child1);
-				query(argCallback, argAABB, argNode.child2);
+				if(count< MAX_STACK_SIZE){
+					query(argCallback, argAABB, argNode.child1, ++count);
+				}
+				if(count< MAX_STACK_SIZE){
+					query(argCallback, argAABB, argNode.child2, ++count);
+				}
 			}
 		}
 	}
@@ -212,17 +216,17 @@ public class DynamicTree {
 	 * @param argCallback a callback class that is called for each proxy that is hit by the ray.
 	 */
 	public void raycast( final RayCastCallback argCallback, final RayCastInput argInput){
-		raycast(argCallback, argInput, m_root);
+		raycast(argCallback, argInput, m_root, 1);
 	}
 	
 	// stacks because it's recursive
 	private static final Vec2Stack vec2stack = new Vec2Stack();
 	private static final AABBStack aabbstack = new AABBStack();
 	private static final TLRayCastInput tlsubInput = new TLRayCastInput();
-	private static final TLRayCastOutput tloutput = new TLRayCastOutput();
+	//private static final TLRayCastOutput tloutput = new TLRayCastOutput();
 
 	private void raycast( final RayCastCallback argCallback, final RayCastInput argInput,
-						  final DynamicTreeNode argNode){
+						  final DynamicTreeNode argNode, int count){
 		if(argNode == null){
 			return;
 		}
@@ -288,8 +292,12 @@ public class DynamicTree {
 				Vec2.maxToOut( p1, temp, segAABB.upperBound);
 			}
 		}else{
-			raycast(argCallback, argInput, argNode.child1);
-			raycast(argCallback, argInput, argNode.child2);
+			if(count < MAX_STACK_SIZE){
+				raycast(argCallback, argInput, argNode.child1, ++count);
+			}
+			if(count < MAX_STACK_SIZE){
+				raycast(argCallback, argInput, argNode.child2, ++count);
+			}		
 		}
 	}
 	

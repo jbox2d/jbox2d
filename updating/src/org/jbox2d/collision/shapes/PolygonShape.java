@@ -484,7 +484,7 @@ public class PolygonShape extends Shape{
 	 * @see Shape#testSegment(Transform, TestSegmentResult, Segment, float)
 	 */
 	@Override
-	public final void raycast( RayCastOutput output, RayCastInput input, Transform xf){
+	public final boolean raycast( RayCastOutput output, RayCastInput input, Transform xf){
 		float lower = 0.0f, upper = input.maxFraction;
 
 
@@ -500,8 +500,6 @@ public class PolygonShape extends Shape{
 		tsd.set(p2).subLocal(p1);
 		int index = -1;
 		
-		output.hit = false;
-
 		for (int i = 0; i < m_vertexCount; ++i){
 			// p = p1 + a * d
 			// dot(normal, p - v) = 0
@@ -512,7 +510,7 @@ public class PolygonShape extends Shape{
 
 			if (denominator == 0.0f){
 				if (numerator < 0.0f){
-					return;
+					return false;
 				}
 			}
 			else{
@@ -534,19 +532,19 @@ public class PolygonShape extends Shape{
 			}
 
 			if (upper < lower){
-				return;
+				return false;
 			}
 		}
 
 		assert(0.0f <= lower && lower <= input.maxFraction);
 
 		if (index >= 0){
-			output.hit = true;
 			output.fraction = lower;
 			Mat22.mulToOut(xf.R, m_normals[index], output.normal);
 			//*normal = Mul(xf.R, m_normals[index]);
-			return;
+			return true;
 		}
+		return false;
 	}
 
 	// djm pooled

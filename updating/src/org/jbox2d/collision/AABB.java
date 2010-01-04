@@ -135,11 +135,9 @@ public class AABB {
 	 * @param output
 	 * @param input
 	 */
-	public final void raycast(final RayCastOutput output, final RayCastInput input){
+	public final boolean raycast(final RayCastOutput output, final RayCastInput input){
 		float tmin = Float.MIN_VALUE;
 		float tmax = Float.MAX_VALUE;
-
-		output.hit = false;
 		
 		final Vec2 p = input.p1;
 		final Vec2 d = tld.get();
@@ -151,7 +149,7 @@ public class AABB {
 		if (absD.x < Settings.EPSILON){
 			// Parallel.
 			if (p.x < lowerBound.x || upperBound.x < p.x){
-				return;
+				return false;
 			}
 		}
 		else{
@@ -180,14 +178,14 @@ public class AABB {
 			tmax = MathUtils.min(tmax, t2);
 
 			if (tmin > tmax){
-				return;
+				return false;
 			}
 		}
 
 		if (absD.y < Settings.EPSILON){
 			// Parallel.
 			if (p.y < lowerBound.y || upperBound.y < p.y){
-				return;
+				return false;
 			}
 		}
 		else{
@@ -216,20 +214,20 @@ public class AABB {
 			tmax = MathUtils.min(tmax, t2);
 
 			if (tmin > tmax){
-				return;
+				return false;
 			}
 		}
 
 		// Does the ray start inside the box?
 		// Does the ray intersect beyond the max fraction?
 		if (tmin < 0.0f || input.maxFraction < tmin){
-			return;
+			return false;
 		}
 
 		// Intersection.
 		output.fraction = tmin;
 		output.normal.set(normal);
-		output.hit = true;
+		return true;
 	}
 
 	public static final boolean testOverlap(final AABB a, final AABB b){

@@ -130,7 +130,7 @@ public class CircleShape extends Shape {
 	 * @see Shape#testSegment(Transform, TestSegmentResult, Segment, float)
 	 */
 	@Override
-	public final void raycast( RayCastOutput output, RayCastInput input, Transform transform){
+	public final boolean raycast( RayCastOutput output, RayCastInput input, Transform transform){
 		
 		final Vec2 position = tlposition.get();;
 		final Vec2 s = tls.get();
@@ -149,8 +149,7 @@ public class CircleShape extends Shape {
 
 		// Check for negative discriminant and short segment.
 		if (sigma < 0.0f || rr < Settings.EPSILON){
-			output.hit = false;
-			return;
+			return false;
 		}
 
 		// Find the point of intersection of the line with the circle.
@@ -159,16 +158,14 @@ public class CircleShape extends Shape {
 		// Is the intersection point on the segment?
 		if (0.0f <= a && a <= input.maxFraction * rr){
 			a /= rr;
-			output.hit = true;
 			output.fraction = a;
 			output.normal.set(r).mulLocal( a);
 			output.normal.addLocal(s);
 			output.normal.normalize();
-			return;
+			return true;
 		}
 		
-		output.hit = false;
-		return;
+		return false;
 	}
 
 
