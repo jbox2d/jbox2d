@@ -156,7 +156,7 @@ public class CircleShape extends Shape {
 			return SegmentCollide.HIT_COLLIDE;
 		}
 
-		return SegmentCollide.HIT_COLLIDE;
+		return SegmentCollide.MISS_COLLIDE; // thanks FrancescoITA
 	}
 
 	// djm pooling
