@@ -23,6 +23,8 @@
 
 package org.jbox2d.common;
 
+import org.jbox2d.testbed.mathtests.SinCosTest;
+
 //Updated to rev. 142 of b2Settings.cpp/.h
 
 /** Global tuning constants based on MKS units and various integer maximums (vertices per shape, pairs, etc.). */

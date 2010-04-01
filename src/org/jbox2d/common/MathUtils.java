@@ -24,8 +24,7 @@
 package org.jbox2d.common;
 
 /**
- * A few math methods that don't fit very well anywhere else. djm: added ToOut
- * method
+ * A few math methods that don't fit very well anywhere else.
  */
 public class MathUtils {
 	public static final float PI = (float) Math.PI;
@@ -269,9 +268,11 @@ public class MathUtils {
 
 	public static final float sqrt(float x) {
 		if (Settings.FAST_MATH) {
-			x = invSqrt(x);
 
-			if (x != 0.0f) {
+			if (x != 0.0f) { // thanks FrancescoITA for including the zero case, now it's technically slightly faster! and more accurate! woooo!
+				
+				x = invSqrt(x);
+
 				return 1.0f / x;
 			}
 			else {
