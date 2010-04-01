@@ -7,7 +7,7 @@ public class SinCosTest {
 	public static final int COLUMN_PADDING = 3;
 	public static final int NUM_DECIMALS = 8;
 	
-	public static int numTables = 200;
+	public static int numTables = 50;
 	// accuracy
 	public static float mostPreciseTable = .00001f;
 	public static float leastPreciseTable = .01f;
@@ -24,7 +24,7 @@ public class SinCosTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
+		int overall = 5;
 		try{
 			numTables = Integer.parseInt(args[0]);
 			mostPreciseTable = Float.parseFloat(args[1]);
@@ -32,12 +32,13 @@ public class SinCosTest {
 			accuracyIterations = Integer.parseInt(args[3]);
 			speedTrials = Integer.parseInt(args[4]);
 			speedIterations = Integer.parseInt(args[5]);
+			overall = Integer.parseInt(args[6]);
 		}catch(Exception e){
 			System.out.println( "Parameters: <number of tables to use> <most precise table value (smallest)> " +
 					"<least precise table value> <number of accuracy test iterations> <number of speed test trials>" +
-					"<number of speed test iterations>");
-			System.out.println( "Sample parameters: 200 .00001 .01 100000 20 5000" );
-			return;
+					"<number of speed test iterations> <number of overall speed test sets>");
+			System.out.println( "Sample parameters: 200 .00001 .01 100000 20 5000 2" );
+			//return;
 		}
 		System.out.println("Tables: "+ numTables);
 		System.out.println("Most Precise Table: "+mostPreciseTable);
@@ -48,7 +49,15 @@ public class SinCosTest {
 		
 		constructTables();
 		doAccuracyTest(true);
-		doSpeedTest(true);
+		for(int i=0; i<overall; i++){
+			doSpeedTest(true);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	/**
@@ -117,7 +126,7 @@ public class SinCosTest {
 	 */
 	public static final double[][] doSpeedTest(boolean print){
 		System.out.println("\nDoing speed tests");
-		double[][] speedResults = new double[numTables][3];
+		double[][] speedResults = new double[numTables][4];
 		
 		SinCosTable.LERP_LOOKUP = false;
 		// without lerp
@@ -131,13 +140,18 @@ public class SinCosTest {
 			speedResults[i][1] = speedTest(tables[i], speedIterations, speedTrials);				
 		}
 		
+		// with the Math calls
+		for(int i=0; i< numTables; i++){
+			speedResults[i][3] = speedTestMath( speedIterations, speedTrials);				
+		}
+		
 		for(int i=0; i< numTables; i++){
 			speedResults[i][2] = speedResults[i][0] - speedResults[i][1];
 		}
 		
 		if(print){
 			System.out.println("Speed results, in iterations per second");
-			String header[] = {"Not lerped", "Lerped", "Difference"};
+			String header[] = {"Not lerped", "Lerped", "Difference", "Java Math"};
 			String side[] = new String[numTables+1];
 			side[0] = "Table precision";
 			for(int i=0; i<tables.length; i++){
@@ -214,6 +228,7 @@ public class SinCosTest {
 		long startTime, endTime;
 		long totalTime = 0;
 		float i,j;
+		float k;
 		
 		final float jstep = MathUtils.TWOPI/numIterations;
 		
@@ -221,7 +236,28 @@ public class SinCosTest {
 			
 			startTime = System.nanoTime();
 			for(j=0; j<MathUtils.TWOPI; j+=jstep){
-				table.sin(j);
+				k = table.sin(j);
+			}
+			endTime = System.nanoTime();
+			totalTime += endTime - startTime;
+		}
+		
+		return numIterations*numTrials*1000000000l/(totalTime);
+	}
+	
+	private static long speedTestMath( final int numIterations, final int numTrials){
+		long startTime, endTime;
+		long totalTime = 0;
+		float i,j;
+		float k;
+		
+		final float jstep = MathUtils.TWOPI/numIterations;
+		
+		for(i=0; i<numTrials; i++){
+			
+			startTime = System.nanoTime();
+			for(j=0; j<MathUtils.TWOPI; j+=jstep){
+				k = (float) Math.sin(j);
 			}
 			endTime = System.nanoTime();
 			totalTime += endTime - startTime;
