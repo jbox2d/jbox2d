@@ -31,10 +31,12 @@ import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;
 import org.jbox2d.structs.collision.ShapeType;
 
+// Updated to rev 109 of b2Shape.h
+
 /**
  * A shape is used for collision detection. You can create a shape however you like.
  * Shapes used for simulation in World are created automatically when a Fixture
- * is created.
+ * is created.  Shapes may encapsulate a one or more child shapes.
  */
 public abstract class Shape {
 	/** Unique id for shape for sorting (C++ version uses memory address) */
@@ -50,8 +52,14 @@ public abstract class Shape {
 
 	public Shape() {
 		uid = uidcount++; //Java version only (C++ version sorts by memory location)
-		m_type = ShapeType.UNKNOWN_SHAPE;
+		m_type = ShapeType.UNKNOWN;
 	}
+	
+	/**
+	 * Get the number of child primitives.
+	 * @return
+	 */
+	public abstract int getChildCount();
 	
 	/**
 	 * Get the type of this shape. You can use this to down cast to the concrete shape.
@@ -69,43 +77,45 @@ public abstract class Shape {
 	public abstract boolean testPoint( final Transform xf, final Vec2 p);
 
 	/**
-	 * Cast a ray against this shape.
-	 * @param output the ray-cast results.
-	 * @param input the ray-cast input parameters.
-	 * @param transform the transform to be applied to the shape.
+	 * Cast a ray against a child shape.
+	 * @param argOutput the ray-cast results.
+	 * @param argInput the ray-cast input parameters.
+	 * @param argTransform the transform to be applied to the shape.
+	 * @param argChildIndex the child shape index
 	 * @return if hit
 	 */
-	public abstract boolean raycast( RayCastOutput output, RayCastInput input, Transform transform);
+	public abstract boolean raycast( RayCastOutput argOutput, RayCastInput argInput, Transform argTransform, int argChildIndex);
 
 
 	/**
-	 * Given a transform, compute the associated axis aligned bounding box for this shape.
-	 * @param aabb returns the axis aligned box.
-	 * @param xf the world transform of the shape.
+	 * Given a transform, compute the associated axis aligned bounding box for a child shape.
+	 * @param argAabb returns the axis aligned box.
+	 * @param argXf the world transform of the shape.
+	 * @param argChildIndex the child shape
 	 */
-	public abstract void computeAABB(final AABB aabb, final Transform xf);
+	public abstract void computeAABB(final AABB argAabb, final Transform argXf, int argChildIndex);
 
 	/**
 	 * Compute the mass properties of this shape using its dimensions and density.
-	 * The inertia tensor is computed about the local origin, not the centroid.
+	 * The inertia tensor is computed about the local origin.
 	 * @param massData returns the mass data for this shape.
 	 * @param density the density in kilograms per meter squared.
 	 */
 	public abstract void computeMass(final MassData massData, final float density);
 	
 	
-	/**
+	/*
 	 * Compute the volume and centroid of this shape intersected with a half plane
 	 * @param normal the surface normal
 	 * @param offset the surface offset along normal
 	 * @param xf the shape transform
 	 * @param c returns the centroid
 	 * @return the total volume less than offset along normal
-	 */
+	 *
 	public abstract float computeSubmergedArea(Vec2 normal,
 									  float offset,
 									  Transform xf, 
-									  Vec2 c);
+									  Vec2 c);*/
 	
 	
 	public abstract Shape clone();

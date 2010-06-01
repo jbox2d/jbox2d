@@ -25,7 +25,7 @@ package org.jbox2d.structs.collision;
 
 import org.jbox2d.common.Vec2;
 
-// Updated to rev 142-218 of b2Shape.h
+// Updated to rev 109 of b2Shape.h
 
 /** This holds the mass data computed for a shape. */
 public class MassData {
@@ -33,7 +33,7 @@ public class MassData {
     public float mass;
     /** The position of the shape's centroid relative to the shape's origin. */
     public final Vec2 center;
-    /** The rotational inertia of the shape. */
+    /** The rotational inertia of the shape about the local origin. */
     public float I;
 
     /**
