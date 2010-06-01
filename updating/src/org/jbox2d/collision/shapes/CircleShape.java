@@ -38,7 +38,7 @@ import org.jbox2d.structs.collision.RayCastOutput;
 import org.jbox2d.structs.collision.ShapeType;
 
 
-//Updated to rev 56->108->139 of Shape.cpp/.h
+//Updated to rev 109 of Shape.cpp/.h
 
 /**
  * A circle shape.
@@ -54,7 +54,7 @@ public class CircleShape extends Shape {
 	 * @param def
 	 */
 	public CircleShape(){
-		m_type = ShapeType.CIRCLE_SHAPE;
+		m_type = ShapeType.CIRCLE;
 		m_p = new Vec2();
 		m_radius = 0;
 	}
@@ -66,6 +66,14 @@ public class CircleShape extends Shape {
 		return shape;
 	}
 
+	/**
+	 * @see org.jbox2d.collision.shapes.Shape#getChildCount()
+	 */
+	@Override
+	public int getChildCount() {
+		return 1;
+	}
+	
 	/**
 	 * Get the supporting vertex index in the given direction.
 	 * @param d
@@ -127,22 +135,22 @@ public class CircleShape extends Shape {
 	private static final TLVec2 tls = new TLVec2();
 	private static final TLVec2 tlr = new TLVec2();
 	/**
-	 * @see Shape#testSegment(Transform, TestSegmentResult, Segment, float)
+	 * @see Shape#raycast(org.jbox2d.structs.collision.RayCastOutput, org.jbox2d.structs.collision.RayCastInput, org.jbox2d.common.Transform, int)
 	 */
 	@Override
-	public final boolean raycast( RayCastOutput output, RayCastInput input, Transform transform){
+	public final boolean raycast( RayCastOutput argOutput, RayCastInput argInput, Transform argTransform, int argChildIndex){
 		
 		final Vec2 position = tlposition.get();;
 		final Vec2 s = tls.get();
 		final Vec2 r = tlr.get();
 		
-		Mat22.mulToOut( transform.R, m_p, position);
-		position.addLocal( transform.position);
-		s.set( input.p1).subLocal(position);
+		Mat22.mulToOut( argTransform.R, m_p, position);
+		position.addLocal( argTransform.position);
+		s.set( argInput.p1).subLocal(position);
 		final float b = Vec2.dot( s, s) - m_radius * m_radius;
 
 		// Solve quadratic equation.
-		r.set(input.p2).subLocal(input.p1);
+		r.set(argInput.p2).subLocal(argInput.p1);
 		final float c =  Vec2.dot(s, r);
 		final float rr = Vec2.dot(r, r);
 		final float sigma = c * c - rr * b;
@@ -156,12 +164,12 @@ public class CircleShape extends Shape {
 		float a = -(c + MathUtils.sqrt(sigma));
 
 		// Is the intersection point on the segment?
-		if (0.0f <= a && a <= input.maxFraction * rr){
+		if (0.0f <= a && a <= argInput.maxFraction * rr){
 			a /= rr;
-			output.fraction = a;
-			output.normal.set(r).mulLocal( a);
-			output.normal.addLocal(s);
-			output.normal.normalize();
+			argOutput.fraction = a;
+			argOutput.normal.set(r).mulLocal( a);
+			argOutput.normal.addLocal(s);
+			argOutput.normal.normalize();
 			return true;
 		}
 		
@@ -172,18 +180,18 @@ public class CircleShape extends Shape {
 	// djm pooling
 	private static final TLVec2 tlp = new TLVec2();
 	/**
-	 * @see Shape#computeAABB(AABB, Transform)
+	 * @see org.jbox2d.collision.shapes.Shape#computeAABB(org.jbox2d.collision.AABB, org.jbox2d.common.Transform, int)
 	 */
 	@Override
-	public final void computeAABB(final AABB aabb, final Transform transform) {
+	public final void computeAABB(final AABB argAabb, final Transform argTransform, int argChildIndex) {
 		final Vec2 p = tlp.get();
-		Mat22.mulToOut(transform.R, m_p, p);
-		p.addLocal(transform.position);
+		Mat22.mulToOut(argTransform.R, m_p, p);
+		p.addLocal(argTransform.position);
 
-		aabb.lowerBound.x = p.x - m_radius;
-		aabb.lowerBound.y = p.y - m_radius;
-		aabb.upperBound.x = p.x + m_radius;
-		aabb.upperBound.y = p.y + m_radius;
+		argAabb.lowerBound.x = p.x - m_radius;
+		argAabb.lowerBound.y = p.y - m_radius;
+		argAabb.upperBound.x = p.x + m_radius;
+		argAabb.upperBound.y = p.y + m_radius;
 	}
 
 	/**
@@ -199,9 +207,9 @@ public class CircleShape extends Shape {
 	}
 
 	// djm pooled from above
-	/**
+	/*
 	 * @see Shape#computeSubmergedArea(Vec2, float, Vec2, Vec2)
-	 */
+	 *
 	@Override
 	public final float computeSubmergedArea( final Vec2 normal, final float offset, final Transform xf, final Vec2 c) {
 		final Vec2 p = tlp.get();
@@ -229,5 +237,5 @@ public class CircleShape extends Shape {
 		c.y = p.y + normal.y * com;
 
 		return area;
-	}
+	}*/
 }

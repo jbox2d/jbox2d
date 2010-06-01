@@ -25,8 +25,8 @@ package org.jbox2d.structs.collision;
 
 // Updated to rev 144 of b2Shape.h
 public enum ShapeType {
-	UNKNOWN_SHAPE(-1), CIRCLE_SHAPE(0), POLYGON_SHAPE(1);
-	public static final int TYPE_COUNT = 2;
+	UNKNOWN(-1), CIRCLE(0), EDGE(1), POLYGON(2), LOOP(3);
+	public static final int TYPE_COUNT = 4;
 	
 	public final int intValue;
 	

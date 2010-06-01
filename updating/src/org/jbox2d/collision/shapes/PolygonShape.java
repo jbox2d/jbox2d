@@ -24,21 +24,18 @@
 package org.jbox2d.collision.shapes;
 
 import org.jbox2d.collision.AABB;
-import org.jbox2d.collision.Segment;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.pooling.TLMassData;
 import org.jbox2d.pooling.TLTransform;
 import org.jbox2d.pooling.TLVec2;
-import org.jbox2d.pooling.arrays.FloatArray;
 import org.jbox2d.structs.collision.MassData;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;
 import org.jbox2d.structs.collision.ShapeType;
 
-//Updated to rev 142 of Shape.cpp/.h / PolygonShape.cpp/.h
+//Updated to rev 109 of PolygonShape.cpp/.h
 
 /** A convex polygon shape.  Create using Body.createShape(ShapeDef), not the ructor here. */
 public class PolygonShape extends Shape{
@@ -66,12 +63,13 @@ public class PolygonShape extends Shape{
 	public int m_vertexCount;
 
 	public PolygonShape() {
-		m_type = ShapeType.POLYGON_SHAPE;
+		m_type = ShapeType.POLYGON;
 
 		m_vertexCount = 0;
 		m_vertices = new Vec2[Settings.maxPolygonVertices];
 		m_normals = new Vec2[Settings.maxPolygonVertices];
 		m_radius = Settings.polygonRadius;
+		m_centroid.setZero();
 	}
 	
 	
@@ -215,6 +213,14 @@ public class PolygonShape extends Shape{
 		m_normals[1].set(m_normals[0]).negateLocal();
 	}
 
+	/**
+	 * @see org.jbox2d.collision.shapes.Shape#getChildCount()
+	 */
+	@Override
+	public int getChildCount() {
+		return 1;
+	}
+	
 	// djm pooling
 	private static final TLVec2 tlpLocal = new TLVec2();
 	private static final TLVec2 tltemp = new TLVec2();
@@ -256,20 +262,20 @@ public class PolygonShape extends Shape{
 	private static final TLVec2 tlupper = new TLVec2();
 	private static final TLVec2 tlv = new TLVec2();
 	/**
-	 * @see Shape#computeAABB(AABB, Transform)
+	 * @see Shape#computeAABB(AABB, Transform, int)
 	 */
 	@Override
-	public final void computeAABB(final AABB aabb,  final Transform xf){
+	public final void computeAABB(final AABB argAabb,  final Transform argXf, int argChildIndex){
 		
 		final Vec2 lower = tllower.get();
 		final Vec2 upper = tlupper.get();
 		final Vec2 v = tlv.get();
 		
-		Transform.mulToOut(xf, m_vertices[0], lower);
+		Transform.mulToOut(argXf, m_vertices[0], lower);
 		upper.set(lower);
 
 		for (int i = 1; i < m_vertexCount; ++i){
-			Transform.mulToOut( xf, m_vertices[i], v);
+			Transform.mulToOut( argXf, m_vertices[i], v);
 			//Vec2 v = Mul(xf, m_vertices[i]);
 			Vec2.minToOut( lower, v, lower);
 			Vec2.maxToOut( upper, v, upper);
@@ -279,14 +285,14 @@ public class PolygonShape extends Shape{
 		//aabb->lowerBound = lower - r;
 		//aabb->upperBound = upper + r;
 
-		aabb.lowerBound.x = lower.x - m_radius;
-		aabb.lowerBound.y = lower.y - m_radius;
-		aabb.upperBound.x = upper.x + m_radius;
-		aabb.upperBound.y = upper.y + m_radius;
+		argAabb.lowerBound.x = lower.x - m_radius;
+		argAabb.lowerBound.y = lower.y - m_radius;
+		argAabb.upperBound.x = upper.x + m_radius;
+		argAabb.upperBound.y = upper.y + m_radius;
 	}
 
 	// djm pooling, and from above
-	private static final TLVec2 tlNormalL = new TLVec2();
+	/*private static final TLVec2 tlNormalL = new TLVec2();
 	private static final TLMassData tlMd = new TLMassData();
 	private static final FloatArray tldepths = new FloatArray();
 	private static final TLVec2 tlIntoVec = new TLVec2();
@@ -294,9 +300,9 @@ public class PolygonShape extends Shape{
 	private static final TLVec2 tlP2b = new TLVec2();
 	private static final TLVec2 tlP3 = new TLVec2();
 	private static final TLVec2 tlcenter = new TLVec2();
-	/**
+	/*
 	 * @see Shape#computeSubmergedArea(Vec2, float, XForm, Vec2)
-	 */
+	 *
 	public float computeSubmergedArea(final Vec2 normal, float offset, Transform xf, Vec2 c) {
 		final Vec2 normalL = tlNormalL.get();
 		final MassData md = tlMd.get();
@@ -417,13 +423,13 @@ public class PolygonShape extends Shape{
 		Transform.mulToOut(xf, center, c);
 		
 		return area;
-	}
+	}*/
 
-	/**
+	/*
 	 * Get the supporting vertex index in the given direction.
 	 * @param d
 	 * @return
-	 */
+	 *
 	public final int getSupport( final Vec2 d){
 		int bestIndex = 0;
 		float bestValue = Vec2.dot(m_vertices[0], d);
@@ -442,7 +448,7 @@ public class PolygonShape extends Shape{
 	 * Get the supporting vertex in the given direction.
 	 * @param d
 	 * @return
-	 */
+	 *
 	public final Vec2 getSupportVertex( final Vec2 d){
 		int bestIndex = 0;
 		float bestValue = Vec2.dot(m_vertices[0], d);
@@ -455,7 +461,7 @@ public class PolygonShape extends Shape{
 		}
 
 		return m_vertices[bestIndex];
-	}
+	}*/
 
 	/**
 	 * Get the vertex count.
@@ -480,69 +486,129 @@ public class PolygonShape extends Shape{
 	private static final TLVec2 tlp1 = new TLVec2();
 	private static final TLVec2 tlp2 = new TLVec2();
 	private static final TLVec2 tltsd = new TLVec2();
+	private static final TLVec2 tlq = new TLVec2();
+
 	/**
-	 * @see Shape#testSegment(Transform, TestSegmentResult, Segment, float)
+	 * @see org.jbox2d.collision.shapes.Shape#raycast(org.jbox2d.structs.collision.RayCastOutput, org.jbox2d.structs.collision.RayCastInput, org.jbox2d.common.Transform, int)
 	 */
 	@Override
-	public final boolean raycast( RayCastOutput output, RayCastInput input, Transform xf){
-		float lower = 0.0f, upper = input.maxFraction;
-
-
+	public final boolean raycast( RayCastOutput argOutput, RayCastInput argInput, Transform argXf, int argChildIndex){
 		final Vec2 p1 = tlp1.get();
 		final Vec2 p2 = tlp2.get();
-		final Vec2 tsd = tltsd.get();
+		final Vec2 d = tltsd.get();
 		final Vec2 temp = tltemp.get();
 		
-		p1.set(input.p1).subLocal( xf.position);
-		Mat22.mulTransToOut(xf.R, p1, p1);
-		p2.set(input.p2).subLocal(xf.position);
-		Mat22.mulTransToOut(xf.R, p2, p2);
-		tsd.set(p2).subLocal(p1);
-		int index = -1;
-		
-		for (int i = 0; i < m_vertexCount; ++i){
-			// p = p1 + a * d
-			// dot(normal, p - v) = 0
-			// dot(normal, p1 - v) + a * dot(normal, d) = 0
-			temp.set( m_vertices[i]).subLocal( p1);
-			final float numerator = Vec2.dot(m_normals[i],temp);
-			final float denominator = Vec2.dot(m_normals[i], tsd);
+		p1.set(argInput.p1).subLocal( argXf.position);
+		Mat22.mulTransToOut(argXf.R, p1, p1);
+		p2.set(argInput.p2).subLocal(argXf.position);
+		Mat22.mulTransToOut(argXf.R, p2, p2);
+		d.set(p2).subLocal(p1);
+
+		if(m_vertexCount == 2){
+			Vec2 v1 = m_vertices[0];
+			Vec2 v2 = m_vertices[1];
+			Vec2 normal = m_normals[0];
+
+			// q = p1 + t * d
+			// dot(normal, q - v1) = 0
+			// dot(normal, p1 - v1) + t * dot(normal, d) = 0
+			temp.set(v1).subLocal(p1);
+			float numerator = Vec2.dot(normal, temp);
+			float denominator = Vec2.dot(normal, d);
 
 			if (denominator == 0.0f){
-				if (numerator < 0.0f){
+				return false;
+			}
+		
+			float t = numerator / denominator;
+			if (t < 0.0f || 1.0f < t){
+				return false;
+			}
+
+			final Vec2 q = tlq.get();
+			final Vec2 r = tlr.get();
+			
+			//Vec2 q = p1 + t * d;
+			temp.set(d).mulLocal(t);
+			q.set(p1).addLocal(temp);
+
+			// q = v1 + s * r
+			// s = dot(q - v1, r) / dot(r, r)
+			//Vec2 r = v2 - v1;
+			r.set(v2).subLocal(v1);
+			
+			float rr = Vec2.dot(r, r);
+			if (rr == 0.0f){
+				return false;
+			}
+
+			temp.set(q).subLocal(v1);
+			float s = Vec2.dot(temp, r) / rr;
+			if (s < 0.0f || 1.0f < s){
+				return false;
+			}
+
+			argOutput.fraction = t;
+			if (numerator > 0.0f){
+				//argOutput.normal = -normal;
+				argOutput.normal.set(normal).mulLocal(-1);
+			}
+			else{
+				//output.normal = normal;
+				argOutput.normal.set(normal);
+			}
+			return true;
+		}
+		else{
+			
+			float lower = 0, upper = argInput.maxFraction;
+			
+			int index = -1;
+			
+			for (int i = 0; i < m_vertexCount; ++i){
+				// p = p1 + a * d
+				// dot(normal, p - v) = 0
+				// dot(normal, p1 - v) + a * dot(normal, d) = 0
+				temp.set( m_vertices[i]).subLocal( p1);
+				final float numerator = Vec2.dot(m_normals[i],temp);
+				final float denominator = Vec2.dot(m_normals[i], d);
+	
+				if (denominator == 0.0f){
+					if (numerator < 0.0f){
+						return false;
+					}
+				}
+				else{
+					// Note: we want this predicate without division:
+					// lower < numerator / denominator, where denominator < 0
+					// Since denominator < 0, we have to flip the inequality:
+					// lower < numerator / denominator <==> denominator * lower > numerator.
+					if (denominator < 0.0f && numerator < lower * denominator){
+						// Increase lower.
+						// The segment enters this half-space.
+						lower = numerator / denominator;
+						index = i;
+					}
+					else if (denominator > 0.0f && numerator < upper * denominator){
+						// Decrease upper.
+						// The segment exits this half-space.
+						upper = numerator / denominator;
+					}
+				}
+	
+				if (upper < lower){
 					return false;
 				}
 			}
-			else{
-				// Note: we want this predicate without division:
-				// lower < numerator / denominator, where denominator < 0
-				// Since denominator < 0, we have to flip the inequality:
-				// lower < numerator / denominator <==> denominator * lower > numerator.
-				if (denominator < 0.0f && numerator < lower * denominator){
-					// Increase lower.
-					// The segment enters this half-space.
-					lower = numerator / denominator;
-					index = i;
-				}
-				else if (denominator > 0.0f && numerator < upper * denominator){
-					// Decrease upper.
-					// The segment exits this half-space.
-					upper = numerator / denominator;
-				}
+	
+			assert(0.0f <= lower && lower <= argInput.maxFraction);
+	
+			if (index >= 0){
+				argOutput.fraction = lower;
+				Mat22.mulToOut(argXf.R, m_normals[index], argOutput.normal);
+				//normal = Mul(xf.R, m_normals[index]);
+				return true;
 			}
-
-			if (upper < lower){
-				return false;
-			}
-		}
-
-		assert(0.0f <= lower && lower <= input.maxFraction);
-
-		if (index >= 0){
-			output.fraction = lower;
-			Mat22.mulToOut(xf.R, m_normals[index], output.normal);
-			//*normal = Mul(xf.R, m_normals[index]);
-			return true;
 		}
 		return false;
 	}
@@ -551,10 +617,6 @@ public class PolygonShape extends Shape{
 	private static final TLVec2 tlpRef = new TLVec2();
 	private static final TLVec2 tle1 = new TLVec2();
 	private static final TLVec2 tle2 = new TLVec2();
-	/**
-	 * @param vs
-	 * @return
-	 */
 	public final void computeCentroidToOut(final Vec2[] vs, final int count, final Vec2 out) {
 		assert(count >= 3);
 		
@@ -601,6 +663,7 @@ public class PolygonShape extends Shape{
 	}
 
 	//djm pooling, from above
+	private static final TLVec2 tlcenter = new TLVec2();
 	/**
 	 * @see Shape#computeMass(MassData)
 	 */
@@ -699,10 +762,10 @@ public class PolygonShape extends Shape{
 	}
 
 
-	/** Get the local centroid relative to the parent body. */
+	/* Get the local centroid relative to the parent body. /
 	public Vec2 getCentroid() {
 		return m_centroid.clone();
-	}
+	}*/
 
 	/** Get the vertices in local coordinates. */
 	public Vec2[] getVertices() {
