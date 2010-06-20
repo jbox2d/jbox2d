@@ -23,6 +23,8 @@
 
 package org.jbox2d.common;
 
+// updated to rev 100
+
 /**
  * A transform contains translation and rotation. It is used to represent
  * the position and orientation of rigid frames.

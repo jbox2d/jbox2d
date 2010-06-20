@@ -22,7 +22,12 @@
  */
 package org.jbox2d.common;
 
-// created from build 218
+// updated to rev 100
+
+/**
+ * 
+ * @author Daniel Murphy
+ */
 public class Vec3 {
 	public float x,y,z;
 	

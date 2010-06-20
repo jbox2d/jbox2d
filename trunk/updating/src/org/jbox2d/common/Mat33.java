@@ -25,7 +25,12 @@ package org.jbox2d.common;
 
 import org.jbox2d.pooling.TLVec3;
 
-// djm created from build 218
+// updated to rev 100
+
+/**
+ * A 3-by-3 matrix. Stored in column-major order.
+ * @author Daniel Murphy
+ */
 public class Mat33 {
 	
 	public static final Mat33 IDENTITY = new Mat33(new Vec3(1,0,0), new Vec3(0,1,0), new Vec3(0,0,1));
