@@ -9,10 +9,10 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.pooling.TLAABB;
 import org.jbox2d.pooling.TLVec2;
-import org.jbox2d.structs.collision.MassData;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;
-import org.jbox2d.structs.collision.ShapeType;
+import org.jbox2d.structs.collision.shapes.MassData;
+import org.jbox2d.structs.collision.shapes.ShapeType;
 import org.jbox2d.structs.dynamics.contacts.ContactEdge;
 
 /**

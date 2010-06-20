@@ -10,7 +10,7 @@ import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.pooling.TLFixtureDef;
 import org.jbox2d.pooling.TLTransform;
 import org.jbox2d.pooling.TLVec2;
-import org.jbox2d.structs.collision.MassData;
+import org.jbox2d.structs.collision.shapes.MassData;
 import org.jbox2d.structs.dynamics.contacts.ContactEdge;
 
 /**
@@ -94,7 +94,7 @@ public class Body {
 		m_xf.R.set(bd.angle);
 
 		m_sweep.localCenter.setZero();
-		m_sweep.t0 = 1.0f;
+		m_sweep.alpha0 = 1.0f;
 		m_sweep.a0 = m_sweep.a = bd.angle;
 		//m_sweep.c0 = m_sweep.c = Transform.mul(m_xf, m_sweep.localCenter);
 		Transform.mulToOut(m_xf, m_sweep.localCenter, m_sweep.c0);

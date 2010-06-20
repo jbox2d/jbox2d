@@ -1,7 +1,7 @@
 package org.jbox2d.dynamics;
 
 import org.jbox2d.common.Vec2;
-import org.jbox2d.structs.collision.MassData;
+import org.jbox2d.structs.collision.shapes.MassData;
 
 /**
  * A body definition holds all the data needed to construct a rigid body.

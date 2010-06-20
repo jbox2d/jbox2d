@@ -25,7 +25,7 @@ public class ContactSolver {
 	 * For each solver, this is the initial number of constraints in the array, which expands
 	 * as needed.
 	 */
-	public static final int INITIAL_NUM_CONSTRAINTS = Settings.maxTOIContactsPerIsland;
+	public static final int INITIAL_NUM_CONSTRAINTS = Settings.maxTOIContacts;
 	
 	/**
 	 * Ensure a reasonable condition number. for the block solver

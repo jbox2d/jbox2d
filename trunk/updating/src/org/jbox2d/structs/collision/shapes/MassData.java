@@ -21,11 +21,11 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package org.jbox2d.structs.collision;
+package org.jbox2d.structs.collision.shapes;
 
 import org.jbox2d.common.Vec2;
 
-// Updated to rev 109 of b2Shape.h
+// Updated to rev 100
 
 /** This holds the mass data computed for a shape. */
 public class MassData {

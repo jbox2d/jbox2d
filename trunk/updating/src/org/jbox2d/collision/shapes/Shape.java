@@ -26,12 +26,12 @@ package org.jbox2d.collision.shapes;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.structs.collision.MassData;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;
-import org.jbox2d.structs.collision.ShapeType;
+import org.jbox2d.structs.collision.shapes.MassData;
+import org.jbox2d.structs.collision.shapes.ShapeType;
 
-// Updated to rev 109 of b2Shape.h
+// Updated to rev 100
 
 /**
  * A shape is used for collision detection. You can create a shape however you like.
@@ -56,12 +56,6 @@ public abstract class Shape {
 	}
 	
 	/**
-	 * Get the number of child primitives.
-	 * @return
-	 */
-	public abstract int getChildCount();
-	
-	/**
 	 * Get the type of this shape. You can use this to down cast to the concrete shape.
 	 * @return the shape type.
 	 */
@@ -84,16 +78,15 @@ public abstract class Shape {
 	 * @param argChildIndex the child shape index
 	 * @return if hit
 	 */
-	public abstract boolean raycast( RayCastOutput argOutput, RayCastInput argInput, Transform argTransform, int argChildIndex);
+	public abstract boolean raycast( RayCastOutput argOutput, RayCastInput argInput, Transform argTransform);
 
 
 	/**
 	 * Given a transform, compute the associated axis aligned bounding box for a child shape.
 	 * @param argAabb returns the axis aligned box.
 	 * @param argXf the world transform of the shape.
-	 * @param argChildIndex the child shape
 	 */
-	public abstract void computeAABB(final AABB argAabb, final Transform argXf, int argChildIndex);
+	public abstract void computeAABB(final AABB argAabb, final Transform argXf);
 
 	/**
 	 * Compute the mass properties of this shape using its dimensions and density.

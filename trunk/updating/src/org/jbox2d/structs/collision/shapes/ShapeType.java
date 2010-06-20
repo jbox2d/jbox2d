@@ -21,12 +21,13 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package org.jbox2d.structs.collision;
+package org.jbox2d.structs.collision.shapes;
 
-// Updated to rev 144 of b2Shape.h
+// Updated to rev 100
+
 public enum ShapeType {
-	UNKNOWN(-1), CIRCLE(0), EDGE(1), POLYGON(2), LOOP(3);
-	public static final int TYPE_COUNT = 4;
+	UNKNOWN(-1), CIRCLE(0), POLYGON(1);
+	public static final int TYPE_COUNT = 2;
 	
 	public final int intValue;
 	
