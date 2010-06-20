@@ -23,11 +23,10 @@
 
 package org.jbox2d.common;
 
+// updated to rev 100
+
 /**
- * A 2x2 matrix class.
- * djm: added ToOut methods
- * @author ewjordan
- *
+ * A 2-by-2 matrix. Stored in column-major order.
  */
 public class Mat22 {
 	/**

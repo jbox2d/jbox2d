@@ -130,12 +130,7 @@ public class Settings {
 	/**
 	 * Maximum number of contacts to be handled to solve a TOI island.
 	 */
-	public static int maxTOIContactsPerIsland = 32;
-
-	/**
-	 * Maximum number of joints to be handled to solve a TOI island.
-	 */
-	public static int maxTOIJointsPerIsland = 32;
+	public static int maxTOIContacts = 32;
 
 	/**
 	 * A velocity threshold for elastic collisions. Any collision with a

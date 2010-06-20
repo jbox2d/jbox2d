@@ -23,13 +23,13 @@
 
 package org.jbox2d.common;
 
+// updated to rev 100
+
 /**
  * This describes the motion of a body/shape for TOI computation.
  * Shapes are defined with respect to the body origin, which may
  * no coincide with the center of mass. However, to support dynamics
  * we must interpolate the center of mass position.
- * 
- * @version 2.1.2
  */
 public class Sweep {
 
