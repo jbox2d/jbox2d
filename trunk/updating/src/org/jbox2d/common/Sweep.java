@@ -24,13 +24,12 @@
 package org.jbox2d.common;
 
 /**
- * Primarily for internal use.
- * <BR><BR>
- * Describes the motion of a body/shape for TOI computation.
+ * This describes the motion of a body/shape for TOI computation.
  * Shapes are defined with respect to the body origin, which may
- * not coincide with the center of mass. However, to support dynamics
+ * no coincide with the center of mass. However, to support dynamics
  * we must interpolate the center of mass position.
  * 
+ * @version 2.1.2
  */
 public class Sweep {
 
@@ -40,14 +39,11 @@ public class Sweep {
 	public final Vec2 c0, c;
 	/** World angles */
 	public float a0, a; 
-	/** Time interval = [t0,1], where t0 is in [0,1] */
-	public float t0;
 	
 	public String toString() {
 		String s = "Sweep:\nlocalCenter: "+localCenter+"\n";
 		s += "c0: "+c0+", c: "+c+"\n";
 		s += "a0: "+a0+", a: "+a+"\n";
-		s += "t0: "+t0+"\n";
 		return s;
 	}
 
@@ -57,13 +53,18 @@ public class Sweep {
 		c = new Vec2();
 	}
 	
-	public Sweep set(Sweep argCloneFrom){
+	public final void normalize(){
+		float d = MathUtils.TWOPI * MathUtils.floor(a0 / MathUtils.TWOPI);
+		a0 -= d;
+		a -= d;
+	}
+	
+	public final Sweep set(Sweep argCloneFrom){
 		localCenter.set(argCloneFrom.localCenter);
 		c0.set( argCloneFrom.c0);
 		c.set( argCloneFrom.c);
 		a0 = argCloneFrom.a0;
 		a = argCloneFrom.a;
-		t0 = argCloneFrom.t0;
 		return this;
 	}
 
@@ -72,7 +73,7 @@ public class Sweep {
 	 * @param xf the result is placed here - must not be null
 	 * @param t the normalized time in [0,1].
 	 */
-	public void getTransform(Transform xf, float t) {
+	public final void getTransform(final Transform xf, final float alpha) {
 		assert(xf != null);
 		//if (xf == null)
 		//	xf = new XForm();
@@ -88,12 +89,12 @@ public class Sweep {
 			xf.R.set(a);
 		}*/
 		
-		float alpha = (t - t0) / (1.0f - t0);
 		xf.position.x = (1.0f - alpha) * c0.x + alpha * c.x;
 		xf.position.y = (1.0f - alpha) * c0.y + alpha * c.y;
-		float angle = (1.0f - alpha) * a0 + alpha * a;
-		xf.R.set(angle);
-
+		//float angle = (1.0f - alpha) * a0 + alpha * a;
+		//xf.R.set(angle);
+		xf.R.set((1.0f - alpha) * a0 + alpha * a);
+		
 		// Shift to origin
 		//xf.position.subLocal(Mat22.mul(xf.R, localCenter));
 		xf.position.x -= xf.R.col1.x * localCenter.x + xf.R.col2.x * localCenter.y;
@@ -104,14 +105,11 @@ public class Sweep {
 	 * Advance the sweep forward, yielding a new initial state.
 	 * @param t the new initial time.
 	 */
-	public void advance(float t) {
-		if (t0 < t && 1.0f - t0 > Settings.EPSILON) {
-			float alpha = (t - t0) / (1.0f - t0);
-			c0.x = (1.0f - alpha) * c0.x + alpha * c.x;
-			c0.y = (1.0f - alpha) * c0.y + alpha * c.y;
-			a0 = (1.0f - alpha) * a0 + alpha * a;
-			t0 = t;
-		}
+	public final void advance(final float t) {
+		//c0 = (1.0f - t) * c0 + t*c;
+		c0.x = (1.0f - t) * c0.x + t*c.x;
+		c0.y = (1.0f - t) * c0.y + t*c.y;
+		a0 = (1.0f - t) * a0 + t*a;
 	}
 
 }
