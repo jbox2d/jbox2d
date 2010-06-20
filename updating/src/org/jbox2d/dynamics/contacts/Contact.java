@@ -13,9 +13,9 @@ import org.jbox2d.pooling.TLTOIInput;
 import org.jbox2d.structs.collision.ContactID;
 import org.jbox2d.structs.collision.Manifold;
 import org.jbox2d.structs.collision.ManifoldPoint;
-import org.jbox2d.structs.collision.ShapeType;
 import org.jbox2d.structs.collision.TOIInput;
 import org.jbox2d.structs.collision.WorldManifold;
+import org.jbox2d.structs.collision.shapes.ShapeType;
 import org.jbox2d.structs.dynamics.contacts.ContactCreateFcn;
 import org.jbox2d.structs.dynamics.contacts.ContactEdge;
 import org.jbox2d.structs.dynamics.contacts.ContactRegister;
@@ -48,8 +48,8 @@ public abstract class Contact {
 	public static boolean s_initialized = false;
 	
 	public static void addType(ContactCreateFcn createFcn, ShapeType type1, ShapeType type2){
-		assert( ShapeType.UNKNOWN_SHAPE.intValue < type1.intValue && type1.intValue < ShapeType.TYPE_COUNT);
-		assert( ShapeType.UNKNOWN_SHAPE.intValue < type2.intValue && type2.intValue < ShapeType.TYPE_COUNT);
+		assert( org.jbox2d.structs.collision.shapes.intValue < type1.intValue && type1.intValue < ShapeType.TYPE_COUNT);
+		assert( org.jbox2d.structs.collision.shapes.intValue < type2.intValue && type2.intValue < ShapeType.TYPE_COUNT);
 		
 		ContactRegister register = new ContactRegister();
 		register.createFcn = createFcn;
@@ -69,9 +69,9 @@ public abstract class Contact {
 	}
 	
 	public static void initializeRegisters(){
-		addType(new CircleContact(), ShapeType.CIRCLE_SHAPE, ShapeType.CIRCLE_SHAPE);
-		addType(new PolygonAndCircleContact(), ShapeType.POLYGON_SHAPE, ShapeType.CIRCLE_SHAPE);
-		addType(new PolygonContact(), ShapeType.POLYGON_SHAPE, ShapeType.POLYGON_SHAPE);
+		addType(new CircleContact(), org.jbox2d.structs.collision.shapes.CIRCLE_SHAPE, org.jbox2d.structs.collision.shapes.CIRCLE_SHAPE);
+		addType(new PolygonAndCircleContact(), org.jbox2d.structs.collision.shapes.POLYGON_SHAPE, org.jbox2d.structs.collision.shapes.CIRCLE_SHAPE);
+		addType(new PolygonContact(), org.jbox2d.structs.collision.shapes.POLYGON_SHAPE, org.jbox2d.structs.collision.shapes.POLYGON_SHAPE);
 	}
 	
 	public static Contact create(Fixture fixtureA, Fixture fixtureB){
@@ -83,8 +83,8 @@ public abstract class Contact {
 		ShapeType type1 = fixtureA.getType();
 		ShapeType type2 = fixtureB.getType();
 		
-		assert( ShapeType.UNKNOWN_SHAPE.intValue < type1.intValue && type1.intValue < ShapeType.TYPE_COUNT);
-		assert( ShapeType.UNKNOWN_SHAPE.intValue < type2.intValue && type2.intValue < ShapeType.TYPE_COUNT);
+		assert( org.jbox2d.structs.collision.shapes.intValue < type1.intValue && type1.intValue < ShapeType.TYPE_COUNT);
+		assert( org.jbox2d.structs.collision.shapes.intValue < type2.intValue && type2.intValue < ShapeType.TYPE_COUNT);
 		
 		ContactCreateFcn createFcn = s_registers[type1.intValue][type2.intValue].createFcn;
 		if(createFcn != null){
@@ -113,8 +113,8 @@ public abstract class Contact {
 		ShapeType type1 = contact.getFixtureA().getType();
 		ShapeType type2 = contact.getFixtureB().getType();
 		
-		assert( ShapeType.UNKNOWN_SHAPE.intValue < type1.intValue && type1.intValue < ShapeType.TYPE_COUNT);
-		assert( ShapeType.UNKNOWN_SHAPE.intValue < type2.intValue && type2.intValue < ShapeType.TYPE_COUNT);
+		assert( org.jbox2d.structs.collision.shapes.intValue < type1.intValue && type1.intValue < ShapeType.TYPE_COUNT);
+		assert( org.jbox2d.structs.collision.shapes.intValue < type2.intValue && type2.intValue < ShapeType.TYPE_COUNT);
 		
 		ContactCreateFcn destoryFcn = s_registers[type1.intValue][type2.intValue].createFcn;
 		destoryFcn.contactDestroyFcn(contact);

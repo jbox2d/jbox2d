@@ -32,13 +32,13 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.TLVec2;
-import org.jbox2d.structs.collision.MassData;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;
-import org.jbox2d.structs.collision.ShapeType;
+import org.jbox2d.structs.collision.shapes.MassData;
+import org.jbox2d.structs.collision.shapes.ShapeType;
 
 
-//Updated to rev 109 of Shape.cpp/.h
+//Updated to rev 100
 
 /**
  * A circle shape.
@@ -64,14 +64,6 @@ public class CircleShape extends Shape {
 		shape.m_p.set(m_p);
 		shape.m_radius = m_radius;
 		return shape;
-	}
-
-	/**
-	 * @see org.jbox2d.collision.shapes.Shape#getChildCount()
-	 */
-	@Override
-	public int getChildCount() {
-		return 1;
 	}
 	
 	/**
@@ -138,7 +130,7 @@ public class CircleShape extends Shape {
 	 * @see Shape#raycast(org.jbox2d.structs.collision.RayCastOutput, org.jbox2d.structs.collision.RayCastInput, org.jbox2d.common.Transform, int)
 	 */
 	@Override
-	public final boolean raycast( RayCastOutput argOutput, RayCastInput argInput, Transform argTransform, int argChildIndex){
+	public final boolean raycast( RayCastOutput argOutput, RayCastInput argInput, Transform argTransform){
 		
 		final Vec2 position = tlposition.get();;
 		final Vec2 s = tls.get();
@@ -183,7 +175,7 @@ public class CircleShape extends Shape {
 	 * @see org.jbox2d.collision.shapes.Shape#computeAABB(org.jbox2d.collision.AABB, org.jbox2d.common.Transform, int)
 	 */
 	@Override
-	public final void computeAABB(final AABB argAabb, final Transform argTransform, int argChildIndex) {
+	public final void computeAABB(final AABB argAabb, final Transform argTransform) {
 		final Vec2 p = tlp.get();
 		Mat22.mulToOut(argTransform.R, m_p, p);
 		p.addLocal(argTransform.position);

@@ -48,8 +48,8 @@ public class TOI {
 		final Sweep sweepA = input.sweepA;
 		final Sweep sweepB = input.sweepB;
 		
-		assert(sweepA.t0 == sweepB.t0);
-		assert(1 - sweepA.t0 > Settings.EPSILON);
+		assert(sweepA.alpha0 == sweepB.alpha0);
+		assert(1 - sweepA.alpha0 > Settings.EPSILON);
 		
 		float radius = proxyA.m_radius + proxyB.m_radius;
 		float tolerance = input.tolerance;

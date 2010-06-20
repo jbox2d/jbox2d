@@ -5,7 +5,7 @@ import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.pooling.SingletonPool;
-import org.jbox2d.structs.collision.ShapeType;
+import org.jbox2d.structs.collision.shapes.ShapeType;
 import org.jbox2d.structs.dynamics.contacts.ContactCreateFcn;
 
 public class PolygonAndCircleContact extends Contact implements ContactCreateFcn {
@@ -14,8 +14,8 @@ public class PolygonAndCircleContact extends Contact implements ContactCreateFcn
 	
 	public PolygonAndCircleContact(Fixture fixtureA, Fixture fixtureB) {
 		super(fixtureA, fixtureB);
-		assert(m_fixtureA.getType() == ShapeType.POLYGON_SHAPE);
-		assert(m_fixtureB.getType() == ShapeType.CIRCLE_SHAPE);
+		assert(m_fixtureA.getType() == org.jbox2d.structs.collision.shapes.POLYGON_SHAPE);
+		assert(m_fixtureB.getType() == org.jbox2d.structs.collision.shapes.CIRCLE_SHAPE);
 	}
 
 	@Override

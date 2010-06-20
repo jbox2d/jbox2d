@@ -30,12 +30,12 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.TLTransform;
 import org.jbox2d.pooling.TLVec2;
-import org.jbox2d.structs.collision.MassData;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;
-import org.jbox2d.structs.collision.ShapeType;
+import org.jbox2d.structs.collision.shapes.MassData;
+import org.jbox2d.structs.collision.shapes.ShapeType;
 
-//Updated to rev 109 of PolygonShape.cpp/.h
+//Updated to rev 100
 
 /** A convex polygon shape.  Create using Body.createShape(ShapeDef), not the ructor here. */
 public class PolygonShape extends Shape{
@@ -83,6 +83,42 @@ public class PolygonShape extends Shape{
 		shape.m_radius = this.m_radius;
 		shape.m_vertexCount = this.m_vertexCount;
 		return shape;
+	}
+	
+	/**
+	 * 	Get the supporting vertex index in the given direction.
+	 * @param d
+	 * @return
+	 */
+	public final int getSupport(final Vec2 d){
+		int bestIndex = 0;
+		float bestValue = Vec2.dot(m_vertices[0], d);
+		for(int i=1; i<m_vertexCount; i++){
+			float value = Vec2.dot(m_vertices[i],d);
+			if( value > bestValue){
+				bestIndex = i;
+				bestValue = value;
+			}
+		}
+		return bestIndex;
+	}
+	
+	/**
+	 * Get the supporting vertex in the given direction.
+	 * @param d
+	 * @return
+	 */
+	public final Vec2 getSupportVertex(final Vec2 d){
+		int bestIndex = 0;
+		float bestValue = Vec2.dot(m_vertices[0], d);
+		for(int i=1; i<m_vertexCount; i++){
+			float value = Vec2.dot(m_vertices[i],d);
+			if( value > bestValue){
+				bestIndex = i;
+				bestValue = value;
+			}
+		}
+		return m_vertices[bestIndex];
 	}
 
 	// djm pooled
@@ -212,14 +248,6 @@ public class PolygonShape extends Shape{
 		m_normals[0].normalize();
 		m_normals[1].set(m_normals[0]).negateLocal();
 	}
-
-	/**
-	 * @see org.jbox2d.collision.shapes.Shape#getChildCount()
-	 */
-	@Override
-	public int getChildCount() {
-		return 1;
-	}
 	
 	// djm pooling
 	private static final TLVec2 tlpLocal = new TLVec2();
@@ -265,7 +293,7 @@ public class PolygonShape extends Shape{
 	 * @see Shape#computeAABB(AABB, Transform, int)
 	 */
 	@Override
-	public final void computeAABB(final AABB argAabb,  final Transform argXf, int argChildIndex){
+	public final void computeAABB(final AABB argAabb,  final Transform argXf){
 		
 		final Vec2 lower = tllower.get();
 		final Vec2 upper = tlupper.get();
@@ -492,7 +520,7 @@ public class PolygonShape extends Shape{
 	 * @see org.jbox2d.collision.shapes.Shape#raycast(org.jbox2d.structs.collision.RayCastOutput, org.jbox2d.structs.collision.RayCastInput, org.jbox2d.common.Transform, int)
 	 */
 	@Override
-	public final boolean raycast( RayCastOutput argOutput, RayCastInput argInput, Transform argXf, int argChildIndex){
+	public final boolean raycast( RayCastOutput argOutput, RayCastInput argInput, Transform argXf){
 		final Vec2 p1 = tlp1.get();
 		final Vec2 p2 = tlp2.get();
 		final Vec2 d = tltsd.get();
@@ -780,5 +808,11 @@ public class PolygonShape extends Shape{
 	/** Get the centroid and apply the supplied transform. */
 	public Vec2 centroid(final Transform xf) {
 		return Transform.mul(xf, m_centroid);
+	}
+	
+	/** Get the centroid and apply the supplied transform. */
+	public Vec2 centroidToOut(final Transform xf, final Vec2 out) {
+		Transform.mulToOut(xf, m_centroid, out);
+		return out;
 	}
 }
