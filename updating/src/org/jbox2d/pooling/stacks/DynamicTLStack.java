@@ -24,5 +24,12 @@ public abstract class DynamicTLStack<T> {
 		tlStack.get().push(argObject);
 	}
 	
+	public void recycle(T... argObjects){
+		Stack<T> stack = tlStack.get();
+		for(T object : argObjects){
+			stack.push(object);
+		}
+	}
+	
 	protected abstract T newObjectInstance();
 }
