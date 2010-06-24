@@ -105,7 +105,7 @@ public abstract class Contact {
 	public static void destroy(Contact contact){
 		assert(s_initialized == true);
 		
-		if(contact.m_manifold.m_pointCount > 0){
+		if(contact.m_manifold.pointCount > 0){
 			contact.getFixtureA().getBody().wakeUp();
 			contact.getFixtureB().getBody().wakeUp();
 		}
@@ -165,7 +165,7 @@ public abstract class Contact {
 		m_fixtureB = fB;
 
 		m_manifold = new Manifold();
-		m_manifold.m_pointCount = 0;
+		m_manifold.pointCount = 0;
 
 		m_prev = null;
 		m_next = null;
@@ -298,14 +298,14 @@ public abstract class Contact {
 			evaluate();
 		}
 		else{
-			m_manifold.m_pointCount = 0;
+			m_manifold.pointCount = 0;
 		}
 
 		Body bodyA = m_fixtureA.getBody();
 		Body bodyB = m_fixtureB.getBody();
 
-		int oldCount = oldManifold.m_pointCount;
-		int newCount = m_manifold.m_pointCount;
+		int oldCount = oldManifold.pointCount;
+		int newCount = m_manifold.pointCount;
 
 		if (newCount == 0 && oldCount > 0){
 			bodyA.wakeUp();
@@ -322,18 +322,18 @@ public abstract class Contact {
 
 		// Match old contact ids to new contact ids and copy the
 		// stored impulses to warm start the solver.
-		for (int i = 0; i < m_manifold.m_pointCount; ++i){
-			ManifoldPoint mp2 = m_manifold.m_points[i];
-			mp2.m_normalImpulse = 0.0f;
-			mp2.m_tangentImpulse = 0.0f;
-			ContactID id2 = mp2.m_id;
+		for (int i = 0; i < m_manifold.pointCount; ++i){
+			ManifoldPoint mp2 = m_manifold.points[i];
+			mp2.normalImpulse = 0.0f;
+			mp2.tangentImpulse = 0.0f;
+			ContactID id2 = mp2.id;
 
-			for (int j = 0; j < oldManifold.m_pointCount; ++j){
-				ManifoldPoint mp1 = oldManifold.m_points[j];
+			for (int j = 0; j < oldManifold.pointCount; ++j){
+				ManifoldPoint mp1 = oldManifold.points[j];
 
-				if (mp1.m_id.key == id2.key){
-					mp2.m_normalImpulse = mp1.m_normalImpulse;
-					mp2.m_tangentImpulse = mp1.m_tangentImpulse;
+				if (mp1.id.key == id2.key){
+					mp2.normalImpulse = mp1.normalImpulse;
+					mp2.tangentImpulse = mp1.tangentImpulse;
 					break;
 				}
 			}

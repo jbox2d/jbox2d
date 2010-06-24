@@ -22,7 +22,6 @@
  */
 package org.jbox2d.structs.collision;
 
-//Updated to rev 56->139-218 of b2Collision.h
 
 //FIXME: In the C++ version, this class is a union of
 //the key and the features, meaning not that it contains
@@ -37,6 +36,8 @@ package org.jbox2d.structs.collision;
 //
 //Also, it might be better performance-wise to pull features
 //to a top level class if inner classes have more overhead (check this).
+
+// updated to rev 100
 
 /** Contact ids to facilitate warm starting.*/
 public class ContactID {

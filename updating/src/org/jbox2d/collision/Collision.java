@@ -19,6 +19,9 @@ import org.jbox2d.structs.collision.distance.DistanceInput;
 import org.jbox2d.structs.collision.distance.DistanceOutput;
 import org.jbox2d.structs.collision.distance.SimplexCache;
 
+// updated to rev 100 collision.h/cpp
+// updated to rev 100 collidecircle.cpp
+// updated to rev 100 collidepolygon.cpp
 /**
  * Functions used for computing contact points, distance
  * queries, and TOI queries.  Collision methods are non-static for pooling speed, 
@@ -75,8 +78,6 @@ public class Collision {
 	 */
 	public static final void getPointStates(final PointState[] state1, final PointState[] state2,
 	                                        final Manifold manifold1, final Manifold manifold2){
-		assert(state1.length == Settings.maxManifoldPoints);
-		assert(state2.length == Settings.maxManifoldPoints);
 		
 		for( int i=0; i< Settings.maxManifoldPoints; i++){
 			state1[i] = PointState.NULL_STATE;
@@ -84,13 +85,13 @@ public class Collision {
 		}
 		
 		// Detect persists and removes.
-		for( int i=0; i<manifold1.m_pointCount; i++){
-			ContactID id = manifold1.m_points[i].m_id;
+		for( int i=0; i<manifold1.pointCount; i++){
+			ContactID id = manifold1.points[i].id;
 			
 			state1[i] = PointState.REMOVE_STATE;
 			
-			for( int j = 0; j < manifold2.m_pointCount; j++){
-				if(manifold2.m_points[j].m_id.key == id.key){
+			for( int j = 0; j < manifold2.pointCount; j++){
+				if(manifold2.points[j].id.key == id.key){
 					state1[i] = PointState.PERSIST_STATE;
 					break;
 				}
@@ -98,13 +99,13 @@ public class Collision {
 		}
 		
 		// Detect persists and adds
-		for( int i=0; i< manifold2.m_pointCount; i++){
-			ContactID id = manifold2.m_points[i].m_id;
+		for( int i=0; i< manifold2.pointCount; i++){
+			ContactID id = manifold2.points[i].id;
 			
 			state2[i] = PointState.ADD_STATE;
 			
-			for(int j=0; j < manifold1.m_pointCount; j++){
-				if(manifold1.m_points[j].m_id.key == id.key){
+			for(int j=0; j < manifold1.pointCount; j++){
+				if(manifold1.points[j].id.key == id.key){
 					state2[i] = PointState.PERSIST_STATE;
 					break;
 				}
@@ -112,40 +113,88 @@ public class Collision {
 		}
 	}
 	
+	
+	/**
+	 * Clipping for contact manifolds.
+	 * Sutherland-Hodgman clipping.
+	 * @param vOut
+	 * @param vIn
+	 * @param normal
+	 * @param offset
+	 * @return
+	 */
+	public static final int clipSegmentToLine(final ClipVertex[] vOut, final ClipVertex[] vIn, final Vec2 normal, float offset){
+		
+		// Start with no output points
+		int numOut = 0;
+		
+		// Calculate the distance of end points to the line
+		float distance0 = Vec2.dot( normal, vIn[0].v) - offset;
+		float distance1 = Vec2.dot( normal, vIn[1].v) - offset;
+		
+		// If the points are behind the plane
+		if (distance0 <= 0.0f){
+			vOut[numOut++] = vIn[0];
+		}
+		if (distance1 <= 0.0f){
+			vOut[numOut++] = vIn[1];
+		}
+		
+		// If the points are on different sides of the plane
+		if (distance0 * distance1 < 0.0f){
+			// Find intersection point of edge and plane
+			float interp = distance0 / (distance0 - distance1);
+			//vOut[numOut].v = vIn[0].v + interp * (vIn[1].v - vIn[0].v);
+			vOut[numOut].v.set(vIn[1].v).subLocal(vIn[0].v).mulLocal( interp).addLocal( vIn[0].v);
+			if (distance0 > 0.0f){
+				vOut[numOut].id.set(vIn[0].id);
+			}
+			else{
+				vOut[numOut].id.set(vIn[1].id);
+			}
+			++numOut;
+		}
+
+		return numOut;
+	}
+	
+	
+	// #### COLLISION STUFF (not from collision.h or collision.cpp) ####
+	
 	// djm pooling
-	private final Vec2 p1 = new Vec2();
-	private final Vec2 p2 = new Vec2();
+	private final Vec2 pA = new Vec2();
+	private final Vec2 pB = new Vec2();
 	private final Vec2 d = new Vec2();
 
 	/**
 	 * Compute the collision manifold between two circles.
 	 * @param manifold
 	 * @param circle1
-	 * @param xf1
+	 * @param xfA
 	 * @param circle2
-	 * @param xf2
+	 * @param xfB
 	 */
-	public final void collideCircles(Manifold manifold, final CircleShape circle1, final Transform xf1,
-	                                        final CircleShape circle2, final Transform xf2){
-		manifold.m_pointCount = 0;
+	public final void collideCircles(Manifold manifold, final CircleShape circle1, final Transform xfA,
+	                                        final CircleShape circle2, final Transform xfB){
+		manifold.pointCount = 0;
 		
-		Transform.mulToOut( xf1, circle1.m_p, p1);
-		Transform.mulToOut( xf2, circle2.m_p, p2);
-		d.set(p2).subLocal(p1);
+		Transform.mulToOut( xfA, circle1.m_p, pA);
+		Transform.mulToOut( xfB, circle2.m_p, pB);
 		
+		d.set(pB).subLocal(pA);
 		float distSqr = Vec2.dot(d, d);
 		float radius = circle1.m_radius + circle2.m_radius;
 		if( distSqr > radius * radius){
 			return;
 		}
 		
-		manifold.m_type = ManifoldType.e_circles;
-		manifold.m_localPoint.set(circle1.m_p);
-		manifold.m_localPlaneNormal.setZero();
-		manifold.m_pointCount = 1;
+		manifold.type = ManifoldType.e_circles;
+		manifold.localPoint.set(circle1.m_p);
+		manifold.localNormal.setZero();
+		manifold.pointCount = 1;
 		
-		manifold.m_points[0].m_localPoint.set(circle2.m_p);
-		manifold.m_points[0].m_id.key = 0;
+		manifold.points[0].localPoint.set(circle2.m_p);
+		manifold.points[0].id.key = 0;
 	}
 	
 	// djm pooling, and from above
@@ -157,22 +206,22 @@ public class Collision {
 	 * Compute the collision manifold between a polygon and a circle.
 	 * @param manifold
 	 * @param polygon
-	 * @param xf1
+	 * @param xfA
 	 * @param circle
-	 * @param xf2
+	 * @param xfB
 	 */
-	public final void collidePolygonAndCircle(Manifold manifold, final PolygonShape polygon, final Transform xf1,
-	                                        final CircleShape circle, final Transform xf2){
-		manifold.m_pointCount = 0;
+	public final void collidePolygonAndCircle(Manifold manifold, final PolygonShape polygon, final Transform xfA,
+	                                        final CircleShape circle, final Transform xfB){
+		manifold.pointCount = 0;
 		
 		// Compute circle position in the frame of the polygon.
-		Transform.mulToOut(xf2, circle.m_p, c);
-		Transform.mulToOut(xf1, c, cLocal);
+		Transform.mulToOut(xfB, circle.m_p, c);
+		Transform.mulToOut(xfA, c, cLocal);
 		
 		// Find the min separating edge.
 		int normalIndex = 0;
 		float separation = Float.MIN_VALUE;
-		float radius = polygon.m_radius+circle.m_radius;
+		float radius = polygon.m_radius + circle.m_radius;
 		int vertexCount = polygon.m_vertexCount;
 		
 		Vec2[] vertices = polygon.m_vertices;
@@ -201,12 +250,12 @@ public class Collision {
 		
 		// If the center is inside the polygon ...
 		if(separation < Settings.EPSILON){
-			manifold.m_pointCount = 1;
-			manifold.m_type = ManifoldType.e_faceA;
-			manifold.m_localPlaneNormal.set(normals[normalIndex]);
-			manifold.m_localPoint.set( v1).addLocal(v2).mulLocal( .5f);
-			manifold.m_points[0].m_localPoint.set(circle.m_p);
-			manifold.m_points[0].m_id.key = 0;
+			manifold.pointCount = 1;
+			manifold.type = ManifoldType.e_faceA;
+			manifold.localNormal.set(normals[normalIndex]);
+			manifold.localPoint.set( v1).addLocal(v2).mulLocal( .5f);
+			manifold.points[0].localPoint.set(circle.m_p);
+			manifold.points[0].id.key = 0;
 			return;
 		}
 	
@@ -224,29 +273,30 @@ public class Collision {
 				return;
 			}
 			
-			manifold.m_pointCount = 1;
-			manifold.m_type = ManifoldType.e_faceA;
-			manifold.m_localPlaneNormal.set(cLocal).subLocal(v1);
-			manifold.m_localPlaneNormal.normalize();
-			manifold.m_localPoint.set(v1);
-			manifold.m_points[0].m_localPoint.set(circle.m_p);
-			manifold.m_points[0].m_id.key = 0;
+			manifold.pointCount = 1;
+			manifold.type = ManifoldType.e_faceA;
+			manifold.localNormal.set(cLocal).subLocal(v1);
+			manifold.localNormal.normalize();
+			manifold.localPoint.set(v1);
+			manifold.points[0].localPoint.set(circle.m_p);
+			manifold.points[0].id.key = 0;
 		}
 		else if (u2 <= 0.0f){
 			if(MathUtils.distanceSquared( cLocal, v2) > radius * radius){
 				return;
 			}
 			
-			manifold.m_pointCount = 1;
-			manifold.m_type = ManifoldType.e_faceA;
-			manifold.m_localPlaneNormal.set(cLocal).subLocal(v2);
-			manifold.m_localPlaneNormal.normalize();
-			manifold.m_localPoint.set(v2);
-			manifold.m_points[0].m_localPoint.set(circle.m_p);
-			manifold.m_points[0].m_id.key = 0;
+			manifold.pointCount = 1;
+			manifold.type = ManifoldType.e_faceA;
+			manifold.localNormal.set(cLocal).subLocal(v2);
+			manifold.localNormal.normalize();
+			manifold.localPoint.set(v2);
+			manifold.points[0].localPoint.set(circle.m_p);
+			manifold.points[0].id.key = 0;
 		}
 		else {
 			//Vec2 faceCenter = 0.5f * (v1 + v2);
+			// (temp is faceCenter)
 			temp.set(v1).addLocal(v2).mulLocal(.5f);
 			
 			temp2.set(cLocal).subLocal(temp);
@@ -255,12 +305,12 @@ public class Collision {
 				return;
 			}
 
-			manifold.m_pointCount = 1;
-			manifold.m_type = ManifoldType.e_faceA;
-			manifold.m_localPlaneNormal.set(normals[vertIndex1]);
-			manifold.m_localPoint.set(temp);
-			manifold.m_points[0].m_localPoint.set(circle.m_p);
-			manifold.m_points[0].m_id.key = 0;
+			manifold.pointCount = 1;
+			manifold.type = ManifoldType.e_faceA;
+			manifold.localNormal.set(normals[vertIndex1]);
+			manifold.localPoint.set(temp);	// (faceCenter)
+			manifold.points[0].localPoint.set(circle.m_p);
+			manifold.points[0].id.key = 0;
 		}
 	}
 	
@@ -277,7 +327,7 @@ public class Collision {
 	 * @param poly2
 	 * @param xf2
 	 */
-	private final float edgeSeparation( final PolygonShape poly1, final Transform xf1, final int edge1,
+	public final float edgeSeparation( final PolygonShape poly1, final Transform xf1, final int edge1,
 	                                          final PolygonShape poly2, final Transform xf2){
 		int count1 = poly1.m_vertexCount;
 		final Vec2[] vertices1 = poly1.m_vertices;
@@ -326,7 +376,7 @@ public class Collision {
 	 * @param xf2
 	 * @return
 	 */
-	private final void findMaxSeparation(EdgeResults results, final PolygonShape poly1, final Transform xf1,
+	public final void findMaxSeparation(EdgeResults results, final PolygonShape poly1, final Transform xf1,
 	                                       final PolygonShape poly2, final Transform xf2){
 		int count1 = poly1.m_vertexCount;
 		final Vec2[] normals1 = poly1.m_normals;
@@ -406,10 +456,9 @@ public class Collision {
 	}
 	
 	// djm pooling from above	
-	private final void findIncidentEdge(final ClipVertex[] c,
+	public final void findIncidentEdge(final ClipVertex[] c,
 	                                           final PolygonShape poly1, final Transform xf1, int edge1,
 	                                           final PolygonShape poly2, final Transform xf2){
-		assert( c.length == 2);
 		int count1 = poly1.m_vertexCount;
 		final Vec2[] normals1 = poly1.m_normals;
 		
@@ -481,7 +530,7 @@ public class Collision {
 
 		// The normal points from 1 to 2
 		
-		manifold.m_pointCount = 0;
+		manifold.pointCount = 0;
 		float totalRadius = polyA.m_radius + polyB.m_radius;
 		
 		findMaxSeparation(results1, polyA, xfA, polyB, xfB);
@@ -508,7 +557,7 @@ public class Collision {
 			xf1 = xfB;
 			xf2 = xfA;
 			edge1 = results2.edgeIndex;
-			manifold.m_type = ManifoldType.e_faceB;
+			manifold.type = ManifoldType.e_faceB;
 			flip = 1;
 		}
 		else{
@@ -517,7 +566,7 @@ public class Collision {
 			xf1 = xfA;
 			xf2 = xfB;
 			edge1 = results1.edgeIndex;
-			manifold.m_type = ManifoldType.e_faceA;
+			manifold.type = ManifoldType.e_faceA;
 			flip = 0;
 		}
 
@@ -571,72 +620,25 @@ public class Collision {
 		}
 
 		// Now clipPoints2 contains the clipped points.
-		manifold.m_localPlaneNormal.set(localNormal);
-		manifold.m_localPoint.set(planePoint);
+		manifold.localNormal.set(localNormal);
+		manifold.localPoint.set(planePoint);
 
 		int pointCount = 0;
 		for (int i = 0; i < Settings.maxManifoldPoints; ++i){
 			float separation = Vec2.dot(normal, clipPoints2[i].v) - frontOffset;
 
 			if (separation <= totalRadius){
-				ManifoldPoint cp = manifold.m_points[pointCount];
-				Transform.mulTransToOut( xf2, clipPoints2[i].v, cp.m_localPoint);
+				ManifoldPoint cp = manifold.points[pointCount];
+				Transform.mulTransToOut( xf2, clipPoints2[i].v, cp.localPoint);
 				//cp.m_localPoint = MulT(xf2, clipPoints2[i].v);
-				cp.m_id.set(clipPoints2[i].id);
-				cp.m_id.features.flip = flip;
+				cp.id.set(clipPoints2[i].id);
+				cp.id.features.flip = flip;
 				++pointCount;
 			}
 		}
 
-		manifold.m_pointCount = pointCount; 
+		manifold.pointCount = pointCount; 
 	}
-	
-	/**
-	 * Clipping for contact manifolds.
-	 * Sutherland-Hodgman clipping.
-	 * @param vOut
-	 * @param vIn
-	 * @param normal
-	 * @param offset
-	 * @return
-	 */
-	public static final int clipSegmentToLine(final ClipVertex[] vOut, final ClipVertex[] vIn, final Vec2 normal, float offset){
-		assert(vOut.length == 2);
-		assert(vIn.length == 2);
-		
-		// Start with no output points
-		int numOut = 0;
-		
-		// Calculate the distance of end points to the line
-		float distance0 = Vec2.dot( normal, vIn[0].v) - offset;
-		float distance1 = Vec2.dot( normal, vIn[1].v) - offset;
-		
-		// If the points are behind the plane
-		if (distance0 <= 0.0f){
-			vOut[numOut++] = vIn[0];
-		}
-		if (distance1 <= 0.0f){
-			vOut[numOut++] = vIn[1];
-		}
-		
-		// If the points are on different sides of the plane
-		if (distance0 * distance1 < 0.0f){
-			// Find intersection point of edge and plane
-			float interp = distance0 / (distance0 - distance1);
-			//vOut[numOut].v = vIn[0].v + interp * (vIn[1].v - vIn[0].v);
-			vOut[numOut].v.set(vIn[1].v).subLocal(vIn[0].v).mulLocal( interp).addLocal( vIn[0].v);
-			if (distance0 > 0.0f){
-				vOut[numOut].id.set(vIn[0].id);
-			}
-			else{
-				vOut[numOut].id.set(vIn[1].id);
-			}
-			++numOut;
-		}
-
-		return numOut;
-	}
-	
 	
 	/**
 	 * Java-specific class for returning edge results

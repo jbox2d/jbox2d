@@ -32,13 +32,13 @@ public class DistanceProxy {
 	 */
 	public final void set(final Shape shape){
 		switch(shape.getType()){
-			case CIRCLE_SHAPE:
+			case CIRCLE:
 				final CircleShape circle = (CircleShape) shape;
-				m_vertices[0] = circle.m_p;
+				m_vertices[0].set(circle.m_p);
 				m_count = 1;
 				m_radius = circle.m_radius;
 				break;
-			case POLYGON_SHAPE:
+			case POLYGON:
 				final PolygonShape poly = (PolygonShape) shape;
 				m_count = poly.m_vertexCount;
 				m_radius = poly.m_radius;

@@ -24,7 +24,6 @@
 package org.jbox2d.collision.shapes;
 
 import org.jbox2d.collision.AABB;
-import org.jbox2d.collision.Segment;
 
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;

@@ -7,6 +7,7 @@ import org.jbox2d.pooling.TLVec2;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;
 
+// updated to rev 100
 /** An axis-aligned bounding box. */
 public class AABB {
 	/** Bottom left vertex of bounding box. */
@@ -119,11 +120,11 @@ public class AABB {
 		result = result && aabb.upperBound.x <= upperBound.x;
 		result = result && aabb.upperBound.y <= upperBound.y;
 		return result;*/
-		// djm: faster using ors, as if one is true we leave the logic early
-		return !(lowerBound.x > aabb.lowerBound.x ||
-				lowerBound.y > aabb.lowerBound.y ||
-				aabb.upperBound.x > upperBound.x ||
-				aabb.upperBound.y > upperBound.y);
+		// djm: faster putting all of them together, as if one is false we leave the logic early
+		return  lowerBound.x > aabb.lowerBound.x &&
+				lowerBound.y > aabb.lowerBound.y &&
+				aabb.upperBound.x > upperBound.x &&
+				aabb.upperBound.y > upperBound.y;
 	}
 
 	// djm pooled
@@ -143,9 +144,11 @@ public class AABB {
 		final Vec2 d = tld.get();
 		final Vec2 absD = tlabsD.get();
 		final Vec2 normal = tlnormal.get();
+		
 		d.set(input.p2).subLocal(input.p1);
 		Vec2.absToOut( d, absD);
 
+		// x then y
 		if (absD.x < Settings.EPSILON){
 			// Parallel.
 			if (p.x < lowerBound.x || upperBound.x < p.x){

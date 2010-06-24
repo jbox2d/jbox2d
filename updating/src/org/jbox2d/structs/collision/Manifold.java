@@ -26,8 +26,7 @@ package org.jbox2d.structs.collision;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 
-//Updated to rev 56->108->139->218 of b2Collision.h
-
+// updated to rev 100
 /**
  * A manifold for two touching convex shapes.
  * Box2D supports multiple types of contact:
@@ -55,31 +54,31 @@ public class Manifold {
 	}
 	
 	/** The points of contact. */
-    public final ManifoldPoint[] m_points;
+    public final ManifoldPoint[] points;
     
     /** not use for Type::e_points */
-    public final Vec2 m_localPlaneNormal;
+    public final Vec2 localNormal;
     
     /** usage depends on manifold type */
-    public final Vec2 m_localPoint;
+    public final Vec2 localPoint;
     
-    public ManifoldType m_type;
+    public ManifoldType type;
     
     /** The number of manifold points. */
-    public int m_pointCount;
+    public int pointCount;
 
     /**
      * creates a manifold with 0 points, with it's points array
      * full of instantiated ManifoldPoints.
      */
     public Manifold() {
-        m_points = new ManifoldPoint[Settings.maxManifoldPoints];
+        points = new ManifoldPoint[Settings.maxManifoldPoints];
         for (int i = 0; i < Settings.maxManifoldPoints; i++) {
-            m_points[i] = new ManifoldPoint();
+            points[i] = new ManifoldPoint();
         }
-        m_localPlaneNormal = new Vec2();
-        m_localPoint = new Vec2();
-        m_pointCount = 0;
+        localNormal = new Vec2();
+        localPoint = new Vec2();
+        pointCount = 0;
     }
 
     /**
@@ -87,13 +86,13 @@ public class Manifold {
      * @param other
      */
     public Manifold(Manifold other) {
-        m_points = new ManifoldPoint[Settings.maxManifoldPoints];
-        m_localPlaneNormal = other.m_localPlaneNormal.clone();
-        m_localPoint = other.m_localPoint.clone();
-        m_pointCount = other.m_pointCount;
+        points = new ManifoldPoint[Settings.maxManifoldPoints];
+        localNormal = other.localNormal.clone();
+        localPoint = other.localPoint.clone();
+        pointCount = other.pointCount;
         // djm: this is correct now
         for(int i=0; i < Settings.maxManifoldPoints; i++){
-    		m_points[i] = new ManifoldPoint(other.m_points[i]);
+    		points[i] = new ManifoldPoint(other.points[i]);
     	}
     }
     
@@ -103,12 +102,12 @@ public class Manifold {
      * @param cp manifold to copy from
      */
     public void set(Manifold cp){
-    	for(int i=0; i<cp.m_pointCount; i++){
-    		m_points[i].set(cp.m_points[i]);
+    	for(int i=0; i<cp.pointCount; i++){
+    		points[i].set(cp.points[i]);
     	}
     	
-    	m_localPlaneNormal.set(cp.m_localPlaneNormal);
-    	m_localPoint.set( cp.m_localPoint);
-    	m_pointCount = cp.m_pointCount;
+    	localNormal.set(cp.localNormal);
+    	localPoint.set( cp.localPoint);
+    	pointCount = cp.pointCount;
     }
 }
