@@ -12,6 +12,7 @@ public class DynamicTreeNode {
 	public Object userData;
 	
 	protected DynamicTreeNode parent;
+	protected DynamicTreeNode next;
 	
 	protected DynamicTreeNode child1;
 	protected DynamicTreeNode child2;

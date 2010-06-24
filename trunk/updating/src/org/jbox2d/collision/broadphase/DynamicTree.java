@@ -61,6 +61,15 @@ public class DynamicTree {
 		
 		insertLeaf(proxy);
 		
+		int iterationCount = m_nodeCount >> 4;
+		int tryCount = 0;
+		int height = computeHeight();
+		while(height > 64 && tryCount < 10){
+			rebalance(iterationCount);
+			height = computeHeight();
+			++tryCount;
+		}
+		
 		return proxy;
 	}
 	
@@ -69,6 +78,7 @@ public class DynamicTree {
 	 * @param argProxy
 	 */
 	public final void destroyProxy(DynamicTreeNode argProxy){
+		assert(argProxy != null);
 		assert(argProxy.isLeaf());
 		
 		removeLeaf(argProxy);
@@ -84,6 +94,7 @@ public class DynamicTree {
 	 * @return true if the proxy was re-inserted.
 	 */
 	public final boolean moveProxy( DynamicTreeNode argProxy, final AABB argAABB, Vec2 displacement){
+		assert( argProxy != null);
 		assert( argProxy.isLeaf());
 		
 		if( argProxy.aabb.contains(argAABB)){
@@ -93,8 +104,8 @@ public class DynamicTree {
 		removeLeaf(argProxy);
 		
 		// Extend AABB
-		argAABB.lowerBound.x += Settings.aabbExtension;
-		argAABB.lowerBound.y += Settings.aabbExtension;
+		argAABB.lowerBound.x -= Settings.aabbExtension;
+		argAABB.lowerBound.y -= Settings.aabbExtension;
 		argAABB.upperBound.x += Settings.aabbExtension;
 		argAABB.upperBound.y += Settings.aabbExtension;
 
@@ -123,16 +134,12 @@ public class DynamicTree {
 	
 	/**
 	 * Rebalances the tree for the given iterations.  Goes through
-	 * the tree by left-center-right (then back to root).  If given enough
+	 * the tree by child1-child2 order (then back to root).  If given enough
 	 * iterations it will hit all the nodes.  It starts off at the last leaf
 	 * that it reinserted.
 	 * @param argIterations
 	 */
 	public final void rebalance(int argIterations){
-		if(m_nodeCount > argIterations){
-			argIterations = m_nodeCount;
-		}
-		
 		if(lastLeaf == null){
 			lastLeaf = m_root;
 		}
@@ -147,12 +154,6 @@ public class DynamicTree {
 			return 0;
 		}
 		
-		argIterations = rebalance(argIterations, argNode.child1);
-		
-		if( argIterations == 0 ){
-			return 0;
-		}
-		
 		if(argNode.isLeaf()){
 			lastLeaf = argNode;
 			removeLeaf(argNode);
@@ -160,11 +161,16 @@ public class DynamicTree {
 			return --argIterations;
 		}
 		
-		argIterations = rebalance(argIterations, argNode.child2);
-		
+		argIterations = rebalance(argIterations, argNode.child1);
 		if( argIterations == 0 ){
 			return 0;
 		}
+		
+		argIterations = rebalance(argIterations, argNode.child2);
+		if( argIterations == 0 ){
+			return 0;
+		}
+		
 		// and then back to root
 		argIterations = rebalance(argIterations, m_root);
 		
@@ -225,10 +231,13 @@ public class DynamicTree {
 	private static final TLRayCastInput tlsubInput = new TLRayCastInput();
 	//private static final TLRayCastOutput tloutput = new TLRayCastOutput();
 
-	private void raycast( final RayCastCallback argCallback, final RayCastInput argInput,
+	/**
+	 * @return true to stop raycast
+	 */
+	private boolean raycast( final RayCastCallback argCallback, final RayCastInput argInput,
 						  final DynamicTreeNode argNode, int count){
 		if(argNode == null){
-			return;
+			return false;
 		}
 		
 		final Vec2 r = vec2stack.get();
@@ -238,6 +247,8 @@ public class DynamicTree {
 		Vec2 p1 = argInput.p1;
 		Vec2 p2 = argInput.p2;
 		r.set(p2).subLocal(p1);
+		assert(r.lengthSquared() > 0f);
+		r.normalize();
 		
 		// v is perpendicular to the segment.
 		Vec2.crossToOut(1f, r, v);
@@ -252,13 +263,14 @@ public class DynamicTree {
 		final AABB segAABB = aabbstack.get();
 		//b2Vec2 t = p1 + maxFraction * (p2 - p1);
 		final Vec2 temp = vec2stack.get();
-		temp.set(r).mulLocal(maxFraction).addLocal(p1);
+		temp.set(p2).subLocal(p1).mulLocal(maxFraction).addLocal(p1);
 		Vec2.minToOut(p1, temp, segAABB.lowerBound);
 		Vec2.maxToOut(p1, temp, segAABB.upperBound);
 		
-		
+		// start part from c++ code that's in the while loop
 		if ( AABB.testOverlap(argNode.aabb, segAABB) == false ){
-			return;
+			vec2stack.recycle(r, v, absV, temp);
+			return false;
 		}
 			
 		final Vec2 c = vec2stack.get();
@@ -270,7 +282,8 @@ public class DynamicTree {
 		float separation = MathUtils.abs( Vec2.dot(v, temp)) - Vec2.dot(absV, h);
 		
 		if(separation > 0f){
-			return;
+			vec2stack.recycle(r, v, absV, temp, c, h);
+			return false;
 		}
 		
 		if( argNode.isLeaf()){
@@ -279,26 +292,37 @@ public class DynamicTree {
 			subInput.p2.set(argInput.p2);
 			subInput.maxFraction = maxFraction;
 			
-			maxFraction = argCallback.raycastCallback( subInput, argNode);
+			float value = argCallback.raycastCallback( subInput, argNode);
 			
-			if(maxFraction == 0f){
-				return;
+			if(value == 0f){
+				vec2stack.recycle(r, v, absV, temp, c, h);
+				// The client has terminated the ray cast.
+				return true;
 			}
 			
-			// update bounding box
-			{
+			if(value > 0f){
+				// Update segment bounding box
+				maxFraction = value;
 				temp.set(p2).subLocal(p1).mulLocal( maxFraction).addLocal( p1);
 				Vec2.minToOut( p1, temp, segAABB.lowerBound);
 				Vec2.maxToOut( p1, temp, segAABB.upperBound);
 			}
 		}else{
 			if(count < MAX_STACK_SIZE){
-				raycast(argCallback, argInput, argNode.child1, ++count);
+				if(raycast(argCallback, argInput, argNode.child1, ++count)){
+					vec2stack.recycle(r, v, absV, temp, c, h);
+					return true; // to stop whole raycast
+				}
 			}
 			if(count < MAX_STACK_SIZE){
-				raycast(argCallback, argInput, argNode.child2, ++count);
+				if(raycast(argCallback, argInput, argNode.child2, ++count)){
+					vec2stack.recycle(r, v, absV, temp, c, h);
+					return true; // to stop whole raycast
+				}
 			}		
 		}
+		vec2stack.recycle(r, v, absV, temp, c, h);
+		return false;
 	}
 	
 	/**
@@ -313,6 +337,7 @@ public class DynamicTree {
 			return 0;
 		}
 		
+		assert(argNode != null);
 		int height1 = computeHeight(argNode.child1);
 		int height2 = computeHeight(argNode.child2);
 		return 1 + MathUtils.max(height1, height2);
@@ -373,8 +398,8 @@ public class DynamicTree {
 				
 				child1.aabb.getCenterToOut(delta1);
 				child2.aabb.getCenterToOut(delta2);
-				delta1.subLocal(center);
-				delta2.subLocal(center);
+				delta1.subLocal(center).absLocal();
+				delta2.subLocal(center).absLocal();
 				
 				float norm1 = delta1.x + delta1.y;
 				float norm2 = delta2.x + delta2.y;
