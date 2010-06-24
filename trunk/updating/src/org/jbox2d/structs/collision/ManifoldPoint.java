@@ -26,8 +26,7 @@ package org.jbox2d.structs.collision;
 import org.jbox2d.structs.collision.ContactID;
 import org.jbox2d.common.Vec2;
 
-//Updated to rev 56->108->139->218 of b2Collision.h
-
+// updated to rev 100
 /**
  * A manifold point is a contact point belonging to a contact
  * manifold. It holds details related to the geometry and dynamics
@@ -42,21 +41,21 @@ import org.jbox2d.common.Vec2;
  */
 public class ManifoldPoint {
 	/** usage depends on manifold type */
-	public final Vec2 m_localPoint;
+	public final Vec2 localPoint;
 	/** the non-penetration impulse */
-	public float m_normalImpulse;
+	public float normalImpulse;
 	/** the friction impulse */
-	public float m_tangentImpulse;
+	public float tangentImpulse;
 	/** uniquely identifies a contact point between two shapes */
-	public final ContactID m_id;
+	public final ContactID id;
 
 	/**
 	 * Blank manifold point with everything zeroed out.
 	 */
 	public ManifoldPoint() {
-		m_localPoint = new Vec2();
-		m_normalImpulse = m_tangentImpulse = 0f;
-		m_id = new ContactID();
+		localPoint = new Vec2();
+		normalImpulse = tangentImpulse = 0f;
+		id = new ContactID();
 	}
 
 	/**
@@ -64,10 +63,10 @@ public class ManifoldPoint {
 	 * @param cp point to copy from
 	 */
 	public ManifoldPoint(final ManifoldPoint cp) {
-		m_localPoint = cp.m_localPoint.clone();
-		m_normalImpulse = cp.m_normalImpulse;
-		m_tangentImpulse = cp.m_tangentImpulse;
-		m_id = new ContactID(cp.m_id);
+		localPoint = cp.localPoint.clone();
+		normalImpulse = cp.normalImpulse;
+		tangentImpulse = cp.tangentImpulse;
+		id = new ContactID(cp.id);
 	}
 
 	/**
@@ -75,9 +74,9 @@ public class ManifoldPoint {
 	 * @param cp the point to copy from
 	 */
 	public void set(final ManifoldPoint cp){
-		m_localPoint.set(cp.m_localPoint);
-		m_normalImpulse = cp.m_normalImpulse;
-		m_tangentImpulse = cp.m_tangentImpulse;
-		m_id.set(cp.m_id);
+		localPoint.set(cp.localPoint);
+		normalImpulse = cp.normalImpulse;
+		tangentImpulse = cp.tangentImpulse;
+		id.set(cp.id);
 	}
 }

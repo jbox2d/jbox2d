@@ -88,7 +88,7 @@ public class ContactSolver {
 			float wA = bodyA.m_angularVelocity;
 			float wB = bodyB.m_angularVelocity;
 
-			assert(manifold.m_pointCount > 0);
+			assert(manifold.pointCount > 0);
 
 			worldManifold.initialize(manifold, bodyA.m_xf, radiusA, bodyB.m_xf, radiusB);
 
@@ -96,29 +96,29 @@ public class ContactSolver {
 			cc.bodyA = bodyA;
 			cc.bodyB = bodyB;
 			cc.manifold = manifold;
-			cc.normal.set(worldManifold.m_normal);
-			cc.pointCount = manifold.m_pointCount;
+			cc.normal.set(worldManifold.normal);
+			cc.pointCount = manifold.pointCount;
 			cc.friction = friction;
 			cc.restitution = restitution;
 
-			cc.localPlaneNormal.set(manifold.m_localPlaneNormal);
-			cc.localPoint.set(manifold.m_localPoint);
+			cc.localPlaneNormal.set(manifold.localNormal);
+			cc.localPoint.set(manifold.localPoint);
 			cc.radius = radiusA + radiusB;
-			cc.type = manifold.m_type;
+			cc.type = manifold.type;
 
 			for (int j = 0; j < cc.pointCount; ++j){
-				ManifoldPoint cp = manifold.m_points[j];
+				ManifoldPoint cp = manifold.points[j];
 				ContactConstraintPoint ccp = cc.points[j];
 
-				ccp.normalImpulse = cp.m_normalImpulse;
-				ccp.tangentImpulse = cp.m_tangentImpulse;
+				ccp.normalImpulse = cp.normalImpulse;
+				ccp.tangentImpulse = cp.tangentImpulse;
 
-				ccp.localPoint.set(cp.m_localPoint);
+				ccp.localPoint.set(cp.localPoint);
 				
-				ccp.rA.x = worldManifold.m_points[j].x - bodyA.m_sweep.c.x;
-				ccp.rA.y = worldManifold.m_points[j].y - bodyA.m_sweep.c.y;
+				ccp.rA.x = worldManifold.points[j].x - bodyA.m_sweep.c.x;
+				ccp.rA.y = worldManifold.points[j].y - bodyA.m_sweep.c.y;
 
-				ccp.rB.set(worldManifold.m_points[j]).subLocal(bodyB.m_sweep.c);
+				ccp.rB.set(worldManifold.points[j]).subLocal(bodyB.m_sweep.c);
 
 				
 				float rnA = Vec2.cross(ccp.rA, cc.normal);
@@ -638,8 +638,8 @@ public class ContactSolver {
 			Manifold m = c.manifold;
 
 			for (int j = 0; j < c.pointCount; ++j){
-				m.m_points[j].m_normalImpulse = c.points[j].normalImpulse;
-				m.m_points[j].m_tangentImpulse = c.points[j].tangentImpulse;
+				m.points[j].normalImpulse = c.points[j].normalImpulse;
+				m.points[j].tangentImpulse = c.points[j].tangentImpulse;
 			}
 		}
 	}

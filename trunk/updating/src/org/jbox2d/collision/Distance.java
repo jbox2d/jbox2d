@@ -11,6 +11,7 @@ import org.jbox2d.structs.collision.distance.DistanceOutput;
 import org.jbox2d.structs.collision.distance.DistanceProxy;
 import org.jbox2d.structs.collision.distance.SimplexCache;
 
+// updated to rev 100
 /**
  * This is non-static for faster pooling. To get an instance,
  * use the {@link SingletonPool}, don't construct a distance
@@ -57,7 +58,7 @@ public class Distance {
 		public void readCache( SimplexCache cache,
 							   DistanceProxy proxyA, Transform transformA,
 							   DistanceProxy proxyB, Transform transformB){
-			assert(0 <= cache.count && cache.count <= 3);
+			assert(cache.count <= 3);
 			
 			// Copy data from cache.
 			m_count = cache.count;
@@ -118,6 +119,7 @@ public class Distance {
 					return;
 				case 2:
 					e12.set(m_v2.w).subLocal(m_v1.w);
+					// use out for a temp variable real quick
 					out.set(m_v1.w).negateLocal();
 					float sgn = Vec2.cross( e12, out);
 					
@@ -225,7 +227,7 @@ public class Distance {
 				return 0.0f;
 
 			case 2:
-				return MathUtils.sqrt(MathUtils.distanceSquared(m_v1.w, m_v2.w));
+				return MathUtils.distance(m_v1.w, m_v2.w);
 
 			case 3:
 				case3.set(m_v2.w).subLocal(m_v1.w);
@@ -424,7 +426,7 @@ public class Distance {
 		
 		// These store the vertices of the last simplex so that we
 		// can check for duplicates and prevent cycling.
-		// pooled above
+		// (pooled above)
 		int saveCount = 0;
 		
 		simplex.getClosestPoint( closestPoint);

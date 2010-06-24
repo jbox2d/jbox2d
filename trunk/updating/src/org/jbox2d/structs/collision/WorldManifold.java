@@ -7,22 +7,27 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.TLVec2;
 
+// updated to rev 100
+/**
+ * This is used to compute the current state of a contact manifold.
+ * @author daniel
+ */
 public class WorldManifold {
 	/**
 	 * World vector pointing from A to B
 	 */
-	public final Vec2 m_normal;
+	public final Vec2 normal;
 	
 	/**
 	 * World contact point (point of intersection)
 	 */
-	public final Vec2[] m_points;
+	public final Vec2[] points;
 	
 	public WorldManifold(){
-		m_normal = new Vec2();
-		m_points = new Vec2[Settings.maxManifoldPoints];
+		normal = new Vec2();
+		points = new Vec2[Settings.maxManifoldPoints];
 		for(int i=0; i<Settings.maxManifoldPoints; i++){
-			m_points[i] = new Vec2();
+			points[i] = new Vec2();
 		}
 	}
 	
@@ -30,7 +35,6 @@ public class WorldManifold {
 	// djm pooling
 	private static final TLVec2 tlpointA = new TLVec2();
 	private static final TLVec2 tlpointB = new TLVec2();
-	private static final TLVec2 tlnormal = new TLVec2();
 	private static final TLVec2 tlcA = new TLVec2();
 	private static final TLVec2 tlcB = new TLVec2();
 	private static final TLVec2 tlplanePoint = new TLVec2();
@@ -39,73 +43,77 @@ public class WorldManifold {
 	
 	public final void initialize(final Manifold manifold, final Transform xfA, float radiusA,
 	                             final Transform xfB, float radiusB){
-		if(manifold.m_pointCount == 0){
+		if(manifold.pointCount == 0){
 			return;
 		}
 		
-		final Vec2 normal = tlnormal.get();
 		final Vec2 cA = tlcA.get();
 		final Vec2 cB = tlcB.get();
 		
-		switch(manifold.m_type){
+		switch(manifold.type){
 			case e_circles:
 				final Vec2 pointA = tlpointA.get();
 				final Vec2 pointB = tlpointB.get();
 				
-				Transform.mulToOut( xfA, manifold.m_localPoint, pointA);
-				Transform.mulToOut( xfB, manifold.m_points[0].m_localPoint, pointB);
 				normal.set(1,0);
+				Transform.mulToOut( xfA, manifold.localPoint, pointA);
+				Transform.mulToOut( xfB, manifold.points[0].localPoint, pointB);
 				
 				if( MathUtils.distanceSquared( pointA, pointB) > Settings.EPSILON * Settings.EPSILON){
 					normal.set(pointB).subLocal( pointA);
 					normal.normalize();
 				}
-				
-				m_normal.set(normal);
-				
+								
 				cA.set(normal).mulLocal( radiusA).addLocal( pointA);
 				cB.set(normal).mulLocal( radiusB).addLocal( pointB);
-				m_points[0].set( cA).subLocal( cB).mulLocal( 0.5f);
+				points[0].set( cA).addLocal( cB).mulLocal( 0.5f);
 				break;
 			case e_faceA:
 				{
 					final Vec2 planePoint = tlplanePoint.get();
 					
-					Mat22.mulToOut( xfA.R, manifold.m_localPlaneNormal, normal);
-					Transform.mulToOut( xfA, manifold.m_localPoint, planePoint);
-					
-					m_normal.set( normal);
-					
+					Mat22.mulToOut( xfA.R, manifold.localNormal, normal);
+					Transform.mulToOut( xfA, manifold.localPoint, planePoint);
+										
 					final Vec2 clipPoint = tlclipPoint.get();
 					
-					for(int i=0; i<manifold.m_pointCount; i++){
-						Transform.mulToOut( xfB, manifold.m_points[i].m_localPoint, clipPoint);
+					for(int i=0; i<manifold.pointCount; i++){
+//						b2Vec2 clipPoint = b2Mul(xfB, manifold->points[i].localPoint);
+//						b2Vec2 cA = clipPoint + (radiusA - b2Dot(clipPoint - planePoint, normal)) * normal;
+//						b2Vec2 cB = clipPoint - radiusB * normal;
+//						points[i] = 0.5f * (cA + cB);
+						Transform.mulToOut( xfB, manifold.points[i].localPoint, clipPoint);
 						cA.set(clipPoint).subLocal( planePoint);
 						float scalar = radiusA - Vec2.dot( cA, normal);
-						cA.set(normal).mulLocal( scalar).addLocal( clipPoint);
+						cA.set( normal).mulLocal( scalar).addLocal( clipPoint);
 						cB.set( normal).mulLocal( radiusB).subLocal( clipPoint).negateLocal();
-						m_points[i].set(cA).addLocal( cB).mulLocal( 0.5f);
+						points[i].set( cA).addLocal( cB).mulLocal( 0.5f);
 					}
 				}
 				break;
 			case e_faceB:
 				final Vec2 planePoint = tlplanePoint.get();
 				
-				Mat22.mulToOut( xfB.R, manifold.m_localPlaneNormal, normal);
-				Transform.mulToOut( xfB, manifold.m_localPoint, planePoint);
-				
-				m_normal.set( normal).negateLocal();
+				Mat22.mulToOut( xfB.R, manifold.localNormal, normal);
+				Transform.mulToOut( xfB, manifold.localPoint, planePoint);
 				
 				final Vec2 clipPoint = tlclipPoint.get();
 				
-				for(int i=0; i<manifold.m_pointCount; i++){
-					Transform.mulToOut( xfA, manifold.m_points[i].m_localPoint, clipPoint);
+				for(int i=0; i<manifold.pointCount; i++){
+//					b2Vec2 clipPoint = b2Mul(xfA, manifold->points[i].localPoint);
+//					b2Vec2 cB = clipPoint + (radiusB - b2Dot(clipPoint - planePoint, normal)) * normal;
+//					b2Vec2 cA = clipPoint - radiusA * normal;
+//					points[i] = 0.5f * (cA + cB);
+					Transform.mulToOut( xfA, manifold.points[i].localPoint, clipPoint);
 					cB.set(clipPoint).subLocal( planePoint);
 					float scalar = radiusB - Vec2.dot( cB, normal);
-					cB.set(normal).mulLocal( scalar).addLocal( clipPoint);
+					cB.set( normal).mulLocal( scalar).addLocal( clipPoint);
 					cA.set( normal).mulLocal( radiusA).subLocal( clipPoint).negateLocal();
-					m_points[i].set(cA).addLocal( cB).mulLocal( 0.5f);
+					points[i].set(cA).addLocal( cB).mulLocal( 0.5f);
 				}
+				
+				// Ensure normal points from A to B.
+				normal.negateLocal();
 				break;
 		}
 	}
