@@ -2,7 +2,6 @@ package org.jbox2d.pooling.stacks;
 
 import java.util.Stack;
 
-import org.jbox2d.pooling.TLStack;
 
 public abstract class DynamicTLStack<T> {
 

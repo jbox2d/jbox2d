@@ -17,7 +17,7 @@ import org.jbox2d.structs.collision.distance.SimplexCache;
  * use the {@link SingletonPool}, don't construct a distance
  * object.
  *
- * @author daniel
+ * @author Daniel Murphy
  */
 public class Distance {
 

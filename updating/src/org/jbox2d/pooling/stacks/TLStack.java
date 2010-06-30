@@ -1,4 +1,4 @@
-package org.jbox2d.pooling;
+package org.jbox2d.pooling.stacks;
 
 import java.util.Stack;
 
