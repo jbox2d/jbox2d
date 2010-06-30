@@ -27,7 +27,7 @@ import org.jbox2d.structs.collision.distance.SimplexCache;
  * queries, and TOI queries.  Collision methods are non-static for pooling speed, 
  * retrieve a collision object from the {@link SingletonPool}.
  * Should not be constructed.
- * @author daniel
+ * @author Daniel Murphy
  */
 public class Collision {
 	public static final int NULL_FEATURE = Integer.MAX_VALUE;

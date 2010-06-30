@@ -4,17 +4,20 @@ import java.util.Arrays;
 
 import org.jbox2d.collision.AABB;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.pooling.stacks.PairStack;
+import org.jbox2d.structs.collision.RayCastCallback;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.broadphase.Pair;
 import org.jbox2d.structs.collision.broadphase.PairCallback;
 import org.jbox2d.structs.collision.broadphase.QueryCallback;
 
+// updated to rev 100
 /**
  * The broad-phase is used for computing pairs and performing volume queries and ray casts.
  * This broad-phase does not persist pairs. Instead, this reports potentially new pairs.
  * It is up to the client to consume the new pairs and to track subsequent overlap.
  *
- * @author daniel
+ * @author Daniel Murphy
  */
 public class BroadPhase implements QueryCallback{
 	public static final int NULL_PROXY = -1;
@@ -39,6 +42,9 @@ public class BroadPhase implements QueryCallback{
 		m_pairCapacity = 16;
 		m_pairCount = 0;
 		m_pairBuffer = new Pair[m_pairCapacity];
+		for(int i=0; i<m_pairCapacity; i++){
+			m_pairBuffer[i] = new Pair();
+		}
 		
 		m_moveCapacity = 16;
 		m_moveCount = 0;
@@ -73,14 +79,16 @@ public class BroadPhase implements QueryCallback{
 	/**
 	 * Call MoveProxy as many times as you like, then when you are done
 	 * call UpdatePairs to finalized the proxy pairs (for your time step).
-	 * @param proxyId
-	 * @param aabb
 	 */
 	public final void moveProxy(DynamicTreeNode proxy, final AABB aabb, final Vec2 displacement){
 		boolean buffer = m_tree.moveProxy(proxy, aabb, displacement);
 		if(buffer){
 			bufferMove(proxy);
 		}
+	}
+	
+	public boolean testOverlap(DynamicTreeNode proxyA, DynamicTreeNode proxyB){
+		return AABB.testOverlap(proxyA.aabb, proxyB.aabb);
 	}
 	
 	/**
@@ -139,6 +147,9 @@ public class BroadPhase implements QueryCallback{
 				++i;
 			}
 		}
+		
+		// Try to keep the tree balanced.
+		m_tree.rebalance(4);
 	}
 
 	/** 
@@ -160,8 +171,8 @@ public class BroadPhase implements QueryCallback{
 	 * @param input the ray-cast input data. The ray extends from p1 to p1 + maxFraction * (p2 - p1).
 	 * @param callback a callback class that is called for each proxy that is hit by the ray.
 	 */
-	public final void raycast(final Object callback, final RayCastInput input){
-		
+	public final void raycast(final RayCastCallback callback, final RayCastInput input){
+		m_tree.raycast(callback, input);
 	}
 	
 	/**
@@ -196,6 +207,7 @@ public class BroadPhase implements QueryCallback{
 		}
 	}
 	
+	private final PairStack pairStack = new PairStack();
 	/**
 	 * This is called from DynamicTree::query when we are gathering pairs.
 	 */
@@ -214,14 +226,22 @@ public class BroadPhase implements QueryCallback{
 			for(int i=0; i<oldBuffer.length; i++){
 				m_pairBuffer[i] = oldBuffer[i];
 			}
+			for(int i=oldBuffer.length; i<m_pairCapacity; i++){
+				m_pairBuffer[i] = new Pair();
+			}
 		}
 		
-		Pair p = new Pair();
-		p.proxyA = proxy;
-		p.proxyB = m_queryProxy;
 		//m_pairBuffer[m_pairCount]proxyIdA = b2Min(proxyId, m_queryProxyId);
 		//m_pairBuffer[m_pairCount].proxyIdB = b2Max(proxyId, m_queryProxyId);
-		m_pairBuffer[m_pairCount] = p;
+		
+		if(proxy.key < m_queryProxy.key){
+			m_pairBuffer[m_pairCount].proxyA = proxy;
+			m_pairBuffer[m_pairCount].proxyB = m_queryProxy;
+		}else{
+			m_pairBuffer[m_pairCount].proxyA = m_queryProxy;
+			m_pairBuffer[m_pairCount].proxyB = proxy;
+		}
+		
 		++m_pairCount;
 		return true;
 	}

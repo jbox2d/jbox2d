@@ -3,7 +3,7 @@ package org.jbox2d.structs.collision.broadphase;
 import org.jbox2d.collision.broadphase.DynamicTreeNode;
 
 /**
- * Java note: at the "creation" (when retrieved from pool) of each node, a random key is given to
+ * Java note: at the "creation" of each node, a random key is given to
  * that node, and that's what we sort from.
  */
 public class Pair implements Comparable<Pair>{
