@@ -845,7 +845,7 @@ public class Body {
 	 * @param out where to put the corresponding local vector.
 	 */
 	public void getLocalVectorToOut(final Vec2 worldVector, final Vec2 out){
-		Mat22.mulToOut( m_xf.R, worldVector, out);
+		Mat22.mulTransToOut( m_xf.R, worldVector, out); // bug fix, thanks Keraj
 	}
 
 	/** Is this body treated like a bullet for continuous collision detection? */
