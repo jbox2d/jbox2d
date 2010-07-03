@@ -629,7 +629,7 @@ public class Body {
 	}
 	
 	public final void getLocalVectorToOut( Vec2 worldVector, Vec2 out){
-		Mat22.mulToOut(m_xf.R, worldVector, out);
+		Mat22.mulTransToOut(m_xf.R, worldVector, out);
 	}
 
 	/**
