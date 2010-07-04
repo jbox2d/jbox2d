@@ -1,0 +1,127 @@
+<project name="JBox2D" default="dist" basedir=".">
+	<description>Here so we can build the distributions</description>
+	<property file="building.properties"/>
+	
+	<target name="dist-library" depends="copyLibraryToTemp">
+		<description>creates the library jar</description>
+		
+		<mkdir dir="${dist}"/>
+		
+		<echo>Copying appropriate class files</echo>
+		<copy todir="temp">
+			<fileset dir="${build}">
+				<exclude name="org/jbox2d/p5/**.class"/>
+				<exclude name="org/jbox2d/testbed/**.class"/>
+				<exclude name="org/jbox2d/testbed/**/*.class"/>
+				<include name="**/*.class"/>
+			</fileset>
+		</copy>
+		
+		<echo>Constructing jar</echo>
+		<jar basedir="temp" destfile="${dist}/${libraryJarName}"/>
+		
+		<echo>Cleaning up</echo>
+		<delete dir="temp"/>
+	</target>
+		
+	<target name="dist-full" depends="copyFullToTemp">
+		<description>creates the full jar (includes the processing core.jar classes, and the testbed+examples)</description>
+
+		<mkdir dir="${dist}"/>
+		
+		<echo>unpacking dependency jar classes</echo>
+		<unjar dest="temp">
+			<fileset dir="${lib}">
+				<include name="*.jar"/>
+			</fileset>
+		</unjar>
+		
+		<echo>copying over the data files used in the Processing implementation</echo>
+		<copy todir="temp">
+			<fileset dir="data">
+				<include name="**"/>
+			</fileset>
+		</copy>
+		
+		<echo>Creating manifest</echo>
+		<echo file="Full.mf" append="false">Main-Class: org.jbox2d.testbed.TestbedMain</echo>
+		
+		<echo>Constructing jar</echo>
+		<jar basedir="temp" manifest="Full.mf" destfile="${dist}/${fullJarName}"/>
+		
+		<echo>Cleaning up</echo>
+		<delete dir="temp"/>
+		<delete file="Full.mf"/>
+	</target>
+	
+	<target name="dist" depends="dist-library,dist-full">
+		<description>creates both jars</description>
+	</target>
+	
+	<target name="copyLibraryToTemp" depends="copyLibraryClassesToTemp,copyLibrarySourceToTemp">
+		<description>copies the library jar's classes to the temp folder, and optionally the source files too</description>
+	</target>
+	
+	<target name="copyFullToTemp" depends="copyAllClassesToTemp,copyAllSourceToTemp">
+		<description>copies all the classes to the temp folder, and optionally the source files too</description>
+	</target>
+	
+	<target name="copyLibraryClassesToTemp">
+		<description>copies the library class to the temp folder</description>
+		<echo>Everything should be built already, and in the ${build} directory</echo>
+
+		<mkdir dir="temp"/>
+		
+		<echo>Copying library class files to temp</echo>
+		<copy todir="temp">
+			<fileset dir="${build}">
+				<exclude name="org/jbox2d/p5/**.class"/>
+				<exclude name="org/jbox2d/testbed/**.class"/>
+				<exclude name="org/jbox2d/testbed/**/*.class"/>
+				<include name="**/*.class"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="copyLibrarySourceToTemp" if="includeSource">
+		<description>copies the library source files to the temp folder</description>
+
+		<echo>Copying library source files to temp</echo>
+		<mkdir dir="temp"/>
+		
+		<copy todir="temp">
+			<fileset dir="${source}">
+				<exclude name="org/jbox2d/p5/**.java"/>
+				<exclude name="org/jbox2d/testbed/**.java"/>
+				<exclude name="org/jbox2d/testbed/**/*.java"/>
+				<include name="**/*.*"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="copyAllClassesToTemp">
+		<description>copies all classes to the temp folder</description>
+		<echo>Everything should be built already, and in the ${build} directory</echo>
+
+		<mkdir dir="temp"/>
+		
+		<echo>Copying all class files to temp</echo>
+		<copy todir="temp">
+			<fileset dir="${build}">
+				<include name="**/*.class"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="copyAllSourceToTemp" if="includeSource">
+		<description>copies all source files to the temp folder</description>
+		<echo>Copying all source files to temp</echo>
+		<mkdir dir="temp"/>
+		
+		<copy todir="temp">
+			<fileset dir="${source}">
+				<include name="**/*.*"/>
+			</fileset>
+		</copy>
+	</target>
+</project>
