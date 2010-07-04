@@ -2,14 +2,14 @@ package org.jbox2d.pooling;
 
 import org.jbox2d.collision.Collision;
 import org.jbox2d.collision.Distance;
-import org.jbox2d.collision.TOI;
+import org.jbox2d.collision.TimeOfImpact;
 
 public final class SingletonPool {
 
 	private static final class Singletons{
 		public final Collision collision = new Collision();
 		public final Distance distance = new Distance();
-		public final TOI toi = new TOI();
+		public final TimeOfImpact toi = new TimeOfImpact();
 	}
 	
 	private static final class Pool extends ThreadLocal<Singletons>{
@@ -28,7 +28,7 @@ public final class SingletonPool {
 		return pool.get().distance;
 	}
 	
-	public static final TOI getTOI(){
+	public static final TimeOfImpact getTOI(){
 		return pool.get().toi;
 	}
 }
