@@ -51,7 +51,7 @@ public class WorldManifold {
 		final Vec2 cB = tlcB.get();
 		
 		switch(manifold.type){
-			case e_circles:
+			case CIRCLES:
 				final Vec2 pointA = tlpointA.get();
 				final Vec2 pointB = tlpointB.get();
 				
@@ -68,7 +68,7 @@ public class WorldManifold {
 				cB.set(normal).mulLocal( radiusB).addLocal( pointB);
 				points[0].set( cA).addLocal( cB).mulLocal( 0.5f);
 				break;
-			case e_faceA:
+			case FACE_A:
 				{
 					final Vec2 planePoint = tlplanePoint.get();
 					
@@ -91,7 +91,7 @@ public class WorldManifold {
 					}
 				}
 				break;
-			case e_faceB:
+			case FACE_B:
 				final Vec2 planePoint = tlplanePoint.get();
 				
 				Mat22.mulToOut( xfB.R, manifold.localNormal, normal);
