@@ -1,10 +1,7 @@
 package org.jbox2d.structs.dynamics.contacts;
 
-import org.jbox2d.structs.collision.shapes.ShapeType;
-
+// updated to rev 100
 public class ContactRegister {
-    public ContactCreateFcn createFcn;
-    public ContactDestroyFcn destroyFcn;
-
+    public ContactCreator creator;
     public boolean primary;
 }

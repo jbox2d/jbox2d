@@ -5,9 +5,9 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.pooling.SingletonPool;
 import org.jbox2d.structs.collision.shapes.ShapeType;
-import org.jbox2d.structs.dynamics.contacts.ContactCreateFcn;
+import org.jbox2d.structs.dynamics.contacts.ContactCreator;
 
-public class CircleContact extends Contact implements ContactCreateFcn {
+public class CircleContact extends Contact implements ContactCreator {
 
 	public CircleContact(){
 		
