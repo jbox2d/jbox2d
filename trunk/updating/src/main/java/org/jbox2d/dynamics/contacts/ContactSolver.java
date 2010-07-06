@@ -14,10 +14,9 @@ import org.jbox2d.structs.collision.WorldManifold;
 import org.jbox2d.structs.dynamics.contacts.ContactConstraint;
 import org.jbox2d.structs.dynamics.contacts.ContactConstraintPoint;
 
+// pooled locally, non-threaded
 /**
- * Made to be pooled in a stack.
  * @author Daniel
- *
  */
 public class ContactSolver {
 	
@@ -792,7 +791,7 @@ class PositionSolverManifold{
 
 		switch (cc.type)
 		{
-		case e_circles:
+		case CIRCLES:
 			{
 				cc.bodyA.getWorldPointToOut(cc.localPoint, pointA);
 				cc.bodyB.getWorldPointToOut(cc.points[0].localPoint, pointB);
@@ -810,7 +809,7 @@ class PositionSolverManifold{
 			}
 			break;
 
-		case e_faceA:
+		case FACE_A:
 			{
 				cc.bodyA.getWorldVectorToOut(cc.localPlaneNormal, m_normal);
 				cc.bodyA.getWorldPointToOut(cc.localPoint, planePoint);
@@ -824,7 +823,7 @@ class PositionSolverManifold{
 			}
 			break;
 
-		case e_faceB:
+		case FACE_B:
 			{
 				cc.bodyB.getWorldPointToOut(cc.localPoint, planePoint);
 				cc.bodyB.getWorldPointToOut(cc.localPoint, planePoint);

@@ -48,9 +48,9 @@ import org.jbox2d.common.Vec2;
 public class Manifold {
 	
 	public static enum ManifoldType{
-		e_circles,
-		e_faceA,
-		e_faceB
+		CIRCLES,
+		FACE_A,
+		FACE_B
 	}
 	
 	/** The points of contact. */

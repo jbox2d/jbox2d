@@ -188,7 +188,7 @@ public class Collision {
 			return;
 		}
 		
-		manifold.type = ManifoldType.e_circles;
+		manifold.type = ManifoldType.CIRCLES;
 		manifold.localPoint.set(circle1.m_p);
 		manifold.localNormal.setZero();
 		manifold.pointCount = 1;
@@ -251,7 +251,7 @@ public class Collision {
 		// If the center is inside the polygon ...
 		if(separation < Settings.EPSILON){
 			manifold.pointCount = 1;
-			manifold.type = ManifoldType.e_faceA;
+			manifold.type = ManifoldType.FACE_A;
 			manifold.localNormal.set(normals[normalIndex]);
 			manifold.localPoint.set( v1).addLocal(v2).mulLocal( .5f);
 			manifold.points[0].localPoint.set(circle.m_p);
@@ -274,7 +274,7 @@ public class Collision {
 			}
 			
 			manifold.pointCount = 1;
-			manifold.type = ManifoldType.e_faceA;
+			manifold.type = ManifoldType.FACE_A;
 			manifold.localNormal.set(cLocal).subLocal(v1);
 			manifold.localNormal.normalize();
 			manifold.localPoint.set(v1);
@@ -287,7 +287,7 @@ public class Collision {
 			}
 			
 			manifold.pointCount = 1;
-			manifold.type = ManifoldType.e_faceA;
+			manifold.type = ManifoldType.FACE_A;
 			manifold.localNormal.set(cLocal).subLocal(v2);
 			manifold.localNormal.normalize();
 			manifold.localPoint.set(v2);
@@ -306,7 +306,7 @@ public class Collision {
 			}
 
 			manifold.pointCount = 1;
-			manifold.type = ManifoldType.e_faceA;
+			manifold.type = ManifoldType.FACE_A;
 			manifold.localNormal.set(normals[vertIndex1]);
 			manifold.localPoint.set(temp);	// (faceCenter)
 			manifold.points[0].localPoint.set(circle.m_p);
@@ -557,7 +557,7 @@ public class Collision {
 			xf1 = xfB;
 			xf2 = xfA;
 			edge1 = results2.edgeIndex;
-			manifold.type = ManifoldType.e_faceB;
+			manifold.type = ManifoldType.FACE_B;
 			flip = 1;
 		}
 		else{
@@ -566,7 +566,7 @@ public class Collision {
 			xf1 = xfA;
 			xf2 = xfB;
 			edge1 = results1.edgeIndex;
-			manifold.type = ManifoldType.e_faceA;
+			manifold.type = ManifoldType.FACE_A;
 			flip = 0;
 		}
 
