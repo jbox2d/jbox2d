@@ -1,5 +1,6 @@
 package org.jbox2d.dynamics;
 
+// updated to rev 100
 /**
  * This holds contact filtering data.
  *

@@ -905,7 +905,7 @@ public class Body {
 	
 	/**
 	 * Set this body to have fixed rotation. This causes the mass
-	/// to be reset.
+	 * to be reset.
 	 * @param flag
 	 */
 	public void setFixedRotation(boolean flag){

@@ -15,6 +15,8 @@ import org.jbox2d.structs.collision.shapes.MassData;
 import org.jbox2d.structs.collision.shapes.ShapeType;
 import org.jbox2d.structs.dynamics.contacts.ContactEdge;
 
+// updated to rev 100
+// thread-safe pooling
 /**
  * A fixture is used to attach a shape to a body for collision detection. A fixture
  * inherits its transform from its parent. Fixtures hold additional non-geometric data
@@ -28,7 +30,7 @@ public class Fixture {
 
 	public final AABB m_aabb = new AABB();
 	
-	public MassData m_massData;
+	public float m_density;
 	
 	public Fixture m_next;
 	public Body m_body;
@@ -83,27 +85,7 @@ public class Fixture {
 	 * @param sensor
 	 */
 	public void setSensor(boolean sensor){
-		if(m_isSensor == sensor){
-			return;
-		}
-		
 		m_isSensor = sensor;
-		
-		if(m_body == null){
-			return;
-		}
-		
-		// Flag associated contacts for filtering.
-		ContactEdge edge = m_body.getContactList();
-		while (edge != null){
-			Contact contact = edge.contact;
-			Fixture fixtureA = contact.getFixtureA();
-			Fixture fixtureB = contact.getFixtureB();
-			if (fixtureA == this || fixtureB == this){
-				contact.setAsSensor(fixtureA.m_isSensor || fixtureB.m_isSensor);
-			}
-			edge = edge.next;
-		}
 	}
 	
 	/**
@@ -158,6 +140,15 @@ public class Fixture {
 		return m_next;
 	}
 	
+	public void setDensity(float density){
+		assert(density >= 0f);
+		m_density = density;
+	}
+	
+	public float getDensity(){
+		return m_density;
+	}
+	
 	/**
 	 * Get the user data that was assigned in the fixture definition. Use this to
 	 * store your application specific data.
@@ -172,7 +163,7 @@ public class Fixture {
 	 * @param data
 	 */
 	public void setUserData(Object data){
-		
+		m_userData = data;
 	}
 	
 	/**
@@ -202,8 +193,8 @@ public class Fixture {
 	 * the shape. The rotational inertia is about the shape's origin.
 	 * @return
 	 */
-	public MassData getMassData(){
-		return m_massData;
+	public void getMassData(MassData massData){
+		m_shape.computeMass(massData, m_density);
 	}
 
 	/**
@@ -239,13 +230,20 @@ public class Fixture {
 	}
 	
 	/**
-	 * Internal method
-	 * @param broadPhase
-	 * @param body
-	 * @param xf
-	 * @param def
+	 * Get the fixture's AABB. This AABB may be enlarge and/or stale.
+	 * If you need a more accurate AABB, compute it using the shape and
+	 * the body transform.
+	 * @return
 	 */
-	public void create(BroadPhase broadPhase, Body body, final Transform xf, final FixtureDef def){
+	public AABB getAABB(){
+		return m_aabb;
+	}
+	
+	
+	// We need separation create/destroy functions from the constructor/destructor because
+	// the destructor cannot access the allocator (no destructor arguments allowed by C++).
+	
+	public void create(Body body, FixtureDef def){
 		m_userData = def.userData;
 		m_friction = def.friction;
 		m_restitution = def.restitution;
@@ -259,11 +257,26 @@ public class Fixture {
 		
 		m_shape = def.shape.clone();
 		
-		m_shape.computeMass( m_massData, def.density);
+		m_density = def.density;
+	}
+	
+	public void destroy(){
+		
+		// The proxy must be destroyed before calling this.
+		assert(m_proxy == null);
+		
+		// Free the child shape.
+		// yeah woo jvm
+		// TODO djm should I pool this then?
+		m_shape = null;
+	}
+	
+	// These support body activation/deactivation.
+	public void createProxy(BroadPhase broadPhase, Body body, final Transform xf, final FixtureDef def){
+		assert(m_proxy == null);
 		
 		// Create proxy in the broad-phase.
 		m_shape.computeAABB( m_aabb, xf);
-		
 		m_proxy = broadPhase.createProxy( m_aabb, this);
 	}
 	
@@ -271,13 +284,13 @@ public class Fixture {
 	 * Internal method
 	 * @param broadPhase
 	 */
-	public void destroy(BroadPhase broadPhase){
-		if(m_proxy != null){
-			broadPhase.destroyProxy( m_proxy);
-			m_proxy = null;
+	public void destroyProxy(BroadPhase broadPhase){
+		if(m_proxy == null){
+			return;
 		}
 		
-		m_shape = null;
+		broadPhase.destroyProxy( m_proxy);
+		m_proxy = null;
 	}
 	
 	private final static TLAABB tlaabb1 = new TLAABB();
@@ -289,7 +302,7 @@ public class Fixture {
 	 * @param xf1
 	 * @param xf2
 	 */
-	public void synchronize(BroadPhase broadPhase, final Transform transform1, final Transform transform2){
+	protected void synchronize(BroadPhase broadPhase, final Transform transform1, final Transform transform2){
 		if(m_proxy == null){
 			return;
 		}
@@ -300,6 +313,8 @@ public class Fixture {
 		
 		m_shape.computeAABB( aabb1, transform1);
 		m_shape.computeAABB( aabb2, transform2);
+		
+		m_aabb.combine(aabb1, aabb2);
 		
 		Vec2 disp = tldisp.get();
 		disp.set( transform2.position).subLocal(transform1.position);
