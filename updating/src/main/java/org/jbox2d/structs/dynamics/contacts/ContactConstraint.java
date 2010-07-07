@@ -7,31 +7,26 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.structs.collision.Manifold;
 import org.jbox2d.structs.collision.Manifold.ManifoldType;
 
+// updated to rev 100
+
 public class ContactConstraint {
 	public final ContactConstraintPoint points[];
 
  	public final Vec2 localPlaneNormal;
-    
     public final Vec2 localPoint;
-    
     public final Vec2 normal;
     
     public final Mat22 normalMass;
-    
     public final Mat22 K;
 
     public Body bodyA;
-
     public Body bodyB;
 
     public ManifoldType type;
     
     public float radius;
-    
     public float friction;
-
     public float restitution;
-
     public int pointCount;
 
     public Manifold manifold;
