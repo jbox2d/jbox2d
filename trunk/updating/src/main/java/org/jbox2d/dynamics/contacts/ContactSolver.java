@@ -1,5 +1,7 @@
 package org.jbox2d.dynamics.contacts;
 
+import java.util.Stack;
+
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
@@ -7,13 +9,13 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.structs.collision.Manifold;
 import org.jbox2d.structs.collision.ManifoldPoint;
 import org.jbox2d.structs.collision.WorldManifold;
 import org.jbox2d.structs.dynamics.contacts.ContactConstraint;
 import org.jbox2d.structs.dynamics.contacts.ContactConstraintPoint;
 
+// updated to rev 100
 // pooled locally, non-threaded
 /**
  * @author Daniel
@@ -32,7 +34,6 @@ public class ContactSolver {
 	public static final float k_maxConditionNumber = 100.0f;
 
 	
-	public TimeStep m_step;
 	public ContactConstraint[] m_constraints;
 	public int m_constraintCount;
 	
@@ -49,8 +50,7 @@ public class ContactSolver {
 	private final Vec2 temp1 = new Vec2();
 	private final Vec2 temp2 = new Vec2();
 	
-	public final void init(TimeStep step, Contact[] contacts, int contactCount){
-		m_step = step;
+	public final void init(Contact[] contacts, int contactCount, float impulseRatio){
 
 		m_constraintCount = contactCount;
 		
@@ -94,7 +94,7 @@ public class ContactSolver {
 			ContactConstraint cc = m_constraints[i];
 			cc.bodyA = bodyA;
 			cc.bodyB = bodyB;
-			cc.manifold = manifold;
+			cc.manifold = manifold; // have to set actual manifold
 			cc.normal.set(worldManifold.normal);
 			cc.pointCount = manifold.pointCount;
 			cc.friction = friction;
@@ -117,8 +117,8 @@ public class ContactSolver {
 				ccp.rA.x = worldManifold.points[j].x - bodyA.m_sweep.c.x;
 				ccp.rA.y = worldManifold.points[j].y - bodyA.m_sweep.c.y;
 
-				ccp.rB.set(worldManifold.points[j]).subLocal(bodyB.m_sweep.c);
-
+				ccp.rB.x = worldManifold.points[j].x - bodyB.m_sweep.c.x;
+				ccp.rB.y = worldManifold.points[j].y - bodyB.m_sweep.c.y;
 				
 				float rnA = Vec2.cross(ccp.rA, cc.normal);
 				float rnB = Vec2.cross(ccp.rB, cc.normal);
@@ -129,12 +129,6 @@ public class ContactSolver {
 
 				assert(kNormal > Settings.EPSILON);
 				ccp.normalMass = 1.0f / kNormal;
-
-				float kEqualized = bodyA.m_mass * bodyA.m_invMass + bodyB.m_mass * bodyB.m_invMass;
-				kEqualized += bodyA.m_mass * bodyA.m_invI * rnA + bodyB.m_mass * bodyB.m_invI * rnB;
-
-				assert(kEqualized > Settings.EPSILON);
-				ccp.equalizedMass = 1.0f / kEqualized;
 
 				Vec2.crossToOut(cc.normal, 1.0f, tangent);
 
@@ -201,8 +195,9 @@ public class ContactSolver {
 	
 	// djm pooling, and from above
 	private final Vec2 P = new Vec2();
+	private final Vec2 temp = new Vec2();
 	
-	public final void initVelocityConstraints(TimeStep step){
+	public void warmStart(){
 		// Warm start.
 		for (int i = 0; i < m_constraintCount; ++i){
 			ContactConstraint c = m_constraints[i];
@@ -214,37 +209,68 @@ public class ContactSolver {
 			float invMassB = bodyB.m_invMass;
 			float invIB = bodyB.m_invI;
 			Vec2 normal = c.normal;
-			Vec2.crossToOut(normal, 1.0f, tangent);
+			Vec2.crossToOut(normal, 1f, tangent);
 
-			if (step.warmStarting){
-				for (int j = 0; j < c.pointCount; ++j){
-					ContactConstraintPoint ccp = c.points[j];
-					ccp.normalImpulse *= step.dtRatio;
-					ccp.tangentImpulse *= step.dtRatio;
-					//Vec2 P = ccp.normalImpulse * normal + ccp.tangentImpulse * tangent;
-					temp1.set(normal).mulLocal(ccp.normalImpulse);
-					P.set(tangent).mulLocal(ccp.tangentImpulse).addLocal(temp1);
-
-					bodyA.m_angularVelocity -= invIA * Vec2.cross(ccp.rA, P);
-					//bodyA.m_linearVelocity -= invMassA * P;
-					temp1.set(P).mulLocal(invMassA);
-					bodyA.m_linearVelocity.subLocal(temp1);
-
-					bodyB.m_angularVelocity += invIB * Vec2.cross(ccp.rB, P);
-					//bodyB.m_linearVelocity += invMassB * P;
-					temp1.set(P).mulLocal(invMassB);
-					bodyB.m_linearVelocity.addLocal(temp1);
-				}
-			}
-			else{
-				for (int j = 0; j < c.pointCount; ++j){
-					ContactConstraintPoint ccp = c.points[j];
-					ccp.normalImpulse = 0.0f;
-					ccp.tangentImpulse = 0.0f;
-				}
+			for (int j = 0; j < c.pointCount; ++j){
+				ContactConstraintPoint ccp = c.points[j];
+				//Vec2 P = ccp.normalImpulse * normal + ccp.tangentImpulse * tangent;
+				temp.set(normal).mulLocal(ccp.normalImpulse);
+				P.set(tangent).mulLocal(ccp.tangentImpulse).add(temp);
+				bodyA.m_angularVelocity -= invIA * Vec2.cross(ccp.rA, P);
+				temp.set(P).mulLocal(invMassA);
+				bodyA.m_linearVelocity.subLocal(temp);
+				bodyB.m_angularVelocity += invIB * Vec2.cross(ccp.rB, P);
+				temp.set(P).mulLocal(invMassB);
+				bodyB.m_linearVelocity.addLocal(temp);
 			}
 		}
 	}
+	
+	// djm pooling, and from above
+	
+//	public final void initVelocityConstraints(TimeStep step){
+//		// Warm start.
+//		for (int i = 0; i < m_constraintCount; ++i){
+//			ContactConstraint c = m_constraints[i];
+//
+//			Body bodyA = c.bodyA;
+//			Body bodyB = c.bodyB;
+//			float invMassA = bodyA.m_invMass;
+//			float invIA = bodyA.m_invI;
+//			float invMassB = bodyB.m_invMass;
+//			float invIB = bodyB.m_invI;
+//			Vec2 normal = c.normal;
+//			Vec2.crossToOut(normal, 1.0f, tangent);
+//
+//			if (step.warmStarting){
+//				for (int j = 0; j < c.pointCount; ++j){
+//					ContactConstraintPoint ccp = c.points[j];
+//					ccp.normalImpulse *= step.dtRatio;
+//					ccp.tangentImpulse *= step.dtRatio;
+//					//Vec2 P = ccp.normalImpulse * normal + ccp.tangentImpulse * tangent;
+//					temp1.set(normal).mulLocal(ccp.normalImpulse);
+//					P.set(tangent).mulLocal(ccp.tangentImpulse).addLocal(temp1);
+//
+//					bodyA.m_angularVelocity -= invIA * Vec2.cross(ccp.rA, P);
+//					//bodyA.m_linearVelocity -= invMassA * P;
+//					temp1.set(P).mulLocal(invMassA);
+//					bodyA.m_linearVelocity.subLocal(temp1);
+//
+//					bodyB.m_angularVelocity += invIB * Vec2.cross(ccp.rB, P);
+//					//bodyB.m_linearVelocity += invMassB * P;
+//					temp1.set(P).mulLocal(invMassB);
+//					bodyB.m_linearVelocity.addLocal(temp1);
+//				}
+//			}
+//			else{
+//				for (int j = 0; j < c.pointCount; ++j){
+//					ContactConstraintPoint ccp = c.points[j];
+//					ccp.normalImpulse = 0.0f;
+//					ccp.tangentImpulse = 0.0f;
+//				}
+//			}
+//		}
+//	}
 	
 	//djm pooling from above
 	private final Vec2 dv = new Vec2();
@@ -536,7 +562,7 @@ public class ContactSolver {
 					if (x.y >= 0.0f && vn1 >= 0.0f)
 					{
 						// Resubstitute for the incremental impulse
-						d.set(d).subLocal(a);
+						d.set(x).subLocal(a);
 
 						// Apply incremental impulse
 						/*Vec2 P1 = d.x * normal;
@@ -588,7 +614,7 @@ public class ContactSolver {
 					if (vn1 >= 0.0f && vn2 >= 0.0f )
 					{
 						// Resubstitute for the incremental impulse
-						d.subLocal(a);
+						d.set(x).subLocal(a);
 
 						// Apply incremental impulse
 						/*Vec2 P1 = d.x * normal;
@@ -628,6 +654,18 @@ public class ContactSolver {
 			bodyA.m_angularVelocity = wA;
 			bodyB.m_linearVelocity.set(vB);
 			bodyB.m_angularVelocity = wB;
+		}
+	}
+	
+	public void storeImpulses(){
+		for( int i=0; i<m_constraintCount; i++){
+			ContactConstraint c = m_constraints[i];
+			Manifold m = c.manifold;
+			
+			for(int j=0; j< c.pointCount; j++){
+				m.points[j].normalImpulse = c.points[j].normalImpulse;
+				m.points[j].tangentImpulse = c.points[j].tangentImpulse;
+			}
 		}
 	}
 	
@@ -703,7 +741,7 @@ public class ContactSolver {
 	}*/
 	
 	// djm pooling, and from above
-	private final PositionSolverManifold psm = new PositionSolverManifold();
+	private final Stack<PositionSolverManifold> solverStack = new Stack<PositionSolverManifold>();
 	private final Vec2 rA = new Vec2();
 	private final Vec2 rB = new Vec2();
 	
@@ -723,15 +761,19 @@ public class ContactSolver {
 			float invMassB = bodyB.m_mass * bodyB.m_invMass;
 			float invIB = bodyB.m_mass * bodyB.m_invI;
 
-			psm.initialize(c);
-			Vec2 normal = psm.m_normal;
-
 			// Solve normal constraints
 			for (int j = 0; j < c.pointCount; ++j){
-				ContactConstraintPoint ccp = c.points[j];
-
-				Vec2 point = psm.m_points[j];
-				float separation = psm.m_separations[j];
+				if(solverStack.isEmpty()){
+					solverStack.push(new PositionSolverManifold());
+					solverStack.push(new PositionSolverManifold());
+					solverStack.push(new PositionSolverManifold());
+				}
+				PositionSolverManifold psm = solverStack.pop();
+				psm.initialize(c, j);
+				Vec2 normal = psm.normal;
+				
+				Vec2 point = psm.point;
+				float separation = psm.separation;
 
 				rA.set(point).subLocal(bodyA.m_sweep.c);
 				rB.set(point).subLocal(bodyB.m_sweep.c);
@@ -742,8 +784,13 @@ public class ContactSolver {
 				// Prevent large corrections and allow slop.
 				float C = MathUtils.clamp(baumgarte * (separation + Settings.linearSlop), Settings.maxLinearCorrection, 0.0f);
 
+				// Compute the effective mass.
+				float rnA = Vec2.cross(rA, normal);
+				float rnB = Vec2.cross(rB, normal);
+				float K = invMassA + invMassB + invIA * rnA * rnA + invIB * rnB * rnB;
+				
 				// Compute normal impulse
-				float impulse = -ccp.equalizedMass * C;
+				float impulse = K > 0.0f ? - C / K : 0.0f;
 
 				P.set(normal).mulLocal(impulse);
 
@@ -767,17 +814,9 @@ public class ContactSolver {
 
 class PositionSolverManifold{
 	
-	public final Vec2 m_normal = new Vec2();
-	public final Vec2 m_points[];
-	public final float m_separations[];
-	
-	public PositionSolverManifold(){
-		m_points = new Vec2[Settings.maxManifoldPoints];
-		for(int i=0; i<m_points.length; i++){
-			m_points[i] = new Vec2();
-		}
-		m_separations = new float[Settings.maxManifoldPoints];
-	}
+	public final Vec2 normal = new Vec2();
+	public final Vec2 point = new Vec2();
+	public float separation;
 	
 	// djm pooling
 	private final Vec2 pointA = new Vec2();
@@ -786,59 +825,51 @@ class PositionSolverManifold{
 	private final Vec2 planePoint = new Vec2();
 	private final Vec2 clipPoint = new Vec2();
 	
-	public void initialize(ContactConstraint cc){
+	public void initialize(ContactConstraint cc, int index){
 		assert(cc.pointCount > 0);
 
-		switch (cc.type)
-		{
-		case CIRCLES:
-			{
+		switch (cc.type){
+			case CIRCLES:{
 				cc.bodyA.getWorldPointToOut(cc.localPoint, pointA);
 				cc.bodyB.getWorldPointToOut(cc.points[0].localPoint, pointB);
 				if (MathUtils.distanceSquared(pointA, pointB) > Settings.EPSILON * Settings.EPSILON){
-					m_normal.set(pointB).subLocal(pointA);
-					m_normal.normalize();
+					normal.set(pointB).subLocal(pointA);
+					normal.normalize();
 				}
 				else{
-					m_normal.set(1.0f, 0.0f);
+					normal.set(1.0f, 0.0f);
 				}
 
-				m_points[0].set(pointA).addLocal(pointB).mulLocal(.5f);
+				point.set(pointA).addLocal(pointB).mulLocal(.5f);
 				temp.set(pointB).subLocal(pointA);
-				m_separations[0] = Vec2.dot(temp, m_normal) - cc.radius;
+				separation = Vec2.dot(temp, normal) - cc.radius;
+				break;
 			}
-			break;
-
-		case FACE_A:
-			{
-				cc.bodyA.getWorldVectorToOut(cc.localPlaneNormal, m_normal);
+	
+			case FACE_A:{
+				cc.bodyA.getWorldVectorToOut(cc.localPlaneNormal, normal);
 				cc.bodyA.getWorldPointToOut(cc.localPoint, planePoint);
 
-				for (int i = 0; i < cc.pointCount; ++i){
-					cc.bodyB.getWorldPointToOut(cc.points[i].localPoint, clipPoint);
-					temp.set(clipPoint).subLocal(planePoint);
-					m_separations[i] = Vec2.dot(temp, m_normal) - cc.radius;
-					m_points[i] = clipPoint;
-				}
+				cc.bodyB.getWorldPointToOut(cc.points[index].localPoint, clipPoint);
+				temp.set(clipPoint).subLocal(planePoint);
+				separation = Vec2.dot(temp, normal) - cc.radius;
+				point.set(clipPoint);
+				break;
 			}
-			break;
-
-		case FACE_B:
-			{
-				cc.bodyB.getWorldPointToOut(cc.localPoint, planePoint);
-				cc.bodyB.getWorldPointToOut(cc.localPoint, planePoint);
-
-				for (int i = 0; i < cc.pointCount; ++i)
+	
+			case FACE_B:
 				{
-					cc.bodyA.getWorldPointToOut(cc.points[i].localPoint, clipPoint);
+					cc.bodyB.getWorldPointToOut(cc.localPoint, planePoint);
+					cc.bodyB.getWorldPointToOut(cc.localPoint, planePoint);
+	
+					cc.bodyA.getWorldPointToOut(cc.points[index].localPoint, clipPoint);
 					temp.set(clipPoint).subLocal(planePoint);
-					m_separations[i] = Vec2.dot(temp, m_normal) - cc.radius;
-					m_points[i] = clipPoint;
+					separation = Vec2.dot(temp, normal) - cc.radius;
+					point.set(clipPoint);
+	
+					// Ensure normal points from A to B
+					normal.negateLocal();
 				}
-
-				// Ensure normal points from A to B
-				m_normal.negateLocal();
-			}
 			break;
 		}
 	}
