@@ -2,6 +2,7 @@ package org.jbox2d.dynamics;
 
 import org.jbox2d.collision.shapes.Shape;
 
+// updated to rev 100
 /**
  * A fixture definition is used to create a fixture. This class defines an
  * abstract fixture definition. You can reuse fixture definitions safely.
@@ -49,8 +50,8 @@ public class FixtureDef {
 	public FixtureDef(){
 		shape = null;
 		userData = null;
-		friction = .2f;
-		restitution = 1f;
+		friction = 0.2f;
+		restitution = 0f;
 		density = 0f;
 		filter = new Filter();
 		filter.categoryBits = 0x0001;
