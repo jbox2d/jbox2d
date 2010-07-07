@@ -3,6 +3,8 @@
  */
 package org.jbox2d.dynamics;
 
+// updated to rev 100
+
 /**
  * The body type.
  * static: zero mass, zero velocity, may be manually moved
