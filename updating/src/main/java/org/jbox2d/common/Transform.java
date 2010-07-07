@@ -36,10 +36,10 @@ public class Transform {
 	public static final Transform IDENTITY = new Transform(Vec2.ZERO, Mat22.IDENTITY);
 	
 	/** The translation caused by the transform */
-	public Vec2 position;
+	public final Vec2 position;
 
 	/** A matrix representing a rotation */
-	public Mat22 R;
+	public final Mat22 R;
 
 	// The identity transform 
 	public static Transform identity;

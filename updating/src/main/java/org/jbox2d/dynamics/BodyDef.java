@@ -1,16 +1,22 @@
 package org.jbox2d.dynamics;
 
 import org.jbox2d.common.Vec2;
-import org.jbox2d.structs.collision.shapes.MassData;
 
 /**
  * A body definition holds all the data needed to construct a rigid body.
- * You can safely re-use body definitions.
- * Shapes are added to a body after construction.
+ * You can safely re-use body definitions. Shapes are added to a body
+ * after construction.
  *
  * @author daniel
  */
 public class BodyDef {
+	
+	/**
+	 * The body type: static, kinematic, or dynamic.
+	 * Note: if a dynamic body would have zero mass, the mass is set to one.
+	 */
+	public BodyType type;
+	
 	
 	/**
 	 * Use this to store application specific body data.
@@ -61,7 +67,7 @@ public class BodyDef {
 	/**
 	 * Is this body initially sleeping?
 	 */
-	public boolean isSleeping;
+	public boolean awake;
 
 	/**
 	 * Should this body be prevented from rotating? Useful for characters.
@@ -71,10 +77,20 @@ public class BodyDef {
 	/**
 	 * Is this a fast moving body that should be prevented from tunneling through
 	 * other moving bodies? Note that all bodies are prevented from tunneling through
-	 * static bodies.
-	 * @warning You should use this flag sparingly since it increases processing time.
+	 * kinematic and static bodies. This setting is only considered on dynamic bodies.
+ 	 * @warning You should use this flag sparingly since it increases processing time.
 	 */
-	public boolean isBullet;
+	public boolean bullet;
+	
+	/**
+	 * Does this body start out active?
+	 */
+	public boolean active;
+	
+	/**
+	 * Experimental: scales the inertia tensor.
+	 */
+	public float inertiaScale;
 	
 	public BodyDef(){
 		userData = null;
@@ -85,8 +101,11 @@ public class BodyDef {
 		linearDamping = 0f;
 		angularDamping = 0f;
 		allowSleep = true;
-		isSleeping = false;
+		awake = true;
 		fixedRotation = false;
-		isBullet = false;
+		bullet = false;
+		type = BodyType.STATIC;
+		active = true;
+		inertiaScale = 1.0f;
 	}
 }
