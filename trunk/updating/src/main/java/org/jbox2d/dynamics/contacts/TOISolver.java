@@ -3,15 +3,12 @@
  */
 package org.jbox2d.dynamics.contacts;
 
-import java.util.Arrays;
-
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.pooling.arrays.DynamicTLArray;
 import org.jbox2d.structs.collision.Manifold;
 import org.jbox2d.structs.collision.ManifoldPoint;
 import org.jbox2d.structs.dynamics.contacts.TOIConstraint;

@@ -382,8 +382,6 @@ public abstract class Contact {
 		}
 	}
 	
-	protected abstract void evaluate();
-
 //	// djm pooled
 //	private static final TLTOIInput tlinput = new TLTOIInput();
 //	
