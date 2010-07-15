@@ -3,22 +3,16 @@ package org.jbox2d.dynamics.contacts;
 import java.util.Stack;
 
 import org.jbox2d.callbacks.ContactListener;
-import org.jbox2d.collision.AABB;
-import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.Shape;
-import org.jbox2d.common.Settings;
-import org.jbox2d.common.Sweep;
 import org.jbox2d.common.Transform;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.pooling.SingletonPool;
 import org.jbox2d.pooling.TLManifold;
-import org.jbox2d.pooling.TLTOIInput;
 import org.jbox2d.pooling.stacks.TLStack;
 import org.jbox2d.structs.collision.ContactID;
 import org.jbox2d.structs.collision.Manifold;
 import org.jbox2d.structs.collision.ManifoldPoint;
-import org.jbox2d.structs.collision.TOIInput;
 import org.jbox2d.structs.collision.WorldManifold;
 import org.jbox2d.structs.collision.shapes.ShapeType;
 import org.jbox2d.structs.dynamics.contacts.ContactCreator;
@@ -158,18 +152,18 @@ public abstract class Contact {
 	}
 	
 	
-	protected int m_flags;
+	public int m_flags;
 	
 	// World pool and list pointers.
-	protected Contact m_prev;
-	protected Contact m_next;
+	public Contact m_prev;
+	public Contact m_next;
 
 	// Nodes for connecting bodies.
-	protected ContactEdge m_nodeA;
-	protected ContactEdge m_nodeB;
+	public ContactEdge m_nodeA;
+	public ContactEdge m_nodeB;
 
-	protected Fixture m_fixtureA;
-	protected Fixture m_fixtureB;
+	public Fixture m_fixtureA;
+	public Fixture m_fixtureB;
 
 	protected Manifold m_manifold;
 
@@ -303,7 +297,7 @@ public abstract class Contact {
 	// djm pooling
 	private static final TLManifold tloldManifold = new TLManifold();
 	
-	protected void update(ContactListener listener){
+	public void update(ContactListener listener){
 		
 		Manifold oldManifold = tloldManifold.get();
 		oldManifold.set(m_manifold);
@@ -366,7 +360,7 @@ public abstract class Contact {
 			m_flags &= ~TOUCHING_FLAG;
 		}
 
-		if(listener != null){
+		if(listener == null){
 			return;
 		}
 		
