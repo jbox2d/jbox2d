@@ -20,7 +20,6 @@ import org.jbox2d.structs.dynamics.contacts.ContactEdge;
 /**
  * A rigid body. These are created via World.createBody.
  */
-
 public class Body {
 	public static final int e_islandFlag = 0x0001;
 	public static final int e_awakeFlag = 0x0002;
@@ -893,7 +892,7 @@ public class Body {
 
 			// Destroy the attached contacts.
 			ContactEdge ce = m_contactList;
-			while (ce){
+			while (ce != null){
 				ContactEdge ce0 = ce;
 				ce = ce.next;
 				m_world.m_contactManager.destroy(ce0.contact);
