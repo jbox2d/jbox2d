@@ -3,6 +3,7 @@ package org.jbox2d.structs.dynamics.joints;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.joints.Joint;
 
+//updated to rev 100
 /**
  * A joint edge is used to connect bodies and joints together
  * in a joint graph where each body is a node and each joint

@@ -2,6 +2,7 @@ package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.common.Vec2;
 
+//updated to rev 100
 public class Jacobian {
 	public final Vec2 linearA = new Vec2();
 	public float angularA;

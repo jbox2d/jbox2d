@@ -14,11 +14,13 @@ import org.jbox2d.pooling.TLVec2;
 import org.jbox2d.structs.collision.WorldManifold;
 import org.jbox2d.structs.collision.shapes.MassData;
 import org.jbox2d.structs.dynamics.contacts.ContactEdge;
+import org.jbox2d.structs.dynamics.joints.JointEdge;
 
 // updated to rev 100
 // thead safe pooling
 /**
  * A rigid body. These are created via World.createBody.
+ * @author Daniel Murphy
  */
 public class Body {
 	public static final int e_islandFlag = 0x0001;
@@ -1012,7 +1014,7 @@ public class Body {
 		}
 
 		// Does a joint prevent collision?
-		for (JointEdge jn = m_jointList; jn; jn = jn.next){
+		for (JointEdge jn = m_jointList; jn != null; jn = jn.next){
 			if (jn.other == other){
 				if (jn.joint.m_collideConnected == false){
 					return false;

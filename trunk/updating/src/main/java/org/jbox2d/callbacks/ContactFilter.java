@@ -6,10 +6,11 @@ package org.jbox2d.callbacks;
 import org.jbox2d.dynamics.Filter;
 import org.jbox2d.dynamics.Fixture;
 
+// updated to rev 100
 /**
  * Implement this class to provide collision filtering. In other words, you can implement
  * this class if you want finer control over contact creation.
- * @author daniel
+ * @author Daniel Murphy
  */
 public class ContactFilter {
 

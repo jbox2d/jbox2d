@@ -3,6 +3,7 @@ package org.jbox2d.dynamics.joints;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.structs.dynamics.joints.JointType;
 
+//updated to rev 100
 /**
  * Joint definitions are used to construct joints.
  * @author Daniel Murphy

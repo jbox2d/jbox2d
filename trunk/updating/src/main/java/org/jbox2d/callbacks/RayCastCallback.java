@@ -6,6 +6,7 @@ package org.jbox2d.callbacks;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Fixture;
 
+// updated to rev 100;
 /**
  * Callback class for ray casts.
  * See World.rayCast

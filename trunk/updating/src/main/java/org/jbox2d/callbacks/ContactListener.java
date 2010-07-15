@@ -3,6 +3,7 @@ package org.jbox2d.callbacks;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.structs.collision.Manifold;
 
+// updated to rev 100
 /**
  * Implement this class to get contact information. You can use these results for
  * things like sounds and game logic. You can also get contact results by
@@ -13,7 +14,7 @@ import org.jbox2d.structs.collision.Manifold;
  * You should strive to make your callbacks efficient because there may be
  * many callbacks per time step.
  * @warning You cannot create/destroy Box2D entities inside these callbacks.
- * @author Daniel
+ * @author Daniel Murphy
  *
  */
 public interface ContactListener {
@@ -56,7 +57,8 @@ public interface ContactListener {
 	 * in a separate data structure.
 	 * Note: this is only called for contacts that are touching, solid, and awake.
 	 * @param contact
-	 * @param impulse
+	 * @param impulse this is usually a pooled variable, so it will be modified after
+	 * this call
 	 */
 	public void postSolve(Contact contact, ContactImpulse impulse);
 }
