@@ -2,14 +2,14 @@ package org.jbox2d.collision.broadphase;
 
 import java.util.Arrays;
 
+import org.jbox2d.callbacks.TreeCallback;
+import org.jbox2d.callbacks.TreeRayCastCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.stacks.PairStack;
-import org.jbox2d.structs.collision.RayCastCallback;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.broadphase.Pair;
 import org.jbox2d.structs.collision.broadphase.PairCallback;
-import org.jbox2d.structs.collision.broadphase.QueryCallback;
 
 // updated to rev 100
 /**
@@ -19,7 +19,7 @@ import org.jbox2d.structs.collision.broadphase.QueryCallback;
  *
  * @author Daniel Murphy
  */
-public class BroadPhase implements QueryCallback{
+public class BroadPhase implements TreeCallback{
 	public static final int NULL_PROXY = -1;
 	
 	private final DynamicTree m_tree;
@@ -158,7 +158,7 @@ public class BroadPhase implements QueryCallback{
 	 * @param callback
 	 * @param aabb
 	 */
-	public final void query(final QueryCallback callback, final AABB aabb){
+	public final void query(final TreeCallback callback, final AABB aabb){
 		m_tree.query(callback, aabb);
 	}
 	
@@ -171,7 +171,7 @@ public class BroadPhase implements QueryCallback{
 	 * @param input the ray-cast input data. The ray extends from p1 to p1 + maxFraction * (p2 - p1).
 	 * @param callback a callback class that is called for each proxy that is hit by the ray.
 	 */
-	public final void raycast(final RayCastCallback callback, final RayCastInput input){
+	public final void raycast(final TreeRayCastCallback callback, final RayCastInput input){
 		m_tree.raycast(callback, input);
 	}
 	
@@ -211,7 +211,7 @@ public class BroadPhase implements QueryCallback{
 	/**
 	 * This is called from DynamicTree::query when we are gathering pairs.
 	 */
-	public final boolean queryCallback(DynamicTreeNode proxy){
+	public final boolean treeCallback(DynamicTreeNode proxy){
 		
 		// A proxy cannot form a pair with itself.
 		if (proxy == m_queryProxy){

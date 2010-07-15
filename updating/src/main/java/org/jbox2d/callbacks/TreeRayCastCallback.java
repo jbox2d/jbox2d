@@ -1,8 +1,9 @@
-package org.jbox2d.structs.collision;
+package org.jbox2d.callbacks;
 
 import org.jbox2d.collision.broadphase.DynamicTreeNode;
+import org.jbox2d.structs.collision.RayCastInput;
 
-public interface RayCastCallback {
+public interface TreeRayCastCallback {
 	/**
 	 * 
 	 * @param argInput

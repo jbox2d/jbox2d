@@ -1,7 +1,7 @@
 /**
  * Created at 3:43:53 AM Jul 7, 2010
  */
-package org.jbox2d.dynamics.contacts;
+package org.jbox2d.callbacks;
 
 import org.jbox2d.common.Settings;
 
