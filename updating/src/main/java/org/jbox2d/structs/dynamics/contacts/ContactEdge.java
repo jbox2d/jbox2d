@@ -3,6 +3,7 @@ package org.jbox2d.structs.dynamics.contacts;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.contacts.Contact;
 
+//updated to rev 100
 /**
  * A contact edge is used to connect bodies and contacts together
  * in a contact graph where each body is a node and each contact

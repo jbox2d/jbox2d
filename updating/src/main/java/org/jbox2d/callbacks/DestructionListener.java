@@ -4,7 +4,9 @@
 package org.jbox2d.callbacks;
 
 import org.jbox2d.dynamics.Fixture;
+import org.jbox2d.dynamics.joints.Joint;
 
+// updated to rev 100
 /**
  * Joints and fixtures are destroyed when their associated
  * body is destroyed. Implement this listener so that you

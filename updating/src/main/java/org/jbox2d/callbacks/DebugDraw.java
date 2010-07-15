@@ -8,6 +8,7 @@ import org.jbox2d.common.IViewportTransform;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 
+// updated to rev 100
 /**
  * Implement this abstract class to allow JBox2d to 
  * automatically draw your physics for debugging purposes.

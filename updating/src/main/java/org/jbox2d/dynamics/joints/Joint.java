@@ -6,6 +6,7 @@ import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.structs.dynamics.joints.JointEdge;
 import org.jbox2d.structs.dynamics.joints.JointType;
 
+// updated to rev 100
 /**
  * The base joint class. Joints are used to raint two bodies together in
  * various fashions. Some joints also feature limits and motors.
