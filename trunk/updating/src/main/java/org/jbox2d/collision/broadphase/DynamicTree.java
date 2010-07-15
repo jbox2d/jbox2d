@@ -1,5 +1,7 @@
 package org.jbox2d.collision.broadphase;
 
+import org.jbox2d.callbacks.TreeCallback;
+import org.jbox2d.callbacks.TreeRayCastCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
@@ -10,9 +12,7 @@ import org.jbox2d.pooling.TLVec2;
 import org.jbox2d.pooling.stacks.AABBStack;
 import org.jbox2d.pooling.stacks.DynamicTreeNodeStack;
 import org.jbox2d.pooling.stacks.Vec2Stack;
-import org.jbox2d.structs.collision.RayCastCallback;
 import org.jbox2d.structs.collision.RayCastInput;
-import org.jbox2d.structs.collision.broadphase.QueryCallback;
 
 /**
  * A dynamic tree arranges data in a binary tree to accelerate
@@ -184,12 +184,12 @@ public class DynamicTree {
 	 * @param argCallback
 	 * @param argAABB
 	 */
-	public final void query(QueryCallback argCallback, AABB argAABB){
+	public final void query(TreeCallback argCallback, AABB argAABB){
 		query(argCallback, argAABB, m_root, 1);
 	}
 	
 	// recursive query
-	private final void query(QueryCallback argCallback, AABB argAABB, DynamicTreeNode argNode, int count){
+	private final void query(TreeCallback argCallback, AABB argAABB, DynamicTreeNode argNode, int count){
 		if(argNode == null){
 			return;
 		}
@@ -197,7 +197,7 @@ public class DynamicTree {
 		if (AABB.testOverlap(argAABB, argNode.aabb)){
 			
 			if(argNode.isLeaf()){
-				boolean proceed = argCallback.queryCallback(argNode);
+				boolean proceed = argCallback.treeCallback(argNode);
 				if( !proceed ){
 					return;
 				}
@@ -221,7 +221,7 @@ public class DynamicTree {
 	 * @param argInput the ray-cast input data. The ray extends from p1 to p1 + maxFraction * (p2 - p1).
 	 * @param argCallback a callback class that is called for each proxy that is hit by the ray.
 	 */
-	public void raycast( final RayCastCallback argCallback, final RayCastInput argInput){
+	public void raycast( final TreeRayCastCallback argCallback, final RayCastInput argInput){
 		raycast(argCallback, argInput, m_root, 1);
 	}
 	
@@ -234,7 +234,7 @@ public class DynamicTree {
 	/**
 	 * @return true to stop raycast
 	 */
-	private boolean raycast( final RayCastCallback argCallback, final RayCastInput argInput,
+	private boolean raycast( final TreeRayCastCallback argCallback, final RayCastInput argInput,
 						  final DynamicTreeNode argNode, int count){
 		if(argNode == null){
 			return false;

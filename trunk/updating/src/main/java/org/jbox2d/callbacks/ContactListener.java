@@ -1,5 +1,6 @@
-package org.jbox2d.dynamics.contacts;
+package org.jbox2d.callbacks;
 
+import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.structs.collision.Manifold;
 
 /**

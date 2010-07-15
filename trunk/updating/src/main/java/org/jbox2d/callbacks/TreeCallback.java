@@ -1,13 +1,13 @@
-package org.jbox2d.structs.collision.broadphase;
+package org.jbox2d.callbacks;
 
 import org.jbox2d.collision.broadphase.DynamicTreeNode;
 
-public interface QueryCallback {
+public interface TreeCallback {
 	
 	/**
 	 * Callback from a query request.  
 	 * @param node
 	 * @return if the query should be continued
 	 */
-	public boolean queryCallback(DynamicTreeNode node);
+	public boolean treeCallback(DynamicTreeNode node);
 }

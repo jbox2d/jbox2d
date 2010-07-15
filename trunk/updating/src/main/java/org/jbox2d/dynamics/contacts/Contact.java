@@ -2,6 +2,7 @@ package org.jbox2d.dynamics.contacts;
 
 import java.util.Stack;
 
+import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.Shape;
