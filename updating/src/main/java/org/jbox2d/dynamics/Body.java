@@ -59,7 +59,7 @@ public class Body {
 	public Fixture m_fixtureList;
 	public int m_fixtureCount;
 	
-	public Joint m_jointList;
+	public JointEdge m_jointList;
 	public ContactEdge m_contactList;
 	
 	public float m_mass, m_invMass;
@@ -105,7 +105,6 @@ public class Body {
 		m_xf.R.set(bd.angle);
 
 		m_sweep.localCenter.setZero();
-		m_sweep.alpha0 = 1.0f;
 		m_sweep.a0 = m_sweep.a = bd.angle;
 		//m_sweep.c0 = m_sweep.c = Transform.mul(m_xf, m_sweep.localCenter);
 		Transform.mulToOut(m_xf, m_sweep.localCenter, m_sweep.c0);
@@ -165,8 +164,9 @@ public class Body {
 
 		BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
 
+		// djm TODO from pool?
 		Fixture fixture = new Fixture();
-		fixture.create(broadPhase, this, m_xf, def);
+		fixture.create(this, def);
 
 		fixture.m_next = m_fixtureList;
 		m_fixtureList = fixture;
@@ -205,6 +205,7 @@ public class Body {
 		return createFixture(def);
 	}
 
+	// TODO djm: pool fixtures?
 	/**
 	 * Destroy a fixture. This removes the fixture from the broad-phase and
 	 * destroys all contacts associated with this fixture. This will
@@ -256,7 +257,7 @@ public class Body {
 			}
 		}
 		
-		if (m_flags & e_activeFlag == 1){
+		if ((m_flags & e_activeFlag) == 1){
 			assert(fixture.m_proxy != null);
 			BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
 			fixture.destroyProxy(broadPhase);
@@ -265,7 +266,7 @@ public class Body {
 			assert(fixture.m_proxy == null);
 		}
 
-		fixture.destroy()
+		fixture.destroy();
 		fixture.m_body = null;
 		fixture.m_next = null;
 		//fixture.~Fixture();
@@ -291,7 +292,7 @@ public class Body {
 		}
 
 		m_xf.R.set(angle);
-		m_xf.position = position;
+		m_xf.position.set(position);
 
 		//m_sweep.c0 = m_sweep.c = Mul(m_xf, m_sweep.localCenter);
 		Transform.mulToOut(m_xf, m_sweep.localCenter, m_sweep.c0);
@@ -317,7 +318,7 @@ public class Body {
 	}
 
 	/**
-	 * Get the world body origin position.
+	 * Get the world body origin position.  Do not modify.
 	 * @return the world position of the body's origin.
 	 */
 	public final Vec2 getPosition(){
@@ -333,14 +334,14 @@ public class Body {
 	}
 
 	/**
-	 * Get the world position of the center of mass.
+	 * Get the world position of the center of mass. Do not modify.
 	 */
 	public final Vec2 getWorldCenter(){
 		return m_sweep.c;
 	}
 
 	/**
-	 * Get the local position of the center of mass.
+	 * Get the local position of the center of mass. Do not modify.
 	 */
 	public final Vec2 getLocalCenter(){
 		return m_sweep.localCenter;
@@ -363,7 +364,8 @@ public class Body {
 	}
 
 	/**
-	 * Get the linear velocity of the center of mass.
+	 * Get the linear velocity of the center of mass. Do not modify,
+	 * instead use {@link #setLinearVelocity(Vec2)}.
 	 * @return the linear velocity of the center of mass.
 	 */
 	public final Vec2 getLinearVelocity(){
@@ -581,6 +583,7 @@ public class Body {
 
 		// Accumulate mass over all fixtures.
 		Vec2 center = tlcenter.get();
+		center.setZero();
 		Vec2 temp = tltemp.get();
 		MassData massData = tlmd.get();
 		for (Fixture f = m_fixtureList; f != null; f = f.m_next){
@@ -748,6 +751,10 @@ public class Body {
 		return m_type;
 	}
 	
+	/**
+	 * Set the type of this body. This may alter the mass and velocity.
+	 * @param type
+	 */
 	public void setType(BodyType type){
 		if (m_type == type){
 			return;
@@ -869,7 +876,7 @@ public class Body {
 
 			// Create all proxies.
 			BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
-			for (Fixture f = m_fixtureList; f; f = f.m_next){
+			for (Fixture f = m_fixtureList; f != null; f = f.m_next){
 				f.createProxy(broadPhase, m_xf);
 			}
 
@@ -880,7 +887,7 @@ public class Body {
 
 			// Destroy all proxies.
 			BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
-			for (Fixture f = m_fixtureList; f; f = f.m_next){
+			for (Fixture f = m_fixtureList; f != null; f = f.m_next){
 				f.destroyProxy(broadPhase);
 			}
 
