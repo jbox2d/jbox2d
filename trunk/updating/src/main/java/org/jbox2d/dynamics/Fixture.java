@@ -272,7 +272,7 @@ public class Fixture {
 	}
 	
 	// These support body activation/deactivation.
-	public void createProxy(BroadPhase broadPhase, Body body, final Transform xf, final FixtureDef def){
+	public void createProxy(BroadPhase broadPhase, final Transform xf){
 		assert(m_proxy == null);
 		
 		// Create proxy in the broad-phase.
