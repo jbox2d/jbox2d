@@ -57,7 +57,7 @@ public class World {
 	private final Vec2 m_gravity = new Vec2();
 	private boolean m_allowSleep;
 	
-	private Body m_groundBody;
+	//private Body m_groundBody;
 	
 	private DestructionListener m_destructionListener;
 	private DebugDraw m_debugDraw;
@@ -1065,11 +1065,11 @@ public class World {
 		toiSolver.initialize(contacts, count, body);
 
 		float k_toiBaumgarte = 0.75f;
-		boolean solved = false;
+		//boolean solved = false;
 		for (int i = 0; i < 20; ++i){
 			boolean contactsOkay = toiSolver.solve(k_toiBaumgarte);
 			if (contactsOkay){
-				solved = true;
+				//solved = true;
 				break;
 			}
 		}
