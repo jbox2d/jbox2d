@@ -10,4 +10,16 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>JBox2D</name>
   <description>A 2D java physics engine, a port of the C++ Box2d engine.  This is the core physics engine.</description>
+  <build>
+  	<plugins>
+  		<plugin>
+  			<groupId>org.apache.maven.plugins</groupId>
+  			<artifactId>maven-compiler-plugin</artifactId>
+  			<version>2.3.1</version>
+  			<configuration>
+  				<compilerVersion>1.5+</compilerVersion>
+  			</configuration>
+  		</plugin>
+  	</plugins>
+  </build>
 </project>
