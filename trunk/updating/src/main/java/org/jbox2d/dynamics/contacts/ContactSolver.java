@@ -215,7 +215,7 @@ public class ContactSolver {
 				ContactConstraintPoint ccp = c.points[j];
 				//Vec2 P = ccp.normalImpulse * normal + ccp.tangentImpulse * tangent;
 				temp.set(normal).mulLocal(ccp.normalImpulse);
-				P.set(tangent).mulLocal(ccp.tangentImpulse).add(temp);
+				P.set(tangent).mulLocal(ccp.tangentImpulse).addLocal(temp);
 				bodyA.m_angularVelocity -= invIA * Vec2.cross(ccp.rA, P);
 				temp.set(P).mulLocal(invMassA);
 				bodyA.m_linearVelocity.subLocal(temp);
