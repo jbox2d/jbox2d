@@ -148,13 +148,14 @@ public class OBBViewportTransform implements IViewportTransform{
 	}
 	
 	
+	private final Mat22 inv = new Mat22();
 	/**
 	 * @see IViewportTransform#getScreenToWorld(Vec2, Vec2)
 	 */
 	public void getScreenToWorld(Vec2 argScreen, Vec2 argWorld){
 		argWorld.set(argScreen);
 		argWorld.subLocal(box.extents);
-		Mat22 inv = box.R.invert();
+		box.R.invertToOut(inv);
 		inv.mulToOut(argWorld, argWorld);
 		if(yFlip){
 			yFlipMatInv.mulToOut( argWorld, argWorld);
