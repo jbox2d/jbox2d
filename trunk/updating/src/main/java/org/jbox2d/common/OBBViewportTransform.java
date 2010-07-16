@@ -1,9 +1,14 @@
 package org.jbox2d.common;
 
-import org.jbox2d.collision.OBB;
 import org.jbox2d.pooling.TLMat22;
 
 public class OBBViewportTransform implements IViewportTransform{
+	
+	public static class OBB{
+		public final Mat22 R = new Mat22();
+		public final Vec2 center = new Vec2();
+		public final Vec2 extents = new Vec2();
+	}
 	
 	protected final OBB box = new OBB();
 	private boolean yFlip = false;

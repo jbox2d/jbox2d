@@ -40,7 +40,16 @@ public class Color3f {
 	public float y;
 	public float z;
 
+	public Color3f(){
+		x = y = z = 0;
+	}
 	public Color3f(float r, float g, float b) {
+		x = r;
+		y = g;
+		z = b;
+	}
+	
+	public void set(float r, float g, float b){
 		x = r;
 		y = g;
 		z = b;
