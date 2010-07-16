@@ -189,9 +189,10 @@ public class DynamicTree {
 	}
 	
 	// recursive query
-	private final void query(TreeCallback argCallback, AABB argAABB, DynamicTreeNode argNode, int count){
+	// returns if to proceed
+	private final boolean query(TreeCallback argCallback, AABB argAABB, DynamicTreeNode argNode, int count){
 		if(argNode == null){
-			return;
+			return true;
 		}
 		
 		if (AABB.testOverlap(argAABB, argNode.aabb)){
@@ -199,17 +200,24 @@ public class DynamicTree {
 			if(argNode.isLeaf()){
 				boolean proceed = argCallback.treeCallback(argNode);
 				if( !proceed ){
-					return;
+					return false;
 				}
 			}else{
 				if(count< MAX_STACK_SIZE){
-					query(argCallback, argAABB, argNode.child1, ++count);
+					boolean proceed = query(argCallback, argAABB, argNode.child1, ++count);
+					if(!proceed){
+						return false;
+					}
 				}
 				if(count< MAX_STACK_SIZE){
-					query(argCallback, argAABB, argNode.child2, ++count);
+					boolean proceed = query(argCallback, argAABB, argNode.child2, ++count);
+					if(!proceed){
+						return false;
+					}
 				}
 			}
 		}
+		return true;
 	}
 	
 	/**
@@ -232,7 +240,7 @@ public class DynamicTree {
 	//private static final TLRayCastOutput tloutput = new TLRayCastOutput();
 
 	/**
-	 * @return true to stop raycast
+	 * @return true to stop raycast (opposite of query above.  not sure why i did this)
 	 */
 	private boolean raycast( final TreeRayCastCallback argCallback, final RayCastInput argInput,
 						  final DynamicTreeNode argNode, int count){
@@ -268,6 +276,11 @@ public class DynamicTree {
 		Vec2.maxToOut(p1, temp, segAABB.upperBound);
 		
 		// start part from c++ code that's in the while loop
+		if(argNode == null){
+			vec2stack.recycle(r, v, absV, temp);
+			return false;
+		}
+		
 		if ( AABB.testOverlap(argNode.aabb, segAABB) == false ){
 			vec2stack.recycle(r, v, absV, temp);
 			return false;
@@ -349,7 +362,7 @@ public class DynamicTree {
 		node.child1 = null;
 		node.child2 = null;
 		node.userData = null;
-		// not quite 100% guarantee of no duplicates, but close enough
+		// not quite 100% guarantee of no duplicates, but close enough for now
 		node.key = (int)(Math.random()*100000000);
 		m_nodeCount++;
 		return node;
@@ -422,7 +435,7 @@ public class DynamicTree {
 		
 		// was that the head node?
 		if(node1 != null){
-			if(node1.child1 == sibling){
+			if(sibling.parent.child1 == sibling){
 				node1.child1 = node2;
 			}else{
 				node1.child2 = node2;
