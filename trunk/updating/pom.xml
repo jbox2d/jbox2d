@@ -3,18 +3,11 @@
   <groupId>org.jbox2d</groupId>
   <artifactId>jbox2d</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
   <name>JBox2D</name>
   <description>JBox2D is a 2d Java physics engine, a port of the C++ Box2d engine.</description>
-  <build>
-  	<plugins>
-  		<plugin>
-  			<groupId>org.apache.maven.plugins</groupId>
-  			<artifactId>maven-compiler-plugin</artifactId>
-  			<version>2.3.1</version>
-  			<configuration>
-  				<compilerVersion>1.5</compilerVersion>
-  			</configuration>
-  		</plugin>
-  	</plugins>
-  </build>
+  <modules>
+  	<module>jbox2d-library</module>
+  	<module>jbox2d-testbed</module>
+  </modules>
 </project>
