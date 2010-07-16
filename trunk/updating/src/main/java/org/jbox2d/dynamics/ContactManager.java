@@ -26,6 +26,7 @@ public class ContactManager implements PairCallback{
 		m_contactCount = 0;
 		m_contactFilter = new ContactFilter();
 		m_contactListener = null;
+		m_broadPhase = new BroadPhase();
 	}
 	/**
 	 * Broad-phase callback.
