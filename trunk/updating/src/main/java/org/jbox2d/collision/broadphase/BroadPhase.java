@@ -126,7 +126,7 @@ public class BroadPhase implements TreeCallback{
 		m_moveCount = 0;
 		
 		// Sort the pair buffer to expose duplicates.
-		Arrays.sort(m_pairBuffer);
+		Arrays.sort(m_pairBuffer, 0, m_pairCount);
 
 		// Send the pairs back to the client.
 		int i = 0;
