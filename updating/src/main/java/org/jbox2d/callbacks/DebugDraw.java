@@ -20,8 +20,8 @@ public abstract class DebugDraw {
 
 	public static final int e_shapeBit				= 0x0001; ///< draw shapes
 	public static final int e_jointBit				= 0x0002; ///< draw joint connections
-	public static final int e_coreShapeBit			= 0x0004; ///< draw core (TOI) shapes
-	public static final int e_aabbBit				= 0x0008; ///< draw axis aligned bounding boxes
+	public static final int e_aabbBit				= 0x0004; ///< draw core (TOI) shapes
+	public static final int e_pairBit				= 0x0008; ///< draw axis aligned bounding boxes
 	public static final int e_centerOfMassBit		= 0x0010; ///< draw center of mass frame
 
 	protected int m_drawFlags;

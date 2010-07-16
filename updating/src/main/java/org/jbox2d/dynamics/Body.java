@@ -11,7 +11,6 @@ import org.jbox2d.pooling.TLFixtureDef;
 import org.jbox2d.pooling.TLMassData;
 import org.jbox2d.pooling.TLTransform;
 import org.jbox2d.pooling.TLVec2;
-import org.jbox2d.structs.collision.WorldManifold;
 import org.jbox2d.structs.collision.shapes.MassData;
 import org.jbox2d.structs.dynamics.contacts.ContactEdge;
 import org.jbox2d.structs.dynamics.joints.JointEdge;
@@ -116,7 +115,7 @@ public class Body {
 		m_prev = null;
 		m_next = null;
 
-		m_linearVelocity = bd.linearVelocity;
+		m_linearVelocity.set(bd.linearVelocity);
 		m_angularVelocity = bd.angularVelocity;
 
 		m_linearDamping = bd.linearDamping;
@@ -163,11 +162,14 @@ public class Body {
 			return null;
 		}
 
-		BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
-
 		// djm TODO from pool?
 		Fixture fixture = new Fixture();
 		fixture.create(this, def);
+		
+		if((m_flags & e_activeFlag) == e_activeFlag){
+			BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
+			fixture.createProxy(broadPhase, m_xf);
+		}
 
 		fixture.m_next = m_fixtureList;
 		m_fixtureList = fixture;
@@ -182,7 +184,7 @@ public class Body {
 
 		// Let the world know we have a new fixture. This will cause new contacts
 		// to be created at the beginning of the next time step.
-		m_world.m_flags |= World.e_newFixture
+		m_world.m_flags |= World.NEW_FIXTURE;
 
 		return fixture;
 	}
@@ -258,7 +260,7 @@ public class Body {
 			}
 		}
 		
-		if ((m_flags & e_activeFlag) == 1){
+		if ((m_flags & e_activeFlag) == e_activeFlag){
 			assert(fixture.m_proxy != null);
 			BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
 			fixture.destroyProxy(broadPhase);
@@ -507,6 +509,7 @@ public class Body {
 	}
 
 	// djm pooling from below
+	private final TLVec2 tloldCenter = new TLVec2();
 	/**
 	 * Set the mass properties to override the mass properties of the fixtures.
 	 * Note that this changes the center of mass position.
@@ -542,9 +545,10 @@ public class Body {
 			m_invI = 1.0f / m_I;
 		}
 
+		Vec2 oldCenter = tloldCenter.get();
 		// Move center of mass.
-		Vec2 oldCenter = m_sweep.c;
-		m_sweep.localCenter = massData.center;
+		oldCenter.set(m_sweep.c);
+		m_sweep.localCenter.set(massData.center);
 		//m_sweep.c0 = m_sweep.c = Mul(m_xf, m_sweep.localCenter);
 		Transform.mulToOut(m_xf, m_sweep.localCenter, m_sweep.c0);
 		m_sweep.c.set(m_sweep.c0);
@@ -576,7 +580,9 @@ public class Body {
 		
 		// Static and kinematic bodies have zero mass.
 		if (m_type == BodyType.STATIC || m_type == BodyType.KINEMATIC){
-			m_sweep.c0 = m_sweep.c = m_xf.position;
+			//m_sweep.c0 = m_sweep.c = m_xf.position;
+			m_sweep.c.set(m_xf.position);
+			m_sweep.c0.set(m_xf.position);
 			return;
 		}
 		
@@ -620,9 +626,10 @@ public class Body {
 			m_invI = 0.0f;
 		}
 
+		Vec2 oldCenter = tloldCenter.get();
 		// Move center of mass.
-		Vec2 oldCenter = m_sweep.c;
-		m_sweep.localCenter = center;
+		oldCenter.set(m_sweep.c);
+		m_sweep.localCenter.set(center);
 		//m_sweep.c0 = m_sweep.c = Mul(m_xf, m_sweep.localCenter);
 		Transform.mulToOut(m_xf, m_sweep.localCenter, m_sweep.c0);
 		m_sweep.c.set(m_sweep.c0);

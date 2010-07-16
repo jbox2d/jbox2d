@@ -197,7 +197,7 @@ public class ContactManager implements PairCallback{
 			}
 
 			// is this contact flagged for filtering?
-			if ((c.m_flags & Contact.FILTER_FLAG) == 1){
+			if ((c.m_flags & Contact.FILTER_FLAG) == Contact.FILTER_FLAG){
 				// Should these bodies collide?
 				if (bodyB.shouldCollide(bodyA) == false){
 					Contact cNuke = c;

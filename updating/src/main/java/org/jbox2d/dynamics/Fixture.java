@@ -184,8 +184,8 @@ public class Fixture {
 	 * @param output
 	 * @param input
 	 */
-	public void raycast(RayCastOutput output, RayCastInput input){
-		m_shape.raycast( output, input, m_body.m_xf);
+	public boolean raycast(RayCastOutput output, RayCastInput input){
+		return m_shape.raycast( output, input, m_body.m_xf);
 	}
 
 	/**

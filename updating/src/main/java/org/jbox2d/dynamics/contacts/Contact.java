@@ -167,7 +167,7 @@ public abstract class Contact {
 
 	protected Manifold m_manifold;
 
-	protected float m_toiCount;
+	public float m_toiCount;
 	
 	
 	protected Contact(){
