@@ -1,21 +1,27 @@
+/**
+ * Created at 4:14:34 AM Jul 17, 2010
+ */
 package org.jbox2d.pooling.arrays;
 
 import java.util.HashMap;
 
-public abstract class DynamicTLArray<I> {
-	
+/**
+ * @author Daniel Murphy
+ */
+public class IntArray {
+
 	private static class TLHashMap<K, V> extends ThreadLocal<HashMap<K, V>>{
 		protected HashMap<K, V> initialValue(){
 			return new HashMap<K, V>();
 		}
 	}
 	
-	private final TLHashMap<Integer, I[]> tlMap = new TLHashMap<Integer, I[]>();
+	private final TLHashMap<Integer, int[]> tlMap = new TLHashMap<Integer, int[]>();
 	
-	public I[] get( int argLength){
+	public int[] get( int argLength){
 		assert(argLength > 0);
 		
-		HashMap<Integer, I[]> map = tlMap.get();
+		HashMap<Integer, int[]> map = tlMap.get();
 		
 		if(!map.containsKey(argLength)){
 			map.put(argLength, getInitializedArray(argLength));
@@ -25,5 +31,7 @@ public abstract class DynamicTLArray<I> {
 		return map.get(argLength);
 	}
 	
-	protected abstract I[] getInitializedArray(int argLength);
+	protected int[] getInitializedArray(int argLength){
+		return new int[argLength];
+	}
 }
