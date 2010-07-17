@@ -1,7 +1,7 @@
 /**
  * Created at 3:09:27 AM Jul 17, 2010
  */
-package org.jbox2d.testbed;
+package org.jbox2d.testbed.framework;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -28,6 +28,8 @@ public class DebugDrawJ2D extends DebugDraw{
 	 */
 	public DebugDrawJ2D(TestPanel argTestPanel) {
 		super(new OBBViewportTransform());
+		viewportTransform.setYFlip(true);
+		
 		panel = argTestPanel;
 	}
 
@@ -75,10 +77,13 @@ public class DebugDrawJ2D extends DebugDraw{
 		Graphics2D g = (Graphics2D) panel.getGraphics();
 		
 		// inside
-		Color c = cpool.getColor(color.x, color.y, color.z);
-		g.setColor(c);
-		getWorldToScreenToOut(center.x + radius * axis.x, center.y + radius * axis.y, saxis);
-		g.drawLine((int)sCenter.x, (int)sCenter.y, (int)saxis.x, (int)saxis.y);
+		Color c;
+		if(axis != null){
+			c = cpool.getColor(color.x, color.y, color.z);
+			g.setColor(c);
+			getWorldToScreenToOut(center.x + radius * axis.x, center.y + radius * axis.y, saxis);
+			g.drawLine((int)sCenter.x, (int)sCenter.y, (int)saxis.x, (int)saxis.y);
+		}
 		
 		c = cpool.getColor(color.x, color.y, color.z, .8f);
 		g.setColor(c);
