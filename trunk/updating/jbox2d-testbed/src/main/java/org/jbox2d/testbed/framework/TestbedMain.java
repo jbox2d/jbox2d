@@ -35,6 +35,7 @@ public class TestbedMain extends JFrame {
 		add(new JScrollPane(new SidePanel(s,this)), "East");
 		pack();
 		setVisible(true);
+		setDefaultCloseOperation(3);
 		panel.changeTest(TestList.tests.get(0));
 	}
 	
@@ -84,6 +85,8 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 	public void initComponents(){
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
+		add(Box.createVerticalGlue());
+		
 		String[] names = new String[TestList.tests.size()];
 		for(int i=0; i<names.length; i++){
 			names[i] = TestList.tests.get(i).getTestName();
@@ -95,6 +98,8 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 		tbox.add(tests);
 		
 		add(tbox);
+		
+		add(Box.createVerticalGlue());
 		
 		hz = new JSlider(1, 200, (int)settings.hz);
 		hz.setSize(100, 10);

@@ -4,6 +4,7 @@
 package org.jbox2d.testbed.tests;
 
 import org.jbox2d.callbacks.DebugDraw;
+import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -33,9 +34,10 @@ public class PyramidTest extends TestbedTest {
 
 		{
 			float a = 0.5f;
-			PolygonShape shape = new PolygonShape();
-			shape.setAsBox(a, a);
-
+			CircleShape shape = new CircleShape();
+			//shape.setAsBox(a, a);
+			shape.m_radius = a;
+			
 			Vec2 x = new Vec2(-7.0f, 0.75f);
 			Vec2 y = new Vec2();
 			Vec2 deltaX = new Vec2(0.5625f, 1.25f);
