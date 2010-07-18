@@ -3,11 +3,31 @@
  */
 package org.jbox2d.testbed.framework;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+
 import javax.swing.JPanel;
 
 import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.callbacks.ContactListener;
+import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.collision.AABB;
+import org.jbox2d.common.Mat22;
+import org.jbox2d.common.OBBViewportTransform;
+import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.structs.collision.Manifold;
@@ -15,6 +35,267 @@ import org.jbox2d.structs.collision.Manifold;
 /**
  * @author Daniel Murphy
  */
-public class TestPanel extends JPanel{
+public class TestPanel extends JPanel implements Runnable{
 	
+	public static boolean[] keys = new boolean[256];
+	public static boolean[] codedKeys = new boolean[512];
+	
+	public TestbedTest currTest = null;
+	public DebugDraw draw = new DebugDrawJ2D(this);
+	
+	public final Vec2 mouse = new Vec2();
+	public final TestbedSettings settings;
+	
+	private long startTime;
+	private long frameCount;
+	private int targetFrameRate;
+	private float frameRate = 0;
+	private boolean animating = false;
+	public Graphics2D dbg = null;
+	public Image dbImage = null;
+	private Thread animator;
+
+	
+	public TestPanel(TestbedSettings argSettings) {
+		setBackground(Color.black);
+		setPreferredSize(new Dimension(600,500));
+		settings = argSettings;
+		setFrameRate(60);
+		
+		addKeyListener(new KeyListener() {
+			public void keyTyped(KeyEvent e) {}
+			
+			public void keyReleased(KeyEvent e) {
+				char key = e.getKeyChar();
+				int code = e.getKeyCode();
+				keys[key] = false;
+				codedKeys[code] = false;
+			}
+			
+			public void keyPressed(KeyEvent e) {
+				char key = e.getKeyChar();
+				int code = e.getKeyCode();
+				keys[key] = true;
+				codedKeys[code] = true;
+				if(currTest != null){
+					currTest.keyPressed(key, code);
+				}
+			}
+		});
+		addMouseMotionListener(new MouseMotionListener() {
+			
+			private final Vec2 pos2 = new Vec2();
+			public void mouseDragged(MouseEvent e) {
+				if(currTest != null){
+					pos2.set(e.getX(), e.getY());
+					mouse.set(pos2);
+					draw.getScreenToWorldToOut(pos2, pos2);
+					currTest.mouseMove(pos2);
+				}
+			}
+			
+			private final Vec2 pos = new Vec2();
+			public void mouseMoved(MouseEvent e) {
+				if(currTest != null){
+					pos.set(e.getX(), e.getY());
+					mouse.set(pos);
+					draw.getScreenToWorldToOut(pos, pos);
+					currTest.mouseMove(pos);
+				}
+			}
+		});
+		
+		addMouseListener(new MouseAdapter() {
+			private final Vec2 pos = new Vec2();
+			public void mouseReleased(MouseEvent e) {
+				if(currTest != null){
+					pos.x = e.getX();
+					pos.y = e.getY();
+					mouse.set(pos);
+					draw.getScreenToWorldToOut(pos, pos);
+					currTest.mouseUp(pos);
+				}
+			}
+			
+			private final Vec2 pos2 = new Vec2();
+			public void mousePressed(MouseEvent e) {
+				if(currTest != null){
+					pos2.x = e.getX();
+					pos2.y = e.getY();
+					mouse.set(pos2);
+					draw.getScreenToWorldToOut(pos2, pos2);
+					if(codedKeys[KeyEvent.VK_SHIFT]){
+						currTest.shiftMouseDown(pos2);
+					}else{
+						currTest.mouseDown(pos);
+					}
+				}
+			}
+		});
+		
+		addMouseWheelListener(new MouseWheelListener() {
+			
+			private final Vec2 oldCenter = new Vec2();
+			private final Vec2 newCenter = new Vec2();
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				DebugDraw d = draw;
+        		int notches = e.getWheelRotation();
+        		
+            	Vec2 oldCenter = new Vec2();
+            	OBBViewportTransform trans = (OBBViewportTransform) d.getViewportTranform();
+            	oldCenter.set(currTest.mouseWorld);
+            	//Change the zoom and clamp it to reasonable values - can't clamp now.
+            	if (notches < 0) {
+            		trans.mulByTransform( Mat22.createScaleTransform( 1.05f ));
+            		currTest.cachedCameraScale *= 1.05;
+            	}
+            	else if (notches > 0) {
+            		trans.mulByTransform( Mat22.createScaleTransform( .95f ));
+            		currTest.cachedCameraScale *= .95f;
+            	}
+            	
+            	d.getScreenToWorldToOut(mouse, newCenter);
+            	
+            	
+            	Vec2 transformedMove = oldCenter.subLocal(newCenter);
+            	d.getViewportTranform().setCenter( d.getViewportTranform().getCenter().addLocal(transformedMove));
+
+            	currTest.cachedCameraX = d.getViewportTranform().getCenter().x;
+            	currTest.cachedCameraY = d.getViewportTranform().getCenter().y;
+			}
+		});
+		
+		animator = new Thread(this, "Animation Thread");
+	}
+	
+	public synchronized void changeTest(TestbedTest test){
+		currTest = test;
+		test.init(draw);
+	}
+	
+	public synchronized void update(){
+		if(currTest != null){
+			currTest.step(settings);
+		}
+	}	
+	
+	public void setFrameRate(int fps) {
+		if (fps == 0) {
+			System.err.println("Animation: fps cannot be zero.  Setting looping to false");
+		}
+		
+		if (fps < 0) {
+			System.err.println("Animation: fps cannot be negative.  Re-assigning fps to default " + 30
+					+ " fps.");
+			fps = 30;
+		}
+		targetFrameRate = fps;
+		frameRate = fps;
+	}
+	
+	public int getFrameRate() {
+		return targetFrameRate;
+	}
+	
+	public float getCalculatedFrameRate() {
+		return frameRate;
+	}
+	
+	public long getStartTime() {
+		return startTime;
+	}
+	
+	public long getFrameCount() {
+		return frameCount;
+	}
+	
+	public boolean isAnimating() {
+		return animating;
+	}
+	
+	public synchronized void start() {
+		if (animating != true) {
+			frameCount = 0;
+			animator.start();
+		}
+		else {
+			System.err.println("\nAnimation is already animating.");
+			System.err.println("\n");
+		}
+	}
+	
+	public void stop() {
+		animating = false;
+	}
+	
+	public void render(){
+		if(dbImage == null){
+			dbImage = createImage(600, 500);
+			if(dbImage == null){
+				System.err.println("dbImage is null");
+				return;
+			}
+			dbg = (Graphics2D)dbImage.getGraphics();
+		}
+		dbg.setColor(Color.black);
+		dbg.fillRect(0, 0, 600, 500);
+	}
+	
+	public void paintScreen(){
+		Graphics g;
+		try{
+			g = this.getGraphics();
+			if((g != null) && dbImage != null){
+				g.drawImage(dbImage, 0, 0, null);
+				Toolkit.getDefaultToolkit().sync();
+				g.dispose();
+			}
+		}catch(Exception e){
+			System.err.println("Graphics context error: "+ e);
+		}
+	}
+	
+	/**
+	 * @see javax.swing.JComponent#addNotify()
+	 */
+	@Override
+	public void addNotify() {
+		super.addNotify();
+		start();
+	}
+	
+	public void run() { // animation loop
+		long beforeTime, afterTime, timeDiff, sleepTime;
+		
+		beforeTime = startTime = System.nanoTime();
+		sleepTime = 0;
+		
+		float timeInSecs = 0;
+		
+		animating = true;
+		while (animating) {
+			
+			render();
+			update();
+			paintScreen();
+			frameCount++;
+			
+			afterTime = System.nanoTime();
+			
+			timeDiff = afterTime - beforeTime;
+			
+			// sleepTime = ((1000000000/targetFrameRate) - timeDiff)/1000000;
+			sleepTime = 1000 / targetFrameRate - timeDiff / 1000000;
+			if (sleepTime > 0) {
+				frameRate = (frameRate * 0.9f) + (1000f / sleepTime) * 0.1f;
+				try {
+					Thread.sleep(sleepTime);
+				}
+				catch (InterruptedException ex) {}
+			}
+			
+			beforeTime = System.nanoTime();
+			
+		} // end of run loop
+	}
 }

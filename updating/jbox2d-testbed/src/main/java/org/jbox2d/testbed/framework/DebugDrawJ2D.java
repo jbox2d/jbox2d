@@ -4,6 +4,7 @@
 package org.jbox2d.testbed.framework;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 import org.jbox2d.callbacks.DebugDraw;
@@ -23,13 +24,13 @@ public class DebugDrawJ2D extends DebugDraw{
 
 	private final TestPanel panel;
 	private final ColorPool cpool = new ColorPool();
+	public Graphics2D graphics = null;
 	/**
 	 * @param viewport
 	 */
 	public DebugDrawJ2D(TestPanel argTestPanel) {
 		super(new OBBViewportTransform());
 		viewportTransform.setYFlip(true);
-		
 		panel = argTestPanel;
 	}
 
@@ -40,7 +41,7 @@ public class DebugDrawJ2D extends DebugDraw{
 	@Override
 	public void drawCircle(Vec2 center, float radius, Color3f color) {
 		getWorldToScreenToOut(center, sCenter);
-		Graphics2D g = (Graphics2D) panel.getGraphics();
+		Graphics2D g = getGraphics();		
 		Color c = cpool.getColor(color.x, color.y, color.z);
 		g.setColor(c);
 		
@@ -57,7 +58,7 @@ public class DebugDrawJ2D extends DebugDraw{
 		getWorldToScreenToOut(p1, sp1);
 		getWorldToScreenToOut(p2, sp2);
 		
-		Graphics2D g = (Graphics2D) panel.getGraphics();
+		Graphics2D g = getGraphics();		
 		Color c = cpool.getColor(color.x, color.y, color.z);
 		g.setColor(c);
 		
@@ -74,7 +75,7 @@ public class DebugDrawJ2D extends DebugDraw{
 		drawCircle(center, radius, color);
 		
 		getWorldToScreenToOut(center, sCenter);
-		Graphics2D g = (Graphics2D) panel.getGraphics();
+		Graphics2D g = getGraphics();		
 		
 		// inside
 		Color c;
@@ -105,7 +106,7 @@ public class DebugDrawJ2D extends DebugDraw{
 		drawPolygon(vertices, vertexCount, color);
 		
 		// inside
-		Graphics2D g = (Graphics2D) panel.getGraphics();
+		Graphics2D g = getGraphics();		
 		int[] xInts = xIntsPool.get(vertexCount);
 		int[] yInts = yIntsPool.get(vertexCount);
 		
@@ -125,11 +126,18 @@ public class DebugDrawJ2D extends DebugDraw{
 	 */
 	@Override
 	public void drawString(float x, float y, String s, Color3f color) {
-		Graphics2D g = (Graphics2D) panel.getGraphics();
+		Graphics2D g = getGraphics();		
 		
 		Color c = cpool.getColor(color.x, color.y, color.z);
 		g.setColor(c);
 		g.drawString(s, x, y);
+	}
+	
+	private Graphics2D getGraphics(){
+		if(graphics == null){
+			graphics = panel.dbg;
+		}
+		return graphics;
 	}
 
 	private final Vec2 temp2 = new Vec2();
@@ -138,8 +146,7 @@ public class DebugDrawJ2D extends DebugDraw{
 	 */
 	@Override
 	public void drawTransform(Transform xf) {
-		Graphics2D g = (Graphics2D) panel.getGraphics();
-		
+		Graphics2D g = getGraphics();		
 		getWorldToScreenToOut(xf.position, temp);
 		temp2.setZero();
 		float k_axisScale = 0.4f;
