@@ -43,18 +43,28 @@ public abstract class TestbedTest implements ContactListener{
 	public Body groundBody;
 	private AABB worldAABB;
 	private int pointCount;
-	private final DestructionListener destructionListener;
-	public final DebugDraw debugDraw;
+	private DestructionListener destructionListener;
+	public DebugDraw debugDraw;
 	public World world;
 	private Body bomb;
 	public Joint mouseJoint;
 	private final Vec2 bombSpawnPoint = new Vec2();
 	private boolean bombSpawning = false;
-	private final Vec2 mouseWorld = new Vec2();
+	public final Vec2 mouseWorld = new Vec2();
 	private int stepCount;
 	private int textLine;
 	
-	public TestbedTest(DebugDraw argDebugDraw){
+	public float cachedCameraScale;
+	public float cachedCameraX;
+	public float cachedCameraY;
+	
+	public boolean hasCachedCamera = false;
+	
+	public TestbedTest(){
+		
+	}
+	
+	public void init(DebugDraw argDebugDraw){
 		debugDraw = argDebugDraw;
 		destructionListener = new DestructionListener() {
 			
@@ -87,7 +97,27 @@ public abstract class TestbedTest implements ContactListener{
 		
 		BodyDef bodyDef = new BodyDef();
 		groundBody = world.createBody(bodyDef);
+		
+		if(hasCachedCamera){
+			setCamera(cachedCameraX, cachedCameraY, cachedCameraScale);
+		}else{
+			setCamera(-10, 10, 10);			
+		}
+		
+		initTest();
 	}
+	
+	public void setCamera(float x, float y, float scale){
+		debugDraw.setCamera(x, y, scale);
+		hasCachedCamera = true;
+		cachedCameraScale = scale;
+		cachedCameraX = x;
+		cachedCameraY = y;
+	}
+	
+	public abstract void initTest();
+	
+	public abstract String getTestName();
 	
 	private final Color3f color1 = new Color3f(.3f, .95f, .3f);
 	private final Color3f color2 = new Color3f(.3f, .3f, .95f);
@@ -110,11 +140,11 @@ public abstract class TestbedTest implements ContactListener{
 		}
 		
 		int flags = 0;
-		flags += settings.drawShapes			* DebugDraw.e_shapeBit;
-		flags += settings.drawJoints			* DebugDraw.e_jointBit;
-		flags += settings.drawAABBs			* DebugDraw.e_aabbBit;
-		flags += settings.drawPairs			* DebugDraw.e_pairBit;
-		flags += settings.drawCOMs				* DebugDraw.e_centerOfMassBit;
+		flags += settings.drawShapes? DebugDraw.e_shapeBit : 0;
+		flags += settings.drawJoints? DebugDraw.e_jointBit: 0;
+		flags += settings.drawAABBs? DebugDraw.e_aabbBit: 0;
+		flags += settings.drawPairs? DebugDraw.e_pairBit: 0;
+		flags += settings.drawCOMs?	 DebugDraw.e_centerOfMassBit: 0;
 		debugDraw.setFlags(flags);
 		
 		world.setWarmStarting(settings.enableWarmStarting);
@@ -163,10 +193,6 @@ public abstract class TestbedTest implements ContactListener{
 				}
 			}
 		}
-	}
-	
-	public void keyboard(char key){
-		
 	}
 	
 	public void shiftMouseDown(Vec2 p){
@@ -335,6 +361,12 @@ public abstract class TestbedTest implements ContactListener{
 			cp.normal.set(worldManifold.normal);
 			cp.state = state2[i];
 			++pointCount;
+		}
+	}
+
+	public void keyPressed(char argKeyChar, int argKeyCode) {
+		if(argKeyChar == 'r'){
+			init(debugDraw);
 		}
 	}
 }
