@@ -13,8 +13,8 @@ public class CircleContact extends Contact {
 
 	public CircleContact(){}
 	
-	public CircleContact(Fixture fixtureA, Fixture fixtureB){
-		super(fixtureA, fixtureB);
+	public void init(Fixture fixtureA, Fixture fixtureB){
+		super.init(fixtureA, fixtureB);
 		assert(m_fixtureA.getType() == ShapeType.CIRCLE);
 		assert(m_fixtureB.getType() == ShapeType.CIRCLE);
 	}
