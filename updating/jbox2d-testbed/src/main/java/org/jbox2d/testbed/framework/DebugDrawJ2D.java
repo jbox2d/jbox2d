@@ -66,6 +66,8 @@ public class DebugDrawJ2D extends DebugDraw{
 	}
 
 	private final Vec2 saxis = new Vec2();
+	private final Vec2 sup = new Vec2(0,1);
+	private final Vec2 sright = new Vec2(1,0);
 	/**
 	 * @see org.jbox2d.callbacks.DebugDraw#drawSolidCircle(org.jbox2d.common.Vec2, float, org.jbox2d.common.Vec2, org.jbox2d.common.Color3f)
 	 */
@@ -86,9 +88,17 @@ public class DebugDrawJ2D extends DebugDraw{
 			g.drawLine((int)sCenter.x, (int)sCenter.y, (int)saxis.x, (int)saxis.y);
 		}
 		
+		sup.set(radius,0);
+		getViewportTranform().vectorTransform(sup, sup);
+		
+		sright.set(0,radius);
+		getViewportTranform().vectorTransform(sright, sright);
+		
+		sCenter.subLocal(sup).subLocal(sright);
+		
 		c = cpool.getColor(color.x, color.y, color.z, .8f);
 		g.setColor(c);
-		g.fillOval((int)sCenter.x, (int)sCenter.y, (int)radius, (int)radius);
+		g.fillOval((int)sCenter.x, (int)sCenter.y, (int)sright.length()*2, (int)sup.length()*2);
 		
 	}
 
