@@ -67,7 +67,13 @@ public class PolygonShape extends Shape{
 
 		m_vertexCount = 0;
 		m_vertices = new Vec2[Settings.maxPolygonVertices];
+		for(int i=0; i<m_vertices.length; i++){
+			m_vertices[i] = new Vec2();
+		}
 		m_normals = new Vec2[Settings.maxPolygonVertices];
+		for(int i=0; i<m_normals.length; i++){
+			m_normals[i] = new Vec2();
+		}
 		m_radius = Settings.polygonRadius;
 		m_centroid.setZero();
 	}

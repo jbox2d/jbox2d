@@ -58,7 +58,7 @@ public class ContactSolver {
 		if(m_constraints.length <= contactCount){
 			ContactConstraint[] newConstraints = new ContactConstraint[m_constraints.length*2];
 			for(int i=0; i< newConstraints.length; i++){
-				if(i<m_constraints.length){
+				if(i<m_constraints.length/2){
 					newConstraints[i] = m_constraints[i];
 				}else{
 					newConstraints[i] = new ContactConstraint();
