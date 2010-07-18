@@ -8,10 +8,10 @@ import org.jbox2d.structs.collision.distance.DistanceProxy;
  * @author Daniel Murphy
  */
 public class TOIInput {
-	public DistanceProxy proxyA;
-	public DistanceProxy proxyB;
-	public Sweep sweepA;
-	public Sweep sweepB;
+	public final DistanceProxy proxyA = new DistanceProxy();
+	public final DistanceProxy proxyB = new DistanceProxy();
+	public final Sweep sweepA = new Sweep();
+	public final Sweep sweepB = new Sweep();
 	/**
 	 * defines sweep interval [0, tMax]
 	 */

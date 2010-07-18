@@ -70,7 +70,7 @@ public abstract class Contact {
 					s.push(new CircleContact());
 					s.push(new CircleContact());
 				}
-				Contact c = s.pop();
+				Contact c = new CircleContact();
 				c.init(fixtureA, fixtureB);
 				return c;
 			}
@@ -87,7 +87,7 @@ public abstract class Contact {
 					s.push(new PolygonAndCircleContact());
 					s.push(new PolygonAndCircleContact());
 				}
-				Contact c = s.pop();
+				Contact c = new PolygonAndCircleContact();
 				c.init(fixtureA, fixtureB);
 				return c;
 			}
@@ -104,7 +104,7 @@ public abstract class Contact {
 					s.push(new PolygonContact());
 					s.push(new PolygonContact());
 				}
-				Contact c = s.pop();
+				Contact c = new PolygonContact();
 				c.init(fixtureA, fixtureB);
 				return c;
 			}
@@ -148,7 +148,7 @@ public abstract class Contact {
 		ShapeType type2 = contact.getFixtureB().getType();
 		
 		ContactCreator creator = s_registers[type1.intValue][type2.intValue].creator;
-		creator.contactDestroyFcn(contact);
+		//creator.contactDestroyFcn(contact);
 	}
 	
 	

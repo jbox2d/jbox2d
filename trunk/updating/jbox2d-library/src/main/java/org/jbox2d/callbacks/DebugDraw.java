@@ -118,11 +118,11 @@ public abstract class DebugDraw {
 	 * @param color
 	 */
 	public abstract void drawString(float x, float y, String s, Color3f color);
-	
+		
 	public IViewportTransform getViewportTranform(){
 		return viewportTransform;
 	}
-
+	
 	/**
 	 * @param x
 	 * @param y

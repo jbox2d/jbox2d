@@ -29,6 +29,9 @@ public class TOISolver {
 	public TOISolver(){
 		m_count = 0;
 		m_toiBody = null;
+		for(int i=0; i<m_constraints.length; i++){
+			m_constraints[i] = new TOIConstraint();
+		}
 	}
 	
 	public void clear(){
@@ -46,6 +49,9 @@ public class TOISolver {
 			TOIConstraint[] old = m_constraints;
 			m_constraints = new TOIConstraint[old.length*2];
 			System.arraycopy(old, 0, m_constraints, 0, old.length);
+			for(int i=old.length; i<m_constraints.length; i++){
+				m_constraints[i] = new TOIConstraint();
+			}
 		}
 		
 		for(int i=0; i<m_count; i++){
