@@ -52,8 +52,8 @@ public abstract class Contact {
 		if(type1 != type2){
 			ContactRegister register2 = new ContactRegister();
 			register2.creator = creator;
-			register.primary = false;
-			s_registers[type2.intValue][type1.intValue] = register;
+			register2.primary = false;
+			s_registers[type2.intValue][type1.intValue] = register2;
 		}
 	}
 	
@@ -70,7 +70,7 @@ public abstract class Contact {
 					s.push(new CircleContact());
 					s.push(new CircleContact());
 				}
-				Contact c = new CircleContact();
+				Contact c = s.pop();
 				c.init(fixtureA, fixtureB);
 				return c;
 			}
@@ -87,7 +87,7 @@ public abstract class Contact {
 					s.push(new PolygonAndCircleContact());
 					s.push(new PolygonAndCircleContact());
 				}
-				Contact c = new PolygonAndCircleContact();
+				Contact c = s.pop();
 				c.init(fixtureA, fixtureB);
 				return c;
 			}
@@ -104,7 +104,7 @@ public abstract class Contact {
 					s.push(new PolygonContact());
 					s.push(new PolygonContact());
 				}
-				Contact c = new PolygonContact();
+				Contact c = s.pop();
 				c.init(fixtureA, fixtureB);
 				return c;
 			}
@@ -159,8 +159,8 @@ public abstract class Contact {
 	public Contact m_next;
 
 	// Nodes for connecting bodies.
-	public ContactEdge m_nodeA;
-	public ContactEdge m_nodeB;
+	public ContactEdge m_nodeA = null;
+	public ContactEdge m_nodeB = null;
 
 	public Fixture m_fixtureA;
 	public Fixture m_fixtureB;
@@ -173,12 +173,10 @@ public abstract class Contact {
 	protected Contact(){
 		m_fixtureA = null;
 		m_fixtureB = null;
+		m_nodeA = new ContactEdge();
+		m_nodeB = new ContactEdge();
+		
 	}
-	
-	protected Contact(Fixture fA, Fixture fB){
-		init(fA, fB);
-	}
-	
 	
 	/** initialization for pooling */
 	public void init(Fixture fA, Fixture fB){
@@ -194,13 +192,11 @@ public abstract class Contact {
 		m_prev = null;
 		m_next = null;
 
-		m_nodeA = new ContactEdge();
 		m_nodeA.contact = null;
 		m_nodeA.prev = null;
 		m_nodeA.next = null;
 		m_nodeA.other = null;
 
-		m_nodeB = new ContactEdge();
 		m_nodeB.contact = null;
 		m_nodeB.prev = null;
 		m_nodeB.next = null;

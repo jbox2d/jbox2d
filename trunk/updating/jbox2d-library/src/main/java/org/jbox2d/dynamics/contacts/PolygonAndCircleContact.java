@@ -14,8 +14,9 @@ public class PolygonAndCircleContact extends Contact {
 	
 	public PolygonAndCircleContact(){}
 	
-	public PolygonAndCircleContact(Fixture fixtureA, Fixture fixtureB) {
-		super(fixtureA, fixtureB);
+	
+	public void init(Fixture fixtureA, Fixture fixtureB){
+		super.init(fixtureA, fixtureB);
 		assert(m_fixtureA.getType() == ShapeType.POLYGON);
 		assert(m_fixtureB.getType() == ShapeType.CIRCLE);
 	}
