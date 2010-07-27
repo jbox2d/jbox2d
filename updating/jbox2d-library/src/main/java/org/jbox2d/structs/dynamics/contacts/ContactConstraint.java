@@ -29,7 +29,7 @@ public class ContactConstraint {
     public float restitution;
     public int pointCount;
 
-    public Manifold manifold;
+    public Manifold manifold = null;
 
     public ContactConstraint() {
         points = new ContactConstraintPoint[Settings.maxManifoldPoints];
@@ -42,7 +42,7 @@ public class ContactConstraint {
         normal = new Vec2();
         normalMass = new Mat22();
         K = new Mat22();
-        manifold = new Manifold();
+
     }
     
     public void set(final ContactConstraint cp){
@@ -58,7 +58,7 @@ public class ContactConstraint {
     	radius = cp.radius;
     	friction = cp.friction;
     	restitution = cp.restitution;
-    	manifold.set(cp.manifold);
+    	manifold = cp.manifold; // djm: not copy here
     	for(int i=0; i<cp.pointCount; i++){
     		points[i].set(cp.points[i]);
     	}
