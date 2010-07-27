@@ -62,7 +62,7 @@ public abstract class DebugDraw {
 			return;
 		}
 		
-		for(int i=0; i<vertexCount-1; i+=2){
+		for(int i=0; i<vertexCount-1; i+=1){
 			drawSegment(vertices[i], vertices[i+1], color);
 		}
 		
