@@ -133,6 +133,12 @@ public abstract class TestbedTest implements ContactListener{
 	public void step(TestbedSettings settings){
 		float timeStep = settings.hz > 0f ? 1f/settings.hz : 0;
 		
+		// keys!
+		if(TestPanel.keys['r']){
+			TestPanel.keys['r'] = false;
+			init(debugDraw);
+		}
+		
 		if(settings.pause){
 			if(settings.singleStep){
 				settings.singleStep = false;
@@ -145,7 +151,7 @@ public abstract class TestbedTest implements ContactListener{
 		}
 		
 		if(title != null){
-			debugDraw.drawString(100, 10, title, Color3f.WHITE);
+			debugDraw.drawString(100, 15, title, Color3f.WHITE);
 		}
 		
 		int flags = 0;
@@ -180,6 +186,7 @@ public abstract class TestbedTest implements ContactListener{
 				debugDraw.drawString(5, textLine, s, Color3f.WHITE);
 				textLine+=15;
 			}
+			textList.clear();
 		}
 		
 		if(mouseJoint != null){
@@ -263,11 +270,11 @@ public abstract class TestbedTest implements ContactListener{
 	}
 	
 	public void setTitle(String argTitle){
-		
+		title = argTitle;
 	}
 	
 	public void addTextLine(String argTextLine){
-		
+		textList.add(argTextLine);
 	}
 	
 	private final Vec2 p = new Vec2();
