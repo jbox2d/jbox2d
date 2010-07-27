@@ -22,6 +22,7 @@ public class PyramidTest extends TestbedTest {
 	@Override
 	public void step(TestbedSettings settings){
 		super.step(settings);
+		setTitle("Pyramid Test");
 //		for (Body b = world.getBodyList(); b.getNext() != null; b = b.getNext()) {
 //			if (b.getMass() == 0.0f) continue;
 //			System.out.println(b + " : " + b.getPosition());

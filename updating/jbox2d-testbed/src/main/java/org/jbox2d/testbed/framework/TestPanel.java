@@ -37,8 +37,8 @@ import org.jbox2d.structs.collision.Manifold;
  */
 public class TestPanel extends JPanel implements Runnable{
 	
-	public static boolean[] keys = new boolean[256];
-	public static boolean[] codedKeys = new boolean[512];
+	public volatile static boolean[] keys = new boolean[256];
+	public volatile static boolean[] codedKeys = new boolean[512];
 	
 	private TestbedTest currTest = null;
 	private TestbedTest nextTest = null;
@@ -72,6 +72,7 @@ public class TestPanel extends JPanel implements Runnable{
 	}
 	
 	public void init(){
+		grabFocus();
 		
 		addKeyListener(new KeyListener() {
 			public void keyTyped(KeyEvent e) {}
@@ -79,14 +80,18 @@ public class TestPanel extends JPanel implements Runnable{
 			public void keyReleased(KeyEvent e) {
 				char key = e.getKeyChar();
 				int code = e.getKeyCode();
-				keys[key] = false;
+				if(key != KeyEvent.CHAR_UNDEFINED){
+					keys[key] = false;
+				}
 				codedKeys[code] = false;
 			}
 			
 			public void keyPressed(KeyEvent e) {
 				char key = e.getKeyChar();
 				int code = e.getKeyCode();
-				keys[key] = true;
+				if(key != KeyEvent.CHAR_UNDEFINED){
+					keys[key] = true;
+				}
 				codedKeys[code] = true;
 				if(currTest != null){
 					currTest.keyPressed(key, code);
@@ -131,6 +136,7 @@ public class TestPanel extends JPanel implements Runnable{
 			
 			private final Vec2 pos2 = new Vec2();
 			public void mousePressed(MouseEvent e) {
+				grabFocus();
 				if(currTest != null){
 					pos2.x = e.getX();
 					pos2.y = e.getY();
