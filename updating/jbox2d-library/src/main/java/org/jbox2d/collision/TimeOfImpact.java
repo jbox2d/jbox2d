@@ -378,7 +378,7 @@ class SeparationFunction{
 				Mat22.mulToOut(xfa.R, m_axis, normal);
 				Transform.mulToOut(xfa, m_localPoint, pointA);
 				
-				Mat22.mulToOut(xfb.R, normal.negateLocal(), axisB);
+				Mat22.mulTransToOut(xfb.R, normal.negateLocal(), axisB);
 				normal.negateLocal();
 				
 				indexes[0] = -1;
@@ -394,7 +394,7 @@ class SeparationFunction{
 				Mat22.mulToOut(xfb.R, m_axis, normal);
 				Transform.mulToOut(xfb, m_localPoint, pointB);
 				
-				Mat22.mulToOut(xfa.R, normal.negateLocal(), axisA);
+				Mat22.mulTransToOut(xfa.R, normal.negateLocal(), axisA);
 				normal.negateLocal();
 				
 				indexes[1] = -1;
@@ -423,8 +423,8 @@ class SeparationFunction{
 		switch(m_type){
 			case POINTS:{
 
-				Mat22.mulToOut(xfa.R, m_axis, axisA);
-				Mat22.mulToOut(xfb.R, m_axis.negateLocal(), axisB);
+				Mat22.mulTransToOut(xfa.R, m_axis, axisA);
+				Mat22.mulTransToOut(xfb.R, m_axis.negateLocal(), axisB);
 				m_axis.negateLocal();
 				
 				localPointA.set(m_proxyA.getVertex(indexA));
