@@ -299,6 +299,7 @@ public class TestPanel extends JPanel implements Runnable{
 			
 			if(nextTest != null){
 				currTest = nextTest;
+				currTest.setPanel(this);
 				currTest.init(draw);
 				nextTest = null;
 			}

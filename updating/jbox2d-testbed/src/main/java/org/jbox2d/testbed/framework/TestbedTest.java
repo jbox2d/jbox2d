@@ -3,6 +3,7 @@
  */
 package org.jbox2d.testbed.framework;
 
+import java.awt.Color;
 import java.util.LinkedList;
 
 import org.jbox2d.callbacks.ContactImpulse;
@@ -65,8 +66,14 @@ public abstract class TestbedTest implements ContactListener{
 	
 	public boolean hasCachedCamera = false;
 	
+	private TestPanel panel;
+	
 	public TestbedTest(){
 		
+	}
+	
+	public void setPanel(TestPanel argPanel){
+		panel = argPanel;
 	}
 	
 	public void init(DebugDraw argDebugDraw){
@@ -177,8 +184,15 @@ public abstract class TestbedTest implements ContactListener{
 		
 		textLine = 15;
 		if(settings.drawStats){
+			Vec2.watchCreations = true;
 			debugDraw.drawString(5, textLine,"bodies/contacts/joints/proxies = "+world.getBodyCount()+"/"+world.getContactCount()+"/"+world.getJointCount()+"/"+world.getProxyCount(), Color3f.WHITE);
 			textLine += 15;
+			debugDraw.drawString(5, textLine, "Framerate: "+ panel.getCalculatedFrameRate(), Color3f.WHITE);
+			textLine += 15;
+			debugDraw.drawString(5, textLine, "Vec2 creations: "+ Vec2.creationCount, Color3f.WHITE);
+			Vec2.creationCount = 0;
+		}else{
+			Vec2.watchCreations = false;
 		}
 		
 		if(!textList.isEmpty()){
@@ -397,11 +411,7 @@ public abstract class TestbedTest implements ContactListener{
 		}
 	}
 
-	public void keyPressed(char argKeyChar, int argKeyCode) {
-		if(argKeyChar == 'r'){
-			init(debugDraw);
-		}
-	}
+	public void keyPressed(char argKeyChar, int argKeyCode) {}
 }
 
 class TestQueryCallback implements QueryCallback{
