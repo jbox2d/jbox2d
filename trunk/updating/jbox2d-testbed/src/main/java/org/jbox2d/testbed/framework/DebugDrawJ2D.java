@@ -4,15 +4,16 @@
 package org.jbox2d.testbed.framework;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.common.Color3f;
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.OBBViewportTransform;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.arrays.IntArray;
+import org.jbox2d.pooling.arrays.Vec2Array;
 import org.jbox2d.testbed.pooling.ColorPool;
 
 // pooling local, not thread-safe
@@ -21,6 +22,7 @@ import org.jbox2d.testbed.pooling.ColorPool;
  * @author Daniel Murphy
  */
 public class DebugDrawJ2D extends DebugDraw{
+	public static int circlePoints = 20;
 
 	private final TestPanel panel;
 	private final ColorPool cpool = new ColorPool();
@@ -34,20 +36,15 @@ public class DebugDrawJ2D extends DebugDraw{
 		panel = argTestPanel;
 	}
 
-	private final Vec2 sCenter = new Vec2();
+	private final Vec2Array vec2Array = new Vec2Array();
 	/**
 	 * @see org.jbox2d.callbacks.DebugDraw#drawCircle(org.jbox2d.common.Vec2, float, org.jbox2d.common.Color3f)
 	 */
 	@Override
 	public void drawCircle(Vec2 center, float radius, Color3f color) {
-		getWorldToScreenToOut(center, sCenter);
-		Graphics2D g = getGraphics();		
-		Color c = cpool.getColor(color.x, color.y, color.z);
-		g.setColor(c);
-		
-		float scaleFactor = getWorldToScreen(1.0f, 0.0f).x - getWorldToScreen(0.0f,0.0f).x;
-		
-		g.drawOval((int)(sCenter.x-radius*scaleFactor), (int)(sCenter.y-radius*scaleFactor), (int)(2*radius*scaleFactor), (int)(2*radius*scaleFactor));
+		Vec2[] vecs = vec2Array.get(circlePoints );
+		generateCirle(center, radius, vecs, circlePoints);
+		drawPolygon(vecs, circlePoints, color);
 	}
 
 	private final Vec2 sp1 = new Vec2();
@@ -68,36 +65,18 @@ public class DebugDrawJ2D extends DebugDraw{
 	}
 
 	private final Vec2 saxis = new Vec2();
-	private final Vec2 sup = new Vec2(0,1);
-	private final Vec2 sright = new Vec2(1,0);
 	/**
 	 * @see org.jbox2d.callbacks.DebugDraw#drawSolidCircle(org.jbox2d.common.Vec2, float, org.jbox2d.common.Vec2, org.jbox2d.common.Color3f)
 	 */
 	@Override
-	public void drawSolidCircle(Vec2 center, float _radius, Vec2 axis, Color3f color) {
-		float scaleFactor = getWorldToScreen(1.0f, 0.0f).x - getWorldToScreen(0.0f,0.0f).x;
-		drawCircle(center, _radius, color);
-		float radius = _radius * scaleFactor;
-		// outside
-		
-		getWorldToScreenToOut(center, sCenter);
-		Graphics2D g = getGraphics();		
-		
-		// inside
-		Color c;
+	public void drawSolidCircle(Vec2 center, float radius, Vec2 axis, Color3f color) {
+		Vec2[] vecs = vec2Array.get(circlePoints );
+		generateCirle(center, radius, vecs, circlePoints);
+		drawSolidPolygon(vecs, circlePoints, color);
 		if(axis != null){
-			c = cpool.getColor(color.x, color.y, color.z);
-			g.setColor(c);
-			getWorldToScreenToOut(center.x + _radius * axis.x, center.y + _radius * axis.y, saxis);
-			g.drawLine((int)sCenter.x, (int)sCenter.y, (int)saxis.x, (int)saxis.y);
+			saxis.set(axis).mulLocal(radius).addLocal(center);
+			drawSegment(center, saxis, color);
 		}
-		
-		sCenter.subLocal(sup).subLocal(sright);
-		
-		c = cpool.getColor(color.x, color.y, color.z, .8f);
-		g.setColor(c);
-		g.fillOval((int)(sCenter.x-radius), (int)(sCenter.y-radius), (int)(radius*2), (int)(radius*2));
-		
 	}
 
 	
@@ -110,9 +89,7 @@ public class DebugDrawJ2D extends DebugDraw{
 	 */
 	@Override
 	public void drawSolidPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
-		// outside
-		drawPolygon(vertices, vertexCount, color);
-		
+
 		// inside
 		Graphics2D g = getGraphics();		
 		int[] xInts = xIntsPool.get(vertexCount);
@@ -124,9 +101,12 @@ public class DebugDrawJ2D extends DebugDraw{
 			yInts[i] = (int)temp.y;
 		}
 		
-		Color c = cpool.getColor(color.x, color.y, color.z, .8f);
+		Color c = cpool.getColor(color.x, color.y, color.z, .5f);
 		g.setColor(c);
 		g.fillPolygon(xInts, yInts, vertexCount);
+		
+		// outside
+		drawPolygon(vertices, vertexCount, color);
 	}
 
 	/**
@@ -143,7 +123,8 @@ public class DebugDrawJ2D extends DebugDraw{
 	
 	private Graphics2D getGraphics(){
 		if(graphics == null){
-			graphics = panel.dbg;
+			graphics = panel.getDBGraphics();
+			//graphics.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 		}
 		return graphics;
 	}
@@ -175,4 +156,14 @@ public class DebugDrawJ2D extends DebugDraw{
 		g.drawLine((int)temp.x, (int)temp.y, (int)temp2.x, (int)temp2.y);
 	}
 
+	// CIRCLE GENERATOR
+		
+	private void generateCirle(Vec2 argCenter, float argRadius, Vec2[] argPoints, int argNumPoints){
+		float inc = MathUtils.TWOPI/argNumPoints;
+		
+		for(int i=0; i<argNumPoints; i++){
+			argPoints[i].x = (argCenter.x + MathUtils.cos(i*inc)*argRadius);
+			argPoints[i].y = (argCenter.y + MathUtils.sin(i*inc)*argRadius);
+		}
+	}
 }

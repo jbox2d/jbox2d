@@ -3,6 +3,8 @@
  */
 package org.jbox2d.testbed.framework;
 
+import java.util.LinkedList;
+
 import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.callbacks.DebugDraw;
@@ -52,7 +54,10 @@ public abstract class TestbedTest implements ContactListener{
 	private boolean bombSpawning = false;
 	public final Vec2 mouseWorld = new Vec2();
 	private int stepCount;
+	
+	private String title = null;
 	private int textLine;
+	private final LinkedList<String> textList = new LinkedList<String>();
 	
 	public float cachedCameraScale;
 	public float cachedCameraX;
@@ -139,6 +144,10 @@ public abstract class TestbedTest implements ContactListener{
 			textLine += 15;
 		}
 		
+		if(title != null){
+			debugDraw.drawString(100, 10, title, Color3f.WHITE);
+		}
+		
 		int flags = 0;
 		flags += settings.drawShapes? DebugDraw.e_shapeBit : 0;
 		flags += settings.drawJoints? DebugDraw.e_jointBit: 0;
@@ -160,8 +169,17 @@ public abstract class TestbedTest implements ContactListener{
 			++stepCount;
 		}
 		
+		textLine = 15;
 		if(settings.drawStats){
-			// stats
+			debugDraw.drawString(5, textLine,"bodies/contacts/joints/proxies = "+world.getBodyCount()+"/"+world.getContactCount()+"/"+world.getJointCount()+"/"+world.getProxyCount(), Color3f.WHITE);
+			textLine += 15;
+		}
+		
+		if(!textList.isEmpty()){
+			for(String s : textList){
+				debugDraw.drawString(5, textLine, s, Color3f.WHITE);
+				textLine+=15;
+			}
 		}
 		
 		if(mouseJoint != null){
@@ -242,6 +260,14 @@ public abstract class TestbedTest implements ContactListener{
 		if(mouseJoint != null){
 			//mouseJoint.setTarget(p);
 		}
+	}
+	
+	public void setTitle(String argTitle){
+		
+	}
+	
+	public void addTextLine(String argTextLine){
+		
 	}
 	
 	private final Vec2 p = new Vec2();

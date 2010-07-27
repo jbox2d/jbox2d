@@ -40,10 +40,13 @@ public class TestPanel extends JPanel implements Runnable{
 	public static boolean[] keys = new boolean[256];
 	public static boolean[] codedKeys = new boolean[512];
 	
-	public TestbedTest currTest = null;
+	private TestbedTest currTest = null;
+	private TestbedTest nextTest = null;
+	
 	public DebugDraw draw = new DebugDrawJ2D(this);
 	
 	public final Vec2 mouse = new Vec2();
+	public int mouseButton = -1;
 	public final TestbedSettings settings;
 	
 	private long startTime;
@@ -51,8 +54,8 @@ public class TestPanel extends JPanel implements Runnable{
 	private int targetFrameRate;
 	private float frameRate = 0;
 	private boolean animating = false;
-	public Graphics2D dbg = null;
-	public Image dbImage = null;
+	private Graphics2D dbg = null;
+	private Image dbImage = null;
 	private Thread animator;
 
 	
@@ -61,6 +64,14 @@ public class TestPanel extends JPanel implements Runnable{
 		setPreferredSize(new Dimension(600,500));
 		settings = argSettings;
 		setFrameRate(60);
+		animator = new Thread(this, "Animation Thread");
+	}
+	
+	public Graphics2D getDBGraphics(){
+		return dbg;
+	}
+	
+	public void init(){
 		
 		addKeyListener(new KeyListener() {
 			public void keyTyped(KeyEvent e) {}
@@ -84,13 +95,14 @@ public class TestPanel extends JPanel implements Runnable{
 		});
 		addMouseMotionListener(new MouseMotionListener() {
 			
-			private final Vec2 pos2 = new Vec2();
+			private final Vec2 posDif = new Vec2();
 			public void mouseDragged(MouseEvent e) {
-				if(currTest != null){
-					pos2.set(e.getX(), e.getY());
-					mouse.set(pos2);
-					draw.getScreenToWorldToOut(pos2, pos2);
-					currTest.mouseMove(pos2);
+				if(mouseButton == MouseEvent.BUTTON3){
+					posDif.set(mouse);
+					mouse.set(e.getX(), e.getY());
+					posDif.subLocal(mouse);
+					draw.getViewportTranform().vectorInverseTransform(posDif, posDif);
+					draw.getViewportTranform().getCenter().addLocal(posDif);
 				}
 			}
 			
@@ -123,11 +135,14 @@ public class TestPanel extends JPanel implements Runnable{
 					pos2.x = e.getX();
 					pos2.y = e.getY();
 					mouse.set(pos2);
-					draw.getScreenToWorldToOut(pos2, pos2);
-					if(codedKeys[KeyEvent.VK_SHIFT]){
-						currTest.shiftMouseDown(pos2);
-					}else{
-						currTest.mouseDown(pos);
+					mouseButton = e.getButton();
+					if(e.getButton() == MouseEvent.BUTTON1){
+						draw.getScreenToWorldToOut(pos2, pos2);
+						if(codedKeys[KeyEvent.VK_SHIFT]){
+							currTest.shiftMouseDown(pos2);
+						}else{
+							currTest.mouseDown(pos);
+						}
 					}
 				}
 			}
@@ -165,15 +180,16 @@ public class TestPanel extends JPanel implements Runnable{
 			}
 		});
 		
-		animator = new Thread(this, "Animation Thread");
+		if(currTest != null){
+			currTest.init(draw);
+		}
 	}
 	
-	public synchronized void changeTest(TestbedTest test){
-		currTest = test;
-		test.init(draw);
+	public void changeTest(TestbedTest test){
+		nextTest = test;
 	}
 	
-	public synchronized void update(){
+	public void update(){
 		if(currTest != null){
 			currTest.step(settings);
 		}
@@ -213,7 +229,7 @@ public class TestPanel extends JPanel implements Runnable{
 		return animating;
 	}
 	
-	public synchronized void start() {
+	public void start() {
 		if (animating != true) {
 			frameCount = 0;
 			animator.start();
@@ -267,13 +283,19 @@ public class TestPanel extends JPanel implements Runnable{
 	public void run() { // animation loop
 		long beforeTime, afterTime, timeDiff, sleepTime;
 		
+		init();
+		
 		beforeTime = startTime = System.nanoTime();
 		sleepTime = 0;
 		
-		float timeInSecs = 0;
-		
 		animating = true;
 		while (animating) {
+			
+			if(nextTest != null){
+				currTest = nextTest;
+				currTest.init(draw);
+				nextTest = null;
+			}
 			
 			render();
 			update();
