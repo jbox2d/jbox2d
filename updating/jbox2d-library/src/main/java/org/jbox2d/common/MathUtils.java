@@ -297,11 +297,13 @@ public class MathUtils {
 	}
 
 	public final static float distanceSquared( Vec2 v1, Vec2 v2) {
-		return v1.x * v2.x + v1.y * v2.y;
+		float dx = (v1.x-v2.x);
+		float dy = (v1.y-v2.y);
+		return dx*dx+dy*dy;
 	}
 	
 	public final static float distance(Vec2 v1, Vec2 v2){
-		return sqrt(v1.x * v2.x + v1.y * v2.y);
+		return sqrt(distanceSquared(v1,v2));
 	}
 }
 // SINCOS accuracy and speed chart

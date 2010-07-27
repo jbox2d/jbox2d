@@ -45,7 +45,9 @@ public class DebugDrawJ2D extends DebugDraw{
 		Color c = cpool.getColor(color.x, color.y, color.z);
 		g.setColor(c);
 		
-		g.drawOval((int)sCenter.x, (int)sCenter.y, (int)radius, (int)radius);
+		float scaleFactor = getWorldToScreen(1.0f, 0.0f).x - getWorldToScreen(0.0f,0.0f).x;
+		
+		g.drawOval((int)(sCenter.x-radius*scaleFactor), (int)(sCenter.y-radius*scaleFactor), (int)(2*radius*scaleFactor), (int)(2*radius*scaleFactor));
 	}
 
 	private final Vec2 sp1 = new Vec2();
@@ -72,9 +74,11 @@ public class DebugDrawJ2D extends DebugDraw{
 	 * @see org.jbox2d.callbacks.DebugDraw#drawSolidCircle(org.jbox2d.common.Vec2, float, org.jbox2d.common.Vec2, org.jbox2d.common.Color3f)
 	 */
 	@Override
-	public void drawSolidCircle(Vec2 center, float radius, Vec2 axis, Color3f color) {
+	public void drawSolidCircle(Vec2 center, float _radius, Vec2 axis, Color3f color) {
+		float scaleFactor = getWorldToScreen(1.0f, 0.0f).x - getWorldToScreen(0.0f,0.0f).x;
+		drawCircle(center, _radius, color);
+		float radius = _radius * scaleFactor;
 		// outside
-		drawCircle(center, radius, color);
 		
 		getWorldToScreenToOut(center, sCenter);
 		Graphics2D g = getGraphics();		
@@ -84,21 +88,15 @@ public class DebugDrawJ2D extends DebugDraw{
 		if(axis != null){
 			c = cpool.getColor(color.x, color.y, color.z);
 			g.setColor(c);
-			getWorldToScreenToOut(center.x + radius * axis.x, center.y + radius * axis.y, saxis);
+			getWorldToScreenToOut(center.x + _radius * axis.x, center.y + _radius * axis.y, saxis);
 			g.drawLine((int)sCenter.x, (int)sCenter.y, (int)saxis.x, (int)saxis.y);
 		}
-		
-		sup.set(radius,0);
-		getViewportTranform().vectorTransform(sup, sup);
-		
-		sright.set(0,radius);
-		getViewportTranform().vectorTransform(sright, sright);
 		
 		sCenter.subLocal(sup).subLocal(sright);
 		
 		c = cpool.getColor(color.x, color.y, color.z, .8f);
 		g.setColor(c);
-		g.fillOval((int)sCenter.x, (int)sCenter.y, (int)sright.length()*2, (int)sup.length()*2);
+		g.fillOval((int)(sCenter.x-radius), (int)(sCenter.y-radius), (int)(radius*2), (int)(radius*2));
 		
 	}
 

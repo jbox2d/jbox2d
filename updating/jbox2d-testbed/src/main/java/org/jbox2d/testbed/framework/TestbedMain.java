@@ -32,7 +32,7 @@ public class TestbedMain extends JFrame {
 		TestbedSettings s = new TestbedSettings();
 		panel = new TestPanel(s);
 		add(panel, "Center");
-		add(new JScrollPane(new SidePanel(s,this)), "East");
+		add(new JScrollPane(new SidePanel(s,this)), "East");   
 		pack();
 		setVisible(true);
 		setDefaultCloseOperation(3);
@@ -101,14 +101,14 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 		
 		add(Box.createVerticalGlue());
 		
-		hz = new JSlider(1, 200, (int)settings.hz);
+		hz = new JSlider(1, 400, (int)settings.hz);
 		hz.setSize(100, 10);
 		hz.addChangeListener(this);
 		hzText = new JLabel("Hz: "+(int)settings.hz);
 		add(hzText);
 		add(hz);
 		
-		pos = new JSlider(1, 100, (int)settings.positionIterations);
+		pos = new JSlider(0, 100, (int)settings.positionIterations);
 		pos.setSize(100, 10);
 		pos.addChangeListener(this);
 		posText = new JLabel("Pos iters: "+(int)settings.positionIterations);

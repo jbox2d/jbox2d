@@ -91,7 +91,7 @@ public class Collision {
 			state1[i] = PointState.REMOVE_STATE;
 			
 			for( int j = 0; j < manifold2.pointCount; j++){
-				if(manifold2.points[j].id.key == id.key){
+				if(manifold2.points[j].id.isEqual(id)){
 					state1[i] = PointState.PERSIST_STATE;
 					break;
 				}
@@ -105,7 +105,7 @@ public class Collision {
 			state2[i] = PointState.ADD_STATE;
 			
 			for(int j=0; j < manifold1.pointCount; j++){
-				if(manifold1.points[j].id.key == id.key){
+				if(manifold1.points[j].id.isEqual(id)){
 					state2[i] = PointState.PERSIST_STATE;
 					break;
 				}
@@ -194,7 +194,7 @@ public class Collision {
 		manifold.pointCount = 1;
 		
 		manifold.points[0].localPoint.set(circle2.m_p);
-		manifold.points[0].id.key = 0;
+		manifold.points[0].id.zero();
 	}
 	
 	// djm pooling, and from above
@@ -216,7 +216,7 @@ public class Collision {
 		
 		// Compute circle position in the frame of the polygon.
 		Transform.mulToOut(xfB, circle.m_p, c);
-		Transform.mulToOut(xfA, c, cLocal);
+		Transform.mulTransToOut(xfA, c, cLocal);
 		
 		// Find the min separating edge.
 		int normalIndex = 0;
@@ -255,7 +255,7 @@ public class Collision {
 			manifold.localNormal.set(normals[normalIndex]);
 			manifold.localPoint.set( v1).addLocal(v2).mulLocal( .5f);
 			manifold.points[0].localPoint.set(circle.m_p);
-			manifold.points[0].id.key = 0;
+			manifold.points[0].id.zero();
 			return;
 		}
 	
@@ -279,7 +279,7 @@ public class Collision {
 			manifold.localNormal.normalize();
 			manifold.localPoint.set(v1);
 			manifold.points[0].localPoint.set(circle.m_p);
-			manifold.points[0].id.key = 0;
+			manifold.points[0].id.zero();
 		}
 		else if (u2 <= 0.0f){
 			if(MathUtils.distanceSquared( cLocal, v2) > radius * radius){
@@ -292,7 +292,7 @@ public class Collision {
 			manifold.localNormal.normalize();
 			manifold.localPoint.set(v2);
 			manifold.points[0].localPoint.set(circle.m_p);
-			manifold.points[0].id.key = 0;
+			manifold.points[0].id.zero();
 		}
 		else {
 			//Vec2 faceCenter = 0.5f * (v1 + v2);
@@ -310,7 +310,7 @@ public class Collision {
 			manifold.localNormal.set(normals[vertIndex1]);
 			manifold.localPoint.set(temp);	// (faceCenter)
 			manifold.points[0].localPoint.set(circle.m_p);
-			manifold.points[0].id.key = 0;
+			manifold.points[0].id.zero();
 		}
 	}
 	
@@ -342,7 +342,7 @@ public class Collision {
 		//Vec2 normal1World = Mul(xf1.R, normals1[edge1]);
 		Mat22.mulToOut( xf1.R, normals1[edge1], normal1World);
 		//Vec2 normal1 = MulT(xf2.R, normal1World);
-		Mat22.mulToOut( xf2.R, normal1World, normal1);
+		Mat22.mulTransToOut( xf2.R, normal1World, normal1);
 
 		// Find support vertex on poly2 for -normal.
 		int index = 0;
@@ -386,7 +386,7 @@ public class Collision {
 		Transform.mulToOut( xf1, poly1.m_centroid, temp);
 		d.subLocal( temp);
 		
-		Mat22.mulToOut( xf1.R, d, dLocal1);
+		Mat22.mulTransToOut( xf1.R, d, dLocal1);
 		
 		// Find edge normal on poly1 that has the largest projection onto d.
 		int edge = 0;
@@ -470,8 +470,8 @@ public class Collision {
 		
 		// Get the normal of the reference edge in poly2's frame.
 		Mat22.mulToOut(xf1.R, normals1[edge1], normal1); // temporary
-		//Mat22.mulToOut(xf2.R, Mul(xf1.R, normals1[edge1]));
-		Mat22.mulToOut(xf2.R, normal1, normal1);
+		//b2Vec2 normal1 = b2MulT(xf2.R, b2Mul(xf1.R, normals1[edge1]));
+		Mat22.mulTransToOut(xf2.R, normal1, normal1);
 		
 		// Find the incident edge on poly2.
 		int index = 0;
@@ -607,13 +607,15 @@ public class Collision {
 
 		// Clip to box side 1
 		//np = ClipSegmentToLine(clipPoints1, incidentEdge, -sideNormal, sideOffset1);
-		np = clipSegmentToLine(clipPoints1, incidentEdge, tangent.negateLocal(), sideOffset1);
-
+		tangent.negateLocal();
+		np = clipSegmentToLine(clipPoints1, incidentEdge, tangent, sideOffset1);
+		tangent.negateLocal();
+		
 		if (np < 2)
 			return;
 
 		// Clip to negative box side 1
-		np = clipSegmentToLine(clipPoints2, clipPoints1,  tangent.negateLocal(), sideOffset2);
+		np = clipSegmentToLine(clipPoints2, clipPoints1,  tangent, sideOffset2);
 
 		if (np < 2){
 			return;
@@ -622,7 +624,7 @@ public class Collision {
 		// Now clipPoints2 contains the clipped points.
 		manifold.localNormal.set(localNormal);
 		manifold.localPoint.set(planePoint);
-
+		
 		int pointCount = 0;
 		for (int i = 0; i < Settings.maxManifoldPoints; ++i){
 			float separation = Vec2.dot(normal, clipPoints2[i].v) - frontOffset;
