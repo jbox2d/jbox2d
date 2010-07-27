@@ -125,6 +125,9 @@ public class OBBViewportTransform implements IViewportTransform{
 		inv.set(box.R);
 		inv.invertLocal();
 		inv.mulToOut(argScreen, argWorld);
+		if(yFlip){
+			yFlipMatInv.mulToOut( argWorld, argWorld);
+		}
 	}
 
 	/**
@@ -132,6 +135,9 @@ public class OBBViewportTransform implements IViewportTransform{
 	 */
 	public void vectorTransform(Vec2 argWorld, Vec2 argScreen) {
 		box.R.mulToOut(argWorld, argScreen);
+		if(yFlip){
+			yFlipMatInv.mulToOut( argScreen, argScreen);
+		}
 	}
 	
 	/**
