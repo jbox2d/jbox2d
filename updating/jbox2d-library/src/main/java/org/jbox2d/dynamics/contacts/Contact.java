@@ -180,7 +180,7 @@ public abstract class Contact {
 		m_fixtureB = null;
 		m_nodeA = new ContactEdge();
 		m_nodeB = new ContactEdge();
-
+		m_manifold = new Manifold();
 	}
 
 	/** initialization for pooling */
@@ -190,7 +190,6 @@ public abstract class Contact {
 		m_fixtureA = fA;
 		m_fixtureB = fB;
 
-		m_manifold = new Manifold();
 		m_manifold.pointCount = 0;
 
 		m_prev = null;
