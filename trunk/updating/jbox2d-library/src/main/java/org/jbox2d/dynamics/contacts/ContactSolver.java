@@ -412,12 +412,12 @@ public class ContactSolver {
 				//Vec2 dv1 = vB + Cross(wB, cp1.rB) - vA - Cross(wA, cp1.rA);
 				Vec2.crossToOut(wA, cp1.rA, temp1);
 				Vec2.crossToOut(wB, cp1.rB, dv1);
-				dv.addLocal(vB).subLocal(vA).subLocal(temp1);
+				dv1.addLocal(vB).subLocal(vA).subLocal(temp1);
 				
 				//Vec2 dv2 = vB + Cross(wB, cp2.rB) - vA - Cross(wA, cp2.rA);
 				Vec2.crossToOut(wA, cp2.rA, temp1);
 				Vec2.crossToOut(wB, cp2.rB, dv2);
-				dv.addLocal(vB).subLocal(vA).subLocal(temp1);
+				dv2.addLocal(vB).subLocal(vA).subLocal(temp1);
 				
 				// Compute normal velocity
 				float vn1 = Vec2.dot(dv1, normal);

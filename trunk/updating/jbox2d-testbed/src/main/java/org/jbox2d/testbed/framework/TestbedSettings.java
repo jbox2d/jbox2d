@@ -9,7 +9,7 @@ package org.jbox2d.testbed.framework;
 public class TestbedSettings {
 	public float hz = 60f;
 	public int velocityIterations = 8;
-	public int positionIterations = 3;
+	public int positionIterations = 0;
 	public boolean drawShapes = true;
 	public boolean drawJoints = true;
 	public boolean drawAABBs = false;

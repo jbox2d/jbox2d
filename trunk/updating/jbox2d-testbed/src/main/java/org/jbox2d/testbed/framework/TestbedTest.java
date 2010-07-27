@@ -180,10 +180,10 @@ public abstract class TestbedTest implements ContactListener{
 				ContactPoint point = points[i];
 				
 				if(point.state == PointState.ADD_STATE){
-					debugDraw.drawSolidCircle(point.position, 10f, null, color1);
+					debugDraw.drawSolidCircle(point.position, .1f, null, color1);
 				}
 				else if(point.state == PointState.PERSIST_STATE){
-					debugDraw.drawSolidCircle(point.position, 5f, null, color2);
+					debugDraw.drawSolidCircle(point.position, .1f, null, color2);
 				}
 				
 				if(settings.drawContactNormals){

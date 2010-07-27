@@ -41,8 +41,6 @@ package org.jbox2d.structs.collision;
 
 /** Contact ids to facilitate warm starting.*/
 public class ContactID {
-	/** Inactive in Java port (used for quick compares in C++ as part of a union) */
-	public int key;
 
 	/** The features that intersect to form the contact point */
 	public final Features features;
@@ -96,17 +94,25 @@ public class ContactID {
 	}
 
 	public ContactID() {
-		key = 0;
 		features = new Features();
 	}
 
 	public ContactID(final ContactID c) {
-		key = c.key;
 		features = new Features(c.features);
 	}
 
 	public void set(final ContactID c){
-		key = c.key;
 		features.set(c.features);
 	}
+	
+	/**
+	 * zeros out the data
+	 */
+	public void zero() {
+		features.flip = 0;
+		features.incidentEdge = 0;
+		features.incidentVertex = 0;
+		features.referenceEdge = 0;
+	}
+
 }
