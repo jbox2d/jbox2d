@@ -153,7 +153,7 @@ public class ContactSolver {
 				float vRel = Vec2.dot(cc.normal, temp1);
 				
 				if (vRel < -Settings.velocityThreshold){
-					ccp.velocityBias = -cc.restitution * vRel;
+					ccp.velocityBias = -restitution * vRel;
 				}
 			}
 
@@ -828,7 +828,7 @@ class PositionSolverManifold{
 	
 	public void initialize(ContactConstraint cc, int index){
 		assert(cc.pointCount > 0);
-
+		
 		switch (cc.type){
 			case CIRCLES:{
 				cc.bodyA.getWorldPointToOut(cc.localPoint, pointA);
@@ -860,7 +860,7 @@ class PositionSolverManifold{
 	
 			case FACE_B:
 				{
-					cc.bodyB.getWorldPointToOut(cc.localPoint, planePoint);
+					cc.bodyB.getWorldVectorToOut(cc.localPlaneNormal, normal);
 					cc.bodyB.getWorldPointToOut(cc.localPoint, planePoint);
 	
 					cc.bodyA.getWorldPointToOut(cc.points[index].localPoint, clipPoint);

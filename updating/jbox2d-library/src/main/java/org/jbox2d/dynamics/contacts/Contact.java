@@ -32,7 +32,7 @@ public abstract class Contact {
 	// Used when crawling contact graph when forming islands.
 	public static final int ISLAND_FLAG = 0x0001;
 	// Set when the shapes are touching.
-	public static final int TOUCHING_FLAG = 0x0002;
+	public static final int TOUCHING_FLAG = 0x0002; // NO_UCD
 	// This contact can be disabled (by user)
 	public static final int ENABLED_FLAG = 0x0004;
 	// This contact needs filtering because a fixture filter was changed.
@@ -40,10 +40,10 @@ public abstract class Contact {
 	// This bullet contact had a TOI event
 	public static final int BULLET_HIT_FLAG = 0x0010;
 
-	public static final ContactRegister[][] s_registers = new ContactRegister[ShapeType.TYPE_COUNT][ShapeType.TYPE_COUNT];
-	public static boolean s_initialized = false;
+	private static final ContactRegister[][] s_registers = new ContactRegister[ShapeType.TYPE_COUNT][ShapeType.TYPE_COUNT];
+	private static boolean s_initialized = false;
 
-	public static void addType(ContactCreator creator, ShapeType type1,
+	private static void addType(ContactCreator creator, ShapeType type1,
 			ShapeType type2) {
 		ContactRegister register = new ContactRegister();
 		register.creator = creator;
@@ -58,7 +58,7 @@ public abstract class Contact {
 		}
 	}
 
-	public static void initializeRegisters() {
+	private static void initializeRegisters() {
 		addType(new ContactCreator() {
 			private final TLStack<Contact> stack = new TLStack<Contact>();
 
@@ -155,7 +155,7 @@ public abstract class Contact {
 		ShapeType type2 = contact.getFixtureB().getType();
 
 		ContactCreator creator = s_registers[type1.intValue][type2.intValue].creator;
-		// creator.contactDestroyFcn(contact);
+		creator.contactDestroyFcn(contact);
 	}
 
 	public int m_flags;
@@ -219,7 +219,7 @@ public abstract class Contact {
 	/**
 	 * Get the world manifold.
 	 */
-	public void getWorldManifold(WorldManifold worldManifold) {
+	public void getWorldManifold(WorldManifold worldManifold) { // NO_UCD
 		final Body bodyA = m_fixtureA.getBody();
 		final Body bodyB = m_fixtureB.getBody();
 		final Shape shapeA = m_fixtureA.getShape();
