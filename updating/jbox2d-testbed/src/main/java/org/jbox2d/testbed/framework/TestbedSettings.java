@@ -14,12 +14,12 @@ public class TestbedSettings {
 	public boolean drawJoints = true;
 	public boolean drawAABBs = false;
 	public boolean drawPairs = false;
-	public boolean drawContactPoints = false;
-	public boolean drawContactNormals = false;
+	public boolean drawContactPoints = true;
+	public boolean drawContactNormals = true;
 	public boolean drawContactForces = false;
 	public boolean drawFrictionForces = false;
 	public boolean drawCOMs = false;
-	public boolean drawStats = false;
+	public boolean drawStats = true;
 	public boolean enableWarmStarting = false;
 	public boolean enableContinuous = false;
 	public boolean pause = false;
