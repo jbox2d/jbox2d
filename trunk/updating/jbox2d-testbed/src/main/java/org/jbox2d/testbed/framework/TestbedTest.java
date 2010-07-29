@@ -158,7 +158,7 @@ public abstract class TestbedTest implements ContactListener{
 		}
 		
 		if(title != null){
-			debugDraw.drawString(100, 15, title, Color3f.WHITE);
+			debugDraw.drawString(panel.getWidth()/2, 15, title, Color3f.WHITE);
 		}
 		
 		int flags = 0;
@@ -176,7 +176,7 @@ public abstract class TestbedTest implements ContactListener{
 		
 		world.Step(timeStep, settings.velocityIterations, settings.positionIterations);
 		
-		world.DrawDebugData();
+		world.drawDebugData();
 		
 		if(timeStep > 0f){
 			++stepCount;
@@ -212,17 +212,17 @@ public abstract class TestbedTest implements ContactListener{
 		}
 		
 		if(settings.drawContactPoints){
-			float axisScale = .3f;
+			float axisScale = 10f;
 			
 			for(int i=0; i<pointCount; i++){
 				
 				ContactPoint point = points[i];
 				
 				if(point.state == PointState.ADD_STATE){
-					debugDraw.drawSolidCircle(point.position, .1f, null, color1);
+					debugDraw.drawSolidCircle(point.position, .5f, null, color1);
 				}
 				else if(point.state == PointState.PERSIST_STATE){
-					debugDraw.drawSolidCircle(point.position, .1f, null, color2);
+					debugDraw.drawSolidCircle(point.position, .3f, null, color2);
 				}
 				
 				if(settings.drawContactNormals){
