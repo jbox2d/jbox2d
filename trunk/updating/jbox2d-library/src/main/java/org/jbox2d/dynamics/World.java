@@ -444,7 +444,7 @@ public class World {
 		}
 
 		if ((m_flags & CLEAR_FORCES) == CLEAR_FORCES){
-			ClearForces();
+			clearForces();
 		}
 
 		m_flags &= ~LOCKED;
@@ -456,7 +456,7 @@ public class World {
 	 * forces will be automatically cleared, so you don't need to call this function.
 	 * @see setAutoClearForces
 	 */
-	public void ClearForces(){
+	public void clearForces(){
 		for (Body body = m_bodyList; body != null; body = body.getNext()){
 			body.m_force.setZero();
 			body.m_torque = 0.0f;
@@ -471,7 +471,7 @@ public class World {
 	/**
 	 * Call this to draw shapes and other debug draw data.
 	 */
-	public void DrawDebugData(){
+	public void drawDebugData(){
 		if (m_debugDraw == null){
 			return;
 		}
@@ -573,7 +573,7 @@ public class World {
 	 * @param point1 the ray starting point
 	 * @param point2 the ray ending point
 	 */
-	public void rayCast(RayCastCallback callback, Vec2 point1, Vec2 point2) {
+	public void raycast(RayCastCallback callback, Vec2 point1, Vec2 point2) {
 		wrcwrapper.broadPhase = m_contactManager.m_broadPhase;
 		wrcwrapper.callback = callback;
 		input.maxFraction = 1.0f;
