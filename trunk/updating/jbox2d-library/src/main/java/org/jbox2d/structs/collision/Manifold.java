@@ -90,6 +90,7 @@ public class Manifold {
         localNormal = other.localNormal.clone();
         localPoint = other.localPoint.clone();
         pointCount = other.pointCount;
+    	type = other.type;
         // djm: this is correct now
         for(int i=0; i < Settings.maxManifoldPoints; i++){
     		points[i] = new ManifoldPoint(other.points[i]);
@@ -106,6 +107,7 @@ public class Manifold {
     		points[i].set(cp.points[i]);
     	}
     	
+    	type = cp.type;
     	localNormal.set(cp.localNormal);
     	localPoint.set( cp.localPoint);
     	pointCount = cp.pointCount;

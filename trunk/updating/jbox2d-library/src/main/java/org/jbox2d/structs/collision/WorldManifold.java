@@ -65,7 +65,7 @@ public class WorldManifold {
 				}
 								
 				cA.set(normal).mulLocal( radiusA).addLocal( pointA);
-				cB.set(normal).mulLocal( radiusB).addLocal( pointB);
+				cB.set(normal).mulLocal( radiusB).subLocal( pointB).negateLocal();
 				points[0].set( cA).addLocal( cB).mulLocal( 0.5f);
 				break;
 			case FACE_A:
@@ -83,6 +83,7 @@ public class WorldManifold {
 //						b2Vec2 cB = clipPoint - radiusB * normal;
 //						points[i] = 0.5f * (cA + cB);
 						Transform.mulToOut( xfB, manifold.points[i].localPoint, clipPoint);
+						// use cA as temporary for now
 						cA.set(clipPoint).subLocal( planePoint);
 						float scalar = radiusA - Vec2.dot( cA, normal);
 						cA.set( normal).mulLocal( scalar).addLocal( clipPoint);
