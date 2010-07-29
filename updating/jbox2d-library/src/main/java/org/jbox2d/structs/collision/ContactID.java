@@ -60,21 +60,21 @@ public class ContactID {
 			referenceEdge = incidentEdge = incidentVertex = flip = 0;
 		}
 
-		public Features(final Features f) {
+		private Features(final Features f) {
 			referenceEdge = f.referenceEdge;
 			incidentEdge = f.incidentEdge;
 			incidentVertex = f.incidentVertex;
 			flip = f.flip;
 		}
 
-		public void set(final Features f){
+		private void set(final Features f){
 			referenceEdge = f.referenceEdge;
 			incidentEdge = f.incidentEdge;
 			incidentVertex = f.incidentVertex;
 			flip = f.flip;
 		}
 
-		public boolean isEqual(final Features f){
+		private boolean isEqual(final Features f){
 			return (referenceEdge==f.referenceEdge &&
 					incidentEdge==f.incidentEdge &&
 					incidentVertex==f.incidentVertex &&
