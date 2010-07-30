@@ -2,13 +2,12 @@ package org.jbox2d.collision.broadphase;
 
 import java.util.Arrays;
 
+import org.jbox2d.callbacks.PairCallback;
 import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.structs.collision.RayCastInput;
-import org.jbox2d.structs.collision.broadphase.Pair;
-import org.jbox2d.structs.collision.broadphase.PairCallback;
 
 // updated to rev 100
 /**

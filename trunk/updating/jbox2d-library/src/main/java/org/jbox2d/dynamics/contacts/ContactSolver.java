@@ -2,6 +2,8 @@ package org.jbox2d.dynamics.contacts;
 
 import java.util.Stack;
 
+import org.jbox2d.collision.Manifold;
+import org.jbox2d.collision.WorldManifold;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
@@ -9,9 +11,7 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.structs.collision.Manifold;
 import org.jbox2d.structs.collision.ManifoldPoint;
-import org.jbox2d.structs.collision.WorldManifold;
 import org.jbox2d.structs.dynamics.contacts.ContactConstraint;
 import org.jbox2d.structs.dynamics.contacts.ContactConstraintPoint;
 

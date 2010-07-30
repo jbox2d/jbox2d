@@ -32,8 +32,6 @@ import org.jbox2d.pooling.TLTransform;
 import org.jbox2d.pooling.TLVec2;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;
-import org.jbox2d.structs.collision.shapes.MassData;
-import org.jbox2d.structs.collision.shapes.ShapeType;
 
 //Updated to rev 100
 

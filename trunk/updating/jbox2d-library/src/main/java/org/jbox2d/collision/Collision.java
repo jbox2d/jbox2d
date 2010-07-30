@@ -1,5 +1,6 @@
 package org.jbox2d.collision;
 
+import org.jbox2d.collision.Manifold.ManifoldType;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
@@ -11,10 +12,8 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.SingletonPool;
 import org.jbox2d.structs.collision.ClipVertex;
 import org.jbox2d.structs.collision.ContactID;
-import org.jbox2d.structs.collision.Manifold;
 import org.jbox2d.structs.collision.ManifoldPoint;
 import org.jbox2d.structs.collision.PointState;
-import org.jbox2d.structs.collision.Manifold.ManifoldType;
 import org.jbox2d.structs.collision.distance.DistanceInput;
 import org.jbox2d.structs.collision.distance.DistanceOutput;
 import org.jbox2d.structs.collision.distance.SimplexCache;

@@ -1,6 +1,6 @@
 package org.jbox2d.pooling.stacks;
 
-import org.jbox2d.structs.collision.broadphase.Pair;
+import org.jbox2d.collision.broadphase.Pair;
 
 public class PairStack extends DynamicTLStack<Pair> {
 
