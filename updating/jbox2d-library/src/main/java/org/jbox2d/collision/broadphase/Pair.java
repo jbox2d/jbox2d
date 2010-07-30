@@ -1,6 +1,5 @@
-package org.jbox2d.structs.collision.broadphase;
+package org.jbox2d.collision.broadphase;
 
-import org.jbox2d.collision.broadphase.DynamicTreeNode;
 
 /**
  * Java note: at the "creation" of each node, a random key is given to

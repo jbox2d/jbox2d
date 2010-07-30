@@ -2,10 +2,10 @@ package org.jbox2d.dynamics;
 
 import org.jbox2d.callbacks.ContactFilter;
 import org.jbox2d.callbacks.ContactListener;
+import org.jbox2d.callbacks.PairCallback;
 import org.jbox2d.collision.broadphase.BroadPhase;
 import org.jbox2d.collision.broadphase.DynamicTreeNode;
 import org.jbox2d.dynamics.contacts.Contact;
-import org.jbox2d.structs.collision.broadphase.PairCallback;
 import org.jbox2d.structs.dynamics.contacts.ContactEdge;
 
 // no pooling needed

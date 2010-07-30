@@ -3,7 +3,9 @@ package org.jbox2d.dynamics;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.broadphase.BroadPhase;
 import org.jbox2d.collision.broadphase.DynamicTreeNode;
+import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.contacts.Contact;
@@ -11,8 +13,6 @@ import org.jbox2d.pooling.TLAABB;
 import org.jbox2d.pooling.TLVec2;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;
-import org.jbox2d.structs.collision.shapes.MassData;
-import org.jbox2d.structs.collision.shapes.ShapeType;
 import org.jbox2d.structs.dynamics.contacts.ContactEdge;
 
 // updated to rev 100

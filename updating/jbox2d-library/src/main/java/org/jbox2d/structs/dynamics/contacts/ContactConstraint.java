@@ -1,11 +1,11 @@
 package org.jbox2d.structs.dynamics.contacts;
 
+import org.jbox2d.collision.Manifold;
+import org.jbox2d.collision.Manifold.ManifoldType;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
-import org.jbox2d.structs.collision.Manifold;
-import org.jbox2d.structs.collision.Manifold.ManifoldType;
 
 // updated to rev 100
 

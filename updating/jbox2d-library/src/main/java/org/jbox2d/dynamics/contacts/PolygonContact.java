@@ -1,11 +1,11 @@
 package org.jbox2d.dynamics.contacts;
 
+import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Transform;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.pooling.SingletonPool;
-import org.jbox2d.structs.collision.Manifold;
-import org.jbox2d.structs.collision.shapes.ShapeType;
 
 // updated to rev 100
 

@@ -1,6 +1,7 @@
 package org.jbox2d.dynamics;
 
 import org.jbox2d.collision.broadphase.BroadPhase;
+import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Sweep;
@@ -11,7 +12,6 @@ import org.jbox2d.pooling.TLFixtureDef;
 import org.jbox2d.pooling.TLMassData;
 import org.jbox2d.pooling.TLTransform;
 import org.jbox2d.pooling.TLVec2;
-import org.jbox2d.structs.collision.shapes.MassData;
 import org.jbox2d.structs.dynamics.contacts.ContactEdge;
 import org.jbox2d.structs.dynamics.joints.JointEdge;
 

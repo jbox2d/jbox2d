@@ -21,7 +21,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package org.jbox2d.structs.collision.shapes;
+package org.jbox2d.collision.shapes;
 
 // Updated to rev 100
 
