@@ -40,11 +40,6 @@ public class Vec2 {
 	 * Vec2 creation is often a bottleneck.
 	 */
 	static public int creationCount = 0;
-	
-	/**
-	 * This is used for fast comparing, should never be modified
-	 */
-	public static final Vec2 ZERO = new Vec2();
 
 	public float x, y;
 
