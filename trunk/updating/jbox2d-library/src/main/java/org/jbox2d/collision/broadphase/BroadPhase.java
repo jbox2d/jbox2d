@@ -2,6 +2,7 @@ package org.jbox2d.collision.broadphase;
 
 import java.util.Arrays;
 
+import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.PairCallback;
 import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
@@ -95,6 +96,10 @@ public class BroadPhase implements TreeCallback{
 	 */
 	public final int getProxyCount(){
 		return m_proxyCount;
+	}
+	
+	public void drawTree(DebugDraw argDraw){
+		m_tree.drawTree(argDraw);
 	}
 	
 	/**

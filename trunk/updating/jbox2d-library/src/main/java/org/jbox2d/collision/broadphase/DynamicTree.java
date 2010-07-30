@@ -1,14 +1,17 @@
 package org.jbox2d.collision.broadphase;
 
+import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
 import org.jbox2d.collision.AABB;
+import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.TLAABB;
 import org.jbox2d.pooling.TLRayCastInput;
 import org.jbox2d.pooling.TLVec2;
+import org.jbox2d.pooling.arrays.Vec2Array;
 import org.jbox2d.pooling.stacks.AABBStack;
 import org.jbox2d.pooling.stacks.DynamicTreeNodeStack;
 import org.jbox2d.pooling.stacks.Vec2Stack;
@@ -521,6 +524,24 @@ public class DynamicTree {
 		// (this is for rebalancing)
 		if(lastLeaf == argNode){
 			lastLeaf = m_root;
+		}
+	}
+
+	public void drawTree(DebugDraw argDraw) {
+		drawTree(argDraw, m_root);
+	}
+	
+	private static final Vec2Array vecs = new Vec2Array();
+	public void drawTree(DebugDraw argDraw, DynamicTreeNode argNode){
+		Vec2[] ray = vecs.get(4);
+		argNode.aabb.getVertices(ray);
+		
+		argDraw.drawPolygon(ray, 4, Color3f.WHITE);
+		if(argNode.child1 != null){
+			drawTree(argDraw, argNode.child1);
+		}
+		if(argNode.child2 != null){
+			drawTree(argDraw, argNode.child2);
 		}
 	}
 }

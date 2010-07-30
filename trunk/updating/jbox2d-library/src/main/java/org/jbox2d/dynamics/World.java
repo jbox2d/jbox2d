@@ -503,7 +503,7 @@ public class World {
 
 		if ((flags & DebugDraw.e_jointBit) == DebugDraw.e_jointBit){
 			for (Joint j = m_jointList; j != null; j = j.getNext()){
-				DrawJoint(j);
+				drawJoint(j);
 			}
 		}
 
@@ -548,6 +548,8 @@ public class World {
 				m_debugDraw.drawTransform(xf);
 			}
 		}
+		
+		m_contactManager.m_broadPhase.drawTree(m_debugDraw);
 	}
 
 	private final WorldQueryWrapper wqwrapper = new WorldQueryWrapper();
@@ -1079,7 +1081,7 @@ public class World {
 		}
 	}
 
-	private void DrawJoint(Joint joint){
+	private void drawJoint(Joint joint){
 		Body bodyA = joint.getBodyA();
 		Body bodyB = joint.getBodyB();
 		Transform xf1 = bodyA.getTransform();
