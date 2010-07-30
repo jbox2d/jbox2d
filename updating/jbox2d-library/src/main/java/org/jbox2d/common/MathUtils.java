@@ -267,21 +267,27 @@ public class MathUtils {
 	}
 
 	public static final float sqrt(float x) {
-		if (Settings.FAST_MATH) {
-			x = invSqrt(x);
-
-			if (x != 0.0f) {
-				return 1.0f / x;
-			}
-			else {
-				return 0;
-			}
-		}
-		else {
+//		if (Settings.FAST_MATH) {
+//			x = invSqrt(x);
+//
+//			if (x != 0.0f) {
+//				return 1.0f / x;
+//			}
+//			else {
+//				return 0;
+//			}
+//		}
+//		else {
+			// this seems to be faster
 			return (float) Math.sqrt(x);
-		}
+//		}
 	}
 
+	/**
+	 * Fast, but not very accurate
+	 * @param x
+	 * @return
+	 */
 	public final static float invSqrt(float x) {
 		final float xhalf = 0.5f * x;
 		int i = Float.floatToRawIntBits(x);
@@ -290,8 +296,6 @@ public class MathUtils {
 		x *= 1.5f - xhalf * x * x;
 		// REPEAT FOR ACCURACY (make sure at least 2 are here, too inaccurate
 		// otherwise)
-		x *= 1.5f - xhalf * x * x;
-		x *= 1.5f - xhalf * x * x;
 		x *= 1.5f - xhalf * x * x;
 		return x;
 	}

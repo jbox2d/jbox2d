@@ -29,10 +29,6 @@ package org.jbox2d.common;
  * A 2-by-2 matrix. Stored in column-major order.
  */
 public class Mat22 {
-	/**
-	 * Used for fast comparing, should never be modified.
-	 */
-	public static final Mat22 IDENTITY = new Mat22(1,0,0,1);
 	
 	public Vec2 col1, col2;
 
@@ -132,6 +128,15 @@ public class Mat22 {
 		col1.y = 0.0f;
 		col2.y = 0.0f;
 	}
+	
+	/**
+	 * Extract the angle from this matrix (assumed to be
+	 * a rotation matrix).
+	 * @return
+	 */
+	public final float getAngle(){
+		return MathUtils.atan2(col1.y, col1.x);
+	}
 
 	/**
 	 * Set by column vectors.
@@ -150,8 +155,9 @@ public class Mat22 {
 		final float a = col1.x, b = col2.x, c = col1.y, d = col2.y;
 		final Mat22 B = new Mat22();
 		float det = a * d - b * c;
-		// b2Assert(det != 0.0f);
-		det = 1.0f / det;
+		if(det != 0){
+			det = 1.0f / det;
+		}
 		B.col1.x = det * d;
 		B.col2.x = -det * b;
 		B.col1.y = -det * c;
@@ -162,8 +168,9 @@ public class Mat22 {
 	public final Mat22 invertLocal() {
 		final float a = col1.x, b = col2.x, c = col1.y, d = col2.y;
 		float det = a * d - b * c;
-		// b2Assert(det != 0.0f);
-		det = 1.0f / det;
+		if(det != 0){
+			det = 1.0f / det;
+		}
 		col1.x = det * d;
 		col2.x = -det * b;
 		col1.y = -det * c;
@@ -373,8 +380,9 @@ public class Mat22 {
 	public final Vec2 solve(final Vec2 b) {
 		final float a11 = col1.x, a12 = col2.x, a21 = col1.y, a22 = col2.y;
 		float det = a11 * a22 - a12 * a21;
-		assert(det != 0.0f);
-		det = 1.0f / det;
+		if (det != 0.0f){
+			det = 1.0f / det;
+		}
 		final Vec2 x = new Vec2( det * (a22 * b.x - a12 * b.y),
 		                         det * (a11 * b.y - a21 * b.x) );
 		return x;
@@ -384,8 +392,9 @@ public class Mat22 {
 	public final void solveToOut(final Vec2 b, final Vec2 out) {
 		final float a11 = col1.x, a12 = col2.x, a21 = col1.y, a22 = col2.y;
 		float det = a11 * a22 - a12 * a21;
-		assert(det != 0.0f);
-		det = 1.0f / det;
+		if (det != 0.0f){
+			det = 1.0f / det;
+		}
 		final float tempy =  det * (a11 * b.y - a21 * b.x) ;
 		out.x = det * (a22 * b.x - a12 * b.y);
 		out.y = tempy;

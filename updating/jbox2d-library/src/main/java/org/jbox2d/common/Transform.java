@@ -30,24 +30,12 @@ package org.jbox2d.common;
  * the position and orientation of rigid frames.
  */
 public class Transform {
-	/**
-	 * Used for fast comparing, should never be modified.
-	 */
-	public static final Transform IDENTITY = new Transform(Vec2.ZERO, Mat22.IDENTITY);
 	
 	/** The translation caused by the transform */
 	public final Vec2 position;
 
 	/** A matrix representing a rotation */
 	public final Mat22 R;
-
-	// The identity transform 
-	public static Transform identity;
-
-	static{
-		Transform.identity = new Transform();
-		Transform.identity.setIdentity();
-	}
 
 	/** The default constructor. */
 	public Transform() {
@@ -72,6 +60,23 @@ public class Transform {
 		position.set(xf.position);
 		R.set(xf.R);
 		return this;
+	}
+	
+	/**
+	 * Set this based on the position and angle.
+	 * @param p
+	 * @param angle
+	 */
+	public final void set(Vec2 p, float angle){
+		position.set(p);
+		R.set(angle);
+	}
+	
+	/**
+	 * Calculate the angle that the rotation matrix represents.
+	 */
+	public final float getAngle(){
+		return MathUtils.atan2(R.col1.y, R.col1.x);
 	}
 
 	/** Set this to the identity transform. */
