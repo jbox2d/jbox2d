@@ -13,6 +13,8 @@ import org.jbox2d.callbacks.DestructionListener;
 import org.jbox2d.callbacks.QueryCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.Collision;
+import org.jbox2d.collision.Manifold;
+import org.jbox2d.collision.WorldManifold;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Settings;
@@ -25,9 +27,7 @@ import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.joints.Joint;
-import org.jbox2d.structs.collision.Manifold;
 import org.jbox2d.structs.collision.PointState;
-import org.jbox2d.structs.collision.WorldManifold;
 
 /**
  * @author Daniel Murphy
@@ -384,7 +384,7 @@ public abstract class TestbedTest implements ContactListener{
 	private final PointState[] state2 = new PointState[Settings.maxManifoldPoints];
 	private final WorldManifold worldManifold = new WorldManifold();
 	/**
-	 * @see org.jbox2d.callbacks.ContactListener#preSolve(org.jbox2d.dynamics.contacts.Contact, org.jbox2d.structs.collision.Manifold)
+	 * @see org.jbox2d.callbacks.ContactListener#preSolve(org.jbox2d.dynamics.contacts.Contact, org.jbox2d.collision.Manifold)
 	 */
 	public void preSolve(Contact contact, Manifold oldManifold) {
 		Manifold manifold = contact.getManifold();
