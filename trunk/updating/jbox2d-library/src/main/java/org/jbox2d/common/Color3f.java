@@ -40,6 +40,7 @@ public class Color3f {
 	public float y;
 	public float z;
 
+	
 	public Color3f(){
 		x = y = z = 0;
 	}
@@ -53,5 +54,11 @@ public class Color3f {
 		x = r;
 		y = g;
 		z = b;
+	}
+	
+	public void set(Color3f argColor){
+		x = argColor.x;
+		y = argColor.y;
+		z = argColor.z;
 	}
 }

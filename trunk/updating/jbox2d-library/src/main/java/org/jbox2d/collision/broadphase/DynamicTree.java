@@ -1,5 +1,7 @@
 package org.jbox2d.collision.broadphase;
 
+import java.awt.Color;
+
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
@@ -528,20 +530,29 @@ public class DynamicTree {
 	}
 
 	public void drawTree(DebugDraw argDraw) {
-		drawTree(argDraw, m_root);
+		int height = computeHeight();
+		drawTree(argDraw, m_root, 0, height);
 	}
 	
+	private final Color3f color = new Color3f();
 	private static final Vec2Array vecs = new Vec2Array();
-	public void drawTree(DebugDraw argDraw, DynamicTreeNode argNode){
+	private final Vec2 textVec = new Vec2();
+	
+	public void drawTree(DebugDraw argDraw, DynamicTreeNode argNode, int spot, int height){
 		Vec2[] ray = vecs.get(4);
 		argNode.aabb.getVertices(ray);
 		
-		argDraw.drawPolygon(ray, 4, Color3f.WHITE);
+		color.set(1, (height-spot)*1f/height, (height-spot)*1f/height);
+		argDraw.drawPolygon(ray, 4, color);
+		
+		argDraw.getViewportTranform().getWorldToScreen(argNode.aabb.upperBound, textVec);
+		argDraw.drawString(textVec.x, textVec.y, (spot+1)+"/"+height, color);
+		
 		if(argNode.child1 != null){
-			drawTree(argDraw, argNode.child1);
+			drawTree(argDraw, argNode.child1, spot+1, height);
 		}
 		if(argNode.child2 != null){
-			drawTree(argDraw, argNode.child2);
+			drawTree(argDraw, argNode.child2, spot+1, height);
 		}
 	}
 }
