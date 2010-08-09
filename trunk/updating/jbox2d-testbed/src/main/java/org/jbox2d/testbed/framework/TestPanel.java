@@ -147,7 +147,7 @@ public class TestPanel extends JPanel implements Runnable{
 						if(codedKeys[KeyEvent.VK_SHIFT]){
 							currTest.shiftMouseDown(pos2);
 						}else{
-							currTest.mouseDown(pos);
+							currTest.mouseDown(pos2);
 						}
 					}
 				}
@@ -158,20 +158,21 @@ public class TestPanel extends JPanel implements Runnable{
 			
 			private final Vec2 oldCenter = new Vec2();
 			private final Vec2 newCenter = new Vec2();
+			private final Mat22 upScale = Mat22.createScaleTransform( 1.05f);
+			private final Mat22 downScale = Mat22.createScaleTransform( .95f);
 			public void mouseWheelMoved(MouseWheelEvent e) {
 				DebugDraw d = draw;
         		int notches = e.getWheelRotation();
         		
-            	Vec2 oldCenter = new Vec2();
             	OBBViewportTransform trans = (OBBViewportTransform) d.getViewportTranform();
             	oldCenter.set(currTest.mouseWorld);
             	//Change the zoom and clamp it to reasonable values - can't clamp now.
             	if (notches < 0) {
-            		trans.mulByTransform( Mat22.createScaleTransform( 1.05f ));
+            		trans.mulByTransform( upScale);
             		currTest.cachedCameraScale *= 1.05;
             	}
             	else if (notches > 0) {
-            		trans.mulByTransform( Mat22.createScaleTransform( .95f ));
+            		trans.mulByTransform( downScale);
             		currTest.cachedCameraScale *= .95f;
             	}
             	
@@ -287,11 +288,10 @@ public class TestPanel extends JPanel implements Runnable{
 	}
 	
 	public void run() { // animation loop
-		long beforeTime, afterTime, timeDiff, sleepTime;
-		
+		long beforeTime, afterTime, updateTime, timeDiff, sleepTime, timeSpent;
 		init();
-		
-		beforeTime = startTime = System.nanoTime();
+		float timeInSecs;
+		beforeTime = startTime = updateTime = System.nanoTime();
 		sleepTime = 0;
 		
 		animating = true;
@@ -304,6 +304,16 @@ public class TestPanel extends JPanel implements Runnable{
 				nextTest = null;
 			}
 			
+			timeSpent = beforeTime - updateTime;
+			if (timeSpent > 0) {
+				timeInSecs = timeSpent * 1.0f / 1000000000.0f;
+				updateTime = System.nanoTime();
+				frameRate = (frameRate * 0.9f)
+						+ (1.0f / timeInSecs ) * 0.1f;
+			}else{
+				updateTime = System.nanoTime();
+			}
+			
 			render();
 			update();
 			paintScreen();
@@ -312,11 +322,9 @@ public class TestPanel extends JPanel implements Runnable{
 			afterTime = System.nanoTime();
 			
 			timeDiff = afterTime - beforeTime;
-			
-			// sleepTime = ((1000000000/targetFrameRate) - timeDiff)/1000000;
-			sleepTime = 1000 / targetFrameRate - timeDiff / 1000000;
+			sleepTime = (1000000000/targetFrameRate - timeDiff)/1000000;
+			//sleepTime = 1000 / targetFrameRate - timeDiff / 1000000;
 			if (sleepTime > 0) {
-				frameRate = (frameRate * 0.9f) + (1000f / sleepTime) * 0.1f;
 				try {
 					Thread.sleep(sleepTime);
 				}

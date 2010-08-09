@@ -268,6 +268,7 @@ public abstract class TestbedTest implements ContactListener{
 		queryAABB.lowerBound.set(p.x - .001f, p.y - .001f);
 		queryAABB.upperBound.set(p.x + .001f, p.y + .001f);
 		callback.point.set(p);
+		callback.fixture = null;
 		world.queryAABB(callback, queryAABB);
 		
 		if(callback.fixture != null){
