@@ -108,6 +108,16 @@ public class TestPanel extends JPanel implements Runnable{
 					posDif.subLocal(mouse);
 					draw.getViewportTranform().vectorInverseTransform(posDif, posDif);
 					draw.getViewportTranform().getCenter().addLocal(posDif);
+					if(currTest != null){
+						currTest.cachedCameraX = draw.getViewportTranform().getCenter().x;
+						currTest.cachedCameraY = draw.getViewportTranform().getCenter().y;
+					}
+				}
+				if(currTest != null){
+					pos.set(e.getX(), e.getY());
+					mouse.set(pos);
+					draw.getScreenToWorldToOut(pos, pos);
+					currTest.mouseMove(pos);
 				}
 			}
 			

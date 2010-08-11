@@ -4,11 +4,15 @@
 package org.jbox2d.testbed.framework;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -16,6 +20,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.UIManager;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -44,6 +52,10 @@ public class TestbedMain extends JFrame {
 	}
 	
 	public static void main(String[] args){
+		try{
+			UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+		}catch(Exception e){}
+		
 		new TestbedMain();
 	}
 }
@@ -67,23 +79,28 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 	
 	private JComboBox tests;
 	
+	private JButton pauseButton = new JButton("Pause");
+	private JButton stepButton = new JButton("Step");
+	
 	static String[] checkboxLabels = {
 		"Warm Starting", "Continuous Collision",
 		"Draw Shapes", "Draw Joints", "Draw AABBs", 
 		"Draw Pairs", "Draw Contact Points",
 		"Draw Contact Normals", "Draw Contact Forces",
 		"Draw Friction Forces", "Draw Center of Mass",
-		"Draw Stats"
+		"Draw Stats", "Draw Dynamic Tree"
 	};
 	
 	public SidePanel(TestbedSettings argSettings, TestbedMain argMain){
 		settings = argSettings;
 		main = argMain;
 		initComponents();
+		addListeners();
 	}
 	
 	public void initComponents(){
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		
 		add(Box.createVerticalGlue());
 		
@@ -93,33 +110,38 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 		}
 		tests = new JComboBox(names);
 		tests.addActionListener(this);
-		Box tbox = Box.createHorizontalBox();
-		tbox.add(new JLabel("Choose a test:"));
-		tbox.add(tests);
+		JPanel testsp = new JPanel();
+		testsp.setLayout(new GridLayout(1, 2));
+		testsp.add(new JLabel("Choose a test:"));
+		testsp.add(tests);
 		
-		add(tbox);
+		add(testsp);
 		
 		add(Box.createVerticalGlue());
 		
+		Box sliders = Box.createVerticalBox();
+		sliders.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
 		hz = new JSlider(1, 400, (int)settings.hz);
 		hz.setSize(100, 10);
 		hz.addChangeListener(this);
 		hzText = new JLabel("Hz: "+(int)settings.hz);
-		add(hzText);
-		add(hz);
+		sliders.add(hzText);
+		sliders.add(hz);
 		
 		pos = new JSlider(0, 100, (int)settings.positionIterations);
 		pos.setSize(100, 10);
 		pos.addChangeListener(this);
 		posText = new JLabel("Pos iters: "+(int)settings.positionIterations);
-		add(posText);
-		add(pos);
+		sliders.add(posText);
+		sliders.add(pos);
 		
 		vel = new JSlider(1, 100, (int)settings.velocityIterations);
 		vel.addChangeListener(this);
 		velText = new JLabel("Vel iters: "+(int)settings.velocityIterations);
-		add(velText);
-		add(vel);
+		sliders.add(velText);
+		sliders.add(vel);
+		
+		add(sliders);
 		
 		for(int i=0; i<checkboxLabels.length; i++){
 			String s = checkboxLabels[i];
@@ -170,6 +192,8 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 				case 11:
 					tf = settings.drawStats;
 					break;
+				case 12:
+					tf = settings.drawDynamicTree;
 				default:
 					System.out.println("oh no");
 					tf = false;
@@ -178,6 +202,31 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 			box.addChangeListener(this);
 			add(box);
 		}
+		
+		Box buttons = Box.createHorizontalBox();
+		buttons.add(pauseButton);
+		buttons.add(stepButton);
+		add(buttons);
+	}
+	
+	public void addListeners(){
+		pauseButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(settings.pause){
+					settings.pause = false;
+					pauseButton.setText("Pause");
+				}else{
+					settings.pause = true;
+					pauseButton.setText("Resume");
+				}
+			}
+		});
+		
+		stepButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				settings.singleStep = true;
+			}
+		});
 	}
 
 	/**
@@ -225,6 +274,9 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 					break;
 				case 11:
 					settings.drawStats = tf;
+					break;
+				case 12:
+					settings.drawDynamicTree = tf;
 					break;
 				default:
 					System.out.println("oh no");
