@@ -549,7 +549,9 @@ public class World {
 			}
 		}
 		
-		m_contactManager.m_broadPhase.drawTree(m_debugDraw);
+		if ((flags & DebugDraw.e_dynamicTreeBit) == DebugDraw.e_dynamicTreeBit){
+			m_contactManager.m_broadPhase.drawTree(m_debugDraw);
+		}
 	}
 
 	private final WorldQueryWrapper wqwrapper = new WorldQueryWrapper();
