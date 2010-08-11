@@ -27,6 +27,8 @@ import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.joints.Joint;
+import org.jbox2d.dynamics.joints.MouseJoint;
+import org.jbox2d.dynamics.joints.MouseJointDef;
 import org.jbox2d.structs.collision.PointState;
 
 /**
@@ -50,7 +52,7 @@ public abstract class TestbedTest implements ContactListener{
 	public DebugDraw debugDraw;
 	public World world;
 	private Body bomb;
-	public Joint mouseJoint;
+	public MouseJoint mouseJoint;
 	private final Vec2 bombSpawnPoint = new Vec2();
 	private boolean bombSpawning = false;
 	public final Vec2 mouseWorld = new Vec2();
@@ -87,7 +89,7 @@ public abstract class TestbedTest implements ContactListener{
 				if(mouseJoint == joint){
 					mouseJoint = null;
 				}else{
-					
+					jointDestroyed(joint);
 				}
 			}
 		};
@@ -113,8 +115,9 @@ public abstract class TestbedTest implements ContactListener{
 		if(hasCachedCamera){
 			setCamera(cachedCameraX, cachedCameraY, cachedCameraScale);
 		}else{
-			setCamera(-10, 10, 10);			
+			setCamera(-20, 30, 10);			
 		}
+		setTitle(getTestName());
 		
 		initTest();
 	}
@@ -134,12 +137,13 @@ public abstract class TestbedTest implements ContactListener{
 	private final Color3f color1 = new Color3f(.3f, .95f, .3f);
 	private final Color3f color2 = new Color3f(.3f, .3f, .95f);
 	private final Color3f color3 = new Color3f(.9f, .9f, .9f);
+	private final Color3f mouseColor = new Color3f(0f, 1f, 0f);
 	private final Vec2 p1 = new Vec2();
 	private final Vec2 p2 = new Vec2();
 	
 	public void step(TestbedSettings settings){
 		float timeStep = settings.hz > 0f ? 1f/settings.hz : 0;
-		
+		textLine = 15;
 		// keys!
 		if(TestPanel.keys['r']){
 			TestPanel.keys['r'] = false;
@@ -167,6 +171,7 @@ public abstract class TestbedTest implements ContactListener{
 		flags += settings.drawAABBs? DebugDraw.e_aabbBit: 0;
 		flags += settings.drawPairs? DebugDraw.e_pairBit: 0;
 		flags += settings.drawCOMs?	 DebugDraw.e_centerOfMassBit: 0;
+		flags += settings.drawDynamicTree? DebugDraw.e_dynamicTreeBit: 0;
 		debugDraw.setFlags(flags);
 		
 		world.setWarmStarting(settings.enableWarmStarting);
@@ -182,12 +187,13 @@ public abstract class TestbedTest implements ContactListener{
 			++stepCount;
 		}
 		
-		textLine = 15;
 		if(settings.drawStats){
 			Vec2.watchCreations = true;
 			debugDraw.drawString(5, textLine,"bodies/contacts/joints/proxies = "+world.getBodyCount()+"/"+world.getContactCount()+"/"+world.getJointCount()+"/"+world.getProxyCount(), Color3f.WHITE);
 			textLine += 15;
 			debugDraw.drawString(5, textLine, "Framerate: "+ panel.getCalculatedFrameRate(), Color3f.WHITE);
+			textLine += 15;
+			debugDraw.drawString(5, textLine, "Mouse world point: "+ mouseWorld.x+","+mouseWorld.y, Color3f.WHITE);
 			textLine += 15;
 			debugDraw.drawString(5, textLine, "Vec2 creations: "+ Vec2.creationCount, Color3f.WHITE);
 			Vec2.creationCount = 0;
@@ -204,7 +210,10 @@ public abstract class TestbedTest implements ContactListener{
 		}
 		
 		if(mouseJoint != null){
-			// mousejoint drawing
+			Vec2 p1 = mouseJoint.getAnchorB();
+			Vec2 p2 = mouseJoint.getTarget();
+			
+			debugDraw.drawSegment(p1, p2, mouseColor);
 		}
 		
 		if(bombSpawning){
@@ -272,7 +281,14 @@ public abstract class TestbedTest implements ContactListener{
 		world.queryAABB(callback, queryAABB);
 		
 		if(callback.fixture != null){
-			System.out.println("mouse joint!");
+			Body body = callback.fixture.getBody();
+			MouseJointDef def = new MouseJointDef();
+			def.bodyA = groundBody;
+			def.bodyB = body;
+			def.target.set(p);
+			def.maxForce = 1000f * body.getMass();
+			mouseJoint = (MouseJoint) world.createJoint(def);
+			body.setAwake(true);
 		}
 	}
 	
@@ -280,7 +296,7 @@ public abstract class TestbedTest implements ContactListener{
 		mouseWorld.set(p);
 		
 		if(mouseJoint != null){
-			//mouseJoint.setTarget(p);
+			mouseJoint.setTarget(p);
 		}
 	}
 	
