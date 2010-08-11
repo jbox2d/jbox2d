@@ -55,7 +55,7 @@ public class ContactSolver {
 		m_constraintCount = contactCount;
 		
 		// dynamic constraint array length, because we are pooling
-		if(m_constraints.length < contactCount){
+		if(m_constraints.length <= contactCount){
 			ContactConstraint[] newConstraints = new ContactConstraint[m_constraints.length*2];
 			for(int i=0; i< newConstraints.length; i++){
 				if(i<m_constraints.length){
