@@ -16,7 +16,9 @@ public abstract class Joint {
 	
 	public static Joint create(JointDef def){
 		Joint joint = null;
-		// none yet
+		if(def instanceof MouseJointDef){
+			return new MouseJoint((MouseJointDef) def);
+		}
 		return joint;
 	}
 	

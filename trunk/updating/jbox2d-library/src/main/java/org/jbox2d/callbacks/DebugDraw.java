@@ -23,7 +23,8 @@ public abstract class DebugDraw {
 	public static final int e_aabbBit				= 0x0004; ///< draw core (TOI) shapes
 	public static final int e_pairBit				= 0x0008; ///< draw axis aligned bounding boxes
 	public static final int e_centerOfMassBit		= 0x0010; ///< draw center of mass frame
-
+	public static final int e_dynamicTreeBit		= 0x0020; ///< draw dynamic tree.
+	
 	protected int m_drawFlags;
 	protected final IViewportTransform viewportTransform;
 
