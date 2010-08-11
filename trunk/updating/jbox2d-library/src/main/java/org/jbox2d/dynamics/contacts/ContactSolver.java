@@ -783,7 +783,7 @@ public class ContactSolver {
 				minSeparation = MathUtils.min(minSeparation, separation);
 
 				// Prevent large corrections and allow slop.
-				float C = MathUtils.clamp(baumgarte * (separation + Settings.linearSlop), Settings.maxLinearCorrection, 0.0f);
+				float C = MathUtils.clamp(baumgarte * (separation + Settings.linearSlop), -Settings.maxLinearCorrection, 0.0f);
 
 				// Compute the effective mass.
 				float rnA = Vec2.cross(rA, normal);
