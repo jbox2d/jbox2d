@@ -742,7 +742,7 @@ public class ContactSolver {
 	}*/
 	
 	// djm pooling, and from above
-	private final Stack<PositionSolverManifold> solverStack = new Stack<PositionSolverManifold>();
+	private final PositionSolverManifold psolver = new PositionSolverManifold();
 	private final Vec2 rA = new Vec2();
 	private final Vec2 rB = new Vec2();
 	
@@ -764,12 +764,7 @@ public class ContactSolver {
 
 			// Solve normal constraints
 			for (int j = 0; j < c.pointCount; ++j){
-				if(solverStack.isEmpty()){
-					solverStack.push(new PositionSolverManifold());
-					solverStack.push(new PositionSolverManifold());
-					solverStack.push(new PositionSolverManifold());
-				}
-				PositionSolverManifold psm = solverStack.pop();
+				PositionSolverManifold psm = psolver;
 				psm.initialize(c, j);
 				Vec2 normal = psm.normal;
 				
