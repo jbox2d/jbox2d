@@ -27,6 +27,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.jbox2d.testbed.tests.TestList;
+
 /**
  * @author Daniel Murphy
  */

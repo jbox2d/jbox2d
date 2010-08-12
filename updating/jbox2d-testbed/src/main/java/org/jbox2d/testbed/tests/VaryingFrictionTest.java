@@ -8,7 +8,7 @@ import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.testbed.framework.TestbedTest;
 
-public class VaryingFriction extends TestbedTest {
+public class VaryingFrictionTest extends TestbedTest {
 
 	@Override
 	public String getTestName() {
