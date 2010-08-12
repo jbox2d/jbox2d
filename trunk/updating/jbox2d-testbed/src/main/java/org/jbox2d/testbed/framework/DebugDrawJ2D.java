@@ -46,6 +46,18 @@ public class DebugDrawJ2D extends DebugDraw{
 		generateCirle(center, radius, vecs, circlePoints);
 		drawPolygon(vecs, circlePoints, color);
 	}
+	
+	@Override
+	public void drawPoint(Vec2 argPoint, float argRadiusOnScreen, Color3f argColor) {
+		getWorldToScreenToOut(argPoint, sp1);
+		Graphics2D g = getGraphics();
+		
+		Color c = cpool.getColor(argColor.x, argColor.y, argColor.z);
+		g.setColor(c);
+		sp1.x -= argRadiusOnScreen;
+		sp1.y -= argRadiusOnScreen;
+		g.fillOval((int)sp1.x, (int)sp1.y, (int)argRadiusOnScreen*2, (int)argRadiusOnScreen*2);
+	}
 
 	private final Vec2 sp1 = new Vec2();
 	private final Vec2 sp2 = new Vec2();
