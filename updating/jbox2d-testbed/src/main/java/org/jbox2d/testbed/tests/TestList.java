@@ -17,5 +17,7 @@ public class TestList {
 		tests.add(new DominoTest());
 		tests.add(new PyramidTest());
 		tests.add(new OneSidedTest());
+		tests.add(new DistanceTest());
+		tests.add(new RayCastTest());
 	}
 }

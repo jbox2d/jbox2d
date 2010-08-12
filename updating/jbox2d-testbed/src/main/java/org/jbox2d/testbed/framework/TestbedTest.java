@@ -196,6 +196,7 @@ public abstract class TestbedTest implements ContactListener{
 			debugDraw.drawString(5, textLine, "Mouse world point: "+ mouseWorld.x+","+mouseWorld.y, Color3f.WHITE);
 			textLine += 15;
 			debugDraw.drawString(5, textLine, "Vec2 creations: "+ Vec2.creationCount, Color3f.WHITE);
+			textLine += 15;
 			Vec2.creationCount = 0;
 		}else{
 			Vec2.watchCreations = false;
@@ -221,23 +222,23 @@ public abstract class TestbedTest implements ContactListener{
 		}
 		
 		if(settings.drawContactPoints){
-			float axisScale = 10f;
+			final float axisScale = .3f;
 			
 			for(int i=0; i<pointCount; i++){
 				
 				ContactPoint point = points[i];
 				
 				if(point.state == PointState.ADD_STATE){
-					debugDraw.drawSolidCircle(point.position, .5f, null, color1);
+					debugDraw.drawPoint(point.position, 10f, color1);
 				}
 				else if(point.state == PointState.PERSIST_STATE){
-					debugDraw.drawSolidCircle(point.position, .3f, null, color2);
+					debugDraw.drawPoint(point.position, 5f, color2);
 				}
 				
 				if(settings.drawContactNormals){
 					p1.set(point.position);
 					p2.set(point.normal).mulLocal(axisScale).addLocal(p1);
-					debugDraw.drawSegment(p1, p1, color3);
+					debugDraw.drawSegment(p1, p2, color3);
 				}
 			}
 		}
