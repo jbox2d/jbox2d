@@ -225,33 +225,21 @@ public class DynamicTree {
 		return true;
 	}
 	
+	// stacks because it's recursive
+	private static final Vec2Stack vec2stack = new Vec2Stack();
+	private static final TLAABB tlaabb = new TLAABB();
+	private static final TLRayCastInput tlsubInput = new TLRayCastInput();
+	
 	/**
 	 * Ray-cast against the proxies in the tree. This relies on the callback
 	 * to perform a exact ray-cast in the case were the proxy contains a shape.
 	 * The callback also performs the any collision filtering. This has performance
 	 * roughly equal to k * log(n), where k is the number of collisions and n is the
-	 * number of proxies in the tree.  The maxFraction in the input will change after callnig this
+	 * number of proxies in the tree.
 	 * @param argInput the ray-cast input data. The ray extends from p1 to p1 + maxFraction * (p2 - p1).
 	 * @param argCallback a callback class that is called for each proxy that is hit by the ray.
 	 */
-	public void raycast( final TreeRayCastCallback argCallback, final RayCastInput argInput){
-		raycast(argCallback, argInput, m_root, 1);
-	}
-	
-	// stacks because it's recursive
-	private static final Vec2Stack vec2stack = new Vec2Stack();
-	private static final AABBStack aabbstack = new AABBStack();
-	private static final TLRayCastInput tlsubInput = new TLRayCastInput();
-	//private static final TLRayCastOutput tloutput = new TLRayCastOutput();
-
-	/**
-	 * @return true to stop raycast (opposite of query above.  not sure why i did this)
-	 */
-	private boolean raycast( final TreeRayCastCallback argCallback, final RayCastInput argInput,
-						  final DynamicTreeNode argNode, int count){
-		if(argNode == null){
-			return false;
-		}
+	public void raycast(TreeRayCastCallback argCallback,  RayCastInput argInput){
 		
 		final Vec2 r = vec2stack.get();
 		final Vec2 v = vec2stack.get();
@@ -270,37 +258,51 @@ public class DynamicTree {
 		// Separating axis for segment (Gino, p80).
 		// |dot(v, p1 - c)| > dot(|v|, h)
 		
-		float maxFraction = argInput.maxFraction;
+		float[] maxFraction = new float[1];
+		maxFraction[0] = argInput.maxFraction;
 		
 		// Build a bounding box for the segment.
-		final AABB segAABB = aabbstack.get();
+		final AABB segAABB = tlaabb.get();
 		//b2Vec2 t = p1 + maxFraction * (p2 - p1);
 		final Vec2 temp = vec2stack.get();
-		temp.set(p2).subLocal(p1).mulLocal(maxFraction).addLocal(p1);
+		temp.set(p2).subLocal(p1).mulLocal(maxFraction[0]).addLocal(p1);
 		Vec2.minToOut(p1, temp, segAABB.lowerBound);
 		Vec2.maxToOut(p1, temp, segAABB.upperBound);
 		
+		raycast(m_root, argInput, 0, segAABB, v, p1, p2, absV, maxFraction, argCallback);
+		vec2stack.recycle(r, v, absV, temp);
+	}
+		
+	public boolean raycast(DynamicTreeNode argNode,
+			RayCastInput argInput,
+			int argCount,
+			AABB argSegAABB,
+			Vec2 argV,
+			Vec2 argP1,
+			Vec2 argP2,
+			Vec2 argAbs_v,
+			float[] argMaxFraction,
+			TreeRayCastCallback argCallback){
 		// start part from c++ code that's in the while loop
 		if(argNode == null){
-			vec2stack.recycle(r, v, absV, temp);
 			return false;
 		}
 		
-		if ( AABB.testOverlap(argNode.aabb, segAABB) == false ){
-			vec2stack.recycle(r, v, absV, temp);
+		if ( AABB.testOverlap(argNode.aabb, argSegAABB) == false ){
 			return false;
 		}
-			
+		
+		final Vec2 temp = vec2stack.get();
 		final Vec2 c = vec2stack.get();
 		final Vec2 h = vec2stack.get();
 		argNode.aabb.getCenterToOut(c);
 		argNode.aabb.getExtentsToOut(h);
 		
-		temp.set(p1).subLocal(c);
-		float separation = MathUtils.abs( Vec2.dot(v, temp)) - Vec2.dot(absV, h);
+		temp.set(argP1).subLocal(c);
+		float separation = MathUtils.abs( Vec2.dot(argV, temp)) - Vec2.dot(argAbs_v, h);
 		
 		if(separation > 0f){
-			vec2stack.recycle(r, v, absV, temp, c, h);
+			vec2stack.recycle(temp, c, h);
 			return false;
 		}
 		
@@ -308,38 +310,40 @@ public class DynamicTree {
 			final RayCastInput subInput = tlsubInput.get();
 			subInput.p1.set(argInput.p1);
 			subInput.p2.set(argInput.p2);
-			subInput.maxFraction = maxFraction;
+			subInput.maxFraction = argMaxFraction[0];
 			
 			float value = argCallback.raycastCallback( subInput, argNode);
 			
 			if(value == 0f){
-				vec2stack.recycle(r, v, absV, temp, c, h);
+				vec2stack.recycle(temp, c, h);
 				// The client has terminated the ray cast.
 				return true;
 			}
 			
 			if(value > 0f){
 				// Update segment bounding box
-				maxFraction = value;
-				temp.set(p2).subLocal(p1).mulLocal( maxFraction).addLocal( p1);
-				Vec2.minToOut( p1, temp, segAABB.lowerBound);
-				Vec2.maxToOut( p1, temp, segAABB.upperBound);
+				argMaxFraction[0] = value;
+				temp.set(argP2).subLocal(argP1).mulLocal( value).addLocal( argP1);
+				Vec2.minToOut( argP1, temp, argSegAABB.lowerBound);
+				Vec2.maxToOut( argP1, temp, argSegAABB.upperBound);
 			}
 		}else{
-			if(count < MAX_STACK_SIZE){
-				if(raycast(argCallback, argInput, argNode.child1, ++count)){
-					vec2stack.recycle(r, v, absV, temp, c, h);
+			if(argCount < MAX_STACK_SIZE){
+				if(raycast(argNode.child1,argInput,++argCount,argSegAABB,
+							argV, argP1, argP2, argAbs_v, argMaxFraction, argCallback)){
+					vec2stack.recycle(temp, c, h);
 					return true; // to stop whole raycast
 				}
 			}
-			if(count < MAX_STACK_SIZE){
-				if(raycast(argCallback, argInput, argNode.child2, ++count)){
-					vec2stack.recycle(r, v, absV, temp, c, h);
+			if(argCount < MAX_STACK_SIZE){
+				if(raycast(argNode.child2,argInput,++argCount,argSegAABB,
+						argV, argP1, argP2, argAbs_v, argMaxFraction, argCallback)){
+					vec2stack.recycle(temp, c, h);
 					return true; // to stop whole raycast
 				}
 			}		
 		}
-		vec2stack.recycle(r, v, absV, temp, c, h);
+		vec2stack.recycle(temp, c, h);
 		return false;
 	}
 	

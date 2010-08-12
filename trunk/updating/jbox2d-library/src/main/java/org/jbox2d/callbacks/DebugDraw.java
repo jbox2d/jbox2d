@@ -71,6 +71,8 @@ public abstract class DebugDraw {
 			drawSegment(vertices[vertexCount-1], vertices[0], color);
 		}
 	}
+	
+	public abstract void drawPoint(Vec2 argPoint, float argRadiusOnScreen, Color3f argColor);
 
 	/**
 	 * Draw a solid closed polygon provided in CCW order.
