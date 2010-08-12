@@ -36,7 +36,10 @@
 			<url>http://ewjordan.com</url>
 		</developer>
 		<developer>
-			<id>quixote_arg</id>
+		     <id>quixote_arg</id>
+		     <name>Andres Quijano</name>
+		     <email>tulsidas@gmail.com</email>
+		     <url>http://www.jengibre.com.ar</url>
 		</developer>
 	</developers>
 
