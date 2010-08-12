@@ -139,10 +139,6 @@ public abstract class Contact {
 		}
 	}
 
-	public static void destroy(Contact contact, ShapeType typeA, ShapeType typeB) {
-		// djm: what's here?
-	}
-
 	public static void destroy(Contact contact) {
 		assert (s_initialized == true);
 
