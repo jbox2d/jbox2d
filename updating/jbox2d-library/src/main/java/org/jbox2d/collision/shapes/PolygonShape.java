@@ -133,7 +133,7 @@ public class PolygonShape extends Shape{
 	 * It is assumed that the exterior is the the right of each edge.
 	 */
 	public final void set( final Vec2[] vertices, final int count){
-		assert(2 >= count && count <= Settings.maxPolygonVertices);
+		assert(2 <= count && count <= Settings.maxPolygonVertices);
 		m_vertexCount = count;
 
 		// Copy vertices.

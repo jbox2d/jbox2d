@@ -21,6 +21,7 @@ import org.jbox2d.structs.collision.distance.SimplexCache;
 // updated to rev 100 collision.h/cpp
 // updated to rev 100 collidecircle.cpp
 // updated to rev 100 collidepolygon.cpp
+// djm checked pretty thoroughly, should be correct
 /**
  * Functions used for computing contact points, distance
  * queries, and TOI queries.  Collision methods are non-static for pooling speed, 
@@ -610,8 +611,9 @@ public class Collision {
 		np = clipSegmentToLine(clipPoints1, incidentEdge, tangent, sideOffset1);
 		tangent.negateLocal();
 		
-		if (np < 2)
+		if (np < 2){
 			return;
+		}
 
 		// Clip to negative box side 1
 		np = clipSegmentToLine(clipPoints2, clipPoints1,  tangent, sideOffset2);

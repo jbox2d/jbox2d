@@ -9,8 +9,8 @@ import org.jbox2d.common.Transform;
  *
  */
 public class DistanceInput {
-	public DistanceProxy proxyA;
-	public DistanceProxy proxyB;
+	public DistanceProxy proxyA = new DistanceProxy();
+	public DistanceProxy proxyB = new DistanceProxy();
 	public final Transform transformA = new Transform();
 	public final Transform transformB = new Transform();
 	public boolean useRadii;
