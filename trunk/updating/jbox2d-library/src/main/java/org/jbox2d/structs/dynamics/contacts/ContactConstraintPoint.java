@@ -2,7 +2,7 @@ package org.jbox2d.structs.dynamics.contacts;
 
 import org.jbox2d.common.Vec2;
 
-// updated to rev 100
+// updated to rev 100 - ec
 
 public class ContactConstraintPoint {
 	
