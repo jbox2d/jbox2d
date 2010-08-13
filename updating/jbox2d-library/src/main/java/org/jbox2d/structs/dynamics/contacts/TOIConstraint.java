@@ -8,7 +8,7 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 
-// updated to rev 100
+// updated to rev 100 - ec
 /**
  * @author daniel
  */
