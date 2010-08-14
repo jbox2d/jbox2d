@@ -41,8 +41,9 @@ public class Settings {
 	/**
 	 * needs to be final, or will slow down math methods
 	 */
-	public static final boolean FAST_MATH = true;
-	public static final boolean SINCOS_LUT_ENABLED = true;
+	public static final boolean FAST_MATH = false;
+	public static final boolean POOLING = true;
+	public static final boolean SINCOS_LUT_ENABLED = false;
 	/**
 	 * smaller the precision, the larger the table. If a small table is used
 	 * (eg, precision is .006 or greater), make sure you set the table to lerp

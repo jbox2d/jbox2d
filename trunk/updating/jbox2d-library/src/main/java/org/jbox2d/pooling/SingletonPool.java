@@ -12,7 +12,7 @@ public final class SingletonPool {
 		public final TimeOfImpact toi = new TimeOfImpact();
 	}
 	
-	private static final class Pool extends ThreadLocal<Singletons>{
+	private static final class Pool extends CustThreadLocal<Singletons>{
 		protected Singletons initialValue(){
 			return new Singletons();
 		}
