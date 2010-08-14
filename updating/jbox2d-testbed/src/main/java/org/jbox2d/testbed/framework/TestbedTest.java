@@ -56,7 +56,7 @@ public abstract class TestbedTest implements ContactListener{
 	private final Vec2 bombSpawnPoint = new Vec2();
 	private boolean bombSpawning = false;
 	public final Vec2 mouseWorld = new Vec2();
-	private int stepCount;
+	protected int stepCount;
 	
 	private String title = null;
 	private int textLine;
@@ -115,7 +115,7 @@ public abstract class TestbedTest implements ContactListener{
 		if(hasCachedCamera){
 			setCamera(cachedCameraX, cachedCameraY, cachedCameraScale);
 		}else{
-			setCamera(-20, 30, 10);			
+			setCamera(0, 10, 10);			
 		}
 		setTitle(getTestName());
 		
@@ -179,7 +179,7 @@ public abstract class TestbedTest implements ContactListener{
 		
 		pointCount = 0;
 		
-		world.Step(timeStep, settings.velocityIterations, settings.positionIterations);
+		world.step(timeStep, settings.velocityIterations, settings.positionIterations);
 		
 		world.drawDebugData();
 		

@@ -13,8 +13,10 @@ import org.jbox2d.testbed.framework.TestbedTest;
 public class TestList {
 	public static final ArrayList<TestbedTest> tests = new ArrayList<TestbedTest>();
 	static{
-		tests.add(new VaryingFrictionTest());
+		tests.add(new ConfinedTest());
 		tests.add(new DominoTest());
+		tests.add(new MJWTest());
+		tests.add(new VaryingFrictionTest());
 		tests.add(new PyramidTest());
 		tests.add(new OneSidedTest());
 		tests.add(new DistanceTest());

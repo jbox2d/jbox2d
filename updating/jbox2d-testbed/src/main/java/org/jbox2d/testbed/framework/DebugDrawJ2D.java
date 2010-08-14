@@ -26,7 +26,6 @@ public class DebugDrawJ2D extends DebugDraw{
 
 	private final TestPanel panel;
 	private final ColorPool cpool = new ColorPool();
-	public Graphics2D graphics = null;
 	/**
 	 * @param viewport
 	 */
@@ -134,11 +133,8 @@ public class DebugDrawJ2D extends DebugDraw{
 	}
 	
 	private Graphics2D getGraphics(){
-		if(graphics == null){
-			graphics = panel.getDBGraphics();
-			//graphics.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-		}
-		return graphics;
+		return panel.getDBGraphics();
+
 	}
 
 	private final Vec2 temp2 = new Vec2();

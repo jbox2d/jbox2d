@@ -25,7 +25,7 @@ public class PyramidTest extends TestbedTest {
 	@Override
 	public void initTest() {
 		setTitle("Pyramid Test");
-		int count = 3;
+		int count = 20;
 		{
 			BodyDef bd = new BodyDef();
 			Body ground = world.createBody(bd);
