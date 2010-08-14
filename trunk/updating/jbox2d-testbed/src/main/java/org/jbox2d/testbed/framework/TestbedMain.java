@@ -4,7 +4,6 @@
 package org.jbox2d.testbed.framework;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,9 +20,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.UIManager;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -32,6 +28,7 @@ import org.jbox2d.testbed.tests.TestList;
 /**
  * @author Daniel Murphy
  */
+@SuppressWarnings("serial")
 public class TestbedMain extends JFrame {
 	
 	TestPanel panel;
@@ -196,6 +193,7 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 					break;
 				case 12:
 					tf = settings.drawDynamicTree;
+					break;
 				default:
 					System.out.println("oh no");
 					tf = false;

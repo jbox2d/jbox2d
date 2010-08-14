@@ -9,34 +9,30 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 import javax.swing.JPanel;
 
-import org.jbox2d.callbacks.ContactImpulse;
-import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.callbacks.DebugDraw;
-import org.jbox2d.collision.AABB;
-import org.jbox2d.collision.Manifold;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.OBBViewportTransform;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.contacts.Contact;
 
 /**
  * @author Daniel Murphy
  */
+@SuppressWarnings("serial")
 public class TestPanel extends JPanel implements Runnable{
-	
+	public static final int INIT_WIDTH = 500;
+	public static final int INIT_HEIGHT = 600;
 	public volatile static boolean[] keys = new boolean[256];
 	public volatile static boolean[] codedKeys = new boolean[512];
 	
@@ -57,18 +53,28 @@ public class TestPanel extends JPanel implements Runnable{
 	private Graphics2D dbg = null;
 	private Image dbImage = null;
 	private Thread animator;
+	
+	private int panelWidth;
+	private int panelHeight;
 
 	
 	public TestPanel(TestbedSettings argSettings) {
 		setBackground(Color.black);
-		setPreferredSize(new Dimension(600,500));
 		settings = argSettings;
+		updateSize(INIT_WIDTH, INIT_HEIGHT);
 		setFrameRate(60);
 		animator = new Thread(this, "Animation Thread");
 	}
 	
 	public Graphics2D getDBGraphics(){
 		return dbg;
+	}
+	
+	public void updateSize(int argWidth, int argHeight){
+		panelWidth = argWidth;
+		panelHeight = argHeight;
+		draw.getViewportTranform().setExtents(argWidth/2, argHeight/2);
+		setPreferredSize(new Dimension(panelWidth, panelHeight));
 	}
 	
 	public void init(){
@@ -197,6 +203,20 @@ public class TestPanel extends JPanel implements Runnable{
 			}
 		});
 		
+		addComponentListener(new ComponentListener() {
+			
+			public void componentShown(ComponentEvent e) {}
+			
+			public void componentResized(ComponentEvent e) {
+				updateSize(getWidth(), getHeight());
+				dbImage = null;
+			}
+			
+			public void componentMoved(ComponentEvent e) {}
+			
+			public void componentHidden(ComponentEvent e) {}
+		});
+		
 		if(currTest != null){
 			currTest.init(draw);
 		}
@@ -263,7 +283,7 @@ public class TestPanel extends JPanel implements Runnable{
 	
 	public void render(){
 		if(dbImage == null){
-			dbImage = createImage(600, 500);
+			dbImage = createImage(panelWidth, panelHeight);
 			if(dbImage == null){
 				System.err.println("dbImage is null");
 				return;
@@ -271,7 +291,7 @@ public class TestPanel extends JPanel implements Runnable{
 			dbg = (Graphics2D)dbImage.getGraphics();
 		}
 		dbg.setColor(Color.black);
-		dbg.fillRect(0, 0, 600, 500);
+		dbg.fillRect(0, 0, panelWidth, panelHeight);
 	}
 	
 	public void paintScreen(){
@@ -305,6 +325,7 @@ public class TestPanel extends JPanel implements Runnable{
 		sleepTime = 0;
 		
 		animating = true;
+		System.out.println("Animation starting");
 		while (animating) {
 			
 			if(nextTest != null){
