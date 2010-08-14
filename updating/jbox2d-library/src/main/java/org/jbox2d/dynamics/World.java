@@ -401,7 +401,7 @@ public class World {
 	 * @param velocityIterations for the velocity constraint solver.
 	 * @param positionIterations for the position constraint solver.
 	 */
-	public void Step(	float dt,
+	public void step(	float dt,
 				int velocityIterations,
 				int positionIterations){
 		// If new fixtures were added, we need to find the new contacts.
@@ -431,12 +431,12 @@ public class World {
 
 		// Integrate velocities, solve velocity constraints, and integrate positions.
 		if (step.dt > 0.0f){
-			Solve(step);
+			solve(step);
 		}
 
 		// Handle TOI events.
 		if (m_continuousPhysics && step.dt > 0.0f){
-			SolveTOI();
+			solveTOI();
 		}
 
 		if (step.dt > 0.0f){
@@ -710,7 +710,7 @@ public class World {
 	private final Island island = new Island();
 	private Body[] stack = new Body[10]; // TODO djm find a good initial stack number;
 	
-	private void Solve(TimeStep step){
+	private void solve(TimeStep step){
 		// Size the island for the worst case.
 		island.init(m_bodyCount, m_contactManager.m_contactCount, m_jointCount, m_contactManager.m_contactListener);
 		
@@ -859,7 +859,8 @@ public class World {
 		// Look for new contacts.
 		m_contactManager.findNewContacts();
 	}
-	private void SolveTOI(){
+	
+	private void solveTOI(){
 		// Prepare all contacts.
 		for (Contact c = m_contactManager.m_contactList; c != null; c = c.m_next){
 			// Enable the contact
@@ -891,7 +892,7 @@ public class World {
 				continue;
 			}
 
-			SolveTOI(body);
+			solveTOI(body);
 
 			body.m_flags |= Body.e_toiFlag;
 		}
@@ -906,7 +907,7 @@ public class World {
 				continue;
 			}
 
-			SolveTOI(body);
+			solveTOI(body);
 
 			body.m_flags |= Body.e_toiFlag;
 		}
@@ -918,7 +919,7 @@ public class World {
 	private final Contact[] contacts = new Contact[Settings.maxTOIContacts];
 	private final TOISolver toiSolver = new TOISolver();
 	
-	private void SolveTOI(Body body){
+	private void solveTOI(Body body){
 		// Find the minimum contact.
 		Contact toiContact = null;
 		float toi = 1.0f;
@@ -1014,7 +1015,7 @@ public class World {
 		if (toiContact.isEnabled() == false){
 			// Contact disabled. Backup and recurse.
 			body.m_sweep.set(backup);
-			SolveTOI(body);
+			solveTOI(body);
 		}
 
 		++toiContact.m_toiCount;
