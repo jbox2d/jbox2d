@@ -134,10 +134,10 @@ public class Collision {
 		
 		// If the points are behind the plane
 		if (distance0 <= 0.0f){
-			vOut[numOut++] = vIn[0];
+			vOut[numOut++].set(vIn[0]);
 		}
 		if (distance1 <= 0.0f){
-			vOut[numOut++] = vIn[1];
+			vOut[numOut++].set(vIn[1]);
 		}
 		
 		// If the points are on different sides of the plane
@@ -162,10 +162,9 @@ public class Collision {
 	// #### COLLISION STUFF (not from collision.h or collision.cpp) ####
 	
 	// djm pooling
+	private final Vec2 d = new Vec2();
 	private final Vec2 pA = new Vec2();
 	private final Vec2 pB = new Vec2();
-	private final Vec2 d = new Vec2();
-
 	/**
 	 * Compute the collision manifold between two circles.
 	 * @param manifold
@@ -329,6 +328,7 @@ public class Collision {
 	 */
 	public final float edgeSeparation( final PolygonShape poly1, final Transform xf1, final int edge1,
 	                                          final PolygonShape poly2, final Transform xf2){
+		
 		int count1 = poly1.m_vertexCount;
 		final Vec2[] vertices1 = poly1.m_vertices;
 		final Vec2[] normals1 = poly1.m_normals;

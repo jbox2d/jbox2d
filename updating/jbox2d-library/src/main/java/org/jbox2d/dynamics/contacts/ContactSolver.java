@@ -1,7 +1,5 @@
 package org.jbox2d.dynamics.contacts;
 
-import java.util.Stack;
-
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.WorldManifold;
 import org.jbox2d.collision.shapes.Shape;
