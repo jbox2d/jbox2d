@@ -28,6 +28,10 @@ import org.jbox2d.structs.dynamics.contacts.ContactRegister;
  * @author daniel
  */
 public abstract class Contact {
+	// statistics gathering
+	public static int activeContacts = 0;
+	public static int contactPoolCount = 0;
+	
 	// Flags stored in m_flags
 	// Used when crawling contact graph when forming islands.
 	public static final int ISLAND_FLAG = 0x0001;
@@ -42,6 +46,7 @@ public abstract class Contact {
 
 	private static final ContactRegister[][] s_registers = new ContactRegister[ShapeType.TYPE_COUNT][ShapeType.TYPE_COUNT];
 	private static boolean s_initialized = false;
+	
 
 	private static void addType(ContactCreator creator, ShapeType type1,
 			ShapeType type2) {
@@ -64,6 +69,8 @@ public abstract class Contact {
 
 			public void contactDestroyFcn(Contact contact) {
 				stack.get().push(contact);
+				contactPoolCount++;
+				activeContacts--;
 			}
 
 			public Contact contactCreateFcn(Fixture fixtureA, Fixture fixtureB) {
@@ -72,8 +79,11 @@ public abstract class Contact {
 					s.push(new CircleContact());
 					s.push(new CircleContact());
 					s.push(new CircleContact());
+					contactPoolCount+=3;
 				}
 				Contact c = s.pop();
+				contactPoolCount--;
+				activeContacts++;
 				c.init(fixtureA, fixtureB);
 				return c;
 			}
@@ -83,6 +93,8 @@ public abstract class Contact {
 
 			public void contactDestroyFcn(Contact contact) {
 				stack.get().push(contact);
+				contactPoolCount++;
+				activeContacts--;
 			}
 
 			public Contact contactCreateFcn(Fixture fixtureA, Fixture fixtureB) {
@@ -91,8 +103,11 @@ public abstract class Contact {
 					s.push(new PolygonAndCircleContact());
 					s.push(new PolygonAndCircleContact());
 					s.push(new PolygonAndCircleContact());
+					contactPoolCount+=3;
 				}
 				Contact c = s.pop();
+				contactPoolCount--;
+				activeContacts++;
 				c.init(fixtureA, fixtureB);
 				return c;
 			}
@@ -102,6 +117,8 @@ public abstract class Contact {
 
 			public void contactDestroyFcn(Contact contact) {
 				stack.get().push(contact);
+				contactPoolCount++;
+				activeContacts--;
 			}
 
 			public Contact contactCreateFcn(Fixture fixtureA, Fixture fixtureB) {
@@ -110,8 +127,11 @@ public abstract class Contact {
 					s.push(new PolygonContact());
 					s.push(new PolygonContact());
 					s.push(new PolygonContact());
+					contactPoolCount+=3;
 				}
 				Contact c = s.pop();
+				contactPoolCount--;
+				activeContacts++;
 				c.init(fixtureA, fixtureB);
 				return c;
 			}

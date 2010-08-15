@@ -10,7 +10,7 @@ import org.jbox2d.pooling.SingletonPool;
 // updated to rev 100
 
 public class PolygonContact extends Contact {
-
+	
 	public PolygonContact(){}
 	
 	public void init(Fixture fixtureA, Fixture fixtureB) {
