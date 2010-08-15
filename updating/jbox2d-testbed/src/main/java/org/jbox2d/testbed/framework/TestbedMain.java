@@ -4,6 +4,7 @@
 package org.jbox2d.testbed.framework;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -101,40 +102,40 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		
-		add(Box.createVerticalGlue());
 		
 		String[] names = new String[TestList.tests.size()];
 		for(int i=0; i<names.length; i++){
 			names[i] = TestList.tests.get(i).getTestName();
 		}
 		tests = new JComboBox(names);
+		tests.setMaximumSize(new Dimension(400, 20));
 		tests.addActionListener(this);
 		JPanel testsp = new JPanel();
 		testsp.setLayout(new GridLayout(1, 2));
 		testsp.add(new JLabel("Choose a test:"));
 		testsp.add(tests);
 		
-		add(testsp);
+		add(tests);
 		
-		add(Box.createVerticalGlue());
 		
 		Box sliders = Box.createVerticalBox();
 		sliders.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
 		hz = new JSlider(1, 400, (int)settings.hz);
-		hz.setSize(100, 10);
+		hz.setMaximumSize(new Dimension(200, 20));
 		hz.addChangeListener(this);
 		hzText = new JLabel("Hz: "+(int)settings.hz);
 		sliders.add(hzText);
 		sliders.add(hz);
 		
 		pos = new JSlider(0, 100, (int)settings.positionIterations);
-		pos.setSize(100, 10);
+		pos.setMaximumSize(new Dimension(200, 20));
 		pos.addChangeListener(this);
 		posText = new JLabel("Pos iters: "+(int)settings.positionIterations);
 		sliders.add(posText);
 		sliders.add(pos);
 		
 		vel = new JSlider(1, 100, (int)settings.velocityIterations);
+		vel.setMaximumSize(new Dimension(200, 20));
 		vel.addChangeListener(this);
 		velText = new JLabel("Vel iters: "+(int)settings.velocityIterations);
 		sliders.add(velText);
@@ -207,6 +208,8 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 		buttons.add(pauseButton);
 		buttons.add(stepButton);
 		add(buttons);
+		add(Box.createVerticalGlue());
+
 	}
 	
 	public void addListeners(){
