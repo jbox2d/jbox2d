@@ -30,7 +30,7 @@ package org.jbox2d.common;
  */
 public class Vec2 {
 	/** Should we count Vec2 creations? */
-	static public boolean watchCreations = true;
+	static public boolean watchCreations = false;
 	/**
 	 * Running count of Vec2 creations.  Must be zeroed out
 	 * manually (perhaps at start of time step).  Incremented
