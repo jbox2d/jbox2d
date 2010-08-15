@@ -109,6 +109,8 @@ public abstract class TestbedTest implements ContactListener{
 		
 		stepCount = 0;
 		
+		Contact.activeContacts = 0;
+		
 		BodyDef bodyDef = new BodyDef();
 		groundBody = world.createBody(bodyDef);
 		
@@ -137,6 +139,7 @@ public abstract class TestbedTest implements ContactListener{
 	private final Color3f color1 = new Color3f(.3f, .95f, .3f);
 	private final Color3f color2 = new Color3f(.3f, .3f, .95f);
 	private final Color3f color3 = new Color3f(.9f, .9f, .9f);
+	private final Color3f color4 = new Color3f(.9f, .9f, 1);
 	private final Color3f mouseColor = new Color3f(0f, 1f, 0f);
 	private final Vec2 p1 = new Vec2();
 	private final Vec2 p2 = new Vec2();
@@ -189,20 +192,29 @@ public abstract class TestbedTest implements ContactListener{
 		
 		if(settings.drawStats){
 			Vec2.watchCreations = true;
-			debugDraw.drawString(5, textLine,"bodies/contacts/joints/proxies = "+world.getBodyCount()+"/"+world.getContactCount()+"/"+world.getJointCount()+"/"+world.getProxyCount(), Color3f.WHITE);
+			debugDraw.drawString(5, textLine, "Engine Info", color4);
 			textLine += 15;
 			debugDraw.drawString(5, textLine, "Framerate: "+ panel.getCalculatedFrameRate(), Color3f.WHITE);
 			textLine += 15;
-			debugDraw.drawString(5, textLine, "Mouse world point: "+ mouseWorld.x+","+mouseWorld.y, Color3f.WHITE);
+			debugDraw.drawString(5, textLine,"bodies/contacts/joints/proxies = "+world.getBodyCount()+"/"+world.getContactCount()+"/"+world.getJointCount()+"/"+world.getProxyCount(), Color3f.WHITE);
+			textLine += 20;
+			debugDraw.drawString(5, textLine, "Pooling Info", color4);
 			textLine += 15;
 			debugDraw.drawString(5, textLine, "Vec2 creations: "+ Vec2.creationCount, Color3f.WHITE);
 			textLine += 15;
+			debugDraw.drawString(5, textLine, "Active contacts: "+ Contact.activeContacts, Color3f.WHITE);
+			textLine += 15;
+			debugDraw.drawString(5, textLine, "Contact pool: "+ Contact.contactPoolCount, Color3f.WHITE);
+			textLine += 20;
+
 			Vec2.creationCount = 0;
 		}else{
 			Vec2.watchCreations = false;
 		}
 		
 		if(!textList.isEmpty()){
+			debugDraw.drawString(5, textLine, "Test Info", color4);
+			textLine += 15;
 			for(String s : textList){
 				debugDraw.drawString(5, textLine, s, Color3f.WHITE);
 				textLine+=15;
