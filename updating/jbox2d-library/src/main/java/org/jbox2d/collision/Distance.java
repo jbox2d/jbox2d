@@ -21,9 +21,9 @@ import org.jbox2d.structs.collision.distance.SimplexCache;
  */
 public class Distance {
 
-	public int GJK_CALLS = 0;
-	public int GJK_ITERS = 0;
-	public int GJK_MAX_ITERS = 20;
+	public static int GJK_CALLS = 0;
+	public static int GJK_ITERS = 0;
+	public static int GJK_MAX_ITERS = 20;
 	
 	/**
 	 * GJK using Voronoi regions (Christer Ericson) and Barycentric coordinates.

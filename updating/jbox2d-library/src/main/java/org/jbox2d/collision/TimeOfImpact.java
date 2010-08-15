@@ -23,11 +23,11 @@ import org.jbox2d.structs.collision.distance.SimplexCache;
 public class TimeOfImpact {
 	public static final int MAX_ITERATIONS = 1000;
 	
-	public int toiCalls = 0;
-	public int toiIters = 0;
-	public int toiMaxIters = 0;
-	public int toiRootIters = 0;
-	public int toiMaxRootIters = 0;
+	public static int toiCalls = 0;
+	public static int toiIters = 0;
+	public static int toiMaxIters = 0;
+	public static int toiRootIters = 0;
+	public static int toiMaxRootIters = 0;
 		
 	
 	//djm pooling
@@ -294,8 +294,8 @@ class SeparationFunction{
 			// Two points on B and one on A.
 			m_type = Type.FACE_B;
 			
-			localPointB1.set(m_proxyA.getVertex(cache.indexB[0]));
-			localPointB2.set(m_proxyA.getVertex(cache.indexB[1]));
+			localPointB1.set(m_proxyB.getVertex(cache.indexB[0]));
+			localPointB2.set(m_proxyB.getVertex(cache.indexB[1]));
 			
 			temp.set(localPointB2).subLocal(localPointB1);
 			Vec2.crossToOut(temp, 1f, m_axis);
