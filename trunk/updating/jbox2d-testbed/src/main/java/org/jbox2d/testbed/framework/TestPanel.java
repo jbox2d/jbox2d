@@ -32,7 +32,7 @@ import org.jbox2d.common.Vec2;
 @SuppressWarnings("serial")
 public class TestPanel extends JPanel implements Runnable{
 	public static final int INIT_WIDTH = 500;
-	public static final int INIT_HEIGHT = 600;
+	public static final int INIT_HEIGHT = 500;
 	public volatile static boolean[] keys = new boolean[256];
 	public volatile static boolean[] codedKeys = new boolean[512];
 	
@@ -112,7 +112,7 @@ public class TestPanel extends JPanel implements Runnable{
 					posDif.set(mouse);
 					mouse.set(e.getX(), e.getY());
 					posDif.subLocal(mouse);
-					draw.getViewportTranform().vectorInverseTransform(posDif, posDif);
+					draw.getViewportTranform().getScreenVectorToWorld(posDif, posDif);
 					draw.getViewportTranform().getCenter().addLocal(posDif);
 					if(currTest != null){
 						currTest.cachedCameraX = draw.getViewportTranform().getCenter().x;

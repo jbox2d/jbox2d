@@ -65,6 +65,7 @@ public class TestbedMain extends JFrame {
  * quick hackup of a side panel
  * @author Daniel Murphy
  */
+@SuppressWarnings("serial")
 class SidePanel extends JPanel implements ChangeListener, ActionListener{
 	
 	final TestbedSettings settings;
