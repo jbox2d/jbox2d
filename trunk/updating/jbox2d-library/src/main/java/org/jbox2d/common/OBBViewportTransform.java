@@ -118,9 +118,9 @@ public class OBBViewportTransform implements IViewportTransform{
 	// djm pooling
 	private static final TLMat22 tlInv = new TLMat22();
 	/**
-	 * @see IViewportTransform#vectorInverseTransform(Vec2, Vec2)
+	 * @see IViewportTransform#getScreenVectorToWorld(Vec2, Vec2)
 	 */
-	public void vectorInverseTransform(Vec2 argScreen, Vec2 argWorld) {
+	public void getScreenVectorToWorld(Vec2 argScreen, Vec2 argWorld) {
 		Mat22 inv = tlInv.get();
 		inv.set(box.R);
 		inv.invertLocal();
@@ -131,9 +131,9 @@ public class OBBViewportTransform implements IViewportTransform{
 	}
 
 	/**
-	 * @see IViewportTransform#vectorTransform(Vec2, Vec2)
+	 * @see IViewportTransform#getWorldVectorToScreen(Vec2, Vec2)
 	 */
-	public void vectorTransform(Vec2 argWorld, Vec2 argScreen) {
+	public void getWorldVectorToScreen(Vec2 argWorld, Vec2 argScreen) {
 		box.R.mulToOut(argWorld, argScreen);
 		if(yFlip){
 			yFlipMatInv.mulToOut( argScreen, argScreen);
