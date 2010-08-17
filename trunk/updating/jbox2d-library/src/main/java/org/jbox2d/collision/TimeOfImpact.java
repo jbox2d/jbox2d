@@ -59,8 +59,8 @@ public class TimeOfImpact {
 		final DistanceProxy proxyA = input.proxyA;
 		final DistanceProxy proxyB = input.proxyB;
 		
-		sweepA.set(input.sweepA);
-		sweepB.set(input.sweepB);
+		Sweep sweepA = input.sweepA;
+		Sweep sweepB = input.sweepB;
 		
 		// Large rotations can make the root finder fail, so we normalize the
 		// sweep angles.
@@ -242,8 +242,8 @@ class SeparationFunction{
 	public Type m_type;
 	public final Vec2 m_localPoint = new Vec2();
 	public final Vec2 m_axis = new Vec2();
-	public final Sweep m_sweepA = new Sweep();
-	public final Sweep m_sweepB = new Sweep();
+	public Sweep m_sweepA;
+	public Sweep m_sweepB;
 	
 	
 	// djm pooling
@@ -269,8 +269,8 @@ class SeparationFunction{
 		int count = cache.count;
 		assert(0 < count && count < 3);
 		
-		m_sweepA.set(sweepA);
-		m_sweepB.set(sweepB);
+		m_sweepA = sweepA;
+		m_sweepB = sweepB;
 		
 		m_sweepA.getTransform(xfa, 0f);
 		m_sweepB.getTransform(xfb, 0f);

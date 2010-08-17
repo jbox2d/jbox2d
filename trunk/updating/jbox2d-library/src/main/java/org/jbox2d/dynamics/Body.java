@@ -232,13 +232,12 @@ public class Body {
 		Fixture last = null; // java change
 		boolean found = false;
 		while (node != null){
-			last = node;
 			if (node == fixture){
 				node = fixture.m_next;
 				found = true;
 				break;
 			}
-
+			last = node;
 			node = node.m_next;
 		}
 
