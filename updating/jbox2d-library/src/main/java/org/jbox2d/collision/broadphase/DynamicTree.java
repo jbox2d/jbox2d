@@ -1,7 +1,5 @@
 package org.jbox2d.collision.broadphase;
 
-import java.awt.Color;
-
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
@@ -14,7 +12,6 @@ import org.jbox2d.pooling.TLAABB;
 import org.jbox2d.pooling.TLRayCastInput;
 import org.jbox2d.pooling.TLVec2;
 import org.jbox2d.pooling.arrays.Vec2Array;
-import org.jbox2d.pooling.stacks.AABBStack;
 import org.jbox2d.pooling.stacks.DynamicTreeNodeStack;
 import org.jbox2d.pooling.stacks.Vec2Stack;
 import org.jbox2d.structs.collision.RayCastInput;

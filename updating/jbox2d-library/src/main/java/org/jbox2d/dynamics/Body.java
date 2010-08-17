@@ -204,7 +204,7 @@ public class Body {
 		FixtureDef def = tldef.get();
 		def.shape = shape;
 		def.density = density;
-
+		
 		return createFixture(def);
 	}
 
@@ -229,9 +229,10 @@ public class Body {
 		// Remove the fixture from this body's singly linked list.
 		assert(m_fixtureCount > 0);
 		Fixture node = m_fixtureList;
+		Fixture last = null; // java change
 		boolean found = false;
 		while (node != null){
-			
+			last = node;
 			if (node == fixture){
 				node = fixture.m_next;
 				found = true;
@@ -243,7 +244,14 @@ public class Body {
 
 		// You tried to remove a shape that is not attached to this body.
 		assert(found);
-
+		
+		// java change, remove it from the list
+		if(last == null){
+			m_fixtureList = fixture.m_next;
+		}else{
+			last.m_next = fixture.m_next;
+		}
+		
 		// Destroy any contacts associated with the fixture.
 		ContactEdge edge = m_contactList;
 		while (edge != null){
@@ -272,6 +280,7 @@ public class Body {
 		fixture.destroy();
 		fixture.m_body = null;
 		fixture.m_next = null;
+		fixture = null;
 		//fixture.~Fixture();
 		//allocator.Free(fixture, sizeof(Fixture));
 
@@ -732,7 +741,7 @@ public class Body {
 	
 	public final void getLinearVelocityFromLocalPointToOut( Vec2 localPoint, Vec2 out){
 		getWorldPointToOut(localPoint,out);
-		getLinearVelocityFromWorldPointToOut(localPoint, out);
+		getLinearVelocityFromWorldPointToOut(out, out);
 	}
 
 	/** Get the linear damping of the body. */

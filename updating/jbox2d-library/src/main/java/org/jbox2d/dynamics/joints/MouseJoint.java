@@ -214,6 +214,7 @@ public class MouseJoint extends Joint {
 		}
 		impulse.set(m_impulse).subLocal(oldImpulse);
 
+		// pooling
 		oldImpulse.set(impulse).mulLocal(b.m_invMass);
 		b.m_linearVelocity.addLocal(oldImpulse);
 		b.m_angularVelocity += b.m_invI * Vec2.cross(r, impulse);

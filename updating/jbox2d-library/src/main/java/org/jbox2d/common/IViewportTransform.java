@@ -81,7 +81,7 @@ public interface IViewportTransform {
 	 * @param argVec
 	 * @param argOut
 	 */
-	public void vectorTransform(Vec2 argWorld, Vec2 argScreen);
+	public void getWorldVectorToScreen(Vec2 argWorld, Vec2 argScreen);
 	
 	
 	/**
@@ -90,7 +90,7 @@ public interface IViewportTransform {
 	 * @param argVec
 	 * @param argOut
 	 */
-	public void vectorInverseTransform(Vec2 argScreen, Vec2 argWorld);
+	public void getScreenVectorToWorld(Vec2 argScreen, Vec2 argWorld);
 	
 	
 	/**
