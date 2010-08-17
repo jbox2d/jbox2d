@@ -3,7 +3,6 @@
  */
 package org.jbox2d.testbed.framework;
 
-import java.awt.Color;
 import java.util.LinkedList;
 
 import org.jbox2d.callbacks.ContactImpulse;
@@ -46,7 +45,6 @@ public abstract class TestbedTest implements ContactListener{
 	}
 	
 	public Body groundBody;
-	private AABB worldAABB;
 	private int pointCount;
 	private DestructionListener destructionListener;
 	public DebugDraw debugDraw;
@@ -139,7 +137,7 @@ public abstract class TestbedTest implements ContactListener{
 	private final Color3f color1 = new Color3f(.3f, .95f, .3f);
 	private final Color3f color2 = new Color3f(.3f, .3f, .95f);
 	private final Color3f color3 = new Color3f(.9f, .9f, .9f);
-	private final Color3f color4 = new Color3f(.9f, .9f, 1);
+	private final Color3f color4 = new Color3f(.84f, .84f, 1);
 	private final Color3f mouseColor = new Color3f(0f, 1f, 0f);
 	private final Vec2 p1 = new Vec2();
 	private final Vec2 p2 = new Vec2();

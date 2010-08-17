@@ -1,7 +1,5 @@
 package org.jbox2d.testbed.tests;
 
-import java.awt.Color;
-
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
