@@ -37,8 +37,6 @@ public class TimeOfImpact {
 	private final Transform xfB = new Transform();
 	private final DistanceOutput distanceOutput = new DistanceOutput();
 	private final SeparationFunction fcn = new SeparationFunction();
-	private final Sweep sweepA = new Sweep();
-	private final Sweep sweepB = new Sweep();
 	private final int[] indexes = new int[2];
 	/**
 	 *
@@ -92,8 +90,8 @@ public class TimeOfImpact {
 			
 			// Get the distance between shapes. We can also use the results
 			// to get a separating axis
-			distanceInput.transformA.set(xfA);
-			distanceInput.transformB.set(xfB);
+			distanceInput.transformA = xfA;
+			distanceInput.transformB = xfB;
 			SingletonPool.getDistance().distance(distanceOutput, cache, distanceInput);
 			
 			// If the shapes are overlapped, we give up on continuous collision.
@@ -112,7 +110,7 @@ public class TimeOfImpact {
 			}
 			
 			// Initialize the separating axis.
-			fcn.initialize(cache, proxyA, sweepA, proxyB, sweepB);
+			fcn.initialize(cache, proxyA, sweepA, proxyB, sweepB, t1);
 			
 			// Compute the TOI on the separating axis. We do this by successively
 			// resolving the deepest point. This loop is bounded by the number of vertices.
@@ -263,7 +261,7 @@ class SeparationFunction{
 	// TODO_ERIN might not need to return the separation
 
 	public float initialize( final SimplexCache cache, final DistanceProxy proxyA, final Sweep sweepA,
-							 final DistanceProxy proxyB, final Sweep sweepB){
+							 final DistanceProxy proxyB, final Sweep sweepB, float t1){
 		m_proxyA = proxyA;
 		m_proxyB = proxyB;
 		int count = cache.count;
@@ -272,8 +270,8 @@ class SeparationFunction{
 		m_sweepA = sweepA;
 		m_sweepB = sweepB;
 		
-		m_sweepA.getTransform(xfa, 0f);
-		m_sweepB.getTransform(xfb, 0f);
+		m_sweepA.getTransform(xfa, t1);
+		m_sweepB.getTransform(xfb, t1);
 		
 		if(count == 1){
 			m_type = Type.POINTS;
