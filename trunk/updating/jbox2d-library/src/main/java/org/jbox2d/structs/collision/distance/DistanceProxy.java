@@ -37,6 +37,7 @@ public class DistanceProxy {
 				m_vertices[0].set(circle.m_p);
 				m_count = 1;
 				m_radius = circle.m_radius;
+				
 				break;
 			case POLYGON:
 				final PolygonShape poly = (PolygonShape) shape;
