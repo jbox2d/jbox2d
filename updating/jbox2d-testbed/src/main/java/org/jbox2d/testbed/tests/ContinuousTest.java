@@ -81,6 +81,12 @@ public class ContinuousTest extends TestbedTest {
 		m_angularVelocity = 33.468121f;
 		m_body.setLinearVelocity(new Vec2(0.0f, -100.0f));
 		m_body.setAngularVelocity(m_angularVelocity);
+		
+		TimeOfImpact.toiCalls = 0;
+		TimeOfImpact.toiIters = 0;
+		TimeOfImpact.toiMaxIters = 0;
+		TimeOfImpact.toiRootIters = 0;
+		TimeOfImpact.toiMaxRootIters = 0;
 	}
 	
 	public void launch(){
