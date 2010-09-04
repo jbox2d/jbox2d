@@ -265,6 +265,10 @@ public class MathUtils {
 			return (float) Math.pow(a, b);
 		}
 	}
+	
+	public static final float randomFloat(float argLow, float argHigh){
+		return (float) Math.random() * (argHigh - argLow) + argLow;
+	}
 
 	public static final float sqrt(float x) {
 //		if (Settings.FAST_MATH) {
