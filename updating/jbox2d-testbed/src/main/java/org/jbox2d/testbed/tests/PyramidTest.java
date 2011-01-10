@@ -27,7 +27,7 @@ public class PyramidTest extends TestbedTest {
 			Body ground = world.createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
-			shape.setAsEdge(new Vec2(-40.0f, -10.0f), new Vec2(40.0f, -10.0f));
+			shape.setAsEdge(new Vec2(-40.0f, 0f), new Vec2(40.0f, 0f));
 			ground.createFixture(shape, 0.0f);
 			
 //			CircleShape cs = new CircleShape();

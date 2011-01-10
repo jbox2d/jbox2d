@@ -112,7 +112,7 @@ public class DebugDrawJ2D extends DebugDraw{
 			yInts[i] = (int)temp.y;
 		}
 		
-		Color c = cpool.getColor(color.x, color.y, color.z, .75f);
+		Color c = cpool.getColor(color.x, color.y, color.z, .5f);
 		g.setColor(c);
 		g.fillPolygon(xInts, yInts, vertexCount);
 		
