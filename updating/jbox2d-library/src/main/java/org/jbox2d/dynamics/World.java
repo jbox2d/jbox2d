@@ -31,6 +31,8 @@ import org.jbox2d.structs.collision.TOIOutput;
 import org.jbox2d.structs.collision.TOIOutput.TOIOutputState;
 import org.jbox2d.structs.dynamics.contacts.ContactEdge;
 import org.jbox2d.structs.dynamics.joints.JointEdge;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The world class manages all physics entities, dynamic simulation,
@@ -40,6 +42,9 @@ import org.jbox2d.structs.dynamics.joints.JointEdge;
  *
  */
 public class World {
+	
+	private static final Logger log = LoggerFactory.getLogger(World.class);
+	
 	public static final int NEW_FIXTURE = 0x0001;
 	public static final int LOCKED = 0x0002;
 	public static final int CLEAR_FORCES = 0x0004;
@@ -404,8 +409,10 @@ public class World {
 	public void step(	float dt,
 				int velocityIterations,
 				int positionIterations){
+		//log.debug("Starting step");
 		// If new fixtures were added, we need to find the new contacts.
 		if ((m_flags & NEW_FIXTURE) == NEW_FIXTURE){
+			//log.debug("There's a new fixture, lets look for new contacts");
 			m_contactManager.findNewContacts();
 			m_flags &= ~NEW_FIXTURE;
 		}
@@ -448,6 +455,7 @@ public class World {
 		}
 
 		m_flags &= ~LOCKED;
+		//log.debug("ending step");
 	}
 
 	/**
@@ -537,6 +545,12 @@ public class World {
 					vs[3].set(aabb.lowerBound.x, aabb.upperBound.y);
 
 					m_debugDraw.drawPolygon(vs, 4, color);
+					if( (b.m_flags & Body.e_toiFlag) == Body.e_toiFlag){
+						//log.debug("toi is on");
+						Vec2 v = b.getWorldCenter();
+						m_debugDraw.drawPoint(v, 5, color);
+						//m_debugDraw.drawString(v.x, v.y, "toi is on", color);
+					}
 				}
 			}
 		}

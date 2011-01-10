@@ -18,6 +18,8 @@ import org.jbox2d.structs.collision.ManifoldPoint;
 import org.jbox2d.structs.dynamics.contacts.ContactCreator;
 import org.jbox2d.structs.dynamics.contacts.ContactEdge;
 import org.jbox2d.structs.dynamics.contacts.ContactRegister;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // updated to rev 100
 /**
@@ -28,6 +30,8 @@ import org.jbox2d.structs.dynamics.contacts.ContactRegister;
  * @author daniel
  */
 public abstract class Contact {
+	private static final Logger log = LoggerFactory.getLogger(Contact.class);
+	
 	// statistics gathering
 	public static int activeContacts = 0;
 	public static int contactPoolCount = 0;
@@ -337,7 +341,9 @@ public abstract class Contact {
 		Body bodyB = m_fixtureB.getBody();
 		Transform xfA = bodyA.getTransform();
 		Transform xfB = bodyB.getTransform();
-
+		//log.debug("TransformA: "+xfA);
+		//log.debug("TransformB: "+xfB);
+		
 		if (sensor) {
 			Shape shapeA = m_fixtureA.getShape();
 			Shape shapeB = m_fixtureB.getShape();
