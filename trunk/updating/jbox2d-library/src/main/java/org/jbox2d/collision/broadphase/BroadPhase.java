@@ -9,6 +9,8 @@ import org.jbox2d.callbacks.TreeRayCastCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.structs.collision.RayCastInput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // updated to rev 100
 /**
@@ -19,6 +21,9 @@ import org.jbox2d.structs.collision.RayCastInput;
  * @author Daniel Murphy
  */
 public class BroadPhase implements TreeCallback{
+	
+	private static final Logger log = LoggerFactory.getLogger(BroadPhase.class);
+	
 	public static final int NULL_PROXY = -1;
 	
 	private final DynamicTree m_tree;
@@ -107,6 +112,7 @@ public class BroadPhase implements TreeCallback{
 	 * @param callback
 	 */
 	public final void updatePairs(PairCallback callback){
+		//log.debug("beginning to update pairs");
 		// Reset pair buffer
 		m_pairCount = 0;
 
@@ -122,8 +128,10 @@ public class BroadPhase implements TreeCallback{
 			//final AABB fatAABB = m_tree.getFatAABB(m_queryProxy);
 
 			// Query tree, create pairs and add them pair buffer.
+			//log.debug("quering aabb: "+m_queryProxy.aabb);
 			m_tree.query(this, m_queryProxy.aabb);
 		}
+		//log.debug("Number of pairs found: "+m_pairCount);
 
 		// Reset move buffer
 		m_moveCount = 0;
@@ -137,7 +145,8 @@ public class BroadPhase implements TreeCallback{
 			Pair primaryPair = m_pairBuffer[i];
 			Object userDataA = primaryPair.proxyA.userData;
 			Object userDataB = primaryPair.proxyB.userData;
-
+			
+			//log.debug("returning pair: "+userDataA+", "+userDataB);
 			callback.addPair(userDataA, userDataB);
 			++i;
 
@@ -147,6 +156,7 @@ public class BroadPhase implements TreeCallback{
 				if (pair.proxyA != primaryPair.proxyA || pair.proxyB != primaryPair.proxyB){
 					break;
 				}
+				//log.debug("skipping duplicate");
 				++i;
 			}
 		}
@@ -216,13 +226,16 @@ public class BroadPhase implements TreeCallback{
 	 */
 	public final boolean treeCallback(DynamicTreeNode proxy){
 		
+		//log.debug("Got a proxy back");
 		// A proxy cannot form a pair with itself.
 		if (proxy == m_queryProxy){
+			//log.debug("It was us...");
 			return true;
 		}
 		
 		// Grow the pair buffer as needed.
 		if (m_pairCount == m_pairCapacity){
+			//log.debug("Growing pair buffer");
 			Pair[] oldBuffer = m_pairBuffer;
 			m_pairCapacity *= 2;
 			m_pairBuffer = new Pair[m_pairCapacity];
@@ -238,9 +251,11 @@ public class BroadPhase implements TreeCallback{
 		//m_pairBuffer[m_pairCount].proxyIdB = b2Max(proxyId, m_queryProxyId);
 		
 		if(proxy.key < m_queryProxy.key){
+			//log.debug("new proxy is first");
 			m_pairBuffer[m_pairCount].proxyA = proxy;
 			m_pairBuffer[m_pairCount].proxyB = m_queryProxy;
 		}else{
+			//log.debug("new proxy is second");
 			m_pairBuffer[m_pairCount].proxyA = m_queryProxy;
 			m_pairBuffer[m_pairCount].proxyB = proxy;
 		}

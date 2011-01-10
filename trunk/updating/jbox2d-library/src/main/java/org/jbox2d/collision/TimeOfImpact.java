@@ -1,5 +1,7 @@
 package org.jbox2d.collision;
 
+import org.slf4j.*;
+
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
@@ -235,6 +237,8 @@ enum Type{
 
 class SeparationFunction{
 	
+	public static final Logger log = LoggerFactory.getLogger(SeparationFunction.class);
+	
 	public DistanceProxy m_proxyA;
 	public DistanceProxy m_proxyB;
 	public Type m_type;
@@ -273,6 +277,10 @@ class SeparationFunction{
 		m_sweepA.getTransform(xfa, t1);
 		m_sweepB.getTransform(xfb, t1);
 		
+//		log.debug("initializing separation.\n" +
+//				"cache: "+cache.count+"-"+cache.metric+"-"+cache.indexA+"-"+cache.indexB+"\n"
+//				"distance: "+proxyA.
+		
 		if(count == 1){
 			m_type = Type.POINTS;
 			/*Vec2 localPointA = m_proxyA.GetVertex(cache.indexA[0]);
@@ -282,7 +290,7 @@ class SeparationFunction{
 			m_axis = pointB - pointA;
 			m_axis.Normalize();*/
 			localPointA.set(m_proxyA.getVertex(cache.indexA[0]));
-			localPointB.set(m_proxyA.getVertex(cache.indexB[0]));
+			localPointB.set(m_proxyB.getVertex(cache.indexB[0]));
 			Transform.mulToOut(xfa, localPointA, pointA);
 			Transform.mulToOut(xfb, localPointB, pointB);
 			m_axis.set(pointB).subLocal(pointA);
@@ -349,8 +357,7 @@ class SeparationFunction{
 	
 //  float FindMinSeparation(int* indexA, int* indexB, float t) const
 	public float findMinSeparation(int[] indexes, float t){
-		assert(indexes.length >= 2);
-		
+
 		m_sweepA.getTransform(xfa, t);
 		m_sweepB.getTransform(xfb, t);
 		

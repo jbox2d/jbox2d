@@ -45,15 +45,16 @@ public class TOISolver {
 		m_toiBody = toiBody;
 		
 		// TODO djm: can I pool this? for now just having an expandable array
-		if(m_count >= m_constraints.length){
-			TOIConstraint[] old = m_constraints;
-			m_constraints = new TOIConstraint[old.length*2];
-			System.arraycopy(old, 0, m_constraints, 0, old.length);
-			for(int i=old.length; i<m_constraints.length; i++){
-				m_constraints[i] = new TOIConstraint();
-			}
-		}
-		
+//		if(m_count >= m_constraints.length){
+//			TOIConstraint[] old = m_constraints;
+//			m_constraints = new TOIConstraint[old.length*2];
+//			System.arraycopy(old, 0, m_constraints, 0, old.length);
+//			for(int i=old.length; i<m_constraints.length; i++){
+//				m_constraints[i] = new TOIConstraint();
+//			}
+//		}
+		m_constraints = new TOIConstraint[count];
+
 		for(int i=0; i<m_count; i++){
 			Contact contact = contacts[i];
 			
@@ -69,6 +70,7 @@ public class TOISolver {
 			
 			assert(manifold.pointCount > 0);
 			
+			m_constraints[i] = new TOIConstraint();
 			TOIConstraint constraint = m_constraints[i];
 			constraint.bodyA = bodyA;
 			constraint.bodyB = bodyB;
@@ -211,10 +213,10 @@ class TOISolverManifold{
 			}
 			
 			case FACE_B : {
-				cc.bodyA.getWorldVectorToOut(cc.localNormal, normal);
-				cc.bodyA.getWorldPointToOut(cc.localPoint, planePoint);
+				cc.bodyB.getWorldVectorToOut(cc.localNormal, normal);
+				cc.bodyB.getWorldPointToOut(cc.localPoint, planePoint);
 				
-				cc.bodyB.getWorldPointToOut(cc.localPoints[index], clipPoint);
+				cc.bodyA.getWorldPointToOut(cc.localPoints[index], clipPoint);
 				temp.set(clipPoint).subLocal(planePoint);
 				separation = Vec2.dot(temp, normal) - cc.radius;
 				point.set(clipPoint);
