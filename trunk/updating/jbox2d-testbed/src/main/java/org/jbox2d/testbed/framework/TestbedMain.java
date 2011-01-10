@@ -24,6 +24,13 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.World;
 import org.jbox2d.testbed.tests.TestList;
 
 /**
@@ -57,6 +64,35 @@ public class TestbedMain extends JFrame {
 		}catch(Exception e){}
 		
 		new TestbedMain();
+		//test();
+	}
+	
+	public static void test(){
+		World w = new World(new Vec2(), true);
+		
+		for (int i = 0; i < 2; i++)
+	      {
+//	         CircleShape circleShape = new CircleShape();
+//	         circleShape.m_radius = 1;
+//	         Shape shape = circleShape;
+	         PolygonShape polygonShape = new PolygonShape();
+	         polygonShape.setAsBox(1, 1);
+	         Shape shape = polygonShape;
+
+	         BodyDef bodyDef = new BodyDef();
+	         bodyDef.type = BodyType.DYNAMIC;
+	         bodyDef.position.set(5 * i, 0);
+	         bodyDef.angle = (float) (Math.PI / 4 * i);
+	         bodyDef.allowSleep = false;
+	         Body body = w.createBody(bodyDef);
+	         body.createFixture(shape, 5.0f);
+	         
+	         body.applyForce(new Vec2(-10000 * (i - 1), 0), new Vec2());
+	      }
+		
+		for(int i=0; i<100; i++){
+			w.step(.01f,10, 10);
+		}
 	}
 }
 

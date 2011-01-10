@@ -124,6 +124,7 @@ public class RayCastTest extends TestbedTest {
 		super.step(settings);
 		
 		addTextLine("Press 1-5 to drop stuff, m to change the mode");
+		addTextLine("Polygon 1 is filtered");
 		addTextLine("Mode = "+m_mode);
 
 		float L = 11.0f;
