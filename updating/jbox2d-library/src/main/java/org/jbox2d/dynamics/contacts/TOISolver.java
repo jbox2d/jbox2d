@@ -12,6 +12,8 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.structs.collision.ManifoldPoint;
 import org.jbox2d.structs.dynamics.contacts.TOIConstraint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // updated to rev 100
 // pooling: local, non-thread
@@ -22,6 +24,7 @@ import org.jbox2d.structs.dynamics.contacts.TOIConstraint;
  */
 public class TOISolver {
 	// TODO djm: find out the best number to start with
+	private final Logger log = LoggerFactory.getLogger(TOISolver.class);
 	private TOIConstraint[] m_constraints = new TOIConstraint[4];
 	private int m_count;
 	private Body m_toiBody;
@@ -45,15 +48,16 @@ public class TOISolver {
 		m_toiBody = toiBody;
 		
 		// TODO djm: can I pool this? for now just having an expandable array
-//		if(m_count >= m_constraints.length){
-//			TOIConstraint[] old = m_constraints;
-//			m_constraints = new TOIConstraint[old.length*2];
-//			System.arraycopy(old, 0, m_constraints, 0, old.length);
-//			for(int i=old.length; i<m_constraints.length; i++){
-//				m_constraints[i] = new TOIConstraint();
-//			}
-//		}
-		m_constraints = new TOIConstraint[count];
+		if(m_count >= m_constraints.length){
+			TOIConstraint[] old = m_constraints;
+			m_constraints = new TOIConstraint[old.length*2];
+			System.arraycopy(old, 0, m_constraints, 0, old.length);
+			for(int i=old.length; i<m_constraints.length; i++){
+				m_constraints[i] = new TOIConstraint();
+			}
+			log.debug("toi constraints expanded to: "+m_constraints.length);
+		}
+//		m_constraints = new TOIConstraint[count];
 
 		for(int i=0; i<m_count; i++){
 			Contact contact = contacts[i];
@@ -70,7 +74,7 @@ public class TOISolver {
 			
 			assert(manifold.pointCount > 0);
 			
-			m_constraints[i] = new TOIConstraint();
+//			m_constraints[i] = new TOIConstraint();
 			TOIConstraint constraint = m_constraints[i];
 			constraint.bodyA = bodyA;
 			constraint.bodyB = bodyB;

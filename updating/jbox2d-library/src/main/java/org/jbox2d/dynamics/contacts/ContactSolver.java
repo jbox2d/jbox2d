@@ -12,6 +12,8 @@ import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.structs.collision.ManifoldPoint;
 import org.jbox2d.structs.dynamics.contacts.ContactConstraint;
 import org.jbox2d.structs.dynamics.contacts.ContactConstraintPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // updated to rev 100
 // pooled locally, non-threaded
@@ -31,6 +33,7 @@ public class ContactSolver {
 	 */
 	public static final float k_maxConditionNumber = 100.0f;
 
+	private static final Logger log = LoggerFactory.getLogger(ContactSolver.class);
 	
 	public ContactConstraint[] m_constraints;
 	public int m_constraintCount;
@@ -63,6 +66,7 @@ public class ContactSolver {
 				}
 			}
 			m_constraints = newConstraints;
+			log.debug("expanded contact constraints to: "+m_constraints.length);
 		}
 		
 		for (int i = 0; i < m_constraintCount; ++i){

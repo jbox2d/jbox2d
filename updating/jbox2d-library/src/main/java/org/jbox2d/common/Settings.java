@@ -70,7 +70,7 @@ public class Settings {
 	 * </ul>
 	 * 
 	 */
-	public static final float SINCOS_LUT_PRECISION = .00131f;
+	public static final float SINCOS_LUT_PRECISION = .00041f;
 	public static final int SINCOS_LUT_LENGTH = (int) Math.ceil(Math.PI * 2 / SINCOS_LUT_PRECISION);
 	/**
 	 * Use if the table's precision is large (eg .006 or greater). Although it
