@@ -21,9 +21,7 @@ import org.slf4j.LoggerFactory;
  * @author Daniel Murphy
  */
 public class BroadPhase implements TreeCallback{
-	
-	private static final Logger log = LoggerFactory.getLogger(BroadPhase.class);
-	
+		
 	public static final int NULL_PROXY = -1;
 	
 	private final DynamicTree m_tree;
