@@ -12,7 +12,7 @@ import org.jbox2d.dynamics.Body;
 public class ContactConstraint {
 	public final ContactConstraintPoint points[];
 
- 	public final Vec2 localPlaneNormal;
+ 	public final Vec2 localNormal;
     public final Vec2 localPoint;
     public final Vec2 normal;
     
@@ -37,7 +37,7 @@ public class ContactConstraint {
             points[i] = new ContactConstraintPoint();
         }
         pointCount = 0;
-        localPlaneNormal = new Vec2();
+        localNormal = new Vec2();
         localPoint = new Vec2();
         normal = new Vec2();
         normalMass = new Mat22();
@@ -47,7 +47,7 @@ public class ContactConstraint {
     
     public void set(final ContactConstraint cp){
     	pointCount = cp.pointCount;
-    	localPlaneNormal.set(cp.localPlaneNormal);
+    	localNormal.set(cp.localNormal);
     	localPoint.set(cp.localPoint);
     	normal.set(cp.normal);
     	normalMass.set(cp.normalMass);
