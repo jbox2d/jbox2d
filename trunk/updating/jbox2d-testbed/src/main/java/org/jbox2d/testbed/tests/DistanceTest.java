@@ -30,6 +30,9 @@ public class DistanceTest extends TestbedTest {
 
 	@Override
 	public void initTest() {
+		
+		input.transformA = new Transform();
+		input.transformB = new Transform();
 		{
 			m_transformA = new Transform();
 			m_transformA.setIdentity();
