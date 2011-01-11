@@ -103,7 +103,7 @@ public class ContactSolver {
 			cc.friction = friction;
 			cc.restitution = restitution;
 
-			cc.localPlaneNormal.set(manifold.localNormal);
+			cc.localNormal.set(manifold.localNormal);
 			cc.localPoint.set(manifold.localPoint);
 			cc.radius = radiusA + radiusB;
 			cc.type = manifold.type;
@@ -112,8 +112,8 @@ public class ContactSolver {
 				ManifoldPoint cp = manifold.points[j];
 				ContactConstraintPoint ccp = cc.points[j];
 
-				ccp.normalImpulse = cp.normalImpulse;
-				ccp.tangentImpulse = cp.tangentImpulse;
+				ccp.normalImpulse = impulseRatio * cp.normalImpulse;
+				ccp.tangentImpulse = impulseRatio * cp.tangentImpulse;
 
 				ccp.localPoint.set(cp.localPoint);
 				
@@ -461,10 +461,10 @@ public class ContactSolver {
 						P2.set(normal).mulLocal(d.y);
 						
 						/*vA -= invMassA * (P1 + P2);
-						wA -= invIA * (Cross(cp1.rA, P1) + Cross(cp2.rA, P2));
-
+						wA -= invIA * (b2Cross(cp1->rA, P1) + b2Cross(cp2->rA, P2));
+	
 						vB += invMassB * (P1 + P2);
-						wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2));*/
+						wB += invIB * (b2Cross(cp1->rB, P1) + b2Cross(cp2->rB, P2));*/
 						
 						temp1.set(P1).addLocal(P2);
 						temp2.set(temp1).mulLocal(invMassA);
@@ -671,18 +671,6 @@ public class ContactSolver {
 			}
 		}
 	}
-	
-	public final void finalizeVelocityConstraints(){
-		for (int i = 0; i < m_constraintCount; ++i){
-			ContactConstraint c = m_constraints[i];
-			Manifold m = c.manifold;
-
-			for (int j = 0; j < c.pointCount; ++j){
-				m.points[j].normalImpulse = c.points[j].normalImpulse;
-				m.points[j].tangentImpulse = c.points[j].tangentImpulse;
-			}
-		}
-	}
 
 	/*#if 0
 	// Sequential solver.
@@ -845,7 +833,7 @@ class PositionSolverManifold{
 			}
 	
 			case FACE_A:{
-				cc.bodyA.getWorldVectorToOut(cc.localPlaneNormal, normal);
+				cc.bodyA.getWorldVectorToOut(cc.localNormal, normal);
 				cc.bodyA.getWorldPointToOut(cc.localPoint, planePoint);
 
 				cc.bodyB.getWorldPointToOut(cc.points[index].localPoint, clipPoint);
@@ -857,7 +845,7 @@ class PositionSolverManifold{
 	
 			case FACE_B:
 				{
-					cc.bodyB.getWorldVectorToOut(cc.localPlaneNormal, normal);
+					cc.bodyB.getWorldVectorToOut(cc.localNormal, normal);
 					cc.bodyB.getWorldPointToOut(cc.localPoint, planePoint);
 	
 					cc.bodyA.getWorldPointToOut(cc.points[index].localPoint, clipPoint);
