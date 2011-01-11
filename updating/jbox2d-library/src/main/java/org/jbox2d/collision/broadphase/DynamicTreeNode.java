@@ -26,6 +26,14 @@ public class DynamicTreeNode {
 		return child1 == null;
 	}
 	
+	public Object getUserData(){
+		return userData;
+	}
+	
+	public void setUserData(Object argData){
+		userData = argData;
+	}
+	
 	/**
 	 * Should never be constructed outside the engine
 	 */
