@@ -3,6 +3,7 @@ package org.jbox2d.dynamics.joints;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
+import org.jbox2d.dynamics.World;
 import org.jbox2d.structs.dynamics.joints.JointEdge;
 import org.jbox2d.structs.dynamics.joints.JointType;
 
@@ -14,10 +15,12 @@ import org.jbox2d.structs.dynamics.joints.JointType;
  */
 public abstract class Joint {
 	
-	public static Joint create(JointDef def){
+	public static Joint create(World argWorld, JointDef def){
 		Joint joint = null;
 		if(def instanceof MouseJointDef){
-			return new MouseJoint((MouseJointDef) def);
+			return new MouseJoint(argWorld, (MouseJointDef) def);
+		}else if(def instanceof PrismaticJointDef){
+			return new PrismaticJoint(argWorld,  (PrismaticJointDef) def);
 		}
 		return joint;
 	}
@@ -40,14 +43,17 @@ public abstract class Joint {
 	
 	public Object m_userData;
 	
+	protected World world;
+	
 	// Cache here per time step to reduce cache misses.
 	Vec2 m_localCenterA, m_localCenterB;
 	float m_invMassA, m_invIA;
 	float m_invMassB, m_invIB;
 	
-	protected Joint(JointDef def){
+	protected Joint(World argWorld, JointDef def){
 		assert(def.bodyA != def.bodyB);
 		
+		world = argWorld;
 		m_type = def.type;
 		m_prev = null;
 		m_next = null;
@@ -97,20 +103,20 @@ public abstract class Joint {
 	 * get the anchor point on bodyA in world coordinates.
 	 * @return
 	 */
-	public abstract Vec2 getAnchorA();
+	public abstract void getAnchorA(Vec2 argOut);
 
 	/**
 	 * get the anchor point on bodyB in world coordinates.
 	 * @return
 	 */
-	public abstract Vec2 getAnchorB();
+	public abstract void getAnchorB(Vec2 argOut);
 
 	/**
 	 * get the reaction force on body2 at the joint anchor in Newtons.
 	 * @param inv_dt
 	 * @return
 	 */
-	public abstract Vec2 getReactionForce(float inv_dt);
+	public abstract void getReactionForce(float inv_dt, Vec2 argOut);
 
 	/**
 	 * get the reaction torque on body2 in N*m.

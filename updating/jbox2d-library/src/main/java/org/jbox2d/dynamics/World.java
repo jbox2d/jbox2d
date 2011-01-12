@@ -23,6 +23,7 @@ import org.jbox2d.dynamics.contacts.TOISolver;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.JointDef;
 import org.jbox2d.pooling.SingletonPool;
+import org.jbox2d.pooling.WorldPool;
 import org.jbox2d.pooling.arrays.Vec2Array;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;
@@ -67,6 +68,8 @@ public class World {
 	private DestructionListener m_destructionListener;
 	private DebugDraw m_debugDraw;
 	
+	private final WorldPool pool;
+	
 	/**
 	 * This is used to compute the time step ratio to
 	 * support a variable time step.
@@ -89,6 +92,7 @@ public class World {
 	 * @param doSleep improve performance by not simulating inactive bodies.
 	 */
 	public World(Vec2 gravity, boolean doSleep){
+		pool = new WorldPool();
 		m_destructionListener = null;
 		m_debugDraw = null;
 		
@@ -109,6 +113,10 @@ public class World {
 		m_inv_dt0 = 0f;
 		
 		m_contactManager = new ContactManager();
+	}
+	
+	public WorldPool getPool(){
+		return pool;
 	}
 
 	/**
@@ -258,7 +266,7 @@ public class World {
 			return null;
 		}
 		
-		Joint j = Joint.create(def);
+		Joint j = Joint.create(this, def);
 
 		// Connect to the world list.
 		j.m_prev = null;
@@ -1105,8 +1113,10 @@ public class World {
 		Transform xf2 = bodyB.getTransform();
 		Vec2 x1 = xf1.position;
 		Vec2 x2 = xf2.position;
-		Vec2 p1 = joint.getAnchorA();
-		Vec2 p2 = joint.getAnchorB();
+		Vec2 p1 = pool.popVec2();
+		Vec2 p2 = pool.popVec2();
+		joint.getAnchorA(p1);
+		joint.getAnchorB(p2);
 
 		color.set(0.5f, 0.8f, 0.8f);
 
@@ -1137,6 +1147,7 @@ public class World {
 			m_debugDraw.drawSegment(p1, p2, color);
 			m_debugDraw.drawSegment(x2, p2, color);
 		}
+		pool.pushVec2(p1,p2);
 	}
 	
 	private final Vec2 center = new Vec2();

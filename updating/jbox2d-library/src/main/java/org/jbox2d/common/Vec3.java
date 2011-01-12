@@ -47,10 +47,18 @@ public class Vec3 {
 		z = argCopy.z;
 	}
 	
-	public void set(Vec3 argVec){
+	public Vec3 set(Vec3 argVec){
 		x = argVec.x;
 		y = argVec.y;
 		z = argVec.z;
+		return this;
+	}
+	
+	public Vec3 set(float argX, float argY, float argZ){
+		x = argX;
+		y = argY;
+		z = argZ;
+		return this;
 	}
 	
 	public Vec3 addLocal(Vec3 argVec){
