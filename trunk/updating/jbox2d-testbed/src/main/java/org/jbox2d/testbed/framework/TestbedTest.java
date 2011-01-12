@@ -221,7 +221,7 @@ public abstract class TestbedTest implements ContactListener{
 		}
 		
 		if(mouseJoint != null){
-			Vec2 p1 = mouseJoint.getAnchorB();
+			mouseJoint.getAnchorB(p1);
 			Vec2 p2 = mouseJoint.getTarget();
 			
 			debugDraw.drawSegment(p1, p2, mouseColor);
