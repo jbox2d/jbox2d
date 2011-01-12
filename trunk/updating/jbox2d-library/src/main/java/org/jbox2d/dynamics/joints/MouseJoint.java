@@ -7,6 +7,7 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
+import org.jbox2d.dynamics.World;
 import org.jbox2d.pooling.TLMat22;
 import org.jbox2d.pooling.TLVec2;
 
@@ -25,8 +26,8 @@ public class MouseJoint extends Joint {
 	private float m_gamma;
 	
 
-	protected MouseJoint(MouseJointDef def) {
-		super(def);
+	protected MouseJoint(World argWorld, MouseJointDef def) {
+		super(argWorld, def);
 		assert(def.target.isValid());
 		assert(def.maxForce >= 0);
 		assert(def.frequencyHz >= 0);
@@ -46,22 +47,18 @@ public class MouseJoint extends Joint {
 	}
 	
 	@Override
-	public Vec2 getAnchorA() {
-		return m_target;
+	public void getAnchorA(Vec2 argOut) {
+		argOut.set(m_target);
 	}
 
-	private final Vec2 anchorBPool = new Vec2();
 	@Override
-	public Vec2 getAnchorB() {
-		m_bodyB.getWorldPointToOut(m_localAnchor, anchorBPool);
-		return anchorBPool;
+	public void getAnchorB(Vec2 argOut) {
+		m_bodyB.getWorldPointToOut(m_localAnchor, argOut);
 	}
 
-	private final Vec2 reactionForcePool = new Vec2();
 	@Override
-	public Vec2 getReactionForce(float invDt) {
-		reactionForcePool.set(m_impulse).mulLocal(invDt);
-		return reactionForcePool;
+	public void getReactionForce(float invDt, Vec2 argOut) {
+		argOut.set(m_impulse).mulLocal(invDt);
 	}
 
 	@Override

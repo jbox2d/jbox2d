@@ -67,9 +67,10 @@ public class Vec2 {
 	}
 
 	/** Set the vector component-wise. */
-	public final void set(float x, float y) {
+	public final Vec2 set(float x, float y) {
 		this.x = x;
 		this.y = y;
+		return this;
 	}
 
 	/** Set this vector to another vector. */
