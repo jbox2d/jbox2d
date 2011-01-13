@@ -18,9 +18,10 @@ import org.jbox2d.testbed.framework.TestbedTest;
 /**
  * @author Daniel Murphy
  */
-public class PrismaticTest extends TestbedTest{
-
+public class PrismaticTest extends TestbedTest {
+	
 	PrismaticJoint m_joint;
+	
 	/**
 	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
 	 */
@@ -30,16 +31,16 @@ public class PrismaticTest extends TestbedTest{
 		{
 			BodyDef bd = new BodyDef();
 			ground = world.createBody(bd);
-
+			
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
 			ground.createFixture(shape, 0.0f);
 		}
-
+		
 		{
 			PolygonShape shape = new PolygonShape();
 			shape.setAsBox(2.0f, 0.5f);
-
+			
 			BodyDef bd = new BodyDef();
 			bd.type = BodyType.DYNAMIC;
 			bd.position.set(-10.0f, 10.0f);
@@ -47,25 +48,25 @@ public class PrismaticTest extends TestbedTest{
 			bd.allowSleep = false;
 			Body body = world.createBody(bd);
 			body.createFixture(shape, 5.0f);
-
+			
 			PrismaticJointDef pjd = new PrismaticJointDef();
-
+			
 			// Bouncy limit
 			Vec2 axis = new Vec2(2.0f, 1.0f);
 			axis.normalize();
 			pjd.initialize(ground, body, new Vec2(0.0f, 0.0f), axis);
-
+			
 			// Non-bouncy limit
-			//pjd.Initialize(ground, body, Vec2(-10.0f, 10.0f), Vec2(1.0f, 0.0f));
-
+			// pjd.Initialize(ground, body, Vec2(-10.0f, 10.0f), Vec2(1.0f, 0.0f));
+			
 			pjd.motorSpeed = 10.0f;
 			pjd.maxMotorForce = 10000.0f;
 			pjd.enableMotor = true;
 			pjd.lowerTranslation = 0.0f;
 			pjd.upperTranslation = 20.0f;
 			pjd.enableLimit = true;
-
-			m_joint = (PrismaticJoint)world.createJoint(pjd);
+			
+			m_joint = (PrismaticJoint) world.createJoint(pjd);
 		}
 	}
 	
@@ -75,24 +76,33 @@ public class PrismaticTest extends TestbedTest{
 	@Override
 	public void step(TestbedSettings settings) {
 		super.step(settings);
-		addTextLine( "Keys: (l) limits, (m) motors, (s) speed");
+		addTextLine("Keys: (l) limits, (m) motors, (s) speed");
 		float force = m_joint.getMotorForce();
-		addTextLine( "Motor Force = "+force);
+		addTextLine("Motor Force = " + force);
+	}
+	
+	/**
+	 * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
+	 */
+	@Override
+	public void keyPressed(char argKeyChar, int argKeyCode) {
 		
-		if(TestPanel.keys['l']){
-			m_joint.enableLimit(!m_joint.isLimitEnabled());
-			TestPanel.keys['l'] = false;
-		}
-		else if(TestPanel.keys['m']){
-			m_joint.enableMotor(!m_joint.isMotorEnabled());
-			TestPanel.keys['m'] = false;
-		}
-		else if(TestPanel.keys['s']){
-			m_joint.setMotorSpeed(-m_joint.getMotorSpeed());
-			TestPanel.keys['s'] = false;
+		switch (argKeyChar) {
+			case 'l' :
+				m_joint.enableLimit(!m_joint.isLimitEnabled());
+				TestPanel.keys['l'] = false;
+				break;
+			case 'm' :
+				m_joint.enableMotor(!m_joint.isMotorEnabled());
+				TestPanel.keys['m'] = false;
+				break;
+			case 's' :
+				m_joint.setMotorSpeed(-m_joint.getMotorSpeed());
+				TestPanel.keys['s'] = false;
+				break;
 		}
 	}
-
+	
 	/**
 	 * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
 	 */
@@ -100,5 +110,5 @@ public class PrismaticTest extends TestbedTest{
 	public String getTestName() {
 		return "Prismatic Test";
 	}
-
+	
 }

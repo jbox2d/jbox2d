@@ -14,10 +14,10 @@ import org.jbox2d.testbed.framework.TestbedSettings;
 import org.jbox2d.testbed.framework.TestbedTest;
 
 public class DistanceTest extends TestbedTest {
-
+	
 	Vec2 m_positionB;
 	float m_angleB;
-
+	
 	Transform m_transformA;
 	Transform m_transformB;
 	PolygonShape m_polygonA;
@@ -27,7 +27,7 @@ public class DistanceTest extends TestbedTest {
 	public String getTestName() {
 		return "Distance Test";
 	}
-
+	
 	@Override
 	public void initTest() {
 		
@@ -40,7 +40,7 @@ public class DistanceTest extends TestbedTest {
 			m_polygonA = new PolygonShape();
 			m_polygonA.setAsBox(10.0f, 0.2f);
 		}
-
+		
 		{
 			m_positionB = new Vec2();
 			m_positionB.set(12.017401f, 0.13678508f);
@@ -48,11 +48,11 @@ public class DistanceTest extends TestbedTest {
 			
 			m_transformB = new Transform();
 			m_transformB.set(m_positionB, m_angleB);
-
+			
 			m_polygonB = new PolygonShape();
 			m_polygonB.setAsBox(2.0f, 0.1f);
 		}
-		for(int i=0; i<v.length; i++){
+		for (int i = 0; i < v.length; i++) {
 			v[i] = new Vec2();
 		}
 	}
@@ -64,7 +64,7 @@ public class DistanceTest extends TestbedTest {
 	Vec2[] v = new Vec2[Settings.maxPolygonVertices];
 	Color3f c1 = new Color3f(1.0f, 0.0f, 0.0f);
 	Color3f c2 = new Color3f(1.0f, 1.0f, 0.0f);
-
+	
 	@Override
 	public void step(TestbedSettings settings) {
 		super.step(settings);
@@ -76,60 +76,59 @@ public class DistanceTest extends TestbedTest {
 		input.useRadii = true;
 		cache.count = 0;
 		SingletonPool.getDistance().distance(output, cache, input);
-
-		addTextLine( "distance = "+ output.distance);
-		addTextLine( "iterations = " + output.iterations);
-
+		
+		addTextLine("distance = " + output.distance);
+		addTextLine("iterations = " + output.iterations);
+		
 		{
-			for (int i = 0; i < m_polygonA.m_vertexCount; ++i){
+			for (int i = 0; i < m_polygonA.m_vertexCount; ++i) {
 				Transform.mulToOut(m_transformA, m_polygonA.m_vertices[i], v[i]);
 			}
 			debugDraw.drawPolygon(v, m_polygonA.m_vertexCount, color);
-
-			for (int i = 0; i < m_polygonB.m_vertexCount; ++i){
+			
+			for (int i = 0; i < m_polygonB.m_vertexCount; ++i) {
 				Transform.mulToOut(m_transformB, m_polygonB.m_vertices[i], v[i]);
 			}
 			debugDraw.drawPolygon(v, m_polygonB.m_vertexCount, color);
 		}
-
+		
 		Vec2 x1 = output.pointA;
 		Vec2 x2 = output.pointB;
-
+		
 		debugDraw.drawPoint(x1, 4.0f, c1);
-
+		
 		debugDraw.drawPoint(x2, 4.0f, c2);
 	}
-
+	
 	@Override
 	public void keyPressed(char argKeyChar, int argKeyCode) {
-		super.keyPressed(argKeyChar, argKeyCode);
-		switch (argKeyChar)
-		{
-		case 'a':
-			m_positionB.x -= 0.1f;
-			break;
-
-		case 'd':
-			m_positionB.x += 0.1f;
-			break;
-
-		case 's':
-			m_positionB.y -= 0.1f;
-			break;
-
-		case 'w':
-			m_positionB.y += 0.1f;
-			break;
-
-		case 'q':
-			m_angleB += 0.1f * MathUtils.PI;
-			break;
-
-		case 'e':
-			m_angleB -= 0.1f * MathUtils.PI;
-			break;
+		
+		switch (argKeyChar) {
+			case 'a' :
+				m_positionB.x -= 0.1f;
+				break;
+			
+			case 'd' :
+				m_positionB.x += 0.1f;
+				break;
+			
+			case 's' :
+				m_positionB.y -= 0.1f;
+				break;
+			
+			case 'w' :
+				m_positionB.y += 0.1f;
+				break;
+			
+			case 'q' :
+				m_angleB += 0.1f * MathUtils.PI;
+				break;
+			
+			case 'e' :
+				m_angleB -= 0.1f * MathUtils.PI;
+				break;
 		}
-
+		
 		m_transformB.set(m_positionB, m_angleB);
 	}
 }

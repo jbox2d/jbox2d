@@ -23,6 +23,7 @@ public class RevoluteTest extends TestbedTest {
 	
 	private RevoluteJoint m_joint;
 	private boolean isLeft = false;
+	
 	/**
 	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
 	 */
@@ -32,29 +33,29 @@ public class RevoluteTest extends TestbedTest {
 		{
 			BodyDef bd = new BodyDef();
 			ground = world.createBody(bd);
-
+			
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
 			ground.createFixture(shape, 0.0f);
 		}
-
+		
 		{
 			CircleShape shape = new CircleShape();
 			shape.m_radius = 0.5f;
-
+			
 			BodyDef bd = new BodyDef();
 			bd.type = BodyType.DYNAMIC;
-
+			
 			RevoluteJointDef rjd = new RevoluteJointDef();
-
+			
 			bd.position.set(0.0f, 20.0f);
 			Body body = world.createBody(bd);
 			body.createFixture(shape, 5.0f);
-
+			
 			float w = 100.0f;
 			body.setAngularVelocity(w);
 			body.setLinearVelocity(new Vec2(-8.0f * w, 0.0f));
-
+			
 			rjd.initialize(ground, body, new Vec2(0.0f, 12.0f));
 			rjd.motorSpeed = -1.0f * MathUtils.PI;
 			rjd.maxMotorTorque = 10000.0f;
@@ -63,8 +64,8 @@ public class RevoluteTest extends TestbedTest {
 			rjd.upperAngle = 0.5f * MathUtils.PI;
 			rjd.enableLimit = true;
 			rjd.collideConnected = true;
-
-			m_joint = (RevoluteJoint)world.createJoint(rjd);
+			
+			m_joint = (RevoluteJoint) world.createJoint(rjd);
 		}
 	}
 	
@@ -74,26 +75,40 @@ public class RevoluteTest extends TestbedTest {
 	@Override
 	public void step(TestbedSettings settings) {
 		super.step(settings);
-		addTextLine("Limits "+(m_joint.isLimitEnabled()?"on":"off")+", Motor "+(m_joint.isMotorEnabled()?"on ":"off ")+ (isLeft?"left":"right"));
+		addTextLine("Limits " + (m_joint.isLimitEnabled() ? "on" : "off") + ", Motor "
+				+ (m_joint.isMotorEnabled() ? "on " : "off ") + (isLeft ? "left" : "right"));
 		addTextLine("Keys: (l) limits, (m) motor, (a) left, (d) right");
 		
-		if(TestPanel.keys['l']){
-			m_joint.enableLimit(!m_joint.isLimitEnabled());
-			TestPanel.keys['l']= false;
-		}
-		else if(TestPanel.keys['m']){
-			m_joint.enableMotor(!m_joint.isMotorEnabled());
-			TestPanel.keys['m']= false;
-		}else if(TestPanel.keys['a']){
-			m_joint.setMotorSpeed(1.0f * MathUtils.PI);
-			TestPanel.keys['a']= false;
-			isLeft = true;
-		}else if(TestPanel.keys['d']){
-			m_joint.setMotorSpeed(-1.0f * MathUtils.PI);
-			TestPanel.keys['d']= false;
-			isLeft = false;
+	}
+	
+	/**
+	 * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
+	 */
+	@Override
+	public void keyPressed(char argKeyChar, int argKeyCode) {
+		
+		switch (argKeyChar) {
+			case 'l' :
+				m_joint.enableLimit(!m_joint.isLimitEnabled());
+				TestPanel.keys['l'] = false;
+				break;
+			case 'm' :
+				m_joint.enableMotor(!m_joint.isMotorEnabled());
+				TestPanel.keys['m'] = false;
+				break;
+			case 'a' :
+				m_joint.setMotorSpeed(1.0f * MathUtils.PI);
+				TestPanel.keys['a'] = false;
+				isLeft = true;
+				break;
+			case 'd' :
+				m_joint.setMotorSpeed(-1.0f * MathUtils.PI);
+				TestPanel.keys['d'] = false;
+				isLeft = false;
+				break;
 		}
 	}
+	
 	/**
 	 * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
 	 */

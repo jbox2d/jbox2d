@@ -95,29 +95,6 @@ public class ConfinedTest extends TestbedTest {
 	
 	@Override
 	public void step(TestbedSettings settings) {
-//		boolean sleeping = true;
-//		for (Body b = world.getBodyList(); b != null; b = b.getNext())
-//		{
-//			if (b.getType() != BodyType.DYNAMIC)
-//			{
-//				continue;
-//			}
-//
-//			if (b.isAwake())
-//			{
-//				sleeping = false;
-//			}
-//		}
-
-//		if (stepCount == 180)
-//		{
-//			stepCount += 0;
-//		} what is this????
-
-		//if (sleeping)
-		//{
-		//	CreateCircle();
-		//}
 
 		super.step(settings);
 
