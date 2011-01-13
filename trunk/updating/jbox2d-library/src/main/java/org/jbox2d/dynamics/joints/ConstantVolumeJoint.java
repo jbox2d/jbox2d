@@ -6,7 +6,6 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.World;
-import org.jbox2d.pooling.arrays.Vec2Array;
 
 public class ConstantVolumeJoint extends Joint {
 	Body[] bodies;
@@ -106,6 +105,8 @@ public class ConstantVolumeJoint extends Joint {
 			normals[i].y = -dx / dist;
 			perimeter += dist;
 		}
+		
+		final Vec2 delta = world.getPool().popVec2();
 
 		float deltaArea = targetVolume - getArea();
 		float toExtrude = 0.5f*deltaArea / perimeter; //*relaxationFactor
@@ -113,7 +114,7 @@ public class ConstantVolumeJoint extends Joint {
 		boolean done = true;
 		for (int i=0; i<bodies.length; ++i) {
 			final int next = (i==bodies.length-1)?0:i+1;
-			final Vec2 delta = new Vec2(toExtrude * (normals[i].x + normals[next].x),
+			delta.set(toExtrude * (normals[i].x + normals[next].x),
 			                            toExtrude * (normals[i].y + normals[next].y));
 			//sumdeltax += dx;
 			float norm = delta.length();
@@ -129,17 +130,17 @@ public class ConstantVolumeJoint extends Joint {
 			//bodies[next].m_linearVelocity.x += delta.x * step.inv_dt;
 			//bodies[next].m_linearVelocity.y += delta.y * step.inv_dt;
 		}
+		
+		world.getPool().pushVec2(delta);
 		//System.out.println(sumdeltax);
 		return done;
 	}
-
-	// djm pooled
-	private static final Vec2Array tlD = new Vec2Array();
+	
 	@Override
 	public void initVelocityConstraints(final TimeStep step) {
 		m_step = step;
 		
-		final Vec2[] d = tlD.get(bodies.length);
+		final Vec2[] d = world.getPool().getVec2Array(bodies.length);
 		
 		for (int i=0; i<bodies.length; ++i) {
 			final int prev = (i==0)?bodies.length-1:i-1;
@@ -173,7 +174,7 @@ public class ConstantVolumeJoint extends Joint {
 		float crossMassSum = 0.0f;
 		float dotMassSum = 0.0f;
 		
-		final Vec2 d[] = tlD.get(bodies.length);
+		final Vec2 d[] = world.getPool().getVec2Array(bodies.length);
 
 		for (int i=0; i<bodies.length; ++i) {
 			final int prev = (i==0)?bodies.length-1:i-1;
