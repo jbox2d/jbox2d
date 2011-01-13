@@ -182,17 +182,19 @@ public class RevoluteJoint extends Joint {
 			m_impulse.mulLocal(step.dtRatio);
 			m_motorImpulse *= step.dtRatio;
 			
-			// r1 and r2 as temp vecs
-			Vec2 P = r1;
+			Vec2 temp = world.getPool().popVec2();
+			Vec2 P = world.getPool().popVec2();
 			P.set(m_impulse.x, m_impulse.y);
 			
-			r2.set(P).mulLocal(m1);
-			b1.m_linearVelocity.subLocal(r2);
+			temp.set(P).mulLocal(m1);
+			b1.m_linearVelocity.subLocal(temp);
 			b1.m_angularVelocity -= i1 * (Vec2.cross(r1, P) + m_motorImpulse + m_impulse.z);
 			
-			r2.set(P).mulLocal(m2);
-			b2.m_linearVelocity.addLocal(r2);
+			temp.set(P).mulLocal(m2);
+			b2.m_linearVelocity.addLocal(temp);
 			b2.m_angularVelocity += i2 * (Vec2.cross(r2, P) + m_motorImpulse + m_impulse.z);
+			
+			world.getPool().pushVec2(temp, P);
 		}
 		else {
 			m_impulse.setZero();
@@ -234,7 +236,7 @@ public class RevoluteJoint extends Joint {
 		if (m_enableLimit && m_limitState != LimitState.INACTIVE) {
 			
 			r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
-			r2.set(m_localAnchor1).subLocal(b2.getLocalCenter());
+			r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
 			Mat22.mulToOut(b1.getTransform().R, r1, r1);
 			Mat22.mulToOut(b2.getTransform().R, r2, r2);
 			// Vec2 r1 = b2Mul(b1.getTransform().R, m_localAnchor1 - b1.getLocalCenter());
@@ -255,7 +257,7 @@ public class RevoluteJoint extends Joint {
 			
 			Vec3 impulse = world.getPool().popVec3();
 			m_mass.solve33ToOut(Cdot.negateLocal(), impulse);
-			Cdot.negateLocal();
+			// Cdot.negateLocal(); just leave negated, we don't use later
 			
 			if (m_limitState == LimitState.EQUAL) {
 				m_impulse.addLocal(impulse);
@@ -264,7 +266,7 @@ public class RevoluteJoint extends Joint {
 				float newImpulse = m_impulse.z + impulse.z;
 				if (newImpulse < 0.0f) {
 					m_mass.solve22ToOut(Cdot1.negateLocal(), temp);
-					Cdot1.negateLocal();
+					//Cdot1.negateLocal(); just leave negated, we don't use it again
 					impulse.x = temp.x;
 					impulse.y = temp.y;
 					impulse.z = -m_impulse.z;
@@ -277,7 +279,7 @@ public class RevoluteJoint extends Joint {
 				float newImpulse = m_impulse.z + impulse.z;
 				if (newImpulse > 0.0f) {
 					m_mass.solve22ToOut(Cdot1.negateLocal(), temp);
-					Cdot1.negateLocal();
+					//Cdot1.negateLocal(); just leave negated, we don't use it again
 					impulse.x = temp.x;
 					impulse.y = temp.y;
 					impulse.z = -m_impulse.z;
@@ -303,7 +305,7 @@ public class RevoluteJoint extends Joint {
 		}
 		else {
 			r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
-			r2.set(m_localAnchor1).subLocal(b2.getLocalCenter());
+			r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
 			Mat22.mulToOut(b1.getTransform().R, r1, r1);
 			Mat22.mulToOut(b2.getTransform().R, r2, r2);
 			// Vec2 r1 = b2Mul(b1.getTransform().R, m_localAnchor1 - b1.getLocalCenter());
@@ -328,6 +330,8 @@ public class RevoluteJoint extends Joint {
 			temp.set(impulse).mulLocal(m2);
 			v2.addLocal(temp);
 			w2 += i2 * Vec2.cross(r2, impulse);
+			
+			world.getPool().pushVec2(Cdot, impulse);
 		}
 		
 		b1.m_linearVelocity.set(v1);
@@ -335,6 +339,7 @@ public class RevoluteJoint extends Joint {
 		b2.m_linearVelocity.set(v2);
 		b2.m_angularVelocity = w2;
 		
+		world.getPool().pushVec2(r1,r2,temp);
 	}
 	
 	@Override
@@ -459,6 +464,9 @@ public class RevoluteJoint extends Joint {
 			
 			b1.synchronizeTransform();
 			b2.synchronizeTransform();
+			
+			world.getPool().pushMat22(K1,K2,K3);
+			world.getPool().pushVec2(impulse, r1, r2, C);
 		}
 		
 		return positionError <= Settings.linearSlop && angularError <= Settings.angularSlop;
