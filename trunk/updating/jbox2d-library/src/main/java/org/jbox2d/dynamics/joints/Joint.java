@@ -11,24 +11,28 @@ import org.jbox2d.structs.dynamics.joints.JointType;
 /**
  * The base joint class. Joints are used to raint two bodies together in
  * various fashions. Some joints also feature limits and motors.
+ * 
  * @author Daniel Murphy
  */
 public abstract class Joint {
 	
-	public static Joint create(World argWorld, JointDef def){
+	public static Joint create(World argWorld, JointDef def) {
 		Joint joint = null;
-		if(def instanceof MouseJointDef){
+		if (def instanceof MouseJointDef) {
 			return new MouseJoint(argWorld, (MouseJointDef) def);
-		}else if(def instanceof PrismaticJointDef){
-			return new PrismaticJoint(argWorld,  (PrismaticJointDef) def);
+		}
+		else if (def instanceof PrismaticJointDef) {
+			return new PrismaticJoint(argWorld, (PrismaticJointDef) def);
+		}
+		else if (def instanceof RevoluteJointDef) {
+			return new RevoluteJoint(argWorld, (RevoluteJointDef) def);
 		}
 		return joint;
 	}
 	
-	public static void destroy(Joint joint){
+	public static void destroy(Joint joint) {
 		// nothing yet
 	}
-	
 	
 	public JointType m_type;
 	public Joint m_prev;
@@ -50,8 +54,8 @@ public abstract class Joint {
 	float m_invMassA, m_invIA;
 	float m_invMassB, m_invIB;
 	
-	protected Joint(World argWorld, JointDef def){
-		assert(def.bodyA != def.bodyB);
+	protected Joint(World argWorld, JointDef def) {
+		assert (def.bodyA != def.bodyB);
 		
 		world = argWorld;
 		m_type = def.type;
@@ -78,87 +82,96 @@ public abstract class Joint {
 	
 	/**
 	 * get the type of the concrete joint.
+	 * 
 	 * @return
 	 */
-	public JointType getType(){
+	public JointType getType() {
 		return m_type;
 	}
-
+	
 	/**
 	 * get the first body attached to this joint.
 	 */
-	public Body getBodyA(){
+	public Body getBodyA() {
 		return m_bodyA;
 	}
-
+	
 	/**
 	 * get the second body attached to this joint.
+	 * 
 	 * @return
 	 */
-	public Body getBodyB(){
+	public Body getBodyB() {
 		return m_bodyB;
 	}
-
+	
 	/**
 	 * get the anchor point on bodyA in world coordinates.
+	 * 
 	 * @return
 	 */
 	public abstract void getAnchorA(Vec2 argOut);
-
+	
 	/**
 	 * get the anchor point on bodyB in world coordinates.
+	 * 
 	 * @return
 	 */
 	public abstract void getAnchorB(Vec2 argOut);
-
+	
 	/**
 	 * get the reaction force on body2 at the joint anchor in Newtons.
+	 * 
 	 * @param inv_dt
 	 * @return
 	 */
 	public abstract void getReactionForce(float inv_dt, Vec2 argOut);
-
+	
 	/**
 	 * get the reaction torque on body2 in N*m.
+	 * 
 	 * @param inv_dt
 	 * @return
 	 */
 	public abstract float getReactionTorque(float inv_dt);
-
+	
 	/**
 	 * get the next joint the world joint list.
 	 */
-	public Joint getNext(){
+	public Joint getNext() {
 		return m_next;
 	}
-
+	
 	/**
 	 * get the user data pointer.
 	 */
-	public Object getUserData(){
+	public Object getUserData() {
 		return m_userData;
 	}
-
+	
 	/**
 	 * Set the user data pointer.
 	 */
-	public void setUserData(Object data){
+	public void setUserData(Object data) {
 		m_userData = data;
 	}
-
+	
 	/**
 	 * Short-cut function to determine if either body is inactive.
+	 * 
 	 * @return
 	 */
-	public boolean IsActive(){
+	public boolean IsActive() {
 		return m_bodyA.isActive() && m_bodyB.isActive();
 	}
 	
 	public abstract void initVelocityConstraints(TimeStep step);
+	
 	public abstract void solveVelocityConstraints(TimeStep step);
 	
 	/**
 	 * This returns true if the position errors are within tolerance.
+	 * 
 	 * @param baumgarte
 	 * @return
 	 */
