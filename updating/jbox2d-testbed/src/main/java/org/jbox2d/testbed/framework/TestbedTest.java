@@ -3,6 +3,8 @@
  */
 package org.jbox2d.testbed.framework;
 
+import java.security.KeyRep;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.jbox2d.callbacks.ContactImpulse;
@@ -56,6 +58,8 @@ public abstract class TestbedTest implements ContactListener{
 	public final Vec2 mouseWorld = new Vec2();
 	protected int stepCount;
 	
+	private final LinkedList<QueueItem> inputQueue;
+	
 	private String title = null;
 	private int textLine;
 	private final LinkedList<String> textList = new LinkedList<String>();
@@ -69,7 +73,7 @@ public abstract class TestbedTest implements ContactListener{
 	private TestPanel panel;
 	
 	public TestbedTest(){
-		
+		inputQueue = new LinkedList<QueueItem>();
 	}
 	
 	public void setPanel(TestPanel argPanel){
@@ -166,6 +170,35 @@ public abstract class TestbedTest implements ContactListener{
 			debugDraw.drawString(panel.getWidth()/2, 15, title, Color3f.WHITE);
 		}
 		
+		// process our input
+		if(!inputQueue.isEmpty()){
+			synchronized (inputQueue) {
+				while(!inputQueue.isEmpty()){
+					QueueItem i = inputQueue.pop();
+					switch(i.type){
+						case KeyPressed:
+							keyPressed(i.c, i.code);
+							break;
+						case KeyReleased:
+							keyReleased(i.c, i.code);
+							break;
+						case MouseDown:
+							mouseDown(i.p);
+							break;
+						case MouseMove:
+							mouseMove(i.p);
+							break;
+						case MouseUp:
+							mouseUp(i.p);
+							break;
+						case ShiftMouseDown:
+							shiftMouseDown(i.p);
+							break;
+					}
+				}
+			}
+		}
+		
 		int flags = 0;
 		flags += settings.drawShapes? DebugDraw.e_shapeBit : 0;
 		flags += settings.drawJoints? DebugDraw.e_jointBit: 0;
@@ -198,11 +231,9 @@ public abstract class TestbedTest implements ContactListener{
 			textLine += 20;
 			debugDraw.drawString(5, textLine, "Pooling Info", color4);
 			textLine += 15;
-			debugDraw.drawString(5, textLine, "Vec2 creations: "+ Vec2.creationCount, Color3f.WHITE);
+			debugDraw.drawString(5, textLine, "Vec2 pooled/creations: "+ world.getPool().getVec2Stack().size() + "/"+Vec2.creationCount, Color3f.WHITE);
 			textLine += 15;
-			debugDraw.drawString(5, textLine, "Active contacts: "+ Contact.activeContacts, Color3f.WHITE);
-			textLine += 15;
-			debugDraw.drawString(5, textLine, "Contact pool: "+ Contact.contactPoolCount, Color3f.WHITE);
+			debugDraw.drawString(5, textLine, "Contact pooled/active: "+ Contact.contactPoolCount+"/"+Contact.activeContacts, Color3f.WHITE);
 			textLine += 20;
 
 			Vec2.creationCount = 0;
@@ -253,6 +284,43 @@ public abstract class TestbedTest implements ContactListener{
 			}
 		}
 	}
+	
+	public void queueShiftMouseDown(Vec2 p){
+		synchronized (inputQueue) {
+			inputQueue.addLast(new QueueItem(QueueItemType.ShiftMouseDown, p));
+		}
+	}
+	
+	public void queueMouseUp(Vec2 p){
+		synchronized (inputQueue) {
+			inputQueue.addLast(new QueueItem(QueueItemType.MouseUp, p));
+		}
+	}
+	
+	public void queueMouseDown(Vec2 p){
+		synchronized (inputQueue) {
+			inputQueue.addLast(new QueueItem(QueueItemType.MouseDown, p));
+		}
+	}
+	
+	public void queueMouseMove(Vec2 p){
+		synchronized (inputQueue) {
+			inputQueue.addLast(new QueueItem(QueueItemType.MouseMove, p));
+		}
+	}
+	
+	public void queueKeyPressed(char c, int code){
+		synchronized (inputQueue) {
+			inputQueue.addLast(new QueueItem(QueueItemType.KeyPressed, c, code));
+		}
+	}
+	
+	public void queueKeyReleased(char c, int code){
+		synchronized (inputQueue) {
+			inputQueue.addLast(new QueueItem(QueueItemType.KeyReleased, c, code));
+		}
+	}
+	
 	
 	public void shiftMouseDown(Vec2 p){
 		mouseWorld.set(p);
@@ -440,6 +508,8 @@ public abstract class TestbedTest implements ContactListener{
 	}
 
 	public void keyPressed(char argKeyChar, int argKeyCode) {}
+	
+	public void keyReleased(char argKeyChar, int argKeyCode) {}
 }
 
 class TestQueryCallback implements QueryCallback{
@@ -468,5 +538,26 @@ class TestQueryCallback implements QueryCallback{
 		
 		return true;
 	}
+}
+
+enum QueueItemType {
+	MouseDown, MouseMove, MouseUp, ShiftMouseDown, KeyPressed, KeyReleased
+}
+
+class QueueItem{
+	public QueueItemType type;
+	public Vec2 p;
+	public char c;
+	public int code;
 	
+	public QueueItem(QueueItemType t, Vec2 pt){
+		type = t;
+		p = pt;
+	}
+	
+	public QueueItem(QueueItemType t, char cr, int cd){
+		type = t;
+		c = cr;
+		code = cd;
+	}
 }

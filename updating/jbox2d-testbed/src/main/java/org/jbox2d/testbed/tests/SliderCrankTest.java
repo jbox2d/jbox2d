@@ -134,14 +134,24 @@ public class SliderCrankTest extends TestbedTest {
 		float torque = m_joint1.getMotorTorque();
 		Formatter f = new Formatter();
 		addTextLine(f.format("Friction: %b, Motor Force = %5.0f, ", m_joint2.isMotorEnabled(), torque).toString());
+
+	}
+	
+	/**
+	 * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
+	 */
+	@Override
+	public void keyPressed(char argKeyChar, int argKeyCode) {
 		
-		if(TestPanel.keys['f']){
-			m_joint2.enableMotor(!m_joint2.isMotorEnabled());
-			TestPanel.keys['f'] = false;
-		}
-		else if(TestPanel.keys['m']){
-			m_joint1.enableMotor(!m_joint1.isMotorEnabled());
-			TestPanel.keys['m'] = false;
+		switch(argKeyChar){
+			case 'f':
+				m_joint2.enableMotor(!m_joint2.isMotorEnabled());
+				TestPanel.keys['f'] = false;
+				break;
+			case 'm':
+				m_joint1.enableMotor(!m_joint1.isMotorEnabled());
+				TestPanel.keys['m'] = false;
+				break;
 		}
 	}
 	

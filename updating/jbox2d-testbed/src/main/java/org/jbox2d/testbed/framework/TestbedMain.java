@@ -47,8 +47,11 @@ public class TestbedMain extends JFrame {
 		TestbedSettings s = new TestbedSettings();
 		panel = new TestPanel(s);
 		add(panel, "Center");
-		add(new JScrollPane(new SidePanel(s,this)), "East");   
+		SidePanel p = new SidePanel(s);
+		p.setMain(this);
+		add(new JScrollPane(p), "East");   
 		pack();
+		
 		setVisible(true);
 		setDefaultCloseOperation(3);
 		panel.changeTest(TestList.tests.get(0));
@@ -67,33 +70,33 @@ public class TestbedMain extends JFrame {
 		//test();
 	}
 	
-	public static void test(){
-		World w = new World(new Vec2(), true);
-		
-		for (int i = 0; i < 2; i++)
-	      {
-//	         CircleShape circleShape = new CircleShape();
-//	         circleShape.m_radius = 1;
-//	         Shape shape = circleShape;
-	         PolygonShape polygonShape = new PolygonShape();
-	         polygonShape.setAsBox(1, 1);
-	         Shape shape = polygonShape;
-
-	         BodyDef bodyDef = new BodyDef();
-	         bodyDef.type = BodyType.DYNAMIC;
-	         bodyDef.position.set(5 * i, 0);
-	         bodyDef.angle = (float) (Math.PI / 4 * i);
-	         bodyDef.allowSleep = false;
-	         Body body = w.createBody(bodyDef);
-	         body.createFixture(shape, 5.0f);
-	         
-	         body.applyForce(new Vec2(-10000 * (i - 1), 0), new Vec2());
-	      }
-		
-		for(int i=0; i<100; i++){
-			w.step(.01f,10, 10);
-		}
-	}
+//	public static void test(){
+//		World w = new World(new Vec2(), true);
+//		
+//		for (int i = 0; i < 2; i++)
+//	      {
+////	         CircleShape circleShape = new CircleShape();
+////	         circleShape.m_radius = 1;
+////	         Shape shape = circleShape;
+//	         PolygonShape polygonShape = new PolygonShape();
+//	         polygonShape.setAsBox(1, 1);
+//	         Shape shape = polygonShape;
+//
+//	         BodyDef bodyDef = new BodyDef();
+//	         bodyDef.type = BodyType.DYNAMIC;
+//	         bodyDef.position.set(5 * i, 0);
+//	         bodyDef.angle = (float) (Math.PI / 4 * i);
+//	         bodyDef.allowSleep = false;
+//	         Body body = w.createBody(bodyDef);
+//	         body.createFixture(shape, 5.0f);
+//	         
+//	         body.applyForce(new Vec2(-10000 * (i - 1), 0), new Vec2());
+//	      }
+//		
+//		for(int i=0; i<100; i++){
+//			w.step(.01f,10, 10);
+//		}
+//	}
 }
 
 
@@ -105,7 +108,7 @@ public class TestbedMain extends JFrame {
 class SidePanel extends JPanel implements ChangeListener, ActionListener{
 	
 	final TestbedSettings settings;
-	final TestbedMain main;
+	TestbedMain main;
 	
 	private JSlider hz;
 	private JLabel hzText;
@@ -128,57 +131,61 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 		"Draw Stats", "Draw Dynamic Tree"
 	};
 	
-	public SidePanel(TestbedSettings argSettings, TestbedMain argMain){
+	public SidePanel(TestbedSettings argSettings){
 		settings = argSettings;
-		main = argMain;
 		initComponents();
 		addListeners();
 	}
 	
+	public void setMain(TestbedMain argMain){
+		main = argMain;
+	}
+	
 	public void initComponents(){
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		setLayout(new BorderLayout());
 		setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		
 		
+		JPanel top = new JPanel();
+		top.setLayout(new GridLayout(7, 1));
 		String[] names = new String[TestList.tests.size()];
 		for(int i=0; i<names.length; i++){
 			names[i] = TestList.tests.get(i).getTestName();
 		}
 		tests = new JComboBox(names);
-		tests.setMaximumSize(new Dimension(400, 20));
+		tests.setMaximumSize(new Dimension(250, 20));
 		tests.addActionListener(this);
 		JPanel testsp = new JPanel();
 		testsp.setLayout(new GridLayout(1, 2));
 		testsp.add(new JLabel("Choose a test:"));
 		testsp.add(tests);
 		
-		add(tests);
-		
-		
-		Box sliders = Box.createVerticalBox();
-		sliders.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+		top.add(tests);
 		hz = new JSlider(1, 400, (int)settings.hz);
 		hz.setMaximumSize(new Dimension(200, 20));
 		hz.addChangeListener(this);
 		hzText = new JLabel("Hz: "+(int)settings.hz);
-		sliders.add(hzText);
-		sliders.add(hz);
+		top.add(hzText);
+		top.add(hz);
 		
 		pos = new JSlider(0, 100, (int)settings.positionIterations);
 		pos.setMaximumSize(new Dimension(200, 20));
 		pos.addChangeListener(this);
 		posText = new JLabel("Pos iters: "+(int)settings.positionIterations);
-		sliders.add(posText);
-		sliders.add(pos);
+		top.add(posText);
+		top.add(pos);
 		
 		vel = new JSlider(1, 100, (int)settings.velocityIterations);
 		vel.setMaximumSize(new Dimension(200, 20));
 		vel.addChangeListener(this);
 		velText = new JLabel("Vel iters: "+(int)settings.velocityIterations);
-		sliders.add(velText);
-		sliders.add(vel);
+		top.add(velText);
+		top.add(vel);
 		
-		add(sliders);
+		add(top, "North");
+		
+		JPanel middle = new JPanel();
+		middle.setLayout(new GridLayout(0, 1));
 		
 		for(int i=0; i<checkboxLabels.length; i++){
 			String s = checkboxLabels[i];
@@ -238,15 +245,14 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 			}
 			box.setSelected(tf);
 			box.addChangeListener(this);
-			add(box);
+			middle.add(box);
 		}
+		add(middle, "Center");
 		
 		Box buttons = Box.createHorizontalBox();
 		buttons.add(pauseButton);
 		buttons.add(stepButton);
-		add(buttons);
-		add(Box.createVerticalGlue());
-
+		add(buttons, "South");
 	}
 	
 	public void addListeners(){

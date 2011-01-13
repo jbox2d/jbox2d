@@ -100,7 +100,7 @@ public class TestPanel extends JPanel implements Runnable{
 				}
 				codedKeys[code] = true;
 				if(currTest != null){
-					currTest.keyPressed(key, code);
+					currTest.queueKeyPressed(key, code);
 				}
 			}
 		});
@@ -123,7 +123,7 @@ public class TestPanel extends JPanel implements Runnable{
 					pos.set(e.getX(), e.getY());
 					mouse.set(pos);
 					draw.getScreenToWorldToOut(pos, pos);
-					currTest.mouseMove(pos);
+					currTest.queueMouseMove(pos);
 				}
 			}
 			
@@ -133,7 +133,7 @@ public class TestPanel extends JPanel implements Runnable{
 					pos.set(e.getX(), e.getY());
 					mouse.set(pos);
 					draw.getScreenToWorldToOut(pos, pos);
-					currTest.mouseMove(pos);
+					currTest.queueMouseMove(pos);
 				}
 			}
 		});
@@ -146,7 +146,7 @@ public class TestPanel extends JPanel implements Runnable{
 					pos.y = e.getY();
 					mouse.set(pos);
 					draw.getScreenToWorldToOut(pos, pos);
-					currTest.mouseUp(pos);
+					currTest.queueMouseUp(pos);
 				}
 			}
 			
@@ -161,9 +161,9 @@ public class TestPanel extends JPanel implements Runnable{
 					if(e.getButton() == MouseEvent.BUTTON1){
 						draw.getScreenToWorldToOut(pos2, pos2);
 						if(codedKeys[KeyEvent.VK_SHIFT]){
-							currTest.shiftMouseDown(pos2);
+							currTest.queueShiftMouseDown(pos2);
 						}else{
-							currTest.mouseDown(pos2);
+							currTest.queueMouseDown(pos2);
 						}
 					}
 				}
@@ -283,6 +283,9 @@ public class TestPanel extends JPanel implements Runnable{
 	
 	public void render(){
 		if(dbImage == null){
+			if(panelWidth <= 0 || panelHeight <= 0){
+				return;
+			}
 			dbImage = createImage(panelWidth, panelHeight);
 			if(dbImage == null){
 				System.err.println("dbImage is null");
