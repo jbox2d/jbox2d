@@ -17,21 +17,24 @@ import org.jbox2d.structs.dynamics.joints.JointType;
 public abstract class Joint {
 	
 	public static Joint create(World argWorld, JointDef def) {
-		Joint joint = null;
-		if (def instanceof MouseJointDef) {
-			return new MouseJoint(argWorld, (MouseJointDef) def);
+		//Joint joint = null;
+		switch(def.type){
+			case MOUSE:
+				return new MouseJoint(argWorld, (MouseJointDef) def);
+			case DISTANCE:
+				return new DistanceJoint(argWorld, (DistanceJointDef) def);
+			case PRISMATIC:
+				return new PrismaticJoint(argWorld, (PrismaticJointDef) def);
+			case REVOLUTE:
+				return new RevoluteJoint(argWorld, (RevoluteJointDef) def);
+			case CONSTANT_VOLUME:
+				return new ConstantVolumeJoint(argWorld, (ConstantVolumeJointDef) def);
 		}
-		else if (def instanceof PrismaticJointDef) {
-			return new PrismaticJoint(argWorld, (PrismaticJointDef) def);
-		}
-		else if (def instanceof RevoluteJointDef) {
-			return new RevoluteJoint(argWorld, (RevoluteJointDef) def);
-		}
-		return joint;
+		return null;
 	}
 	
 	public static void destroy(Joint joint) {
-		// nothing yet
+		joint.destructor();
 	}
 	
 	public JointType m_type;
@@ -176,4 +179,9 @@ public abstract class Joint {
 	 * @return
 	 */
 	public abstract boolean solvePositionConstraints(float baumgarte);
+	
+	/**
+	 * Override to handle destruction of joint
+	 */
+	public void destructor() { }
 }

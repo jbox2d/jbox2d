@@ -1123,25 +1123,24 @@ public class World {
 		switch (joint.getType())
 		{
 		// TODO djm write after writing joints
-		/*case e_distanceJoint:
+		case DISTANCE:
 			m_debugDraw.drawSegment(p1, p2, color);
 			break;
 
-		case e_pulleyJoint:
-			{
-				PulleyJoint pulley = (PulleyJoint)joint;
-				Vec2 s1 = pulley.getGroundAnchorA();
-				Vec2 s2 = pulley.getGroundAnchorB();
-				m_debugDraw.drawSegment(s1, p1, color);
-				m_debugDraw.drawSegment(s2, p2, color);
-				m_debugDraw.drawSegment(s1, s2, color);
-			}
-			break;
-
-		case e_mouseJoint:
+//		case e_pulleyJoint:
+//			{
+//				PulleyJoint pulley = (PulleyJoint)joint;
+//				Vec2 s1 = pulley.getGroundAnchorA();
+//				Vec2 s2 = pulley.getGroundAnchorB();
+//				m_debugDraw.drawSegment(s1, p1, color);
+//				m_debugDraw.drawSegment(s2, p2, color);
+//				m_debugDraw.drawSegment(s1, s2, color);
+//			}
+//			break;
+		case CONSTANT_VOLUME:
+		case MOUSE:
 			// don't draw this
 			break;
-			*/
 		default:
 			m_debugDraw.drawSegment(x1, p1, color);
 			m_debugDraw.drawSegment(p1, p2, color);
