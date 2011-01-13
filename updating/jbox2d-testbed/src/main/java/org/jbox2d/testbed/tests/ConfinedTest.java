@@ -17,7 +17,7 @@ public class ConfinedTest extends TestbedTest {
 	
 	@Override
 	public String getTestName() {
-		return "Confined Test";
+		return "Confined";
 	}
 
 	@Override

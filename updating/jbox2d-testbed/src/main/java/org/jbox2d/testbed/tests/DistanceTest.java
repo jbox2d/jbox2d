@@ -25,7 +25,7 @@ public class DistanceTest extends TestbedTest {
 	
 	@Override
 	public String getTestName() {
-		return "Distance Test";
+		return "Distance";
 	}
 	
 	@Override

@@ -106,7 +106,7 @@ public class BlobTest4 extends TestbedTest {
 
 	@Override
 	public String getTestName() {
-		return "Blob Joint Test";
+		return "Blob Joint";
 	}
 
 }

@@ -114,7 +114,7 @@ public class RevoluteTest extends TestbedTest {
 	 */
 	@Override
 	public String getTestName() {
-		return "Revolute Test";
+		return "Revolute";
 	}
 	
 }

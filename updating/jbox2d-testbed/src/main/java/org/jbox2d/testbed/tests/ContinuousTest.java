@@ -34,7 +34,7 @@ public class ContinuousTest extends TestbedTest {
 	 */
 	@Override
 	public String getTestName() {
-		return "Continuous Test";
+		return "Continuous";
 	}
 	
 	public void switchObjects(){

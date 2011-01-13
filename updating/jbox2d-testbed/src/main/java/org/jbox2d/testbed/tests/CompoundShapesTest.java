@@ -138,7 +138,7 @@ public class CompoundShapesTest extends TestbedTest{
 	 */
 	@Override
 	public String getTestName() {
-		return "Compound Shapes Test";
+		return "Compound Shapes";
 	}
 	
 }

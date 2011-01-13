@@ -28,7 +28,7 @@ public class OneSidedTest extends TestbedTest{
 	
 	@Override
 	public String getTestName() {
-		return "One Sided Test";
+		return "One Sided";
 	}
 
 	@Override
