@@ -20,7 +20,7 @@ public class PyramidTest extends TestbedTest {
 	 */
 	@Override
 	public void initTest() {
-		setTitle("Pyramid Test");
+		setTitle("Pyramid");
 		int count = 20;
 		{
 			BodyDef bd = new BodyDef();

@@ -160,7 +160,7 @@ public class SliderCrankTest extends TestbedTest {
 	 */
 	@Override
 	public String getTestName() {
-		return "SliderCrankTest";
+		return "Slider Crank";
 	}
 	
 }

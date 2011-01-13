@@ -108,7 +108,7 @@ public class PrismaticTest extends TestbedTest {
 	 */
 	@Override
 	public String getTestName() {
-		return "Prismatic Test";
+		return "Prismatic";
 	}
 	
 }

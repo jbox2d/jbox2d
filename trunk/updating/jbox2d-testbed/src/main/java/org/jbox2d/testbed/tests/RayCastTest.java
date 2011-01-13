@@ -33,7 +33,7 @@ public class RayCastTest extends TestbedTest {
 	
 	@Override
 	public String getTestName() {
-		return "Raycast Test";
+		return "Raycast";
 	}
 	
 	@Override
