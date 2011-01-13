@@ -22,6 +22,7 @@ import org.jbox2d.testbed.framework.TestbedTest;
 public class RevoluteTest extends TestbedTest {
 	
 	private RevoluteJoint m_joint;
+	private boolean isLeft = false;
 	/**
 	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
 	 */
@@ -55,7 +56,7 @@ public class RevoluteTest extends TestbedTest {
 			body.setLinearVelocity(new Vec2(-8.0f * w, 0.0f));
 
 			rjd.initialize(ground, body, new Vec2(0.0f, 12.0f));
-			rjd.motorSpeed = 1.0f * MathUtils.PI;
+			rjd.motorSpeed = -1.0f * MathUtils.PI;
 			rjd.maxMotorTorque = 10000.0f;
 			rjd.enableMotor = false;
 			rjd.lowerAngle = -0.25f * MathUtils.PI;
@@ -73,16 +74,24 @@ public class RevoluteTest extends TestbedTest {
 	@Override
 	public void step(TestbedSettings settings) {
 		super.step(settings);
-		addTextLine("Limits = "+m_joint.isLimitEnabled()+", Motor = "+m_joint.isMotorEnabled());
-		addTextLine("Keys: (l) limits, (a) left, (s) off, (d) right");
+		addTextLine("Limits "+(m_joint.isLimitEnabled()?"on":"off")+", Motor "+(m_joint.isMotorEnabled()?"on ":"off ")+ (isLeft?"left":"right"));
+		addTextLine("Keys: (l) limits, (m) motor, (a) left, (d) right");
 		
 		if(TestPanel.keys['l']){
 			m_joint.enableLimit(!m_joint.isLimitEnabled());
 			TestPanel.keys['l']= false;
 		}
-		else if(TestPanel.keys['s']){
+		else if(TestPanel.keys['m']){
 			m_joint.enableMotor(!m_joint.isMotorEnabled());
-			TestPanel.keys['s']= false;
+			TestPanel.keys['m']= false;
+		}else if(TestPanel.keys['a']){
+			m_joint.setMotorSpeed(1.0f * MathUtils.PI);
+			TestPanel.keys['a']= false;
+			isLeft = true;
+		}else if(TestPanel.keys['d']){
+			m_joint.setMotorSpeed(-1.0f * MathUtils.PI);
+			TestPanel.keys['d']= false;
+			isLeft = false;
 		}
 	}
 	/**
@@ -90,7 +99,7 @@ public class RevoluteTest extends TestbedTest {
 	 */
 	@Override
 	public String getTestName() {
-		return "Prismatic Test";
+		return "Revolute Test";
 	}
 	
 }
