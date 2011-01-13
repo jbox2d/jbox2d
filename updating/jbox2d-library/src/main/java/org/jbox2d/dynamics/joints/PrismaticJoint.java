@@ -223,23 +223,23 @@ public class PrismaticJoint extends Joint {
 		Body b1 = m_bodyA;
 		Body b2 = m_bodyB;
 		
-		m_localCenterA = b1.getLocalCenter();
-		m_localCenterB = b2.getLocalCenter();
+		m_localCenterA.set(b1.getLocalCenter());
+		m_localCenterB.set(b2.getLocalCenter());
 		
 		Transform xf1 = b1.getTransform();
 		Transform xf2 = b2.getTransform();
 		
 		// Compute the effective masses.
-		Vec2 temp = world.getPool().popVec2();
-		Vec2 r1 = world.getPool().popVec2();
-		Vec2 r2 = world.getPool().popVec2();
-		Vec2 d = world.getPool().popVec2();
+		final Vec2 temp = world.getPool().popVec2();
+		final Vec2 r1 = world.getPool().popVec2();
+		final Vec2 r2 = world.getPool().popVec2();
+		final Vec2 d = world.getPool().popVec2();
 		
-		temp.set(m_localAnchor1).subLocal(m_localCenterA);
-		Mat22.mulToOut(xf1.R, temp, r1);
+		r1.set(m_localAnchor1).subLocal(m_localCenterA);
+		r2.set(m_localAnchor2).subLocal(m_localCenterB);
+		Mat22.mulToOut(xf1.R, r1, r1);
+		Mat22.mulToOut(xf2.R, r2, r2);
 		
-		temp.set(m_localAnchor2).subLocal(m_localCenterB);
-		Mat22.mulToOut(xf2.R, temp, r2);
 		d.set(b2.m_sweep.c).addLocal(r2).subLocal(b1.m_sweep.c).subLocal(r1);
 		
 		m_invMassA = b1.m_invMass;
@@ -321,7 +321,7 @@ public class PrismaticJoint extends Joint {
 			m_impulse.mulLocal(step.dtRatio);
 			m_motorImpulse *= step.dtRatio;
 			
-			Vec2 P = world.getPool().popVec2();
+			final Vec2 P = world.getPool().popVec2();
 			temp.set(m_axis).mulLocal(m_motorImpulse + m_impulse.z);
 			P.set(m_perp).mulLocal(m_impulse.x).addLocal(temp);
 			
@@ -362,21 +362,20 @@ public class PrismaticJoint extends Joint {
 		boolean active = false;
 		float C2 = 0.0f;
 		
-		Mat22 R1 = world.getPool().popMat22();
-		Mat22 R2 = world.getPool().popMat22();
+		final Mat22 R1 = world.getPool().popMat22();
+		final Mat22 R2 = world.getPool().popMat22();
 		R1.set(a1);
 		R2.set(a2);
 		
-		Vec2 temp = world.getPool().popVec2();
-		Vec2 r1 = world.getPool().popVec2();
-		Vec2 r2 = world.getPool().popVec2();
-		Vec2 d = world.getPool().popVec2();
+		final Vec2 temp = world.getPool().popVec2();
+		final Vec2 r1 = world.getPool().popVec2();
+		final Vec2 r2 = world.getPool().popVec2();
+		final Vec2 d = world.getPool().popVec2();
 		
-		temp.set(m_localAnchor1).subLocal(m_localCenterA);
-		Mat22.mulToOut(R1, temp, r1);
-		
-		temp.set(m_localAnchor2).subLocal(m_localCenterB);
-		Mat22.mulToOut(R2, temp, r2);
+		r1.set(m_localAnchor1).subLocal(m_localCenterA);
+		r2.set(m_localAnchor2).subLocal(m_localCenterB);
+		Mat22.mulToOut(R1, r1, r1);
+		Mat22.mulToOut(R2, r2, r2);
 		d.set(c2).addLocal(r2).subLocal(c1).subLocal(r1);
 		
 		if (m_enableLimit) {
@@ -415,8 +414,8 @@ public class PrismaticJoint extends Joint {
 		m_s1 = Vec2.cross(temp, m_perp);
 		m_s2 = Vec2.cross(r2, m_perp);
 		
-		Vec3 impulse = world.getPool().popVec3();
-		Vec2 C1 = world.getPool().popVec2();
+		final Vec3 impulse = world.getPool().popVec3();
+		final Vec2 C1 = world.getPool().popVec2();
 		
 		C1.x = Vec2.dot(m_perp, d);
 		C1.y = a2 - a1 - m_refAngle;
@@ -439,7 +438,7 @@ public class PrismaticJoint extends Joint {
 			m_K.col2.set(k12, k22, k23);
 			m_K.col3.set(k13, k23, k33);
 			
-			Vec3 C = world.getPool().popVec3();
+			final Vec3 C = world.getPool().popVec3();
 			C.x = C1.x;
 			C.y = C1.y;
 			C.z = C2;
@@ -466,7 +465,7 @@ public class PrismaticJoint extends Joint {
 			impulse.z = 0.0f;
 		}
 		
-		Vec2 P = world.getPool().popVec2();
+		final Vec2 P = world.getPool().popVec2();
 		temp.set(m_perp).mulLocal(impulse.x);
 		P.set(m_axis).mulLocal(impulse.z).addLocal(temp);
 		float L1 = impulse.x * m_s1 + impulse.y + impulse.z * m_a1;
@@ -505,7 +504,7 @@ public class PrismaticJoint extends Joint {
 		Vec2 v2 = b2.m_linearVelocity;
 		float w2 = b2.m_angularVelocity;
 		
-		Vec2 temp = world.getPool().popVec2();
+		final Vec2 temp = world.getPool().popVec2();
 		
 		// Solve linear motor constraint.
 		if (m_enableMotor && m_limitState != LimitState.EQUAL) {
@@ -517,7 +516,7 @@ public class PrismaticJoint extends Joint {
 			m_motorImpulse = MathUtils.clamp(m_motorImpulse + impulse, -maxImpulse, maxImpulse);
 			impulse = m_motorImpulse - oldImpulse;
 			
-			Vec2 P = world.getPool().popVec2();
+			final Vec2 P = world.getPool().popVec2();
 			P.set(m_axis).mulLocal(impulse);
 			float L1 = impulse * m_a1;
 			float L2 = impulse * m_a2;
@@ -533,7 +532,7 @@ public class PrismaticJoint extends Joint {
 			world.getPool().pushVec2(P);
 		}
 		
-		Vec2 Cdot1 = world.getPool().popVec2();
+		final Vec2 Cdot1 = world.getPool().popVec2();
 		temp.set(v2).subLocal(v1);
 		Cdot1.x = Vec2.dot(m_perp, temp) + m_s2 * w2 - m_s1 * w1;
 		Cdot1.y = w2 - w1;
@@ -544,14 +543,14 @@ public class PrismaticJoint extends Joint {
 			temp.set(v2).subLocal(v1);
 			Cdot2 = Vec2.dot(m_axis, temp) + m_a2 * w2 - m_a1 * w1;
 			
-			Vec3 Cdot = world.getPool().popVec3();
+			final Vec3 Cdot = world.getPool().popVec3();
 			Cdot.set(Cdot1.x, Cdot1.y, Cdot2);
 			Cdot.negateLocal();
 			
-			Vec3 f1 = world.getPool().popVec3();
+			final Vec3 f1 = world.getPool().popVec3();
 			f1.set(m_impulse);
 			
-			Vec3 df = world.getPool().popVec3();
+			final Vec3 df = world.getPool().popVec3();
 			m_K.solve33ToOut(Cdot, df);
 			m_impulse.addLocal(df);
 			
@@ -564,8 +563,8 @@ public class PrismaticJoint extends Joint {
 			
 			// f2(1:2) = invK(1:2,1:2) * (-Cdot(1:2) - K(1:2,3) * (f2(3) - f1(3))) +
 			// f1(1:2)
-			Vec2 b = world.getPool().popVec2();
-			Vec2 f2r = world.getPool().popVec2();
+			final Vec2 b = world.getPool().popVec2();
+			final Vec2 f2r = world.getPool().popVec2();
 
 			temp.set(m_K.col3.x, m_K.col3.y).mulLocal(m_impulse.z - f1.z);
 			b.set(Cdot1).negateLocal().subLocal(temp);
@@ -578,7 +577,7 @@ public class PrismaticJoint extends Joint {
 			
 			df.set(m_impulse).subLocal(f1);
 			
-			Vec2 P = world.getPool().popVec2();
+			final Vec2 P = world.getPool().popVec2();
 			temp.set(m_axis).mulLocal(df.z);
 			P.set(m_perp).mulLocal(df.x).addLocal(temp);
 			
@@ -598,14 +597,14 @@ public class PrismaticJoint extends Joint {
 		}
 		else {
 			// Limit is inactive, just solve the prismatic constraint in block form.
-			Vec2 df = world.getPool().popVec2();
+			final Vec2 df = world.getPool().popVec2();
 			m_K.solve22ToOut(Cdot1.negateLocal(), df);
 			Cdot1.negateLocal();
 			
 			m_impulse.x += df.x;
 			m_impulse.y += df.y;
 			
-			Vec2 P = world.getPool().popVec2();
+			final Vec2 P = world.getPool().popVec2();
 			P.set(m_perp).mulLocal(df.x);
 			float L1 = df.x * m_s1 + df.y;
 			float L2 = df.x * m_s2 + df.y;

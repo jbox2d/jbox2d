@@ -25,99 +25,92 @@ package org.jbox2d.common;
 // updated to rev 100
 
 /**
- * 
  * @author Daniel Murphy
  */
 public class Vec3 {
-	public float x,y,z;
+	public float x, y, z;
 	
-	public Vec3(){
-		x=y=z=0f;
+	public Vec3() {
+		x = y = z = 0f;
 	}
 	
-	public Vec3(float argX, float argY, float argZ){
+	public Vec3(float argX, float argY, float argZ) {
 		x = argX;
 		y = argY;
 		z = argZ;
 	}
 	
-	public Vec3(Vec3 argCopy){
+	public Vec3(Vec3 argCopy) {
 		x = argCopy.x;
 		y = argCopy.y;
 		z = argCopy.z;
 	}
 	
-	public Vec3 set(Vec3 argVec){
+	public Vec3 set(Vec3 argVec) {
 		x = argVec.x;
 		y = argVec.y;
 		z = argVec.z;
 		return this;
 	}
 	
-	public Vec3 set(float argX, float argY, float argZ){
+	public Vec3 set(float argX, float argY, float argZ) {
 		x = argX;
 		y = argY;
 		z = argZ;
 		return this;
 	}
 	
-	public Vec3 addLocal(Vec3 argVec){
+	public Vec3 addLocal(Vec3 argVec) {
 		x += argVec.x;
 		y += argVec.y;
 		z += argVec.z;
 		return this;
 	}
 	
-	public Vec3 add(Vec3 argVec){
-		return new Vec3(x + argVec.x,
-		                y + argVec.y,
-		                z + argVec.z);
+	public Vec3 add(Vec3 argVec) {
+		return new Vec3(x + argVec.x, y + argVec.y, z + argVec.z);
 	}
 	
-	public Vec3 subLocal(Vec3 argVec){
+	public Vec3 subLocal(Vec3 argVec) {
 		x -= argVec.x;
 		y -= argVec.y;
 		z -= argVec.z;
 		return this;
 	}
 	
-	public Vec3 sub(Vec3 argVec){
-		return new Vec3(x - argVec.x,
-		                y - argVec.y,
-		                z - argVec.z);
+	public Vec3 sub(Vec3 argVec) {
+		return new Vec3(x - argVec.x, y - argVec.y, z - argVec.z);
 	}
 	
-	public Vec3 mulLocal(float argScalar){
+	public Vec3 mulLocal(float argScalar) {
 		x *= argScalar;
 		y *= argScalar;
 		z *= argScalar;
 		return this;
 	}
 	
-	public Vec3 mul(float argScalar){
-		return new Vec3(x * argScalar,
-		                y * argScalar,
-		                z * argScalar);
+	public Vec3 mul(float argScalar) {
+		return new Vec3(x * argScalar, y * argScalar, z * argScalar);
 	}
 	
-	public Vec3 negate(){
-		return new Vec3(-x,-y,-z);
+	public Vec3 negate() {
+		return new Vec3(-x, -y, -z);
 	}
 	
-	public Vec3 negateLocal(){
-		x*=-1;
-		y*=-1;
-		z*=-1;
+	public Vec3 negateLocal() {
+		x = -x;
+		y = -y;
+		z = -z;
 		return this;
 	}
 	
-	public void setZero(){
+	public void setZero() {
 		x = 0;
 		y = 0;
 		z = 0;
 	}
 	
-	public Vec3 clone(){
+	public Vec3 clone() {
 		return new Vec3(this);
 	}
 	
@@ -133,7 +126,7 @@ public class Vec3 {
 		result = prime * result + Float.floatToIntBits(z);
 		return result;
 	}
-
+	
 	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
@@ -155,15 +148,15 @@ public class Vec3 {
 		return true;
 	}
 	
-	public final static float dot(Vec3 a, Vec3 b){
+	public final static float dot(Vec3 a, Vec3 b) {
 		return a.x * b.x + a.y * b.y + a.z * b.z;
 	}
 	
-	public final static Vec3 cross(Vec3 a, Vec3 b){
+	public final static Vec3 cross(Vec3 a, Vec3 b) {
 		return new Vec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
 	}
 	
-	public final static void crossToOut(Vec3 a, Vec3 b, Vec3 out){
+	public final static void crossToOut(Vec3 a, Vec3 b, Vec3 out) {
 		final float tempy = a.z * b.x - a.x * b.z;
 		final float tempz = a.x * b.y - a.y * b.x;
 		out.x = a.y * b.z - a.z * b.y;
