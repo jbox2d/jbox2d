@@ -3,6 +3,8 @@
  */
 package org.jbox2d.testbed.tests;
 
+import java.util.Formatter;
+
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
@@ -130,7 +132,8 @@ public class SliderCrankTest extends TestbedTest {
 		
 		addTextLine("Keys: (f) toggle friction, (m) toggle motor");
 		float torque = m_joint1.getMotorTorque();
-		addTextLine("Motor Torque = "+torque);
+		Formatter f = new Formatter();
+		addTextLine(f.format("Friction: %b, Motor Force = %5.0f, ", m_joint2.isMotorEnabled(), torque).toString());
 		
 		if(TestPanel.keys['f']){
 			m_joint2.enableMotor(!m_joint2.isMotorEnabled());
