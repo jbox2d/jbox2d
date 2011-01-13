@@ -13,6 +13,8 @@ import org.jbox2d.testbed.framework.TestbedTest;
 public class TestList {
 	public static final ArrayList<TestbedTest> tests = new ArrayList<TestbedTest>();
 	static{
+		tests.add(new RevoluteTest());
+		tests.add(new SliderCrankTest());
 		tests.add(new PrismaticTest());
 		tests.add(new ContinuousTest());
 		tests.add(new CompoundShapesTest());
