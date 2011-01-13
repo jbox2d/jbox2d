@@ -53,7 +53,7 @@ public abstract class Joint {
 	protected World world;
 	
 	// Cache here per time step to reduce cache misses.
-	Vec2 m_localCenterA, m_localCenterB;
+	public final Vec2 m_localCenterA, m_localCenterB;
 	float m_invMassA, m_invIA;
 	float m_invMassB, m_invIB;
 	
@@ -81,6 +81,9 @@ public abstract class Joint {
 		m_edgeB.other = null;
 		m_edgeB.prev = null;
 		m_edgeB.next = null;
+		
+		m_localCenterA = new Vec2();
+		m_localCenterB = new Vec2();
 	}
 	
 	/**
