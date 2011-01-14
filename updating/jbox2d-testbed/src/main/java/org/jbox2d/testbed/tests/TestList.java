@@ -13,6 +13,10 @@ import org.jbox2d.testbed.framework.TestbedTest;
 public class TestList {
 	public static final ArrayList<TestbedTest> tests = new ArrayList<TestbedTest>();
 	static{
+		tests.add(new DynamicTreeTest());
+		tests.add(new Chain());
+		tests.add(new Breakable());
+		tests.add(new VerticalStack());
 		tests.add(new PrismaticTest());
 		tests.add(new BodyTypes());
 		tests.add(new TheoJansen());

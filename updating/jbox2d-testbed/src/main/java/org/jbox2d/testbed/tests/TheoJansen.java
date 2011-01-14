@@ -14,6 +14,7 @@ import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.joints.DistanceJointDef;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
+import org.jbox2d.testbed.framework.TestbedSettings;
 import org.jbox2d.testbed.framework.TestbedTest;
 
 /**
@@ -240,6 +241,15 @@ public class TheoJansen extends TestbedTest {
 			m_motorJoint.enableMotor(!m_motorJoint.isMotorEnabled());
 			break;
 		}
+	}
+	
+	/**
+	 * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
+	 */
+	@Override
+	public void step(TestbedSettings settings) {
+		super.step(settings);
+		addTextLine("Keys: left = a, brake = s, right = d, toggle motor = m");
 	}
 	
 	/**

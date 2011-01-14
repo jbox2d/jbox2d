@@ -11,7 +11,7 @@ public class TestbedSettings {
 	public int velocityIterations = 8;
 	public int positionIterations = 3;
 	public boolean drawShapes = true;
-	public boolean drawJoints = false;
+	public boolean drawJoints = true;
 	public boolean drawAABBs = false;
 	public boolean drawPairs = false;
 	public boolean drawContactPoints = false;
@@ -22,7 +22,7 @@ public class TestbedSettings {
 	public boolean drawStats = true;
 	public boolean drawDebug = true;
 	public boolean drawDynamicTree = false;
-	public boolean enableWarmStarting = false;
+	public boolean enableWarmStarting = true;
 	public boolean enableContinuous = true;
 	public boolean pause = false;
 	public boolean singleStep = false;
