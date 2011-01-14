@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import org.jbox2d.callbacks.DebugDraw;
+import org.jbox2d.collision.AABB;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.OBBViewportTransform;
@@ -74,6 +75,14 @@ public class DebugDrawJ2D extends DebugDraw{
 		
 		g.drawLine((int)sp1.x, (int)sp1.y, (int)sp2.x, (int)sp2.y);
 	}
+	
+	
+	public void drawAABB(AABB argAABB, Color3f color){
+		Vec2 vecs[] = vec2Array.get(4);
+		argAABB.getVertices(vecs);
+		drawPolygon(vecs, 4, color);
+	}
+	
 
 	private final Vec2 saxis = new Vec2();
 	/**

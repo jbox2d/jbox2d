@@ -8,11 +8,20 @@
 			<param name="ConversionPattern" value="%-5p %c{1} - %m%n" />
 		</layout>
 	</appender>
+	
+	<appender name="ToFile" class="org.apache.log4j.RollingFileAppender">
+		<param name="file" value="JBox2d.log" />
+		<param name="MaxFileSize" value="1000KB" />
+		<param name="MaxBackupIndex" value="4" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d [%t] %-5p %l - %m%n" />
+		</layout>
+	</appender>
 
-	<appender name="ColFile" class="org.apache.log4j.RollingFileAppender">
+	<!--<appender name="ColFile" class="org.apache.log4j.RollingFileAppender">
 		<param name="file" value="Collision.log" />
 		<param name="MaxFileSize" value="1000KB" />
-		<!-- Keep one backup file -->
+		 Keep one backup file 
 		<param name="MaxBackupIndex" value="4" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d [%t] %-5p %l - %m%n" />
@@ -21,7 +30,7 @@
 	<appender name="DynFile" class="org.apache.log4j.RollingFileAppender">
 		<param name="file" value="Dynamics.log" />
 		<param name="MaxFileSize" value="1000KB" />
-		<!-- Keep one backup file -->
+		 Keep one backup file 
 		<param name="MaxBackupIndex" value="4" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d [%t] %-5p %l - %m%n" />
@@ -31,29 +40,17 @@
 	<appender name="TestbedFile" class="org.apache.log4j.RollingFileAppender">
 		<param name="file" value="Testbed.log" />
 		<param name="MaxFileSize" value="1000KB" />
-		<!-- Keep one backup file -->
+		 Keep one backup file 
 		<param name="MaxBackupIndex" value="4" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d [%t] %-5p %l - %m%n" />
 		</layout>
-	</appender>
-
-	<logger name="org.jbox2d.collision">
-		<level value="debug"/>
-		<appender-ref ref="console"/>
-		<appender-ref ref="ColFile"/>
-	</logger>
+	</appender>-->
 	
-	<logger name="org.jbox2d.dynamics">
+	<logger name="org.jbox2d.*">
 		<level value="debug"/>
 		<appender-ref ref="console"/>
-		<appender-ref ref="DynFile"/>
-	</logger>
-	
-	<logger name="org.jbox2d.testbed">
-		<level value="debug"/>
-		<appender-ref ref="console"/>
-		<appender-ref ref="TestbedFile"/>
+		<appender-ref ref="ToFile"/>
 	</logger>
 	
 	<root>

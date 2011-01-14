@@ -3,9 +3,6 @@
  */
 package org.jbox2d.testbed.framework;
 
-import java.awt.Color;
-import java.security.KeyRep;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.jbox2d.callbacks.ContactImpulse;
@@ -62,7 +59,7 @@ public abstract class TestbedTest implements ContactListener{
 	private final LinkedList<QueueItem> inputQueue;
 	
 	private String title = null;
-	private int textLine;
+	protected int textLine;
 	private final LinkedList<String> textList = new LinkedList<String>();
 	
 	public float cachedCameraScale;
@@ -139,32 +136,12 @@ public abstract class TestbedTest implements ContactListener{
 	
 	public abstract String getTestName();
 	
-	private final Color3f color1 = new Color3f(.3f, .95f, .3f);
-	private final Color3f color2 = new Color3f(.3f, .3f, .95f);
-	private final Color3f color3 = new Color3f(.9f, .9f, .9f);
-	private final Color3f color4 = new Color3f(.84f, .84f, 1);
-	private final Color3f mouseColor = new Color3f(0f, 1f, 0f);
-	private final Vec2 p1 = new Vec2();
-	private final Vec2 p2 = new Vec2();
-	
-	public void step(TestbedSettings settings){
-		float timeStep = settings.hz > 0f ? 1f/settings.hz : 0;
+	public void update(TestbedSettings settings){
 		textLine = 15;
 		// keys!
 		if(TestPanel.keys['r']){
 			TestPanel.keys['r'] = false;
 			init(debugDraw);
-		}
-		
-		if(settings.pause){
-			if(settings.singleStep){
-				settings.singleStep = false;
-			}else{
-				timeStep = 0;
-			}
-			
-			debugDraw.drawString(5, textLine, "****PAUSED****", Color3f.WHITE);
-			textLine += 15;
 		}
 		
 		if(title != null){
@@ -198,6 +175,34 @@ public abstract class TestbedTest implements ContactListener{
 					}
 				}
 			}
+		}
+		
+		step(settings);
+	}
+	
+	private final Color3f color1 = new Color3f(.3f, .95f, .3f);
+	private final Color3f color2 = new Color3f(.3f, .3f, .95f);
+	private final Color3f color3 = new Color3f(.9f, .9f, .9f);
+	private final Color3f color4 = new Color3f(.84f, .84f, 1);
+	private final Color3f mouseColor = new Color3f(0f, 1f, 0f);
+	private final Vec2 p1 = new Vec2();
+	private final Vec2 p2 = new Vec2();
+	
+	
+	
+	public void step(TestbedSettings settings){
+		float timeStep = settings.hz > 0f ? 1f/settings.hz : 0;
+		
+		
+		if(settings.pause){
+			if(settings.singleStep){
+				settings.singleStep = false;
+			}else{
+				timeStep = 0;
+			}
+			
+			debugDraw.drawString(5, textLine, "****PAUSED****", Color3f.WHITE);
+			textLine += 15;
 		}
 		
 		int flags = 0;

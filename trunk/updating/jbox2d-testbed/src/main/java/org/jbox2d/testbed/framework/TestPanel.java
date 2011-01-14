@@ -228,7 +228,7 @@ public class TestPanel extends JPanel implements Runnable{
 	
 	public void update(){
 		if(currTest != null){
-			currTest.step(settings);
+			currTest.update(settings);
 		}
 	}	
 	
