@@ -10,4 +10,13 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>JBox2d Serialization</name>
   <description>Serialization library for JBox2D, schema described here: http://alteredsoftworks.com/box2d/Box2Scene.pdf</description>
+  <dependencies>
+  	<dependency>
+  		<groupId>org.jbox2d</groupId>
+  		<artifactId>jbox2d-library</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  		<type>jar</type>
+  		<scope>compile</scope>
+  	</dependency>
+  </dependencies>
 </project>
