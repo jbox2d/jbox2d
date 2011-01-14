@@ -120,7 +120,11 @@ public class MathUtils {
 	
 	public static final int floor(final float x) {
 		if (Settings.FAST_MATH) {
-			return x > 0 ? (int) x : (int) x - 1;
+			int y = (int) x;
+	        if (x < 0 && x != y) {
+	            y--;
+	        }
+	        return y;
 		}
 		else {
 			return (int) Math.floor(x);
@@ -129,7 +133,11 @@ public class MathUtils {
 	
 	public static final int ceil(final float x){
 		if (Settings.FAST_MATH){
-			return floor(x+.5f);
+			int y = (int) x;
+	        if (x > 0 && x != y) {
+	            y++;
+	        }
+	        return y;
 		}else{
 			return (int) Math.ceil(x);
 		}
@@ -208,32 +216,32 @@ public class MathUtils {
 
 	// UNTESTED
 	public static final float atan2(final float y, final float x) {
-		if (Settings.FAST_MATH) {
-			// float coeff_1 = PI/4;
-			// float coeff_2 = 3*coeff_1;
-			final float abs_y = abs(y) + .0000000001f; // kludge to prevent 0/0
-			// condition
-			float angle, r;
-			if (x >= 0) {
-				r = (x - abs_y) / (x + abs_y);
-				// angle = coeff_1 - coeff_1 * r;
-				angle = 0.1963f * r * r * r - 0.9817f * r + Settings.PI / 4;
-			}
-			else {
-				r = (x + abs_y) / (abs_y - x);
-				// angle = coeff_2 - coeff_1 * r;
-				angle = 0.1963f * r * r * r - 0.9817f * r + 3 * Settings.PI / 4;
-			}
-			if (y < 0) {
-				return -angle; // negate if in quad III or IV
-			}
-			else {
-				return angle;
-			}
-		}
-		else {
+//		if (Settings.FAST_MATH) {
+//			// float coeff_1 = PI/4;
+//			// float coeff_2 = 3*coeff_1;
+//			final float abs_y = abs(y) + .0000000001f; // kludge to prevent 0/0
+//			// condition
+//			float angle, r;
+//			if (x >= 0) {
+//				r = (x - abs_y) / (x + abs_y);
+//				// angle = coeff_1 - coeff_1 * r;
+//				angle = 0.1963f * r * r * r - 0.9817f * r + Settings.PI / 4;
+//			}
+//			else {
+//				r = (x + abs_y) / (abs_y - x);
+//				// angle = coeff_2 - coeff_1 * r;
+//				angle = 0.1963f * r * r * r - 0.9817f * r + 3 * Settings.PI / 4;
+//			}
+//			if (y < 0) {
+//				return -angle; // negate if in quad III or IV
+//			}
+//			else {
+//				return angle;
+//			}
+//		}
+//		else {
 			return (float) Math.atan2(y, x);
-		}
+//		}
 	}
 	
 	

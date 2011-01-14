@@ -8,6 +8,7 @@ import java.util.Stack;
 
 import org.jbox2d.collision.AABB;
 import org.jbox2d.common.Mat22;
+import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.Vec3;
 
@@ -33,6 +34,9 @@ public class WorldPool {
 	}
 	
 	public final Vec2 popVec2(){
+		if(!Settings.POOLING){
+			return new Vec2();
+		}
 		if(vecs.isEmpty()){
 			vecs.push(new Vec2());
 			vecs.push(new Vec2());
@@ -45,10 +49,16 @@ public class WorldPool {
 	}
 	
 	public final void pushVec2(Vec2 argVec2){
+		if(!Settings.POOLING){
+			return;
+		}
 		vecs.push(argVec2);
 	}
 	
 	public final void pushVec2(Vec2... argVec2s){
+		if(!Settings.POOLING){
+			return;
+		}
 		for(Vec2 v : argVec2s){
 			vecs.push(v);
 		}
@@ -59,6 +69,9 @@ public class WorldPool {
 	}
 	
 	public final Vec3 popVec3(){
+		if(!Settings.POOLING){
+			return new Vec3();
+		}
 		if(vec3s.isEmpty()){
 			vec3s.push(new Vec3());
 			vec3s.push(new Vec3());
@@ -71,10 +84,16 @@ public class WorldPool {
 	}
 	
 	public final void pushVec3(Vec3 argVec3){
+		if(!Settings.POOLING){
+			return;
+		}
 		vec3s.push(argVec3);
 	}
 	
 	public final void pushVec3(Vec3... argVec3s){
+		if(!Settings.POOLING){
+			return;
+		}
 		for(Vec3 v : argVec3s){
 			vec3s.push(v);
 		}
@@ -86,6 +105,9 @@ public class WorldPool {
 	}
 	
 	public final Mat22 popMat22(){
+		if(!Settings.POOLING){
+			return new Mat22();
+		}
 		if(mats.isEmpty()){
 			mats.push(new Mat22());
 			mats.push(new Mat22());
@@ -98,10 +120,16 @@ public class WorldPool {
 	}
 	
 	public final void pushMat22(Mat22 argMat){
+		if(!Settings.POOLING){
+			return;
+		}
 		mats.push(argMat);
 	}
 	
 	public final void pushMat22(Mat22... argMats){
+		if(!Settings.POOLING){
+			return;
+		}
 		for(Mat22 m : argMats){
 			mats.push(m);
 		}
@@ -112,6 +140,9 @@ public class WorldPool {
 	}
 	
 	public final AABB popAABB(){
+		if(!Settings.POOLING){
+			return new AABB();
+		}
 		if(aabbs.isEmpty()){
 			aabbs.push(new AABB());
 			aabbs.push(new AABB());

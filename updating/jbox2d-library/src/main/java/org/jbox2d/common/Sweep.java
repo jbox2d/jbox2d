@@ -109,7 +109,7 @@ public class Sweep {
 		//c0 = (1.0f - t) * c0 + t*c;
 		c0.x = (1.0f - t) * c0.x + t*c.x;
 		c0.y = (1.0f - t) * c0.y + t*c.y;
-		a0 = (1.0f - t) * a0 + t*a;
+		a0 = (1.0f - t) * a0 + t*a;		
 	}
 
 }

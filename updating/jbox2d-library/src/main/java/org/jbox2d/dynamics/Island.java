@@ -296,6 +296,7 @@ public class Island {
 			b.m_sweep.c0.set(b.m_sweep.c);
 			b.m_sweep.a0 = b.m_sweep.a;
 
+
 			// Integrate
 			//b.m_sweep.c += step.dt * b.m_linearVelocity;
 			temp.set(b.m_linearVelocity).mulLocal(step.dt);

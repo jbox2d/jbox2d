@@ -356,6 +356,7 @@ public class PrismaticJoint extends Joint {
 		
 		Vec2 c2 = b2.m_sweep.c;
 		float a2 = b2.m_sweep.a;
+
 		
 		// Solve linear limit constraint.
 		float linearError = 0.0f, angularError = 0.0f;
@@ -482,6 +483,7 @@ public class PrismaticJoint extends Joint {
 		// TODO_ERIN remove need for this.
 		b1.m_sweep.c.set(c1);
 		b1.m_sweep.a = a1;
+
 		b2.m_sweep.c.set(c2);
 		b2.m_sweep.a = a2;
 		b1.synchronizeTransform();
@@ -536,6 +538,7 @@ public class PrismaticJoint extends Joint {
 		temp.set(v2).subLocal(v1);
 		Cdot1.x = Vec2.dot(m_perp, temp) + m_s2 * w2 - m_s1 * w1;
 		Cdot1.y = w2 - w1;
+		//System.out.println(Cdot1);
 		
 		if (m_enableLimit && m_limitState != LimitState.INACTIVE) {
 			// Solve prismatic and limit constraint in block form.

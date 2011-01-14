@@ -23,8 +23,6 @@
 
 package org.jbox2d.common;
 
-import org.jbox2d.pooling.TLVec3;
-
 // updated to rev 100
 
 /**
@@ -35,7 +33,7 @@ public class Mat33 {
 	
 	public static final Mat33 IDENTITY = new Mat33(new Vec3(1,0,0), new Vec3(0,1,0), new Vec3(0,0,1));
 	
-	public Vec3 col1,col2,col3;
+	public final Vec3 col1,col2,col3;
 	
 	public Mat33(){
 		col1 = new Vec3();
@@ -78,13 +76,7 @@ public class Mat33 {
 	 */
 	public final Vec2 solve22(Vec2 b){
 		Vec2 x = new Vec2();
-		final float a11 = col1.x, a12 = col2.x, a21 = col1.y, a22 = col2.y;
-		float det = a11 * a22 - a12 * a21;
-		assert(det != 0.0f);
-		
-		det = 1.0f / det;
-		x.x = det * (a22 * b.x - a12 * b.y);
-		x.y = det * (a11 * b.y - a21 * b.x);
+		solve22ToOut(b, x);
 		return x;
 	}
 	
@@ -97,9 +89,9 @@ public class Mat33 {
 	public final void solve22ToOut(Vec2 b, Vec2 out){
 		final float a11 = col1.x, a12 = col2.x, a21 = col1.y, a22 = col2.y;
 		float det = a11 * a22 - a12 * a21;
-		assert(det != 0.0f);
-		
-		det = 1.0f / det;
+		if (det != 0.0f){
+			det = 1.0f / det;
+		}
 		out.x = det * (a22 * b.x - a12 * b.y);
 		out.y = det * (a11 * b.y - a21 * b.x);
 	}
@@ -113,24 +105,10 @@ public class Mat33 {
 	 */
 	public final Vec3 solve33(Vec3 b){
 		Vec3 x = new Vec3();
-		final Vec3 crossed = tlCrossed.get();
-		Vec3.crossToOut(col2, col3, crossed);
-		float det = Vec3.dot(col1, crossed);
-		assert(det != 0.0f);
-		
-		det = 1.0f / det;
-		Vec3.crossToOut(col2, col3, crossed);
-		x.x = det * Vec3.dot(b, crossed);
-		Vec3.crossToOut(b, col3, crossed);
-		x.y = det * Vec3.dot(col1, crossed);
-		Vec3.crossToOut(col2, b, crossed);
-		x.z = det * Vec3.dot(col1, crossed);
+		solve33ToOut(b, x);
 		return x;
 	}
 	
-	
-	// djm pooling
-	private static final TLVec3 tlCrossed = new TLVec3();
 	/**
 	 * Solve A * x = b, where b is a column vector. This is more efficient
 	 * than computing the inverse in one-shot cases.
@@ -138,17 +116,19 @@ public class Mat33 {
 	 * @param out the result
 	 */
 	public final void solve33ToOut(Vec3 b, Vec3 out){
-		final Vec3 crossed = tlCrossed.get();
-		Vec3.crossToOut(col2, col3, crossed);
-		float det = Vec3.dot(col1, crossed);
-		assert(det != 0.0f);
-		
-		det = 1.0f / det;
-		Vec3.crossToOut(col2, col3, crossed);
-		out.x = det * Vec3.dot(b, crossed);
-		Vec3.crossToOut(b, col3, crossed);
-		out.y = det * Vec3.dot(col1, crossed);
-		Vec3.crossToOut(col2, b, crossed);
-		out.z = det * Vec3.dot(col1, crossed);
+		Vec3.crossToOut(col2, col3, out);
+		float det = Vec3.dot(col1, out);
+		if (det != 0.0f){
+			det = 1.0f / det;
+		}
+		Vec3.crossToOut(col2, col3, out);
+		float x = det * Vec3.dot(b, out);
+		Vec3.crossToOut(b, col3, out);
+		float y = det * Vec3.dot(col1, out);
+		Vec3.crossToOut(col2, b, out);
+		float z = det * Vec3.dot(col1, out);
+		out.x = x;
+		out.y = y;
+		out.z = z;
 	}
 }

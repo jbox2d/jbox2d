@@ -114,6 +114,10 @@ public class Vec3 {
 		return new Vec3(this);
 	}
 	
+	public String toString(){
+		return "("+x+","+y+","+z+")";
+	}
+	
 	/**
 	 * @see java.lang.Object#hashCode()
 	 */
