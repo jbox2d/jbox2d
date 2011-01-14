@@ -1,7 +1,6 @@
 package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.common.Vec2;
-import org.jbox2d.structs.dynamics.joints.JointType;
 
 public class MouseJointDef extends JointDef {
 	/**

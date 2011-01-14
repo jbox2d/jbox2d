@@ -15,9 +15,6 @@ import org.jbox2d.pooling.TLManifold;
 import org.jbox2d.pooling.stacks.TLStack;
 import org.jbox2d.structs.collision.ContactID;
 import org.jbox2d.structs.collision.ManifoldPoint;
-import org.jbox2d.structs.dynamics.contacts.ContactCreator;
-import org.jbox2d.structs.dynamics.contacts.ContactEdge;
-import org.jbox2d.structs.dynamics.contacts.ContactRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

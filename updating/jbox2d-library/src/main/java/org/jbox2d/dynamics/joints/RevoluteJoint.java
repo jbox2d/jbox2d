@@ -32,7 +32,6 @@ import org.jbox2d.common.Vec3;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.World;
-import org.jbox2d.structs.dynamics.joints.LimitState;
 
 //Point-to-point constraint
 //C = p2 - p1

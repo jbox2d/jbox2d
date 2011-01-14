@@ -2,7 +2,6 @@ package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
-import org.jbox2d.structs.dynamics.joints.JointType;
 
 /**
  * Prismatic joint definition. This requires defining a line of

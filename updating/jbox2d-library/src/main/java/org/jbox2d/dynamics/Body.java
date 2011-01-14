@@ -8,12 +8,12 @@ import org.jbox2d.common.Sweep;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.contacts.Contact;
+import org.jbox2d.dynamics.contacts.ContactEdge;
+import org.jbox2d.dynamics.joints.JointEdge;
 import org.jbox2d.pooling.TLFixtureDef;
 import org.jbox2d.pooling.TLMassData;
 import org.jbox2d.pooling.TLTransform;
 import org.jbox2d.pooling.TLVec2;
-import org.jbox2d.structs.dynamics.contacts.ContactEdge;
-import org.jbox2d.structs.dynamics.joints.JointEdge;
 
 // updated to rev 100
 // thead safe pooling
