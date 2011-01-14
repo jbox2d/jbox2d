@@ -1011,7 +1011,6 @@ public class Body {
 		m_xf.R.set(m_sweep.a);
 		
 		//m_xf.position = m_sweep.c - Mul(m_xf.R, m_sweep.localCenter);
-
 		Mat22.mulToOut(m_xf.R, m_sweep.localCenter, m_xf.position);
 		m_xf.position.mulLocal(-1).addLocal(m_sweep.c);
 	}

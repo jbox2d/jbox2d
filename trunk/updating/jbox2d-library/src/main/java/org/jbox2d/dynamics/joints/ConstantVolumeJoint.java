@@ -29,9 +29,6 @@ public class ConstantVolumeJoint extends Joint {
 		targetVolume *= factor;
 	}
 
-	// djm this is not a hot method, so no pool. no one wants
-	// to swim when it's cold out.  except when you have a hot
-	// tub.....then its amazing.....hmmmm......
 	public ConstantVolumeJoint(World argWorld, ConstantVolumeJointDef def) {
 		super(argWorld,def);
 		if (def.bodies.length <= 2) {
@@ -47,10 +44,10 @@ public class ConstantVolumeJoint extends Joint {
 		}
 		targetVolume = getArea();
 
+		final DistanceJointDef djd = new DistanceJointDef();
 		distanceJoints = new DistanceJoint[bodies.length];
 		for (int i=0; i<targetLengths.length; ++i) {
 			final int next = (i == targetLengths.length-1)?0:i+1;
-			final DistanceJointDef djd = new DistanceJointDef();
 			djd.frequencyHz = def.frequencyHz;//20.0f;
 			djd.dampingRatio = def.dampingRatio;//50.0f;
 			djd.initialize(bodies[i], bodies[next], bodies[i].getWorldCenter(), bodies[next].getWorldCenter());

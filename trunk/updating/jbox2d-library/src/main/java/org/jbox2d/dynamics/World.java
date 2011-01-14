@@ -938,7 +938,6 @@ public class World {
 	private final TOIInput toiInput = new TOIInput();
 	private final TOIOutput toiOutput = new TOIOutput();
 	private final Sweep backup = new Sweep();
-	private final Contact[] contacts = new Contact[Settings.maxTOIContacts];
 	private final TOISolver toiSolver = new TOISolver();
 	
 	private void solveTOI(Body body){
@@ -1043,6 +1042,7 @@ public class World {
 		++toiContact.m_toiCount;
 
 		// Update all the valid contacts on this body and build a contact island.
+		final Contact[] contacts = new Contact[Settings.maxTOIContacts];
 		count = 0;
 		for (ContactEdge ce = body.m_contactList; ce != null && count < Settings.maxTOIContacts; ce = ce.next){
 			Body other = ce.other;

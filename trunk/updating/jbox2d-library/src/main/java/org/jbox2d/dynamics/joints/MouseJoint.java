@@ -33,7 +33,9 @@ public class MouseJoint extends Joint {
 		
 		m_target.set(def.target);
 		Transform.mulTransToOut(m_bodyB.getTransform(), m_target, m_localAnchor);
-		
+		System.out.println("local anchor: "+m_localAnchor);
+		System.out.println("target: "+m_target);
+
 		m_maxForce = def.maxForce;
 		m_impulse.setZero();
 		
@@ -179,8 +181,8 @@ public class MouseJoint extends Joint {
 		Body b = m_bodyB;
 
 		Vec2 r = world.getPool().popVec2();
-		
-		r.set(m_localAnchor.subLocal(b.getLocalCenter()));
+
+		r.set(m_localAnchor).subLocal(b.getLocalCenter());
 		Mat22.mulToOut(b.getTransform().R, r, r);
 		
 		// Cdot = v + cross(w, r)

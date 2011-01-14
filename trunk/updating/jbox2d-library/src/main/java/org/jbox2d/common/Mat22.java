@@ -30,7 +30,7 @@ package org.jbox2d.common;
  */
 public class Mat22 {
 	
-	public Vec2 col1, col2;
+	public final Vec2 col1, col2;
 
 	/** Convert the matrix to printable format. */
 	@Override
