@@ -3,6 +3,7 @@
  */
 package org.jbox2d.testbed.framework;
 
+import java.awt.Color;
 import java.security.KeyRep;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -239,6 +240,13 @@ public abstract class TestbedTest implements ContactListener{
 			Vec2.creationCount = 0;
 		}else{
 			Vec2.watchCreations = false;
+		}
+		
+		if(settings.drawDebug){
+			debugDraw.drawString(5, textLine, "Debug Info", color4);
+			textLine += 15;
+			debugDraw.drawString(5, textLine, "World mouse: "+mouseWorld, Color3f.WHITE);
+			textLine += 20;
 		}
 		
 		if(!textList.isEmpty()){
