@@ -59,6 +59,7 @@ public class TestbedMain extends JFrame {
 	
 	public void testChanged(TestbedTest argNew){
 		panel.changeTest(argNew);
+		panel.grabFocus();
 	}
 	
 	public static void main(String[] args){
@@ -128,7 +129,7 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 		"Draw Pairs", "Draw Contact Points",
 		"Draw Contact Normals", "Draw Contact Forces",
 		"Draw Friction Forces", "Draw Center of Mass",
-		"Draw Stats", "Draw Dynamic Tree"
+		"Draw Stats", "Draw Debug", "Draw Dynamic Tree"
 	};
 	
 	public SidePanel(TestbedSettings argSettings){
@@ -237,8 +238,10 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 					tf = settings.drawStats;
 					break;
 				case 12:
-					tf = settings.drawDynamicTree;
+					tf = settings.drawDebug;
 					break;
+				case 13:
+					tf = settings.drawDynamicTree;
 				default:
 					System.out.println("oh no");
 					tf = false;
@@ -322,8 +325,10 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 					settings.drawStats = tf;
 					break;
 				case 12:
-					settings.drawDynamicTree = tf;
+					settings.drawDebug = tf;
 					break;
+				case 13:
+					settings.drawDynamicTree = tf;
 				default:
 					System.out.println("oh no");
 			}

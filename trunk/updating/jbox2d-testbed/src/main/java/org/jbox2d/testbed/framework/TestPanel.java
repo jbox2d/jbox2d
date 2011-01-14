@@ -31,8 +31,8 @@ import org.jbox2d.common.Vec2;
  */
 @SuppressWarnings("serial")
 public class TestPanel extends JPanel implements Runnable{
-	public static final int INIT_WIDTH = 500;
-	public static final int INIT_HEIGHT = 500;
+	public static final int INIT_WIDTH = 600;
+	public static final int INIT_HEIGHT = 600;
 	public volatile static boolean[] keys = new boolean[256];
 	public volatile static boolean[] codedKeys = new boolean[512];
 	
