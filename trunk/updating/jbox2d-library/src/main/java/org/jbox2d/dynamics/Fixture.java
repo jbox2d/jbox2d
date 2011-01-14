@@ -9,11 +9,11 @@ import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.contacts.Contact;
+import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.pooling.TLAABB;
 import org.jbox2d.pooling.TLVec2;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;
-import org.jbox2d.structs.dynamics.contacts.ContactEdge;
 
 // updated to rev 100
 // thread-safe pooling

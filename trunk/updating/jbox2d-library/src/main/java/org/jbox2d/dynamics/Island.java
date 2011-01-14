@@ -6,9 +6,9 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.contacts.Contact;
+import org.jbox2d.dynamics.contacts.ContactConstraint;
 import org.jbox2d.dynamics.contacts.ContactSolver;
 import org.jbox2d.dynamics.joints.Joint;
-import org.jbox2d.structs.dynamics.contacts.ContactConstraint;
 
 /*
 Position Correction Notes

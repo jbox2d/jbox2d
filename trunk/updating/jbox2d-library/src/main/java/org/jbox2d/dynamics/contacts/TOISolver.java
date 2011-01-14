@@ -11,7 +11,6 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.structs.collision.ManifoldPoint;
-import org.jbox2d.structs.dynamics.contacts.TOIConstraint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

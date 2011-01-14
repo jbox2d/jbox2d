@@ -6,7 +6,7 @@ import org.jbox2d.callbacks.PairCallback;
 import org.jbox2d.collision.broadphase.BroadPhase;
 import org.jbox2d.collision.broadphase.DynamicTreeNode;
 import org.jbox2d.dynamics.contacts.Contact;
-import org.jbox2d.structs.dynamics.contacts.ContactEdge;
+import org.jbox2d.dynamics.contacts.ContactEdge;
 
 // no pooling needed
 /**

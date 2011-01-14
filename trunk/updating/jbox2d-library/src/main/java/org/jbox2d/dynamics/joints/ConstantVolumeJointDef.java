@@ -1,7 +1,6 @@
 package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.dynamics.Body;
-import org.jbox2d.structs.dynamics.joints.JointType;
 
 /**
  * Definition for a {@link ConstantVolumeJoint}, which connects a group a bodies together

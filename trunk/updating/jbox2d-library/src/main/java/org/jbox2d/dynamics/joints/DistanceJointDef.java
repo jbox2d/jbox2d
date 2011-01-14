@@ -25,7 +25,6 @@ package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
-import org.jbox2d.structs.dynamics.joints.JointType;
 
 //Updated to rev 56->130->142 of b2DistanceJoint.cpp/.h
 
