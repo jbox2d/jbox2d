@@ -1,5 +1,7 @@
 package org.jbox2d.collision.broadphase;
 
+import java.util.Stack;
+
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
@@ -222,9 +224,27 @@ public class DynamicTree {
 	}
 	
 	// stacks because it's recursive
-	private static final Vec2Stack vec2stack = new Vec2Stack();
-	private static final TLAABB tlaabb = new TLAABB();
-	private static final TLRayCastInput tlsubInput = new TLRayCastInput();
+	private final Stack<Vec2> vec2stack = new Stack<Vec2>();
+	private final AABB aabb = new AABB();
+	private final RayCastInput subInput = new RayCastInput();
+	// TODO replace with non-threadlocal vec2 stack
+	private final Vec2 getVec2(){
+		if(vec2stack.isEmpty()){
+			vec2stack.push(new Vec2());
+			vec2stack.push(new Vec2());
+			vec2stack.push(new Vec2());
+			vec2stack.push(new Vec2());
+			vec2stack.push(new Vec2());
+			return new Vec2();
+		}
+		return vec2stack.pop();
+	}
+	
+	private final void recycleVec2(Vec2... items){
+		for(Vec2 v :items){
+			vec2stack.push(v);
+		}
+	}
 	
 	/**
 	 * Ray-cast against the proxies in the tree. This relies on the callback
@@ -237,9 +257,9 @@ public class DynamicTree {
 	 */
 	public void raycast(TreeRayCastCallback argCallback,  RayCastInput argInput){
 		
-		final Vec2 r = vec2stack.get();
-		final Vec2 v = vec2stack.get();
-		final Vec2 absV = vec2stack.get();
+		final Vec2 r = getVec2();
+		final Vec2 v = getVec2();
+		final Vec2 absV = getVec2();
 		
 		Vec2 p1 = argInput.p1;
 		Vec2 p2 = argInput.p2;
@@ -258,15 +278,15 @@ public class DynamicTree {
 		maxFraction[0] = argInput.maxFraction;
 		
 		// Build a bounding box for the segment.
-		final AABB segAABB = tlaabb.get();
+		final AABB segAABB = aabb;
 		//b2Vec2 t = p1 + maxFraction * (p2 - p1);
-		final Vec2 temp = vec2stack.get();
+		final Vec2 temp = getVec2();
 		temp.set(p2).subLocal(p1).mulLocal(maxFraction[0]).addLocal(p1);
 		Vec2.minToOut(p1, temp, segAABB.lowerBound);
 		Vec2.maxToOut(p1, temp, segAABB.upperBound);
 		
 		raycast(m_root, argInput, 0, segAABB, v, p1, p2, absV, maxFraction, argCallback);
-		vec2stack.recycle(r, v, absV, temp);
+		recycleVec2(r, v, absV, temp);
 	}
 		
 	public boolean raycast(DynamicTreeNode argNode,
@@ -288,9 +308,9 @@ public class DynamicTree {
 			return false;
 		}
 		
-		final Vec2 temp = vec2stack.get();
-		final Vec2 c = vec2stack.get();
-		final Vec2 h = vec2stack.get();
+		final Vec2 temp = getVec2();
+		final Vec2 c = getVec2();
+		final Vec2 h = getVec2();
 		argNode.aabb.getCenterToOut(c);
 		argNode.aabb.getExtentsToOut(h);
 		
@@ -298,12 +318,11 @@ public class DynamicTree {
 		float separation = MathUtils.abs( Vec2.dot(argV, temp)) - Vec2.dot(argAbs_v, h);
 		
 		if(separation > 0f){
-			vec2stack.recycle(temp, c, h);
+			recycleVec2(temp, c, h);
 			return false;
 		}
 		
 		if( argNode.isLeaf()){
-			final RayCastInput subInput = tlsubInput.get();
 			subInput.p1.set(argInput.p1);
 			subInput.p2.set(argInput.p2);
 			subInput.maxFraction = argMaxFraction[0];
@@ -311,7 +330,7 @@ public class DynamicTree {
 			float value = argCallback.raycastCallback( subInput, argNode);
 			
 			if(value == 0f){
-				vec2stack.recycle(temp, c, h);
+				recycleVec2(temp, c, h);
 				// The client has terminated the ray cast.
 				return true;
 			}
@@ -327,19 +346,19 @@ public class DynamicTree {
 			if(argCount < MAX_STACK_SIZE){
 				if(raycast(argNode.child1,argInput,++argCount,argSegAABB,
 							argV, argP1, argP2, argAbs_v, argMaxFraction, argCallback)){
-					vec2stack.recycle(temp, c, h);
+					recycleVec2(temp, c, h);
 					return true; // to stop whole raycast
 				}
 			}
 			if(argCount < MAX_STACK_SIZE){
 				if(raycast(argNode.child2,argInput,++argCount,argSegAABB,
 						argV, argP1, argP2, argAbs_v, argMaxFraction, argCallback)){
-					vec2stack.recycle(temp, c, h);
+					recycleVec2(temp, c, h);
 					return true; // to stop whole raycast
 				}
 			}		
 		}
-		vec2stack.recycle(temp, c, h);
+		recycleVec2(temp, c, h);
 		return false;
 	}
 	
@@ -384,10 +403,10 @@ public class DynamicTree {
 		m_nodeCount--;
 	}
 	
-	private static final TLVec2 tlcenter = new TLVec2();
+	private final Vec2 center = new Vec2();
 	//private static final TLVec2 tltemp = new TLVec2();
-	private static final TLVec2 tldelta1 = new TLVec2();
-	private static final TLVec2 tldelta2 = new TLVec2();
+	private final Vec2 delta1 = new Vec2();
+	private final Vec2 delta2 = new Vec2();
 
 
 	private final void insertLeaf(DynamicTreeNode argNode){
@@ -400,7 +419,6 @@ public class DynamicTree {
 		}
 		
 		// find the best sibling
-		final Vec2 center = tlcenter.get();
 		//final Vec2 temp = tltemp.get();
 		
 		argNode.aabb.getCenterToOut(center);
@@ -408,8 +426,6 @@ public class DynamicTree {
 		
 		DynamicTreeNode child1,child2;
 		if(sibling.isLeaf() == false){
-			final Vec2 delta1 = tldelta1.get();
-			final Vec2 delta2 = tldelta2.get();
 			do{
 				child1 = sibling.child1;
 				child2 = sibling.child2;
@@ -470,7 +486,7 @@ public class DynamicTree {
 		}
 	}
 	
-	private static final TLAABB tloldAABB = new TLAABB();
+	private final AABB oldAABB = new AABB();
 	
 	private final void removeLeaf(DynamicTreeNode argNode){
 		if(argNode == m_root){
@@ -502,8 +518,6 @@ public class DynamicTree {
 			sibling.parent = node1;
 			freeNode(node2);
 			
-			final AABB oldAABB = tloldAABB.get();
-			
 			// Adjust ancestor bounds.  if the old one was larger, we just keep it
 			while(node1 != null){
 				oldAABB.set(node1.aabb);
@@ -530,6 +544,9 @@ public class DynamicTree {
 	}
 
 	public void drawTree(DebugDraw argDraw) {
+		if(m_root == null){
+			return;
+		}
 		int height = computeHeight();
 		drawTree(argDraw, m_root, 0, height);
 	}
