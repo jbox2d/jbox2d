@@ -88,7 +88,7 @@ public class DynamicTree {
 	}
 	
 	// djm pooling
-	private static final TLVec2 tld = new TLVec2();
+	private final Vec2 d = new Vec2();
 	/**
 	 * Move a proxy with a swepted AABB. If the proxy has moved outside of its fattened AABB,
 	 * then the proxy is removed from the tree and re-inserted. Otherwise
@@ -111,7 +111,6 @@ public class DynamicTree {
 		argAABB.upperBound.x += Settings.aabbExtension;
 		argAABB.upperBound.y += Settings.aabbExtension;
 
-		Vec2 d = tld.get();
 		// Predict AABB displacement.
 		d.set(displacement).mulLocal(Settings.aabbMultiplier);
 		if (d.x < 0.0f){

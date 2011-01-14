@@ -23,6 +23,8 @@
 
 package org.jbox2d.common;
 
+import java.util.Random;
+
 /**
  * A few math methods that don't fit very well anywhere else.
  */
@@ -117,6 +119,11 @@ public class MathUtils {
 			return Math.abs(x);
 		}
 	}
+
+	public static final int abs(int x) {
+        int y = x >> 31;
+        return (x ^ y) - y;
+    }
 	
 	public static final int floor(final float x) {
 		if (Settings.FAST_MATH) {
@@ -276,6 +283,10 @@ public class MathUtils {
 	
 	public static final float randomFloat(float argLow, float argHigh){
 		return (float) Math.random() * (argHigh - argLow) + argLow;
+	}
+	
+	public static final float randomFloat(Random r, float argLow, float argHigh){
+		return r.nextFloat() * (argHigh - argLow) + argLow;
 	}
 
 	public static final float sqrt(float x) {

@@ -41,7 +41,7 @@ public class Settings {
 	/**
 	 * needs to be final, or will slow down math methods
 	 */
-	public static final boolean FAST_MATH = true;
+	public static final boolean FAST_MATH = false;
 	public static final boolean POOLING = true;
 	public static final boolean SINCOS_LUT_ENABLED = false;
 	/**
