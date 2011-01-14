@@ -33,9 +33,7 @@ public class MouseJoint extends Joint {
 		
 		m_target.set(def.target);
 		Transform.mulTransToOut(m_bodyB.getTransform(), m_target, m_localAnchor);
-		System.out.println("local anchor: "+m_localAnchor);
-		System.out.println("target: "+m_target);
-
+		
 		m_maxForce = def.maxForce;
 		m_impulse.setZero();
 		
