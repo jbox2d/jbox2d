@@ -40,7 +40,7 @@ public class WeldJointDef extends JointDef {
 	 * @param bB
 	 * @param anchor
 	 */
-	public void Initialize(Body bA, Body bB, Vec2 anchor){
+	public void initialize(Body bA, Body bB, Vec2 anchor){
 		bodyA = bA;
 		bodyB = bB;
 		bodyA.getLocalPointToOut(anchor, localAnchorA);

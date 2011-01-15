@@ -26,6 +26,8 @@ public abstract class Joint {
 				return new PrismaticJoint(argWorld.getPool(), (PrismaticJointDef) def);
 			case REVOLUTE:
 				return new RevoluteJoint(argWorld.getPool(), (RevoluteJointDef) def);
+			case WELD:
+				return new WeldJoint(argWorld.getPool(), (WeldJointDef) def);
 			case CONSTANT_VOLUME:
 				return new ConstantVolumeJoint(argWorld, (ConstantVolumeJointDef) def);
 		}
