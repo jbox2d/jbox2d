@@ -2,6 +2,7 @@
 s/b2//g
 s/->/./g
 s/Body\*/Body/g
+s/Joint\*/Joint/g
 s/(Vec2/(new Vec2/g
 s/, Vec2/, new Vec2/g
 s/\.Set/.set/g
@@ -16,6 +17,7 @@ s/bool /boolean /g
 s/int32/int/g
 s/&bd/bd/g
 s/&fd/fd/g
+s/&shape/shape/g
 s/BodyDef bd;/BodyDef bd = new BodyDef();/g
 s/PolygonShape shape;/PolygonShape shape = new PolygonShape();/g
 s/CircleShape shape;/CircleShape shape = new CircleShape();/g
@@ -32,3 +34,6 @@ s/ cosf(/ MathUtils.cos(/g
 s/m_debugDraw/debugDraw/g
 s/Color(/new Color3f(/g
 s/\.Draw/.draw/g
+s/Cross(/Vec2.cross(/g
+s/\.Length/.length/g
+s/_linearSlop/Settings.linearSlop/g

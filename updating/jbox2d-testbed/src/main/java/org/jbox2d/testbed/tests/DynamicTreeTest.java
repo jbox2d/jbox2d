@@ -5,22 +5,14 @@ package org.jbox2d.testbed.tests;
 
 import java.util.Random;
 
-import org.jbox2d.callbacks.ContactImpulse;
-import org.jbox2d.callbacks.RayCastCallback;
 import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.broadphase.DynamicTree;
 import org.jbox2d.collision.broadphase.DynamicTreeNode;
-import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.BodyDef;
-import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.pooling.arrays.Vec2Array;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;

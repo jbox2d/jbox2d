@@ -203,6 +203,7 @@ public class EdgeShapes extends TestbedTest {
 		Vec2 point2 = point1.add(d);
 
 
+		callback.m_fixture = null;
 		world.raycast(callback, point1, point2);
 
 		if (callback.m_fixture != null)

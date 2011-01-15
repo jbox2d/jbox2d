@@ -10,7 +10,6 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
-import org.jbox2d.dynamics.joints.PrismaticJoint;
 import org.jbox2d.dynamics.joints.PrismaticJointDef;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jbox2d.testbed.framework.TestbedSettings;
@@ -87,7 +86,7 @@ public class BodyTypes extends TestbedTest {
 			pjd.upperTranslation = 10.0f;
 			pjd.enableLimit = true;
 			
-			PrismaticJoint j = (PrismaticJoint) world.createJoint(pjd);
+			world.createJoint(pjd);
 			
 			m_speed = 3.0f;
 		}
