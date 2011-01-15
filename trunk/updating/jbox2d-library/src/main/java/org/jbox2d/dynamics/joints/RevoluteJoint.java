@@ -31,7 +31,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.common.Vec3;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
-import org.jbox2d.dynamics.World;
+import org.jbox2d.pooling.WorldPool;
 
 //Point-to-point constraint
 //C = p2 - p1
@@ -77,7 +77,7 @@ public class RevoluteJoint extends Joint {
 	public float m_upperAngle;
 	public LimitState m_limitState;
 	
-	public RevoluteJoint(World argWorld, RevoluteJointDef def) {
+	public RevoluteJoint(WorldPool argWorld, RevoluteJointDef def) {
 		super(argWorld, def);
 		m_localAnchor1.set(def.localAnchorA);
 		m_localAnchor2.set(def.localAnchorB);
@@ -104,8 +104,8 @@ public class RevoluteJoint extends Joint {
 			assert (b1.m_invI > 0.0f || b2.m_invI > 0.0f);
 		}
 		
-		final Vec2 r1 = world.getPool().popVec2();
-		final Vec2 r2 = world.getPool().popVec2();
+		final Vec2 r1 = pool.popVec2();
+		final Vec2 r2 = pool.popVec2();
 		
 		// Compute the effective mass matrix.
 		r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
@@ -181,8 +181,8 @@ public class RevoluteJoint extends Joint {
 			m_impulse.mulLocal(step.dtRatio);
 			m_motorImpulse *= step.dtRatio;
 			
-			Vec2 temp = world.getPool().popVec2();
-			Vec2 P = world.getPool().popVec2();
+			Vec2 temp = pool.popVec2();
+			Vec2 P = pool.popVec2();
 			P.set(m_impulse.x, m_impulse.y);
 			
 			temp.set(P).mulLocal(m1);
@@ -193,13 +193,13 @@ public class RevoluteJoint extends Joint {
 			b2.m_linearVelocity.addLocal(temp);
 			b2.m_angularVelocity += i2 * (Vec2.cross(r2, P) + m_motorImpulse + m_impulse.z);
 			
-			world.getPool().pushVec2(temp, P);
+			pool.pushVec2(temp, P);
 		}
 		else {
 			m_impulse.setZero();
 			m_motorImpulse = 0.0f;
 		}
-		world.getPool().pushVec2(r1, r2);
+		pool.pushVec2(r1, r2);
 	}
 	
 	@Override
@@ -227,9 +227,9 @@ public class RevoluteJoint extends Joint {
 			w1 -= i1 * impulse;
 			w2 += i2 * impulse;
 		}
-		Vec2 temp = world.getPool().popVec2();
-		Vec2 r1 = world.getPool().popVec2();
-		Vec2 r2 = world.getPool().popVec2();
+		Vec2 temp = pool.popVec2();
+		Vec2 r1 = pool.popVec2();
+		Vec2 r2 = pool.popVec2();
 		
 		// Solve limit constraint.
 		if (m_enableLimit && m_limitState != LimitState.INACTIVE) {
@@ -241,8 +241,8 @@ public class RevoluteJoint extends Joint {
 			// Vec2 r1 = b2Mul(b1.getTransform().R, m_localAnchor1 - b1.getLocalCenter());
 			// Vec2 r2 = b2Mul(b2.getTransform().R, m_localAnchor2 - b2.getLocalCenter());
 			
-			Vec2 Cdot1 = world.getPool().popVec2();
-			Vec3 Cdot = world.getPool().popVec3();
+			Vec2 Cdot1 = pool.popVec2();
+			Vec3 Cdot = pool.popVec3();
 			
 			// Solve point-to-point constraint
 			Vec2.crossToOut(w1, r1, temp);
@@ -254,7 +254,7 @@ public class RevoluteJoint extends Joint {
 			// float Cdot2 = w2 - w1;
 			// b2Vec3 Cdot(Cdot1.x, Cdot1.y, Cdot2);
 			
-			Vec3 impulse = world.getPool().popVec3();
+			Vec3 impulse = pool.popVec3();
 			m_mass.solve33ToOut(Cdot.negateLocal(), impulse);
 			// Cdot.negateLocal(); just leave negated, we don't use later
 			
@@ -287,7 +287,7 @@ public class RevoluteJoint extends Joint {
 					m_impulse.z = 0.0f;
 				}
 			}
-			Vec2 P = world.getPool().popVec2();
+			Vec2 P = pool.popVec2();
 			
 			P.set(impulse.x, impulse.y);
 			
@@ -299,8 +299,8 @@ public class RevoluteJoint extends Joint {
 			v2.addLocal(temp);
 			w2 += i2 * (Vec2.cross(r2, P) + impulse.z);
 			
-			world.getPool().pushVec2(P, Cdot1);
-			world.getPool().pushVec3(impulse, Cdot);
+			pool.pushVec2(P, Cdot1);
+			pool.pushVec3(impulse, Cdot);
 		}
 		else {
 			r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
@@ -311,8 +311,8 @@ public class RevoluteJoint extends Joint {
 			// Vec2 r2 = b2Mul(b2.getTransform().R, m_localAnchor2 - b2.getLocalCenter());
 			
 			// Solve point-to-point constraint
-			Vec2 Cdot = world.getPool().popVec2();
-			Vec2 impulse = world.getPool().popVec2();
+			Vec2 Cdot = pool.popVec2();
+			Vec2 impulse = pool.popVec2();
 			
 			Vec2.crossToOut(w1, r1, temp);
 			Vec2.crossToOut(w2, r2, Cdot);
@@ -330,7 +330,7 @@ public class RevoluteJoint extends Joint {
 			v2.addLocal(temp);
 			w2 += i2 * Vec2.cross(r2, impulse);
 			
-			world.getPool().pushVec2(Cdot, impulse);
+			pool.pushVec2(Cdot, impulse);
 		}
 		
 		b1.m_linearVelocity.set(v1);
@@ -338,7 +338,7 @@ public class RevoluteJoint extends Joint {
 		b2.m_linearVelocity.set(v2);
 		b2.m_angularVelocity = w2;
 		
-		world.getPool().pushVec2(r1,r2,temp);
+		pool.pushVec2(r1,r2,temp);
 	}
 	
 	@Override
@@ -389,11 +389,11 @@ public class RevoluteJoint extends Joint {
 		
 		// Solve point-to-point constraint.
 		{
-			Vec2 impulse = world.getPool().popVec2();
+			Vec2 impulse = pool.popVec2();
 
-			Vec2 r1 = world.getPool().popVec2();
-			Vec2 r2 = world.getPool().popVec2();
-			Vec2 C = world.getPool().popVec2();
+			Vec2 r1 = pool.popVec2();
+			Vec2 r2 = pool.popVec2();
+			Vec2 C = pool.popVec2();
 			
 			r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 			r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
@@ -409,7 +409,7 @@ public class RevoluteJoint extends Joint {
 			// Handle large detachment.
 			final float k_allowedStretch = 10.0f * Settings.linearSlop;
 			if (C.lengthSquared() > k_allowedStretch * k_allowedStretch) {
-				Vec2 u = world.getPool().popVec2();
+				Vec2 u = pool.popVec2();
 				
 				// Use a particle solution (no rotation).
 				// u.set(C);
@@ -428,22 +428,22 @@ public class RevoluteJoint extends Joint {
 				
 				C.set(b2.m_sweep.c).addLocal(r2).subLocal(b1.m_sweep.c).subLocal(r1);
 				
-				world.getPool().pushVec2(u);
+				pool.pushVec2(u);
 			}
 			
-			Mat22 K1 = world.getPool().popMat22();
+			Mat22 K1 = pool.popMat22();
 			K1.col1.x = invMass1 + invMass2;
 			K1.col2.x = 0.0f;
 			K1.col1.y = 0.0f;
 			K1.col2.y = invMass1 + invMass2;
 			
-			Mat22 K2 = world.getPool().popMat22();
+			Mat22 K2 = pool.popMat22();
 			K2.col1.x = invI1 * r1.y * r1.y;
 			K2.col2.x = -invI1 * r1.x * r1.y;
 			K2.col1.y = -invI1 * r1.x * r1.y;
 			K2.col2.y = invI1 * r1.x * r1.x;
 			
-			Mat22 K3 = world.getPool().popMat22();
+			Mat22 K3 = pool.popMat22();
 			K3.col1.x = invI2 * r2.y * r2.y;
 			K3.col2.x = -invI2 * r2.x * r2.y;
 			K3.col1.y = -invI2 * r2.x * r2.y;
@@ -464,8 +464,8 @@ public class RevoluteJoint extends Joint {
 			b1.synchronizeTransform();
 			b2.synchronizeTransform();
 			
-			world.getPool().pushMat22(K1,K2,K3);
-			world.getPool().pushVec2(impulse, r1, r2, C);
+			pool.pushMat22(K1,K2,K3);
+			pool.pushVec2(impulse, r1, r2, C);
 		}
 		
 		return positionError <= Settings.linearSlop && angularError <= Settings.angularSlop;

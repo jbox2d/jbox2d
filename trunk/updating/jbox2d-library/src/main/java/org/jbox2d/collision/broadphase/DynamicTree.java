@@ -40,10 +40,13 @@ public class DynamicTree {
 	
 	private int m_insertionCount;
 	
+	private int m_path;
+	
 	public DynamicTree(){
 		m_root = null;
 		m_nodeCount = 0;
 		m_insertionCount = 0;
+		m_path = 0;
 		lastLeaf = null;
 	}
 	
@@ -143,42 +146,28 @@ public class DynamicTree {
 	 * @param argIterations
 	 */
 	public final void rebalance(int argIterations){
-		if(lastLeaf == null){
-			lastLeaf = m_root;
+		if(m_root == null){
+			return;
 		}
-		rebalance( argIterations, lastLeaf);
-	}
-	// recursive
-	private final int rebalance(int argIterations, DynamicTreeNode argNode){
-		if(argNode == null){
-			return argIterations;
+		DynamicTreeNode currNode, nextNode;
+		for(int i=0; i< argIterations; i++){
+			currNode = m_root;
+			
+			int bit = 0;
+			while(currNode.isLeaf() == false){
+				int goLeft = (m_path >> bit) & 1;
+				if(goLeft == 0){
+					currNode = currNode.child1;
+				}else{
+					currNode = currNode.child2;
+				}
+				bit = (bit + 1) & 31;
+			}
+			++m_path;
+			
+			removeLeaf(currNode);
+			insertLeaf(currNode);
 		}
-		if( argIterations == 0 ){
-			return 0;
-		}
-		
-		if(argNode.isLeaf()){
-			lastLeaf = argNode;
-			removeLeaf(argNode);
-			insertLeaf(argNode);
-			return --argIterations;
-		}
-		
-		argIterations = rebalance(argIterations, argNode.child1);
-		if( argIterations == 0 ){
-			return 0;
-		}
-		
-		argIterations = rebalance(argIterations, argNode.child2);
-		if( argIterations == 0 ){
-			return 0;
-		}
-		
-		// and then back to root
-		argIterations = rebalance(argIterations, m_root);
-		
-		// I don't think we will ever get here
-		return argIterations;
 	}
 	
 	/**

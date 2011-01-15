@@ -160,7 +160,7 @@ public class BroadPhase implements TreeCallback{
 		}
 		
 		// Try to keep the tree balanced.
-		m_tree.rebalance(4);
+		m_tree.rebalance(2);
 	}
 
 	/** 

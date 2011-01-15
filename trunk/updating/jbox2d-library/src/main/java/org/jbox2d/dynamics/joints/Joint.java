@@ -4,6 +4,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.pooling.WorldPool;
 
 // updated to rev 100
 /**
@@ -18,13 +19,13 @@ public abstract class Joint {
 		//Joint joint = null;
 		switch(def.type){
 			case MOUSE:
-				return new MouseJoint(argWorld, (MouseJointDef) def);
+				return new MouseJoint(argWorld.getPool(), (MouseJointDef) def);
 			case DISTANCE:
-				return new DistanceJoint(argWorld, (DistanceJointDef) def);
+				return new DistanceJoint(argWorld.getPool(), (DistanceJointDef) def);
 			case PRISMATIC:
-				return new PrismaticJoint(argWorld, (PrismaticJointDef) def);
+				return new PrismaticJoint(argWorld.getPool(), (PrismaticJointDef) def);
 			case REVOLUTE:
-				return new RevoluteJoint(argWorld, (RevoluteJointDef) def);
+				return new RevoluteJoint(argWorld.getPool(), (RevoluteJointDef) def);
 			case CONSTANT_VOLUME:
 				return new ConstantVolumeJoint(argWorld, (ConstantVolumeJointDef) def);
 		}
@@ -48,17 +49,17 @@ public abstract class Joint {
 	
 	public Object m_userData;
 	
-	protected World world;
+	protected WorldPool pool;
 	
 	// Cache here per time step to reduce cache misses.
 	public final Vec2 m_localCenterA, m_localCenterB;
 	float m_invMassA, m_invIA;
 	float m_invMassB, m_invIB;
 	
-	protected Joint(World argWorld, JointDef def) {
+	protected Joint(WorldPool argWorldPool, JointDef def) {
 		assert (def.bodyA != def.bodyB);
 		
-		world = argWorld;
+		pool = argWorldPool;
 		m_type = def.type;
 		m_prev = null;
 		m_next = null;

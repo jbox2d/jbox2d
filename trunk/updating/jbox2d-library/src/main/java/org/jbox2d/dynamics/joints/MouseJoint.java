@@ -7,7 +7,7 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
-import org.jbox2d.dynamics.World;
+import org.jbox2d.pooling.WorldPool;
 
 public class MouseJoint extends Joint {
 
@@ -24,7 +24,7 @@ public class MouseJoint extends Joint {
 	private float m_gamma;
 	
 
-	protected MouseJoint(World argWorld, MouseJointDef def) {
+	protected MouseJoint(WorldPool argWorld, MouseJointDef def) {
 		super(argWorld, def);
 		assert(def.target.isValid());
 		assert(def.maxForce >= 0);
@@ -124,7 +124,7 @@ public class MouseJoint extends Joint {
 		}
 		m_beta = step.dt * k * m_gamma;
 
-		Vec2 r = world.getPool().popVec2();
+		Vec2 r = pool.popVec2();
 		
 		// Compute the effective mass matrix.
 		//Vec2 r = Mul(b.getTransform().R, m_localAnchor - b.getLocalCenter());
@@ -137,15 +137,15 @@ public class MouseJoint extends Joint {
 		float invMass = b.m_invMass;
 		float invI = b.m_invI;
 
-		Mat22 K1 = world.getPool().popMat22();
+		Mat22 K1 = pool.popMat22();
 		K1.col1.x = invMass;	K1.col2.x = 0.0f;
 		K1.col1.y = 0.0f;		K1.col2.y = invMass;
 
-		Mat22 K2 = world.getPool().popMat22();
+		Mat22 K2 = pool.popMat22();
 		K2.col1.x =  invI * r.y * r.y;	K2.col2.x = -invI * r.x * r.y;
 		K2.col1.y = -invI * r.x * r.y;	K2.col2.y =  invI * r.x * r.x;
 
-		Mat22 K = world.getPool().popMat22();
+		Mat22 K = pool.popMat22();
 		K.set(K1).addLocal(K2);
 		K.col1.x += m_gamma;
 		K.col2.y += m_gamma;
@@ -160,13 +160,13 @@ public class MouseJoint extends Joint {
 		// Warm starting.
 		m_impulse.mulLocal(step.dtRatio);
 		// pool
-		Vec2 temp = world.getPool().popVec2();
+		Vec2 temp = pool.popVec2();
 		temp.set(m_impulse).mulLocal(invMass);
 		b.m_linearVelocity.addLocal(temp);
 		b.m_angularVelocity += invI * Vec2.cross(r, m_impulse);
 		
-		world.getPool().pushVec2(r, temp);
-		world.getPool().pushMat22(K1,K2,K);
+		pool.pushVec2(r, temp);
+		pool.pushMat22(K1,K2,K);
 	}
 
 	@Override
@@ -178,18 +178,18 @@ public class MouseJoint extends Joint {
 	public void solveVelocityConstraints(TimeStep step) {
 		Body b = m_bodyB;
 
-		Vec2 r = world.getPool().popVec2();
+		Vec2 r = pool.popVec2();
 
 		r.set(m_localAnchor).subLocal(b.getLocalCenter());
 		Mat22.mulToOut(b.getTransform().R, r, r);
 		
 		// Cdot = v + cross(w, r)
-		Vec2 Cdot = world.getPool().popVec2();
+		Vec2 Cdot = pool.popVec2();
 		Vec2.crossToOut(b.m_angularVelocity, r, Cdot);
 		Cdot.addLocal(b.m_linearVelocity);
 		
-		Vec2 impulse = world.getPool().popVec2();
-		Vec2 temp = world.getPool().popVec2();
+		Vec2 impulse = pool.popVec2();
+		Vec2 temp = pool.popVec2();
 		
 		//Mul(m_mass, -(Cdot + m_beta * m_C + m_gamma * m_impulse));
 		impulse.set(m_C).mulLocal(m_beta);
@@ -211,7 +211,7 @@ public class MouseJoint extends Joint {
 		b.m_linearVelocity.addLocal(oldImpulse);
 		b.m_angularVelocity += b.m_invI * Vec2.cross(r, impulse);
 		
-		world.getPool().pushVec2(r, Cdot, impulse, oldImpulse);
+		pool.pushVec2(r, Cdot, impulse, oldImpulse);
 	}
 
 }
