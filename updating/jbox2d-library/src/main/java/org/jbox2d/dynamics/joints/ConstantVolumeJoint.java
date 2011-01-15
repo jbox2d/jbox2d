@@ -18,6 +18,7 @@ public class ConstantVolumeJoint extends Joint {
 	TimeStep m_step;
 	private float m_impulse = 0.0f;
 
+	private World world;
 
 	DistanceJoint[] distanceJoints;
 
@@ -30,7 +31,8 @@ public class ConstantVolumeJoint extends Joint {
 	}
 
 	public ConstantVolumeJoint(World argWorld, ConstantVolumeJointDef def) {
-		super(argWorld,def);
+		super(argWorld.getPool(),def);
+		world = argWorld;
 		if (def.bodies.length <= 2) {
 			throw new IllegalArgumentException("You cannot create a constant volume joint with less than three bodies.");
 		}
@@ -103,7 +105,7 @@ public class ConstantVolumeJoint extends Joint {
 			perimeter += dist;
 		}
 		
-		final Vec2 delta = world.getPool().popVec2();
+		final Vec2 delta = pool.popVec2();
 
 		float deltaArea = targetVolume - getArea();
 		float toExtrude = 0.5f*deltaArea / perimeter; //*relaxationFactor
@@ -128,7 +130,7 @@ public class ConstantVolumeJoint extends Joint {
 			//bodies[next].m_linearVelocity.y += delta.y * step.inv_dt;
 		}
 		
-		world.getPool().pushVec2(delta);
+		pool.pushVec2(delta);
 		//System.out.println(sumdeltax);
 		return done;
 	}
@@ -137,7 +139,7 @@ public class ConstantVolumeJoint extends Joint {
 	public void initVelocityConstraints(final TimeStep step) {
 		m_step = step;
 		
-		final Vec2[] d = world.getPool().getVec2Array(bodies.length);
+		final Vec2[] d = pool.getVec2Array(bodies.length);
 		
 		for (int i=0; i<bodies.length; ++i) {
 			final int prev = (i==0)?bodies.length-1:i-1;
@@ -171,7 +173,7 @@ public class ConstantVolumeJoint extends Joint {
 		float crossMassSum = 0.0f;
 		float dotMassSum = 0.0f;
 		
-		final Vec2 d[] = world.getPool().getVec2Array(bodies.length);
+		final Vec2 d[] = pool.getVec2Array(bodies.length);
 
 		for (int i=0; i<bodies.length; ++i) {
 			final int prev = (i==0)?bodies.length-1:i-1;

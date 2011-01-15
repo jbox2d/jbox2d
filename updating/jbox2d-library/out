@@ -1,0 +1,220 @@
+/**
+ * Created at 3:38:38 AM Jan 15, 2011
+ */
+package org.jbox2d.dynamics.joints;
+
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.TimeStep;
+import org.jbox2d.dynamics.World;
+
+/**
+ * @author Daniel Murphy
+ */
+public class WeldJoint extends Joint {
+	
+	Vec2 m_localAnchorA;
+	Vec2 m_localAnchorB;
+	float m_referenceAngle;
+
+	Vec3 m_impulse;
+
+	Mat33 m_mass;
+	
+	/**
+	 * @param argWorld
+	 * @param def
+	 */
+	protected WeldJoint(World argWorld, WeldJointDef def) {
+		super(argWorld, def);
+		m_localAnchorA = def.localAnchorA;
+		m_localAnchorB = def.localAnchorB;
+		m_referenceAngle = def.referenceAngle;
+
+		m_impulse.setZero();
+	}
+
+	/**
+	 * @see org.jbox2d.dynamics.joints.Joint#getAnchorA(org.jbox2d.common.Vec2)
+	 */
+	@Override
+	public void getAnchorA(new Vec2 argOut) {
+		return m_bodyA.getWorldPoint(m_localAnchorA);
+
+	}
+	
+	/**
+	 * @see org.jbox2d.dynamics.joints.Joint#getAnchorB(org.jbox2d.common.Vec2)
+	 */
+	@Override
+	public void getAnchorB(new Vec2 argOut) {
+		return m_bodyB.getWorldPoint(m_localAnchorB);
+
+	}
+	
+	/**
+	 * @see org.jbox2d.dynamics.joints.Joint#getReactionForce(float, org.jbox2d.common.Vec2)
+	 */
+	@Override
+	public void getReactionForce(float inv_dt, new Vec2 argOut) {
+		Vec2 P(m_impulse.x, m_impulse.y);
+		return inv_dt * P;
+	}
+	
+	/**
+	 * @see org.jbox2d.dynamics.joints.Joint#getReactionTorque(float)
+	 */
+	@Override
+	public float getReactionTorque(float inv_dt) {
+		return inv_dt * m_impulse.z;
+	}
+	
+	/**
+	 * @see org.jbox2d.dynamics.joints.Joint#initVelocityConstraints(org.jbox2d.dynamics.TimeStep)
+	 */
+	@Override
+	public void initVelocityConstraints(TimeStep step) {
+		Body bA = m_bodyA;
+		Body bB = m_bodyB;
+
+		// Compute the effective mass matrix.
+		Vec2 rA = Mul(bA.getTransform().R, m_localAnchorA - bA.getLocalCenter());
+		Vec2 rB = Mul(bB.getTransform().R, m_localAnchorB - bB.getLocalCenter());
+
+		// J = [-I -r1_skew I r2_skew]
+		//     [ 0       -1 0       1]
+		// r_skew = [-ry; rx]
+
+		// Matlab
+		// K = [ mA+r1y^2*iA+mB+r2y^2*iB,  -r1y*iA*r1x-r2y*iB*r2x,          -r1y*iA-r2y*iB]
+		//     [  -r1y*iA*r1x-r2y*iB*r2x, mA+r1x^2*iA+mB+r2x^2*iB,           r1x*iA+r2x*iB]
+		//     [          -r1y*iA-r2y*iB,           r1x*iA+r2x*iB,                   iA+iB]
+
+		float mA = bA.m_invMass, mB = bB.m_invMass;
+		float iA = bA.m_invI, iB = bB.m_invI;
+
+		m_mass.col1.x = mA + mB + rA.y * rA.y * iA + rB.y * rB.y * iB;
+		m_mass.col2.x = -rA.y * rA.x * iA - rB.y * rB.x * iB;
+		m_mass.col3.x = -rA.y * iA - rB.y * iB;
+		m_mass.col1.y = m_mass.col2.x;
+		m_mass.col2.y = mA + mB + rA.x * rA.x * iA + rB.x * rB.x * iB;
+		m_mass.col3.y = rA.x * iA + rB.x * iB;
+		m_mass.col1.z = m_mass.col3.x;
+		m_mass.col2.z = m_mass.col3.y;
+		m_mass.col3.z = iA + iB;
+
+		if (step.warmStarting)
+		{
+			// Scale impulses to support a variable time step.
+			m_impulse *= step.dtRatio;
+
+			Vec2 P(m_impulse.x, m_impulse.y);
+
+			bA.m_linearVelocity -= mA * P;
+			bA.m_angularVelocity -= iA * (Cross(rA, P) + m_impulse.z);
+
+			bB.m_linearVelocity += mB * P;
+			bB.m_angularVelocity += iB * (Cross(rB, P) + m_impulse.z);
+		}
+		else
+		{
+			m_impulse.setZero();
+		}
+	}
+	
+	/**
+	 * @see org.jbox2d.dynamics.joints.Joint#solveVelocityConstraints(org.jbox2d.dynamics.TimeStep)
+	 */
+	@Override
+	public void solveVelocityConstraints(TimeStep step) {
+		Body bA = m_bodyA;
+		Body bB = m_bodyB;
+
+		Vec2 vA = bA.m_linearVelocity;
+		float wA = bA.m_angularVelocity;
+		Vec2 vB = bB.m_linearVelocity;
+		float wB = bB.m_angularVelocity;
+
+		float mA = bA.m_invMass, mB = bB.m_invMass;
+		float iA = bA.m_invI, iB = bB.m_invI;
+
+		Vec2 rA = Mul(bA.getTransform().R, m_localAnchorA - bA.getLocalCenter());
+		Vec2 rB = Mul(bB.getTransform().R, m_localAnchorB - bB.getLocalCenter());
+
+		// Solve point-to-point finalraint
+		Vec2 Cdot1 = vB + Cross(wB, rB) - vA - Cross(wA, rA);
+		float Cdot2 = wB - wA;
+		Vec3 Cdot(Cdot1.x, Cdot1.y, Cdot2);
+
+		Vec3 impulse = m_mass.Solve33(-Cdot);
+		m_impulse += impulse;
+
+		Vec2 P(impulse.x, impulse.y);
+
+		vA -= mA * P;
+		wA -= iA * (Cross(rA, P) + impulse.z);
+
+		vB += mB * P;
+		wB += iB * (Cross(rB, P) + impulse.z);
+
+		bA.m_linearVelocity = vA;
+		bA.m_angularVelocity = wA;
+		bB.m_linearVelocity = vB;
+		bB.m_angularVelocity = wB;
+	}
+	
+	/**
+	 * @see org.jbox2d.dynamics.joints.Joint#solvePositionConstraints(float)
+	 */
+	@Override
+	public boolean solvePositionConstraints(float baumgarte) {
+		Body bA = m_bodyA;
+		Body bB = m_bodyB;
+
+		float mA = bA.m_invMass, mB = bB.m_invMass;
+		float iA = bA.m_invI, iB = bB.m_invI;
+
+		Vec2 rA = Mul(bA.getTransform().R, m_localAnchorA - bA.getLocalCenter());
+		Vec2 rB = Mul(bB.getTransform().R, m_localAnchorB - bB.getLocalCenter());
+
+		Vec2 C1 =  bB.m_sweep.c + rB - bA.m_sweep.c - rA;
+		float C2 = bB.m_sweep.a - bA.m_sweep.a - m_referenceAngle;
+
+		// Handle large detachment.
+		final float k_allowedStretch = 10.0f * _linearSlop;
+		float positionError = C1.Length();
+		float angularError = MathUtils.abs(C2);
+		if (positionError > k_allowedStretch)
+		{
+			iA *= 1.0f;
+			iB *= 1.0f;
+		}
+
+		m_mass.col1.x = mA + mB + rA.y * rA.y * iA + rB.y * rB.y * iB;
+		m_mass.col2.x = -rA.y * rA.x * iA - rB.y * rB.x * iB;
+		m_mass.col3.x = -rA.y * iA - rB.y * iB;
+		m_mass.col1.y = m_mass.col2.x;
+		m_mass.col2.y = mA + mB + rA.x * rA.x * iA + rB.x * rB.x * iB;
+		m_mass.col3.y = rA.x * iA + rB.x * iB;
+		m_mass.col1.z = m_mass.col3.x;
+		m_mass.col2.z = m_mass.col3.y;
+		m_mass.col3.z = iA + iB;
+
+		Vec3 C(C1.x, C1.y, C2);
+
+		Vec3 impulse = m_mass.Solve33(-C);
+
+		Vec2 P(impulse.x, impulse.y);
+
+		bA.m_sweep.c -= mA * P;
+		bA.m_sweep.a -= iA * (Cross(rA, P) + impulse.z);
+
+		bB.m_sweep.c += mB * P;
+		bB.m_sweep.a += iB * (Cross(rB, P) + impulse.z);
+
+		bA.SynchronizeTransform();
+		bB.SynchronizeTransform();
+
+		return positionError <= _linearSlop && angularError <= _angularSlop;
+	}
+	
+}

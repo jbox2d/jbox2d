@@ -29,7 +29,7 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
-import org.jbox2d.dynamics.World;
+import org.jbox2d.pooling.WorldPool;
 
 //Updated to rev 56->130->142 of b2DistanceJoint.cpp/.h
 
@@ -58,7 +58,7 @@ public class DistanceJoint extends Joint {
 	public float m_gamma;
 	public float m_bias;
 	
-	public DistanceJoint(World argWorld, final DistanceJointDef def) {
+	public DistanceJoint(WorldPool argWorld, final DistanceJointDef def) {
 		super(argWorld, def);
 		m_localAnchor1 = def.localAnchorA.clone();
 		m_localAnchor2 = def.localAnchorB.clone();
@@ -124,8 +124,8 @@ public class DistanceJoint extends Joint {
 		final Body b1 = m_bodyA;
 		final Body b2 = m_bodyB;
 		
-		Vec2 r1 = world.getPool().popVec2();
-		Vec2 r2 = world.getPool().popVec2();
+		Vec2 r1 = pool.popVec2();
+		Vec2 r2 = pool.popVec2();
 		
 		// Compute the effective mass matrix.
 		r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
@@ -179,7 +179,7 @@ public class DistanceJoint extends Joint {
 			// Scale the impulse to support a variable time step.
 			m_impulse *= step.dtRatio;
 			
-			Vec2 P = world.getPool().popVec2();
+			Vec2 P = pool.popVec2();
 			P.set(m_u).mulLocal(m_impulse);
 			
 			b1.m_linearVelocity.x -= b1.m_invMass * P.x;
@@ -190,12 +190,12 @@ public class DistanceJoint extends Joint {
 			b2.m_linearVelocity.y += b2.m_invMass * P.y;
 			b2.m_angularVelocity += b2.m_invI * Vec2.cross(r2, P);
 			
-			world.getPool().pushVec2(P);
+			pool.pushVec2(P);
 		}
 		else {
 			m_impulse = 0.0f;
 		}
-		world.getPool().pushVec2(r1, r2);
+		pool.pushVec2(r1, r2);
 	}
 	
 	@Override
@@ -203,16 +203,16 @@ public class DistanceJoint extends Joint {
 		final Body b1 = m_bodyA;
 		final Body b2 = m_bodyB;
 		
-		final Vec2 r1 = world.getPool().popVec2();
-		final Vec2 r2 = world.getPool().popVec2();
+		final Vec2 r1 = pool.popVec2();
+		final Vec2 r2 = pool.popVec2();
 		
 		r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 		r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
 		Mat22.mulToOut(b1.getTransform().R, r1, r1);
 		Mat22.mulToOut(b2.getTransform().R, r2, r2);
 		
-		final Vec2 v1 = world.getPool().popVec2();
-		final Vec2 v2 = world.getPool().popVec2();
+		final Vec2 v1 = pool.popVec2();
+		final Vec2 v2 = pool.popVec2();
 		
 		// Cdot = dot(u, v + cross(w, r))
 		Vec2.crossToOut(b1.m_angularVelocity, r1, v1);
@@ -234,7 +234,7 @@ public class DistanceJoint extends Joint {
 		b2.m_linearVelocity.y += b2.m_invMass * Py;
 		b2.m_angularVelocity += b2.m_invI * (r2.x * Py - r2.y * Px);// b2Cross(r2, P);
 		
-		world.getPool().pushVec2(r1, r2, v1,v2);
+		pool.pushVec2(r1, r2, v1,v2);
 	}
 	
 	@Override
@@ -246,9 +246,9 @@ public class DistanceJoint extends Joint {
 		final Body b1 = m_bodyA;
 		final Body b2 = m_bodyB;
 		
-		final Vec2 r1 = world.getPool().popVec2();
-		final Vec2 r2 = world.getPool().popVec2();
-		final Vec2 d = world.getPool().popVec2();
+		final Vec2 r1 = pool.popVec2();
+		final Vec2 r2 = pool.popVec2();
+		final Vec2 d = pool.popVec2();
 		
 		r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 		r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
@@ -278,7 +278,7 @@ public class DistanceJoint extends Joint {
 		b1.synchronizeTransform();
 		b2.synchronizeTransform();
 		
-		world.getPool().pushVec2(r1,r2,d);
+		pool.pushVec2(r1,r2,d);
 		
 		return MathUtils.abs(C) < Settings.linearSlop;
 	}
