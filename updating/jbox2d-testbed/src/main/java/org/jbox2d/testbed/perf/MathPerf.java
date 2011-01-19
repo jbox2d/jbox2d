@@ -20,6 +20,21 @@ import org.jbox2d.common.MathUtils;
 //ceil                              0.0348
 //fastCeil                          0.0215
 
+// Results from Windows 1/19/11
+//Test Name               Milliseconds Avg
+//Sin                             254.5806
+//SinLUT                           57.6727
+//Pow                             125.5473
+//FastPow                          25.7931
+//Max                              16.9723
+//FastMax                          16.9692
+//Floor                             0.0659
+//fastFloor                         0.0206
+//aTan2                            31.6952
+//fastATan2                        22.9149
+//ceil                              0.0476
+//fastCeil                          0.0238
+
 /**
  * @author Daniel Murphy
  */

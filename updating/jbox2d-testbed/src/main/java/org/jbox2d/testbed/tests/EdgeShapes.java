@@ -129,7 +129,7 @@ public class EdgeShapes extends TestbedTest {
 		}
 
 		m_bodies[m_bodyIndex] = world.createBody(bd);
-
+		
 		if (index < 4)
 		{
 			FixtureDef fd = new FixtureDef();
