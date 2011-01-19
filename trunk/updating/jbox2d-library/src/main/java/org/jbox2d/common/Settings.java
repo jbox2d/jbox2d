@@ -41,9 +41,9 @@ public class Settings {
 	/**
 	 * needs to be final, or will slow down math methods
 	 */
-	public static final boolean FAST_MATH = false;
+	public static final boolean FAST_MATH = true;
 	public static final boolean POOLING = true;
-	public static final boolean SINCOS_LUT_ENABLED = false;
+	public static final boolean SINCOS_LUT_ENABLED = true;
 	/**
 	 * smaller the precision, the larger the table. If a small table is used
 	 * (eg, precision is .006 or greater), make sure you set the table to lerp
@@ -70,7 +70,7 @@ public class Settings {
 	 * </ul>
 	 * 
 	 */
-	public static final float SINCOS_LUT_PRECISION = .00041f;
+	public static final float SINCOS_LUT_PRECISION = .00093f;
 	public static final int SINCOS_LUT_LENGTH = (int) Math.ceil(Math.PI * 2 / SINCOS_LUT_PRECISION);
 	/**
 	 * Use if the table's precision is large (eg .006 or greater). Although it
