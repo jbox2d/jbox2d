@@ -16,6 +16,15 @@ import org.jbox2d.pooling.WorldPool;
 //ThreadLocal member      62.1190
 //     Member             60.6938
 
+// Windows results 1/19/11
+//Test Name               Milliseconds Avg
+//Creation                         74.6291
+//World Pool                      273.5585
+//Circle Pool                      82.2195
+//ThreadLocal member               83.2970
+//Member                           80.7545
+
+
 /**
  * @author Daniel Murphy
  */
