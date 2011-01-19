@@ -31,7 +31,24 @@ import java.util.Random;
 public class MathUtils {
 	public static final float PI = (float) Math.PI;
 	public static final float TWOPI = (float) (Math.PI * 2);
-		
+    public static final float INV_PI = 1f / PI;
+    public static final float HALF_PI = PI / 2;
+    public static final float QUARTER_PI = PI / 4;
+    public static final float THREE_HALVES_PI = TWOPI - HALF_PI;
+
+    
+    /**
+     * Degrees to radians conversion factor
+     */
+    public static final float DEG2RAD = PI / 180;
+
+    /**
+     * Radians to degrees conversion factor
+     */
+    public static final float RAD2DEG = 180 / PI;
+
+    private static final float SHIFT23 = 1 << 23;
+    private static final float INV_SHIFT23 = 1.0f / SHIFT23;
 	
 	public static final float[] sinLUT = new float[Settings.SINCOS_LUT_LENGTH];
 	public static final float[] cosLUT = new float[Settings.SINCOS_LUT_LENGTH];
@@ -45,35 +62,38 @@ public class MathUtils {
 	
 	public static final float sin(float x){
 		if(Settings.SINCOS_LUT_ENABLED){
-			x %= TWOPI;
+			return sinLUT(x);
+		}else{
+			return (float) StrictMath.sin(x);
+		}
+	}
+	
+	public static final float sinLUT(float x){
+		x %= TWOPI;
+		
+		while(x < 0){
+			x += TWOPI;
+		}
+		
+		if(Settings.SINCOS_LUT_LERP){
 			
-			while(x < 0){
-				x += TWOPI;
+			x /= Settings.SINCOS_LUT_PRECISION;
+							
+			final int index = (int)x;
+			
+			if(index != 0){
+				x %= index;
 			}
 			
-			if(Settings.SINCOS_LUT_LERP){
-				
-				x /= Settings.SINCOS_LUT_PRECISION;
-								
-				final int index = (int)x;
-				
-				if(index != 0){
-					x %= index;
-				}
-				
-				// the next index is 0
-				if(index == Settings.SINCOS_LUT_LENGTH-1){
-					return ( (1-x)*sinLUT[index] + x * sinLUT[0]);
-				}else{
-					return ( (1-x)*sinLUT[index] + x * sinLUT[index + 1]);
-				}
-				
+			// the next index is 0
+			if(index == Settings.SINCOS_LUT_LENGTH-1){
+				return ( (1-x)*sinLUT[index] + x * sinLUT[0]);
 			}else{
-				return sinLUT[ MathUtils.round(x / Settings.SINCOS_LUT_PRECISION) % Settings.SINCOS_LUT_LENGTH];
+				return ( (1-x)*sinLUT[index] + x * sinLUT[index + 1]);
 			}
 			
 		}else{
-			return (float) Math.sin(x);
+			return sinLUT[ MathUtils.round(x / Settings.SINCOS_LUT_PRECISION) % Settings.SINCOS_LUT_LENGTH];
 		}
 	}
 	
@@ -107,7 +127,7 @@ public class MathUtils {
 			}
 			
 		}else{
-			return (float) Math.cos(x);
+			return (float) StrictMath.cos(x);
 		}
 	}
 
@@ -154,14 +174,24 @@ public class MathUtils {
 		if(Settings.FAST_MATH){
 			return floor(x + .5f);
 		}else{
-			return Math.round(x);
+			return StrictMath.round(x);
 		}
 	}
+	
+	/**
+     * Rounds up the value to the nearest higher power^2 value.
+     * 
+     * @param x
+     * @return power^2 value
+     */
+    public static final int ceilPowerOf2(int x) {
+        int pow2 = 1;
+        while (pow2 < x) {
+            pow2 <<= 1;
+        }
+        return pow2;
+    }
 
-	// Max/min rewritten here because for some reason MathUtils.max/min
-	// can run absurdly slow for such simple functions...
-	// TODO: profile, see if this just seems to be the case or is actually
-	// causing issues...
 	public final static float max(final float a, final float b) {
 		return a > b ? a : b;
 	}
@@ -220,37 +250,63 @@ public class MathUtils {
 	public final static boolean isPowerOfTwo(final int x) {
 		return x > 0 && (x & x - 1) == 0;
 	}
+ public static final float fastPow(float a, float b) {
+        float x = Float.floatToRawIntBits(a);
+        x *= INV_SHIFT23;
+        x -= 127;
+        float y = x - (x >= 0 ? (int) x : (int) x - 1);
+        b *= x + (y - y * y) * 0.346607f;
+        y = b - (b >= 0 ? (int) b : (int) b - 1);
+        y = (y - y * y) * 0.33971f;
+        return Float.intBitsToFloat((int) ((b + 127 - y) * SHIFT23));
+    }
 
 	// UNTESTED
 	public static final float atan2(final float y, final float x) {
 //		if (Settings.FAST_MATH) {
-//			// float coeff_1 = PI/4;
-//			// float coeff_2 = 3*coeff_1;
-//			final float abs_y = abs(y) + .0000000001f; // kludge to prevent 0/0
-//			// condition
-//			float angle, r;
-//			if (x >= 0) {
-//				r = (x - abs_y) / (x + abs_y);
-//				// angle = coeff_1 - coeff_1 * r;
-//				angle = 0.1963f * r * r * r - 0.9817f * r + Settings.PI / 4;
-//			}
-//			else {
-//				r = (x + abs_y) / (abs_y - x);
-//				// angle = coeff_2 - coeff_1 * r;
-//				angle = 0.1963f * r * r * r - 0.9817f * r + 3 * Settings.PI / 4;
-//			}
-//			if (y < 0) {
-//				return -angle; // negate if in quad III or IV
-//			}
-//			else {
-//				return angle;
-//			}
+		
 //		}
 //		else {
-			return (float) Math.atan2(y, x);
+			return (float) StrictMath.atan2(y, x);
 //		}
 	}
 	
+	public static final float fastAtan2(float y, float x){
+		if ( x == 0.0f )
+		{
+			if ( y > 0.0f ) return HALF_PI;
+			if ( y == 0.0f ) return 0.0f;
+			return -HALF_PI;
+		}
+		float atan;
+		float z = y/x;
+		if ( abs( z ) < 1.0f )
+		{
+			atan = z/(1.0f + 0.28f*z*z);
+			if ( x < 0.0f )
+			{
+				if ( y < 0.0f ) return atan - PI;
+				return atan + PI;
+			}
+		}
+		else
+		{
+			atan = HALF_PI - z/(z*z + 0.28f);
+			if ( y < 0.0f ) return atan - PI;
+		}
+		return atan;
+	}
+	
+	public static final float reduceAngle(float theta) {
+        theta %= TWOPI;
+        if (abs(theta) > PI) {
+            theta = theta - TWOPI;
+        }
+        if (abs(theta) > HALF_PI) {
+            theta = PI - theta;
+        }
+        return theta;
+    }
 	
 
 	/**
@@ -290,37 +346,7 @@ public class MathUtils {
 	}
 
 	public static final float sqrt(float x) {
-//		if (Settings.FAST_MATH) {
-//			x = invSqrt(x);
-//
-//			if (x != 0.0f) {
-//				return 1.0f / x;
-//			}
-//			else {
-//				return 0;
-//			}
-//		}
-//		else {
-			// this seems to be faster
-			return (float) Math.sqrt(x);
-//		}
-	}
-
-	/**
-	 * Fast, but not very accurate
-	 * @param x
-	 * @return
-	 */
-	public final static float invSqrt(float x) {
-		final float xhalf = 0.5f * x;
-		int i = Float.floatToRawIntBits(x);
-		i = 0x5f3759df - (i >> 1);
-		x = Float.intBitsToFloat(i);
-		x *= 1.5f - xhalf * x * x;
-		// REPEAT FOR ACCURACY (make sure at least 2 are here, too inaccurate
-		// otherwise)
-		x *= 1.5f - xhalf * x * x;
-		return x;
+		return (float) StrictMath.sqrt(x);
 	}
 
 	public final static float distanceSquared( Vec2 v1, Vec2 v2) {
