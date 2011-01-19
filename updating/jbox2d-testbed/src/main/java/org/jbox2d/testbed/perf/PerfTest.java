@@ -38,11 +38,11 @@ public abstract class PerfTest {
 	}
 	
 	public void printResults(){
-		System.out.printf("%20s%20s\n","Test Name", "Milliseconds Avg");
+		System.out.printf("%-20s%20s\n","Test Name", "Milliseconds Avg");
 
 		for(int i=0; i<numTests; i++){
-			double milliseconds = (times[i] / 1000) * 1.0 / 1000;
-			System.out.printf("%20s%20.4f\n",getTestName(i), milliseconds);
+			double milliseconds = times[i]* 1.0 / 1000000;
+			System.out.printf("%-20s%20.4f\n",getTestName(i), milliseconds);
 		}
 	}
 	
