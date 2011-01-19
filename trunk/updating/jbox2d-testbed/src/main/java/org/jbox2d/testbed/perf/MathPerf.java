@@ -5,27 +5,28 @@ package org.jbox2d.testbed.perf;
 
 import org.jbox2d.common.MathUtils;
 
-//Sin took 171.891 ms on average
-//SinLUT took 53.677 ms on average
-//Pow took 149.635 ms on average
-//FastPow took 42.247 ms on average
-//Max took 23.392 ms on average
-//FastMax took 23.335 ms on average
-//Floor took 0.273 ms on average
-//fastFloor took 0.098 ms on average
-//aTan2 took 40.397 ms on average
-//fastATan2 took 36.709 ms on average
-//ceil took 0.198 ms on average
-//fastCeil took 0.126 ms on average
-//FastSin took 57.313 ms on average
+// Results from Mac 1/19/11
+//Test Name               Milliseconds Avg
+//Sin                              86.2132
+//SinLUT                           26.7498
+//Pow                              74.5660
+//FastPow                          20.9268
+//Max                              11.6579
+//FastMax                          11.6045
+//Floor                             0.0593
+//fastFloor                         0.0216
+//aTan2                            20.1040
+//fastATan2                        18.2086
+//ceil                              0.0348
+//fastCeil                          0.0215
 
 /**
  * @author Daniel Murphy
  */
 public class MathPerf extends PerfTest{
 
-	public static int INNER_ITERS = 100000;
-	public static int OUTER_ITERS = 20;
+	public static int INNER_ITERS = 500000;
+	public static int OUTER_ITERS = 100;
 	
 	String[] tests = new String[]{
 		"Sin", "SinLUT", "Pow", "FastPow", "Max", "FastMax", "Floor", "fastFloor", "aTan2", "fastATan2", "ceil", "fastCeil"

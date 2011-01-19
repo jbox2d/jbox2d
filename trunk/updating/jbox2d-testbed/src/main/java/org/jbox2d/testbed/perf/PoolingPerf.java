@@ -8,12 +8,13 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.TLVec2;
 import org.jbox2d.pooling.WorldPool;
 
-
-//Creation took 66.0 ms on average
-//World Pool took 174.0 ms on average
-//Circle Pool took 62.0 ms on average
-//ThreadLocal member took 62.0 ms on average
-//Member took 60.0 ms on average
+// Mac results 1/19/11
+//	Test Name    Milliseconds Avg
+//	 Creation             65.4416
+// World Pool            202.3449
+//Circle Pool             62.5145
+//ThreadLocal member      62.1190
+//     Member             60.6938
 
 /**
  * @author Daniel Murphy
@@ -22,8 +23,8 @@ public class PoolingPerf extends PerfTest{
 	
 
 
-	public static final int INNER_ITERS = 100000;
-	public static final int OUTER_ITERS = 20;
+	public static final int INNER_ITERS = 1000000;
+	public static final int OUTER_ITERS = 100;
 	
 	public static class CirclePool{
 		final Vec2[] pool;
