@@ -1,36 +1,43 @@
 /**
- * Created at 3:38:38 AM Jan 15, 2011
+ * Created at 7:27:32 AM Jan 20, 2011
  */
 package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.TimeStep;
-import org.jbox2d.dynamics.World;
+import org.jbox2d.pooling.WorldPool;
 
 /**
  * @author Daniel Murphy
  */
-public class WeldJoint extends Joint {
+public class FrictionJoint extends Joint {
 	
 	Vec2 m_localAnchorA;
 	Vec2 m_localAnchorB;
-	float m_referenceAngle;
 
-	Vec3 m_impulse;
+	Mat22 m_linearMass;
+	float m_angularMass;
 
-	Mat33 m_mass;
+	Vec2 m_linearImpulse;
+	float m_angularImpulse;
+
+	float m_maxForce;
+	float m_maxTorque;
 	
 	/**
-	 * @param argWorld
+	 * @param argWorldPool
 	 * @param def
 	 */
-	protected WeldJoint(World argWorld, WeldJointDef def) {
-		super(argWorld, def);
+	protected FrictionJoint(WorldPool argWorldPool, FrictionJointDef def) {
+		super(argWorldPool, def);
 		m_localAnchorA = def.localAnchorA;
 		m_localAnchorB = def.localAnchorB;
-		m_referenceAngle = def.referenceAngle;
 
-		m_impulse.setZero();
+		m_linearImpulse.setZero();
+		m_angularImpulse = 0.0f;
+
+		m_maxForce = def.maxForce;
+		m_maxTorque = def.maxTorque;
 	}
 
 	/**
@@ -38,8 +45,8 @@ public class WeldJoint extends Joint {
 	 */
 	@Override
 	public void getAnchorA(new Vec2 argOut) {
-		return m_bodyA.getWorldPoint(m_localAnchorA);
-
+		// TODO Auto-generated method stub
+		
 	}
 	
 	/**
@@ -47,8 +54,8 @@ public class WeldJoint extends Joint {
 	 */
 	@Override
 	public void getAnchorB(new Vec2 argOut) {
-		return m_bodyB.getWorldPoint(m_localAnchorB);
-
+		// TODO Auto-generated method stub
+		
 	}
 	
 	/**
@@ -56,8 +63,8 @@ public class WeldJoint extends Joint {
 	 */
 	@Override
 	public void getReactionForce(float inv_dt, new Vec2 argOut) {
-		Vec2 P(m_impulse.x, m_impulse.y);
-		return inv_dt * P;
+		// TODO Auto-generated method stub
+		
 	}
 	
 	/**
@@ -65,7 +72,8 @@ public class WeldJoint extends Joint {
 	 */
 	@Override
 	public float getReactionTorque(float inv_dt) {
-		return inv_dt * m_impulse.z;
+		// TODO Auto-generated method stub
+		return 0;
 	}
 	
 	/**
@@ -92,32 +100,45 @@ public class WeldJoint extends Joint {
 		float mA = bA.m_invMass, mB = bB.m_invMass;
 		float iA = bA.m_invI, iB = bB.m_invI;
 
-		m_mass.col1.x = mA + mB + rA.y * rA.y * iA + rB.y * rB.y * iB;
-		m_mass.col2.x = -rA.y * rA.x * iA - rB.y * rB.x * iB;
-		m_mass.col3.x = -rA.y * iA - rB.y * iB;
-		m_mass.col1.y = m_mass.col2.x;
-		m_mass.col2.y = mA + mB + rA.x * rA.x * iA + rB.x * rB.x * iB;
-		m_mass.col3.y = rA.x * iA + rB.x * iB;
-		m_mass.col1.z = m_mass.col3.x;
-		m_mass.col2.z = m_mass.col3.y;
-		m_mass.col3.z = iA + iB;
+		Mat22 K1;
+		K1.col1.x = mA + mB;	K1.col2.x = 0.0f;
+		K1.col1.y = 0.0f;		K1.col2.y = mA + mB;
+
+		Mat22 K2;
+		K2.col1.x =  iA * rA.y * rA.y;	K2.col2.x = -iA * rA.x * rA.y;
+		K2.col1.y = -iA * rA.x * rA.y;	K2.col2.y =  iA * rA.x * rA.x;
+
+		Mat22 K3;
+		K3.col1.x =  iB * rB.y * rB.y;	K3.col2.x = -iB * rB.x * rB.y;
+		K3.col1.y = -iB * rB.x * rB.y;	K3.col2.y =  iB * rB.x * rB.x;
+
+		Mat22 K = K1 + K2 + K3;
+		m_linearMass = K.getInverse();
+
+		m_angularMass = iA + iB;
+		if (m_angularMass > 0.0f)
+		{
+			m_angularMass = 1.0f / m_angularMass;
+		}
 
 		if (step.warmStarting)
 		{
 			// Scale impulses to support a variable time step.
-			m_impulse *= step.dtRatio;
+			m_linearImpulse *= step.dtRatio;
+			m_angularImpulse *= step.dtRatio;
 
-			Vec2 P(m_impulse.x, m_impulse.y);
+			Vec2 P(m_linearImpulse.x, m_linearImpulse.y);
 
 			bA.m_linearVelocity -= mA * P;
-			bA.m_angularVelocity -= iA * (Cross(rA, P) + m_impulse.z);
+			bA.m_angularVelocity -= iA * (Vec2.cross(rA, P) + m_angularImpulse);
 
 			bB.m_linearVelocity += mB * P;
-			bB.m_angularVelocity += iB * (Cross(rB, P) + m_impulse.z);
+			bB.m_angularVelocity += iB * (Vec2.cross(rB, P) + m_angularImpulse);
 		}
 		else
 		{
-			m_impulse.setZero();
+			m_linearImpulse.setZero();
+			m_angularImpulse = 0.0f;
 		}
 	}
 	
@@ -140,21 +161,44 @@ public class WeldJoint extends Joint {
 		Vec2 rA = Mul(bA.getTransform().R, m_localAnchorA - bA.getLocalCenter());
 		Vec2 rB = Mul(bB.getTransform().R, m_localAnchorB - bB.getLocalCenter());
 
-		// Solve point-to-point finalraint
-		Vec2 Cdot1 = vB + Cross(wB, rB) - vA - Cross(wA, rA);
-		float Cdot2 = wB - wA;
-		Vec3 Cdot(Cdot1.x, Cdot1.y, Cdot2);
+		// Solve angular friction
+		{
+			float Cdot = wB - wA;
+			float impulse = -m_angularMass * Cdot;
 
-		Vec3 impulse = m_mass.Solve33(-Cdot);
-		m_impulse += impulse;
+			float oldImpulse = m_angularImpulse;
+			float maxImpulse = step.dt * m_maxTorque;
+			m_angularImpulse = Clamp(m_angularImpulse + impulse, -maxImpulse, maxImpulse);
+			impulse = m_angularImpulse - oldImpulse;
 
-		Vec2 P(impulse.x, impulse.y);
+			wA -= iA * impulse;
+			wB += iB * impulse;
+		}
 
-		vA -= mA * P;
-		wA -= iA * (Cross(rA, P) + impulse.z);
+		// Solve linear friction
+		{
+			Vec2 Cdot = vB + Vec2.cross(wB, rB) - vA - Vec2.cross(wA, rA);
 
-		vB += mB * P;
-		wB += iB * (Cross(rB, P) + impulse.z);
+			Vec2 impulse = -Mul(m_linearMass, Cdot);
+			Vec2 oldImpulse = m_linearImpulse;
+			m_linearImpulse += impulse;
+
+			float maxImpulse = step.dt * m_maxForce;
+
+			if (m_linearImpulse.lengthSquared() > maxImpulse * maxImpulse)
+			{
+				m_linearImpulse.Normalize();
+				m_linearImpulse *= maxImpulse;
+			}
+
+			impulse = m_linearImpulse - oldImpulse;
+
+			vA -= mA * impulse;
+			wA -= iA * Vec2.cross(rA, impulse);
+
+			vB += mB * impulse;
+			wB += iB * Vec2.cross(rB, impulse);
+		}
 
 		bA.m_linearVelocity = vA;
 		bA.m_angularVelocity = wA;
@@ -167,54 +211,6 @@ public class WeldJoint extends Joint {
 	 */
 	@Override
 	public boolean solvePositionConstraints(float baumgarte) {
-		Body bA = m_bodyA;
-		Body bB = m_bodyB;
-
-		float mA = bA.m_invMass, mB = bB.m_invMass;
-		float iA = bA.m_invI, iB = bB.m_invI;
-
-		Vec2 rA = Mul(bA.getTransform().R, m_localAnchorA - bA.getLocalCenter());
-		Vec2 rB = Mul(bB.getTransform().R, m_localAnchorB - bB.getLocalCenter());
-
-		Vec2 C1 =  bB.m_sweep.c + rB - bA.m_sweep.c - rA;
-		float C2 = bB.m_sweep.a - bA.m_sweep.a - m_referenceAngle;
-
-		// Handle large detachment.
-		final float k_allowedStretch = 10.0f * _linearSlop;
-		float positionError = C1.Length();
-		float angularError = MathUtils.abs(C2);
-		if (positionError > k_allowedStretch)
-		{
-			iA *= 1.0f;
-			iB *= 1.0f;
-		}
-
-		m_mass.col1.x = mA + mB + rA.y * rA.y * iA + rB.y * rB.y * iB;
-		m_mass.col2.x = -rA.y * rA.x * iA - rB.y * rB.x * iB;
-		m_mass.col3.x = -rA.y * iA - rB.y * iB;
-		m_mass.col1.y = m_mass.col2.x;
-		m_mass.col2.y = mA + mB + rA.x * rA.x * iA + rB.x * rB.x * iB;
-		m_mass.col3.y = rA.x * iA + rB.x * iB;
-		m_mass.col1.z = m_mass.col3.x;
-		m_mass.col2.z = m_mass.col3.y;
-		m_mass.col3.z = iA + iB;
-
-		Vec3 C(C1.x, C1.y, C2);
-
-		Vec3 impulse = m_mass.Solve33(-C);
-
-		Vec2 P(impulse.x, impulse.y);
-
-		bA.m_sweep.c -= mA * P;
-		bA.m_sweep.a -= iA * (Cross(rA, P) + impulse.z);
-
-		bB.m_sweep.c += mB * P;
-		bB.m_sweep.a += iB * (Cross(rB, P) + impulse.z);
-
-		bA.SynchronizeTransform();
-		bB.SynchronizeTransform();
-
-		return positionError <= _linearSlop && angularError <= _angularSlop;
+		return true;
 	}
-	
 }

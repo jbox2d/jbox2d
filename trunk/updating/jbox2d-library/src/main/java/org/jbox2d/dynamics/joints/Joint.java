@@ -28,6 +28,8 @@ public abstract class Joint {
 				return new RevoluteJoint(argWorld.getPool(), (RevoluteJointDef) def);
 			case WELD:
 				return new WeldJoint(argWorld.getPool(), (WeldJointDef) def);
+			case FRICTION:
+				return new FrictionJoint(argWorld.getPool(), (FrictionJointDef) def);
 			case CONSTANT_VOLUME:
 				return new ConstantVolumeJoint(argWorld, (ConstantVolumeJointDef) def);
 		}
