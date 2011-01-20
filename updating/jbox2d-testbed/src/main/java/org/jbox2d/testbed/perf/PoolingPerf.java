@@ -52,8 +52,28 @@ public class PoolingPerf extends PerfTest{
 		}
 	}
 	
+	public static class CustStack{
+		final Vec2[] pool;
+		int index;
+		public CustStack(){
+			pool = new Vec2[50];
+			for(int i=0; i<pool.length; i++){
+				pool[i] = new Vec2();
+			}
+			index = 0;
+		}
+		
+		public final Vec2 get(){
+			return pool[index++];
+		}
+		
+		public final void reduce(int i){
+			index -= i;
+		}
+	}
+	
 	public String[] tests = new String[]{
-		"Creation", "World Pool", "Circle Pool", "ThreadLocal member", "Member"
+		"Creation", "World Pool", "Circle Pool", "Custom Stack", "ThreadLocal member", "Member"
 	};
 	
 	public float aStore = 0;
@@ -61,13 +81,14 @@ public class PoolingPerf extends PerfTest{
 	public CirclePool cp = new CirclePool();
 	public TLVec2 tlv = new TLVec2();
 	public Vec2 mv = new Vec2();
+	public CustStack stack = new CustStack();
 	
 	/**
 	 * @param argNumTests
 	 * @param argIters
 	 */
 	public PoolingPerf() {
-		super(5, OUTER_ITERS);
+		super(6, OUTER_ITERS);
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -95,9 +116,12 @@ public class PoolingPerf extends PerfTest{
 				runCirclePoolTest();
 				break;
 			case 3:
-				runThreadLocalTest();
+				runCustStackTest();
 				break;
 			case 4:
+				runThreadLocalTest();
+				break;
+			case 5:
 				runMemberTest();
 				break;
 		}
@@ -140,6 +164,17 @@ public class PoolingPerf extends PerfTest{
 		for(int i=0; i<INNER_ITERS; i++){
 			v = tlv.get();
 			a += op(v);
+		}
+		aStore += a;
+	}
+	
+	public void runCustStackTest(){
+		Vec2 v;
+		float a = 0;
+		for(int i=0; i<INNER_ITERS; i++){
+			v = stack.get();
+			a += op(v);
+			stack.reduce(1);
 		}
 		aStore += a;
 	}
