@@ -47,7 +47,7 @@
 		</layout>
 	</appender>-->
 	
-	<logger name="org.jbox2d.*">
+	<logger name="org.jbox2d">
 		<level value="debug"/>
 		<appender-ref ref="console"/>
 		<appender-ref ref="ToFile"/>

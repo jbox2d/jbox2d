@@ -99,7 +99,10 @@ public class TestPanel extends JPanel implements Runnable{
 					keys[key] = true;
 				}
 				codedKeys[code] = true;
-				if(currTest != null){
+				if(key == ' '){
+					currTest.lanchBomb();
+				}
+				else if(currTest != null){
 					currTest.queueKeyPressed(key, code);
 				}
 			}
