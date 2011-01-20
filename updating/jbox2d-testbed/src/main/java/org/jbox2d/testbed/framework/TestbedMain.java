@@ -8,6 +8,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -31,26 +33,64 @@ import org.jbox2d.testbed.tests.TestList;
 @SuppressWarnings("serial")
 public class TestbedMain extends JFrame {
 	
-	TestPanel panel;
+	private TestPanel panel;
+	private int currTestIndex;
+	private SidePanel side;
 	
 	public TestbedMain(){
 		super("JBox2D Testbed");
 		setLayout(new BorderLayout());
 		TestbedSettings s = new TestbedSettings();
 		panel = new TestPanel(s);
+		
+		panel.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyChar() == '['){
+					lastTest();
+				}
+				else if(e.getKeyChar() == ']'){
+					nextTest();
+				}
+			}
+		});
+		
 		add(panel, "Center");
-		SidePanel p = new SidePanel(s);
-		p.setMain(this);
-		add(new JScrollPane(p), "East");   
+		side = new SidePanel(s);
+		side.setMain(this);
+		add(new JScrollPane(side), "East");   
 		pack();
 		
 		setVisible(true);
 		setDefaultCloseOperation(3);
+		currTestIndex = 0;
 		panel.changeTest(TestList.tests.get(0));
 	}
 	
-	public void testChanged(TestbedTest argNew){
-		panel.changeTest(argNew);
+	public void nextTest(){
+		int index = currTestIndex + 1;
+		index %= TestList.tests.size();
+		side.tests.setSelectedIndex(index);
+	}
+	
+	public void lastTest(){
+		int index = currTestIndex - 1;
+		if(index < 0){
+			index += TestList.tests.size();
+		}
+		side.tests.setSelectedIndex(index);
+	}
+	
+	public void testChanged(int argNew){
+		currTestIndex = argNew;
+		panel.changeTest(TestList.tests.get(argNew));
 		panel.grabFocus();
 	}
 	
@@ -110,7 +150,8 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 	private JSlider vel;
 	private JLabel velText;
 	
-	private JComboBox tests;
+	public JComboBox tests;
+	
 	
 	private JButton pauseButton = new JButton("Pause");
 	private JButton stepButton = new JButton("Step");
@@ -344,6 +385,6 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	public void actionPerformed(ActionEvent e) {		
-		main.testChanged( TestList.tests.get(tests.getSelectedIndex()));
+		main.testChanged(tests.getSelectedIndex());
 	}
 }

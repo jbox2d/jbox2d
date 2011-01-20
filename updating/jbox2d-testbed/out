@@ -1,5 +1,5 @@
 /**
- * Created at 4:31:15 AM Jan 15, 2011
+ * Created at 7:50:04 AM Jan 20, 2011
  */
 package org.jbox2d.testbed.tests;
 
@@ -8,41 +8,158 @@ import org.jbox2d.testbed.framework.TestbedTest;
 /**
  * @author Daniel Murphy
  */
-public class SphereStack extends TestbedTest {
-	
-	int e_count = 10;
-	Body m_bodies[e_count];
+public class ApplyForce extends TestbedTest {
 	
 	/**
 	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
 	 */
 	@Override
 	public void initTest() {
+		world.setGravity(new Vec2(0.0f, 0.0f));
+
+		final float k_restitution = 0.4f;
+
+		Body ground;
 		{
 			BodyDef bd = new BodyDef();
-			Body ground = world.createBody(bd);
+			bd.position.set(0.0f, 20.0f);
+			ground = world.createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
-			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
-			ground.createFixture(shape, 0.0f);
+
+			FixtureDef sd;
+			sd.shape = shape;
+			sd.density = 0.0f;
+			sd.restitution = k_restitution;
+
+			// Left vertical
+			shape.setAsEdge(new Vec2(-20.0f, -20.0f), new Vec2(-20.0f, 20.0f));
+			ground.createFixture(&sd);
+
+			// Right vertical
+			shape.setAsEdge(new Vec2(20.0f, -20.0f), new Vec2(20.0f, 20.0f));
+			ground.createFixture(&sd);
+
+			// Top horizontal
+			shape.setAsEdge(new Vec2(-20.0f, 20.0f), new Vec2(20.0f, 20.0f));
+			ground.createFixture(&sd);
+
+			// Bottom horizontal
+			shape.setAsEdge(new Vec2(-20.0f, -20.0f), new Vec2(20.0f, -20.0f));
+			ground.createFixture(&sd);
 		}
 
 		{
-			CircleShape shape = new CircleShape();
-			shape.m_radius = 1.0f;
+			Transform xf1;
+			xf1.R.set(0.3524f * MathUtils.PI);
+			xf1.position = Mul(xf1.R, new Vec2(1.0f, 0.0f));
 
-			for (int i = 0; i < e_count; ++i)
+			Vec2 vertices[3];
+			vertices[0] = Mul(xf1, new Vec2(-1.0f, 0.0f));
+			vertices[1] = Mul(xf1, new Vec2(1.0f, 0.0f));
+			vertices[2] = Mul(xf1, new Vec2(0.0f, 0.5f));
+			
+			PolygonShape poly1;
+			poly1.set(vertices, 3);
+
+			FixtureDef sd1;
+			sd1.shape = &poly1;
+			sd1.density = 4.0f;
+
+			Transform xf2;
+			xf2.R.set(-0.3524f * MathUtils.PI);
+			xf2.position = Mul(xf2.R, new Vec2(-1.0f, 0.0f));
+
+			vertices[0] = Mul(xf2, new Vec2(-1.0f, 0.0f));
+			vertices[1] = Mul(xf2, new Vec2(1.0f, 0.0f));
+			vertices[2] = Mul(xf2, new Vec2(0.0f, 0.5f));
+			
+			PolygonShape poly2;
+			poly2.set(vertices, 3);
+
+			FixtureDef sd2;
+			sd2.shape = &poly2;
+			sd2.density = 2.0f;
+
+			BodyDef bd = new BodyDef();
+			bd.type = BodyType.DYNAMIC;
+			bd.angularDamping = 5.0f;
+			bd.linearDamping = 0.1f;
+
+			bd.position.set(0.0f, 2.0);
+			bd.angle = MathUtils.PI;
+			bd.allowSleep = false;
+			m_body = world.createBody(bd);
+			m_body.createFixture(&sd1);
+			m_body.createFixture(&sd2);
+		}
+
+		{
+			PolygonShape shape = new PolygonShape();
+			shape.setAsBox(0.5f, 0.5f);
+
+			FixtureDef fd = new FixtureDef();
+			fd.shape = shape;
+			fd.density = 1.0f;
+			fd.friction = 0.3f;
+
+			for (int i = 0; i < 10; ++i)
 			{
 				BodyDef bd = new BodyDef();
 				bd.type = BodyType.DYNAMIC;
-				bd.position.set(0.0, 4.0f + 3.0f * i);
 
-				m_bodies[i] = world.createBody(bd);
+				bd.position.set(0.0f, 5.0f + 1.54f * i);
+				Body body = world.createBody(bd);
 
-				m_bodies[i].createFixture(shape, 1.0f);
+				body.createFixture(fd);
 
-				//m_bodies[i].setLinearVelocity(new Vec2(0.0f, -100.0f));
+				float gravity = 10.0f;
+				float I = body.getInertia();
+				float mass = body.getMass();
+
+				// For a circle: I = 0.5 * m * r * r ==> r = sqrt(2 * I / m)
+				float radius = Sqrt(2.0f * I / mass);
+
+				FrictionJointDef jd;
+				jd.localAnchorA.setZero();
+				jd.localAnchorB.setZero();
+				jd.bodyA = ground;
+				jd.bodyB = body;
+				jd.collideConnected = true;
+				jd.maxForce = mass * gravity;
+				jd.maxTorque = mass * radius * gravity;
+
+				world.createJoint(&jd);
 			}
+		}
+	}
+	
+	/**
+	 * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
+	 */
+	@Override
+	public void keyPressed(char argKeyChar, int argKeyCode) {
+		switch (argKeyChar)
+		{
+		case 'w':
+			{
+				Vec2 f = m_body.getWorldVector(new Vec2(0.0f, -200.0f));
+				Vec2 p = m_body.getWorldPoint(new Vec2(0.0f, 2.0f));
+				m_body.ApplyForce(f, p);
+			}
+			break;
+
+		case 'a':
+			{
+				m_body.ApplyTorque(50.0f);
+			}
+			break;
+
+		case 'd':
+			{
+				m_body.ApplyTorque(-50.0f);
+			}
+			break;
 		}
 	}
 	
