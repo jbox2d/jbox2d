@@ -130,7 +130,7 @@ public class ConstantVolumeJoint extends Joint {
 			//bodies[next].m_linearVelocity.y += delta.y * step.inv_dt;
 		}
 		
-		pool.pushVec2(delta);
+		pool.pushVec2(1);
 		//System.out.println(sumdeltax);
 		return done;
 	}

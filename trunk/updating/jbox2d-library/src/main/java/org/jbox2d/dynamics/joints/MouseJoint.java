@@ -165,8 +165,8 @@ public class MouseJoint extends Joint {
 		b.m_linearVelocity.addLocal(temp);
 		b.m_angularVelocity += invI * Vec2.cross(r, m_impulse);
 		
-		pool.pushVec2(r, temp);
-		pool.pushMat22(K1,K2,K);
+		pool.pushVec2(2);
+		pool.pushMat22(3);
 	}
 
 	@Override
@@ -211,7 +211,7 @@ public class MouseJoint extends Joint {
 		b.m_linearVelocity.addLocal(oldImpulse);
 		b.m_angularVelocity += b.m_invI * Vec2.cross(r, impulse);
 		
-		pool.pushVec2(r, Cdot, impulse, oldImpulse);
+		pool.pushVec2(4);
 	}
 
 }

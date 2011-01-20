@@ -190,12 +190,12 @@ public class DistanceJoint extends Joint {
 			b2.m_linearVelocity.y += b2.m_invMass * P.y;
 			b2.m_angularVelocity += b2.m_invI * Vec2.cross(r2, P);
 			
-			pool.pushVec2(P);
+			pool.pushVec2(1);
 		}
 		else {
 			m_impulse = 0.0f;
 		}
-		pool.pushVec2(r1, r2);
+		pool.pushVec2(2);
 	}
 	
 	@Override
@@ -234,7 +234,7 @@ public class DistanceJoint extends Joint {
 		b2.m_linearVelocity.y += b2.m_invMass * Py;
 		b2.m_angularVelocity += b2.m_invI * (r2.x * Py - r2.y * Px);// b2Cross(r2, P);
 		
-		pool.pushVec2(r1, r2, v1,v2);
+		pool.pushVec2(4);
 	}
 	
 	@Override
@@ -278,7 +278,7 @@ public class DistanceJoint extends Joint {
 		b1.synchronizeTransform();
 		b2.synchronizeTransform();
 		
-		pool.pushVec2(r1,r2,d);
+		pool.pushVec2(3);
 		
 		return MathUtils.abs(C) < Settings.linearSlop;
 	}

@@ -1146,7 +1146,7 @@ public class World {
 			m_debugDraw.drawSegment(p1, p2, color);
 			m_debugDraw.drawSegment(x2, p2, color);
 		}
-		pool.pushVec2(p1,p2);
+		pool.pushVec2(2);
 	}
 	
 	private final Vec2 center = new Vec2();

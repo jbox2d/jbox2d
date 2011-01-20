@@ -193,13 +193,13 @@ public class RevoluteJoint extends Joint {
 			b2.m_linearVelocity.addLocal(temp);
 			b2.m_angularVelocity += i2 * (Vec2.cross(r2, P) + m_motorImpulse + m_impulse.z);
 			
-			pool.pushVec2(temp, P);
+			pool.pushVec2(2);
 		}
 		else {
 			m_impulse.setZero();
 			m_motorImpulse = 0.0f;
 		}
-		pool.pushVec2(r1, r2);
+		pool.pushVec2(2);
 	}
 	
 	@Override
@@ -299,8 +299,8 @@ public class RevoluteJoint extends Joint {
 			v2.addLocal(temp);
 			w2 += i2 * (Vec2.cross(r2, P) + impulse.z);
 			
-			pool.pushVec2(P, Cdot1);
-			pool.pushVec3(impulse, Cdot);
+			pool.pushVec2(2);
+			pool.pushVec3(2);
 		}
 		else {
 			r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
@@ -330,7 +330,7 @@ public class RevoluteJoint extends Joint {
 			v2.addLocal(temp);
 			w2 += i2 * Vec2.cross(r2, impulse);
 			
-			pool.pushVec2(Cdot, impulse);
+			pool.pushVec2(2);
 		}
 		
 		b1.m_linearVelocity.set(v1);
@@ -338,7 +338,7 @@ public class RevoluteJoint extends Joint {
 		b2.m_linearVelocity.set(v2);
 		b2.m_angularVelocity = w2;
 		
-		pool.pushVec2(r1,r2,temp);
+		pool.pushVec2(3);
 	}
 	
 	@Override
@@ -428,7 +428,7 @@ public class RevoluteJoint extends Joint {
 				
 				C.set(b2.m_sweep.c).addLocal(r2).subLocal(b1.m_sweep.c).subLocal(r1);
 				
-				pool.pushVec2(u);
+				pool.pushVec2(1);
 			}
 			
 			Mat22 K1 = pool.popMat22();
@@ -464,8 +464,8 @@ public class RevoluteJoint extends Joint {
 			b1.synchronizeTransform();
 			b2.synchronizeTransform();
 			
-			pool.pushMat22(K1,K2,K3);
-			pool.pushVec2(impulse, r1, r2, C);
+			pool.pushMat22(3);
+			pool.pushVec2(4);
 		}
 		
 		return positionError <= Settings.linearSlop && angularError <= Settings.angularSlop;

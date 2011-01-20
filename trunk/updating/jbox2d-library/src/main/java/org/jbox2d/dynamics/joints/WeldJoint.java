@@ -131,13 +131,13 @@ public class WeldJoint extends Joint {
 			bB.m_linearVelocity.addLocal(temp);
 			bB.m_angularVelocity += iB * (Vec2.cross(rB, P) + m_impulse.z);
 			
-			pool.pushVec2(P, temp);
+			pool.pushVec2(2);
 		}
 		else
 		{
 			m_impulse.setZero();
 		}
-		pool.pushVec2(rA,rB);
+		pool.pushVec2(2);
 	}
 	
 	/**
@@ -195,8 +195,8 @@ public class WeldJoint extends Joint {
 		bB.m_linearVelocity.set(vB);
 		bB.m_angularVelocity = wB;
 		
-		pool.pushVec2(rA, rB, Cdot1, temp, P);
-		pool.pushVec3(Cdot, impulse);
+		pool.pushVec2(5);
+		pool.pushVec3(2);
 	}
 	
 	/**
@@ -260,6 +260,9 @@ public class WeldJoint extends Joint {
 
 		bA.synchronizeTransform();
 		bB.synchronizeTransform();
+		
+		pool.pushVec2(5);
+		pool.pushVec3(2);
 
 		return positionError <= Settings.linearSlop && angularError <= Settings.angularSlop;
 	}
