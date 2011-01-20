@@ -237,7 +237,7 @@ public abstract class TestbedTest implements ContactListener{
 			textLine += 20;
 			debugDraw.drawString(5, textLine, "Pooling Info", color4);
 			textLine += 15;
-			debugDraw.drawString(5, textLine, "Vec2 pooled/creations: "+ world.getPool().getVec2Stack().size() + "/"+Vec2.creationCount, Color3f.WHITE);
+			debugDraw.drawString(5, textLine, "Vec2 creations: "+ Vec2.creationCount, Color3f.WHITE);
 			textLine += 15;
 			debugDraw.drawString(5, textLine, "Contact pooled/active: "+ Contact.contactPoolCount+"/"+Contact.activeContacts, Color3f.WHITE);
 			textLine += 20;

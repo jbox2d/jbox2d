@@ -24,6 +24,7 @@ public abstract class PerfTest {
 	public void go(){
 		long prev, after;
 		for(int i=0; i<iters; i++){
+			System.out.println(i*100.0/iters + "%");
 			for(int test=0; test<numTests; test++){
 				prev = System.nanoTime();
 				runTest(test);

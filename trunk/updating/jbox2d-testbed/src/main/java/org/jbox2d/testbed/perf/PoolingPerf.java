@@ -8,13 +8,13 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.TLVec2;
 import org.jbox2d.pooling.WorldPool;
 
-// Mac results 1/19/11
-//	Test Name    Milliseconds Avg
-//	 Creation             65.4416
-// World Pool            202.3449
-//Circle Pool             62.5145
-//ThreadLocal member      62.1190
-//     Member             60.6938
+//Test Name               Milliseconds Avg
+//Creation                         70.6609
+//World Pool                      251.3508
+//Circle Pool                      75.3677
+//Custom Stack                     75.6705
+//ThreadLocal member               77.2405
+//Member                           74.3760
 
 // Windows results 1/19/11
 //Test Name               Milliseconds Avg
@@ -143,7 +143,7 @@ public class PoolingPerf extends PerfTest{
 		for(int i=0; i<INNER_ITERS; i++){
 			v = wp.popVec2();
 			a += op(v);
-			wp.pushVec2(v);
+			wp.pushVec2(1);
 		}
 		aStore += a;
 	}
