@@ -36,12 +36,12 @@ public class PoolingStack<E> {
 	}
 	
 	public final E pop(){
-		assert(index < size);
+		assert(index < size) : "End of stack reached, there is probably a leak somewhere";
 		return pool[index++];
 	}
 	
 	public final PoolContainer<E> pop(int argNum){
-		assert(index + argNum < size);
+		assert(index + argNum < size) : "End of stack reached, there is probably a leak somewhere";
 		
 		switch(argNum){
 			case 9:
@@ -71,7 +71,7 @@ public class PoolingStack<E> {
 	
 	public final void push(int argNum){
 		index -= argNum;
-		assert (index >= 0);
+		assert (index >= 0) : "Beginning of stack reached, push/pops are unmatched";
 	}
 	
 	
