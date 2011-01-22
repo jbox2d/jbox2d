@@ -13,6 +13,7 @@ import org.jbox2d.testbed.framework.TestbedTest;
 public class TestList {
 	public static final ArrayList<TestbedTest> tests = new ArrayList<TestbedTest>();
 	static{
+		tests.add(new LineJointTest());
 		tests.add(new ApplyForce());
 		tests.add(new SphereStack());
 		tests.add(new Cantilever());
