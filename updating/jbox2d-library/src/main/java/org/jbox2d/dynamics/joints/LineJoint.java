@@ -390,7 +390,8 @@ public class LineJoint extends Joint {
 			final Vec2 Cdot = pool.popVec2();
 			Cdot.set(Cdot1, Cdot2);
 			
-			final Vec2 f1 = m_impulse;
+			final Vec2 f1 = pool.popVec2();
+			f1.set(m_impulse);
 			final Vec2 df = pool.popVec2();
 			m_K.solveToOut(Cdot.negateLocal(), df); // just leave negated
 			m_impulse.addLocal(df);
@@ -430,7 +431,7 @@ public class LineJoint extends Joint {
 			temp.set(P).mulLocal(m_invMassB);
 			v2.addLocal(temp);
 			w2 += m_invIB * L2;
-			pool.pushVec2(3);
+			pool.pushVec2(4);
 		}
 		else {
 			// Limit is inactive, just solve the prismatic constraint in block
