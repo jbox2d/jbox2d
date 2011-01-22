@@ -3,6 +3,12 @@
  */
 package org.jbox2d.testbed.tests;
 
+import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.joints.LineJointDef;
 import org.jbox2d.testbed.framework.TestbedTest;
 
 /**
@@ -35,9 +41,9 @@ public class LineJointTest extends TestbedTest {
 			Body body = world.createBody(bd);
 			body.createFixture(shape, 1.0f);
 
-			LineJointDef jd;
-			Vec2 axis(2.0f, 1.0f);
-			axis.Normalize();
+			LineJointDef jd = new LineJointDef();
+			Vec2 axis = new Vec2(2.0f, 1.0f);
+			axis.normalize();
 			jd.initialize(ground, body, new Vec2(0.0f, 8.5f), axis);
 			jd.motorSpeed = 0.0f;
 			jd.maxMotorForce = 100.0f;
@@ -45,7 +51,7 @@ public class LineJointTest extends TestbedTest {
 			jd.lowerTranslation = -4.0f;
 			jd.upperTranslation = 4.0f;
 			jd.enableLimit = true;
-			world.createJoint(&jd);
+			world.createJoint(jd);
 		}
 	}
 	
