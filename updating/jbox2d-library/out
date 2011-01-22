@@ -1,5 +1,5 @@
 /**
- * Created at 7:27:32 AM Jan 20, 2011
+ * Created at 9:06:02 PM Jan 21, 2011
  */
 package org.jbox2d.dynamics.joints;
 
@@ -10,43 +10,62 @@ import org.jbox2d.pooling.WorldPool;
 /**
  * @author Daniel Murphy
  */
-public class FrictionJoint extends Joint {
+public class LineJoint extends Joint {
 	
-	Vec2 m_localAnchorA;
-	Vec2 m_localAnchorB;
+	Vec2 m_localAnchor1;
+	Vec2 m_localAnchor2;
+	Vec2 m_localXAxis1;
+	Vec2 m_localYAxis1;
 
-	Mat22 m_linearMass;
-	float m_angularMass;
+	Vec2 m_axis, m_perp;
+	float m_s1, m_s2;
+	float m_a1, m_a2;
 
-	Vec2 m_linearImpulse;
-	float m_angularImpulse;
+	Mat22 m_K;
+	Vec2 m_impulse;
 
-	float m_maxForce;
-	float m_maxTorque;
+	float m_motorMass;			// effective mass for motor/limit translational finalraint.
+	float m_motorImpulse;
+
+	float m_lowerTranslation;
+	float m_upperTranslation;
+	float m_maxMotorForce;
+	float m_motorSpeed;
+
+	boolean m_enableLimit;
+	boolean m_enableMotor;
+	LimitState m_limitState;
 	
-	/**
-	 * @param argWorldPool
-	 * @param def
-	 */
-	protected FrictionJoint(WorldPool argWorldPool, FrictionJointDef def) {
-		super(argWorldPool, def);
-		m_localAnchorA = def.localAnchorA;
-		m_localAnchorB = def.localAnchorB;
+	
+	public LineJoint(WorldPool argPool, LineJointDef argDef){
+		super(argPool, argDef);
+		m_localAnchor1 = def.localAnchorA;
+		m_localAnchor2 = def.localAnchorB;
+		m_localXAxis1 = def.localAxisA;
+		m_localYAxis1 = Vec2.cross(1.0f, m_localXAxis1);
 
-		m_linearImpulse.setZero();
-		m_angularImpulse = 0.0f;
+		m_impulse.setZero();
+		m_motorMass = 0.0;
+		m_motorImpulse = 0.0f;
 
-		m_maxForce = def.maxForce;
-		m_maxTorque = def.maxTorque;
+		m_lowerTranslation = def.lowerTranslation;
+		m_upperTranslation = def.upperTranslation;
+		m_maxMotorForce = def.maxMotorForce;
+		m_motorSpeed = def.motorSpeed;
+		m_enableLimit = def.enableLimit;
+		m_enableMotor = def.enableMotor;
+		m_limitState = e_inactiveLimit;
+
+		m_axis.setZero();
+		m_perp.setZero();
 	}
-
 	/**
 	 * @see org.jbox2d.dynamics.joints.Joint#getAnchorA(org.jbox2d.common.Vec2)
 	 */
 	@Override
 	public void getAnchorA(new Vec2 argOut) {
-		// TODO Auto-generated method stub
-		
+		return m_bodyA.getWorldPoint(m_localAnchor1);
+
 	}
 	
 	/**
@@ -54,8 +73,8 @@ public class FrictionJoint extends Joint {
 	 */
 	@Override
 	public void getAnchorB(new Vec2 argOut) {
-		// TODO Auto-generated method stub
-		
+		return m_bodyB.getWorldPoint(m_localAnchor2);
+
 	}
 	
 	/**
@@ -63,8 +82,8 @@ public class FrictionJoint extends Joint {
 	 */
 	@Override
 	public void getReactionForce(float inv_dt, new Vec2 argOut) {
-		// TODO Auto-generated method stub
-		
+		return inv_dt * (m_impulse.x * m_perp + (m_motorImpulse + m_impulse.y) * m_axis);
+
 	}
 	
 	/**
@@ -72,8 +91,105 @@ public class FrictionJoint extends Joint {
 	 */
 	@Override
 	public float getReactionTorque(float inv_dt) {
-		// TODO Auto-generated method stub
-		return 0;
+		return 0.0f;
+
+	}
+	
+	float GetJointTranslation()
+	{
+		Body b1 = m_bodyA;
+		Body  = m_bodyB;
+
+		Vec2 p1 = b1.getWorldPoint(m_localAnchor1);
+		Vec2 p2 = .getWorldPoint(m_localAnchor2);
+		Vec2 d = p2 - p1;
+		Vec2 axis = b1.getWorldVector(m_localXAxis1);
+
+		float translation = Dot(d, axis);
+		return translation;
+	}
+	
+	float GetJointSpeed()
+	{
+		Body b1 = m_bodyA;
+		Body  = m_bodyB;
+
+		Vec2 r1 = Mul(b1.getTransform().R, m_localAnchor1 - b1.getLocalCenter());
+		Vec2 r2 = Mul(.getTransform().R, m_localAnchor2 - .getLocalCenter());
+		Vec2 p1 = b1.m_sweep.c + r1;
+		Vec2 p2 = .m_sweep.c + r2;
+		Vec2 d = p2 - p1;
+		Vec2 axis = b1.getWorldVector(m_localXAxis1);
+
+		Vec2 v1 = b1.m_linearVelocity;
+		Vec2 v2 = .m_linearVelocity;
+		float w1 = b1.m_angularVelocity;
+		float w2 = .m_angularVelocity;
+
+		float speed = Dot(d, Vec2.cross(w1, axis)) + Dot(axis, v2 + Vec2.cross(w2, r2) - v1 - Vec2.cross(w1, r1));
+		return speed;
+	}
+
+	boolean IsLimitEnabled()
+	{
+		return m_enableLimit;
+	}
+
+	void EnableLimit(boolean flag)
+	{
+		m_bodyA.setAwake(true);
+		m_bodyB.setAwake(true);
+		m_enableLimit = flag;
+	}
+
+	float GetLowerLimit()
+	{
+		return m_lowerTranslation;
+	}
+
+	float GetUpperLimit()
+	{
+		return m_upperTranslation;
+	}
+
+	void SetLimits(float lower, float upper)
+	{
+		Assert(lower <= upper);
+		m_bodyA.setAwake(true);
+		m_bodyB.setAwake(true);
+		m_lowerTranslation = lower;
+		m_upperTranslation = upper;
+	}
+
+	boolean IsMotorEnabled()
+	{
+		return m_enableMotor;
+	}
+
+	void EnableMotor(boolean flag)
+	{
+		m_bodyA.setAwake(true);
+		m_bodyB.setAwake(true);
+		m_enableMotor = flag;
+	}
+
+	void SetMotorSpeed(float speed)
+	{
+		m_bodyA.setAwake(true);
+		m_bodyB.setAwake(true);
+		m_motorSpeed = speed;
+	}
+
+	void SetMaxMotorForce(float force)
+	{
+		m_bodyA.setAwake(true);
+		m_bodyB.setAwake(true);
+		m_maxMotorForce = force;
+	}
+
+	float GetMotorForce()
+	{
+		return m_motorImpulse;
 	}
 	
 	/**
@@ -81,64 +197,120 @@ public class FrictionJoint extends Joint {
 	 */
 	@Override
 	public void initVelocityConstraints(TimeStep step) {
-		Body bA = m_bodyA;
-		Body bB = m_bodyB;
+		Body b1 = m_bodyA;
+		Body  = m_bodyB;
 
-		// Compute the effective mass matrix.
-		Vec2 rA = Mul(bA.getTransform().R, m_localAnchorA - bA.getLocalCenter());
-		Vec2 rB = Mul(bB.getTransform().R, m_localAnchorB - bB.getLocalCenter());
+		m_localCenterA = b1.getLocalCenter();
+		m_localCenterB = .getLocalCenter();
 
-		// J = [-I -r1_skew I r2_skew]
-		//     [ 0       -1 0       1]
-		// r_skew = [-ry; rx]
+		Transform xf1 = b1.getTransform();
+		Transform xf2 = .getTransform();
 
-		// Matlab
-		// K = [ mA+r1y^2*iA+mB+r2y^2*iB,  -r1y*iA*r1x-r2y*iB*r2x,          -r1y*iA-r2y*iB]
-		//     [  -r1y*iA*r1x-r2y*iB*r2x, mA+r1x^2*iA+mB+r2x^2*iB,           r1x*iA+r2x*iB]
-		//     [          -r1y*iA-r2y*iB,           r1x*iA+r2x*iB,                   iA+iB]
+		// Compute the effective masses.
+		Vec2 r1 = Mul(xf1.R, m_localAnchor1 - m_localCenterA);
+		Vec2 r2 = Mul(xf2.R, m_localAnchor2 - m_localCenterB);
+		Vec2 d = .m_sweep.c + r2 - b1.m_sweep.c - r1;
 
-		float mA = bA.m_invMass, mB = bB.m_invMass;
-		float iA = bA.m_invI, iB = bB.m_invI;
+		m_invMassA = b1.m_invMass;
+		m_invIA = b1.m_invI;
+		m_invMassB = .m_invMass;
+		m_invIB = .m_invI;
 
-		Mat22 K1;
-		K1.col1.x = mA + mB;	K1.col2.x = 0.0f;
-		K1.col1.y = 0.0f;		K1.col2.y = mA + mB;
-
-		Mat22 K2;
-		K2.col1.x =  iA * rA.y * rA.y;	K2.col2.x = -iA * rA.x * rA.y;
-		K2.col1.y = -iA * rA.x * rA.y;	K2.col2.y =  iA * rA.x * rA.x;
-
-		Mat22 K3;
-		K3.col1.x =  iB * rB.y * rB.y;	K3.col2.x = -iB * rB.x * rB.y;
-		K3.col1.y = -iB * rB.x * rB.y;	K3.col2.y =  iB * rB.x * rB.x;
-
-		Mat22 K = K1 + K2 + K3;
-		m_linearMass = K.getInverse();
-
-		m_angularMass = iA + iB;
-		if (m_angularMass > 0.0f)
+		// Compute motor Jacobian and effective mass.
 		{
-			m_angularMass = 1.0f / m_angularMass;
+			m_axis = Mul(xf1.R, m_localXAxis1);
+			m_a1 = Vec2.cross(d + r1, m_axis);
+			m_a2 = Vec2.cross(r2, m_axis);
+
+			m_motorMass = m_invMassA + m_invMassB + m_invIA * m_a1 * m_a1 + m_invIB * m_a2 * m_a2;
+			if (m_motorMass > _epsilon)
+			{
+				m_motorMass = 1.0f / m_motorMass;
+			}
+			else
+			{
+				m_motorMass = 0.0f;
+			}
+		}
+
+		// Prismatic finalraint.
+		{
+			m_perp = Mul(xf1.R, m_localYAxis1);
+
+			m_s1 = Vec2.cross(d + r1, m_perp);
+			m_s2 = Vec2.cross(r2, m_perp);
+
+			float m1 = m_invMassA, m2 = m_invMassB;
+			float i1 = m_invIA, i2 = m_invIB;
+
+			float k11 = m1 + m2 + i1 * m_s1 * m_s1 + i2 * m_s2 * m_s2;
+			float k12 = i1 * m_s1 * m_a1 + i2 * m_s2 * m_a2;
+			float k22 = m1 + m2 + i1 * m_a1 * m_a1 + i2 * m_a2 * m_a2;
+
+			m_K.col1.set(k11, k12);
+			m_K.col2.set(k12, k22);
+		}
+
+		// Compute motor and limit terms.
+		if (m_enableLimit)
+		{
+			float jointTranslation = Dot(m_axis, d);
+			if (MathUtils.abs(m_upperTranslation - m_lowerTranslation) < 2.0f * Settings.linearSlop)
+			{
+				m_limitState = e_equalLimits;
+			}
+			else if (jointTranslation <= m_lowerTranslation)
+			{
+				if (m_limitState != e_atLowerLimit)
+				{
+					m_limitState = e_atLowerLimit;
+					m_impulse.y = 0.0f;
+				}
+			}
+			else if (jointTranslation >= m_upperTranslation)
+			{
+				if (m_limitState != e_atUpperLimit)
+				{
+					m_limitState = e_atUpperLimit;
+					m_impulse.y = 0.0f;
+				}
+			}
+			else
+			{
+				m_limitState = e_inactiveLimit;
+				m_impulse.y = 0.0f;
+			}
+		}
+		else
+		{
+			m_limitState = e_inactiveLimit;
+		}
+
+		if (m_enableMotor == false)
+		{
+			m_motorImpulse = 0.0f;
 		}
 
 		if (step.warmStarting)
 		{
-			// Scale impulses to support a variable time step.
-			m_linearImpulse *= step.dtRatio;
-			m_angularImpulse *= step.dtRatio;
+			// Account for variable time step.
+			m_impulse *= step.dtRatio;
+			m_motorImpulse *= step.dtRatio;
 
-			Vec2 P(m_linearImpulse.x, m_linearImpulse.y);
+			Vec2 P = m_impulse.x * m_perp + (m_motorImpulse + m_impulse.y) * m_axis;
+			float L1 = m_impulse.x * m_s1 + (m_motorImpulse + m_impulse.y) * m_a1;
+			float L2 = m_impulse.x * m_s2 + (m_motorImpulse + m_impulse.y) * m_a2;
 
-			bA.m_linearVelocity -= mA * P;
-			bA.m_angularVelocity -= iA * (Vec2.cross(rA, P) + m_angularImpulse);
+			b1.m_linearVelocity -= m_invMassA * P;
+			b1.m_angularVelocity -= m_invIA * L1;
 
-			bB.m_linearVelocity += mB * P;
-			bB.m_angularVelocity += iB * (Vec2.cross(rB, P) + m_angularImpulse);
+			.m_linearVelocity += m_invMassB * P;
+			.m_angularVelocity += m_invIB * L2;
 		}
 		else
 		{
-			m_linearImpulse.setZero();
-			m_angularImpulse = 0.0f;
+			m_impulse.setZero();
+			m_motorImpulse = 0.0f;
 		}
 	}
 	
@@ -147,63 +319,111 @@ public class FrictionJoint extends Joint {
 	 */
 	@Override
 	public void solveVelocityConstraints(TimeStep step) {
-		Body bA = m_bodyA;
-		Body bB = m_bodyB;
+		Body b1 = m_bodyA;
+		Body  = m_bodyB;
 
-		Vec2 vA = bA.m_linearVelocity;
-		float wA = bA.m_angularVelocity;
-		Vec2 vB = bB.m_linearVelocity;
-		float wB = bB.m_angularVelocity;
+		Vec2 v1 = b1.m_linearVelocity;
+		float w1 = b1.m_angularVelocity;
+		Vec2 v2 = .m_linearVelocity;
+		float w2 = .m_angularVelocity;
 
-		float mA = bA.m_invMass, mB = bB.m_invMass;
-		float iA = bA.m_invI, iB = bB.m_invI;
-
-		Vec2 rA = Mul(bA.getTransform().R, m_localAnchorA - bA.getLocalCenter());
-		Vec2 rB = Mul(bB.getTransform().R, m_localAnchorB - bB.getLocalCenter());
-
-		// Solve angular friction
+		// Solve linear motor finalraint.
+		if (m_enableMotor && m_limitState != e_equalLimits)
 		{
-			float Cdot = wB - wA;
-			float impulse = -m_angularMass * Cdot;
+			float Cdot = Dot(m_axis, v2 - v1) + m_a2 * w2 - m_a1 * w1;
+			float impulse = m_motorMass * (m_motorSpeed - Cdot);
+			float oldImpulse = m_motorImpulse;
+			float maxImpulse = step.dt * m_maxMotorForce;
+			m_motorImpulse = Clamp(m_motorImpulse + impulse, -maxImpulse, maxImpulse);
+			impulse = m_motorImpulse - oldImpulse;
 
-			float oldImpulse = m_angularImpulse;
-			float maxImpulse = step.dt * m_maxTorque;
-			m_angularImpulse = Clamp(m_angularImpulse + impulse, -maxImpulse, maxImpulse);
-			impulse = m_angularImpulse - oldImpulse;
+			Vec2 P = impulse * m_axis;
+			float L1 = impulse * m_a1;
+			float L2 = impulse * m_a2;
 
-			wA -= iA * impulse;
-			wB += iB * impulse;
+			v1 -= m_invMassA * P;
+			w1 -= m_invIA * L1;
+
+			v2 += m_invMassB * P;
+			w2 += m_invIB * L2;
 		}
 
-		// Solve linear friction
+		float Cdot1 = Dot(m_perp, v2 - v1) + m_s2 * w2 - m_s1 * w1;
+
+		if (m_enableLimit && m_limitState != e_inactiveLimit)
 		{
-			Vec2 Cdot = vB + Vec2.cross(wB, rB) - vA - Vec2.cross(wA, rA);
+			// Solve prismatic and limit finalraint in block form.
+			float Cdot2 = Dot(m_axis, v2 - v1) + m_a2 * w2 - m_a1 * w1;
+			Vec2 Cdot(Cdot1, Cdot2);
 
-			Vec2 impulse = -Mul(m_linearMass, Cdot);
-			Vec2 oldImpulse = m_linearImpulse;
-			m_linearImpulse += impulse;
+			Vec2 f1 = m_impulse;
+			Vec2 df =  m_K.Solve(-Cdot);
+			m_impulse += df;
 
-			float maxImpulse = step.dt * m_maxForce;
-
-			if (m_linearImpulse.lengthSquared() > maxImpulse * maxImpulse)
+			if (m_limitState == e_atLowerLimit)
 			{
-				m_linearImpulse.Normalize();
-				m_linearImpulse *= maxImpulse;
+				m_impulse.y = Max(m_impulse.y, 0.0f);
+			}
+			else if (m_limitState == e_atUpperLimit)
+			{
+				m_impulse.y = Min(m_impulse.y, 0.0f);
 			}
 
-			impulse = m_linearImpulse - oldImpulse;
+			// f2(1) = invK(1,1) * (-Cdot(1) - K(1,2) * (f2(2) - f1(2))) + f1(1)
+			float b = -Cdot1 - (m_impulse.y - f1.y) * m_K.col2.x;
+			float f2r;
+			if (m_K.col1.x != 0.0f)
+			{
+				f2r = b / m_K.col1.x + f1.x;
+			}
+			else
+			{
+				f2r = f1.x;	
+			}
 
-			vA -= mA * impulse;
-			wA -= iA * Vec2.cross(rA, impulse);
+			m_impulse.x = f2r;
 
-			vB += mB * impulse;
-			wB += iB * Vec2.cross(rB, impulse);
+			df = m_impulse - f1;
+
+			Vec2 P = df.x * m_perp + df.y * m_axis;
+			float L1 = df.x * m_s1 + df.y * m_a1;
+			float L2 = df.x * m_s2 + df.y * m_a2;
+
+			v1 -= m_invMassA * P;
+			w1 -= m_invIA * L1;
+
+			v2 += m_invMassB * P;
+			w2 += m_invIB * L2;
+		}
+		else
+		{
+			// Limit is inactive, just solve the prismatic finalraint in block form.
+			float df;
+			if (m_K.col1.x != 0.0f)
+			{
+				df = - Cdot1 / m_K.col1.x;
+			}
+			else
+			{
+				df = 0.0f;
+			}
+			m_impulse.x += df;
+
+			Vec2 P = df * m_perp;
+			float L1 = df * m_s1;
+			float L2 = df * m_s2;
+
+			v1 -= m_invMassA * P;
+			w1 -= m_invIA * L1;
+
+			v2 += m_invMassB * P;
+			w2 += m_invIB * L2;
 		}
 
-		bA.m_linearVelocity = vA;
-		bA.m_angularVelocity = wA;
-		bB.m_linearVelocity = vB;
-		bB.m_angularVelocity = wB;
+		b1.m_linearVelocity = v1;
+		b1.m_angularVelocity = w1;
+		.m_linearVelocity = v2;
+		.m_angularVelocity = w2;
 	}
 	
 	/**
@@ -211,6 +431,126 @@ public class FrictionJoint extends Joint {
 	 */
 	@Override
 	public boolean solvePositionConstraints(float baumgarte) {
-		return true;
+		Body b1 = m_bodyA;
+		Body  = m_bodyB;
+
+		Vec2 c1 = b1.m_sweep.c;
+		float a1 = b1.m_sweep.a;
+
+		Vec2 c2 = .m_sweep.c;
+		float a2 = .m_sweep.a;
+
+		// Solve linear limit finalraint.
+		float linearError = 0.0f, angularError = 0.0f;
+		boolean active = false;
+		float C2 = 0.0f;
+
+		Mat22 R1(a1), R2(a2);
+
+		Vec2 r1 = Mul(R1, m_localAnchor1 - m_localCenterA);
+		Vec2 r2 = Mul(R2, m_localAnchor2 - m_localCenterB);
+		Vec2 d = c2 + r2 - c1 - r1;
+
+		if (m_enableLimit)
+		{
+			m_axis = Mul(R1, m_localXAxis1);
+
+			m_a1 = Vec2.cross(d + r1, m_axis);
+			m_a2 = Vec2.cross(r2, m_axis);
+
+			float translation = Dot(m_axis, d);
+			if (MathUtils.abs(m_upperTranslation - m_lowerTranslation) < 2.0f * Settings.linearSlop)
+			{
+				// Prevent large angular corrections
+				C2 = Clamp(translation, -_maxLinearCorrection, _maxLinearCorrection);
+				linearError = MathUtils.abs(translation);
+				active = true;
+			}
+			else if (translation <= m_lowerTranslation)
+			{
+				// Prevent large linear corrections and allow some slop.
+				C2 = Clamp(translation - m_lowerTranslation + Settings.linearSlop, -_maxLinearCorrection, 0.0f);
+				linearError = m_lowerTranslation - translation;
+				active = true;
+			}
+			else if (translation >= m_upperTranslation)
+			{
+				// Prevent large linear corrections and allow some slop.
+				C2 = Clamp(translation - m_upperTranslation - Settings.linearSlop, 0.0f, _maxLinearCorrection);
+				linearError = translation - m_upperTranslation;
+				active = true;
+			}
+		}
+
+		m_perp = Mul(R1, m_localYAxis1);
+
+		m_s1 = Vec2.cross(d + r1, m_perp);
+		m_s2 = Vec2.cross(r2, m_perp);
+
+		Vec2 impulse;
+		float C1;
+		C1 = Dot(m_perp, d);
+
+		linearError = Max(linearError, MathUtils.abs(C1));
+		angularError = 0.0f;
+
+		if (active)
+		{
+			float m1 = m_invMassA, m2 = m_invMassB;
+			float i1 = m_invIA, i2 = m_invIB;
+
+			float k11 = m1 + m2 + i1 * m_s1 * m_s1 + i2 * m_s2 * m_s2;
+			float k12 = i1 * m_s1 * m_a1 + i2 * m_s2 * m_a2;
+			float k22 = m1 + m2 + i1 * m_a1 * m_a1 + i2 * m_a2 * m_a2;
+
+			m_K.col1.set(k11, k12);
+			m_K.col2.set(k12, k22);
+
+			Vec2 C;
+			C.x = C1;
+			C.y = C2;
+
+			impulse = m_K.Solve(-C);
+		}
+		else
+		{
+			float m1 = m_invMassA, m2 = m_invMassB;
+			float i1 = m_invIA, i2 = m_invIB;
+
+			float k11 = m1 + m2 + i1 * m_s1 * m_s1 + i2 * m_s2 * m_s2;
+
+			float impulse1;
+			if (k11 != 0.0f)
+			{
+				impulse1 = - C1 / k11;
+			}
+			else
+			{
+				impulse1 = 0.0f;
+			}
+
+			impulse.x = impulse1;
+			impulse.y = 0.0f;
+		}
+
+		Vec2 P = impulse.x * m_perp + impulse.y * m_axis;
+		float L1 = impulse.x * m_s1 + impulse.y * m_a1;
+		float L2 = impulse.x * m_s2 + impulse.y * m_a2;
+
+		c1 -= m_invMassA * P;
+		a1 -= m_invIA * L1;
+		c2 += m_invMassB * P;
+		a2 += m_invIB * L2;
+
+		// TODO_ERIN remove need for this.
+		b1.m_sweep.c = c1;
+		b1.m_sweep.a = a1;
+		.m_sweep.c = c2;
+		.m_sweep.a = a2;
+		b1.SynchronizeTransform();
+		.SynchronizeTransform();
+
+		return linearError <= Settings.linearSlop && angularError <= _angularSlop;
 	}
+	
 }
