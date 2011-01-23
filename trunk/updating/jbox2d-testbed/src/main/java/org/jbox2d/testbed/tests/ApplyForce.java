@@ -29,7 +29,7 @@ public class ApplyForce extends TestbedTest {
 	 */
 	@Override
 	public void initTest() {
-		world.setGravity(new Vec2(0.0f, 0.0f));
+		m_world.setGravity(new Vec2(0.0f, 0.0f));
 		
 		final float k_restitution = 0.4f;
 		
@@ -37,7 +37,7 @@ public class ApplyForce extends TestbedTest {
 		{
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, 20.0f);
-			ground = world.createBody(bd);
+			ground = m_world.createBody(bd);
 			
 			PolygonShape shape = new PolygonShape();
 			
@@ -103,7 +103,7 @@ public class ApplyForce extends TestbedTest {
 			bd.position.set(0.0f, 2.0f);
 			bd.angle = MathUtils.PI;
 			bd.allowSleep = false;
-			m_body = world.createBody(bd);
+			m_body = m_world.createBody(bd);
 			m_body.createFixture(sd1);
 			m_body.createFixture(sd2);
 		}
@@ -122,7 +122,7 @@ public class ApplyForce extends TestbedTest {
 				bd.type = BodyType.DYNAMIC;
 				
 				bd.position.set(0.0f, 5.0f + 1.54f * i);
-				Body body = world.createBody(bd);
+				Body body = m_world.createBody(bd);
 				
 				body.createFixture(fd);
 				
@@ -142,7 +142,7 @@ public class ApplyForce extends TestbedTest {
 				jd.maxForce = mass * gravity;
 				jd.maxTorque = mass * radius * gravity;
 				
-				world.createJoint(jd);
+				m_world.createJoint(jd);
 			}
 		}
 	}

@@ -3,6 +3,8 @@ s/b2//g
 s/->/./g
 s/Body\*/Body/g
 s/Joint\*/Joint/g
+s/Shape\*/Shape/g
+s/Fixture\*/Fixture/g
 s/(Vec2(/(new Vec2(/g
 s/, Vec2(/, new Vec2(/g
 s/\.Set/.set/g

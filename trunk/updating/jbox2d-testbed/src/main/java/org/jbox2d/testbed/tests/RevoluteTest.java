@@ -32,7 +32,7 @@ public class RevoluteTest extends TestbedTest {
 		Body ground = null;
 		{
 			BodyDef bd = new BodyDef();
-			ground = world.createBody(bd);
+			ground = m_world.createBody(bd);
 			
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
@@ -49,7 +49,7 @@ public class RevoluteTest extends TestbedTest {
 			RevoluteJointDef rjd = new RevoluteJointDef();
 			
 			bd.position.set(0.0f, 20.0f);
-			Body body = world.createBody(bd);
+			Body body = m_world.createBody(bd);
 			body.createFixture(shape, 5.0f);
 			
 			float w = 100.0f;
@@ -65,7 +65,7 @@ public class RevoluteTest extends TestbedTest {
 			rjd.enableLimit = true;
 			rjd.collideConnected = true;
 			
-			m_joint = (RevoluteJoint) world.createJoint(rjd);
+			m_joint = (RevoluteJoint) m_world.createJoint(rjd);
 		}
 	}
 	

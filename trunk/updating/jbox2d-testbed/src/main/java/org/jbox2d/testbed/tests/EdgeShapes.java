@@ -38,7 +38,7 @@ public class EdgeShapes extends TestbedTest {
 		// Ground body
 		{
 			BodyDef bd = new BodyDef();
-			Body ground = world.createBody(bd);
+			Body ground = m_world.createBody(bd);
 
 			float x1 = -20.0f;
 			float y1 = 2.0f * MathUtils.cos(x1 / 10.0f * MathUtils.PI);
@@ -111,7 +111,7 @@ public class EdgeShapes extends TestbedTest {
 	{
 		if (m_bodies[m_bodyIndex] != null)
 		{
-			world.destroyBody(m_bodies[m_bodyIndex]);
+			m_world.destroyBody(m_bodies[m_bodyIndex]);
 			m_bodies[m_bodyIndex] = null;
 		}
 
@@ -128,7 +128,7 @@ public class EdgeShapes extends TestbedTest {
 			bd.angularDamping = 0.02f;
 		}
 
-		m_bodies[m_bodyIndex] = world.createBody(bd);
+		m_bodies[m_bodyIndex] = m_world.createBody(bd);
 		
 		if (index < 4)
 		{
@@ -156,7 +156,7 @@ public class EdgeShapes extends TestbedTest {
 		{
 			if (m_bodies[i] != null)
 			{
-				world.destroyBody(m_bodies[i]);
+				m_world.destroyBody(m_bodies[i]);
 				m_bodies[i] = null;
 				return;
 			}
@@ -204,20 +204,20 @@ public class EdgeShapes extends TestbedTest {
 
 
 		callback.m_fixture = null;
-		world.raycast(callback, point1, point2);
+		m_world.raycast(callback, point1, point2);
 
 		if (callback.m_fixture != null)
 		{
-			debugDraw.drawPoint(callback.m_point, 5.0f, new Color3f(0.4f, 0.9f, 0.4f));
+			m_debugDraw.drawPoint(callback.m_point, 5.0f, new Color3f(0.4f, 0.9f, 0.4f));
 
-			debugDraw.drawSegment(point1, callback.m_point, new Color3f(0.8f, 0.8f, 0.8f));
+			m_debugDraw.drawSegment(point1, callback.m_point, new Color3f(0.8f, 0.8f, 0.8f));
 
 			Vec2 head = callback.m_normal.mul(.5f).addLocal(callback.m_point);
-			debugDraw.drawSegment(callback.m_point, head, new Color3f(0.9f, 0.9f, 0.4f));
+			m_debugDraw.drawSegment(callback.m_point, head, new Color3f(0.9f, 0.9f, 0.4f));
 		}
 		else
 		{
-			debugDraw.drawSegment(point1, point2, new Color3f(0.8f, 0.8f, 0.8f));
+			m_debugDraw.drawSegment(point1, point2, new Color3f(0.8f, 0.8f, 0.8f));
 		}
 
 		if (advanceRay)

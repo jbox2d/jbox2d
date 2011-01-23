@@ -27,7 +27,7 @@ public class CompoundShapesTest extends TestbedTest{
 		{
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, 0.0f);
-			Body body = world.createBody(bd);
+			Body body = m_world.createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge( new Vec2(50.0f, 0.0f), new Vec2(-50.0f, 0.0f));
@@ -51,7 +51,7 @@ public class CompoundShapesTest extends TestbedTest{
 				bd.type = BodyType.DYNAMIC;
 				bd.position.set(x + 5.0f, 1.05f + 2.5f * i);
 				bd.angle = MathUtils.randomFloat(-MathUtils.PI, MathUtils.PI);
-				Body body = world.createBody(bd);
+				Body body = m_world.createBody(bd);
 				body.createFixture(circle1, 2.0f);
 				body.createFixture(circle2, 0.0f);
 			}
@@ -71,7 +71,7 @@ public class CompoundShapesTest extends TestbedTest{
 				bd.type = BodyType.DYNAMIC;
 				bd.position.set(x - 5.0f, 1.05f + 2.5f * i);
 				bd.angle = MathUtils.randomFloat(-MathUtils.PI, MathUtils.PI);
-				Body body = world.createBody(bd);
+				Body body = m_world.createBody(bd);
 				body.createFixture(polygon1, 2.0f);
 				body.createFixture(polygon2, 2.0f);
 			}
@@ -107,7 +107,7 @@ public class CompoundShapesTest extends TestbedTest{
 				bd.type = BodyType.DYNAMIC;
 				bd.position.set(x, 2.05f + 2.5f * i);
 				bd.angle = 0.0f;
-				Body body = world.createBody(bd);
+				Body body = m_world.createBody(bd);
 				body.createFixture(triangle1, 2.0f);
 				body.createFixture(triangle2, 2.0f);
 			}
@@ -126,7 +126,7 @@ public class CompoundShapesTest extends TestbedTest{
 			BodyDef bd = new BodyDef();
 			bd.type = BodyType.DYNAMIC;
 			bd.position.set( 0.0f, 2.0f );
-			Body body = world.createBody(bd);
+			Body body = m_world.createBody(bd);
 			body.createFixture(bottom, 4.0f);
 			body.createFixture(left, 4.0f);
 			body.createFixture(right, 4.0f);

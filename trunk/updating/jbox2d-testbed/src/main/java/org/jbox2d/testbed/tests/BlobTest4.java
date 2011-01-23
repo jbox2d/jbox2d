@@ -52,7 +52,7 @@ public class BlobTest4 extends TestbedTest {
 
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, 0.0f);
-			ground = world.createBody(bd);
+			ground = m_world.createBody(bd);
 			ground.createFixture(sd,0f);
 			
 			sd.setAsBox(0.4f,50.0f,new Vec2(-10.0f,0.0f), 0.0f);
@@ -79,7 +79,7 @@ public class BlobTest4 extends TestbedTest {
 			float y = cy + ry * (float)Math.cos(angle);
 			bd.position.set(new Vec2(x,y));
 			bd.type = BodyType.DYNAMIC;
-			Body body = world.createBody(bd);
+			Body body = m_world.createBody(bd);
 			
 			FixtureDef fd = new FixtureDef();
 			CircleShape cd = new CircleShape();
@@ -93,14 +93,14 @@ public class BlobTest4 extends TestbedTest {
 
 		cvjd.frequencyHz = 10.0f;
 		cvjd.dampingRatio = 1.0f;
-		world.createJoint(cvjd);
+		m_world.createJoint(cvjd);
 		
 		BodyDef bd2 = new BodyDef();
 		bd2.type = BodyType.DYNAMIC;
 		PolygonShape psd = new PolygonShape();
 		psd.setAsBox(3.0f,1.5f,new Vec2(cx,cy+15.0f),0.0f);
 		bd2.position = new Vec2(cx,cy+15.0f);
-		Body fallingBox = world.createBody(bd2);
+		Body fallingBox = m_world.createBody(bd2);
 		fallingBox.createFixture(psd,1.0f);
 	}
 

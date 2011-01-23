@@ -1,31 +1,30 @@
 /**
- * Created at 5:30:15 AM Jan 14, 2011
+ * Created at 1:59:32 PM Jan 23, 2011
  */
 package org.jbox2d.testbed.tests;
 
+import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
-import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jbox2d.testbed.framework.TestbedTest;
 
 /**
  * @author Daniel Murphy
  */
-public class Chain extends TestbedTest {
-	
+public class VaryingRestitution extends TestbedTest{
+
 	/**
 	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
 	 */
 	@Override
 	public void initTest() {
-		Body ground = null;
 		{
 			BodyDef bd = new BodyDef();
-			ground = m_world.createBody(bd);
+			Body ground = m_world.createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
@@ -33,42 +32,35 @@ public class Chain extends TestbedTest {
 		}
 
 		{
-			PolygonShape shape = new PolygonShape();
-			shape.setAsBox(0.6f, 0.125f);
+			CircleShape shape = new CircleShape();
+			shape.m_radius = 1.0f;
 
 			FixtureDef fd = new FixtureDef();
 			fd.shape = shape;
-			fd.density = 20.0f;
-			fd.friction = 0.2f;
+			fd.density = 1.0f;
 
-			RevoluteJointDef jd = new RevoluteJointDef();
-			jd.collideConnected = false;
+			float restitution[] = {0.0f, 0.1f, 0.3f, 0.5f, 0.75f, 0.9f, 1.0f};
 
-			final float y = 25.0f;
-			Body prevBody = ground;
-			for (int i = 0; i < 30; ++i)
+			for (int i = 0; i < 7; ++i)
 			{
 				BodyDef bd = new BodyDef();
 				bd.type = BodyType.DYNAMIC;
-				bd.position.set(0.5f + i, y);
+				bd.position.set(-10.0f + 3.0f * i, 20.0f);
+
 				Body body = m_world.createBody(bd);
+
+				fd.restitution = restitution[i];
 				body.createFixture(fd);
-
-				Vec2 anchor = new Vec2(i, y);
-				jd.initialize(prevBody, body, anchor);
-				m_world.createJoint(jd);
-
-				prevBody = body;
 			}
 		}
 	}
-	
+
 	/**
 	 * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
 	 */
 	@Override
 	public String getTestName() {
-		return "Chain";
+		return "Varying Restitution";
 	}
-	
+
 }

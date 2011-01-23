@@ -3,6 +3,17 @@
  */
 package org.jbox2d.testbed.tests;
 
+import java.util.HashSet;
+
+import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.FixtureDef;
+import org.jbox2d.testbed.framework.ContactPoint;
 import org.jbox2d.testbed.framework.TestbedSettings;
 import org.jbox2d.testbed.framework.TestbedTest;
 
@@ -20,91 +31,91 @@ public class CollisionProcessing extends TestbedTest {
 		{
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-50.0f, 0.0f), new Vec2(50.0f, 0.0f));
-
-			FixtureDef sd;
-			sd.shape = shape;;
-
+			
+			FixtureDef sd = new FixtureDef();
+			sd.shape = shape;
+			
 			BodyDef bd = new BodyDef();
-			Body ground = world.createBody(bd);
-			ground.createFixture(&sd);
+			Body ground = m_world.createBody(bd);
+			ground.createFixture(sd);
 		}
-
+		
 		float xLo = -5.0f, xHi = 5.0f;
 		float yLo = 2.0f, yHi = 35.0f;
-
+		
 		// Small triangle
-		Vec2 vertices[3];
-		vertices[0].set(-1.0f, 0.0f);
-		vertices[1].set(1.0f, 0.0f);
-		vertices[2].set(0.0f, 2.0f);
-
-		PolygonShape polygon;
+		Vec2 vertices[] = new Vec2[3];
+		vertices[0] = new Vec2(-1.0f, 0.0f);
+		vertices[1] = new Vec2(1.0f, 0.0f);
+		vertices[2] = new Vec2(0.0f, 2.0f);
+		
+		PolygonShape polygon = new PolygonShape();
 		polygon.set(vertices, 3);
-
-		FixtureDef triangleShapeDef;
-		triangleShapeDef.shape = &polygon;
+		
+		FixtureDef triangleShapeDef = new FixtureDef();
+		triangleShapeDef.shape = polygon;
 		triangleShapeDef.density = 1.0f;
-
-		BodyDef triangleBodyDef;
+		
+		BodyDef triangleBodyDef = new BodyDef();
 		triangleBodyDef.type = BodyType.DYNAMIC;
 		triangleBodyDef.position.set(MathUtils.randomFloat(xLo, xHi), MathUtils.randomFloat(yLo, yHi));
-
-		Body body1 = world.createBody(&triangleBodyDef);
-		body1.createFixture(&triangleShapeDef);
-
+		
+		Body body1 = m_world.createBody(triangleBodyDef);
+		body1.createFixture(triangleShapeDef);
+		
 		// Large triangle (recycle definitions)
-		vertices[0] *= 2.0f;
-		vertices[1] *= 2.0f;
-		vertices[2] *= 2.0f;
+		vertices[0].mulLocal(2.0f);
+		vertices[1].mulLocal(2.0f);
+		vertices[2].mulLocal(2.0f);
 		polygon.set(vertices, 3);
-
+		
 		triangleBodyDef.position.set(MathUtils.randomFloat(xLo, xHi), MathUtils.randomFloat(yLo, yHi));
-
-		Body body2 = world.createBody(&triangleBodyDef);
-		body2.createFixture(&triangleShapeDef);
+		
+		Body body2 = m_world.createBody(triangleBodyDef);
+		body2.createFixture(triangleShapeDef);
 		
 		// Small box
 		polygon.setAsBox(1.0f, 0.5f);
-
-		FixtureDef boxShapeDef;
-		boxShapeDef.shape = &polygon;
+		
+		FixtureDef boxShapeDef = new FixtureDef();
+		boxShapeDef.shape = polygon;
 		boxShapeDef.density = 1.0f;
-
-		BodyDef boxBodyDef;
+		
+		BodyDef boxBodyDef = new BodyDef();
 		boxBodyDef.type = BodyType.DYNAMIC;
 		boxBodyDef.position.set(MathUtils.randomFloat(xLo, xHi), MathUtils.randomFloat(yLo, yHi));
-
-		Body body3 = world.createBody(&boxBodyDef);
-		body3.createFixture(&boxShapeDef);
-
+		
+		Body body3 = m_world.createBody(boxBodyDef);
+		body3.createFixture(boxShapeDef);
+		
 		// Large box (recycle definitions)
 		polygon.setAsBox(2.0f, 1.0f);
 		boxBodyDef.position.set(MathUtils.randomFloat(xLo, xHi), MathUtils.randomFloat(yLo, yHi));
 		
-		Body body4 = world.createBody(&boxBodyDef);
-		body4.createFixture(&boxShapeDef);
-
+		Body body4 = m_world.createBody(boxBodyDef);
+		body4.createFixture(boxShapeDef);
+		
 		// Small circle
-		CircleShape circle;
+		CircleShape circle = new CircleShape();
 		circle.m_radius = 1.0f;
-
-		FixtureDef circleShapeDef;
-		circleShapeDef.shape = &circle;
+		
+		FixtureDef circleShapeDef = new FixtureDef();
+		circleShapeDef.shape = circle;
 		circleShapeDef.density = 1.0f;
-
-		BodyDef circleBodyDef;
+		
+		BodyDef circleBodyDef = new BodyDef();
 		circleBodyDef.type = BodyType.DYNAMIC;
 		circleBodyDef.position.set(MathUtils.randomFloat(xLo, xHi), MathUtils.randomFloat(yLo, yHi));
-
-		Body body5 = world.createBody(&circleBodyDef);
-		body5.createFixture(&circleShapeDef);
-
+		
+		Body body5 = m_world.createBody(circleBodyDef);
+		body5.createFixture(circleShapeDef);
+		
 		// Large circle
 		circle.m_radius *= 2.0f;
 		circleBodyDef.position.set(MathUtils.randomFloat(xLo, xHi), MathUtils.randomFloat(yLo, yHi));
-
-		Body body6 = world.createBody(&circleBodyDef);
-		body6.createFixture(&circleShapeDef);
+		
+		Body body6 = m_world.createBody(circleBodyDef);
+		body6.createFixture(circleShapeDef);
 	}
 	
 	/**
@@ -117,55 +128,36 @@ public class CollisionProcessing extends TestbedTest {
 		// We are going to destroy some bodies according to contact
 		// points. We must buffer the bodies that should be destroyed
 		// because they may belong to multiple contact points.
-		final int k_maxNuke = 6;
-		Body nuke[k_maxNuke];
-		int nukeCount = 0;
-
+		HashSet<Body> nuke = new HashSet<Body>();
+		
 		// Traverse the contact results. Destroy bodies that
 		// are touching heavier bodies.
-		for (int i = 0; i < m_pointCount; ++i)
-		{
-			ContactPoint* point = m_points + i;
-
+		for (int i = 0; i < m_pointCount; ++i) {
+			ContactPoint point = points[i];
+			
 			Body body1 = point.fixtureA.getBody();
 			Body body2 = point.fixtureB.getBody();
 			float mass1 = body1.getMass();
 			float mass2 = body2.getMass();
-
-			if (mass1 > 0.0f && mass2 > 0.0f)
-			{
-				if (mass2 > mass1)
-				{
-					nuke[nukeCount++] = body1;
+			
+			if (mass1 > 0.0f && mass2 > 0.0f) {
+				if (mass2 > mass1) {
+					nuke.add(body1);
 				}
-				else
-				{
-					nuke[nukeCount++] = body2;
-				}
-
-				if (nukeCount == k_maxNuke)
-				{
-					break;
+				else {
+					nuke.add(body2);
 				}
 			}
 		}
-
+		
 		// Sort the nuke array to group duplicates.
-		std::sort(nuke, nuke + nukeCount);
-
+		// Arrays.sort(nuke);
+		
 		// Destroy the bodies, skipping duplicates.
-		int i = 0;
-		while (i < nukeCount)
-		{
-			Body b = nuke[i++];
-			while (i < nukeCount && nuke[i] == b)
-			{
-				++i;
-			}
-
-			if (b != m_bomb)
-			{
-				world.destroyBody(b);
+		for (Body b : nuke) {
+			
+			if (b != m_bomb) {
+				m_world.destroyBody(b);
 			}
 		}
 	}
