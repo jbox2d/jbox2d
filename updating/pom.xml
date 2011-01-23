@@ -22,7 +22,7 @@
 		<connection>scm:svn:http://jbox2d.googlecode.com/svn</connection>
 		<developerConnection>scm:svn:https://jbox2d.googlecode.com/svn</developerConnection>
 	</scm>
-	
+
 	<developers>
 		<developer>
 			<id>toucansam99@gmail.com</id>
@@ -37,12 +37,19 @@
 			<url>http://ewjordan.com</url>
 		</developer>
 		<developer>
-		     <id>quixote_arg</id>
-		     <name>Andres Quijano</name>
-		     <email>tulsidas@gmail.com</email>
-		     <url>http://www.jengibre.com.ar</url>
+			<id>quixote_arg</id>
+			<name>Andres Quijano</name>
+			<email>tulsidas@gmail.com</email>
+			<url>http://www.jengibre.com.ar</url>
 		</developer>
 	</developers>
+
+	<licenses>
+		<license>
+			<name>New BSD License</name>
+			<url>http://www.opensource.org/licenses/bsd-license.php</url>
+		</license>
+	</licenses>
 
 	<build>
 		<plugins>
