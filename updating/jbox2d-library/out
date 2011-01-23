@@ -1,5 +1,5 @@
 /**
- * Created at 11:34:45 AM Jan 23, 2011
+ * Created at 12:12:02 PM Jan 23, 2011
  */
 package org.jbox2d.dynamics.joints;
 
@@ -7,136 +7,70 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.pooling.WorldPool;
 
-//Gear Joint:
-//C0 = (coordinate1 + ratio * coordinate2)_initial
-//C = C0 - (cordinate1 + ratio * coordinate2) = 0
-//Cdot = -(Cdot1 + ratio * Cdot2)
-//J = -[J1 ratio * J2]
-//K = J * invM * JT
-//= J1 * invM1 * J1T + ratio * ratio * J2 * invM2 * J2T
-//
-//Revolute:
-//coordinate = rotation
-//Cdot = angularVelocity
-//J = [0 0 1]
-//K = J * invM * JT = invI
-//
-//Prismatic:
-//coordinate = dot(p - pg, ug)
-//Cdot = dot(v + cross(w, r), ug)
-//J = [ug cross(r, ug)]
-//K = J * invM * JT = invMass + invI * cross(r, ug)^2
-
 /**
- * A gear joint is used to connect two joints together. Either joint
- * can be a revolute or prismatic joint. You specify a gear ratio
- * to bind the motions together:
- * coordinate1 + ratio * coordinate2 = constant
- * The ratio can be negative or positive. If one joint is a revolute joint
- * and the other joint is a prismatic joint, then the ratio will have units
- * of length or units of 1/length.
- * @warning The revolute and prismatic joints must be attached to
- * fixed bodies (which must be body1 on those joints).
  * @author Daniel Murphy
  */
-public class GearJoint extends Joint {
+public class PulleyJoint extends Joint {
 	
-	Body m_ground1;
-	Body m_ground2;
-
-	// One of these is null.
-	RevoluteJoint m_revolute1;
-	PrismaticJoint m_prismatic1;
-
-	// One of these is null.
-	RevoluteJoint m_revolute2;
-	PrismaticJoint m_prismatic2;
-
+	public static final float MIN_PULLEY_LENGTH = 2.0f;
+	
 	Vec2 m_groundAnchor1;
 	Vec2 m_groundAnchor2;
-
 	Vec2 m_localAnchor1;
 	Vec2 m_localAnchor2;
 
-	Jacobian m_J;
-
+	Vec2 m_u1;
+	Vec2 m_u2;
+	
 	float m_constant;
 	float m_ratio;
+	
+	float m_maxLength1;
+	float m_maxLength2;
 
-	// Effective mass
-	float m_mass;
+	// Effective masses
+	float m_pulleyMass;
+	float m_limitMass1;
+	float m_limitMass2;
 
-	// Impulse for accumulation/warm starting.
+	// Impulses for accumulation/warm starting.
 	float m_impulse;
+	float m_limitImpulse1;
+	float m_limitImpulse2;
+
+	LimitState m_state;
+	LimitState m_limitState1;
+	LimitState m_limitState2;
 	
 	/**
 	 * @param argWorldPool
 	 * @param def
 	 */
-	public GearJoint(WorldPool argWorldPool, GearJointDef def) {
+	public PulleyJoint(WorldPool argWorldPool, PulleyJointDef def) {
 		super(argWorldPool, def);
-		
-		JointType type1 = def.joint1.getType();
-		JointType type2 = def.joint2.getType();
+		m_groundAnchor1 = def.groundAnchorA;
+		m_groundAnchor2 = def.groundAnchorB;
+		m_localAnchor1 = def.localAnchorA;
+		m_localAnchor2 = def.localAnchorB;
 
-		Assert(type1 == e_revoluteJoint || type1 == e_prismaticJoint);
-		Assert(type2 == e_revoluteJoint || type2 == e_prismaticJoint);
-		Assert(def.joint1.getBodyA().getType() == _staticBody);
-		Assert(def.joint2.getBodyA().getType() == _staticBody);
-
-		m_revolute1 = null;
-		m_prismatic1 = null;
-		m_revolute2 = null;
-		m_prismatic2 = null;
-
-		float coordinate1, coordinate2;
-
-		m_ground1 = def.joint1.getBodyA();
-		m_bodyA = def.joint1.getBodyB();
-		if (type1 == e_revoluteJoint)
-		{
-			m_revolute1 = (RevoluteJoint)def.joint1;
-			m_groundAnchor1 = m_revolute1.m_localAnchor1;
-			m_localAnchor1 = m_revolute1.m_localAnchor2;
-			coordinate1 = m_revolute1.getJointAngle();
-		}
-		else
-		{
-			m_prismatic1 = (PrismaticJoint)def.joint1;
-			m_groundAnchor1 = m_prismatic1.m_localAnchor1;
-			m_localAnchor1 = m_prismatic1.m_localAnchor2;
-			coordinate1 = m_prismatic1.getJointTranslation();
-		}
-
-		m_ground2 = def.joint2.getBodyA();
-		m_bodyB = def.joint2.getBodyB();
-		if (type2 == e_revoluteJoint)
-		{
-			m_revolute2 = (RevoluteJoint)def.joint2;
-			m_groundAnchor2 = m_revolute2.m_localAnchor1;
-			m_localAnchor2 = m_revolute2.m_localAnchor2;
-			coordinate2 = m_revolute2.getJointAngle();
-		}
-		else
-		{
-			m_prismatic2 = (PrismaticJoint)def.joint2;
-			m_groundAnchor2 = m_prismatic2.m_localAnchor1;
-			m_localAnchor2 = m_prismatic2.m_localAnchor2;
-			coordinate2 = m_prismatic2.getJointTranslation();
-		}
-
+		assert(def.ratio != 0.0f);
 		m_ratio = def.ratio;
 
-		m_constant = coordinate1 + m_ratio * coordinate2;
+		m_constant = def.lengthA + m_ratio * def.lengthB;
+
+		m_maxLength1 = Min(def.maxLengthA, m_constant - m_ratio * _minPulleyLength);
+		m_maxLength2 = Min(def.maxLengthB, (m_constant - _minPulleyLength) / m_ratio);
 
 		m_impulse = 0.0f;
+		m_limitImpulse1 = 0.0f;
+		m_limitImpulse2 = 0.0f;
 	}
 	
 	/**
 	 * @see org.jbox2d.dynamics.joints.Joint#getAnchorA(org.jbox2d.common.Vec2)
 	 */
 	@Override
-	public void getAnchorA(new Vec2 argOut) {
+	public void getAnchorA(Vec2 argOut) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -145,7 +79,7 @@ public class GearJoint extends Joint {
 	 * @see org.jbox2d.dynamics.joints.Joint#getAnchorB(org.jbox2d.common.Vec2)
 	 */
 	@Override
-	public void getAnchorB(new Vec2 argOut) {
+	public void getAnchorB(Vec2 argOut) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -154,7 +88,7 @@ public class GearJoint extends Joint {
 	 * @see org.jbox2d.dynamics.joints.Joint#getReactionForce(float, org.jbox2d.common.Vec2)
 	 */
 	@Override
-	public void getReactionForce(float inv_dt, new Vec2 argOut) {
+	public void getReactionForce(float inv_dt, Vec2 argOut) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -173,58 +107,108 @@ public class GearJoint extends Joint {
 	 */
 	@Override
 	public void initVelocityConstraints(TimeStep step) {
-		Body g1 = m_ground1;
-		Body g2 = m_ground2;
 		Body b1 = m_bodyA;
 		Body  = m_bodyB;
 
-		float K = 0.0f;
-		m_J.setZero();
+		Vec2 r1 = Mul(b1.getTransform().R, m_localAnchor1 - b1.getLocalCenter());
+		Vec2 r2 = Mul(.getTransform().R, m_localAnchor2 - .getLocalCenter());
 
-		if (m_revolute1)
+		Vec2 p1 = b1.m_sweep.c + r1;
+		Vec2 p2 = .m_sweep.c + r2;
+
+		Vec2 s1 = m_groundAnchor1;
+		Vec2 s2 = m_groundAnchor2;
+
+		// Get the pulley axes.
+		m_u1 = p1 - s1;
+		m_u2 = p2 - s2;
+
+		float length1 = m_u1.length();
+		float length2 = m_u2.length();
+
+		if (length1 > Settings.linearSlop)
 		{
-			m_J.angularA = -1.0f;
-			K += b1.m_invI;
+			m_u1 *= 1.0f / length1;
 		}
 		else
 		{
-			Vec2 ug = Mul(g1.getTransform().R, m_prismatic1.m_localXAxis1);
-			Vec2 r = Mul(b1.getTransform().R, m_localAnchor1 - b1.getLocalCenter());
-			float crug = Vec2.cross(r, ug);
-			m_J.linearA = -ug;
-			m_J.angularA = -crug;
-			K += b1.m_invMass + b1.m_invI * crug * crug;
+			m_u1.setZero();
 		}
 
-		if (m_revolute2)
+		if (length2 > Settings.linearSlop)
 		{
-			m_J.angularB = -m_ratio;
-			K += m_ratio * m_ratio * .m_invI;
+			m_u2 *= 1.0f / length2;
 		}
 		else
 		{
-			Vec2 ug = Mul(g2.getTransform().R, m_prismatic2.m_localXAxis1);
-			Vec2 r = Mul(.getTransform().R, m_localAnchor2 - .getLocalCenter());
-			float crug = Vec2.cross(r, ug);
-			m_J.linearB = -m_ratio * ug;
-			m_J.angularB = -m_ratio * crug;
-			K += m_ratio * m_ratio * (.m_invMass + .m_invI * crug * crug);
+			m_u2.setZero();
+		}
+
+		float C = m_constant - length1 - m_ratio * length2;
+		if (C > 0.0f)
+		{
+			m_state = e_inactiveLimit;
+			m_impulse = 0.0f;
+		}
+		else
+		{
+			m_state = e_atUpperLimit;
+		}
+
+		if (length1 < m_maxLength1)
+		{
+			m_limitState1 = e_inactiveLimit;
+			m_limitImpulse1 = 0.0f;
+		}
+		else
+		{
+			m_limitState1 = e_atUpperLimit;
+		}
+
+		if (length2 < m_maxLength2)
+		{
+			m_limitState2 = e_inactiveLimit;
+			m_limitImpulse2 = 0.0f;
+		}
+		else
+		{
+			m_limitState2 = e_atUpperLimit;
 		}
 
 		// Compute effective mass.
-		m_mass = K > 0.0f ? 1.0f / K : 0.0f;
+		float cr1u1 = Vec2.cross(r1, m_u1);
+		float cr2u2 = Vec2.cross(r2, m_u2);
+
+		m_limitMass1 = b1.m_invMass + b1.m_invI * cr1u1 * cr1u1;
+		m_limitMass2 = .m_invMass + .m_invI * cr2u2 * cr2u2;
+		m_pulleyMass = m_limitMass1 + m_ratio * m_ratio * m_limitMass2;
+		assert(m_limitMass1 > _epsilon);
+		assert(m_limitMass2 > _epsilon);
+		assert(m_pulleyMass > _epsilon);
+		m_limitMass1 = 1.0f / m_limitMass1;
+		m_limitMass2 = 1.0f / m_limitMass2;
+		m_pulleyMass = 1.0f / m_pulleyMass;
 
 		if (step.warmStarting)
 		{
+			// Scale impulses to support variable time steps.
+			m_impulse *= step.dtRatio;
+			m_limitImpulse1 *= step.dtRatio;
+			m_limitImpulse2 *= step.dtRatio;
+
 			// Warm starting.
-			b1.m_linearVelocity += b1.m_invMass * m_impulse * m_J.linearA;
-			b1.m_angularVelocity += b1.m_invI * m_impulse * m_J.angularA;
-			.m_linearVelocity += .m_invMass * m_impulse * m_J.linearB;
-			.m_angularVelocity += .m_invI * m_impulse * m_J.angularB;
+			Vec2 P1 = -(m_impulse + m_limitImpulse1) * m_u1;
+			Vec2 P2 = (-m_ratio * m_impulse - m_limitImpulse2) * m_u2;
+			b1.m_linearVelocity += b1.m_invMass * P1;
+			b1.m_angularVelocity += b1.m_invI * Vec2.cross(r1, P1);
+			.m_linearVelocity += .m_invMass * P2;
+			.m_angularVelocity += .m_invI * Vec2.cross(r2, P2);
 		}
 		else
 		{
 			m_impulse = 0.0f;
+			m_limitImpulse1 = 0.0f;
+			m_limitImpulse2 = 0.0f;
 		}
 	}
 	
@@ -236,16 +220,57 @@ public class GearJoint extends Joint {
 		Body b1 = m_bodyA;
 		Body  = m_bodyB;
 
-		float Cdot = m_J.Compute(	b1.m_linearVelocity, b1.m_angularVelocity,
-									.m_linearVelocity, .m_angularVelocity);
+		Vec2 r1 = Mul(b1.getTransform().R, m_localAnchor1 - b1.getLocalCenter());
+		Vec2 r2 = Mul(.getTransform().R, m_localAnchor2 - .getLocalCenter());
 
-		float impulse = m_mass * (-Cdot);
-		m_impulse += impulse;
+		if (m_state == e_atUpperLimit)
+		{
+			Vec2 v1 = b1.m_linearVelocity + Vec2.cross(b1.m_angularVelocity, r1);
+			Vec2 v2 = .m_linearVelocity + Vec2.cross(.m_angularVelocity, r2);
 
-		b1.m_linearVelocity += b1.m_invMass * impulse * m_J.linearA;
-		b1.m_angularVelocity += b1.m_invI * impulse * m_J.angularA;
-		.m_linearVelocity += .m_invMass * impulse * m_J.linearB;
-		.m_angularVelocity += .m_invI * impulse * m_J.angularB;
+			float Cdot = -Vec2.dot(m_u1, v1) - m_ratio * Vec2.dot(m_u2, v2);
+			float impulse = m_pulleyMass * (-Cdot);
+			float oldImpulse = m_impulse;
+			m_impulse = Max(0.0f, m_impulse + impulse);
+			impulse = m_impulse - oldImpulse;
+
+			Vec2 P1 = -impulse * m_u1;
+			Vec2 P2 = -m_ratio * impulse * m_u2;
+			b1.m_linearVelocity += b1.m_invMass * P1;
+			b1.m_angularVelocity += b1.m_invI * Vec2.cross(r1, P1);
+			.m_linearVelocity += .m_invMass * P2;
+			.m_angularVelocity += .m_invI * Vec2.cross(r2, P2);
+		}
+
+		if (m_limitState1 == e_atUpperLimit)
+		{
+			Vec2 v1 = b1.m_linearVelocity + Vec2.cross(b1.m_angularVelocity, r1);
+
+			float Cdot = -Vec2.dot(m_u1, v1);
+			float impulse = -m_limitMass1 * Cdot;
+			float oldImpulse = m_limitImpulse1;
+			m_limitImpulse1 = Max(0.0f, m_limitImpulse1 + impulse);
+			impulse = m_limitImpulse1 - oldImpulse;
+
+			Vec2 P1 = -impulse * m_u1;
+			b1.m_linearVelocity += b1.m_invMass * P1;
+			b1.m_angularVelocity += b1.m_invI * Vec2.cross(r1, P1);
+		}
+
+		if (m_limitState2 == e_atUpperLimit)
+		{
+			Vec2 v2 = .m_linearVelocity + Vec2.cross(.m_angularVelocity, r2);
+
+			float Cdot = -Vec2.dot(m_u2, v2);
+			float impulse = -m_limitMass2 * Cdot;
+			float oldImpulse = m_limitImpulse2;
+			m_limitImpulse2 = Max(0.0f, m_limitImpulse2 + impulse);
+			impulse = m_limitImpulse2 - oldImpulse;
+
+			Vec2 P2 = -impulse * m_u2;
+			.m_linearVelocity += .m_invMass * P2;
+			.m_angularVelocity += .m_invI * Vec2.cross(r2, P2);
+		}
 	}
 	
 	/**
@@ -253,43 +278,123 @@ public class GearJoint extends Joint {
 	 */
 	@Override
 	public boolean solvePositionConstraints(float baumgarte) {
-		float linearError = 0.0f;
-
 		Body b1 = m_bodyA;
 		Body  = m_bodyB;
 
-		float coordinate1, coordinate2;
-		if (m_revolute1)
+		Vec2 s1 = m_groundAnchor1;
+		Vec2 s2 = m_groundAnchor2;
+
+		float linearError = 0.0f;
+
+		if (m_state == e_atUpperLimit)
 		{
-			coordinate1 = m_revolute1.getJointAngle();
+			Vec2 r1 = Mul(b1.getTransform().R, m_localAnchor1 - b1.getLocalCenter());
+			Vec2 r2 = Mul(.getTransform().R, m_localAnchor2 - .getLocalCenter());
+
+			Vec2 p1 = b1.m_sweep.c + r1;
+			Vec2 p2 = .m_sweep.c + r2;
+
+			// Get the pulley axes.
+			m_u1 = p1 - s1;
+			m_u2 = p2 - s2;
+
+			float length1 = m_u1.length();
+			float length2 = m_u2.length();
+
+			if (length1 > Settings.linearSlop)
+			{
+				m_u1 *= 1.0f / length1;
+			}
+			else
+			{
+				m_u1.setZero();
+			}
+
+			if (length2 > Settings.linearSlop)
+			{
+				m_u2 *= 1.0f / length2;
+			}
+			else
+			{
+				m_u2.setZero();
+			}
+
+			float C = m_constant - length1 - m_ratio * length2;
+			linearError = Max(linearError, -C);
+
+			C = Clamp(C + Settings.linearSlop, -_maxLinearCorrection, 0.0f);
+			float impulse = -m_pulleyMass * C;
+
+			Vec2 P1 = -impulse * m_u1;
+			Vec2 P2 = -m_ratio * impulse * m_u2;
+
+			b1.m_sweep.c += b1.m_invMass * P1;
+			b1.m_sweep.a += b1.m_invI * Vec2.cross(r1, P1);
+			.m_sweep.c += .m_invMass * P2;
+			.m_sweep.a += .m_invI * Vec2.cross(r2, P2);
+
+			b1.SynchronizeTransform();
+			.SynchronizeTransform();
 		}
-		else
+
+		if (m_limitState1 == e_atUpperLimit)
 		{
-			coordinate1 = m_prismatic1.getJointTranslation();
+			Vec2 r1 = Mul(b1.getTransform().R, m_localAnchor1 - b1.getLocalCenter());
+			Vec2 p1 = b1.m_sweep.c + r1;
+
+			m_u1 = p1 - s1;
+			float length1 = m_u1.length();
+
+			if (length1 > Settings.linearSlop)
+			{
+				m_u1 *= 1.0f / length1;
+			}
+			else
+			{
+				m_u1.setZero();
+			}
+
+			float C = m_maxLength1 - length1;
+			linearError = Max(linearError, -C);
+			C = Clamp(C + Settings.linearSlop, -_maxLinearCorrection, 0.0f);
+			float impulse = -m_limitMass1 * C;
+
+			Vec2 P1 = -impulse * m_u1;
+			b1.m_sweep.c += b1.m_invMass * P1;
+			b1.m_sweep.a += b1.m_invI * Vec2.cross(r1, P1);
+
+			b1.SynchronizeTransform();
 		}
 
-		if (m_revolute2)
+		if (m_limitState2 == e_atUpperLimit)
 		{
-			coordinate2 = m_revolute2.getJointAngle();
+			Vec2 r2 = Mul(.getTransform().R, m_localAnchor2 - .getLocalCenter());
+			Vec2 p2 = .m_sweep.c + r2;
+
+			m_u2 = p2 - s2;
+			float length2 = m_u2.length();
+
+			if (length2 > Settings.linearSlop)
+			{
+				m_u2 *= 1.0f / length2;
+			}
+			else
+			{
+				m_u2.setZero();
+			}
+
+			float C = m_maxLength2 - length2;
+			linearError = Max(linearError, -C);
+			C = Clamp(C + Settings.linearSlop, -_maxLinearCorrection, 0.0f);
+			float impulse = -m_limitMass2 * C;
+
+			Vec2 P2 = -impulse * m_u2;
+			.m_sweep.c += .m_invMass * P2;
+			.m_sweep.a += .m_invI * Vec2.cross(r2, P2);
+
+			.SynchronizeTransform();
 		}
-		else
-		{
-			coordinate2 = m_prismatic2.getJointTranslation();
-		}
 
-		float C = m_constant - (coordinate1 + m_ratio * coordinate2);
-
-		float impulse = m_mass * (-C);
-
-		b1.m_sweep.c += b1.m_invMass * impulse * m_J.linearA;
-		b1.m_sweep.a += b1.m_invI * impulse * m_J.angularA;
-		.m_sweep.c += .m_invMass * impulse * m_J.linearB;
-		.m_sweep.a += .m_invI * impulse * m_J.angularB;
-
-		b1.SynchronizeTransform();
-		.SynchronizeTransform();
-
-		// TODO_ERIN not implemented
 		return linearError < Settings.linearSlop;
 	}
 	
