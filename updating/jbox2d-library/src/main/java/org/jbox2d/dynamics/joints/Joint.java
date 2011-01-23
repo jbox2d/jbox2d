@@ -32,6 +32,8 @@ public abstract class Joint {
 				return new FrictionJoint(argWorld.getPool(), (FrictionJointDef) def);
 			case LINE:
 				return new LineJoint(argWorld.getPool(), (LineJointDef) def);
+			case GEAR:
+				return new GearJoint(argWorld.getPool(), (GearJointDef) def);
 			case CONSTANT_VOLUME:
 				return new ConstantVolumeJoint(argWorld, (ConstantVolumeJointDef) def);
 		}
