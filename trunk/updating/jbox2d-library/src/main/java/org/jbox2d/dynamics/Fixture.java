@@ -41,7 +41,7 @@ public class Fixture {
 	public float m_restitution;
 	
 	public DynamicTreeNode m_proxy;
-	public Filter m_filter;
+	public final Filter m_filter;
 	
 	public boolean m_isSensor;
 	
@@ -53,6 +53,7 @@ public class Fixture {
 		m_next = null;
 		m_proxy = null;
 		m_shape = null;
+		m_filter = new Filter();
 	}
 	
 	/**
@@ -95,7 +96,7 @@ public class Fixture {
 	 * @param filter
 	 */
 	public void setFilterData(final Filter filter){
-		m_filter = filter;
+		m_filter.set(filter);
 		
 		if(m_body == null){
 			return;
@@ -251,7 +252,7 @@ public class Fixture {
 		m_body = body;
 		m_next = null;
 		
-		m_filter = def.filter;
+		m_filter.set(def.filter);
 		
 		m_isSensor = def.isSensor;
 		

@@ -24,4 +24,10 @@ public class Filter {
 	 * filtering always wins against the mask bits.
 	 */
 	public int groupIndex;
+	
+	public void set(Filter argOther){
+		categoryBits = argOther.categoryBits;
+		maskBits = argOther.maskBits;
+		groupIndex = argOther.groupIndex;
+	}
 }
