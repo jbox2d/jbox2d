@@ -103,6 +103,8 @@ public class PrismaticJoint extends Joint {
 		b1.getWorldVectorToOut(m_localXAxis1, axis);
 		
 		float translation = Vec2.dot(p2, axis);
+		
+		pool.pushVec2(3);
 		return translation;
 	}
 	
