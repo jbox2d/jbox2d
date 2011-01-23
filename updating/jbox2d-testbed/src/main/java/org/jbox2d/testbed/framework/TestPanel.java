@@ -331,7 +331,7 @@ public class TestPanel extends JPanel implements Runnable{
 		sleepTime = 0;
 		
 		animating = true;
-		System.out.println("Animation starting");
+		//System.out.println("Animation starting");
 		while (animating) {
 			
 			if(nextTest != null){
