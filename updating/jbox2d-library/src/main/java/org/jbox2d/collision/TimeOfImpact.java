@@ -101,7 +101,8 @@ public class TimeOfImpact {
 			// to get a separating axis
 			distanceInput.transformA = xfA;
 			distanceInput.transformB = xfB;
-//			SingletonPool.getDistance().distance(distanceOutput, cache, distanceInput);
+			SingletonPool.getDistance().distance(distanceOutput, cache, distanceInput);
+			
 //			System.out.printf("Dist: %f at points %f, %f and %f, %f.  %d iterations\n",
 //					distanceOutput.distance, distanceOutput.pointA.x, distanceOutput.pointA.y,
 //					distanceOutput.pointB.x, distanceOutput.pointB.y, distanceOutput.iterations);
@@ -135,7 +136,7 @@ public class TimeOfImpact {
 				
 				// Find the deepest point at t2. Store the witness point indices.
 				float s2 = fcn.findMinSeparation(indexes, t2);
-				System.out.printf("s2: %f\n", s2);
+//				System.out.printf("s2: %f\n", s2);
 				// Is the final configuration separated?
 				if (s2 > target + tolerance){
 					// Victory!
@@ -263,8 +264,8 @@ class SeparationFunction{
 	public Type m_type;
 	public final Vec2 m_localPoint = new Vec2();
 	public final Vec2 m_axis = new Vec2();
-	public final Sweep m_sweepA = new Sweep();
-	public final Sweep m_sweepB = new Sweep();
+	public Sweep m_sweepA;
+	public Sweep m_sweepB;
 	
 	
 	// djm pooling
@@ -290,8 +291,8 @@ class SeparationFunction{
 		int count = cache.count;
 		assert(0 < count && count < 3);
 		
-		m_sweepA.set(sweepA);
-		m_sweepB.set(sweepB);
+		m_sweepA = sweepA;
+		m_sweepB = sweepB;
 		
 		m_sweepA.getTransform(xfa, t1);
 		m_sweepB.getTransform(xfb, t1);

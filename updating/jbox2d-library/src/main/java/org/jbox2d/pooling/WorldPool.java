@@ -68,6 +68,9 @@ public class WorldPool {
 	 * @see org.jbox2d.pooling.PoolingStack#reclaim(int)
 	 */
 	public final void pushVec2(int argNum) {
+		if(!Settings.POOLING){
+			return;
+		}
 		vecs.push(argNum);
 	}
 
