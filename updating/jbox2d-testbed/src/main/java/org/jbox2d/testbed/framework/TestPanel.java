@@ -184,7 +184,7 @@ public class TestPanel extends JPanel implements Runnable{
         		int notches = e.getWheelRotation();
         		
             	OBBViewportTransform trans = (OBBViewportTransform) d.getViewportTranform();
-            	oldCenter.set(currTest.mouseWorld);
+            	oldCenter.set(currTest.m_mouseWorld);
             	//Change the zoom and clamp it to reasonable values - can't clamp now.
             	if (notches < 0) {
             		trans.mulByTransform( upScale);
@@ -227,6 +227,12 @@ public class TestPanel extends JPanel implements Runnable{
 	
 	public void changeTest(TestbedTest test){
 		nextTest = test;
+	}
+	
+	public void resetTest(){
+		if(currTest != null){
+			currTest.init(draw);
+		}
 	}
 	
 	public void update(){

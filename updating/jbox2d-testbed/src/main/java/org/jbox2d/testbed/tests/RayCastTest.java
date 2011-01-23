@@ -43,7 +43,7 @@ public class RayCastTest extends TestbedTest {
 		m_polygons = new PolygonShape[4];
 		{
 			BodyDef bd = new BodyDef();
-			Body ground = world.createBody(bd);
+			Body ground = m_world.createBody(bd);
 			
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
@@ -132,47 +132,47 @@ public class RayCastTest extends TestbedTest {
 		
 		if (m_mode == Mode.e_closest) {
 			ccallback.init();
-			world.raycast(ccallback, point1, point2);
+			m_world.raycast(ccallback, point1, point2);
 			
 			if (ccallback.m_hit) {
-				debugDraw.drawPoint(ccallback.m_point, 5.0f, new Color3f(0.4f, 0.9f, 0.4f));
-				debugDraw.drawSegment(point1, ccallback.m_point, new Color3f(0.8f, 0.8f, 0.8f));
+				m_debugDraw.drawPoint(ccallback.m_point, 5.0f, new Color3f(0.4f, 0.9f, 0.4f));
+				m_debugDraw.drawSegment(point1, ccallback.m_point, new Color3f(0.8f, 0.8f, 0.8f));
 				pooledHead.set(ccallback.m_normal);
 				pooledHead.mulLocal(.5f).addLocal(ccallback.m_point);
-				debugDraw.drawSegment(ccallback.m_point, pooledHead, new Color3f(0.9f, 0.9f, 0.4f));
+				m_debugDraw.drawSegment(ccallback.m_point, pooledHead, new Color3f(0.9f, 0.9f, 0.4f));
 			}
 			else {
-				debugDraw.drawSegment(point1, point2, new Color3f(0.8f, 0.8f, 0.8f));
+				m_debugDraw.drawSegment(point1, point2, new Color3f(0.8f, 0.8f, 0.8f));
 			}
 		}
 		else if (m_mode == Mode.e_any) {
 			acallback.init();
-			world.raycast(acallback, point1, point2);
+			m_world.raycast(acallback, point1, point2);
 			
 			if (acallback.m_hit) {
-				debugDraw.drawPoint(acallback.m_point, 5.0f, new Color3f(0.4f, 0.9f, 0.4f));
-				debugDraw.drawSegment(point1, acallback.m_point, new Color3f(0.8f, 0.8f, 0.8f));
+				m_debugDraw.drawPoint(acallback.m_point, 5.0f, new Color3f(0.4f, 0.9f, 0.4f));
+				m_debugDraw.drawSegment(point1, acallback.m_point, new Color3f(0.8f, 0.8f, 0.8f));
 				pooledHead.set(acallback.m_normal);
 				pooledHead.mulLocal(.5f).addLocal(acallback.m_point);
-				debugDraw.drawSegment(acallback.m_point, pooledHead, new Color3f(0.9f, 0.9f, 0.4f));
+				m_debugDraw.drawSegment(acallback.m_point, pooledHead, new Color3f(0.9f, 0.9f, 0.4f));
 			}
 			else {
-				debugDraw.drawSegment(point1, point2, new Color3f(0.8f, 0.8f, 0.8f));
+				m_debugDraw.drawSegment(point1, point2, new Color3f(0.8f, 0.8f, 0.8f));
 			}
 		}
 		else if (m_mode == Mode.e_multiple) {
 			mcallback.init();
-			world.raycast(mcallback, point1, point2);
-			debugDraw.drawSegment(point1, point2, new Color3f(0.8f, 0.8f, 0.8f));
+			m_world.raycast(mcallback, point1, point2);
+			m_debugDraw.drawSegment(point1, point2, new Color3f(0.8f, 0.8f, 0.8f));
 			
 			for (int i = 0; i < mcallback.m_count; ++i) {
 				Vec2 p = mcallback.m_points[i];
 				Vec2 n = mcallback.m_normals[i];
-				debugDraw.drawPoint(p, 5.0f, new Color3f(0.4f, 0.9f, 0.4f));
-				debugDraw.drawSegment(point1, p, new Color3f(0.8f, 0.8f, 0.8f));
+				m_debugDraw.drawPoint(p, 5.0f, new Color3f(0.4f, 0.9f, 0.4f));
+				m_debugDraw.drawSegment(point1, p, new Color3f(0.8f, 0.8f, 0.8f));
 				pooledHead.set(n);
 				pooledHead.mulLocal(.5f).addLocal(p);
-				debugDraw.drawSegment(p, pooledHead, new Color3f(0.9f, 0.9f, 0.4f));
+				m_debugDraw.drawSegment(p, pooledHead, new Color3f(0.9f, 0.9f, 0.4f));
 			}
 		}
 		
@@ -183,7 +183,7 @@ public class RayCastTest extends TestbedTest {
 	
 	void Create(int index) {
 		if (m_bodies[m_bodyIndex] != null) {
-			world.destroyBody(m_bodies[m_bodyIndex]);
+			m_world.destroyBody(m_bodies[m_bodyIndex]);
 			m_bodies[m_bodyIndex] = null;
 		}
 		
@@ -201,7 +201,7 @@ public class RayCastTest extends TestbedTest {
 			bd.angularDamping = 0.02f;
 		}
 		
-		m_bodies[m_bodyIndex] = world.createBody(bd);
+		m_bodies[m_bodyIndex] = m_world.createBody(bd);
 		
 		if (index < 4) {
 			FixtureDef fd = new FixtureDef();
@@ -223,7 +223,7 @@ public class RayCastTest extends TestbedTest {
 	void DestroyBody() {
 		for (int i = 0; i < e_maxBodies; ++i) {
 			if (m_bodies[i] != null) {
-				world.destroyBody(m_bodies[i]);
+				m_world.destroyBody(m_bodies[i]);
 				m_bodies[i] = null;
 				return;
 			}

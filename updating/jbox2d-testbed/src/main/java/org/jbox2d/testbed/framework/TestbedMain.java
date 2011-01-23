@@ -4,6 +4,7 @@
 package org.jbox2d.testbed.framework;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -22,6 +23,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.UIManager;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -86,6 +89,10 @@ public class TestbedMain extends JFrame {
 			index += TestList.tests.size();
 		}
 		side.tests.setSelectedIndex(index);
+	}
+	
+	public void resetTest(){
+		panel.resetTest();
 	}
 	
 	public void testChanged(int argNew){
@@ -155,6 +162,8 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 	
 	private JButton pauseButton = new JButton("Pause");
 	private JButton stepButton = new JButton("Step");
+	private JButton resetButton = new JButton("Reset");
+	private JButton quitButton = new JButton("Quit");
 	
 	static String[] checkboxLabels = {
 		"Warm Starting", "Continuous Collision",
@@ -162,7 +171,7 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 		"Draw Pairs", "Draw Contact Points",
 		"Draw Contact Normals", "Draw Contact Forces",
 		"Draw Friction Forces", "Draw Center of Mass",
-		"Draw Stats", "Draw Debug", "Draw Dynamic Tree"
+		"Draw Stats", "Draw Help", "Draw Dynamic Tree"
 	};
 	
 	public SidePanel(TestbedSettings argSettings){
@@ -181,7 +190,8 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 		
 		
 		JPanel top = new JPanel();
-		top.setLayout(new GridLayout(7, 1));
+		top.setLayout(new GridLayout(0, 1));
+		top.setBorder(BorderFactory.createCompoundBorder(new EtchedBorder(EtchedBorder.LOWERED), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
 		String[] names = new String[TestList.tests.size()];
 		for(int i=0; i<names.length; i++){
 			names[i] = TestList.tests.get(i).getTestName();
@@ -220,7 +230,7 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 		
 		JPanel middle = new JPanel();
 		middle.setLayout(new GridLayout(0, 1));
-		
+		middle.setBorder(BorderFactory.createCompoundBorder(new EtchedBorder(EtchedBorder.LOWERED), BorderFactory.createEmptyBorder(5, 10, 5, 10)));
 		for(int i=0; i<checkboxLabels.length; i++){
 			String s = checkboxLabels[i];
 			
@@ -271,7 +281,7 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 					tf = settings.drawStats;
 					break;
 				case 12:
-					tf = settings.drawDebug;
+					tf = settings.drawHelp;
 					break;
 				case 13:
 					tf = settings.drawDynamicTree;
@@ -289,6 +299,8 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 		Box buttons = Box.createHorizontalBox();
 		buttons.add(pauseButton);
 		buttons.add(stepButton);
+		buttons.add(resetButton);
+		buttons.add(quitButton);
 		add(buttons, "South");
 	}
 	
@@ -308,6 +320,24 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 		stepButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				settings.singleStep = true;
+				if(!settings.pause){
+					settings.pause = true;
+					pauseButton.setText("Resume");
+				}
+			}
+		});
+		
+		resetButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				main.resetTest();
+			}
+		});
+		
+		quitButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
 			}
 		});
 	}
@@ -359,7 +389,7 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 					settings.drawStats = tf;
 					break;
 				case 12:
-					settings.drawDebug = tf;
+					settings.drawHelp = tf;
 					break;
 				case 13:
 					settings.drawDynamicTree = tf;

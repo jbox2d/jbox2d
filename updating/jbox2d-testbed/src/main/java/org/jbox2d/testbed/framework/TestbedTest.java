@@ -44,22 +44,22 @@ public abstract class TestbedTest implements ContactListener{
 		}
 	}
 	
-	public Body groundBody;
-	private int pointCount;
+	public Body m_groundBody;
+	protected int m_pointCount;
 	private DestructionListener destructionListener;
-	public DebugDraw debugDraw;
-	public World world;
-	private Body bomb;
-	public MouseJoint mouseJoint;
+	public DebugDraw m_debugDraw;
+	public World m_world;
+	protected Body m_bomb;
+	public MouseJoint m_mouseJoint;
 	private final Vec2 bombSpawnPoint = new Vec2();
 	private boolean bombSpawning = false;
-	public final Vec2 mouseWorld = new Vec2();
-	protected int stepCount;
+	public final Vec2 m_mouseWorld = new Vec2();
+	protected int m_stepCount;
 	
 	private final LinkedList<QueueItem> inputQueue;
 	
 	private String title = null;
-	protected int textLine;
+	protected int m_textLine;
 	private final LinkedList<String> textList = new LinkedList<String>();
 	
 	public float cachedCameraScale;
@@ -79,15 +79,15 @@ public abstract class TestbedTest implements ContactListener{
 	}
 	
 	public void init(DebugDraw argDebugDraw){
-		debugDraw = argDebugDraw;
+		m_debugDraw = argDebugDraw;
 		destructionListener = new DestructionListener() {
 			
 			public void sayGoodbye(Fixture fixture) {
 			}
 			
 			public void sayGoodbye(Joint joint) {
-				if(mouseJoint == joint){
-					mouseJoint = null;
+				if(m_mouseJoint == joint){
+					m_mouseJoint = null;
 				}else{
 					jointDestroyed(joint);
 				}
@@ -95,24 +95,24 @@ public abstract class TestbedTest implements ContactListener{
 		};
 		
 		Vec2 gravity = new Vec2(0, -10f);
-		world = new World(gravity, true);
-		bomb = null;
-		textLine = 30;
-		mouseJoint = null;
-		pointCount = 0;
+		m_world = new World(gravity, true);
+		m_bomb = null;
+		m_textLine = 30;
+		m_mouseJoint = null;
+		m_pointCount = 0;
 		
-		world.setDestructionListener(destructionListener);
-		world.setContactListener(this);
-		world.setDebugDraw(debugDraw);
+		m_world.setDestructionListener(destructionListener);
+		m_world.setContactListener(this);
+		m_world.setDebugDraw(m_debugDraw);
 		
 		bombSpawning = false;
 		
-		stepCount = 0;
+		m_stepCount = 0;
 		
 		Contact.activeContacts = 0;
 		
 		BodyDef bodyDef = new BodyDef();
-		groundBody = world.createBody(bodyDef);
+		m_groundBody = m_world.createBody(bodyDef);
 		
 		if(hasCachedCamera){
 			setCamera(cachedCameraX, cachedCameraY, cachedCameraScale);
@@ -125,7 +125,7 @@ public abstract class TestbedTest implements ContactListener{
 	}
 	
 	public void setCamera(float x, float y, float scale){
-		debugDraw.setCamera(x, y, scale);
+		m_debugDraw.setCamera(x, y, scale);
 		hasCachedCamera = true;
 		cachedCameraScale = scale;
 		cachedCameraX = x;
@@ -137,15 +137,15 @@ public abstract class TestbedTest implements ContactListener{
 	public abstract String getTestName();
 	
 	public void update(TestbedSettings settings){
-		textLine = 15;
+		m_textLine = 15;
 		// keys!
 		if(TestPanel.keys['r']){
 			TestPanel.keys['r'] = false;
-			init(debugDraw);
+			init(m_debugDraw);
 		}
 		
 		if(title != null){
-			debugDraw.drawString(panel.getWidth()/2, 15, title, Color3f.WHITE);
+			m_debugDraw.drawString(panel.getWidth()/2, 15, title, Color3f.WHITE);
 		}
 		
 		// process our input
@@ -193,6 +193,9 @@ public abstract class TestbedTest implements ContactListener{
 	public void step(TestbedSettings settings){
 		float timeStep = settings.hz > 0f ? 1f/settings.hz : 0;
 		
+		if(settings.singleStep && !settings.pause){
+			settings.pause = true;
+		}
 		
 		if(settings.pause){
 			if(settings.singleStep){
@@ -201,8 +204,8 @@ public abstract class TestbedTest implements ContactListener{
 				timeStep = 0;
 			}
 			
-			debugDraw.drawString(5, textLine, "****PAUSED****", Color3f.WHITE);
-			textLine += 15;
+			m_debugDraw.drawString(5, m_textLine, "****PAUSED****", Color3f.WHITE);
+			m_textLine += 15;
 		}
 		
 		int flags = 0;
@@ -212,87 +215,95 @@ public abstract class TestbedTest implements ContactListener{
 		flags += settings.drawPairs? DebugDraw.e_pairBit: 0;
 		flags += settings.drawCOMs?	 DebugDraw.e_centerOfMassBit: 0;
 		flags += settings.drawDynamicTree? DebugDraw.e_dynamicTreeBit: 0;
-		debugDraw.setFlags(flags);
+		m_debugDraw.setFlags(flags);
 		
-		world.setWarmStarting(settings.enableWarmStarting);
-		world.setContinuousPhysics(settings.enableContinuous);
+		m_world.setWarmStarting(settings.enableWarmStarting);
+		m_world.setContinuousPhysics(settings.enableContinuous);
 		
-		pointCount = 0;
+		m_pointCount = 0;
 		
-		world.step(timeStep, settings.velocityIterations, settings.positionIterations);
+		m_world.step(timeStep, settings.velocityIterations, settings.positionIterations);
 		
-		world.drawDebugData();
+		m_world.drawDebugData();
 		
 		if(timeStep > 0f){
-			++stepCount;
+			++m_stepCount;
 		}
 		
 		if(settings.drawStats){
 			Vec2.watchCreations = true;
-			debugDraw.drawString(5, textLine, "Engine Info", color4);
-			textLine += 15;
-			debugDraw.drawString(5, textLine, "Framerate: "+ panel.getCalculatedFrameRate(), Color3f.WHITE);
-			textLine += 15;
-			debugDraw.drawString(5, textLine,"bodies/contacts/joints/proxies = "+world.getBodyCount()+"/"+world.getContactCount()+"/"+world.getJointCount()+"/"+world.getProxyCount(), Color3f.WHITE);
-			textLine += 20;
-			debugDraw.drawString(5, textLine, "Pooling Info", color4);
-			textLine += 15;
-			debugDraw.drawString(5, textLine, "Vec2 creations: "+ Vec2.creationCount, Color3f.WHITE);
-			textLine += 15;
-			debugDraw.drawString(5, textLine, "Contact pooled/active: "+ Contact.contactPoolCount+"/"+Contact.activeContacts, Color3f.WHITE);
-			textLine += 20;
+			m_debugDraw.drawString(5, m_textLine, "Engine Info", color4);
+			m_textLine += 15;
+			m_debugDraw.drawString(5, m_textLine, "Framerate: "+ panel.getCalculatedFrameRate(), Color3f.WHITE);
+			m_textLine += 15;
+			m_debugDraw.drawString(5, m_textLine,"bodies/contacts/joints/proxies = "+m_world.getBodyCount()+"/"+m_world.getContactCount()+"/"+m_world.getJointCount()+"/"+m_world.getProxyCount(), Color3f.WHITE);
+			m_textLine += 20;
+			m_debugDraw.drawString(5, m_textLine, "Pooling Info", color4);
+			m_textLine += 15;
+			m_debugDraw.drawString(5, m_textLine, "Vec2 creations: "+ Vec2.creationCount, Color3f.WHITE);
+			m_textLine += 15;
+			m_debugDraw.drawString(5, m_textLine, "Contact pooled/active: "+ Contact.contactPoolCount+"/"+Contact.activeContacts, Color3f.WHITE);
+			m_textLine += 20;
 
 			Vec2.creationCount = 0;
 		}else{
 			Vec2.watchCreations = false;
 		}
 		
-		if(settings.drawDebug){
-			debugDraw.drawString(5, textLine, "Debug Info", color4);
-			textLine += 15;
-			debugDraw.drawString(5, textLine, "World mouse: "+mouseWorld, Color3f.WHITE);
-			textLine += 20;
+		if(settings.drawHelp){
+			m_debugDraw.drawString(5, m_textLine, "Help", color4);
+			m_textLine += 15;
+			m_debugDraw.drawString(5, m_textLine, "Click and drag the left mouse button to move objects.", Color3f.WHITE);
+			m_textLine += 15;
+			m_debugDraw.drawString(5, m_textLine, "Shift-Click to aim a bullet, or press space.", Color3f.WHITE);
+			m_textLine += 15;
+			m_debugDraw.drawString(5, m_textLine, "Click and drag the right mouse button to move the view.", Color3f.WHITE);
+			m_textLine += 15;
+			m_debugDraw.drawString(5, m_textLine, "Scroll to zoom in/out.", Color3f.WHITE);
+			m_textLine += 15;
+			m_debugDraw.drawString(5, m_textLine, "Press '[' or ']' to change tests, and 'r' to restart.", Color3f.WHITE);
+			m_textLine += 20;
 		}
 		
 		if(!textList.isEmpty()){
-			debugDraw.drawString(5, textLine, "Test Info", color4);
-			textLine += 15;
+			m_debugDraw.drawString(5, m_textLine, "Test Info", color4);
+			m_textLine += 15;
 			for(String s : textList){
-				debugDraw.drawString(5, textLine, s, Color3f.WHITE);
-				textLine+=15;
+				m_debugDraw.drawString(5, m_textLine, s, Color3f.WHITE);
+				m_textLine+=15;
 			}
 			textList.clear();
 		}
 		
-		if(mouseJoint != null){
-			mouseJoint.getAnchorB(p1);
-			Vec2 p2 = mouseJoint.getTarget();
+		if(m_mouseJoint != null){
+			m_mouseJoint.getAnchorB(p1);
+			Vec2 p2 = m_mouseJoint.getTarget();
 			
-			debugDraw.drawSegment(p1, p2, mouseColor);
+			m_debugDraw.drawSegment(p1, p2, mouseColor);
 		}
 		
 		if(bombSpawning){
-			debugDraw.drawSegment(bombSpawnPoint, mouseWorld, Color3f.WHITE);
+			m_debugDraw.drawSegment(bombSpawnPoint, m_mouseWorld, Color3f.WHITE);
 		}
 		
 		if(settings.drawContactPoints){
 			final float axisScale = .3f;
 			
-			for(int i=0; i<pointCount; i++){
+			for(int i=0; i<m_pointCount; i++){
 				
 				ContactPoint point = points[i];
 				
 				if(point.state == PointState.ADD_STATE){
-					debugDraw.drawPoint(point.position, 10f, color1);
+					m_debugDraw.drawPoint(point.position, 10f, color1);
 				}
 				else if(point.state == PointState.PERSIST_STATE){
-					debugDraw.drawPoint(point.position, 5f, color2);
+					m_debugDraw.drawPoint(point.position, 5f, color2);
 				}
 				
 				if(settings.drawContactNormals){
 					p1.set(point.position);
 					p2.set(point.normal).mulLocal(axisScale).addLocal(p1);
-					debugDraw.drawSegment(p1, p2, color3);
+					m_debugDraw.drawSegment(p1, p2, color3);
 				}
 			}
 		}
@@ -336,9 +347,9 @@ public abstract class TestbedTest implements ContactListener{
 	
 	
 	public void shiftMouseDown(Vec2 p){
-		mouseWorld.set(p);
+		m_mouseWorld.set(p);
 		
-		if(mouseJoint != null){
+		if(m_mouseJoint != null){
 			return;
 		}
 		
@@ -346,9 +357,9 @@ public abstract class TestbedTest implements ContactListener{
 	}
 	
 	public void mouseUp(Vec2 p){
-		if(mouseJoint != null){
-			world.destroyJoint(mouseJoint);
-			mouseJoint = null;
+		if(m_mouseJoint != null){
+			m_world.destroyJoint(m_mouseJoint);
+			m_mouseJoint = null;
 		}
 		
 		if(bombSpawning){
@@ -360,9 +371,9 @@ public abstract class TestbedTest implements ContactListener{
 	private final TestQueryCallback callback = new TestQueryCallback();
 	
 	public void mouseDown(Vec2 p){
-		mouseWorld.set(p);
+		m_mouseWorld.set(p);
 		
-		if(mouseJoint != null){
+		if(m_mouseJoint != null){
 			return;
 		}
 		
@@ -370,25 +381,25 @@ public abstract class TestbedTest implements ContactListener{
 		queryAABB.upperBound.set(p.x + .001f, p.y + .001f);
 		callback.point.set(p);
 		callback.fixture = null;
-		world.queryAABB(callback, queryAABB);
+		m_world.queryAABB(callback, queryAABB);
 		
 		if(callback.fixture != null){
 			Body body = callback.fixture.getBody();
 			MouseJointDef def = new MouseJointDef();
-			def.bodyA = groundBody;
+			def.bodyA = m_groundBody;
 			def.bodyB = body;
 			def.target.set(p);
 			def.maxForce = 1000f * body.getMass();
-			mouseJoint = (MouseJoint) world.createJoint(def);
+			m_mouseJoint = (MouseJoint) m_world.createJoint(def);
 			body.setAwake(true);
 		}
 	}
 	
 	public void mouseMove(Vec2 p){
-		mouseWorld.set(p);
+		m_mouseWorld.set(p);
 		
-		if(mouseJoint != null){
-			mouseJoint.setTarget(p);
+		if(m_mouseJoint != null){
+			m_mouseJoint.setTarget(p);
 		}
 	}
 	
@@ -412,17 +423,17 @@ public abstract class TestbedTest implements ContactListener{
 	private final AABB aabb = new AABB();
 	
 	public void launchBomb(Vec2 position, Vec2 velocity){
-		if(bomb != null){
-			world.destroyBody(bomb);
-			bomb = null;
+		if(m_bomb != null){
+			m_world.destroyBody(m_bomb);
+			m_bomb = null;
 		}
 		// todo optimize this
 		BodyDef bd = new BodyDef();
 		bd.type = BodyType.DYNAMIC;
 		bd.position.set(position);
 		bd.bullet = true;
-		bomb = world.createBody(bd);
-		bomb.setLinearVelocity(velocity);
+		m_bomb = m_world.createBody(bd);
+		m_bomb.setLinearVelocity(velocity);
 		
 		CircleShape circle = new CircleShape();
 		circle.m_radius = 0.3f;
@@ -441,7 +452,7 @@ public abstract class TestbedTest implements ContactListener{
 		aabb.lowerBound.set(minV);
 		aabb.upperBound.set(maxV);
 		
-		bomb.createFixture(fd);
+		m_bomb.createFixture(fd);
 	}
 	
 	public void spawnBomb(Vec2 worldPt){
@@ -470,24 +481,15 @@ public abstract class TestbedTest implements ContactListener{
 	/**
 	 * @see org.jbox2d.callbacks.ContactListener#beginContact(org.jbox2d.dynamics.contacts.Contact)
 	 */
-	public void beginContact(Contact contact) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void beginContact(Contact contact) { }
 	/**
 	 * @see org.jbox2d.callbacks.ContactListener#endContact(org.jbox2d.dynamics.contacts.Contact)
 	 */
-	public void endContact(Contact contact) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void endContact(Contact contact) { }
 	/**
 	 * @see org.jbox2d.callbacks.ContactListener#postSolve(org.jbox2d.dynamics.contacts.Contact, org.jbox2d.callbacks.ContactImpulse)
 	 */
-	public void postSolve(Contact contact, ContactImpulse impulse) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void postSolve(Contact contact, ContactImpulse impulse) { }
 	
 	private final PointState[] state1 = new PointState[Settings.maxManifoldPoints];
 	private final PointState[] state2 = new PointState[Settings.maxManifoldPoints];
@@ -509,14 +511,14 @@ public abstract class TestbedTest implements ContactListener{
 		
 		contact.getWorldManifold(worldManifold);
 		
-		for(int i=0; i<manifold.pointCount && pointCount < MAX_CONTACT_POINTS; i++){
-			ContactPoint cp = points[pointCount];
+		for(int i=0; i<manifold.pointCount && m_pointCount < MAX_CONTACT_POINTS; i++){
+			ContactPoint cp = points[m_pointCount];
 			cp.fixtureA = fixtureA;
 			cp.fixtureB = fixtureB;
 			cp.position.set(worldManifold.points[i]);
 			cp.normal.set(worldManifold.normal);
 			cp.state = state2[i];
-			++pointCount;
+			++m_pointCount;
 		}
 	}
 

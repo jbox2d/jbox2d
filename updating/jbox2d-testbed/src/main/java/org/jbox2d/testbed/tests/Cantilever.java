@@ -30,7 +30,7 @@ public class Cantilever extends TestbedTest {
 		Body ground = null;
 		{
 			BodyDef bd = new BodyDef();
-			ground = world.createBody(bd);
+			ground = m_world.createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
@@ -53,12 +53,12 @@ public class Cantilever extends TestbedTest {
 				BodyDef bd = new BodyDef();
 				bd.type = BodyType.DYNAMIC;
 				bd.position.set(-14.5f + 1.0f * i, 5.0f);
-				Body body = world.createBody(bd);
+				Body body = m_world.createBody(bd);
 				body.createFixture(fd);
 
 				Vec2 anchor = new Vec2(-15.0f + 1.0f * i, 5.0f);
 				jd.initialize(prevBody, body, anchor);
-				world.createJoint(jd);
+				m_world.createJoint(jd);
 
 				prevBody = body;
 			}
@@ -81,12 +81,12 @@ public class Cantilever extends TestbedTest {
 				bd.type = BodyType.DYNAMIC;
 				bd.position.set(-14.5f + 1.0f * i, 15.0f);
 				bd.inertiaScale = 10.0f;
-				Body body = world.createBody(bd);
+				Body body = m_world.createBody(bd);
 				body.createFixture(fd);
 
 				Vec2 anchor = new Vec2(-15.0f + 1.0f * i, 15.0f);
 				jd.initialize(prevBody, body, anchor);
-				world.createJoint(jd);
+				m_world.createJoint(jd);
 
 				prevBody = body;
 			}
@@ -108,14 +108,14 @@ public class Cantilever extends TestbedTest {
 				BodyDef bd = new BodyDef();
 				bd.type = BodyType.DYNAMIC;
 				bd.position.set(-4.5f + 1.0f * i, 5.0f);
-				Body body = world.createBody(bd);
+				Body body = m_world.createBody(bd);
 				body.createFixture(fd);
 
 				if (i > 0)
 				{
 					Vec2 anchor = new Vec2(-5.0f + 1.0f * i, 5.0f);
 					jd.initialize(prevBody, body, anchor);
-					world.createJoint(jd);
+					m_world.createJoint(jd);
 				}
 
 				prevBody = body;
@@ -139,14 +139,14 @@ public class Cantilever extends TestbedTest {
 				bd.type = BodyType.DYNAMIC;
 				bd.position.set(5.5f + 1.0f * i, 10.0f);
 				bd.inertiaScale = 10.0f;
-				Body body = world.createBody(bd);
+				Body body = m_world.createBody(bd);
 				body.createFixture(fd);
 
 				if (i > 0)
 				{
 					Vec2 anchor = new Vec2(5.0f + 1.0f * i, 10.0f);
 					jd.initialize(prevBody, body, anchor);
-					world.createJoint(jd);
+					m_world.createJoint(jd);
 				}
 
 				prevBody = body;
@@ -170,7 +170,7 @@ public class Cantilever extends TestbedTest {
 			BodyDef bd = new BodyDef();
 			bd.type = BodyType.DYNAMIC;
 			bd.position.set(-8.0f + 8.0f * i, 12.0f);
-			Body body = world.createBody(bd);
+			Body body = m_world.createBody(bd);
 			body.createFixture(fd);
 		}
 
@@ -186,7 +186,7 @@ public class Cantilever extends TestbedTest {
 			BodyDef bd = new BodyDef();
 			bd.type = BodyType.DYNAMIC;
 			bd.position.set(-6.0f + 6.0f * i, 10.0f);
-			Body body = world.createBody(bd);
+			Body body = m_world.createBody(bd);
 			body.createFixture(fd);
 		}
 	}
