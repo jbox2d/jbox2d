@@ -150,6 +150,8 @@ public class RevoluteJoint extends Joint {
 			m_motorImpulse = 0.0f;
 		}
 		
+//		System.out.printf("joint angle: %f, %f, and %f\n", b2.m_sweep.a, b1.m_sweep.a, m_referenceAngle);
+		
 		if (m_enableLimit) {
 			float jointAngle = b2.m_sweep.a - b1.m_sweep.a - m_referenceAngle;
 			if (MathUtils.abs(m_upperAngle - m_lowerAngle) < 2.0f * Settings.angularSlop) {
@@ -175,6 +177,7 @@ public class RevoluteJoint extends Joint {
 		else {
 			m_limitState = LimitState.INACTIVE;
 		}
+//		System.out.printf("limit state: %s\n", m_limitState.toString());
 		
 		if (step.warmStarting) {
 			// Scale impulses to support a variable time step.
@@ -207,9 +210,9 @@ public class RevoluteJoint extends Joint {
 		final Body b1 = m_bodyA;
 		final Body b2 = m_bodyB;
 		
-		Vec2 v1 = b1.m_linearVelocity;
+		final Vec2 v1 = b1.m_linearVelocity;
 		float w1 = b1.m_angularVelocity;
-		Vec2 v2 = b2.m_linearVelocity;
+		final Vec2 v2 = b2.m_linearVelocity;
 		float w2 = b2.m_angularVelocity;
 		
 		float m1 = b1.m_invMass, m2 = b2.m_invMass;
@@ -227,9 +230,9 @@ public class RevoluteJoint extends Joint {
 			w1 -= i1 * impulse;
 			w2 += i2 * impulse;
 		}
-		Vec2 temp = pool.popVec2();
-		Vec2 r1 = pool.popVec2();
-		Vec2 r2 = pool.popVec2();
+		final Vec2 temp = pool.popVec2();
+		final Vec2 r1 = pool.popVec2();
+		final Vec2 r2 = pool.popVec2();
 		
 		// Solve limit constraint.
 		if (m_enableLimit && m_limitState != LimitState.INACTIVE) {
@@ -241,8 +244,8 @@ public class RevoluteJoint extends Joint {
 			// Vec2 r1 = b2Mul(b1.getTransform().R, m_localAnchor1 - b1.getLocalCenter());
 			// Vec2 r2 = b2Mul(b2.getTransform().R, m_localAnchor2 - b2.getLocalCenter());
 			
-			Vec2 Cdot1 = pool.popVec2();
-			Vec3 Cdot = pool.popVec3();
+			final Vec2 Cdot1 = pool.popVec2();
+			final Vec3 Cdot = pool.popVec3();
 			
 			// Solve point-to-point constraint
 			Vec2.crossToOut(w1, r1, temp);
@@ -287,7 +290,7 @@ public class RevoluteJoint extends Joint {
 					m_impulse.z = 0.0f;
 				}
 			}
-			Vec2 P = pool.popVec2();
+			final Vec2 P = pool.popVec2();
 			
 			P.set(impulse.x, impulse.y);
 			
@@ -333,9 +336,7 @@ public class RevoluteJoint extends Joint {
 			pool.pushVec2(2);
 		}
 		
-		b1.m_linearVelocity.set(v1);
 		b1.m_angularVelocity = w1;
-		b2.m_linearVelocity.set(v2);
 		b2.m_angularVelocity = w2;
 		
 		pool.pushVec2(3);
@@ -466,6 +467,7 @@ public class RevoluteJoint extends Joint {
 			
 			pool.pushMat22(3);
 			pool.pushVec2(4);
+			
 		}
 		
 		return positionError <= Settings.linearSlop && angularError <= Settings.angularSlop;

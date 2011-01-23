@@ -12,7 +12,7 @@ public class SimplexCache {
 	 */
 	public float metric;
 	
-	public short count;
+	public int count;
 	
 	/**
 	 * vertices on shape A
@@ -23,6 +23,17 @@ public class SimplexCache {
 	 * vertices on shape B
 	 */
 	public final int indexB[] = new int[3];
+	
+	public SimplexCache(){
+		metric = 0;
+		count = 0;
+		indexA[0] = Integer.MAX_VALUE;
+		indexA[1] = Integer.MAX_VALUE;
+		indexA[2] = Integer.MAX_VALUE;
+		indexB[0] = Integer.MAX_VALUE;
+		indexB[1] = Integer.MAX_VALUE;
+		indexB[2] = Integer.MAX_VALUE;
+	}
 
 	public void set(SimplexCache sc){
 		System.arraycopy(sc.indexA, 0, indexA, 0, indexA.length);

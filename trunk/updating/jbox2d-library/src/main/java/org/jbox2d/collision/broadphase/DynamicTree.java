@@ -369,6 +369,8 @@ public class DynamicTree {
 		return 1 + MathUtils.max(height1, height2);
 	}
 	
+	private int nodeNum = 0;
+	
 	private final DynamicTreeNode allocateNode(){
 		DynamicTreeNode node = stack.get();
 		node.parent = null;
@@ -376,7 +378,7 @@ public class DynamicTree {
 		node.child2 = null;
 		node.userData = null;
 		// not quite 100% guarantee of no duplicates, but close enough for now
-		node.key = (int)(Math.random()*100000000);
+		node.key = (int)(Math.random()*1000000000);
 		m_nodeCount++;
 		return node;
 	}
