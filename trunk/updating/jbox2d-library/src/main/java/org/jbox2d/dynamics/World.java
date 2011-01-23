@@ -1045,8 +1045,8 @@ public class World {
 				// Compute the time of impact in interval [0, minTOI]
 				toiInput.proxyA.set(fixtureA.getShape());
 				toiInput.proxyB.set(fixtureB.getShape());
-				toiInput.sweepA = bodyA.m_sweep;
-				toiInput.sweepB = bodyB.m_sweep;
+				toiInput.sweepA.set(bodyA.m_sweep);
+				toiInput.sweepB.set(bodyB.m_sweep);
 				toiInput.tMax = toi;
 				
 				SingletonPool.getTOI().timeOfImpact(toiOutput, toiInput);
