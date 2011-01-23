@@ -34,6 +34,8 @@ public abstract class Joint {
 				return new LineJoint(argWorld.getPool(), (LineJointDef) def);
 			case GEAR:
 				return new GearJoint(argWorld.getPool(), (GearJointDef) def);
+			case PULLEY:
+				return new PulleyJoint(argWorld.getPool(), (PulleyJointDef) def);
 			case CONSTANT_VOLUME:
 				return new ConstantVolumeJoint(argWorld, (ConstantVolumeJointDef) def);
 		}

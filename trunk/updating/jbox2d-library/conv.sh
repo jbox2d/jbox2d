@@ -39,3 +39,5 @@ s/Dot(/Vec2.dot(/g
 s/\.Length/.length/g
 s/_linearSlop/Settings.linearSlop/g
 s/Assert(/assert(/g
+s/Max(/MathUtils.max(/g
+s/Min(/MathUtils.min(/g
