@@ -3,6 +3,13 @@
  */
 package org.jbox2d.testbed.tests;
 
+import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.joints.PulleyJoint;
+import org.jbox2d.dynamics.joints.PulleyJointDef;
 import org.jbox2d.testbed.framework.TestbedSettings;
 import org.jbox2d.testbed.framework.TestbedTest;
 
@@ -11,6 +18,7 @@ import org.jbox2d.testbed.framework.TestbedTest;
  */
 public class Pulleys extends TestbedTest {
 	
+	PulleyJoint m_joint1;
 	/**
 	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
 	 */
@@ -46,14 +54,14 @@ public class Pulleys extends TestbedTest {
 			Body body2 = world.createBody(bd);
 			body2.createFixture(shape, 5.0f);
 
-			PulleyJointDef pulleyDef;
-			Vec2 anchor1(-10.0f, y + b);
-			Vec2 anchor2(10.0f, y + b);
-			Vec2 groundAnchor1(-10.0f, y + b + L);
-			Vec2 groundAnchor2(10.0f, y + b + L);
+			PulleyJointDef pulleyDef = new PulleyJointDef();
+			Vec2 anchor1 = new Vec2(-10.0f, y + b);
+			Vec2 anchor2 = new Vec2(10.0f, y + b);
+			Vec2 groundAnchor1 = new Vec2(-10.0f, y + b + L);
+			Vec2 groundAnchor2 = new Vec2(10.0f, y + b + L);
 			pulleyDef.initialize(body1, body2, groundAnchor1, groundAnchor2, anchor1, anchor2, 2.0f);
 
-			m_joint1 = (PulleyJoint)world.createJoint(&pulleyDef);
+			m_joint1 = (PulleyJoint)world.createJoint(pulleyDef);
 		}
 	}
 	
@@ -65,16 +73,17 @@ public class Pulleys extends TestbedTest {
 		super.step(settings);
 		float ratio = m_joint1.getRatio();
 		float L = m_joint1.getLength1() + ratio * m_joint1.getLength2();
-		debugDraw.drawString(5, m_textLine, "L1 + %4.2f * L2 = %4.2f", (float) ratio, (float) L);
-		m_textLine += 15;
+		addTextLine("L1 + "+ratio+" * L2 = "+L);
+		if(L >= 36){
+			addTextLine("Pulley is taught");
+		}
 	}
 	/**
 	 * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
 	 */
 	@Override
 	public String getTestName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Pulleys";
 	}
 	
 }

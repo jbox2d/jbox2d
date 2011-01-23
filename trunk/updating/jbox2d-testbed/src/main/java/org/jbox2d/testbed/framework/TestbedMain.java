@@ -275,8 +275,9 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 					break;
 				case 13:
 					tf = settings.drawDynamicTree;
+					break;
 				default:
-					System.out.println("oh no");
+					System.out.println("oh no: "+i);
 					tf = false;
 			}
 			box.setSelected(tf);
@@ -362,8 +363,9 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 					break;
 				case 13:
 					settings.drawDynamicTree = tf;
+					break;
 				default:
-					System.out.println("oh no");
+					System.out.println("oh no: "+i);
 			}
 		}else if(e.getSource() instanceof JSlider){
 			JSlider s = (JSlider) e.getSource();
