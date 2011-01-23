@@ -201,8 +201,7 @@ public class Web extends TestbedTest {
 	 */
 	@Override
 	public String getTestName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Web";
 	}
 	
 }
