@@ -96,6 +96,9 @@ public class TestbedMain extends JFrame {
 	}
 	
 	public void testChanged(int argNew){
+		if(argNew == -1){
+			return;
+		}
 		currTestIndex = argNew;
 		panel.changeTest(TestList.tests.get(argNew));
 		panel.grabFocus();
