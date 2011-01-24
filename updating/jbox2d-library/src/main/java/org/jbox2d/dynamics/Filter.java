@@ -29,7 +29,7 @@ package org.jbox2d.dynamics;
 // updated to rev 100
 /**
  * This holds contact filtering data.
- *
+ * 
  * @author daniel
  */
 public class Filter {
@@ -51,7 +51,7 @@ public class Filter {
 	 */
 	public int groupIndex;
 	
-	public void set(Filter argOther){
+	public void set(Filter argOther) {
 		categoryBits = argOther.categoryBits;
 		maskBits = argOther.maskBits;
 		groupIndex = argOther.groupIndex;

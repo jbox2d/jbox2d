@@ -63,19 +63,11 @@ import org.jbox2d.structs.collision.RayCastOutput;
  * is created.  Shapes may encapsulate a one or more child shapes.
  */
 public abstract class Shape {
-	/** Unique id for shape for sorting (C++ version uses memory address) */
-	public int uid; 
-	/**
-	 * Used to generate uids - not initialized on applet reload,
-	 * but that's okay since these just have to be unique.
-	 */
-	static private int uidcount = 0;
 
 	public ShapeType m_type;
 	public float m_radius;
 
 	public Shape() {
-		uid = uidcount++; //Java version only (C++ version sorts by memory location)
 		m_type = ShapeType.UNKNOWN;
 	}
 	

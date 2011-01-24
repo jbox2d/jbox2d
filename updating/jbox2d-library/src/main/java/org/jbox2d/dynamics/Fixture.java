@@ -36,8 +36,6 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
-import org.jbox2d.pooling.TLAABB;
-import org.jbox2d.pooling.TLVec2;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;
 
@@ -320,9 +318,9 @@ public class Fixture {
 		m_proxy = null;
 	}
 	
-	private final static TLAABB tlaabb1 = new TLAABB();
-	private final static TLAABB tlaabb2 = new TLAABB();
-	private final static TLVec2 tldisp = new TLVec2();
+	private final AABB pool1 = new AABB();
+	private final AABB pool2 = new AABB();
+	
 	/**
 	 * Internal method
 	 * @param broadPhase
@@ -335,16 +333,30 @@ public class Fixture {
 		}
 		
 		// Compute an AABB that covers the swept shape (may miss some rotation effect).
-		AABB aabb1 = tlaabb1.get();
-		AABB aabb2 = tlaabb2.get();
 		
-		m_shape.computeAABB( aabb1, transform1);
-		m_shape.computeAABB( aabb2, transform2);
+//		AABB aabb1 = tlaabb1.get();
+//		AABB aabb2 = tlaabb2.get();
+//		
+//		m_shape.computeAABB( aabb1, transform1);
+//		m_shape.computeAABB( aabb2, transform2);
+//		
+//		m_aabb.combine(aabb1, aabb2);
+//		
+//		Vec2 disp = tldisp.get();
+//		disp.set( transform2.position).subLocal(transform1.position);
+//		
+//		broadPhase.moveProxy( m_proxy, m_aabb, disp);
 		
-		m_aabb.combine(aabb1, aabb2);
+		m_shape.computeAABB( pool1, transform1);
+		m_shape.computeAABB( pool2, transform2);
+		m_aabb.lowerBound.x = pool1.lowerBound.x < pool2.lowerBound.x ? pool1.lowerBound.x : pool2.lowerBound.x;
+		m_aabb.lowerBound.y = pool1.lowerBound.y < pool2.lowerBound.y ? pool1.lowerBound.y : pool2.lowerBound.y;
+		m_aabb.upperBound.x = pool1.upperBound.x > pool2.upperBound.x ? pool1.upperBound.x : pool2.upperBound.x;
+		m_aabb.upperBound.y = pool1.upperBound.y > pool2.upperBound.y ? pool1.upperBound.y : pool2.upperBound.y;
 		
-		Vec2 disp = tldisp.get();
-		disp.set( transform2.position).subLocal(transform1.position);
+		final Vec2 disp = pool1.lowerBound; // just use this vec for pooling
+		disp.x = transform2.position.x - transform1.position.x;
+		disp.y = transform2.position.y - transform1.position.y;
 		
 		broadPhase.moveProxy( m_proxy, m_aabb, disp);
 	}

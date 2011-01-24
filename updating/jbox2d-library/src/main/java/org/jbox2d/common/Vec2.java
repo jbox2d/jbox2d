@@ -79,7 +79,6 @@ public class Vec2 {
 		}
 		this.x = x;
 		this.y = y;
-		// testbed.PTest.debugCount++;
 	}
 
 	public Vec2( Vec2 toCopy) {

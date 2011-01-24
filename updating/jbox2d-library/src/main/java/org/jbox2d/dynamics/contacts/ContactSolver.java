@@ -35,6 +35,7 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
+import org.jbox2d.pooling.WorldPool;
 import org.jbox2d.structs.collision.ManifoldPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

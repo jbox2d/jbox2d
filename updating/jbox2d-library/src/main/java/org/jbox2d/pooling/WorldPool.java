@@ -30,9 +30,11 @@
 package org.jbox2d.pooling;
 
 import java.util.HashMap;
-import java.util.Stack;
 
 import org.jbox2d.collision.AABB;
+import org.jbox2d.collision.Collision;
+import org.jbox2d.collision.Distance;
+import org.jbox2d.collision.TimeOfImpact;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
@@ -47,14 +49,29 @@ import org.jbox2d.pooling.PoolingStack.PoolContainer;
  */
 public class WorldPool {
 	
-	private final PoolingStack<Vec2> vecs = new PoolingStack<Vec2>(Vec2.class, 100);
-	private final PoolingStack<Vec3> vec3s = new PoolingStack<Vec3>(Vec3.class, 100);
-	private final PoolingStack<Mat22> mats = new PoolingStack<Mat22>(Mat22.class, 100);
-	private final PoolingStack<AABB> aabbs = new PoolingStack<AABB>(AABB.class, 100);
+	private final PoolingStack<Vec2> vecs;
+	private final PoolingStack<Vec3> vec3s;
+	private final PoolingStack<Mat22> mats;
+	private final PoolingStack<AABB> aabbs;
 	
 	private final HashMap<Integer, float[]> afloats = new HashMap<Integer, float[]>();
 	private final HashMap<Integer, int[]> aints = new HashMap<Integer, int[]>();
 	private final HashMap<Integer, Vec2[]> avecs = new HashMap<Integer, Vec2[]>();
+	
+	private final Collision collision;
+	private final TimeOfImpact toi;
+	private final Distance dist;
+	
+	public WorldPool(int argSize){
+		vecs = new PoolingStack<Vec2>(Vec2.class, argSize);
+		vec3s = new PoolingStack<Vec3>(Vec3.class, argSize);
+		mats = new PoolingStack<Mat22>(Mat22.class, argSize);
+		aabbs = new PoolingStack<AABB>(AABB.class, argSize);
+		
+		dist = new Distance();
+		collision = new Collision(this);
+		toi = new TimeOfImpact(this);
+	}
 	
 	public final PoolingStack<Vec2> getVec2Stack(){
 		return vecs;
@@ -195,6 +212,17 @@ public class WorldPool {
 		aabbs.push(argNum);
 	}
 	
+	public final Collision getCollision(){
+		return collision;
+	}
+	
+	public final TimeOfImpact getTimeOfImpact(){
+		return toi;
+	}
+	
+	public final Distance getDistance(){
+		return dist;
+	}
 	
 	public final float[] getFloatArray(int argLength){
 		if(!afloats.containsKey(argLength)){
