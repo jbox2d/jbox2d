@@ -37,8 +37,6 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.structs.collision.ManifoldPoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 // updated to rev 100
 // pooling: local, non-thread
@@ -49,7 +47,6 @@ import org.slf4j.LoggerFactory;
  */
 public class TOISolver {
 	// TODO djm: find out the best number to start with
-	private final Logger log = LoggerFactory.getLogger(TOISolver.class);
 	private TOIConstraint[] m_constraints = new TOIConstraint[4];
 	private int m_count;
 	private Body m_toiBody;
@@ -80,7 +77,6 @@ public class TOISolver {
 			for(int i=old.length; i<m_constraints.length; i++){
 				m_constraints[i] = new TOIConstraint();
 			}
-			log.debug("toi constraints expanded to: "+m_constraints.length);
 		}
 //		m_constraints = new TOIConstraint[count];
 
