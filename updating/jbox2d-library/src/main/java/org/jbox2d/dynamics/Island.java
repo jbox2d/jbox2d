@@ -242,12 +242,18 @@ public class Island {
 			if (b.getType() != BodyType.DYNAMIC){
 				continue;
 			}
+			
 
 			// Integrate velocities.
 			///b.m_linearVelocity += step.dt * (gravity + b.m_invMass * b.m_force);
-			temp.set(b.m_force).mulLocal(b.m_invMass).addLocal(gravity).mulLocal(step.dt);
-			b.m_linearVelocity.addLocal(temp);
+//			temp.set(b.m_force).mulLocal(b.m_invMass).addLocal(gravity).mulLocal(step.dt);
+//			b.m_linearVelocity.addLocal(temp);
+//			b.m_angularVelocity += step.dt * b.m_invI * b.m_torque;
+			
+			b.m_linearVelocity.x += (b.m_force.x * b.m_invMass + gravity.x)*step.dt;
+			b.m_linearVelocity.y += (b.m_force.y * b.m_invMass + gravity.y)*step.dt;
 			b.m_angularVelocity += step.dt * b.m_invI * b.m_torque;
+			
 
 			// Apply damping.
 			// ODE: dv/dt + c * v = 0
@@ -256,8 +262,18 @@ public class Island {
 			// v2 = exp(-c * dt) * v1
 			// Taylor expansion:
 			// v2 = (1.0f - c * dt) * v1
-			b.m_linearVelocity.mulLocal(MathUtils.clamp(1.0f - step.dt * b.m_linearDamping, 0.0f, 1.0f));
-			b.m_angularVelocity *= MathUtils.clamp(1.0f - step.dt * b.m_angularDamping, 0.0f, 1.0f);
+//			b.m_linearVelocity.mulLocal(MathUtils.clamp(1.0f - step.dt * b.m_linearDamping, 0.0f, 1.0f));
+//			b.m_angularVelocity *= MathUtils.clamp(1.0f - step.dt * b.m_angularDamping, 0.0f, 1.0f);
+			
+			
+			float a = (1.0f - step.dt * b.m_linearDamping);
+			float a1 = (0.0f > (a < 1.0f ? a : 1.0f) ? 0.0f : (a < 1.0f ? a : 1.0f));
+			b.m_linearVelocity.x *= a1;
+			b.m_linearVelocity.y *= a1;
+			
+			float a2 = (1.0f - step.dt * b.m_angularDamping);
+			float b1 = (a2 < 1.0f ? a2 : 1.0f);
+			b.m_angularVelocity *= 0.0f > b1 ? 0.0f : b1;
 		}
 
 		// Partition contacts so that contacts with static bodies are solved last.

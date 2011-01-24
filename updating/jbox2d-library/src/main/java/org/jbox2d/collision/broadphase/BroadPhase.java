@@ -119,7 +119,18 @@ public class BroadPhase implements TreeCallback {
 	}
 	
 	public boolean testOverlap(DynamicTreeNode proxyA, DynamicTreeNode proxyB) {
-		return AABB.testOverlap(proxyA.aabb, proxyB.aabb);
+//		return AABB.testOverlap(proxyA.aabb, proxyB.aabb);
+		AABB a = proxyA.aabb;
+		AABB b = proxyB.aabb;
+		if (b.lowerBound.x - a.upperBound.x > 0.0f || b.lowerBound.y - a.upperBound.y > 0.0f) {
+			return false;
+		}
+		
+		if (a.lowerBound.x - b.upperBound.x > 0.0f || a.lowerBound.y - b.upperBound.y > 0.0f) {
+			return false;
+		}
+		
+		return true;
 	}
 	
 	/**
@@ -269,7 +280,6 @@ public class BroadPhase implements TreeCallback {
 		
 		// Grow the pair buffer as needed.
 		if (m_pairCount == m_pairCapacity) {
-			// log.debug("Growing pair buffer");
 			Pair[] oldBuffer = m_pairBuffer;
 			m_pairCapacity *= 2;
 			m_pairBuffer = new Pair[m_pairCapacity];

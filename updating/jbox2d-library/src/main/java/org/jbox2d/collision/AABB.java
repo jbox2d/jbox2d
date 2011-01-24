@@ -187,11 +187,12 @@ public class AABB {
 		float tmin = Float.MIN_VALUE;
 		float tmax = Float.MAX_VALUE;
 		
-		final Vec2 p = input.p1;
+		final Vec2 p = argPool.popVec2();
 		final Vec2 d = argPool.popVec2();
 		final Vec2 absD = argPool.popVec2();
 		final Vec2 normal = argPool.popVec2();
 		
+		p.set(input.p1);
 		d.set(input.p2).subLocal(input.p1);
 		Vec2.absToOut(d, absD);
 		
@@ -199,7 +200,7 @@ public class AABB {
 		if (absD.x < Settings.EPSILON) {
 			// Parallel.
 			if (p.x < lowerBound.x || upperBound.x < p.x) {
-				argPool.pushVec2(3);
+				argPool.pushVec2(4);
 				return false;
 			}
 		}
@@ -229,7 +230,7 @@ public class AABB {
 			tmax = MathUtils.min(tmax, t2);
 			
 			if (tmin > tmax) {
-				argPool.pushVec2(3);
+				argPool.pushVec2(4);
 				return false;
 			}
 		}
@@ -237,7 +238,7 @@ public class AABB {
 		if (absD.y < Settings.EPSILON) {
 			// Parallel.
 			if (p.y < lowerBound.y || upperBound.y < p.y) {
-				argPool.pushVec2(3);
+				argPool.pushVec2(4);
 				return false;
 			}
 		}
@@ -267,7 +268,7 @@ public class AABB {
 			tmax = MathUtils.min(tmax, t2);
 			
 			if (tmin > tmax) {
-				argPool.pushVec2(3);
+				argPool.pushVec2(4);
 				return false;
 			}
 		}
@@ -275,7 +276,7 @@ public class AABB {
 		// Does the ray start inside the box?
 		// Does the ray intersect beyond the max fraction?
 		if (tmin < 0.0f || input.maxFraction < tmin) {
-			argPool.pushVec2(3);
+			argPool.pushVec2(4);
 			return false;
 		}
 		
@@ -283,7 +284,7 @@ public class AABB {
 		output.fraction = tmin;
 		output.normal.x = normal.x;
 		output.normal.y = normal.y;
-		argPool.pushVec2(3);
+		argPool.pushVec2(4);
 		return true;
 	}
 	

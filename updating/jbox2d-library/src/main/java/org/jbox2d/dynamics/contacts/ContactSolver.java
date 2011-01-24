@@ -35,10 +35,7 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.pooling.WorldPool;
 import org.jbox2d.structs.collision.ManifoldPoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 // updated to rev 100
 // pooled locally, non-threaded
@@ -57,8 +54,6 @@ public class ContactSolver {
 	 * Ensure a reasonable condition number. for the block solver
 	 */
 	public static final float k_maxConditionNumber = 100.0f;
-
-	private static final Logger log = LoggerFactory.getLogger(ContactSolver.class);
 	
 	public ContactConstraint[] m_constraints;
 	public int m_constraintCount;
@@ -82,7 +77,7 @@ public class ContactSolver {
 		
 		// dynamic constraint array length, because we are pooling
 		if(m_constraints.length <= contactCount){
-			ContactConstraint[] newConstraints = new ContactConstraint[m_constraints.length*2];
+			ContactConstraint[] newConstraints = new ContactConstraint[m_constraintCount*2];
 			for(int i=0; i< newConstraints.length; i++){
 				if(i<m_constraints.length){
 					newConstraints[i] = m_constraints[i];
@@ -91,7 +86,6 @@ public class ContactSolver {
 				}
 			}
 			m_constraints = newConstraints;
-			log.debug("expanded contact constraints to: "+m_constraints.length);
 		}
 		
 		for (int i = 0; i < m_constraintCount; ++i){
@@ -122,14 +116,16 @@ public class ContactSolver {
 			ContactConstraint cc = m_constraints[i];
 			cc.bodyA = bodyA;
 			cc.bodyB = bodyB;
-			cc.manifold = manifold; // have to set actual manifold
-			cc.normal.set(worldManifold.normal);
+			cc.manifold = manifold;
+			cc.normal.x = worldManifold.normal.x;
+			cc.normal.y = worldManifold.normal.y; // have to set actual manifold
 			cc.pointCount = manifold.pointCount;
 			cc.friction = friction;
 			cc.restitution = restitution;
-
-			cc.localNormal.set(manifold.localNormal);
-			cc.localPoint.set(manifold.localPoint);
+			cc.localNormal.x = manifold.localNormal.x;
+			cc.localNormal.y = manifold.localNormal.y;
+			cc.localPoint.x = manifold.localPoint.x;
+			cc.localPoint.y = manifold.localPoint.y;
 			cc.radius = radiusA + radiusB;
 			cc.type = manifold.type;
 
@@ -139,17 +135,16 @@ public class ContactSolver {
 
 				ccp.normalImpulse = impulseRatio * cp.normalImpulse;
 				ccp.tangentImpulse = impulseRatio * cp.tangentImpulse;
-
-				ccp.localPoint.set(cp.localPoint);
+				ccp.localPoint.x = cp.localPoint.x;
+				ccp.localPoint.y = cp.localPoint.y;
 				
 				ccp.rA.x = worldManifold.points[j].x - bodyA.m_sweep.c.x;
 				ccp.rA.y = worldManifold.points[j].y - bodyA.m_sweep.c.y;
 
 				ccp.rB.x = worldManifold.points[j].x - bodyB.m_sweep.c.x;
 				ccp.rB.y = worldManifold.points[j].y - bodyB.m_sweep.c.y;
-				
-				float rnA = Vec2.cross(ccp.rA, cc.normal);
-				float rnB = Vec2.cross(ccp.rB, cc.normal);
+				float rnA = ccp.rA.x * cc.normal.y - ccp.rA.y * cc.normal.x;
+				float rnB = ccp.rB.x * cc.normal.y - ccp.rB.y * cc.normal.x;
 				rnA *= rnA;
 				rnB *= rnB;
 
@@ -157,11 +152,12 @@ public class ContactSolver {
 
 				assert(kNormal > Settings.EPSILON);
 				ccp.normalMass = 1.0f / kNormal;
-
-				Vec2.crossToOut(cc.normal, 1.0f, tangent);
-
-				float rtA = Vec2.cross(ccp.rA, tangent);
-				float rtB = Vec2.cross(ccp.rB, tangent);
+				
+				tangent.x = 1.0f * cc.normal.y;
+				tangent.y = -1.0f * cc.normal.x;
+				
+				float rtA = ccp.rA.x * tangent.y - ccp.rA.y * tangent.x;
+				float rtB = ccp.rB.x * tangent.y - ccp.rB.y * tangent.x;
 				rtA *= rtA;
 				rtB *= rtB;
 
@@ -172,12 +168,16 @@ public class ContactSolver {
 
 				// Setup a velocity bias for restitution.
 				ccp.velocityBias = 0.0f;
-				Vec2.crossToOut(wB, ccp.rB, temp1);
-				Vec2.crossToOut(wA, ccp.rA, temp2);
-				temp1.addLocal(vB).subLocal(vA).subLocal(temp2);
+				temp2.x = -wA * ccp.rA.y;
+				temp2.y = wA * ccp.rA.x;
+				//temp1.addLocal(vB).subLocal(vA).subLocal(temp2);
+				temp1.x = -wB * ccp.rB.y + vB.x - vA.x - temp2.x;
+				temp1.y = wB * ccp.rB.x + vB.y - vA.y - temp2.y;
+				Vec2 a = cc.normal;
+
 				
 				//float vRel = Dot(cc.normal, vB + Cross(wB, ccp.rB) - vA - Cross(wA, ccp.rA));
-				float vRel = Vec2.dot(cc.normal, temp1);
+				float vRel = a.x * temp1.x + a.y * temp1.y;
 				
 				if (vRel < -Settings.velocityThreshold){
 					ccp.velocityBias = -restitution * vRel;
@@ -207,9 +207,14 @@ public class ContactSolver {
 				//final float k_maxConditionNumber = 100.0f;
 				if (k11 * k11 < k_maxConditionNumber * (k11 * k22 - k12 * k12)){
 					// K is safe to invert.
-					cc.K.col1.set(k11, k12);
-					cc.K.col2.set(k12, k22);
-					cc.normalMass.set(cc.K);
+					cc.K.col1.x = k11;
+					cc.K.col1.y = k12;
+					cc.K.col2.x = k12;
+					cc.K.col2.y = k22;
+					cc.normalMass.col1.x = cc.K.col1.x;
+					cc.normalMass.col1.y = cc.K.col1.y;
+					cc.normalMass.col2.x = cc.K.col2.x;
+					cc.normalMass.col2.y = cc.K.col2.y;
 					cc.normalMass.invertLocal();
 				}
 				else{
@@ -223,7 +228,6 @@ public class ContactSolver {
 	
 	// djm pooling, and from above
 	private final Vec2 P = new Vec2();
-	private final Vec2 temp = new Vec2();
 	
 	public void warmStart(){
 		// Warm start.
@@ -242,14 +246,27 @@ public class ContactSolver {
 			for (int j = 0; j < c.pointCount; ++j){
 				ContactConstraintPoint ccp = c.points[j];
 				//Vec2 P = ccp.normalImpulse * normal + ccp.tangentImpulse * tangent;
-				temp.set(normal).mulLocal(ccp.normalImpulse);
-				P.set(tangent).mulLocal(ccp.tangentImpulse).addLocal(temp);
-				bodyA.m_angularVelocity -= invIA * Vec2.cross(ccp.rA, P);
-				temp.set(P).mulLocal(invMassA);
-				bodyA.m_linearVelocity.subLocal(temp);
-				bodyB.m_angularVelocity += invIB * Vec2.cross(ccp.rB, P);
-				temp.set(P).mulLocal(invMassB);
-				bodyB.m_linearVelocity.addLocal(temp);
+				
+//				temp.set(normal).mulLocal(ccp.normalImpulse);
+//				P.set(tangent).mulLocal(ccp.tangentImpulse).addLocal(temp);
+//				bodyA.m_angularVelocity -= invIA * Vec2.cross(ccp.rA, P);
+//				temp.set(P).mulLocal(invMassA);
+//				bodyA.m_linearVelocity.subLocal(temp);
+//				bodyB.m_angularVelocity += invIB * Vec2.cross(ccp.rB, P);
+//				temp.set(P).mulLocal(invMassB);
+//				bodyB.m_linearVelocity.addLocal(temp);
+				
+				
+				float Px = ccp.normalImpulse * normal.x + ccp.tangentImpulse * tangent.x;
+				float Py = ccp.normalImpulse * normal.y + ccp.tangentImpulse * tangent.y;
+
+				bodyA.m_angularVelocity -= invIA * (ccp.rA.x * Py - ccp.rA.y * Px);
+				bodyA.m_linearVelocity.x -= Px * invMassA;
+				bodyA.m_linearVelocity.y -= Py * invMassA;
+				
+				bodyB.m_angularVelocity += invIB * (ccp.rB.x * Py - ccp.rB.y * Px);
+				bodyB.m_linearVelocity.x += Px * invMassB;
+				bodyB.m_linearVelocity.y += Py * invMassB;
 			}
 		}
 	}
