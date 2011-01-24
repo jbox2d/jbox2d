@@ -46,7 +46,7 @@ public class TestbedSettings {
 	public boolean drawFrictionForces = false;
 	public boolean drawCOMs = false;
 	public boolean drawStats = true;
-	public boolean drawHelp = true;
+	public boolean drawHelp = false;
 	public boolean drawDynamicTree = false;
 	public boolean enableWarmStarting = true;
 	public boolean enableContinuous = true;
