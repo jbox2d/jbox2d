@@ -19,7 +19,7 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
-import org.jbox2d.pooling.SingletonPool;
+import org.jbox2d.pooling.WorldPool;
 import org.jbox2d.testbed.framework.TestbedSettings;
 import org.jbox2d.testbed.framework.TestbedTest;
 
@@ -185,7 +185,6 @@ public class PolyShapes extends TestbedTest {
 			break;
 		}
 	}
-	PolyShapesCallback callback = new PolyShapesCallback();
 	
 	/**
 	 * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
@@ -194,7 +193,7 @@ public class PolyShapes extends TestbedTest {
 	public void step(TestbedSettings settings) {
 		super.step(settings);
 		
-		callback.m_count = 0;
+		PolyShapesCallback callback = new PolyShapesCallback(m_world.getPool());
 		callback.m_circle.m_radius = 2.0f;
 		callback.m_circle.m_p.set(0.0f, 2.1f);
 		callback.m_transform.setIdentity();
@@ -236,9 +235,11 @@ class PolyShapesCallback implements QueryCallback{
 	Transform m_transform = new Transform();
 	DebugDraw debugDraw;
 	int m_count;
+	WorldPool p;
 	
-	public PolyShapesCallback(){
+	public PolyShapesCallback(WorldPool argWorld){
 		m_count = 0;
+		p = argWorld;
 	}
 	
 	void DrawFixture(Fixture fixture)
@@ -287,7 +288,7 @@ class PolyShapesCallback implements QueryCallback{
 		Body body = fixture.getBody();
 		Shape shape = fixture.getShape();
 
-		boolean overlap = SingletonPool.getCollision().testOverlap(shape, m_circle, body.getTransform(), m_transform);
+		boolean overlap = p.getCollision().testOverlap(shape, m_circle, body.getTransform(), m_transform);
 
 		if (overlap)
 		{

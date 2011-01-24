@@ -16,6 +16,8 @@ public class TestList {
 		
 		// general collision
 		// watching...
+		tests.add(new DominoTower());
+		tests.add(new CircleStress());
 		tests.add(new VaryingRestitution());
 		tests.add(new VaryingFrictionTest());
 		tests.add(new SphereStack());

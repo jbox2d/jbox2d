@@ -77,7 +77,7 @@ public class PoolingPerf extends PerfTest{
 	};
 	
 	public float aStore = 0;
-	public WorldPool wp = new WorldPool();
+	public WorldPool wp = new WorldPool(100);
 	public CirclePool cp = new CirclePool();
 	public TLVec2 tlv = new TLVec2();
 	public Vec2 mv = new Vec2();
