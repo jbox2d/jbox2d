@@ -12,6 +12,7 @@ import org.jbox2d.collision.broadphase.DynamicTree;
 import org.jbox2d.collision.broadphase.DynamicTreeNode;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.arrays.Vec2Array;
 import org.jbox2d.structs.collision.RayCastInput;
@@ -187,7 +188,7 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback, TreeRa
 		Actor actor = (Actor)proxyId.userData;
 
 		RayCastOutput output = new RayCastOutput();
-		boolean hit = actor.aabb.raycast(output, input);
+		boolean hit = actor.aabb.raycast(output, input, m_world.getPool());
 
 		if (hit)
 		{
@@ -340,7 +341,7 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback, TreeRa
 			}
 
 			RayCastOutput output = new RayCastOutput();
-			boolean hit = m_actors[i].aabb.raycast(output, input);
+			boolean hit = m_actors[i].aabb.raycast(output, input,m_world.getPool());
 			if (hit)
 			{
 				bruteActor = m_actors[i];
@@ -351,7 +352,7 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback, TreeRa
 
 		if (bruteActor != null)
 		{
-			assert(bruteOutput.fraction == m_rayCastOutput.fraction);
+			assert(MathUtils.abs(bruteOutput.fraction - m_rayCastOutput.fraction) <= Settings.EPSILON);
 		}
 	}
 

@@ -6,7 +6,6 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.pooling.SingletonPool;
 import org.jbox2d.structs.collision.distance.DistanceInput;
 import org.jbox2d.structs.collision.distance.DistanceOutput;
 import org.jbox2d.structs.collision.distance.SimplexCache;
@@ -75,7 +74,7 @@ public class DistanceTest extends TestbedTest {
 		input.transformB.set(m_transformB);
 		input.useRadii = true;
 		cache.count = 0;
-		SingletonPool.getDistance().distance(output, cache, input);
+		m_world.getPool().getDistance().distance(output, cache, input);
 		
 		addTextLine("distance = " + output.distance);
 		addTextLine("iterations = " + output.iterations);

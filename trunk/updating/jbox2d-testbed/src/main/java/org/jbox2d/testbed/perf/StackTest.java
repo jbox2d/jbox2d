@@ -45,7 +45,7 @@ public class StackTest extends PerfTest {
 		return s;
 	}
 	
-	private final WorldPool wp = new WorldPool();
+	private final WorldPool wp = new WorldPool(100);
 
 	
 	/**
