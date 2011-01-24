@@ -41,6 +41,7 @@ public class PoolingStack<E> {
 	private final int size;
 	private final PoolContainer<E> container;
 	
+	@SuppressWarnings("unchecked")
 	public PoolingStack(Class<E> argClass, int argStackSize){
 		size = argStackSize;
 		pool = (E[]) Array.newInstance(argClass, argStackSize);
