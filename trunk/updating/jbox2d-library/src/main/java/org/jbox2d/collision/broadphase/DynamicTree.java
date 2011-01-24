@@ -253,9 +253,6 @@ public class DynamicTree {
 	private final PoolingStack<Vec2> vec2s = new PoolingStack<Vec2>(Vec2.class, MAX_STACK_SIZE * 3 + 4);
 	private final AABB aabb = new AABB();
 	private final RayCastInput subInput = new RayCastInput();
-	
-	// TODO replace with non-threadlocal vec2 stack
-	
 	/**
 	 * Ray-cast against the proxies in the tree. This relies on the callback
 	 * to perform a exact ray-cast in the case were the proxy contains a shape.
