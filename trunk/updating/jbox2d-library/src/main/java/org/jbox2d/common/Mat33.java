@@ -148,9 +148,9 @@ public class Mat33 {
 			det = 1.0f / det;
 		}
 		Vec3.crossToOut(col2, col3, out);
-		float x = det * Vec3.dot(b, out);
+		final float x = det * Vec3.dot(b, out);
 		Vec3.crossToOut(b, col3, out);
-		float y = det * Vec3.dot(col1, out);
+		final float y = det * Vec3.dot(col1, out);
 		Vec3.crossToOut(col2, b, out);
 		float z = det * Vec3.dot(col1, out);
 		out.x = x;

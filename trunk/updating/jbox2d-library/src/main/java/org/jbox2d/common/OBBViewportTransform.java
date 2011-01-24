@@ -28,6 +28,10 @@ package org.jbox2d.common;
 
 import org.jbox2d.pooling.TLMat22;
 
+/**
+ * Orientated bounding box viewport transform
+ * @author Daniel Murphy
+ */
 public class OBBViewportTransform implements IViewportTransform{
 	
 	public static class OBB{

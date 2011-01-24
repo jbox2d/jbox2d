@@ -51,7 +51,6 @@ import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.JointDef;
 import org.jbox2d.dynamics.joints.JointEdge;
 import org.jbox2d.dynamics.joints.PulleyJoint;
-import org.jbox2d.pooling.SingletonPool;
 import org.jbox2d.pooling.WorldPool;
 import org.jbox2d.pooling.arrays.Vec2Array;
 import org.jbox2d.structs.collision.RayCastInput;
@@ -59,8 +58,6 @@ import org.jbox2d.structs.collision.RayCastOutput;
 import org.jbox2d.structs.collision.TOIInput;
 import org.jbox2d.structs.collision.TOIOutput;
 import org.jbox2d.structs.collision.TOIOutput.TOIOutputState;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The world class manages all physics entities, dynamic simulation,
@@ -70,9 +67,8 @@ import org.slf4j.LoggerFactory;
  * @author Daniel Murphy
  */
 public class World {
-	
-	private static final Logger log = LoggerFactory.getLogger(World.class);
-	
+	public static final int WORLD_POOL_SIZE = 100;
+		
 	public static final int NEW_FIXTURE = 0x0001;
 	public static final int LOCKED = 0x0002;
 	public static final int CLEAR_FORCES = 0x0004;
@@ -122,7 +118,7 @@ public class World {
 	 *            improve performance by not simulating inactive bodies.
 	 */
 	public World(Vec2 gravity, boolean doSleep) {
-		pool = new WorldPool();
+		pool = new WorldPool(WORLD_POOL_SIZE);
 		m_destructionListener = null;
 		m_debugDraw = null;
 		
@@ -142,7 +138,7 @@ public class World {
 		
 		m_inv_dt0 = 0f;
 		
-		m_contactManager = new ContactManager();
+		m_contactManager = new ContactManager(pool);
 	}
 	
 	public WorldPool getPool() {
@@ -1075,7 +1071,7 @@ public class World {
 				toiInput.sweepB.set(bodyB.m_sweep);
 				toiInput.tMax = toi;
 				
-				SingletonPool.getTOI().timeOfImpact(toiOutput, toiInput);
+				pool.getTimeOfImpact().timeOfImpact(toiOutput, toiInput);
 				
 				if (toiOutput.state == TOIOutputState.TOUCHING && toiOutput.t < toi) {
 					toiContact = contact;

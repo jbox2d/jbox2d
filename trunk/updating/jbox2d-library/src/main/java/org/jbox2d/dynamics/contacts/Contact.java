@@ -36,13 +36,11 @@ import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Transform;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.pooling.SingletonPool;
 import org.jbox2d.pooling.TLManifold;
+import org.jbox2d.pooling.WorldPool;
 import org.jbox2d.pooling.stacks.TLStack;
 import org.jbox2d.structs.collision.ContactID;
 import org.jbox2d.structs.collision.ManifoldPoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 // updated to rev 100
 /**
@@ -53,7 +51,6 @@ import org.slf4j.LoggerFactory;
  * @author daniel
  */
 public abstract class Contact {
-	private static final Logger log = LoggerFactory.getLogger(Contact.class);
 	
 	// statistics gathering
 	public static int activeContacts = 0;
@@ -100,12 +97,12 @@ public abstract class Contact {
 				activeContacts--;
 			}
 
-			public Contact contactCreateFcn(Fixture fixtureA, Fixture fixtureB) {
+			public Contact contactCreateFcn(WorldPool argPool, Fixture fixtureA, Fixture fixtureB) {
 				Stack<Contact> s = stack.get();
 				if (s.isEmpty()) {
-					s.push(new CircleContact());
-					s.push(new CircleContact());
-					s.push(new CircleContact());
+					s.push(new CircleContact(argPool));
+					s.push(new CircleContact(argPool));
+					s.push(new CircleContact(argPool));
 					contactPoolCount+=3;
 				}
 				Contact c = s.pop();
@@ -124,12 +121,12 @@ public abstract class Contact {
 				activeContacts--;
 			}
 
-			public Contact contactCreateFcn(Fixture fixtureA, Fixture fixtureB) {
+			public Contact contactCreateFcn(WorldPool argPool, Fixture fixtureA, Fixture fixtureB) {
 				Stack<Contact> s = stack.get();
 				if (s.isEmpty()) {
-					s.push(new PolygonAndCircleContact());
-					s.push(new PolygonAndCircleContact());
-					s.push(new PolygonAndCircleContact());
+					s.push(new PolygonAndCircleContact(argPool));
+					s.push(new PolygonAndCircleContact(argPool));
+					s.push(new PolygonAndCircleContact(argPool));
 					contactPoolCount+=3;
 				}
 				Contact c = s.pop();
@@ -148,12 +145,12 @@ public abstract class Contact {
 				activeContacts--;
 			}
 
-			public Contact contactCreateFcn(Fixture fixtureA, Fixture fixtureB) {
+			public Contact contactCreateFcn(WorldPool argPool, Fixture fixtureA, Fixture fixtureB) {
 				Stack<Contact> s = stack.get();
 				if (s.isEmpty()) {
-					s.push(new PolygonContact());
-					s.push(new PolygonContact());
-					s.push(new PolygonContact());
+					s.push(new PolygonContact(argPool));
+					s.push(new PolygonContact(argPool));
+					s.push(new PolygonContact(argPool));
 					contactPoolCount+=3;
 				}
 				Contact c = s.pop();
@@ -165,7 +162,7 @@ public abstract class Contact {
 		}, ShapeType.POLYGON, ShapeType.POLYGON);
 	}
 
-	public static Contact create(Fixture fixtureA, Fixture fixtureB) {
+	public static Contact create(WorldPool argPool, Fixture fixtureA, Fixture fixtureB) {
 		if (s_initialized == false) {
 			initializeRegisters();
 			s_initialized = true;
@@ -177,9 +174,9 @@ public abstract class Contact {
 		ContactCreator creator = s_registers[type1.intValue][type2.intValue].creator;
 		if (creator != null) {
 			if (s_registers[type1.intValue][type2.intValue].primary) {
-				return creator.contactCreateFcn(fixtureA, fixtureB);
+				return creator.contactCreateFcn(argPool, fixtureA, fixtureB);
 			} else {
-				return creator.contactCreateFcn(fixtureB, fixtureA);
+				return creator.contactCreateFcn(argPool, fixtureB, fixtureA);
 			}
 		} else {
 			return null;
@@ -217,13 +214,16 @@ public abstract class Contact {
 	protected Manifold m_manifold;
 
 	public float m_toiCount;
+	
+	protected final WorldPool pool;
 
-	protected Contact() {
+	protected Contact(WorldPool argPool) {
 		m_fixtureA = null;
 		m_fixtureB = null;
 		m_nodeA = new ContactEdge();
 		m_nodeB = new ContactEdge();
 		m_manifold = new Manifold();
+		pool = argPool;
 	}
 
 	/** initialization for pooling */
@@ -262,7 +262,7 @@ public abstract class Contact {
 	/**
 	 * Get the world manifold.
 	 */
-	public void getWorldManifold(WorldManifold worldManifold) { // NO_UCD
+	public void getWorldManifold(WorldManifold worldManifold) {
 		final Body bodyA = m_fixtureA.getBody();
 		final Body bodyB = m_fixtureB.getBody();
 		final Shape shapeA = m_fixtureA.getShape();
@@ -370,7 +370,7 @@ public abstract class Contact {
 		if (sensor) {
 			Shape shapeA = m_fixtureA.getShape();
 			Shape shapeB = m_fixtureB.getShape();
-			touching = SingletonPool.getCollision().testOverlap(shapeA, shapeB,
+			touching = pool.getCollision().testOverlap(shapeA, shapeB,
 					xfA, xfB);
 
 			// Sensors don't generate manifolds.

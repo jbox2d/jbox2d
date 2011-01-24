@@ -31,14 +31,20 @@ import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Transform;
 import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.pooling.SingletonPool;
+import org.jbox2d.pooling.WorldPool;
 
 // updated to rev 100
 
 public class PolygonContact extends Contact {
 	
-	public PolygonContact(){}
 	
+	/**
+	 * @param argPool
+	 */
+	protected PolygonContact(WorldPool argPool) {
+		super(argPool);
+	}
+
 	public void init(Fixture fixtureA, Fixture fixtureB) {
 		super.init(fixtureA, fixtureB);
 		assert(m_fixtureA.getType() == ShapeType.POLYGON);
@@ -47,7 +53,7 @@ public class PolygonContact extends Contact {
 
 	@Override
 	public void evaluate(Manifold manifold, Transform xfA, Transform xfB) {
-		SingletonPool.getCollision().collidePolygons(m_manifold,
+		pool.getCollision().collidePolygons(m_manifold,
 				(PolygonShape)m_fixtureA.getShape(), xfA,
 				(PolygonShape)m_fixtureB.getShape(), xfB);
 	}

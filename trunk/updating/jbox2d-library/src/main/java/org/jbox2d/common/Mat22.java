@@ -366,7 +366,7 @@ public class Mat22 {
 		/*out.x = Vec2.dot(v, col1);
 		out.y = Vec2.dot(v, col2);*/
 		out.x = v.x * col1.x + v.y * col1.y;
-		out.y = Vec2.dot(v, col2);
+		out.y = v.x * col2.x + v.y * col2.y;
 	}
 
 	/**
