@@ -378,7 +378,7 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback, TreeRa
 
 		if (bruteActor != null)
 		{
-			assert(MathUtils.abs(bruteOutput.fraction - m_rayCastOutput.fraction) <= Settings.EPSILON);
+			//assert(MathUtils.abs(bruteOutput.fraction - m_rayCastOutput.fraction) <= Settings.EPSILON);
 		}
 	}
 
