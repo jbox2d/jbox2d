@@ -26,6 +26,8 @@
  ******************************************************************************/
 package org.jbox2d.dynamics;
 
+import java.util.Stack;
+
 import org.jbox2d.callbacks.ContactFilter;
 import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.callbacks.DebugDraw;
@@ -39,20 +41,29 @@ import org.jbox2d.collision.broadphase.BroadPhase;
 import org.jbox2d.collision.broadphase.DynamicTreeNode;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Sweep;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.contacts.CircleContact;
 import org.jbox2d.dynamics.contacts.Contact;
+import org.jbox2d.dynamics.contacts.ContactCreator;
 import org.jbox2d.dynamics.contacts.ContactEdge;
+import org.jbox2d.dynamics.contacts.ContactRegister;
+import org.jbox2d.dynamics.contacts.PolygonAndCircleContact;
+import org.jbox2d.dynamics.contacts.PolygonContact;
 import org.jbox2d.dynamics.contacts.TOISolver;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.JointDef;
 import org.jbox2d.dynamics.joints.JointEdge;
 import org.jbox2d.dynamics.joints.PulleyJoint;
+import org.jbox2d.pooling.MutableStack;
+import org.jbox2d.pooling.PolygonContactStack;
 import org.jbox2d.pooling.WorldPool;
 import org.jbox2d.pooling.arrays.Vec2Array;
+import org.jbox2d.pooling.stacks.TLStack;
 import org.jbox2d.structs.collision.RayCastInput;
 import org.jbox2d.structs.collision.RayCastOutput;
 import org.jbox2d.structs.collision.TOIInput;
@@ -72,6 +83,11 @@ public class World {
 	public static final int NEW_FIXTURE = 0x0001;
 	public static final int LOCKED = 0x0002;
 	public static final int CLEAR_FORCES = 0x0004;
+	
+	
+	// statistics gathering
+	public int activeContacts = 0;
+	public int contactPoolCount = 0;
 	
 	protected int m_flags;
 	
@@ -109,6 +125,9 @@ public class World {
 	 */
 	private boolean m_continuousPhysics;
 	
+	private ContactRegister[][] contactStacks = new ContactRegister[ShapeType.TYPE_COUNT][ShapeType.TYPE_COUNT];
+	private boolean c_initialized = false;
+	
 	/**
 	 * Construct a world object.
 	 * 
@@ -138,7 +157,65 @@ public class World {
 		
 		m_inv_dt0 = 0f;
 		
-		m_contactManager = new ContactManager(pool);
+		m_contactManager = new ContactManager(this);
+		
+		initializeRegisters();
+	}
+	
+	private void addType(MutableStack<Contact> creator, ShapeType type1,
+			ShapeType type2) {
+		ContactRegister register = new ContactRegister();
+		register.creator = creator;
+		register.primary = true;
+		contactStacks[type1.intValue][type2.intValue] = register;
+
+		if (type1 != type2) {
+			ContactRegister register2 = new ContactRegister();
+			register2.creator = creator;
+			register2.primary = false;
+			contactStacks[type2.intValue][type1.intValue] = register2;
+		}
+	}
+
+	private void initializeRegisters() {
+		addType(pool.getCircleContactStack(), ShapeType.CIRCLE, ShapeType.CIRCLE);
+		addType(pool.getPolyCircleContactStack(), ShapeType.POLYGON, ShapeType.CIRCLE);
+		addType(pool.getPolyContactStack(), ShapeType.POLYGON, ShapeType.POLYGON);
+	}
+
+	public Contact popContact(Fixture fixtureA, Fixture fixtureB) {
+		final ShapeType type1 = fixtureA.getType();
+		final ShapeType type2 = fixtureB.getType();
+
+		final ContactRegister reg = contactStacks[type1.intValue][type2.intValue];
+		final MutableStack<Contact> creator = reg.creator;
+		if (creator != null) {
+			if (reg.primary) {
+				Contact c = creator.pop();
+				c.init(fixtureA, fixtureB);
+				return c;
+			} else {
+				Contact c = creator.pop();
+				c.init(fixtureB, fixtureA);
+				return c;
+			}
+		} else {
+			return null;
+		}
+	}
+
+	public void pushContact(Contact contact) {
+
+		if (contact.m_manifold.pointCount > 0) {
+			contact.getFixtureA().getBody().setAwake(true);
+			contact.getFixtureB().getBody().setAwake(true);
+		}
+
+		ShapeType type1 = contact.getFixtureA().getType();
+		ShapeType type2 = contact.getFixtureB().getType();
+
+		MutableStack<Contact> creator = contactStacks[type1.intValue][type2.intValue].creator;
+		creator.push(contact);
 	}
 	
 	public WorldPool getPool() {

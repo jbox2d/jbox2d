@@ -36,12 +36,11 @@ import org.jbox2d.pooling.WorldPool;
 // updated to rev 100
 
 public class CircleContact extends Contact {
-
 	
 	/**
 	 * @param argPool
 	 */
-	protected CircleContact(WorldPool argPool) {
+	public CircleContact(WorldPool argPool) {
 		super(argPool);
 	}
 

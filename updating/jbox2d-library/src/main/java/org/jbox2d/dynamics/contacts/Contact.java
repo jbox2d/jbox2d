@@ -36,6 +36,7 @@ import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Transform;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
+import org.jbox2d.pooling.MutableStack;
 import org.jbox2d.pooling.TLManifold;
 import org.jbox2d.pooling.WorldPool;
 import org.jbox2d.pooling.stacks.TLStack;
@@ -68,136 +69,6 @@ public abstract class Contact {
 	// This bullet contact had a TOI event
 	public static final int BULLET_HIT_FLAG = 0x0010;
 
-	private static final ContactRegister[][] s_registers = new ContactRegister[ShapeType.TYPE_COUNT][ShapeType.TYPE_COUNT];
-	private static boolean s_initialized = false;
-	
-
-	private static void addType(ContactCreator creator, ShapeType type1,
-			ShapeType type2) {
-		ContactRegister register = new ContactRegister();
-		register.creator = creator;
-		register.primary = true;
-		s_registers[type1.intValue][type2.intValue] = register;
-
-		if (type1 != type2) {
-			ContactRegister register2 = new ContactRegister();
-			register2.creator = creator;
-			register2.primary = false;
-			s_registers[type2.intValue][type1.intValue] = register2;
-		}
-	}
-
-	private static void initializeRegisters() {
-		addType(new ContactCreator() {
-			private final TLStack<Contact> stack = new TLStack<Contact>();
-
-			public void contactDestroyFcn(Contact contact) {
-				stack.get().push(contact);
-				contactPoolCount++;
-				activeContacts--;
-			}
-
-			public Contact contactCreateFcn(WorldPool argPool, Fixture fixtureA, Fixture fixtureB) {
-				Stack<Contact> s = stack.get();
-				if (s.isEmpty()) {
-					s.push(new CircleContact(argPool));
-					s.push(new CircleContact(argPool));
-					s.push(new CircleContact(argPool));
-					contactPoolCount+=3;
-				}
-				Contact c = s.pop();
-				contactPoolCount--;
-				activeContacts++;
-				c.init(fixtureA, fixtureB);
-				return c;
-			}
-		}, ShapeType.CIRCLE, ShapeType.CIRCLE);
-		addType(new ContactCreator() {
-			private final TLStack<Contact> stack = new TLStack<Contact>();
-
-			public void contactDestroyFcn(Contact contact) {
-				stack.get().push(contact);
-				contactPoolCount++;
-				activeContacts--;
-			}
-
-			public Contact contactCreateFcn(WorldPool argPool, Fixture fixtureA, Fixture fixtureB) {
-				Stack<Contact> s = stack.get();
-				if (s.isEmpty()) {
-					s.push(new PolygonAndCircleContact(argPool));
-					s.push(new PolygonAndCircleContact(argPool));
-					s.push(new PolygonAndCircleContact(argPool));
-					contactPoolCount+=3;
-				}
-				Contact c = s.pop();
-				contactPoolCount--;
-				activeContacts++;
-				c.init(fixtureA, fixtureB);
-				return c;
-			}
-		}, ShapeType.POLYGON, ShapeType.CIRCLE);
-		addType(new ContactCreator() {
-			private final TLStack<Contact> stack = new TLStack<Contact>();
-
-			public void contactDestroyFcn(Contact contact) {
-				stack.get().push(contact);
-				contactPoolCount++;
-				activeContacts--;
-			}
-
-			public Contact contactCreateFcn(WorldPool argPool, Fixture fixtureA, Fixture fixtureB) {
-				Stack<Contact> s = stack.get();
-				if (s.isEmpty()) {
-					s.push(new PolygonContact(argPool));
-					s.push(new PolygonContact(argPool));
-					s.push(new PolygonContact(argPool));
-					contactPoolCount+=3;
-				}
-				Contact c = s.pop();
-				contactPoolCount--;
-				activeContacts++;
-				c.init(fixtureA, fixtureB);
-				return c;
-			}
-		}, ShapeType.POLYGON, ShapeType.POLYGON);
-	}
-
-	public static Contact create(WorldPool argPool, Fixture fixtureA, Fixture fixtureB) {
-		if (s_initialized == false) {
-			initializeRegisters();
-			s_initialized = true;
-		}
-
-		ShapeType type1 = fixtureA.getType();
-		ShapeType type2 = fixtureB.getType();
-
-		ContactCreator creator = s_registers[type1.intValue][type2.intValue].creator;
-		if (creator != null) {
-			if (s_registers[type1.intValue][type2.intValue].primary) {
-				return creator.contactCreateFcn(argPool, fixtureA, fixtureB);
-			} else {
-				return creator.contactCreateFcn(argPool, fixtureB, fixtureA);
-			}
-		} else {
-			return null;
-		}
-	}
-
-	public static void destroy(Contact contact) {
-		assert (s_initialized == true);
-
-		if (contact.m_manifold.pointCount > 0) {
-			contact.getFixtureA().getBody().setAwake(true);
-			contact.getFixtureB().getBody().setAwake(true);
-		}
-
-		ShapeType type1 = contact.getFixtureA().getType();
-		ShapeType type2 = contact.getFixtureB().getType();
-
-		ContactCreator creator = s_registers[type1.intValue][type2.intValue].creator;
-		creator.contactDestroyFcn(contact);
-	}
-
 	public int m_flags;
 
 	// World pool and list pointers.
@@ -211,7 +82,7 @@ public abstract class Contact {
 	public Fixture m_fixtureA;
 	public Fixture m_fixtureB;
 
-	protected Manifold m_manifold;
+	public Manifold m_manifold;
 
 	public float m_toiCount;
 	

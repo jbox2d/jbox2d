@@ -58,6 +58,10 @@ public class WorldPool {
 	private final HashMap<Integer, int[]> aints = new HashMap<Integer, int[]>();
 	private final HashMap<Integer, Vec2[]> avecs = new HashMap<Integer, Vec2[]>();
 	
+	private final PolygonContactStack pcstack = new PolygonContactStack(this);
+	private final CircleContactStack ccstack = new CircleContactStack(this);
+	private final PolyCircleContactStack cpstack = new PolyCircleContactStack(this);
+	
 	private final Collision collision;
 	private final TimeOfImpact toi;
 	private final Distance dist;
@@ -71,6 +75,18 @@ public class WorldPool {
 		dist = new Distance();
 		collision = new Collision(this);
 		toi = new TimeOfImpact(this);
+	}
+	
+	public final PolygonContactStack getPolyContactStack(){
+		return pcstack;
+	}
+	
+	public final CircleContactStack getCircleContactStack(){
+		return ccstack;
+	}
+	
+	public final PolyCircleContactStack getPolyCircleContactStack(){
+		return cpstack;
 	}
 	
 	public final PoolingStack<Vec2> getVec2Stack(){

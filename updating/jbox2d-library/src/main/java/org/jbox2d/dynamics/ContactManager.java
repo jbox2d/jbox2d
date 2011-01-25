@@ -49,9 +49,9 @@ public class ContactManager implements PairCallback {
 	public ContactFilter m_contactFilter;
 	public ContactListener m_contactListener;
 	
-	private final WorldPool pool;
+	private final World pool;
 	
-	public ContactManager(WorldPool argPool) {
+	public ContactManager(World argPool) {
 		m_contactList = null;
 		m_contactCount = 0;
 		m_contactFilter = new ContactFilter();
@@ -109,7 +109,7 @@ public class ContactManager implements PairCallback {
 		}
 		
 		// Call the factory.
-		Contact c = Contact.create(pool, fixtureA, fixtureB);
+		Contact c = pool.popContact(fixtureA, fixtureB);
 		
 		// Contact creation may swap fixtures.
 		fixtureA = c.getFixtureA();
@@ -206,7 +206,7 @@ public class ContactManager implements PairCallback {
 		}
 		
 		// Call the factory.
-		Contact.destroy(c);
+		pool.pushContact(c);
 		--m_contactCount;
 	}
 	

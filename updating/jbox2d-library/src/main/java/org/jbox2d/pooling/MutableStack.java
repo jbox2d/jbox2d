@@ -7,15 +7,20 @@ public abstract class MutableStack<E> {
 	private int size;
 	
 	public MutableStack(){
-		index = 4; size = 5;
-		stack = createArray(5);
+		index = 0;
+		size = 0;
 	}
 	
-	protected abstract E[] createArray(int argSize);
+	protected void initStack(int argSize){
+		index = argSize - 1; size = argSize;
+		stack = createArray(argSize, null);
+	}
+	
+	protected abstract E[] createArray(int argSize, E[] argOld);
 	
 	public final E pop(){
 		if(index >= size){
-			stack = createArray(size*2);
+			stack = createArray(size*2, stack);
 			size = stack.length;
 		}
 		return stack[index++];

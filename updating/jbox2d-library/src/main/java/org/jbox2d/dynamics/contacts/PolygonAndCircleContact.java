@@ -41,7 +41,7 @@ public class PolygonAndCircleContact extends Contact {
 	/**
 	 * @param argPool
 	 */
-	protected PolygonAndCircleContact(WorldPool argPool) {
+	public PolygonAndCircleContact(WorldPool argPool) {
 		super(argPool);
 	}
 
