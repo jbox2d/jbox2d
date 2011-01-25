@@ -69,6 +69,7 @@ public class Settings {
 	 */
 	public static final boolean FAST_MATH = true;
 	public static final boolean POOLING = true;
+	public static final int CONTACT_STACK_INIT_SIZE = 10;
 	public static final boolean SINCOS_LUT_ENABLED = false;
 	/**
 	 * smaller the precision, the larger the table. If a small table is used

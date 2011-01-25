@@ -37,11 +37,7 @@ import org.jbox2d.pooling.WorldPool;
 
 public class PolygonContact extends Contact {
 	
-	
-	/**
-	 * @param argPool
-	 */
-	protected PolygonContact(WorldPool argPool) {
+	public PolygonContact(WorldPool argPool) {
 		super(argPool);
 	}
 

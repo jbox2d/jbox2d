@@ -34,5 +34,5 @@ public interface ContactCreator {
 
 	public Contact contactCreateFcn(WorldPool argPool, Fixture fixtureA, Fixture fixtureB);
 	
-	public void contactDestroyFcn(Contact contact);
+	public void contactDestroyFcn(WorldPool argPool, Contact contact);
 }
