@@ -177,10 +177,9 @@ public class Distance {
 					assert (false);
 					out.setZero();
 					return;
-					
 				case 1 :
 					out.set(m_v1.w);
-					
+					return;
 				case 2 :
 					case22.set(m_v2.w).mulLocal(m_v2.a);
 					case2.set(m_v1.w).mulLocal(m_v1.a).addLocal(case22);
