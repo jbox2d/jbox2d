@@ -49,12 +49,14 @@
 
 package org.jbox2d.common;
 
+import java.io.Serializable;
+
 // updated to rev 100
 
 /**
  * A 2D column vector
  */
-public class Vec2 {
+public class Vec2 implements Serializable {
 	/** Should we count Vec2 creations? */
 	static public boolean watchCreations = false;
 	/**

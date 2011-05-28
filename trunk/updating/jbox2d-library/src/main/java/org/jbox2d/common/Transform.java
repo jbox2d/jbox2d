@@ -49,13 +49,15 @@
 
 package org.jbox2d.common;
 
+import java.io.Serializable;
+
 // updated to rev 100
 
 /**
  * A transform contains translation and rotation. It is used to represent
  * the position and orientation of rigid frames.
  */
-public class Transform {
+public class Transform implements Serializable {
 	
 	/** The translation caused by the transform */
 	public final Vec2 position;

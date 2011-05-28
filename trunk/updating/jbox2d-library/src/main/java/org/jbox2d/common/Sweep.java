@@ -49,6 +49,8 @@
 
 package org.jbox2d.common;
 
+import java.io.Serializable;
+
 // updated to rev 100
 
 /**
@@ -57,7 +59,7 @@ package org.jbox2d.common;
  * no coincide with the center of mass. However, to support dynamics
  * we must interpolate the center of mass position.
  */
-public class Sweep {
+public class Sweep implements Serializable {
 	
 	/** Local center of mass position */
 	public final Vec2 localCenter;
