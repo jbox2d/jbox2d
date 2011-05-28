@@ -48,12 +48,14 @@
  */
 package org.jbox2d.common;
 
+import java.io.Serializable;
+
 // updated to rev 100
 
 /**
  * @author Daniel Murphy
  */
-public class Vec3 {
+public class Vec3 implements Serializable {
 	public float x, y, z;
 	
 	public Vec3() {

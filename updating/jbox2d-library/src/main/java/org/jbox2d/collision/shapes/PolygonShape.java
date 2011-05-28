@@ -171,7 +171,10 @@ public class PolygonShape extends Shape {
 		
 		// Copy vertices.
 		for (int i = 0; i < m_vertexCount; ++i) {
-			m_vertices[i] = vertices[i];
+			if(m_vertices[i] == null){
+				m_vertices[i] = new Vec2();
+			}
+			m_vertices[i].set(vertices[i]);
 		}
 		
 		final Vec2 edge = pool1;
