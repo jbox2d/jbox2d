@@ -195,7 +195,7 @@ public class Island {
 		
 		m_listener = listener;
 		
-		if(m_bodies == null || m_bodyCapacity >= m_bodies.length){
+		if(m_bodies == null || m_bodyCapacity > m_bodies.length){
 			m_bodies = new Body[m_bodyCapacity];
 		}
 		if(m_joints == null || m_jointCapacity > m_joints.length){

@@ -1078,6 +1078,9 @@ public class World {
 	private final Sweep backup = new Sweep();
 	private final TOISolver toiSolver = new TOISolver();
 	
+
+	private Contact[] m_contacts = new Contact[Settings.maxTOIContacts];
+	
 	private void solveTOI(Body body) {
 		// Find the minimum contact.
 		Contact toiContact = null;
@@ -1181,7 +1184,10 @@ public class World {
 		++toiContact.m_toiCount;
 		
 		// Update all the valid contacts on this body and build a contact island.
-		final Contact[] contacts = new Contact[Settings.maxTOIContacts];
+		if (m_contacts == null || m_contacts.length < Settings.maxTOIContacts){
+			m_contacts = new Contact[Settings.maxTOIContacts];
+		}
+		
 		count = 0;
 		for (ContactEdge ce = body.m_contactList; ce != null && count < Settings.maxTOIContacts; ce = ce.next) {
 			Body other = ce.other;
@@ -1223,12 +1229,12 @@ public class World {
 				continue;
 			}
 			
-			contacts[count] = contact;
+			m_contacts[count] = contact;
 			++count;
 		}
 		
 		// Reduce the TOI body's overlap with the contact island.
-		toiSolver.initialize(contacts, count, body);
+		toiSolver.initialize(m_contacts, count, body);
 		
 		float k_toiBaumgarte = 0.75f;
 		// boolean solved = false;
