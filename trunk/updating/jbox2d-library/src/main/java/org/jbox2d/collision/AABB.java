@@ -128,7 +128,7 @@ public class AABB {
 	
 	public final void getExtentsToOut(final Vec2 out) {
 		out.x = (upperBound.x - lowerBound.x) * .5f;
-		out.x = (upperBound.y - lowerBound.y) * .5f;
+		out.y = (upperBound.y - lowerBound.y) * .5f; // thanks FDN1
 	}
 	
 	public final void getVertices(Vec2[] argRay) {
