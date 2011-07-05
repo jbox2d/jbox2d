@@ -46,111 +46,99 @@
  * misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  */
+package org.jbox2d.collision;
 
-package org.jbox2d.common;
 
-import java.io.Serializable;
+//FIXME: In the C++ version, this class is a union of
+//the key and the features, meaning not that it contains
+//both separately, but that the same data can be accessed
+//as either.  The key there is 32 bit, and each member of
+//features is 8 bits.
+//
+//We need to figure out if this is a problem or not, because
+//I have a feeling that as of right now, key is never being
+//set anyways.  Initial examination seems to show that key is
+//always zero. [hacked around for the moment]
+//
+//Also, it might be better performance-wise to pull features
+//to a top level class if inner classes have more overhead (check this).
 
 // updated to rev 100
 
-/**
- * A transform contains translation and rotation. It is used to represent
- * the position and orientation of rigid frames.
- */
-public class Transform implements Serializable {
-	private static final long serialVersionUID = 1L;
+/** Contact ids to facilitate warm starting.*/
+public class ContactID {
 
-	/** The translation caused by the transform */
-	public final Vec2 position;
-	
-	/** A matrix representing a rotation */
-	public final Mat22 R;
-	
-	/** The default constructor. */
-	public Transform() {
-		position = new Vec2();
-		R = new Mat22();
+	/** The features that intersect to form the contact point */
+	public final Features features;
+
+	/** The features that intersect to form the contact point */
+	public static class Features {
+		/** The edge that defines the outward contact normal. */
+		public int referenceEdge;
+		/** The edge most anti-parallel to the reference edge. */
+		public int incidentEdge;
+		/** The vertex (0 or 1) on the incident edge that was clipped. */
+		public int incidentVertex;
+		/** A value of 1 indicates that the reference edge is on shape2. */
+		public int flip;
+
+		public Features() {
+			referenceEdge = incidentEdge = incidentVertex = flip = 0;
+		}
+
+		private Features(final Features f) {
+			referenceEdge = f.referenceEdge;
+			incidentEdge = f.incidentEdge;
+			incidentVertex = f.incidentVertex;
+			flip = f.flip;
+		}
+
+		private void set(final Features f){
+			referenceEdge = f.referenceEdge;
+			incidentEdge = f.incidentEdge;
+			incidentVertex = f.incidentVertex;
+			flip = f.flip;
+		}
+
+		private boolean isEqual(final Features f){
+			return (referenceEdge==f.referenceEdge &&
+					incidentEdge==f.incidentEdge &&
+					incidentVertex==f.incidentVertex &&
+					flip==f.flip);
+		}
+
+		@Override
+		public String toString() {
+			final String s = "Features: (" + this.flip + " ," + this.incidentEdge + " ," + this.incidentVertex + " ," + this.referenceEdge + ")";
+			return s;
+		}
+
 	}
-	
-	/** Initialize as a copy of another transform. */
-	public Transform(final Transform xf) {
-		position = xf.position.clone();
-		R = xf.R.clone();
+
+	public boolean isEqual(final ContactID cid) {
+		return cid.features.isEqual(this.features);
 	}
-	
-	/** Initialize using a position vector and a rotation matrix. */
-	public Transform(final Vec2 _position, final Mat22 _R) {
-		position = _position.clone();
-		R = _R.clone();
+
+	public ContactID() {
+		features = new Features();
 	}
-	
-	/** Set this to equal another transform. */
-	public final Transform set(final Transform xf) {
-		position.set(xf.position);
-		R.set(xf.R);
-		return this;
+
+	public ContactID(final ContactID c) {
+		features = new Features(c.features);
+	}
+
+	public void set(final ContactID c){
+		features.set(c.features);
 	}
 	
 	/**
-	 * Set this based on the position and angle.
-	 * 
-	 * @param p
-	 * @param angle
+	 * zeros out the data
 	 */
-	public final void set(Vec2 p, float angle) {
-		position.set(p);
-		R.set(angle);
+	public void zero() {
+		features.flip = 0;
+		features.incidentEdge = 0;
+		features.incidentVertex = 0;
+		features.referenceEdge = 0;
 	}
-	
-	/**
-	 * Calculate the angle that the rotation matrix represents.
-	 */
-	public final float getAngle() {
-		return MathUtils.atan2(R.col1.y, R.col1.x);
-	}
-	
-	/** Set this to the identity transform. */
-	public final void setIdentity() {
-		position.setZero();
-		R.setIdentity();
-	}
-	
-	public final static Vec2 mul(final Transform T, final Vec2 v) {
-		return new Vec2(T.position.x + T.R.col1.x * v.x + T.R.col2.x * v.y, T.position.y + T.R.col1.y * v.x
-				+ T.R.col2.y * v.y);
-	}
-	
-	/* djm added */
-	public final static void mulToOut(final Transform T, final Vec2 v, final Vec2 out) {
-		final float tempy = T.position.y + T.R.col1.y * v.x + T.R.col2.y * v.y;
-		out.x = T.position.x + T.R.col1.x * v.x + T.R.col2.x * v.y;
-		out.y = tempy;
-	}
-	
-	public final static Vec2 mulTrans(final Transform T, final Vec2 v) {
-		final float v1x = v.x - T.position.x;
-		final float v1y = v.y - T.position.y;
-		final Vec2 b = T.R.col1;
-		final Vec2 b1 = T.R.col2;
-		return new Vec2((v1x * b.x + v1y * b.y), (v1x * b1.x + v1y * b1.y));
-		// return T.R.mulT(v.sub(T.position));
-	}
-	
-	public final static void mulTransToOut(final Transform T, final Vec2 v, final Vec2 out) {
-		final float v1x = v.x - T.position.x;
-		final float v1y = v.y - T.position.y;
-		final Vec2 b = T.R.col1;
-		final Vec2 b1 = T.R.col2;
-		final float tempy = v1x * b1.x + v1y * b1.y;
-		out.x = v1x * b.x + v1y * b.y;
-		out.y = tempy;
-	}
-	
-	@Override
-	public final String toString() {
-		String s = "XForm:\n";
-		s += "Position: " + position + "\n";
-		s += "R: \n" + R + "\n";
-		return s;
-	}
+
 }

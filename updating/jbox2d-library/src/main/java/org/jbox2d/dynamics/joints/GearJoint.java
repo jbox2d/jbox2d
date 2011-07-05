@@ -35,7 +35,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.TimeStep;
-import org.jbox2d.pooling.WorldPool;
+import org.jbox2d.pooling.IWorldPool;
 
 //Gear Joint:
 //C0 = (coordinate1 + ratio * coordinate2)_initial
@@ -104,7 +104,7 @@ public class GearJoint extends Joint {
 	 * @param argWorldPool
 	 * @param def
 	 */
-	public GearJoint(WorldPool argWorldPool, GearJointDef def) {
+	public GearJoint(IWorldPool argWorldPool, GearJointDef def) {
 		super(argWorldPool, def);
 		
 		JointType type1 = def.joint1.getType();

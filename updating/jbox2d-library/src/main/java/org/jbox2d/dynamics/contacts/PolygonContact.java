@@ -31,13 +31,13 @@ import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Transform;
 import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.pooling.WorldPool;
+import org.jbox2d.pooling.IWorldPool;
 
 // updated to rev 100
 
 public class PolygonContact extends Contact {
 	
-	public PolygonContact(WorldPool argPool) {
+	public PolygonContact(IWorldPool argPool) {
 		super(argPool);
 	}
 

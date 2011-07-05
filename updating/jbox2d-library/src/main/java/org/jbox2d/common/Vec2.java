@@ -57,17 +57,7 @@ import java.io.Serializable;
  * A 2D column vector
  */
 public class Vec2 implements Serializable {
-	/** Should we count Vec2 creations? */
-	static public boolean watchCreations = false;
-	/**
-	 * Running count of Vec2 creations.  Must be zeroed out
-	 * manually (perhaps at start of time step).  Incremented
-	 * in Vec2 constructor if watchCreations flag is true.
-	 * <BR><BR>
-	 * Mainly used for optimization purposes, since temporary
-	 * Vec2 creation is often a bottleneck.
-	 */
-	static public int creationCount = 0;
+	private static final long serialVersionUID = 1L;
 
 	public float x, y;
 
@@ -76,9 +66,6 @@ public class Vec2 implements Serializable {
 	}
 
 	public Vec2(float x, float y) {
-		if (Vec2.watchCreations) {
-			++Vec2.creationCount;
-		}
 		this.x = x;
 		this.y = y;
 	}

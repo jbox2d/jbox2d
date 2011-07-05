@@ -31,7 +31,7 @@ import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Transform;
 import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.pooling.WorldPool;
+import org.jbox2d.pooling.IWorldPool;
 
 // updated to rev 100
 
@@ -40,7 +40,7 @@ public class CircleContact extends Contact {
 	/**
 	 * @param argPool
 	 */
-	public CircleContact(WorldPool argPool) {
+	public CircleContact(IWorldPool argPool) {
 		super(argPool);
 	}
 

@@ -35,8 +35,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.common.Vec3;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
-import org.jbox2d.pooling.PoolingStack.PoolContainer;
-import org.jbox2d.pooling.WorldPool;
+import org.jbox2d.pooling.IWorldPool;
 
 public class PrismaticJoint extends Joint {
 	
@@ -65,7 +64,7 @@ public class PrismaticJoint extends Joint {
 	public boolean m_enableMotor;
 	public LimitState m_limitState;
 	
-	public PrismaticJoint(WorldPool argWorld, PrismaticJointDef def) {
+	public PrismaticJoint(IWorldPool argWorld, PrismaticJointDef def) {
 		super(argWorld, def);
 		m_localAnchor1 = new Vec2(def.localAnchorA);
 		m_localAnchor2 = new Vec2(def.localAnchorB);
@@ -139,16 +138,16 @@ public class PrismaticJoint extends Joint {
 		Body b1 = m_bodyA;
 		Body b2 = m_bodyB;
 		
-		PoolContainer<Vec2> pc = pool.popVec2(9);
-		Vec2 temp = pc.p0;
-		Vec2 r1 = pc.p1;
-		Vec2 r2 = pc.p2;
-		Vec2 p1 = pc.p3;
-		Vec2 p2 = pc.p4;
-		Vec2 d = pc.p5;
-		Vec2 axis = pc.p6;
-		Vec2 temp2 = pc.p7;
-		Vec2 temp3 = pc.p8;
+		Vec2[] pc = pool.popVec2(9);
+		Vec2 temp = pc[0];
+		Vec2 r1 = pc[1];
+		Vec2 r2 = pc[2];
+		Vec2 p1 = pc[3];
+		Vec2 p2 = pc[4];
+		Vec2 d = pc[5];
+		Vec2 axis = pc[6];
+		Vec2 temp2 = pc[7];
+		Vec2 temp3 = pc[8];
 		
 		temp.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 		Mat22.mulToOut(b1.getTransform().R, temp, r1);

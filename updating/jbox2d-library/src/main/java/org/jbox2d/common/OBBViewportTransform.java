@@ -26,8 +26,6 @@
  ******************************************************************************/
 package org.jbox2d.common;
 
-import org.jbox2d.pooling.TLMat22;
-
 /**
  * Orientated bounding box viewport transform
  * @author Daniel Murphy
@@ -146,12 +144,11 @@ public class OBBViewportTransform implements IViewportTransform{
 	}
 
 	// djm pooling
-	private static final TLMat22 tlInv = new TLMat22();
+	private final Mat22 inv = new Mat22();
 	/**
 	 * @see IViewportTransform#getScreenVectorToWorld(Vec2, Vec2)
 	 */
 	public void getScreenVectorToWorld(Vec2 argScreen, Vec2 argWorld) {
-		Mat22 inv = tlInv.get();
 		inv.set(box.R);
 		inv.invertLocal();
 		inv.mulToOut(argScreen, argWorld);
@@ -183,16 +180,15 @@ public class OBBViewportTransform implements IViewportTransform{
 		argScreen.addLocal(box.extents);
 	}
 	
-	
-	private final Mat22 inv = new Mat22();
+	private final Mat22 inv2 = new Mat22();
 	/**
 	 * @see IViewportTransform#getScreenToWorld(Vec2, Vec2)
 	 */
 	public void getScreenToWorld(Vec2 argScreen, Vec2 argWorld){
 		argWorld.set(argScreen);
 		argWorld.subLocal(box.extents);
-		box.R.invertToOut(inv);
-		inv.mulToOut(argWorld, argWorld);
+		box.R.invertToOut(inv2);
+		inv2.mulToOut(argWorld, argWorld);
 		if(yFlip){
 			yFlipMatInv.mulToOut( argWorld, argWorld);
 		}

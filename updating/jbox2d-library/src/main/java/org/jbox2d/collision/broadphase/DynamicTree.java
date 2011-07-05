@@ -33,12 +33,13 @@ import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
 import org.jbox2d.collision.AABB;
+import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.pooling.PoolingStack;
-import org.jbox2d.structs.collision.RayCastInput;
+import org.jbox2d.pooling.IOrderedStack;
+import org.jbox2d.pooling.OrderedStack;
 
 // updated to rev 100
 /**
@@ -250,7 +251,7 @@ public class DynamicTree {
 	}
 	
 	// stacks because it's recursive
-	private final PoolingStack<Vec2> vec2s = new PoolingStack<Vec2>(Vec2.class, MAX_STACK_SIZE * 3 + 4);
+	private final IOrderedStack<Vec2> vec2s = new OrderedStack<Vec2>(Vec2.class, MAX_STACK_SIZE * 3 + 4, 10);
 	private final AABB aabb = new AABB();
 	private final RayCastInput subInput = new RayCastInput();
 	/**

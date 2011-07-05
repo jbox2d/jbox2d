@@ -47,110 +47,61 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package org.jbox2d.common;
+package org.jbox2d.collision;
 
-import java.io.Serializable;
+import org.jbox2d.common.Vec2;
 
 // updated to rev 100
-
 /**
- * A transform contains translation and rotation. It is used to represent
- * the position and orientation of rigid frames.
+ * A manifold point is a contact point belonging to a contact
+ * manifold. It holds details related to the geometry and dynamics
+ * of the contact points.
+ * The local point usage depends on the manifold type:
+ * <ul><li>e_circles: the local center of circleB</li>
+ * <li>e_faceA: the local center of cirlceB or the clip point of polygonB</li>
+ * <li>e_faceB: the clip point of polygonA</li></ul>
+ * This structure is stored across time steps, so we keep it small.<br/>
+ * Note: the impulses are used for internal caching and may not
+ * provide reliable contact forces, especially for high speed collisions.
  */
-public class Transform implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class ManifoldPoint {
+	/** usage depends on manifold type */
+	public final Vec2 localPoint;
+	/** the non-penetration impulse */
+	public float normalImpulse;
+	/** the friction impulse */
+	public float tangentImpulse;
+	/** uniquely identifies a contact point between two shapes */
+	public final ContactID id;
 
-	/** The translation caused by the transform */
-	public final Vec2 position;
-	
-	/** A matrix representing a rotation */
-	public final Mat22 R;
-	
-	/** The default constructor. */
-	public Transform() {
-		position = new Vec2();
-		R = new Mat22();
-	}
-	
-	/** Initialize as a copy of another transform. */
-	public Transform(final Transform xf) {
-		position = xf.position.clone();
-		R = xf.R.clone();
-	}
-	
-	/** Initialize using a position vector and a rotation matrix. */
-	public Transform(final Vec2 _position, final Mat22 _R) {
-		position = _position.clone();
-		R = _R.clone();
-	}
-	
-	/** Set this to equal another transform. */
-	public final Transform set(final Transform xf) {
-		position.set(xf.position);
-		R.set(xf.R);
-		return this;
-	}
-	
 	/**
-	 * Set this based on the position and angle.
-	 * 
-	 * @param p
-	 * @param angle
+	 * Blank manifold point with everything zeroed out.
 	 */
-	public final void set(Vec2 p, float angle) {
-		position.set(p);
-		R.set(angle);
+	public ManifoldPoint() {
+		localPoint = new Vec2();
+		normalImpulse = tangentImpulse = 0f;
+		id = new ContactID();
 	}
-	
+
 	/**
-	 * Calculate the angle that the rotation matrix represents.
+	 * Creates a manifold point as a copy of the given point
+	 * @param cp point to copy from
 	 */
-	public final float getAngle() {
-		return MathUtils.atan2(R.col1.y, R.col1.x);
+	public ManifoldPoint(final ManifoldPoint cp) {
+		localPoint = cp.localPoint.clone();
+		normalImpulse = cp.normalImpulse;
+		tangentImpulse = cp.tangentImpulse;
+		id = new ContactID(cp.id);
 	}
-	
-	/** Set this to the identity transform. */
-	public final void setIdentity() {
-		position.setZero();
-		R.setIdentity();
-	}
-	
-	public final static Vec2 mul(final Transform T, final Vec2 v) {
-		return new Vec2(T.position.x + T.R.col1.x * v.x + T.R.col2.x * v.y, T.position.y + T.R.col1.y * v.x
-				+ T.R.col2.y * v.y);
-	}
-	
-	/* djm added */
-	public final static void mulToOut(final Transform T, final Vec2 v, final Vec2 out) {
-		final float tempy = T.position.y + T.R.col1.y * v.x + T.R.col2.y * v.y;
-		out.x = T.position.x + T.R.col1.x * v.x + T.R.col2.x * v.y;
-		out.y = tempy;
-	}
-	
-	public final static Vec2 mulTrans(final Transform T, final Vec2 v) {
-		final float v1x = v.x - T.position.x;
-		final float v1y = v.y - T.position.y;
-		final Vec2 b = T.R.col1;
-		final Vec2 b1 = T.R.col2;
-		return new Vec2((v1x * b.x + v1y * b.y), (v1x * b1.x + v1y * b1.y));
-		// return T.R.mulT(v.sub(T.position));
-	}
-	
-	public final static void mulTransToOut(final Transform T, final Vec2 v, final Vec2 out) {
-		final float v1x = v.x - T.position.x;
-		final float v1y = v.y - T.position.y;
-		final Vec2 b = T.R.col1;
-		final Vec2 b1 = T.R.col2;
-		final float tempy = v1x * b1.x + v1y * b1.y;
-		out.x = v1x * b.x + v1y * b.y;
-		out.y = tempy;
-	}
-	
-	@Override
-	public final String toString() {
-		String s = "XForm:\n";
-		s += "Position: " + position + "\n";
-		s += "R: \n" + R + "\n";
-		return s;
+
+	/**
+	 * Sets this manifold point form the given one
+	 * @param cp the point to copy from
+	 */
+	public void set(final ManifoldPoint cp){
+		localPoint.set(cp.localPoint);
+		normalImpulse = cp.normalImpulse;
+		tangentImpulse = cp.tangentImpulse;
+		id.set(cp.id);
 	}
 }

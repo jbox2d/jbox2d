@@ -25,39 +25,67 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 /**
- * Created at 4:14:34 AM Jul 17, 2010
+ * Created at 12:52:04 AM Jan 20, 2011
  */
-package org.jbox2d.pooling.arrays;
+package org.jbox2d.pooling;
 
-import java.util.HashMap;
+import java.lang.reflect.Array;
 
 /**
  * @author Daniel Murphy
  */
-public class IntArray {
-
-	private static class TLHashMap<K, V> extends ThreadLocal<HashMap<K, V>>{
-		protected HashMap<K, V> initialValue(){
-			return new HashMap<K, V>();
+public class OrderedStack<E> implements IOrderedStack<E> {
+	
+	private final E[] pool;
+	private int index;
+	private final int size;
+	private final E[] container;
+	
+	@SuppressWarnings("unchecked")
+	public OrderedStack(Class<E> argClass, int argStackSize, int argContainerSize){
+		size = argStackSize;
+		pool = (E[]) Array.newInstance(argClass, argStackSize);
+		for(int i=0; i<argStackSize; i++){
+			try {
+				pool[i] = argClass.newInstance();
+			}
+			catch (InstantiationException e) {
+				System.err.println("Error creating pooled object "+argClass.getCanonicalName());
+				e.printStackTrace();
+			}
+			catch (IllegalAccessException e) {
+				System.err.println("Error creating pooled object "+argClass.getCanonicalName());
+				e.printStackTrace();
+			}
 		}
+		index = 0;
+		container = (E[]) Array.newInstance(argClass, argContainerSize);
 	}
 	
-	private final TLHashMap<Integer, int[]> tlMap = new TLHashMap<Integer, int[]>();
-	
-	public int[] get( int argLength){
-		assert(argLength > 0);
-		
-		HashMap<Integer, int[]> map = tlMap.get();
-		
-		if(!map.containsKey(argLength)){
-			map.put(argLength, getInitializedArray(argLength));
-		}
-		
-		assert(map.get(argLength).length == argLength) : "Array not built of correct length";
-		return map.get(argLength);
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IPoolingStack#pop()
+	 */
+	public final E pop(){
+		assert(index < size) : "End of stack reached, there is probably a leak somewhere";
+		return pool[index++];
 	}
 	
-	protected int[] getInitializedArray(int argLength){
-		return new int[argLength];
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IPoolingStack#pop(int)
+	 */
+	public final E[] pop(int argNum){
+		assert(index + argNum < size) : "End of stack reached, there is probably a leak somewhere";
+		assert(argNum <= container.length) : "Container array is too small";
+		System.arraycopy(pool, index, container, 0, argNum);
+		index += argNum;
+		return container;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IPoolingStack#push(int)
+	 */
+	public final void push(int argNum){
+		index -= argNum;
+		assert (index >= 0) : "Beginning of stack reached, push/pops are unmatched";
 	}
 }

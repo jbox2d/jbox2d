@@ -26,22 +26,18 @@
  ******************************************************************************/
 package org.jbox2d.dynamics.contacts;
 
-import java.util.Stack;
 
 import org.jbox2d.callbacks.ContactListener;
+import org.jbox2d.collision.ContactID;
 import org.jbox2d.collision.Manifold;
+import org.jbox2d.collision.ManifoldPoint;
 import org.jbox2d.collision.WorldManifold;
 import org.jbox2d.collision.shapes.Shape;
-import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Transform;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.pooling.MutableStack;
+import org.jbox2d.pooling.IWorldPool;
 import org.jbox2d.pooling.TLManifold;
-import org.jbox2d.pooling.WorldPool;
-import org.jbox2d.pooling.stacks.TLStack;
-import org.jbox2d.structs.collision.ContactID;
-import org.jbox2d.structs.collision.ManifoldPoint;
 
 // updated to rev 100
 /**
@@ -52,10 +48,6 @@ import org.jbox2d.structs.collision.ManifoldPoint;
  * @author daniel
  */
 public abstract class Contact {
-	
-	// statistics gathering
-	public static int activeContacts = 0;
-	public static int contactPoolCount = 0;
 	
 	// Flags stored in m_flags
 	// Used when crawling contact graph when forming islands.
@@ -86,9 +78,9 @@ public abstract class Contact {
 
 	public float m_toiCount;
 	
-	protected final WorldPool pool;
+	protected final IWorldPool pool;
 
-	protected Contact(WorldPool argPool) {
+	protected Contact(IWorldPool argPool) {
 		m_fixtureA = null;
 		m_fixtureB = null;
 		m_nodeA = new ContactEdge();

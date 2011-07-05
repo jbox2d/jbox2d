@@ -1,0 +1,5 @@
+<project name="build properties">
+    <property name="sharpen.workspace.dir" value="C:/Users/Daniel/Projects/JBox2D" />
+    <property name="eclipse.home" value="C:/Program Files/eclipse" />
+    <property name="nant.exe" value="C:/nant-0.91-alpha2/bin/NAnt.exe" />
+</project>

@@ -29,9 +29,8 @@ package org.jbox2d.collision;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.pooling.IWorldPool;
 import org.jbox2d.pooling.WorldPool;
-import org.jbox2d.structs.collision.RayCastInput;
-import org.jbox2d.structs.collision.RayCastOutput;
 
 // updated to rev 100
 /** An axis-aligned bounding box. */
@@ -173,8 +172,15 @@ public class AABB {
 				&& aabb.upperBound.y > upperBound.y;
 	}
 	
+	/**
+	 * @deprecated please use {@link #raycast(RayCastOutput, RayCastInput, IWorldPool)} for
+	 * better performance
+	 * @param output
+	 * @param input
+	 * @return
+	 */
 	public final boolean raycast(final RayCastOutput output, final RayCastInput input) {
-		return raycast(output, input, new WorldPool(4));
+		return raycast(output, input, new WorldPool(4, 4));
 	}
 	
 	/**
@@ -183,7 +189,7 @@ public class AABB {
 	 * @param output
 	 * @param input
 	 */
-	public final boolean raycast(final RayCastOutput output, final RayCastInput input, WorldPool argPool) {
+	public final boolean raycast(final RayCastOutput output, final RayCastInput input, IWorldPool argPool) {
 		float tmin = Float.MIN_VALUE;
 		float tmax = Float.MAX_VALUE;
 		

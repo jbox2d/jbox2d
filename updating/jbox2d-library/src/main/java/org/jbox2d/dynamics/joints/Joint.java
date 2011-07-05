@@ -30,7 +30,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.World;
-import org.jbox2d.pooling.WorldPool;
+import org.jbox2d.pooling.IWorldPool;
 
 // updated to rev 100
 /**
@@ -85,14 +85,14 @@ public abstract class Joint {
 	
 	public Object m_userData;
 	
-	protected WorldPool pool;
+	protected IWorldPool pool;
 	
 	// Cache here per time step to reduce cache misses.
 	public final Vec2 m_localCenterA, m_localCenterB;
 	float m_invMassA, m_invIA;
 	float m_invMassB, m_invIB;
 	
-	protected Joint(WorldPool argWorldPool, JointDef def) {
+	protected Joint(IWorldPool argWorldPool, JointDef def) {
 		assert (def.bodyA != def.bodyB);
 		
 		pool = argWorldPool;

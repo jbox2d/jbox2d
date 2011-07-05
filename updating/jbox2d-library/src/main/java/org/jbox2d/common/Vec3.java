@@ -56,6 +56,8 @@ import java.io.Serializable;
  * @author Daniel Murphy
  */
 public class Vec3 implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	public float x, y, z;
 	
 	public Vec3() {

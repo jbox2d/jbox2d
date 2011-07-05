@@ -50,14 +50,14 @@
 package org.jbox2d.collision.shapes;
 
 import org.jbox2d.collision.AABB;
+import org.jbox2d.collision.RayCastInput;
+import org.jbox2d.collision.RayCastOutput;
 
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.structs.collision.RayCastInput;
-import org.jbox2d.structs.collision.RayCastOutput;
 
 //Updated to rev 100
 
@@ -152,8 +152,8 @@ public class CircleShape extends Shape {
 	// norm(x) = radius
 	
 	/**
-	 * @see Shape#raycast(org.jbox2d.structs.collision.RayCastOutput,
-	 *      org.jbox2d.structs.collision.RayCastInput, org.jbox2d.common.Transform, int)
+	 * @see Shape#raycast(org.jbox2d.collision.RayCastOutput,
+	 *      org.jbox2d.collision.RayCastInput, org.jbox2d.common.Transform, int)
 	 */
 	@Override
 	public final boolean raycast(RayCastOutput argOutput, RayCastInput argInput, Transform argTransform) {
