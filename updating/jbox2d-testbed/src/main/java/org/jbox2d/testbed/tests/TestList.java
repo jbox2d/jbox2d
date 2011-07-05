@@ -42,8 +42,6 @@ public class TestList {
 		
 		// general collision
 		// watching...
-		tests.add(new DominoTower());
-		tests.add(new CircleStress());
 		tests.add(new VaryingRestitution());
 		tests.add(new VaryingFrictionTest());
 		tests.add(new SphereStack());
@@ -51,6 +49,9 @@ public class TestList {
 		tests.add(new DominoTest());
 		tests.add(new VerticalStack());
 		tests.add(new PyramidTest());
+		tests.add(new DominoTower());
+		tests.add(new CircleStress());
+		
 		// more interactive..
 		tests.add(new ShapeEditing());
 		tests.add(new Breakable());
@@ -89,5 +90,6 @@ public class TestList {
 		// misc
 		tests.add(new DynamicTreeTest());
 		tests.add(new DistanceTest());
+		tests.add(new LiquidTest());
 	}
 }

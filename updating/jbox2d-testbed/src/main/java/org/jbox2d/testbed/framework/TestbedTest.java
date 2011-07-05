@@ -38,6 +38,7 @@ import org.jbox2d.callbacks.DestructionListener;
 import org.jbox2d.callbacks.QueryCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.Collision;
+import org.jbox2d.collision.Collision.PointState;
 import org.jbox2d.collision.Manifold;
 import org.jbox2d.collision.WorldManifold;
 import org.jbox2d.collision.shapes.CircleShape;
@@ -54,7 +55,6 @@ import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.MouseJoint;
 import org.jbox2d.dynamics.joints.MouseJointDef;
-import org.jbox2d.structs.collision.PointState;
 
 /**
  * @author Daniel Murphy
@@ -135,7 +135,7 @@ public abstract class TestbedTest implements ContactListener{
 		
 		m_stepCount = 0;
 		
-		Contact.activeContacts = 0;
+//		Contact.activeContacts = 0;
 		
 		BodyDef bodyDef = new BodyDef();
 		m_groundBody = m_world.createBody(bodyDef);
@@ -209,7 +209,7 @@ public abstract class TestbedTest implements ContactListener{
 	private final Color3f color1 = new Color3f(.3f, .95f, .3f);
 	private final Color3f color2 = new Color3f(.3f, .3f, .95f);
 	private final Color3f color3 = new Color3f(.9f, .9f, .9f);
-	private final Color3f color4 = new Color3f(.84f, .84f, 1);
+	private final Color3f color4 = new Color3f(.6f, .61f, 1);
 	private final Color3f mouseColor = new Color3f(0f, 1f, 0f);
 	private final Vec2 p1 = new Vec2();
 	private final Vec2 p2 = new Vec2();
@@ -257,23 +257,23 @@ public abstract class TestbedTest implements ContactListener{
 		}
 		
 		if(settings.drawStats){
-			Vec2.watchCreations = true;
+//			Vec2.watchCreations = true;
 			m_debugDraw.drawString(5, m_textLine, "Engine Info", color4);
 			m_textLine += 15;
 			m_debugDraw.drawString(5, m_textLine, "Framerate: "+ panel.getCalculatedFrameRate(), Color3f.WHITE);
 			m_textLine += 15;
 			m_debugDraw.drawString(5, m_textLine,"bodies/contacts/joints/proxies = "+m_world.getBodyCount()+"/"+m_world.getContactCount()+"/"+m_world.getJointCount()+"/"+m_world.getProxyCount(), Color3f.WHITE);
-			m_textLine += 20;
-			m_debugDraw.drawString(5, m_textLine, "Pooling Info", color4);
-			m_textLine += 15;
-			m_debugDraw.drawString(5, m_textLine, "Vec2 creations: "+ Vec2.creationCount, Color3f.WHITE);
-			m_textLine += 15;
-			m_debugDraw.drawString(5, m_textLine, "Contact pooled/active: "+ Contact.contactPoolCount+"/"+Contact.activeContacts, Color3f.WHITE);
+//			m_textLine += 20;
+//			m_debugDraw.drawString(5, m_textLine, "Pooling Info", color4);
+//			m_textLine += 15;
+//			m_debugDraw.drawString(5, m_textLine, "Vec2 creations: "+ Vec2.creationCount, Color3f.WHITE);
+//			m_textLine += 15;
+//			m_debugDraw.drawString(5, m_textLine, "Contact pooled/active: "+ Contact.contactPoolCount+"/"+Contact.activeContacts, Color3f.WHITE);
 			m_textLine += 20;
 
-			Vec2.creationCount = 0;
+//			Vec2.creationCount = 0;
 		}else{
-			Vec2.watchCreations = false;
+//			Vec2.watchCreations = false;
 		}
 		
 		if(settings.drawHelp){

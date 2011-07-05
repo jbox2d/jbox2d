@@ -26,15 +26,15 @@
  ******************************************************************************/
 package org.jbox2d.testbed.tests;
 
+import org.jbox2d.collision.Distance.SimplexCache;
+import org.jbox2d.collision.DistanceInput;
+import org.jbox2d.collision.DistanceOutput;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.structs.collision.distance.DistanceInput;
-import org.jbox2d.structs.collision.distance.DistanceOutput;
-import org.jbox2d.structs.collision.distance.SimplexCache;
 import org.jbox2d.testbed.framework.TestbedSettings;
 import org.jbox2d.testbed.framework.TestbedTest;
 

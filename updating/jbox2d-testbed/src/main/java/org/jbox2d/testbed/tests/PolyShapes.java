@@ -45,7 +45,7 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
-import org.jbox2d.pooling.WorldPool;
+import org.jbox2d.pooling.IWorldPool;
 import org.jbox2d.testbed.framework.TestbedSettings;
 import org.jbox2d.testbed.framework.TestbedTest;
 
@@ -261,9 +261,9 @@ class PolyShapesCallback implements QueryCallback{
 	Transform m_transform = new Transform();
 	DebugDraw debugDraw;
 	int m_count;
-	WorldPool p;
+	IWorldPool p;
 	
-	public PolyShapesCallback(WorldPool argWorld){
+	public PolyShapesCallback(IWorldPool argWorld){
 		m_count = 0;
 		p = argWorld;
 	}

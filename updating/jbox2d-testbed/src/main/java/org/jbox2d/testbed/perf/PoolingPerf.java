@@ -31,7 +31,7 @@ package org.jbox2d.testbed.perf;
 
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.pooling.TLVec2;
+import org.jbox2d.pooling.IWorldPool;
 import org.jbox2d.pooling.WorldPool;
 
 //Test Name               Milliseconds Avg
@@ -50,6 +50,15 @@ import org.jbox2d.pooling.WorldPool;
 //ThreadLocal member               83.2970
 //Member                           80.7545
 
+// Windows results 7/5/2011
+//Test Name               Milliseconds Avg
+//Creation                         79.3003
+//World Pool                       82.9722
+//Circle Pool                      85.9589
+//Custom Stack                     85.5465
+//ThreadLocal member               87.7560
+//Member                           84.1358
+
 
 /**
  * @author Daniel Murphy
@@ -64,16 +73,21 @@ public class PoolingPerf extends PerfTest{
 	public static class CirclePool{
 		final Vec2[] pool;
 		int index;
+		final int length;
 		public CirclePool(){
-			pool = new Vec2[50];
+			pool = new Vec2[200];
 			for(int i=0; i<pool.length; i++){
 				pool[i] = new Vec2();
 			}
+			length = 200;
 			index = -1;
 		}
 		
 		public final Vec2 get(){
-			index = (index + 1)%pool.length;
+			index++;
+			if(index >= length){
+				index = 0;
+			}
 			return pool[index];
 		}
 	}
@@ -98,12 +112,19 @@ public class PoolingPerf extends PerfTest{
 		}
 	}
 	
+	public static class TLVec2 extends ThreadLocal<Vec2>{
+		@Override
+		protected Vec2 initialValue() {
+			return new Vec2();
+		}
+	}
+	
 	public String[] tests = new String[]{
 		"Creation", "World Pool", "Circle Pool", "Custom Stack", "ThreadLocal member", "Member"
 	};
 	
 	public float aStore = 0;
-	public WorldPool wp = new WorldPool(100);
+	public IWorldPool wp = new WorldPool(100, 10);
 	public CirclePool cp = new CirclePool();
 	public TLVec2 tlv = new TLVec2();
 	public Vec2 mv = new Vec2();
