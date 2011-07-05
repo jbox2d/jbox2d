@@ -35,7 +35,7 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
-import org.jbox2d.pooling.WorldPool;
+import org.jbox2d.pooling.IWorldPool;
 
 /**
  * @author Daniel Murphy
@@ -76,7 +76,7 @@ public class PulleyJoint extends Joint {
 	 * @param argWorldPool
 	 * @param def
 	 */
-	public PulleyJoint(WorldPool argWorldPool, PulleyJointDef def) {
+	public PulleyJoint(IWorldPool argWorldPool, PulleyJointDef def) {
 		super(argWorldPool, def);
 		m_groundAnchor1.set(def.groundAnchorA);
 		m_groundAnchor2.set(def.groundAnchorB);

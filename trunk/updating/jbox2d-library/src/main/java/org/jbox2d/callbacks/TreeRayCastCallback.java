@@ -26,9 +26,9 @@
  ******************************************************************************/
 package org.jbox2d.callbacks;
 
+import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.collision.broadphase.DynamicTree;
 import org.jbox2d.collision.broadphase.DynamicTreeNode;
-import org.jbox2d.structs.collision.RayCastInput;
 
 // updated to rev 100
 

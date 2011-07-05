@@ -27,6 +27,8 @@
 package org.jbox2d.dynamics;
 
 import org.jbox2d.collision.AABB;
+import org.jbox2d.collision.RayCastInput;
+import org.jbox2d.collision.RayCastOutput;
 import org.jbox2d.collision.broadphase.BroadPhase;
 import org.jbox2d.collision.broadphase.DynamicTreeNode;
 import org.jbox2d.collision.shapes.MassData;
@@ -36,8 +38,6 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
-import org.jbox2d.structs.collision.RayCastInput;
-import org.jbox2d.structs.collision.RayCastOutput;
 
 // updated to rev 100
 // thread-safe pooling

@@ -33,7 +33,6 @@ import org.jbox2d.collision.broadphase.BroadPhase;
 import org.jbox2d.collision.broadphase.DynamicTreeNode;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
-import org.jbox2d.pooling.WorldPool;
 
 // updated to rev 100
 /**

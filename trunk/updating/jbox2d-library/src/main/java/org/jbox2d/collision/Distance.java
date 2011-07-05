@@ -26,15 +26,14 @@
  ******************************************************************************/
 package org.jbox2d.collision;
 
+import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.Transform;
-import org.jbox2d.structs.collision.distance.DistanceInput;
-import org.jbox2d.structs.collision.distance.DistanceOutput;
-import org.jbox2d.structs.collision.distance.DistanceProxy;
-import org.jbox2d.structs.collision.distance.SimplexCache;
 
 // updated to rev 100
 /**
@@ -49,7 +48,7 @@ public class Distance {
 	public static int GJK_CALLS = 0;
 	public static int GJK_ITERS = 0;
 	public static int GJK_MAX_ITERS = 20;
-	
+
 	/**
 	 * GJK using Voronoi regions (Christer Ericson) and Barycentric coordinates.
 	 */
@@ -68,6 +67,39 @@ public class Distance {
 			a = sv.a;
 			indexA = sv.indexA;
 			indexB = sv.indexB;
+		}
+	}
+	
+	/**
+	 *  Used to warm start b2Distance.
+	 *  Set count to zero on first call.
+	 * @author daniel
+	 */
+	public static class SimplexCache {
+		/** length or area */
+		public float metric;
+		public int count;
+		/** vertices on shape A */
+		public final int indexA[] = new int[3];
+		/** vertices on shape B */
+		public final int indexB[] = new int[3];
+		
+		public SimplexCache(){
+			metric = 0;
+			count = 0;
+			indexA[0] = Integer.MAX_VALUE;
+			indexA[1] = Integer.MAX_VALUE;
+			indexA[2] = Integer.MAX_VALUE;
+			indexB[0] = Integer.MAX_VALUE;
+			indexB[1] = Integer.MAX_VALUE;
+			indexB[2] = Integer.MAX_VALUE;
+		}
+
+		public void set(SimplexCache sc){
+			System.arraycopy(sc.indexA, 0, indexA, 0, indexA.length);
+			System.arraycopy(sc.indexB, 0, indexB, 0, indexB.length);
+			metric = sc.metric;
+			count = sc.count;
 		}
 	}
 	
@@ -434,6 +466,109 @@ public class Distance {
 			m_v2.a = d123_2 * inv_d123;
 			m_v3.a = d123_3 * inv_d123;
 			m_count = 3;
+		}
+	}
+	
+	/**
+	 * A distance proxy is used by the GJK algorithm.
+	 * It encapsulates any shape.
+	 *
+	 * @author daniel
+	 */
+	public static class DistanceProxy {
+		public final Vec2[] m_vertices;
+		public int m_count;
+		public float m_radius;
+		
+		public DistanceProxy(){
+			m_vertices = new Vec2[Settings.maxPolygonVertices];
+			for(int i=0; i<m_vertices.length; i++){
+				m_vertices[i] = new Vec2();
+			}
+			m_count = 0;
+			m_radius = 0f;
+		}
+		
+		/**
+		 * Initialize the proxy using the given shape. The shape
+		 * must remain in scope while the proxy is in use.
+		 */
+		public final void set(final Shape shape){
+			switch(shape.getType()){
+				case CIRCLE:
+					final CircleShape circle = (CircleShape) shape;
+					m_vertices[0].set(circle.m_p);
+					m_count = 1;
+					m_radius = circle.m_radius;
+					
+					break;
+				case POLYGON:
+					final PolygonShape poly = (PolygonShape) shape;
+					m_count = poly.m_vertexCount;
+					m_radius = poly.m_radius;
+					for(int i=0; i<m_count; i++){
+						m_vertices[i].set(poly.m_vertices[i]);
+					}
+					break;
+				default:
+					assert(false);
+			}
+		}
+		
+		/**
+		 * Get the supporting vertex index in the given direction.
+		 * @param d
+		 * @return
+		 */
+		public final int getSupport(final Vec2 d){
+			int bestIndex = 0;
+			float bestValue = Vec2.dot(m_vertices[0], d);
+			for( int i=1; i<m_count; i++){
+				float value = Vec2.dot(m_vertices[i], d);
+				if(value > bestValue){
+					bestIndex = i;
+					bestValue = value;
+				}
+			}
+			
+			return bestIndex;
+		}
+		
+		/**
+		 * Get the supporting vertex in the given direction.
+		 * @param d
+		 * @return
+		 */
+		public final Vec2 getSupportVertex(final Vec2 d){
+			int bestIndex = 0;
+			float bestValue = Vec2.dot(m_vertices[0], d);
+			for( int i=1; i<m_count; i++){
+				float value = Vec2.dot(m_vertices[i], d);
+				if(value > bestValue){
+					bestIndex = i;
+					bestValue = value;
+				}
+			}
+			
+			return m_vertices[bestIndex];
+		}
+		
+		/**
+		 * Get the vertex count.
+		 * @return
+		 */
+		public final int getVertexCount(){
+			return m_count;
+		}
+		
+		/**
+		 * Get a vertex by index. Used by b2Distance.
+		 * @param index
+		 * @return
+		 */
+		public final Vec2 getVertex(int index){
+			assert(0 <= index && index < m_count);
+			return m_vertices[index];
 		}
 	}
 	

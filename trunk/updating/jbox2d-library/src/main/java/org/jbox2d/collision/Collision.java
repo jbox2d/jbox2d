@@ -26,6 +26,7 @@
  ******************************************************************************/
 package org.jbox2d.collision;
 
+import org.jbox2d.collision.Distance.SimplexCache;
 import org.jbox2d.collision.Manifold.ManifoldType;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
@@ -35,14 +36,7 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.pooling.WorldPool;
-import org.jbox2d.structs.collision.ClipVertex;
-import org.jbox2d.structs.collision.ContactID;
-import org.jbox2d.structs.collision.ManifoldPoint;
-import org.jbox2d.structs.collision.PointState;
-import org.jbox2d.structs.collision.distance.DistanceInput;
-import org.jbox2d.structs.collision.distance.DistanceOutput;
-import org.jbox2d.structs.collision.distance.SimplexCache;
+import org.jbox2d.pooling.IWorldPool;
 
 // updated to rev 100
 /**
@@ -56,9 +50,9 @@ import org.jbox2d.structs.collision.distance.SimplexCache;
 public class Collision {
 	public static final int NULL_FEATURE = Integer.MAX_VALUE;
 	
-	private final WorldPool pool;
+	private final IWorldPool pool;
 	
-	public Collision(WorldPool argPool) {
+	public Collision(IWorldPool argPool) {
 		incidentEdge[0] = new ClipVertex();
 		incidentEdge[1] = new ClipVertex();
 		clipPoints1[0] = new ClipVertex();
@@ -691,4 +685,46 @@ public class Collision {
 		public float separation;
 		public int edgeIndex;
 	}
+	
+	/**
+	 * Used for computing contact manifolds.
+	 */
+	public static class ClipVertex{
+		public final Vec2 v;
+		public final ContactID id;
+
+		public ClipVertex(){
+			v = new Vec2();
+			id = new ContactID();
+		}
+
+		public void set(final ClipVertex cv){
+			v.set(cv.v);
+			id.set(cv.id);
+		}
+	}
+	
+	/**
+	 * This is used for determining the state of contact points.
+	 * @author Daniel Murphy
+	 */
+	public static enum PointState {
+		/**
+		 * point does not exist
+		 */
+		NULL_STATE,
+		/**
+		 * point was added in the update
+		 */
+		ADD_STATE,
+		/**
+		 * point persisted across the update
+		 */
+		PERSIST_STATE,
+		/**
+		 * point was removed in the update
+		 */
+		REMOVE_STATE
+	}
+
 }

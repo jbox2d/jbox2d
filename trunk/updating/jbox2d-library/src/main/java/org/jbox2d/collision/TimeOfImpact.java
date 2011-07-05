@@ -26,20 +26,15 @@
  ******************************************************************************/
 package org.jbox2d.collision;
 
+import org.jbox2d.collision.Distance.DistanceProxy;
+import org.jbox2d.collision.Distance.SimplexCache;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Sweep;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.pooling.WorldPool;
-import org.jbox2d.structs.collision.TOIInput;
-import org.jbox2d.structs.collision.TOIOutput;
-import org.jbox2d.structs.collision.TOIOutput.TOIOutputState;
-import org.jbox2d.structs.collision.distance.DistanceInput;
-import org.jbox2d.structs.collision.distance.DistanceOutput;
-import org.jbox2d.structs.collision.distance.DistanceProxy;
-import org.jbox2d.structs.collision.distance.SimplexCache;
+import org.jbox2d.pooling.IWorldPool;
 
 /**
  * Class used for computing the time of impact. This class should not be
@@ -56,6 +51,35 @@ public class TimeOfImpact {
 	public static int toiRootIters = 0;
 	public static int toiMaxRootIters = 0;
 	
+	/**
+	 * Input parameters for TOI
+	 * @author Daniel Murphy
+	 */
+	public static class TOIInput {
+		public final DistanceProxy proxyA = new DistanceProxy();
+		public final DistanceProxy proxyB = new DistanceProxy();
+		public final Sweep sweepA = new Sweep();
+		public final Sweep sweepB = new Sweep();
+		/**
+		 * defines sweep interval [0, tMax]
+		 */
+		public float tMax;
+	}
+	
+	public static enum TOIOutputState {
+		UNKNOWN, FAILED, OVERLAPPED, TOUCHING, SEPARATED
+	}
+	
+	/**
+	 * Output parameters for TimeOfImpact
+	 * @author daniel
+	 */
+	public static class TOIOutput {
+		public TOIOutputState state;
+		public float t;
+	}
+
+	
 	// djm pooling
 	private final SimplexCache cache = new SimplexCache();
 	private final DistanceInput distanceInput = new DistanceInput();
@@ -68,9 +92,9 @@ public class TimeOfImpact {
 	private final Sweep sweepB = new Sweep();
 	
 	
-	private final WorldPool pool;
+	private final IWorldPool pool;
 	
-	public TimeOfImpact(WorldPool argPool){
+	public TimeOfImpact(IWorldPool argPool){
 		pool = argPool;
 	}
 	/**

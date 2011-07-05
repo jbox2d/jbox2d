@@ -34,7 +34,7 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
-import org.jbox2d.pooling.WorldPool;
+import org.jbox2d.pooling.IWorldPool;
 
 /**
  * @author Daniel Murphy
@@ -57,7 +57,7 @@ public class FrictionJoint extends Joint {
 	 * @param argWorldPool
 	 * @param def
 	 */
-	public FrictionJoint(WorldPool argWorldPool, FrictionJointDef def) {
+	public FrictionJoint(IWorldPool argWorldPool, FrictionJointDef def) {
 		super(argWorldPool, def);
 		m_localAnchorA = new Vec2(def.localAnchorA);
 		m_localAnchorB = new Vec2(def.localAnchorB);

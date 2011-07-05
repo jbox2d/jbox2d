@@ -57,7 +57,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.common.Vec3;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
-import org.jbox2d.pooling.WorldPool;
+import org.jbox2d.pooling.IWorldPool;
 
 //Point-to-point constraint
 //C = p2 - p1
@@ -103,7 +103,7 @@ public class RevoluteJoint extends Joint {
 	public float m_upperAngle;
 	public LimitState m_limitState;
 	
-	public RevoluteJoint(WorldPool argWorld, RevoluteJointDef def) {
+	public RevoluteJoint(IWorldPool argWorld, RevoluteJointDef def) {
 		super(argWorld, def);
 		m_localAnchor1.set(def.localAnchorA);
 		m_localAnchor2.set(def.localAnchorB);

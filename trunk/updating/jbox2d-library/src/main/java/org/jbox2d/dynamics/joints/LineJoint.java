@@ -36,7 +36,7 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
-import org.jbox2d.pooling.WorldPool;
+import org.jbox2d.pooling.IWorldPool;
 
 /**
  * @author Daniel Murphy
@@ -69,7 +69,7 @@ public class LineJoint extends Joint {
 	private boolean m_enableMotor;
 	private LimitState m_limitState;
 	
-	public LineJoint(WorldPool argPool, LineJointDef def) {
+	public LineJoint(IWorldPool argPool, LineJointDef def) {
 		super(argPool, def);
 		m_localAnchor1.set(def.localAnchorA);
 		m_localAnchor2.set(def.localAnchorB);

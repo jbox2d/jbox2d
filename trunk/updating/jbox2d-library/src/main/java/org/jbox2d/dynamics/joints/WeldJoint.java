@@ -37,7 +37,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.common.Vec3;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
-import org.jbox2d.pooling.WorldPool;
+import org.jbox2d.pooling.IWorldPool;
 
 /**
  * @author Daniel Murphy
@@ -56,7 +56,7 @@ public class WeldJoint extends Joint {
 	 * @param argWorld
 	 * @param def
 	 */
-	protected WeldJoint(WorldPool argWorld, WeldJointDef def) {
+	protected WeldJoint(IWorldPool argWorld, WeldJointDef def) {
 		super(argWorld, def);
 		m_localAnchorA = new Vec2(def.localAnchorA);
 		m_localAnchorB = new Vec2(def.localAnchorB);

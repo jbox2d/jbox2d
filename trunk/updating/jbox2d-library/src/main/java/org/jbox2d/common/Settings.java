@@ -68,7 +68,6 @@ public class Settings {
 	 * needs to be final, or will slow down math methods
 	 */
 	public static final boolean FAST_MATH = true;
-	public static final boolean POOLING = true;
 	public static final int CONTACT_STACK_INIT_SIZE = 10;
 	public static final boolean SINCOS_LUT_ENABLED = false;
 	/**
@@ -105,6 +104,8 @@ public class Settings {
 	 * lerp. Or, run the tests yourself in {@link SinCosTest}.
 	 */
 	public static final boolean SINCOS_LUT_LERP = false;
+	
+	public static final int TREE_REBALANCE_STEPS = 4;
 	
 	// Collision
 	

@@ -39,7 +39,10 @@ import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.Vec3;
-import org.jbox2d.pooling.PoolingStack.PoolContainer;
+import org.jbox2d.dynamics.contacts.CircleContact;
+import org.jbox2d.dynamics.contacts.Contact;
+import org.jbox2d.dynamics.contacts.PolygonAndCircleContact;
+import org.jbox2d.dynamics.contacts.PolygonContact;
 
 /**
  * Provides object pooling for all objects used in the engine.  Objects
@@ -47,199 +50,207 @@ import org.jbox2d.pooling.PoolingStack.PoolContainer;
  * the exception of arrays).
  * @author Daniel Murphy
  */
-public class WorldPool {
+public class WorldPool implements IWorldPool {
 	
-	private final PoolingStack<Vec2> vecs;
-	private final PoolingStack<Vec3> vec3s;
-	private final PoolingStack<Mat22> mats;
-	private final PoolingStack<AABB> aabbs;
+	private final OrderedStack<Vec2> vecs;
+	private final OrderedStack<Vec3> vec3s;
+	private final OrderedStack<Mat22> mats;
+	private final OrderedStack<AABB> aabbs;
 	
 	private final HashMap<Integer, float[]> afloats = new HashMap<Integer, float[]>();
 	private final HashMap<Integer, int[]> aints = new HashMap<Integer, int[]>();
 	private final HashMap<Integer, Vec2[]> avecs = new HashMap<Integer, Vec2[]>();
 	
-	private final PolygonContactStack pcstack = new PolygonContactStack(this);
-	private final CircleContactStack ccstack = new CircleContactStack(this);
-	private final PolyCircleContactStack cpstack = new PolyCircleContactStack(this);
+	private final Object[] args = new Object[]{
+		this
+	};
+	
+	private final MutableStack<Contact, PolygonContact> pcstack =
+		new MutableStack<Contact, PolygonContact>(PolygonContact.class,
+				Settings.CONTACT_STACK_INIT_SIZE, IWorldPool.class, args);
+	
+	private final MutableStack<Contact, CircleContact> ccstack = 
+		new MutableStack<Contact, CircleContact>(CircleContact.class,
+				Settings.CONTACT_STACK_INIT_SIZE, IWorldPool.class, args);
+	
+	private final MutableStack<Contact, PolygonAndCircleContact> cpstack = 
+		new MutableStack<Contact, PolygonAndCircleContact>(PolygonAndCircleContact.class,
+				Settings.CONTACT_STACK_INIT_SIZE, IWorldPool.class, args);
 	
 	private final Collision collision;
 	private final TimeOfImpact toi;
 	private final Distance dist;
 	
-	public WorldPool(int argSize){
-		vecs = new PoolingStack<Vec2>(Vec2.class, argSize);
-		vec3s = new PoolingStack<Vec3>(Vec3.class, argSize);
-		mats = new PoolingStack<Mat22>(Mat22.class, argSize);
-		aabbs = new PoolingStack<AABB>(AABB.class, argSize);
+	public WorldPool(int argSize, int argContainerSize){
+		vecs = new OrderedStack<Vec2>(Vec2.class, argSize, argContainerSize);
+		vec3s = new OrderedStack<Vec3>(Vec3.class, argSize, argContainerSize);
+		mats = new OrderedStack<Mat22>(Mat22.class, argSize, argContainerSize);
+		aabbs = new OrderedStack<AABB>(AABB.class, argSize, argContainerSize);
 		
 		dist = new Distance();
 		collision = new Collision(this);
 		toi = new TimeOfImpact(this);
 	}
 	
-	public final PolygonContactStack getPolyContactStack(){
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#getPolyContactStack()
+	 */
+	public final IDynamicStack<Contact> getPolyContactStack(){
 		return pcstack;
 	}
 	
-	public final CircleContactStack getCircleContactStack(){
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#getCircleContactStack()
+	 */
+	public final IDynamicStack<Contact> getCircleContactStack(){
 		return ccstack;
 	}
 	
-	public final PolyCircleContactStack getPolyCircleContactStack(){
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#getPolyCircleContactStack()
+	 */
+	public final IDynamicStack<Contact> getPolyCircleContactStack(){
 		return cpstack;
 	}
 	
-	public final PoolingStack<Vec2> getVec2Stack(){
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#getVec2Stack()
+	 */
+	public final IOrderedStack<Vec2> getVec2Stack(){
 		return vecs;
 	}
 	
-	/**
-	 * @return
-	 * @see org.jbox2d.pooling.PoolingStack#get()
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#popVec2()
 	 */
 	public final Vec2 popVec2() {
-		if(!Settings.POOLING){
-			return new Vec2();
-		}
 		return vecs.pop();
 	}
 
-	/**
-	 * @param argNum
-	 * @return
-	 * @see org.jbox2d.pooling.PoolingStack#get(int)
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#popVec2(int)
 	 */
-	public final PoolContainer<Vec2> popVec2(int argNum) {
-		if(!Settings.POOLING){
-			PoolContainer<Vec2> pc = new PoolContainer<Vec2>();
-			Vec2[] ray = new Vec2[PoolContainer.MAX_MEMBERS];
-			for(int i=0; i<argNum; i++){
-				ray[i] = new Vec2();
-			}
-			pc.populate(ray);
-			return pc;
-		}
+	public final Vec2[] popVec2(int argNum) {
 		return vecs.pop(argNum);
 	}
 
-	/**
-	 * @param argNum
-	 * @see org.jbox2d.pooling.PoolingStack#reclaim(int)
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#pushVec2(int)
 	 */
 	public final void pushVec2(int argNum) {
-		if(!Settings.POOLING){
-			return;
-		}
 		vecs.push(argNum);
 	}
 
-	public final PoolingStack<Vec3> getVec3Stack(){
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#getVec3Stack()
+	 */
+	public final IOrderedStack<Vec3> getVec3Stack(){
 		return vec3s;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#popVec3()
+	 */
 	public final Vec3 popVec3(){
-		if(!Settings.POOLING){
-			return new Vec3();
-		}
 		return vec3s.pop();
 	}
 	
-	public final PoolContainer<Vec3> popVec3(int argNum){
-		if(!Settings.POOLING){
-			PoolContainer<Vec3> pc = new PoolContainer<Vec3>();
-			Vec3[] ray = new Vec3[PoolContainer.MAX_MEMBERS];
-			for(int i=0; i<argNum; i++){
-				ray[i] = new Vec3();
-			}
-			pc.populate(ray);
-			return pc;
-		}
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#popVec3(int)
+	 */
+	public final Vec3[] popVec3(int argNum){
 		return vec3s.pop(argNum);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#pushVec3(int)
+	 */
 	public final void pushVec3(int argNum){
-		if(!Settings.POOLING){
-			return;
-		}
 		vec3s.push(argNum);
 	}
 	
 	
-	public final PoolingStack<Mat22> getMat22Stack(){
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#getMat22Stack()
+	 */
+	public final IOrderedStack<Mat22> getMat22Stack(){
 		return mats;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#popMat22()
+	 */
 	public final Mat22 popMat22(){
-		if(!Settings.POOLING){
-			return new Mat22();
-		}
 		return mats.pop();
 	}
 	
-	public final PoolContainer<Mat22> popMat22(int argNum){
-		if(!Settings.POOLING){
-			PoolContainer<Mat22> pc = new PoolContainer<Mat22>();
-			Mat22[] ray = new Mat22[PoolContainer.MAX_MEMBERS];
-			for(int i=0; i<argNum; i++){
-				ray[i] = new Mat22();
-			}
-			pc.populate(ray);
-			return pc;
-		}
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#popMat22(int)
+	 */
+	public final Mat22[] popMat22(int argNum){
 		return mats.pop(argNum);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#pushMat22(int)
+	 */
 	public final void pushMat22(int argNum){
-		if(!Settings.POOLING){
-			return;
-		}
 		mats.push(argNum);
 	}
 	
 	
-	public final PoolingStack<AABB> getAABBStack(){
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#getAABBStack()
+	 */
+	public final IOrderedStack<AABB> getAABBStack(){
 		return aabbs;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#popAABB()
+	 */
 	public final AABB popAABB(){
-		if(!Settings.POOLING){
-			return new AABB();
-		}
 		return aabbs.pop();
 	}
 	
-	public final PoolContainer<AABB> popAABB(int argNum){
-		if(!Settings.POOLING){
-			PoolContainer<AABB> pc = new PoolContainer<AABB>();
-			AABB[] ray = new AABB[PoolContainer.MAX_MEMBERS];
-			for(int i=0; i<argNum; i++){
-				ray[i] = new AABB();
-			}
-			pc.populate(ray);
-			return pc;
-		}
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#popAABB(int)
+	 */
+	public final AABB[] popAABB(int argNum){
 		return aabbs.pop(argNum);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#pushAABB(int)
+	 */
 	public final void pushAABB(int argNum){
-		if(!Settings.POOLING){
-			return;
-		}
 		aabbs.push(argNum);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#getCollision()
+	 */
 	public final Collision getCollision(){
 		return collision;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#getTimeOfImpact()
+	 */
 	public final TimeOfImpact getTimeOfImpact(){
 		return toi;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#getDistance()
+	 */
 	public final Distance getDistance(){
 		return dist;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#getFloatArray(int)
+	 */
 	public final float[] getFloatArray(int argLength){
 		if(!afloats.containsKey(argLength)){
 			afloats.put(argLength, new float[argLength]);
@@ -249,6 +260,9 @@ public class WorldPool {
 		return afloats.get(argLength);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#getIntArray(int)
+	 */
 	public final int[] getIntArray(int argLength){
 		if(!aints.containsKey(argLength)){
 			aints.put(argLength, new int[argLength]);
@@ -258,6 +272,9 @@ public class WorldPool {
 		return aints.get(argLength);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.jbox2d.pooling.IWorldPool#getVec2Array(int)
+	 */
 	public final Vec2[] getVec2Array(int argLength){
 		if(!avecs.containsKey(argLength)){
 			Vec2[] ray = new Vec2[argLength];

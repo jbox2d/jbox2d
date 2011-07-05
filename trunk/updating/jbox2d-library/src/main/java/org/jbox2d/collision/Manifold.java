@@ -51,7 +51,6 @@ package org.jbox2d.collision;
 
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.structs.collision.ManifoldPoint;
 
 // updated to rev 100
 /**

@@ -55,7 +55,7 @@ import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
-import org.jbox2d.pooling.WorldPool;
+import org.jbox2d.pooling.IWorldPool;
 
 //Updated to rev 56->130->142 of b2DistanceJoint.cpp/.h
 
@@ -84,7 +84,7 @@ public class DistanceJoint extends Joint {
 	public float m_gamma;
 	public float m_bias;
 	
-	public DistanceJoint(WorldPool argWorld, final DistanceJointDef def) {
+	public DistanceJoint(IWorldPool argWorld, final DistanceJointDef def) {
 		super(argWorld, def);
 		m_localAnchor1 = def.localAnchorA.clone();
 		m_localAnchor2 = def.localAnchorB.clone();

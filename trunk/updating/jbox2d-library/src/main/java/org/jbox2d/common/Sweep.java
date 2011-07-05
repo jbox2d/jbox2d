@@ -60,6 +60,7 @@ import java.io.Serializable;
  * we must interpolate the center of mass position.
  */
 public class Sweep implements Serializable {
+	private static final long serialVersionUID = 1L;
 	
 	/** Local center of mass position */
 	public final Vec2 localCenter;

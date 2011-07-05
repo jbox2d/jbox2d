@@ -32,6 +32,7 @@ package org.jbox2d.utests;
 import java.util.Random;
 
 import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.Vec2;
 
 import junit.framework.TestCase;
 
@@ -76,5 +77,21 @@ public class MathTest extends TestCase {
 			float a = r.nextFloat() * MAX - MAX/2;
 			assertEquals(Math.abs(a), MathUtils.abs(a));
 		}
+	}
+	
+	public void testVec2(){
+		Vec2 v = new Vec2();
+		v.x = 0;
+		v.y = 1;
+		v.subLocal(new Vec2(10,10));
+		assertEquals(-10, v.x);
+		assertEquals(-9, v.y);
+		
+		Vec2 v2 = v.add(new Vec2(1,1));
+		assertEquals(-9, v2.x);
+		assertEquals(-8, v2.y);
+		assertFalse(v.equals(v2));
+		
+		// TODO write tests for the rest of common lib
 	}
 }

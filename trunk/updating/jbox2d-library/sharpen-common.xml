@@ -1,0 +1,71 @@
+<project name="sharpen common">
+
+	<macrodef name="reset-dir">
+		<attribute name="dir" />
+		<sequential>
+			<delete dir="@{dir}" />
+			<mkdir dir="@{dir}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="prepare-sharpen-workspace">
+		<attribute name="project" />
+		<attribute name="dir" />
+		
+		<sequential>
+			<reset-dir dir="@{dir}/@{project}"  />
+			
+			<copy todir="@{dir}/@{project}">
+				<fileset dir=".">
+					<include name="**/*.java"  />
+				</fileset>
+			</copy>
+		</sequential>
+	</macrodef>
+			
+	<macrodef name="sharpen">
+		<attribute name="workspace" />
+		<attribute name="resource" />
+		
+		<element name="args" optional="yes" />
+		
+		<sequential>
+			<echo>org.eclipse.core.launcher.Main -data @{workspace} -application sharpen.core.application @{resource}</echo>
+		
+			<java fork="true" classname="org.eclipse.core.launcher.Main" failonerror="true" timeout="1800000">
+			
+				<jvmarg value="-Xms256m" />
+				<jvmarg value="-Xmx512m" />
+				
+				<classpath>
+					<fileset dir="${eclipse.home}/plugins">
+						<include name="org.eclipse.equinox.launcher_*.jar"  />
+					</fileset>
+				</classpath>
+				
+				<arg value="-data" />
+				<arg file="@{workspace}" />
+				<arg value="-application" />
+				<arg value="sharpen.core.application" />
+				<arg value="@{resource}" />
+				
+				<args />
+			</java>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="copy-sharpen-output">
+		<attribute name="fromdir" />
+		<attribute name="todir" />
+		
+		<sequential>
+			<reset-dir dir="@{todir}" />
+			<copy todir="@{todir}">
+				<fileset dir="@{fromdir}">
+					<include name="**/*.cs" />
+				</fileset>
+			</copy>
+		</sequential>
+	</macrodef>
+	
+</project>

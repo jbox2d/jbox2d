@@ -33,7 +33,7 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
-import org.jbox2d.pooling.WorldPool;
+import org.jbox2d.pooling.IWorldPool;
 
 public class MouseJoint extends Joint {
 
@@ -50,7 +50,7 @@ public class MouseJoint extends Joint {
 	private float m_gamma;
 	
 
-	protected MouseJoint(WorldPool argWorld, MouseJointDef def) {
+	protected MouseJoint(IWorldPool argWorld, MouseJointDef def) {
 		super(argWorld, def);
 		assert(def.target.isValid());
 		assert(def.maxForce >= 0);

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<project name="jbox2d-library" default="build">
+
+	<property name="src.dir" value="ContactList.net" />
+	<property name="bin.dir" value="${src.dir}/bin" />
+	
+	<include buildfile="build-properties.xml" />
+
+	<target name="build" depends="init">
+		<csc target="exe" output="${bin.dir}/JBox2d-Library.exe">
+			<sources basedir="${src.dir}">
+				<include name="**/*.cs" />
+			</sources>
+		</csc>
+	</target>
+	
+	<target name="init">
+		<mkdir dir="${bin.dir}" />
+	</target>
+	
+</project>
