@@ -29,9 +29,9 @@
  */
 package org.jbox2d.testbed.framework;
 
+import org.jbox2d.collision.Collision.PointState;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Fixture;
-import org.jbox2d.structs.collision.PointState;
 
 /**
  * @author Daniel Murphy

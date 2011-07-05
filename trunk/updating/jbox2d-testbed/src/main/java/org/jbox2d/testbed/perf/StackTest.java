@@ -31,7 +31,7 @@ package org.jbox2d.testbed.perf;
 
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.pooling.PoolingStack.PoolContainer;
+import org.jbox2d.pooling.IWorldPool;
 import org.jbox2d.pooling.WorldPool;
 
 
@@ -71,7 +71,7 @@ public class StackTest extends PerfTest {
 		return s;
 	}
 	
-	private final WorldPool wp = new WorldPool(100);
+	private final IWorldPool wp = new WorldPool(100, 10);
 
 	
 	/**
@@ -91,9 +91,9 @@ public class StackTest extends PerfTest {
 					wp.pushVec2(2);
 					break;}
 				case 1:{
-					final PoolContainer<Vec2> pc = wp.popVec2(2);
-					final Vec2 v1 = pc.p0;
-					final Vec2 v2 = pc.p1;
+					final Vec2[] pc = wp.popVec2(2);
+					final Vec2 v1 = pc[0];
+					final Vec2 v2 = pc[1];
 					a += op(v1);
 					a += op(v2);
 					wp.pushVec2(2);
@@ -108,10 +108,10 @@ public class StackTest extends PerfTest {
 					wp.pushVec2(3);
 					break;}
 				case 3:{
-					final PoolContainer<Vec2> pc = wp.popVec2(3);
-					final Vec2 v1 = pc.p0;
-					final Vec2 v2 = pc.p1;
-					final Vec2 v3 = pc.p2;
+					final Vec2[] pc = wp.popVec2(2);
+					final Vec2 v1 = pc[0];
+					final Vec2 v2 = pc[1];
+					final Vec2 v3 = pc[2];
 					a += op(v1);
 					a += op(v2);
 					a += op(v3);
@@ -129,11 +129,11 @@ public class StackTest extends PerfTest {
 					wp.pushVec2(4);
 					break;}
 				case 5:{
-					final PoolContainer<Vec2> pc = wp.popVec2(4);
-					final Vec2 v1 = pc.p0;
-					final Vec2 v2 = pc.p1;
-					final Vec2 v3 = pc.p2;
-					final Vec2 v4 = pc.p3;
+					final Vec2[] pc = wp.popVec2(2);
+					final Vec2 v1 = pc[0];
+					final Vec2 v2 = pc[1];
+					final Vec2 v3 = pc[2];
+					final Vec2 v4 = pc[3];
 					a += op(v1);
 					a += op(v2);
 					a += op(v3);
@@ -162,16 +162,16 @@ public class StackTest extends PerfTest {
 					wp.pushVec2(9);
 					break;}
 				case 7:{
-					final PoolContainer<Vec2> pc = wp.popVec2(9);
-					final Vec2 v1 = pc.p0;
-					final Vec2 v2 = pc.p1;
-					final Vec2 v3 = pc.p2;
-					final Vec2 v4 = pc.p3;
-					final Vec2 v5 = pc.p4;
-					final Vec2 v6 = pc.p5;
-					final Vec2 v7 = pc.p6;
-					final Vec2 v8 = pc.p7;
-					final Vec2 v9 = pc.p8;
+					final Vec2[] pc = wp.popVec2(2);
+					final Vec2 v1 = pc[0];
+					final Vec2 v2 = pc[1];
+					final Vec2 v3 = pc[2];
+					final Vec2 v4 = pc[3];
+					final Vec2 v5 = pc[4];
+					final Vec2 v6 = pc[5];
+					final Vec2 v7 = pc[6];
+					final Vec2 v8 = pc[7];
+					final Vec2 v9 = pc[8];
 					a += op(v1);
 					a += op(v2);
 					a += op(v3);
