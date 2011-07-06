@@ -350,7 +350,7 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 			if (hit) {
 				bruteActor = m_actors[i];
 				bruteOutput = output;
-				input.maxFraction = output.fraction;
+			    //input.set(m_rayCastInput);
 			}
 		}
 
