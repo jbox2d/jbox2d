@@ -126,12 +126,6 @@ public class PolyShapes extends TestbedTest {
 	
 	void Create(int index)
 	{
-		if (m_bodies[m_bodyIndex] != null)
-		{
-			m_world.destroyBody(m_bodies[m_bodyIndex]);
-			m_bodies[m_bodyIndex] = null;
-		}
-
 		BodyDef bd = new BodyDef();
 		bd.type = BodyType.DYNAMIC;
 
@@ -236,6 +230,7 @@ public class PolyShapes extends TestbedTest {
 		addTextLine("Press 1-5 to drop stuff");
 		addTextLine("Press 'a' to (de)activate some bodies");
 		addTextLine("Press 'd' to destroy a body");
+		addTextLine("Up to 30 bodies in the target circle are highlighted");
 	}
 	
 	/**
@@ -251,12 +246,12 @@ public class PolyShapes extends TestbedTest {
 /**
  * This callback is called by b2World::QueryAABB. We find all the fixtures
  * that overlap an AABB. Of those, we use b2TestOverlap to determine which fixtures
- * overlap a circle. Up to 8 overlapped fixtures will be highlighted with a yellow border.
+ * overlap a circle. Up to 30 overlapped fixtures will be highlighted with a yellow border.
  * @author Daniel Murphy
  */
 
 class PolyShapesCallback implements QueryCallback{
-	int e_maxCount = 8;
+	int e_maxCount = 30;
 	CircleShape m_circle = new CircleShape();
 	Transform m_transform = new Transform();
 	DebugDraw debugDraw;
