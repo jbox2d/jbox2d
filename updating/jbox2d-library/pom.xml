@@ -20,6 +20,20 @@
   				<compilerVersion>1.5+</compilerVersion>
   			</configuration>
   		</plugin>
+  		<plugin>
+	  		<artifactId>maven-assembly-plugin</artifactId>
+	        <version>2.2</version>
+	        <configuration>
+	          <descriptorRefs>
+	            <descriptorRef>jar-with-dependencies</descriptorRef>
+	          </descriptorRefs>
+	          <archive>
+	            <manifest>
+	              <mainClass>org.jbox2d.testbed.framework.TestbedMain</mainClass>
+	            </manifest>
+         	 </archive>
+	        </configuration>
+        </plugin>
   	</plugins>
   </build>
   <dependencies>
@@ -29,6 +43,13 @@
   		<version>4.8.2</version>
   		<type>jar</type>
   		<scope>test</scope>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.slf4j</groupId>
+  		<artifactId>slf4j-api</artifactId>
+  		<version>1.6.1</version>
+  		<type>jar</type>
+  		<scope>compile</scope>
   	</dependency>
   </dependencies>
 </project>

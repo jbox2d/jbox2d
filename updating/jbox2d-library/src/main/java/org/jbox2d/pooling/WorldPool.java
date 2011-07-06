@@ -61,21 +61,24 @@ public class WorldPool implements IWorldPool {
 	private final HashMap<Integer, int[]> aints = new HashMap<Integer, int[]>();
 	private final HashMap<Integer, Vec2[]> avecs = new HashMap<Integer, Vec2[]>();
 	
+	private final Class<?>[] classes = new Class<?>[]{
+		IWorldPool.class
+	};
 	private final Object[] args = new Object[]{
 		this
 	};
 	
 	private final MutableStack<Contact, PolygonContact> pcstack =
 		new MutableStack<Contact, PolygonContact>(PolygonContact.class,
-				Settings.CONTACT_STACK_INIT_SIZE, IWorldPool.class, args);
+				Settings.CONTACT_STACK_INIT_SIZE, classes, args);
 	
 	private final MutableStack<Contact, CircleContact> ccstack = 
 		new MutableStack<Contact, CircleContact>(CircleContact.class,
-				Settings.CONTACT_STACK_INIT_SIZE, IWorldPool.class, args);
+				Settings.CONTACT_STACK_INIT_SIZE, classes, args);
 	
 	private final MutableStack<Contact, PolygonAndCircleContact> cpstack = 
 		new MutableStack<Contact, PolygonAndCircleContact>(PolygonAndCircleContact.class,
-				Settings.CONTACT_STACK_INIT_SIZE, IWorldPool.class, args);
+				Settings.CONTACT_STACK_INIT_SIZE, classes, args);
 	
 	private final Collision collision;
 	private final TimeOfImpact toi;
