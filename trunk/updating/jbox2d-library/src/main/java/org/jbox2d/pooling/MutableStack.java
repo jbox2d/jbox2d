@@ -29,76 +29,63 @@ package org.jbox2d.pooling;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 
-public class MutableStack<E, T extends E> implements IDynamicStack<E> {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class MutableStack<E, T extends E> implements IDynamicStack<E> {
+	
+	private static final Logger log = LoggerFactory.getLogger(MutableStack.class);
+	
 	private T[] stack;
 	private int index;
 	private int size;
 	private final Class<T> sClass;
 	
-	private final Class<?> params;
+	private final Class<?>[] params;
 	private final Object[] args;
 	
-	@SuppressWarnings("unchecked")
 	public MutableStack(Class<T> argClass, int argInitSize){
-		index = 0;
-		size = argInitSize;
-		sClass = argClass;
-		
-		stack = (T[]) Array.newInstance(sClass, argInitSize);
-		for(int i=0; i<argInitSize; i++){
-			try {
-				stack[i] = sClass.newInstance();
-			}
-			catch (InstantiationException e) {
-				System.err.println("Error creating pooled object "+argClass.getCanonicalName());
-				e.printStackTrace();
-			}
-			catch (IllegalAccessException e) {
-				System.err.println("Error creating pooled object "+argClass.getCanonicalName());
-				e.printStackTrace();
-			}
-		}
-		index = 0;
-		params = null;
-		args = null;
+		this(argClass, argInitSize, null, null);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public MutableStack(Class<T> argClass, int argInitSize, Class<?> params, Object[] args){
+	public MutableStack(Class<T> argClass, int argInitSize, Class<?>[] argParam, Object[] argArgs){
 		index = 0;
 		size = argInitSize;
 		sClass = argClass;
+		params = argParam;
+		args = argArgs;
 		
 		stack = (T[]) Array.newInstance(sClass, argInitSize);
 		for(int i=0; i<argInitSize; i++){
 			try {
-				stack[i] = sClass.getConstructor(params).newInstance(args);
+				if(params != null){
+					stack[i] = sClass.getConstructor(params).newInstance(args);
+				}else{
+					stack[i] = sClass.newInstance();
+				}
 			}
 			catch (InstantiationException e) {
-				System.err.println("Error creating pooled object "+argClass.getCanonicalName());
-				e.printStackTrace();
-			}
-			catch (IllegalAccessException e) {
-				System.err.println("Error creating pooled object "+argClass.getCanonicalName());
-				e.printStackTrace();
+				log.error("Error creating pooled object " + sClass.getSimpleName(), e);
+				assert(false) : "Error creating pooled object " + sClass.getCanonicalName();
+			} catch (IllegalAccessException e) {
+				log.error("Error creating pooled object " + sClass.getSimpleName(), e);
+				assert(false) : "Error creating pooled object " + sClass.getCanonicalName();
 			} catch (IllegalArgumentException e) {
-				System.err.println("Error creating pooled object "+argClass.getCanonicalName());
-				e.printStackTrace();
+				log.error("Error creating pooled object " + sClass.getSimpleName(), e);
+				assert(false) : "Error creating pooled object " + sClass.getCanonicalName();
 			} catch (SecurityException e) {
-				System.err.println("Error creating pooled object "+argClass.getCanonicalName());
-				e.printStackTrace();
+				log.error("Error creating pooled object " + sClass.getSimpleName(), e);
+				assert(false) : "Error creating pooled object " + sClass.getCanonicalName();
 			} catch (InvocationTargetException e) {
-				System.err.println("Error creating pooled object "+argClass.getCanonicalName());
-				e.printStackTrace();
+				log.error("Error creating pooled object " + sClass.getSimpleName(), e);
+				assert(false) : "Error creating pooled object " + sClass.getCanonicalName();
 			} catch (NoSuchMethodException e) {
-				System.err.println("Error creating pooled object "+argClass.getCanonicalName());
-				e.printStackTrace();
+				log.error("Error creating pooled object " + sClass.getSimpleName(), e);
+				assert(false) : "Error creating pooled object " + sClass.getCanonicalName();
 			}
 		}
 		index = 0;
-		this.params = params;
-		this.args = args;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -112,23 +99,24 @@ public class MutableStack<E, T extends E> implements IDynamicStack<E> {
 				}else{
 					newStack[i] = sClass.newInstance();
 				}
-			}
-			catch (InstantiationException e) {
-				System.err.println("Error creating pooled object "+sClass.getCanonicalName());
-				e.printStackTrace();
-			}
-			catch (IllegalAccessException e) {
-				System.err.println("Error creating pooled object "+sClass.getCanonicalName());
-				e.printStackTrace();
+			} catch (InstantiationException e) {
+				log.error("Error creating pooled object " + sClass.getSimpleName(), e);
+				assert(false) : "Error creating pooled object " + sClass.getCanonicalName();
+			} catch (IllegalAccessException e) {
+				log.error("Error creating pooled object " + sClass.getSimpleName(), e);
+				assert(false) : "Error creating pooled object " + sClass.getCanonicalName();
+			} catch (IllegalArgumentException e) {
+				log.error("Error creating pooled object " + sClass.getSimpleName(), e);
+				assert(false) : "Error creating pooled object " + sClass.getCanonicalName();
 			} catch (SecurityException e) {
-				System.err.println("Error creating pooled object "+sClass.getCanonicalName());
-				e.printStackTrace();
+				log.error("Error creating pooled object " + sClass.getSimpleName(), e);
+				assert(false) : "Error creating pooled object " + sClass.getCanonicalName();
 			} catch (InvocationTargetException e) {
-				System.err.println("Error creating pooled object "+sClass.getCanonicalName());
-				e.printStackTrace();
+				log.error("Error creating pooled object " + sClass.getSimpleName(), e);
+				assert(false) : "Error creating pooled object " + sClass.getCanonicalName();
 			} catch (NoSuchMethodException e) {
-				System.err.println("Error creating pooled object "+sClass.getCanonicalName());
-				e.printStackTrace();
+				log.error("Error creating pooled object " + sClass.getSimpleName(), e);
+				assert(false) : "Error creating pooled object " + sClass.getCanonicalName();
 			}
 		}
 		stack = newStack;

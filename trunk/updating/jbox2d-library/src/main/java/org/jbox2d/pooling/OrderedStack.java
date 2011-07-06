@@ -31,10 +31,14 @@ package org.jbox2d.pooling;
 
 import java.lang.reflect.Array;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Daniel Murphy
  */
 public class OrderedStack<E> implements IOrderedStack<E> {
+	private static final Logger log = LoggerFactory.getLogger(OrderedStack.class);
 	
 	private final E[] pool;
 	private int index;
@@ -50,12 +54,12 @@ public class OrderedStack<E> implements IOrderedStack<E> {
 				pool[i] = argClass.newInstance();
 			}
 			catch (InstantiationException e) {
-				System.err.println("Error creating pooled object "+argClass.getCanonicalName());
-				e.printStackTrace();
+				log.error("Error creating pooled object " + argClass.getSimpleName(), e);
+				assert(false) : "Error creating pooled object " + argClass.getCanonicalName();
 			}
 			catch (IllegalAccessException e) {
-				System.err.println("Error creating pooled object "+argClass.getCanonicalName());
-				e.printStackTrace();
+				log.error("Error creating pooled object " + argClass.getSimpleName(), e);
+				assert(false) : "Error creating pooled object " + argClass.getCanonicalName();
 			}
 		}
 		index = 0;

@@ -84,12 +84,12 @@ public class MathTest extends TestCase {
 		v.x = 0;
 		v.y = 1;
 		v.subLocal(new Vec2(10,10));
-		assertEquals(-10, v.x);
-		assertEquals(-9, v.y);
+		assertEquals(-10f, v.x);
+		assertEquals(-9f, v.y);
 		
 		Vec2 v2 = v.add(new Vec2(1,1));
-		assertEquals(-9, v2.x);
-		assertEquals(-8, v2.y);
+		assertEquals(-9f, v2.x);
+		assertEquals(-8f, v2.y);
 		assertFalse(v.equals(v2));
 		
 		// TODO write tests for the rest of common lib
