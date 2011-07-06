@@ -26,7 +26,6 @@
  ******************************************************************************/
 package org.jbox2d.collision.broadphase;
 
-import java.util.Random;
 import java.util.Stack;
 
 import org.jbox2d.callbacks.DebugDraw;
@@ -66,7 +65,7 @@ public class DynamicTree {
 	
 	private final Stack<DynamicTreeNode> nodeStack = new Stack<DynamicTreeNode>();
 	private final Vec2[] drawVecs = new Vec2[4];
-	private final Random rand = new Random();
+	private int nodeCounter = 0;
 	
 	public DynamicTree() {
 		m_root = null;
@@ -399,7 +398,7 @@ public class DynamicTree {
 		node.child1 = null;
 		node.child2 = null;
 		node.userData = null;
-		node.key = rand.nextInt();
+		node.key = nodeCounter++;
 		m_nodeCount++;
 		return node;
 	}
