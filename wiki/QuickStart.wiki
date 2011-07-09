@@ -1,0 +1,24 @@
+#summary How to get started using JBox2D
+
+= Introduction =
+
+JBox2D is a Java rigid body physics engine library.  It does not include any graphics support, you are expected to hook it up to your rendering library yourself (though the testbed includes a sample implementation using Java2D graphics, it is not intended to be a production-ready implementation).
+
+This page will show you how to get the testbed running in your environment of choice.  The most recent versions of JBox2D lean on Maven to help handle dependency management, and the general steps to get the testbed running if you already know how to use SVN and Maven in your environment are:
+
+  # Check out the project through Subversion: `svn checkout http://jbox2d.googlecode.com/svn/trunk/ jbox2d-read-only`
+  # Import to your IDE as a Maven project (using the pom.xml descriptor in the /updating directory)
+  # Run the org.jbox2d.testbed.framework.TestbedMain class
+
+
+= Eclipse (tested with [http://www.eclipse.org/downloads/packages/release/helios/sr2 Eclipse Helios]) =
+
+  # Check out the project through Subversion (you can also do this within Eclipse using the [http://subclipse.tigris.org/ Subclipse] plugin if you don't like the command line):
+    `svn checkout http://jbox2d.googlecode.com/svn/trunk/ jbox2d-read-only`
+  # Make sure you have the [http://maven.apache.org/eclipse-plugin.html Maven Integration for Eclipse] plugin installed
+  # In Eclipse, go to _File_->_Import_ and select _Maven_->_Existing Maven Projects_
+  # Navigate to the directory that you checked out from Subversion (jbox2d-read-only if you cut and pasted the example above) and hit _Next_
+  # Select both of the projects, and add them to your working sets if desired
+  # Finish the import
+  # In Package Explorer, find the jbox2d-testbed project, navigate to _src/main/java_ and find the _org.jbox2d.testbed.framework_ package - right click on TestbedMain.java and run it as a Java application.
+  # If the JBox2D testbed runs, congratulations, you've successfully set up the project!  You can add the jbox2d-library project as a reference to other projects to use it, or you can browse through the jbox2d-testbed project to see how things are done (navigate to the org.jbox2d.testbed.tests directory to see code examples)
