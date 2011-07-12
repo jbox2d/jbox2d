@@ -41,6 +41,7 @@
   	</dependency>
   </dependencies>
   
+  <url>http://code.google.com/p/jbox2d/</url>
   <build>
   	<plugins>
   		<plugin>
