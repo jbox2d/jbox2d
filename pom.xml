@@ -16,9 +16,9 @@
 	</issueManagement>
 
 	<scm>
-		<url>scm:svn:https://java-simple-mvc.googlecode.com/svn/jbox2d-2.1.2.0</url>
-		<connection>scm:svn:http://java-simple-mvc.googlecode.com/svn/jbox2d-2.1.2.0</connection>
-		<developerConnection>scm:svn:https://java-simple-mvc.googlecode.com/svn/tags/jbox2d-2.1.2.0</developerConnection>
+		<url>scm:svn:https://jbox2d.googlecode.com/svn/jbox2d-2.1.2.0</url>
+		<connection>scm:svn:http://jbox2d.googlecode.com/svn/jbox2d-2.1.2.0</connection>
+		<developerConnection>scm:svn:https://jbox2d.googlecode.com/svn/tags/jbox2d-2.1.2.0</developerConnection>
 	</scm>
 
 	<developers>
