@@ -10,6 +10,7 @@
   <version>2.1.2.1-SNAPSHOT</version>
   <name>JBox2D</name>
   <description>A 2D java physics engine, a port of the C++ Box2d engine.  This is the core physics engine.</description>
+  <url>http://code.google.com/p/jbox2d/</url>
   <build>
   	<plugins>
   		<plugin>
