@@ -11,6 +11,7 @@
 		<module>jbox2d-testbed</module>
 	</modules>
 
+	<url>http://code.google.com/p/jbox2d/</url>
 	<issueManagement>
 		<url>http://code.google.com/p/jbox2d/issues/list</url>
 	</issueManagement>
