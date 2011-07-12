@@ -150,7 +150,7 @@ public class SinCosTest {
 		}
 		
 		if(print){
-			System.out.println("Speed results, in iterations per second");
+			System.out.println("Speed results, in iterations per second (higher number means faster)");
 			String header[] = {"Not lerped", "Lerped", "Difference", "Java Math"};
 			String side[] = new String[numTables+1];
 			side[0] = "Table precision";
@@ -257,7 +257,7 @@ public class SinCosTest {
 			
 			startTime = System.nanoTime();
 			for(j=0; j<MathUtils.TWOPI; j+=jstep){
-				k = (float) Math.sin(j);
+				k = (float) StrictMath.sin(j);
 			}
 			endTime = System.nanoTime();
 			totalTime += endTime - startTime;
