@@ -267,28 +267,28 @@ public class MathUtils {
 	}
 
 	public static final float sqrt(float x) {
-		if(Settings.FAST_MATH){
-			if (x != 0.0f) { // thanks FrancescoITA for including the zero case
-				
-				final float xhalf = 0.5f * x;
-				int i = Float.floatToRawIntBits(x);
-				i = 0x5f3759df - (i >> 1);
-				x = Float.intBitsToFloat(i);
-				x *= 1.5f - xhalf * x * x;
-				// REPEAT FOR ACCURACY (make sure at least 2 are here, too inaccurate
-				// otherwise)
-				x *= 1.5f - xhalf * x * x;
-				x *= 1.5f - xhalf * x * x;
-				x *= 1.5f - xhalf * x * x;
-
-				return 1.0f / x;
-			}
-			else {
-				return 0;
-			}
-		}else{
+//		if(Settings.FAST_MATH){
+//			if (x != 0.0f) { // thanks FrancescoITA for including the zero case
+//				
+//				final float xhalf = 0.5f * x;
+//				int i = Float.floatToRawIntBits(x);
+//				i = 0x5f3759df - (i >> 1);
+//				x = Float.intBitsToFloat(i);
+//				x *= 1.5f - xhalf * x * x;
+//				// REPEAT FOR ACCURACY (make sure at least 2 are here, too inaccurate
+//				// otherwise)
+//				x *= 1.5f - xhalf * x * x;
+//				x *= 1.5f - xhalf * x * x;
+//				x *= 1.5f - xhalf * x * x;
+//
+//				return 1.0f / x;
+//			}
+//			else {
+//				return 0;
+//			}
+//		}else{
 			return (float)StrictMath.sqrt(x);
-		}
+//		}
 	}
 
 	public final static float invSqrt(float x) {

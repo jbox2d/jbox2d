@@ -23,8 +23,6 @@
 
 package org.jbox2d.common;
 
-import org.jbox2d.testbed.mathtests.SinCosTest;
-
 //Updated to rev. 142 of b2Settings.cpp/.h
 
 /** Global tuning constants based on MKS units and various integer maximums (vertices per shape, pairs, etc.). */
@@ -75,7 +73,7 @@ public class Settings {
      * Although it is more expensive, it greatly increases
      * accuracy.  Look in the MathUtils source for some test results
      * on the accuracy and speed of lerp vs non lerp.  Or, run the tests
-     * yourself in {@link SinCosTest}.
+     * yourself in {@link org.jbox2d.testbed.mathtests.SinCosTest}.
      */
     public static final boolean SINCOS_LUT_LERP = false;
     
