@@ -1,0 +1,31 @@
+Java file -> corresponding C++ file & revision number updated to
+package: org.jbox2d.collision
+Updated thru rev 144 (May 8, 2008)
+----------------------------------------------------------------
+
+AABB.java         				-> b2Collision.h 139
+Bound.java        				-> b2BroadPhase.h 139
+BroadPhase.java   				-> b2BroadPhase.h/cpp 139
+BufferedPair.java 				-> b2PairManager.h/cpp 139
+CircleDef.java 					-> b2CircleShape.h/cpp 139
+Collision.java    				-> b2Collision.h 139
+CollideCircle.java 				-> b2CollideCircle.cpp 144
+CollidePoly.java 				-> b2CollidePoly.cpp 142
+Distance.java 					-> b2Distance.cpp 139
+FilterData.java 				-> b2Shape.h 144
+Manifold.java					-> b2Collision.h 139
+ManifoldPoint.java				-> b2Collision.h 139
+MassData.java					-> b2Shape.h 144
+OBB.java						-> b2Collision.h 139
+Pair.java						-> b2PairManager.h 136
+PairCallback.java				-> b2PairManager.h 136
+PairManager.java				-> b2PairManager.h/cpp 136
+PolygonDef.java					-> b2PolygonShape.h 142
+PolygonShape.java				-> b2PolygonShape.h/cpp 142 (relates to b2Shape.cpp, too)
+Proxy.java						-> b2BroadPhase.h 139
+Segment.java					-> b2Collision.h/cpp (NOT DONE)
+Shape.java 						-> b2Shape.h/cpp 139
+ShapeDef.java 					-> b2Shape.h 144
+ShapeType.java					-> b2Shape.h 144
+SupportsGenericDistance.java 	-> Related to b2Distance.cpp
+TOI.java						-> b2TimeOfImpact.cpp
