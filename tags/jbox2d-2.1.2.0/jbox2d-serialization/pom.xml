@@ -1,0 +1,22 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>jbox2d</artifactId>
+    <groupId>org.jbox2d</groupId>
+    <version>2.1.2.0-SNAPSHOT</version>
+  </parent>
+  <groupId>org.jbox2d</groupId>
+  <artifactId>jbox2d-serialization</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>JBox2d Serialization</name>
+  <description>Serialization library for JBox2D, schema described here: http://alteredsoftworks.com/box2d/Box2Scene.pdf</description>
+  <dependencies>
+  	<dependency>
+  		<groupId>org.jbox2d</groupId>
+  		<artifactId>jbox2d-library</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  		<type>jar</type>
+  		<scope>compile</scope>
+  	</dependency>
+  </dependencies>
+</project>
