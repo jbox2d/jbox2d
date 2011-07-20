@@ -160,6 +160,14 @@ public class World {
 		initializeRegisters();
 	}
 	
+	public void setAllowSleep(boolean argAllowSleep){
+		m_allowSleep = argAllowSleep;
+	}
+	
+	public boolean isAllowSleep(){
+		return m_allowSleep;
+	}
+	
 	private void addType(IDynamicStack<Contact> creator, ShapeType type1,
 			ShapeType type2) {
 		ContactRegister register = new ContactRegister();
@@ -595,7 +603,7 @@ public class World {
 	private final Transform xf = new Transform();
 	private final Vec2 cA = new Vec2();
 	private final Vec2 cB = new Vec2();
-	private final static Vec2Array avs = new Vec2Array();
+	private final Vec2Array avs = new Vec2Array();
 	
 	/**
 	 * Call this to draw shapes and other debug draw data.
@@ -612,19 +620,23 @@ public class World {
 				xf.set(b.getTransform());
 				for (Fixture f = b.getFixtureList(); f != null; f = f.getNext()) {
 					if (b.isActive() == false) {
-						drawShape(f, xf, new Color3f(0.5f, 0.5f, 0.3f));
+						color.set(0.5f, 0.5f, 0.3f);
+						drawShape(f, xf, color);
 					}
 					else if (b.getType() == BodyType.STATIC) {
-						drawShape(f, xf, new Color3f(0.5f, 0.9f, 0.5f));
+						color.set(0.5f, 0.9f, 0.3f);
+						drawShape(f, xf, color);
 					}
 					else if (b.getType() == BodyType.KINEMATIC) {
-						drawShape(f, xf, new Color3f(0.5f, 0.5f, 0.9f));
+						color.set(0.5f, 0.5f, 0.9f);
+						drawShape(f, xf, color);
 					}
 					else if (b.isAwake() == false) {
-						drawShape(f, xf, new Color3f(0.6f, 0.6f, 0.6f));
-					}
-					else {
-						drawShape(f, xf, new Color3f(0.9f, 0.7f, 0.7f));
+						color.set(0.5f, 0.5f, 0.9f);
+						drawShape(f, xf, color);
+					} else {
+						color.set(0.9f, 0.7f, 0.7f);
+						drawShape(f, xf, color);
 					}
 				}
 			}
@@ -770,6 +782,10 @@ public class World {
 		m_warmStarting = flag;
 	}
 	
+	public boolean isWarmStarting(){
+		return m_warmStarting;
+	}
+	
 	/**
 	 * Enable/disable continuous physics. For testing.
 	 * 
@@ -777,6 +793,10 @@ public class World {
 	 */
 	public void setContinuousPhysics(boolean flag) {
 		m_continuousPhysics = flag;
+	}
+	
+	public boolean isContinuousPhysics(){
+		return m_continuousPhysics;
 	}
 	
 	/**

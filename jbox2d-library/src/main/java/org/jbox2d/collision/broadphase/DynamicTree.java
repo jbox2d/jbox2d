@@ -419,6 +419,10 @@ public class DynamicTree {
 	private final Vec2 delta1 = new Vec2();
 	private final Vec2 delta2 = new Vec2();
 	
+	public int getInsertionCount(){
+		return m_insertionCount;
+	}
+	
 	private final void insertLeaf(DynamicTreeNode argNode) {
 		m_insertionCount++;
 		

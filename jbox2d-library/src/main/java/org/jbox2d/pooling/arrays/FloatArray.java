@@ -28,21 +28,17 @@ package org.jbox2d.pooling.arrays;
 
 import java.util.HashMap;
 
+/**
+ * Not thread safe float[] pooling.
+ * @author Daniel
+ */
 public class FloatArray {
-
-	private static class TLHashMap<K, V> extends ThreadLocal<HashMap<K, V>>{
-		protected HashMap<K, V> initialValue(){
-			return new HashMap<K, V>();
-		}
-	}
 	
-	private final TLHashMap<Integer, float[]> tlMap = new TLHashMap<Integer, float[]>();
+	private final HashMap<Integer, float[]> map = new HashMap<Integer, float[]>();
 	
 	public float[] get( int argLength){
 		assert(argLength > 0);
-		
-		HashMap<Integer, float[]> map = tlMap.get();
-		
+				
 		if(!map.containsKey(argLength)){
 			map.put(argLength, getInitializedArray(argLength));
 		}

@@ -71,6 +71,14 @@ public class FrictionJoint extends Joint {
 		m_linearMass = new Mat22();
 	}
 	
+	public Vec2 getLocalAnchorA(){
+		return m_localAnchorA;
+	}
+	
+	public Vec2 getLocalAnchorB(){
+		return m_localAnchorB;
+	}
+	
 	/**
 	 * @see org.jbox2d.dynamics.joints.Joint#getAnchorA(org.jbox2d.common.Vec2)
 	 */

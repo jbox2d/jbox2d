@@ -44,10 +44,10 @@ public class PulleyJoint extends Joint {
 	
 	public static final float MIN_PULLEY_LENGTH = 2.0f;
 	
-	private final Vec2 m_groundAnchor1 = new Vec2();
-	private final Vec2 m_groundAnchor2 = new Vec2();
-	private final Vec2 m_localAnchor1 = new Vec2();
-	private final Vec2 m_localAnchor2 = new Vec2();
+	public final Vec2 m_groundAnchor1 = new Vec2();
+	public final Vec2 m_groundAnchor2 = new Vec2();
+	public final Vec2 m_localAnchor1 = new Vec2();
+	public final Vec2 m_localAnchor2 = new Vec2();
 	
 	private final Vec2 m_u1 = new Vec2();
 	private final Vec2 m_u2 = new Vec2();
@@ -72,6 +72,9 @@ public class PulleyJoint extends Joint {
 	private LimitState m_limitState1;
 	private LimitState m_limitState2;
 	
+	private float origLength1;
+	private float origLength2;
+	
 	/**
 	 * @param argWorldPool
 	 * @param def
@@ -86,6 +89,9 @@ public class PulleyJoint extends Joint {
 		assert (def.ratio != 0.0f);
 		m_ratio = def.ratio;
 		
+		origLength1 = def.lengthA;
+		origLength2 = def.lengthB;
+		
 		m_constant = def.lengthA + m_ratio * def.lengthB;
 		
 		m_maxLength1 = MathUtils.min(def.maxLengthA, m_constant - m_ratio * MIN_PULLEY_LENGTH);
@@ -96,6 +102,14 @@ public class PulleyJoint extends Joint {
 		m_limitImpulse2 = 0.0f;
 	}
 	
+	public float getOrigLength1() {
+		return origLength1;
+	}
+
+	public float getOrigLength2() {
+		return origLength2;
+	}
+
 	/**
 	 * @see org.jbox2d.dynamics.joints.Joint#getAnchorA(org.jbox2d.common.Vec2)
 	 */
