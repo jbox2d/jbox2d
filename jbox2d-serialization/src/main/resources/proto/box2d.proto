@@ -2,7 +2,7 @@
 package box2d;
 
 option java_package = "org.box2d.proto";
-option java_outer_classname = "JBox2D";
+option java_outer_classname = "Box2D";
 
 // Math classes
 
