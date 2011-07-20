@@ -9,8 +9,9 @@
   </parent>
   <packaging>jar</packaging>
   <artifactId>jbox2d-serialization</artifactId>
-  <name>JBox2d Serialization</name>
+  <name>jbox2d-serialization</name>
   <description>Serialization library for jbox2d</description>
+  <url>http://code.google.com/p/jbox2d/</url>
   <version>1.0.0-SNAPSHOT</version>
 
   <build>
@@ -26,7 +27,7 @@
                 <mkdir dir="target/generated-sources" />
                 <exec failonerror="true" executable="protoc">
                   <arg value="--java_out=target/generated-sources" />
-                  <arg value="src/main/resources/proto/jbox2d.proto" />
+                  <arg value="src/main/resources/proto/box2d.proto" />
                 </exec>
               </tasks>
               <sourceRoot>target/generated-sources</sourceRoot>
