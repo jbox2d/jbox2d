@@ -23,13 +23,13 @@
           <execution>
             <phase>generate-sources</phase>
             <configuration>
-              <tasks>
+              <target>
                 <mkdir dir="target/generated-sources" />
-                <exec failonerror="true" executable="protoc">
+                <exec executable="protoc">
                   <arg value="--java_out=target/generated-sources" />
                   <arg value="src/main/resources/proto/box2d.proto" />
                 </exec>
-              </tasks>
+              </target>
               <sourceRoot>target/generated-sources</sourceRoot>
             </configuration>
             <goals>
