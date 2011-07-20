@@ -243,8 +243,8 @@ public class DistanceJoint extends Joint {
 		// Cdot = dot(u, v + cross(w, r))
 		Vec2.crossToOut(b1.m_angularVelocity, r1, v1);
 		Vec2.crossToOut(b2.m_angularVelocity, r2, v2);
-		v1.set(b1.m_linearVelocity).addLocal(b1.m_linearVelocity);
-		v2.set(b2.m_linearVelocity).addLocal(b2.m_linearVelocity);
+		v1.addLocal(b1.m_linearVelocity);
+		v2.addLocal(b2.m_linearVelocity);
 		
 		float Cdot = Vec2.dot(m_u, v2.subLocal(v1));
 		

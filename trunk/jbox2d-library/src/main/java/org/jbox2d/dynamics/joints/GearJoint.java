@@ -86,8 +86,8 @@ public class GearJoint extends Joint {
 	private final Vec2 m_groundAnchor1 = new Vec2();
 	private final Vec2 m_groundAnchor2 = new Vec2();
 	
-	private final Vec2 m_localAnchor1 = new Vec2();
-	private final Vec2 m_localAnchor2 = new Vec2();
+	public final Vec2 m_localAnchor1 = new Vec2();
+	public final Vec2 m_localAnchor2 = new Vec2();
 	
 	private final Jacobian m_J;
 	
@@ -309,6 +309,14 @@ public class GearJoint extends Joint {
 		b2.m_angularVelocity += b2.m_invI * impulse * m_J.angularB;
 		
 		pool.pushVec2(1);
+	}
+	
+	public Joint getJoint1() {
+		return m_revolute1 != null ? m_revolute1 : m_prismatic1;
+	}
+	
+	public Joint getJoint2() {
+		return m_revolute2 != null ? m_revolute2 : m_prismatic2;
 	}
 	
 	/**

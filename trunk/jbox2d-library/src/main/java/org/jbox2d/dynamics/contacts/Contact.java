@@ -37,7 +37,6 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.pooling.IWorldPool;
-import org.jbox2d.pooling.TLManifold;
 
 // updated to rev 100
 /**
@@ -206,11 +205,10 @@ public abstract class Contact {
 	}
 
 	// djm pooling
-	private static final TLManifold tloldManifold = new TLManifold();
+	private final Manifold oldManifold = new Manifold();
 
 	public void update(ContactListener listener) {
-
-		Manifold oldManifold = tloldManifold.get();
+		
 		oldManifold.set(m_manifold);
 
 		// Re-enable this contact.
