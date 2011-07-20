@@ -632,7 +632,7 @@ public class World {
 						drawShape(f, xf, color);
 					}
 					else if (b.isAwake() == false) {
-						color.set(0.5f, 0.5f, 0.9f);
+						color.set(0.5f, 0.5f, 0.5f);
 						drawShape(f, xf, color);
 					} else {
 						color.set(0.9f, 0.7f, 0.7f);
