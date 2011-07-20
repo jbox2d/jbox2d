@@ -4,7 +4,7 @@
 	<artifactId>jbox2d</artifactId>
 	<version>2.1.2.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>JBox2D</name>
+	<name>jbox2d</name>
 	<description>JBox2D is a 2d Java physics engine, a port of the C++ Box2d engine.  This is the parent pom for the library and testbed modules.</description>
 	<modules>
 		<module>jbox2d-library</module>
