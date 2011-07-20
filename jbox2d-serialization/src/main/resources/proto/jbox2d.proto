@@ -1,0 +1,160 @@
+
+package jbox2d;
+
+option java_package = "org.jbox2d.proto";
+option java_outer_classname = "JBox2D";
+
+// Math classes
+
+message PbVec2 {
+  required float x = 1;
+  required float y = 2;
+}
+
+// enums
+
+enum PbBodyType {
+  STATIC = 0;
+  DYNAMIC = 1;
+  KINEMATIC = 2;
+}
+
+enum PbShapeType { 
+  CIRCLE = 1;
+  POLYGON = 2;
+  EDGE = 3;
+  LOOP = 4;
+}
+
+enum PbJointType {
+  DISTANCE = 1;
+  REVOLUTE = 2;
+  PRISMATIC = 3;
+  PULLEY = 4;
+  MOUSE = 5;
+  GEAR = 6;
+  WHEEL = 7;
+  WELD = 8;
+  FRICTION = 9;
+  ROPE = 10;
+}
+
+
+// objects
+
+message PbFilter {
+  optional int32 category_bits = 1;
+  optional int32 mask_bits = 2;
+  optional int32 group_index = 3;
+}
+
+// just include all fields we might use
+message PbShape {
+  required PbShapeType type = 1;
+  optional PbVec2 center = 2; // circle
+  optional float radius = 3; // circle
+  
+  repeated PbVec2 points = 4; // polygon
+  repeated PbVec2 normals = 5; // polygon
+  optional PbVec2 centroid = 6;
+}
+
+message PbFixture {
+  optional int32 id = 1;
+  optional float restitution = 2;
+  optional float friction = 3;
+  optional float density = 4;
+  optional bool sensor = 5;
+  
+  optional PbFilter filter = 6;
+  optional PbShape shape = 7;
+}
+
+message PbJoint {
+  optional int32 id = 1;
+  required PbJointType type = 2;
+  
+  optional int32 body_a = 3;
+  optional int32 body_b = 4;
+  
+  optional bool collideConnected = 5;
+  
+  optional PbVec2 anchor_a = 6;
+  optional PbVec2 anchor_b = 7;
+  
+  optional float ref_angle = 10; // used by: revolute, prismatic, joint
+  optional bool enable_limit = 12; // used by: revolute, prismatic
+  optional float lower_limit = 13; // used by: revolute, prismatic
+  optional float upper_limit = 14; // used by: revolute, prismatic
+  optional bool enable_motor = 15; // used by: revolute, prismatic, wheel
+  optional float motor_speed = 16; // used by: revolute, prismatic, wheel
+  optional float max_motor_torque = 17; // used by: revolute, wheel
+  
+  optional PbVec2 local_axis_a = 20; // used by: prismatic, wheel
+  optional float max_motor_force = 21; // used by: prismatic
+  
+  optional float length = 30; // used by: distance
+  optional float frequency = 31; // used by: distance, mouse
+  optional float damping_ratio = 32; // used by: distance, mouse
+  
+  optional PbVec2 ground_anchor_a = 40; // used by: pulley
+  optional PbVec2 ground_anchor_b = 41; // used by: pulley
+  optional float length_a = 42; // used by: pulley
+  optional float length_b = 43; // used by: pulley
+  optional float ratio = 44; // used by: pulley, gear
+  
+  optional PbVec2 target = 50; // used by: mouse
+  optional float max_force = 51; // used by: mouse, friction, rope
+  
+  optional int32 joint1 = 61; // used by: gear
+  optional int32 joint2 = 62; // used by: gear
+  
+  optional float spring_frequency = 70; // used by: wheel
+  optional float spring_damping_ratio = 71; // used by: wheel
+  
+  // weld joint 80
+  
+  optional float max_torque = 90; // used by: friction
+  
+  optional float max_length = 100; // used by: rope
+  
+  repeated int32 bodies = 110; // used by: constant volume joint
+  
+}
+
+message PbBody {
+  optional int32 id = 1;
+  required PbBodyType type = 2;
+  optional PbVec2 position = 3;
+  optional float angle = 4;
+  optional PbVec2 linear_velocity = 5;
+  optional float angular_velocity = 6;
+  optional float linear_damping = 7;
+  optional float angular_damping = 8;
+  optional float gravity_scale = 9;
+  
+  optional bool bullet = 10;
+  optional bool allow_sleep = 11;
+  optional bool awake = 12;
+  optional bool active = 13;
+  optional bool fixed_rotation = 14;
+  
+  // mass
+  optional float mass = 15;
+  optional float I = 16;
+  
+  repeated PbFixture fixtures = 20;
+}
+
+message PbWorld {
+  optional int32 id = 1;
+  optional PbVec2 gravity = 2;
+  optional bool allow_sleep = 3;
+  optional bool auto_clear_forces = 4;
+  optional bool warm_starting = 5;
+  optional bool continuous_physics = 6;
+  optional bool sub_stepping = 7;
+  
+  repeated PbBody bodies = 20;
+  repeated PbJoint joints = 21;
+}
