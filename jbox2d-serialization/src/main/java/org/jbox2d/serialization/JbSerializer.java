@@ -18,11 +18,19 @@ public interface JbSerializer {
 	
 	/**
 	 * Sets the object signer for the serializer.  This allows
-	 * the user to specify an 'id' for each main physics object,
+	 * the user to specify an 'tag' for each main physics object,
 	 * which is then referenced later at deserialization for the user.
 	 * @param argSigner
 	 */
 	public void setObjectSigner(ObjectSigner argSigner);
+	
+	/**
+	 * Sets a listener for unsupported exception instead of 
+	 * stopping the whole serialization process by throwing
+	 * and exception.
+	 * @param argListener
+	 */
+	public void setUnsupportedListener(UnsupportedListener argListener);
 
 	public SerializationResult serialize(World argWorld);
 	
@@ -32,19 +40,9 @@ public interface JbSerializer {
 	
 	public SerializationResult serialize(Shape argShape);
 	
-	/** 
-	 * Serializes independent joints (joints that don't reference
-	 * other joints)
-	 * @param argJoint
-	 * @param argBodyIndexMap
-	 * @return
-	 */
-	public SerializationResult serialize(Joint argJoint,
-			Map<Body, Integer> argBodyIndexMap);
-	
 	/**
-	 * Serialized dependent joints (joints that are built on other
-	 * joints)
+	 * Serializes joints.  Joints need to reference bodies
+	 * and sometimes other joints.
 	 * @param argJoint
 	 * @param argBodyIndexMap
 	 * @param argJointIndexMap
@@ -56,35 +54,35 @@ public interface JbSerializer {
 	
 	/**
 	 * Interface that allows the serializer to
-	 * look up id's for each object, that can be
-	 * used later by the user when deserializing
+	 * look up tags for each object, which can be
+	 * used later during deserializing by the developer.
 	 * @author Daniel
 	 */
 	public static interface ObjectSigner {
 		/**
 		 * @param argWorld
-		 * @return the id for the world. can be null.
+		 * @return the tag for the world. can be null.
 		 */
-		public Integer getId(World argWorld);
+		public Long getTag(World argWorld);
 		/**
 		 * @param argBody
-		 * @return the id for the body.  can be null.
+		 * @return the tag for the body.  can be null.
 		 */
-		public Integer getId(Body argBody);
+		public Long getTag(Body argBody);
 		/**
 		 * @param argShape
-		 * @return the id for the shape. can be null.
+		 * @return the tag for the shape. can be null.
 		 */
-		public Integer getId(Shape argShape);
+		public Long getTag(Shape argShape);
 		/**
 		 * @param argFixture
-		 * @return the id for the fixture. can be null.
+		 * @return the tag for the fixture. can be null.
 		 */
-		public Integer getId(Fixture argFixture);
+		public Long getTag(Fixture argFixture);
 		/**
 		 * @param argJoint
-		 * @return the id for the joint. can be null.
+		 * @return the tag for the joint. can be null.
 		 */
-		public Integer getId(Joint argJoint);
+		public Long getTag(Joint argJoint);
 	}
 }

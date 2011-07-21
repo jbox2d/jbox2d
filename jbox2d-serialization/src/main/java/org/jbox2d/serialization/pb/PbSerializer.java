@@ -13,6 +13,7 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.Filter;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.joints.ConstantVolumeJoint;
 import org.jbox2d.dynamics.joints.DistanceJoint;
 import org.jbox2d.dynamics.joints.FrictionJoint;
 import org.jbox2d.dynamics.joints.GearJoint;
@@ -34,6 +35,9 @@ import org.box2d.proto.Box2D.PbWorld;
 import org.jbox2d.serialization.JbSerializer;
 import org.jbox2d.serialization.SerializationHelper;
 import org.jbox2d.serialization.SerializationResult;
+import org.jbox2d.serialization.UnsupportedListener;
+import org.jbox2d.serialization.UnsupportedObjectException;
+import org.jbox2d.serialization.UnsupportedObjectException.Type;
 
 /**
  * Protobuffer serializer implementation.
@@ -43,16 +47,29 @@ import org.jbox2d.serialization.SerializationResult;
 public class PbSerializer implements JbSerializer {
 	
 	private ObjectSigner signer = null;
+	private UnsupportedListener listener = null;
 	
-	public PbSerializer(){}
+	public PbSerializer(UnsupportedListener argListener){
+		listener = argListener;
+	}
 	
 	public PbSerializer(ObjectSigner argSigner){
+		signer = argSigner;
+	}
+	
+	public PbSerializer(UnsupportedListener argListener, ObjectSigner argSigner){
+		listener = argListener;
 		signer = argSigner;
 	}
 
 	@Override
 	public void setObjectSigner(ObjectSigner argSigner) {
 		signer = argSigner;
+	}
+	
+	@Override
+	public void setUnsupportedListener(UnsupportedListener argListener) {
+		listener = argListener;
 	}
 
 	@Override
@@ -73,9 +90,9 @@ public class PbSerializer implements JbSerializer {
 	public PbWorld.Builder serializeWorld(World argWorld) {
 		final PbWorld.Builder builder = PbWorld.newBuilder();
 		if(signer != null){
-			Integer id = signer.getId(argWorld);
-			if(id != null){
-				builder.setId(id);
+			Long tag = signer.getTag(argWorld);
+			if(tag != null){
+				builder.setTag(tag);
 			}
 		}
 		
@@ -101,20 +118,21 @@ public class PbSerializer implements JbSerializer {
 		// first pass
 		while(cjoint != null){
 			if(SerializationHelper.isIndependentJoint(cjoint.getType())){
-				builder.addJoints(serializeIndepJoint(
-						cjoint, bodies));
+				builder.addJoints(serializeJoint(
+						cjoint, bodies, joints));
 				joints.put(cjoint, cnt);
 				cnt++;
 			}
 			cjoint = cjoint.m_next;
 		}
 		
-		// second pass
+		// second pass for dependent joints
 		cjoint = argWorld.getJointList();
 		while(cjoint != null){
 			if(!SerializationHelper.isIndependentJoint(cjoint.getType())){
-				builder.addJoints(serializeDependJoint(
+				builder.addJoints(serializeJoint(
 						cjoint, bodies, joints));
+				joints.put(cjoint, cnt);
 				cnt++;
 			}
 			cjoint = cjoint.m_next;
@@ -125,7 +143,11 @@ public class PbSerializer implements JbSerializer {
 
 	@Override
 	public SerializationResult serialize(Body argBody) {
-		final PbBody body = serializeBody(argBody).build();
+		PbBody.Builder builder = serializeBody(argBody);
+		if(builder == null){
+			return null;
+		}
+		final PbBody body = builder.build();
 		return new SerializationResult() {
 			@Override
 			public void writeTo(OutputStream argOutputStream) throws IOException {
@@ -141,9 +163,9 @@ public class PbSerializer implements JbSerializer {
 	public PbBody.Builder serializeBody(Body argBody) {
 		PbBody.Builder builder = PbBody.newBuilder();
 		if(signer != null){
-			Integer id = signer.getId(argBody);
+			Long id = signer.getTag(argBody);
 			if(id != null){
-				builder.setId(id);
+				builder.setTag(id);
 			}
 		}
 		switch(argBody.getType()){
@@ -157,8 +179,14 @@ public class PbSerializer implements JbSerializer {
 				builder.setType(PbBodyType.STATIC);
 				break;
 			default:
-				throw new IllegalArgumentException(
-						"Unknown body type: "+argBody.getType());
+				UnsupportedObjectException e =
+					new UnsupportedObjectException("Unknown body type: " + argBody.getType(),
+							Type.BODY);
+				if(listener == null){
+					throw e;
+				}
+				listener.isUnsupported(e);
+				return null;
 		}
 		builder.setPosition(vecToPb(argBody.getPosition()));
 		builder.setAngle(argBody.getAngle());
@@ -168,6 +196,10 @@ public class PbSerializer implements JbSerializer {
 		builder.setAngularDamping(argBody.getAngularDamping());
 		//TODO
 		//builder.setGravityScale(argBody.getGravityScale());
+		
+		builder.setForce(vecToPb(argBody.m_force));
+		builder.setTorque(argBody.m_torque);
+		
 		builder.setBullet(argBody.isBullet());
 		builder.setAllowSleep(argBody.isSleepingAllowed());
 		builder.setAwake(argBody.isAwake());
@@ -204,9 +236,9 @@ public class PbSerializer implements JbSerializer {
 	public PbFixture.Builder serializeFixture(Fixture argFixture) {
 		final PbFixture.Builder builder = PbFixture.newBuilder();
 		if(signer != null){
-			Integer id = signer.getId(argFixture);
-			if(id != null){
-				builder.setId(id);
+			Long tag = signer.getTag(argFixture);
+			if(tag != null){
+				builder.setTag(tag);
 			}
 		}
 		
@@ -223,8 +255,12 @@ public class PbSerializer implements JbSerializer {
 
 	@Override
 	public SerializationResult serialize(Shape argShape) {
+		PbShape.Builder builder = serializeShape(argShape);
+		if(builder == null){
+			return null;
+		}
 		// should we do lazy building?
-		final PbShape shape = serializeShape(argShape).build();
+		final PbShape shape = builder.build();
 		return new SerializationResult() {
 			@Override
 			public void writeTo(OutputStream argOutputStream) throws IOException{
@@ -239,6 +275,12 @@ public class PbSerializer implements JbSerializer {
 	
 	public PbShape.Builder serializeShape(Shape argShape){
 		final PbShape.Builder builder = PbShape.newBuilder();
+		if(signer != null){
+			Long tag = signer.getTag(argShape);
+			if(tag != null){
+				builder.setTag(tag);
+			}
+		}
 		builder.setRadius(argShape.m_radius);
 		
 		switch(argShape.m_type){
@@ -257,132 +299,65 @@ public class PbSerializer implements JbSerializer {
 				}
 				break;
 			default:
-				throw new IllegalArgumentException(
-						"Currently only encodes circle and polygon shapes");
-		}
-		
-		return builder;
-	}
-	
-	@Override
-	public SerializationResult serialize(Joint argJoint,
-			Map<Body, Integer> argBodyIndexMap) {
-		final PbJoint joint = serializeIndepJoint(argJoint, argBodyIndexMap).build();
-		return new SerializationResult() {
-			@Override
-			public void writeTo(OutputStream argOutputStream) throws IOException {
-				joint.writeTo(argOutputStream);
-			}
-			@Override
-			public Object getValue() {
-				return joint;
-			}
-		};
-	}
-	
-	@Override
-	public SerializationResult serialize(Joint argJoint,
-			Map<Body, Integer> argBodyIndexMap,
-			Map<Joint, Integer> argJointIndexMap) {
-		final PbJoint joint = serializeDependJoint(argJoint,
-				argBodyIndexMap, argJointIndexMap).build();
-		return new SerializationResult() {
-			@Override
-			public void writeTo(OutputStream argOutputStream) throws IOException {
-				joint.writeTo(argOutputStream);
-			}
-			@Override
-			public Object getValue() {
-				return joint;
-			}
-		};
-	}
-	
-	public PbJoint.Builder serializeDependJoint(Joint argJoint,
-			Map<Body, Integer> argBodyIndexMap,
-			Map<Joint, Integer> argJointIndexMap){
-		final PbJoint.Builder builder = PbJoint.newBuilder();
-		if(signer != null){
-			Integer id = signer.getId(argJoint);
-			if(id != null){
-				builder.setId(id);
-			}
-		}
-		Body bA = argJoint.m_bodyA;
-		Body bB = argJoint.m_bodyB;
-		
-		if(bA != null){
-			if(!argBodyIndexMap.containsKey(bA)){
-				throw new IllegalArgumentException("Body " + bA +
-						" is not present in the index map");
-			}
-			builder.setBodyA(argBodyIndexMap.get(bA));
-		}
-		
-		if(bB != null){
-			if(!argBodyIndexMap.containsKey(bB)){
-				throw new IllegalArgumentException("Body " + bB +
-						" is not present in the index map");
-			}
-			builder.setBodyB(argBodyIndexMap.get(bB));
-		}
-		
-		builder.setCollideConnected(argJoint.m_collideConnected);
-		
-		switch(argJoint.getType()){
-			case GEAR:{
-				GearJoint j = (GearJoint) argJoint;
-				builder.setType(PbJointType.GEAR);
-				builder.setAnchorA(vecToPb(j.m_localAnchor1));
-				builder.setAnchorB(vecToPb(j.m_localAnchor2));
-				builder.setRatio(j.getRatio());
-				if(!argJointIndexMap.containsKey(j.getJoint1())){
-					throw new IllegalArgumentException("Joint 1 not in map");
+				UnsupportedObjectException e =
+					new UnsupportedObjectException("Currently only encodes circle and polygon shapes",
+							Type.SHAPE);
+				if(listener == null){
+					throw e;
 				}
-				int j1 = argJointIndexMap.get(j.getJoint1());
-				if(!argJointIndexMap.containsKey(j.getJoint2())){
-					throw new IllegalArgumentException("Joint 2 not in map");
-				}
-				int j2 = argJointIndexMap.get(j.getJoint2());
-				
-				builder.setJoint1(j1);
-				builder.setJoint2(j2);
-			} break;
-			default:
-				throw new IllegalArgumentException(
-						"Unknown dependant joint type: " + argJoint.getType());
+				listener.isUnsupported(e);
+				return null;
 		}
 		
 		return builder;
 	}
 
-	public PbJoint.Builder serializeIndepJoint(Joint argJoint,
-			Map<Body, Integer> argBodyIndexMap) {
+	@Override
+	public SerializationResult serialize(Joint argJoint,
+			Map<Body, Integer> argBodyIndexMap,
+			Map<Joint, Integer> argJointIndexMap) {
+		PbJoint.Builder builder = serializeJoint(argJoint,
+				argBodyIndexMap, argJointIndexMap);
+		if(builder == null){
+			return null;
+		}
+		final PbJoint joint = builder.build();
+		return new SerializationResult() {
+			@Override
+			public void writeTo(OutputStream argOutputStream) throws IOException {
+				joint.writeTo(argOutputStream);
+			}
+			@Override
+			public Object getValue() {
+				return joint;
+			}
+		};
+	}
+	
+	public PbJoint.Builder serializeJoint(Joint argJoint,
+			Map<Body, Integer> argBodyIndexMap,
+			Map<Joint, Integer> argJointIndexMap) {
 		final PbJoint.Builder builder = PbJoint.newBuilder();
 		if(signer != null){
-			Integer id = signer.getId(argJoint);
-			if(id != null){
-				builder.setId(id);
+			Long tag = signer.getTag(argJoint);
+			if(tag != null){
+				builder.setTag(tag);
 			}
 		}
 		Body bA = argJoint.m_bodyA;
 		Body bB = argJoint.m_bodyB;
 		
-		if(bA != null){
-			if(!argBodyIndexMap.containsKey(bA)){
-				throw new IllegalArgumentException("Body " + bA +
-						" is not present in the index map");
-			}
-			builder.setBodyA(argBodyIndexMap.get(bA));
+		if(!argBodyIndexMap.containsKey(bA)){
+			throw new IllegalArgumentException("Body " + bA +
+					" is not present in the index map");
 		}
-		
-		if(bB != null){
-			if(!argBodyIndexMap.containsKey(bB)){
-				throw new IllegalArgumentException("Body " + bB +
-						" is not present in the index map");
-			}
-			builder.setBodyB(argBodyIndexMap.get(bB));
+		builder.setBodyA(argBodyIndexMap.get(bA));
+	
+		if(!argBodyIndexMap.containsKey(bB)){
+			throw new IllegalArgumentException("Body " + bB +
+					" is not present in the index map");
 		}
+		builder.setBodyB(argBodyIndexMap.get(bB));
 		
 		builder.setCollideConnected(argJoint.m_collideConnected);
 		
@@ -443,11 +418,23 @@ public class PbSerializer implements JbSerializer {
 				builder.setDampingRatio(j.getDampingRatio());
 			} break;
 			case GEAR: {
-				//GearJoint j = (GearJoint) argJoint;
-				// dep joint
-				throw new IllegalArgumentException("Gear joint not serialized in this method. " +
-							"You must use dependant joint serialization method.");
-			}
+				GearJoint j = (GearJoint) argJoint;
+				builder.setType(PbJointType.GEAR);
+				builder.setAnchorA(vecToPb(j.m_localAnchor1));
+				builder.setAnchorB(vecToPb(j.m_localAnchor2));
+				builder.setRatio(j.getRatio());
+				if(!argJointIndexMap.containsKey(j.getJoint1())){
+					throw new IllegalArgumentException("Joint 1 not in map");
+				}
+				int j1 = argJointIndexMap.get(j.getJoint1());
+				if(!argJointIndexMap.containsKey(j.getJoint2())){
+					throw new IllegalArgumentException("Joint 2 not in map");
+				}
+				int j2 = argJointIndexMap.get(j.getJoint2());
+				
+				builder.setJoint1(j1);
+				builder.setJoint2(j2);
+			} break;
 			case FRICTION: {
 				FrictionJoint j = (FrictionJoint) argJoint;
 				builder.setType(PbJointType.FRICTION);
@@ -456,9 +443,30 @@ public class PbSerializer implements JbSerializer {
 				builder.setMaxForce(j.getMaxForce());
 				builder.setMaxTorque(j.getMaxTorque());
 			} break;
+			case CONSTANT_VOLUME: {
+				ConstantVolumeJoint j = (ConstantVolumeJoint) argJoint;
+				builder.setType(PbJointType.CONSTANT_VOLUME);
+				builder.setFrequency(j.frequencyHz);
+				builder.setDampingRatio(j.dampingRatio);
+				builder.setTargetVolume(j.targetVolume);
+				
+				for(Body b : j.bodies){
+					if(!argBodyIndexMap.containsKey(b)){
+						throw new IllegalArgumentException("Body " + b +
+								" is not present in the index map");
+					}
+					builder.addBodies(argBodyIndexMap.get(b));
+				}
+			} break;
 			default:
-				throw new IllegalArgumentException(
-						"Unknown joint type: "+argJoint.getType());
+				UnsupportedObjectException e =
+					new UnsupportedObjectException("Unknown joint type: "+argJoint.getType(),
+							Type.JOINT);
+				if(listener == null){
+					throw e;
+				}
+				listener.isUnsupported(e);
+				return null;
 		}
 		return builder;
 	}

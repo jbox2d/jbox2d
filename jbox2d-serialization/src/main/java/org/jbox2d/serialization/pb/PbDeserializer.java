@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.box2d.proto.Box2D.PbFixture;
+import org.box2d.proto.Box2D.PbJoint;
 import org.box2d.proto.Box2D.PbShape;
 import org.box2d.proto.Box2D.PbVec2;
 import org.jbox2d.collision.shapes.CircleShape;
@@ -16,7 +17,10 @@ import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.joints.Joint;
+import org.jbox2d.dynamics.joints.JointDef;
+import org.jbox2d.dynamics.joints.PrismaticJointDef;
 import org.jbox2d.serialization.JbDeserializer;
+import org.jbox2d.serialization.UnsupportedListener;
 
 public class PbDeserializer implements JbDeserializer{
 
@@ -25,6 +29,13 @@ public class PbDeserializer implements JbDeserializer{
 	@Override
 	public void setObjectListener(ObjectListener argListener) {
 		listener = argListener;
+	}
+
+
+	@Override
+	public void setUnsupportedListener(UnsupportedListener argListener) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	@Override
@@ -60,7 +71,7 @@ public class PbDeserializer implements JbDeserializer{
 		
 		Fixture fixture = argBody.createFixture(fd);
 		if(listener != null){
-			listener.processFixture(fixture, f.getId());
+			listener.processFixture(fixture, f.getTag());
 		}
 		return fixture;
 	}
@@ -99,6 +110,10 @@ public class PbDeserializer implements JbDeserializer{
 			default:
 				throw new IllegalArgumentException("Unknown shape type");
 		}
+		
+		if(listener != null){
+			listener.processShape(shape, s.getTag());
+		}
 		return shape;
 	}
 
@@ -107,6 +122,27 @@ public class PbDeserializer implements JbDeserializer{
 			Map<Integer, Body> argBodyMap, Map<Integer, Joint> argJointMap) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public Joint deserializeJoint(World argWorld, PbJoint argJoint,
+			Map<Integer, Body> argBodyMap,
+			Map<Integer, Joint> argJointMap){
+		JointDef jd = null;
+		
+		switch(argJoint.getType()){
+			case PRISMATIC:
+				jd = new PrismaticJointDef();
+		}
+		
+		
+		if(!argBodyMap.containsKey(argJoint.getBodyA())){
+			throw new IllegalArgumentException("Index " + argJoint.getBodyA() +
+				" is not present in the body map");
+		}
+		jd.bodyA = argBodyMap.get(argJoint.getBodyA());
+		
+		
+		return argWorld.createJoint(jd);
 	}
 	
 	private Vec2 pbToVec(PbVec2 argVec){

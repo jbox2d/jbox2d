@@ -37,6 +37,7 @@ enum PbJointType {
   WELD = 8;
   FRICTION = 9;
   ROPE = 10;
+  CONSTANT_VOLUME = 11;
 }
 
 
@@ -50,28 +51,29 @@ message PbFilter {
 
 // just include all fields we might use
 message PbShape {
-  required PbShapeType type = 1;
-  optional PbVec2 center = 2; // circle
-  optional float radius = 3; // circle
+  optional int64 tag = 1;
+  required PbShapeType type = 2;
+  optional PbVec2 center = 10; // circle
+  optional float radius = 11; // circle
   
-  repeated PbVec2 points = 4; // polygon
-  repeated PbVec2 normals = 5; // polygon
-  optional PbVec2 centroid = 6;
+  repeated PbVec2 points = 20; // polygon
+  repeated PbVec2 normals = 21; // polygon
+  optional PbVec2 centroid = 22; // polygon
 }
 
 message PbFixture {
-  optional int32 id = 1;
+  optional int64 tag = 1;
   optional float restitution = 2;
   optional float friction = 3;
   optional float density = 4;
   optional bool sensor = 5;
   
-  optional PbFilter filter = 6;
-  optional PbShape shape = 7;
+  optional PbFilter filter = 10;
+  optional PbShape shape = 11;
 }
 
 message PbJoint {
-  optional int32 id = 1;
+  optional int64 tag = 1;
   required PbJointType type = 2;
   
   optional int32 body_a = 3;
@@ -94,8 +96,8 @@ message PbJoint {
   optional float max_motor_force = 21; // used by: prismatic
   
   optional float length = 30; // used by: distance
-  optional float frequency = 31; // used by: distance, mouse
-  optional float damping_ratio = 32; // used by: distance, mouse
+  optional float frequency = 31; // used by: distance, mouse, con vol
+  optional float damping_ratio = 32; // used by: distance, mouse, col vol
   
   optional PbVec2 ground_anchor_a = 40; // used by: pulley
   optional PbVec2 ground_anchor_b = 41; // used by: pulley
@@ -118,36 +120,41 @@ message PbJoint {
   
   optional float max_length = 100; // used by: rope
   
-  repeated int32 bodies = 110; // used by: constant volume joint
+  repeated int32 bodies = 110; // used by: con vol
+  optional float target_volume = 111; // used by: con vol
   
 }
 
 message PbBody {
-  optional int32 id = 1;
+  optional int64 tag = 1;
   required PbBodyType type = 2;
-  optional PbVec2 position = 3;
-  optional float angle = 4;
-  optional PbVec2 linear_velocity = 5;
-  optional float angular_velocity = 6;
-  optional float linear_damping = 7;
-  optional float angular_damping = 8;
-  optional float gravity_scale = 9;
   
-  optional bool bullet = 10;
-  optional bool allow_sleep = 11;
-  optional bool awake = 12;
-  optional bool active = 13;
-  optional bool fixed_rotation = 14;
-  
+  // physical attributes
+  optional PbVec2 position = 10;
+  optional float angle = 11;
+  optional PbVec2 linear_velocity = 12;
+  optional float angular_velocity = 13;
+  optional PbVec2 force = 14;
+  optional float torque = 15;
   // mass
-  optional float mass = 15;
-  optional float I = 16;
+  optional float mass = 16;
+  optional float I = 17;
   
-  repeated PbFixture fixtures = 20;
+  // configuration
+  optional float linear_damping = 50;
+  optional float angular_damping = 51;
+  optional float gravity_scale = 52;
+  optional bool bullet = 53;
+  optional bool allow_sleep = 54;
+  optional bool awake = 55;
+  optional bool active = 56;
+  optional bool fixed_rotation = 57;
+  
+  repeated PbFixture fixtures = 100;
 }
 
 message PbWorld {
-  optional int32 id = 1;
+  optional int64 tag = 1;
   optional PbVec2 gravity = 2;
   optional bool allow_sleep = 3;
   optional bool auto_clear_forces = 4;
