@@ -33,10 +33,13 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.World;
 
+// TODO(dmurph): clean this up a bit, add docs
 public class ConstantVolumeJoint extends Joint {
-	Body[] bodies;
+	
+	
+	public final Body[] bodies;
 	float[] targetLengths;
-	float targetVolume;
+	public float targetVolume;
 	//float relaxationFactor;//1.0 is perfectly stiff (but doesn't work, unstable)
 
 	Vec2[] normals;
@@ -47,6 +50,9 @@ public class ConstantVolumeJoint extends Joint {
 	private World world;
 
 	DistanceJoint[] distanceJoints;
+	
+	public final float frequencyHz;
+	public final float dampingRatio;
 
 	public Body[] getBodies() {
 		return bodies;
@@ -81,6 +87,8 @@ public class ConstantVolumeJoint extends Joint {
 			djd.initialize(bodies[i], bodies[next], bodies[i].getWorldCenter(), bodies[next].getWorldCenter());
 			distanceJoints[i] = (DistanceJoint)world.createJoint(djd);
 		}
+		frequencyHz = def.frequencyHz;
+		dampingRatio = def.dampingRatio;
 
 		normals = new Vec2[bodies.length];
 		for (int i=0; i<normals.length; ++i) {
