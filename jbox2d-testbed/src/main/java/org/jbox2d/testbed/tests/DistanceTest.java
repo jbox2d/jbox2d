@@ -54,7 +54,7 @@ public class DistanceTest extends TestbedTest {
 	}
 	
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
 		
 		input.transformA = new Transform();
 		input.transformB = new Transform();

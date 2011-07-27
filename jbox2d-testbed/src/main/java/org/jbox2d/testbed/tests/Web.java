@@ -48,10 +48,10 @@ public class Web extends TestbedTest {
 	Joint m_joints[] = new Joint[8];
 	
 	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
+	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
 	 */
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
 		Body ground = null;
 		{
 			BodyDef bd = new BodyDef();

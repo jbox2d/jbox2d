@@ -62,11 +62,18 @@ public class CollisionFiltering extends TestbedTest {
 	final int k_boxMask = 0xFFFF ^ k_triangleCategory;
 	final int k_circleMask = 0xFFFF;
 	
+	@Override
+	public boolean isSaveLoadEnabled() {
+	  return true;
+	}
 	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
+	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
 	 */
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
+	  if(argDeserialized){
+	    return;
+	  }
 		// Ground body
 		{
 			PolygonShape shape = new PolygonShape();

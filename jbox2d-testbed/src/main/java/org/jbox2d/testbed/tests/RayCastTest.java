@@ -63,7 +63,7 @@ public class RayCastTest extends TestbedTest {
 	}
 	
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
 		m_bodies = new Body[e_maxBodies];
 		m_userData = new Integer[e_maxBodies];
 		m_polygons = new PolygonShape[4];

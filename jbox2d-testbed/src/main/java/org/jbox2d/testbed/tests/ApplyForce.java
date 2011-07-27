@@ -48,13 +48,19 @@ import org.jbox2d.testbed.framework.TestbedTest;
  */
 public class ApplyForce extends TestbedTest {
 	
+  private static final long BODY_TAG = 1;
+  
 	Body m_body;
 	
 	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
+	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
 	 */
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
+	  if(argDeserialized){
+	    return;
+	  }
+	  
 		m_world.setGravity(new Vec2(0.0f, 0.0f));
 		
 		final float k_restitution = 0.4f;
@@ -209,6 +215,26 @@ public class ApplyForce extends TestbedTest {
 		if(TestPanel.keys['d']){
 			m_body.applyTorque(-20.0f);
 		}
+	}
+	
+	@Override
+	public boolean isSaveLoadEnabled() {
+	  return true;
+	}
+	
+	@Override
+	public Long getTag(Body argBody) {
+	  if(argBody == m_body){
+	    return BODY_TAG;
+	  }
+	  return null;
+	}
+	
+	@Override
+	public void processBody(Body argBody, Long argTag) {
+	  if(argTag == BODY_TAG){
+	    m_body = argBody;
+	  }
 	}
 	
 	/**

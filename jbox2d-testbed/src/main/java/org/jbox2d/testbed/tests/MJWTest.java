@@ -37,7 +37,7 @@ import org.jbox2d.testbed.framework.TestbedTest;
 public class MJWTest extends TestbedTest {
    
    @Override
-   public void initTest() {
+   public void initTest(boolean argDeserialized) {
       setTitle("Couple of Things Test");
       
       m_world.setGravity(new Vec2());

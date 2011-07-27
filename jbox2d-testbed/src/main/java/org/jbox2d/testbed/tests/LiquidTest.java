@@ -229,7 +229,7 @@ public class LiquidTest extends TestbedTest {
 	}
 	
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
 		if (firstTime) {
 			setCamera(0f, 2f, 35f);
 			firstTime = false;

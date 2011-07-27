@@ -61,15 +61,23 @@ import org.jbox2d.dynamics.joints.ConstantVolumeJointDef;
 import org.jbox2d.testbed.framework.TestbedTest;
 
 public class BlobTest4 extends TestbedTest {
-	private boolean firstTime = true;
+  
 	
 	@Override
-	public void initTest() {
-
-		if (firstTime) {
-			setCamera(0.0f,10.0f,20.0f);
-			firstTime = false;
-		}
+	public float getDefaultCameraScale() {
+	  return 20;
+	}
+	
+	@Override
+	public boolean isSaveLoadEnabled() {
+	  return true;
+	}
+	
+	@Override
+	public void initTest(boolean argDeserialized) {
+	  if(argDeserialized){
+	    return;
+	  }
 		
     	Body ground = null;
 		{

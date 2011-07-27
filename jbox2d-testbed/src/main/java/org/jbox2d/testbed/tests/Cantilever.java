@@ -44,15 +44,22 @@ import org.jbox2d.testbed.framework.TestbedTest;
  */
 public class Cantilever extends TestbedTest {
 	
-	Body m_middle;
 	
 	int e_count = 8;
 	
+	@Override
+	public boolean isSaveLoadEnabled() {
+	  return true;
+	}
+	
 	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
+	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
 	 */
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
+	  if(argDeserialized){
+	    return;
+	  }
 		Body ground = null;
 		{
 			BodyDef bd = new BodyDef();

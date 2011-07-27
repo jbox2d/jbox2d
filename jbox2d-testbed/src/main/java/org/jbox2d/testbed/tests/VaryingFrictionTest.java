@@ -40,9 +40,17 @@ public class VaryingFrictionTest extends TestbedTest {
 	public String getTestName() {
 		return "Varying Friction";
 	}
+	
+	@Override
+	public boolean isSaveLoadEnabled() {
+	  return true;
+	}
 
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
+	  if(argDeserialized){
+	    return;
+	  }
 		{
 			BodyDef bd = new BodyDef();
 			Body ground = m_world.createBody(bd);
