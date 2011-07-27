@@ -7,6 +7,6 @@ public final class SerializationHelper {
 	private SerializationHelper(){}
 	
 	public static boolean isIndependentJoint(JointType argType){
-		return argType != JointType.GEAR;
+		return argType != JointType.GEAR && argType != JointType.CONSTANT_VOLUME;
 	}
 }

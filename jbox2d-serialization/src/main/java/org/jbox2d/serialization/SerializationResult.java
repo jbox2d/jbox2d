@@ -7,7 +7,7 @@ import java.io.OutputStream;
  * Container for holding serialization results.  Use
  * {@link #getValue()} to get the implementation-specific
  * result.
- * @author dmurph
+ * @author Daniel Murphy
  *
  */
 public interface SerializationResult {

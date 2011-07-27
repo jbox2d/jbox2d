@@ -32,13 +32,41 @@ public interface JbSerializer {
 	 */
 	public void setUnsupportedListener(UnsupportedListener argListener);
 
-	public SerializationResult serialize(World argWorld);
+	/**
+	 * Serializes the world
+	 * @param argWorld
+	 * @return
+   * @throws UnsupportedObjectException if a physics object is unsupported by this library.
+   * @see #setUnsupportedListener(UnsupportedListener)
+	 */
+	public SerializationResult serialize(World argWorld) throws UnsupportedObjectException;
 	
-	public SerializationResult serialize(Body argBody);
+	/**
+	 * Serializes a body
+	 * @param argBody
+	 * @return
+   * @throws UnsupportedObjectException if a physics object is unsupported by this library.
+   * @see #setUnsupportedListener(UnsupportedListener)
+	 */
+	public SerializationResult serialize(Body argBody) throws UnsupportedObjectException;
 	
-	public SerializationResult serialize(Fixture argFixture);
+	/**
+	 * Serializes a fixture
+	 * @param argFixture
+	 * @return
+	 * @throws UnsupportedObjectException if a physics object is unsupported by this library.
+	 * @see #setUnsupportedListener(UnsupportedListener)
+	 */
+	public SerializationResult serialize(Fixture argFixture) throws UnsupportedObjectException;
 	
-	public SerializationResult serialize(Shape argShape);
+	/**
+	 * Serializes a shape
+	 * @param argShape
+	 * @return
+   * @throws UnsupportedObjectException if a physics object is unsupported by this library.
+   * @see #setUnsupportedListener(UnsupportedListener)
+	 */
+	public SerializationResult serialize(Shape argShape) throws UnsupportedObjectException;
 	
 	/**
 	 * Serializes joints.  Joints need to reference bodies
