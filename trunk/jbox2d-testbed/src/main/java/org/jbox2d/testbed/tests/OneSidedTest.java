@@ -58,7 +58,7 @@ public class OneSidedTest extends TestbedTest{
 	}
 
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
 		// Ground
 		{
 			BodyDef bd = new BodyDef();

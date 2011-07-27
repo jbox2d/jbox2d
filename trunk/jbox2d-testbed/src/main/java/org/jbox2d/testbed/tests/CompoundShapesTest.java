@@ -45,11 +45,19 @@ import org.jbox2d.testbed.framework.TestbedTest;
  */
 public class CompoundShapesTest extends TestbedTest{
 
+  @Override
+  public boolean isSaveLoadEnabled() {
+    return true;
+  }
 	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
+	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
 	 */
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
+	  if(argDeserialized){
+	    return;
+	  }
+	  
 		{
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, 0.0f);

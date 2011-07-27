@@ -56,10 +56,10 @@ public class Gears extends TestbedTest {
 	GearJoint m_joint5;
 	
 	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
+	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
 	 */
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
 		Body ground = null;
 		{
 			BodyDef bd = new BodyDef();

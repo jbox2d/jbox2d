@@ -49,10 +49,10 @@ public class PrismaticTest extends TestbedTest {
 	PrismaticJoint m_joint;
 	
 	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
+	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
 	 */
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
 		Body ground = null;
 		{
 			BodyDef bd = new BodyDef();

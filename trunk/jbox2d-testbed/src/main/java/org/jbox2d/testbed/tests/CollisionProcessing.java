@@ -48,11 +48,18 @@ import org.jbox2d.testbed.framework.TestbedTest;
  */
 public class CollisionProcessing extends TestbedTest {
 	
+  @Override
+  public boolean isSaveLoadEnabled() {
+    return true;
+  }
 	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
+	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
 	 */
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
+	  if(argDeserialized){
+	    return;
+	  }
 		// Ground body
 		{
 			PolygonShape shape = new PolygonShape();

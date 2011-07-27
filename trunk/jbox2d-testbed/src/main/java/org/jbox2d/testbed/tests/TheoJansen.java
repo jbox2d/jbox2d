@@ -38,6 +38,7 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.joints.DistanceJointDef;
+import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jbox2d.testbed.framework.TestbedSettings;
@@ -48,6 +49,12 @@ import org.jbox2d.testbed.framework.TestbedTest;
  */
 public class TheoJansen extends TestbedTest {
 	
+  private static final long CHASSIS_TAG = 1;
+  private static final long WHEEL_TAG = 2;
+  
+  private static final long MOTOR_TAG = 8;
+
+  
 	Vec2 m_offset = new Vec2();
 	Body m_chassis;
 	Body m_wheel;
@@ -55,11 +62,57 @@ public class TheoJansen extends TestbedTest {
 	boolean m_motorOn;
 	float m_motorSpeed;
 	
+	@Override
+	public Long getTag(Body argBody) {
+	  if(argBody == m_chassis){
+	    return CHASSIS_TAG;
+	  }
+	  else if(argBody == m_wheel){
+	    return WHEEL_TAG;
+	  }
+	  return null;
+	}
+	
+	@Override
+	public Long getTag(Joint argJoint) {
+	  if(argJoint == m_motorJoint){
+	    return MOTOR_TAG;
+	  }
+	  return null;
+	}
+
+	@Override
+	public void processBody(Body argBody, Long argTag) {
+	  if(argTag == CHASSIS_TAG){
+	    m_chassis = argBody;
+	  }
+	  else if(argTag == WHEEL_TAG){
+	    m_wheel = argBody;
+	  }
+	}
+	
+	@Override
+	public void processJoint(Joint argJoint, Long argTag) {
+	  if(argTag == MOTOR_TAG){
+	    m_motorJoint = (RevoluteJoint) argJoint;
+	    m_motorOn = m_motorJoint.m_enableMotor;
+	  }
+	}
+	
+	@Override
+	public boolean isSaveLoadEnabled() {
+	  return true;
+	}
+	
 	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
+	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
 	 */
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
+	  if(argDeserialized){
+	    return;
+	  }
+	  
 		m_offset.set(0.0f, 8.0f);
 		m_motorSpeed = 2.0f;
 		m_motorOn = true;

@@ -56,10 +56,10 @@ public class SensorTest extends TestbedTest {
 	BoolWrapper m_touching[] = new BoolWrapper[e_count];
 	
 	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
+	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
 	 */
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
 		
 		for(int i=0; i<m_touching.length; i++){
 			m_touching[i] = new BoolWrapper();

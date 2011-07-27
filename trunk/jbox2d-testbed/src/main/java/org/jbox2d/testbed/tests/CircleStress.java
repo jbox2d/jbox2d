@@ -37,6 +37,7 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
+import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jbox2d.testbed.framework.TestbedSettings;
@@ -47,18 +48,48 @@ import org.jbox2d.testbed.framework.TestbedTest;
  */
 public class CircleStress extends TestbedTest {
 	
-	private boolean firstTime = true;
+  private static final long JOINT_TAG = 1;
+  
 	private RevoluteJoint joint;
 	
+	@Override
+	public Long getTag(Joint argJoint) {
+	  if(argJoint == joint){
+	    return JOINT_TAG;
+	  }
+	  return null;
+	}
+	
+	@Override
+	public void processJoint(Joint argJoint, Long argTag) {
+	  if(argTag == JOINT_TAG){
+	    joint = (RevoluteJoint) argJoint;
+	  }
+	}
+	
+	@Override
+	public boolean isSaveLoadEnabled() {
+	  return true;
+	}
+	
+	@Override
+	public float getDefaultCameraY() {
+	  return 20;
+	}
+	
+	@Override
+	public float getDefaultCameraScale() {
+	  return 5;
+	}
+	
 	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
+	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
 	 */
 	@Override
-	public void initTest() {
-		if (firstTime) {
-			setCamera(0f, 20f, 5f);
-			firstTime = false;
-		}
+	public void initTest(boolean argDeserialized) {
+	  if(argDeserialized){
+	    return;
+	  }
 		
 		{
 			BodyDef bd = new BodyDef();

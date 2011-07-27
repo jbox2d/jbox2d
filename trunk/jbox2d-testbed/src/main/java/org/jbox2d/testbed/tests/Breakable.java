@@ -58,10 +58,10 @@ public class Breakable extends TestbedTest {
 	boolean m_break;
 	
 	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
+	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
 	 */
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
 		// Ground body
 		{
 			BodyDef bd = new BodyDef();

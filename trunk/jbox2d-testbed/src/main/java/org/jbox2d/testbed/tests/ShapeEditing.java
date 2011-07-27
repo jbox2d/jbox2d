@@ -49,10 +49,10 @@ public class ShapeEditing extends TestbedTest {
 	Fixture m_fixture2;
 	
 	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
+	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
 	 */
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
 		{
 			BodyDef bd = new BodyDef();
 			Body ground = m_world.createBody(bd);

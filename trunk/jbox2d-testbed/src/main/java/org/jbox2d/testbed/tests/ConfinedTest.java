@@ -42,12 +42,20 @@ public class ConfinedTest extends TestbedTest {
 	int e_rowCount = 0;
 	
 	@Override
+	public boolean isSaveLoadEnabled() {
+	  return true;
+	}
+	
+	@Override
 	public String getTestName() {
 		return "Confined";
 	}
 
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
+	  if(argDeserialized){
+	    return;
+	  }
 		{
 			BodyDef bd = new BodyDef();
 			Body ground = m_world.createBody(bd);

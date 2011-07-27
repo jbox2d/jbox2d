@@ -103,6 +103,10 @@ public class TestPanel extends JPanel implements Runnable{
 		setPreferredSize(new Dimension(panelWidth, panelHeight));
 	}
 	
+	public TestbedTest getCurrTest(){
+	  return currTest;
+	}
+	
 	public void init(){
 		grabFocus();
 		
@@ -257,7 +261,7 @@ public class TestPanel extends JPanel implements Runnable{
 	
 	public void resetTest(){
 		if(currTest != null){
-			currTest.init(draw);
+		  currTest.reset();
 		}
 	}
 	

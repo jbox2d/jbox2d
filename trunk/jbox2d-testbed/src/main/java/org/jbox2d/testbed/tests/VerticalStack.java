@@ -51,10 +51,10 @@ public class VerticalStack extends TestbedTest {
 	Body m_bodies[] = new Body[e_rowCount * e_columnCount];
 	int m_indices[] = new int[e_rowCount * e_columnCount];
 	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
+	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
 	 */
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
 		{
 			BodyDef bd = new BodyDef();
 			Body ground = m_world.createBody(bd);

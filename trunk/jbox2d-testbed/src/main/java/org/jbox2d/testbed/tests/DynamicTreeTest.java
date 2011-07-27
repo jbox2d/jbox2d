@@ -67,10 +67,10 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 	Random rand = new Random();
 
 	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
+	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
 	 */
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
 		worldExtent = 15.0f;
 		m_proxyExtent = 0.5f;
 

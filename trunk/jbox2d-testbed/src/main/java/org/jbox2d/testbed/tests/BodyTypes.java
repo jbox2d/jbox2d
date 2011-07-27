@@ -51,10 +51,16 @@ public class BodyTypes extends TestbedTest {
 	float m_speed;
 	
 	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest()
+	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
 	 */
 	@Override
-	public void initTest() {
+	public void initTest(boolean argDeserialized) {
+    m_speed = 3.0f;
+    
+    if(argDeserialized){
+      return;
+    }
+    
 		Body ground = null;
 		{
 			BodyDef bd = new BodyDef();
@@ -114,7 +120,6 @@ public class BodyTypes extends TestbedTest {
 			
 			m_world.createJoint(pjd);
 			
-			m_speed = 3.0f;
 		}
 		
 		// .create a payload
