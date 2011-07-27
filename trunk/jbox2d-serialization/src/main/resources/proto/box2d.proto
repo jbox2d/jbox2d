@@ -38,6 +38,7 @@ enum PbJointType {
   FRICTION = 9;
   ROPE = 10;
   CONSTANT_VOLUME = 11;
+  LINE = 12;
 }
 
 
@@ -81,19 +82,19 @@ message PbJoint {
   
   optional bool collideConnected = 5;
   
-  optional PbVec2 anchor_a = 6;
-  optional PbVec2 anchor_b = 7;
+  optional PbVec2 local_anchor_a = 6;
+  optional PbVec2 local_anchor_b = 7;
   
   optional float ref_angle = 10; // used by: revolute, prismatic, joint
-  optional bool enable_limit = 12; // used by: revolute, prismatic
-  optional float lower_limit = 13; // used by: revolute, prismatic
-  optional float upper_limit = 14; // used by: revolute, prismatic
-  optional bool enable_motor = 15; // used by: revolute, prismatic, wheel
+  optional bool enable_limit = 12; // used by: revolute, prismatic, line
+  optional float lower_limit = 13; // used by: revolute, prismatic, line
+  optional float upper_limit = 14; // used by: revolute, prismatic, line
+  optional bool enable_motor = 15; // used by: revolute, prismatic, wheel, line
   optional float motor_speed = 16; // used by: revolute, prismatic, wheel
   optional float max_motor_torque = 17; // used by: revolute, wheel
   
-  optional PbVec2 local_axis_a = 20; // used by: prismatic, wheel
-  optional float max_motor_force = 21; // used by: prismatic
+  optional PbVec2 local_axis_a = 20; // used by: prismatic, wheel, line
+  optional float max_motor_force = 21; // used by: prismatic, line
   
   optional float length = 30; // used by: distance
   optional float frequency = 31; // used by: distance, mouse, con vol
@@ -104,6 +105,8 @@ message PbJoint {
   optional float length_a = 42; // used by: pulley
   optional float length_b = 43; // used by: pulley
   optional float ratio = 44; // used by: pulley, gear
+  optional float max_length_a = 45; // used by: pulley
+  optional float max_length_b = 46; // used by: pulley
   
   optional PbVec2 target = 50; // used by: mouse
   optional float max_force = 51; // used by: mouse, friction, rope
@@ -121,8 +124,10 @@ message PbJoint {
   optional float max_length = 100; // used by: rope
   
   repeated int32 bodies = 110; // used by: con vol
-  optional float target_volume = 111; // used by: con vol
+  repeated int32 joints = 111; // used by: con vol
+  optional float target_volume = 112; // used by: con vol
   
+  // line joint 120
 }
 
 message PbBody {
