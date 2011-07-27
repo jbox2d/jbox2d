@@ -678,12 +678,6 @@ public class World {
 					vs[3].set(aabb.lowerBound.x, aabb.upperBound.y);
 					
 					m_debugDraw.drawPolygon(vs, 4, color);
-					if ((b.m_flags & Body.e_toiFlag) == Body.e_toiFlag) {
-						// log.debug("toi is on");
-						Vec2 v = b.getWorldCenter();
-						m_debugDraw.drawPoint(v, 5, color);
-						// m_debugDraw.drawString(v.x, v.y, "toi is on", color);
-					}
 				}
 			}
 		}
