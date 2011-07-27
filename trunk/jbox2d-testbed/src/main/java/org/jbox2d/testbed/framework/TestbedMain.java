@@ -30,6 +30,8 @@
 package org.jbox2d.testbed.framework;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -44,15 +46,18 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.ListCellRenderer;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.jbox2d.testbed.tests.TestList;
+import org.jbox2d.testbed.framework.TestbedModel.ListItem;
 
 /**
  * @author Daniel Murphy
@@ -63,12 +68,13 @@ public class TestbedMain extends JFrame {
 	private TestPanel panel;
 	private int currTestIndex;
 	private SidePanel side;
+	private TestbedModel model;
 	
-	public TestbedMain(){
+	public TestbedMain(TestbedModel argModel){
 		super("JBox2D Testbed");
+		model = argModel;
 		setLayout(new BorderLayout());
-		TestbedSettings s = new TestbedSettings();
-		panel = new TestPanel(s);
+		panel = new TestPanel(model.getSettings());
 		
 		panel.addKeyListener(new KeyListener() {
 			
@@ -90,7 +96,7 @@ public class TestbedMain extends JFrame {
 		});
 		
 		add(panel, "Center");
-		side = new SidePanel(s);
+		side = new SidePanel(argModel);
 		side.setMain(this);
 		add(new JScrollPane(side), "East");   
 		pack();
@@ -98,33 +104,52 @@ public class TestbedMain extends JFrame {
 		setVisible(true);
 		setDefaultCloseOperation(3);
 		currTestIndex = 0;
-		panel.changeTest(TestList.tests.get(0));
+		side.tests.setSelectedIndex(0);
+		side.actionPerformed(null);
+		//panel.changeTest(argModel.getTestAt(0));
 	}
 	
 	public void nextTest(){
 		int index = currTestIndex + 1;
-		index %= TestList.tests.size();
-		side.tests.setSelectedIndex(index);
+		index %= model.getTestsSize();
+		
+		while(!model.isTestAt(index) && index < model.getTestsSize() - 1){
+		    index++;
+		}
+		if(model.isTestAt(index)){
+		    side.tests.setSelectedIndex(index);
+		}
 	}
 	
 	public void lastTest(){
-		int index = currTestIndex - 1;
-		if(index < 0){
-			index += TestList.tests.size();
-		}
-		side.tests.setSelectedIndex(index);
+	    int index = currTestIndex - 1;
+	    index = (index < 0) ? index + model.getTestsSize() : index;
+	    
+	    while(!model.isTestAt(index) && index > 0){
+	        index--;
+	    }
+	    if(model.isTestAt(index)){
+	        side.tests.setSelectedIndex(index);
+	    }
 	}
 	
 	public void resetTest(){
 		panel.resetTest();
 	}
 	
-	public void testChanged(int argNew){
-		if(argNew == -1){
-			return;
-		}
-		currTestIndex = argNew;
-		panel.changeTest(TestList.tests.get(argNew));
+	public void testChanged(int argIndex){
+    if(argIndex == -1){
+        return;
+    }
+    if(!model.isTestAt(argIndex)){
+        if(argIndex + 1 < model.getTestsSize()){
+            side.tests.setSelectedIndex(argIndex + 1);
+        }else{
+            return;
+        }
+    }
+		currTestIndex = argIndex;
+		panel.changeTest(model.getTestAt(argIndex));
 		panel.grabFocus();
 	}
 	
@@ -133,37 +158,10 @@ public class TestbedMain extends JFrame {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 		}catch(Exception e){}
 		
-		new TestbedMain();
-		//test();
+		TestbedModel model = new TestbedModel();
+		TestList.populateModel(model);
+		new TestbedMain(model);
 	}
-	
-//	public static void test(){
-//		World w = new World(new Vec2(), true);
-//		
-//		for (int i = 0; i < 2; i++)
-//	      {
-////	         CircleShape circleShape = new CircleShape();
-////	         circleShape.m_radius = 1;
-////	         Shape shape = circleShape;
-//	         PolygonShape polygonShape = new PolygonShape();
-//	         polygonShape.setAsBox(1, 1);
-//	         Shape shape = polygonShape;
-//
-//	         BodyDef bodyDef = new BodyDef();
-//	         bodyDef.type = BodyType.DYNAMIC;
-//	         bodyDef.position.set(5 * i, 0);
-//	         bodyDef.angle = (float) (Math.PI / 4 * i);
-//	         bodyDef.allowSleep = false;
-//	         Body body = w.createBody(bodyDef);
-//	         body.createFixture(shape, 5.0f);
-//	         
-//	         body.applyForce(new Vec2(-10000 * (i - 1), 0), new Vec2());
-//	      }
-//		
-//		for(int i=0; i<100; i++){
-//			w.step(.01f,10, 10);
-//		}
-//	}
 }
 
 
@@ -174,7 +172,7 @@ public class TestbedMain extends JFrame {
 @SuppressWarnings("serial")
 class SidePanel extends JPanel implements ChangeListener, ActionListener{
 	
-	final TestbedSettings settings;
+	final TestbedModel model;
 	TestbedMain main;
 	
 	private JSlider hz;
@@ -201,8 +199,8 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 		"Draw Stats", "Draw Help", "Draw Dynamic Tree"
 	};
 	
-	public SidePanel(TestbedSettings argSettings){
-		settings = argSettings;
+	public SidePanel(TestbedModel argModel){
+		model = argModel;
 		initComponents();
 		addListeners();
 	}
@@ -215,17 +213,44 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 		setLayout(new BorderLayout());
 		setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		
+    TestbedSettings settings = model.getSettings();
 		
 		JPanel top = new JPanel();
 		top.setLayout(new GridLayout(0, 1));
 		top.setBorder(BorderFactory.createCompoundBorder(new EtchedBorder(EtchedBorder.LOWERED), BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-		String[] names = new String[TestList.tests.size()];
-		for(int i=0; i<names.length; i++){
-			names[i] = TestList.tests.get(i).getTestName();
-		}
-		tests = new JComboBox(names);
+		tests = new JComboBox(model.getComboModel());
 		tests.setMaximumSize(new Dimension(250, 20));
 		tests.addActionListener(this);
+		tests.setRenderer(new ListCellRenderer() {
+        JLabel categoryLabel = new JLabel();
+        JLabel testLabel = new JLabel();
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index,
+                boolean isSelected, boolean cellHasFocus) {
+            ListItem item = (ListItem) value;
+            
+            if(item.isCategory()){
+                categoryLabel.setOpaque(true);
+                categoryLabel.setBackground(new Color(.5f,.5f,.6f));
+                categoryLabel.setForeground(Color.white);
+                categoryLabel.setHorizontalAlignment(SwingConstants.CENTER);
+                categoryLabel.setText(item.category);
+                return categoryLabel;
+            }else{
+                testLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+                testLabel.setText(item.test.getTestName());
+                
+                if (isSelected) {
+                    testLabel.setBackground(list.getSelectionBackground());
+                    testLabel.setForeground(list.getSelectionForeground());
+                }else{
+                    testLabel.setBackground(list.getBackground());
+                    testLabel.setForeground(list.getForeground());
+                }
+                return testLabel;
+            }
+        }
+    });
 		JPanel testsp = new JPanel();
 		testsp.setLayout(new GridLayout(1, 2));
 		testsp.add(new JLabel("Choose a test:"));
@@ -334,11 +359,11 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 	public void addListeners(){
 		pauseButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(settings.pause){
-					settings.pause = false;
+				if(model.getSettings().pause){
+					model.getSettings().pause = false;
 					pauseButton.setText("Pause");
 				}else{
-					settings.pause = true;
+					model.getSettings().pause = true;
 					pauseButton.setText("Resume");
 				}
 			}
@@ -346,9 +371,9 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 		
 		stepButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				settings.singleStep = true;
-				if(!settings.pause){
-					settings.pause = true;
+				model.getSettings().singleStep = true;
+				if(!model.getSettings().pause){
+					model.getSettings().pause = true;
 					pauseButton.setText("Resume");
 				}
 			}
@@ -375,6 +400,8 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 	public void stateChanged(ChangeEvent e) {
 		if(e.getSource() instanceof JCheckBox){
 			JCheckBox box = (JCheckBox) e.getSource();
+			
+			TestbedSettings settings = model.getSettings();
 			
 			int i = (Integer)box.getClientProperty("index");
 			boolean tf = box.isSelected();
@@ -426,7 +453,9 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 			}
 		}else if(e.getSource() instanceof JSlider){
 			JSlider s = (JSlider) e.getSource();
-			
+
+      TestbedSettings settings = model.getSettings();
+      
 			if(s == hz){
 				settings.hz = s.getValue();
 				hzText.setText("Hz: "+s.getValue());
@@ -440,10 +469,7 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener{
 		}
 	}
 
-	/**
-	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-	 */
-	public void actionPerformed(ActionEvent e) {		
-		main.testChanged(tests.getSelectedIndex());
+	public void actionPerformed(ActionEvent e) {
+	  main.testChanged(tests.getSelectedIndex());
 	}
 }
