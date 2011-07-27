@@ -109,6 +109,14 @@ public class PulleyJoint extends Joint {
 	public float getOrigLength2() {
 		return origLength2;
 	}
+	
+	public float getMaxLength1(){
+	  return m_maxLength1;
+	}
+	
+	public float getMaxLength2(){
+	  return m_maxLength2;
+	}
 
 	/**
 	 * @see org.jbox2d.dynamics.joints.Joint#getAnchorA(org.jbox2d.common.Vec2)
