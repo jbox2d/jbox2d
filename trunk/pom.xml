@@ -8,6 +8,7 @@
 	<description>JBox2D is a 2d Java physics engine, a port of the C++ Box2d engine.  This is the parent pom for the library and testbed modules.</description>
 	<modules>
 		<module>jbox2d-library</module>
+		<module>jbox2d-serialization</module>
 		<module>jbox2d-testbed</module>
 	</modules>
 
