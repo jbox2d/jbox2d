@@ -30,7 +30,7 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.IWorldPool;
-import org.jbox2d.pooling.WorldPool;
+import org.jbox2d.pooling.normal.DefaultWorldPool;
 
 // updated to rev 100
 /** An axis-aligned bounding box. */
@@ -180,7 +180,7 @@ public class AABB {
 	 * @return
 	 */
 	public final boolean raycast(final RayCastOutput output, final RayCastInput input) {
-		return raycast(output, input, new WorldPool(4, 4));
+		return raycast(output, input, new DefaultWorldPool(4, 4));
 	}
 	
 	/**

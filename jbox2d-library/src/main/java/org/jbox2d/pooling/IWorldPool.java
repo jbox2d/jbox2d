@@ -48,15 +48,11 @@ public interface IWorldPool {
 
 	public IDynamicStack<Contact> getPolyCircleContactStack();
 
-	public IOrderedStack<Vec2> getVec2Stack();
-
 	public Vec2 popVec2();
 
 	public Vec2[] popVec2(int argNum);
 
 	public void pushVec2(int argNum);
-
-	public IOrderedStack<Vec3> getVec3Stack();
 
 	public Vec3 popVec3();
 
@@ -64,15 +60,11 @@ public interface IWorldPool {
 
 	public void pushVec3(int argNum);
 
-	public IOrderedStack<Mat22> getMat22Stack();
-
 	public Mat22 popMat22();
 
 	public Mat22[] popMat22(int argNum);
 
 	public void pushMat22(int argNum);
-
-	public IOrderedStack<AABB> getAABBStack();
 
 	public AABB popAABB();
 
