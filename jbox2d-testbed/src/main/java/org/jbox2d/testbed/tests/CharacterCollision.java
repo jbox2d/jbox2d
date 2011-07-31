@@ -45,152 +45,156 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class CharacterCollision extends TestbedTest {
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-	 */
-	@Override
-	public void initTest(boolean argDeserialized) {
-		// Ground body
-		{
-			BodyDef bd = new BodyDef();
-			Body ground = m_world.createBody(bd);
 
-			PolygonShape shape = new PolygonShape();
-			shape.setAsEdge(new Vec2(-20.0f, 0.0f), new Vec2(20.0f, 0.0f));
-			ground.createFixture(shape, 0.0f);
-		}
+  @Override
+  public boolean isSaveLoadEnabled() {
+    return true;
+  }
 
-		// Collinear edges
-		{
-			BodyDef bd = new BodyDef();
-			Body ground = m_world.createBody(bd);
+  /**
+   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
+   */
+  @Override
+  public void initTest(boolean argDeserialized) {
+    // Ground body
+    {
+      BodyDef bd = new BodyDef();
+      Body ground = m_world.createBody(bd);
 
-			PolygonShape shape = new PolygonShape();
-			shape.m_radius = 0.0f;
-			shape.setAsEdge(new Vec2(-8.0f, 1.0f), new Vec2(-6.0f, 1.0f));
-			ground.createFixture(shape, 0.0f);
-			shape.setAsEdge(new Vec2(-6.0f, 1.0f), new Vec2(-4.0f, 1.0f));
-			ground.createFixture(shape, 0.0f);
-			shape.setAsEdge(new Vec2(-4.0f, 1.0f), new Vec2(-2.0f, 1.0f));
-			ground.createFixture(shape, 0.0f);
-		}
+      PolygonShape shape = new PolygonShape();
+      shape.setAsEdge(new Vec2(-20.0f, 0.0f), new Vec2(20.0f, 0.0f));
+      ground.createFixture(shape, 0.0f);
+    }
 
-		// Square tiles
-		{
-			BodyDef bd = new BodyDef();
-			Body ground = m_world.createBody(bd);
+    // Collinear edges
+    {
+      BodyDef bd = new BodyDef();
+      Body ground = m_world.createBody(bd);
 
-			PolygonShape shape = new PolygonShape();
-			shape.setAsBox(1.0f, 1.0f, new Vec2(4.0f, 3.0f), 0.0f);
-			ground.createFixture(shape, 0.0f);
-			shape.setAsBox(1.0f, 1.0f, new Vec2(6.0f, 3.0f), 0.0f);
-			ground.createFixture(shape, 0.0f);
-			shape.setAsBox(1.0f, 1.0f, new Vec2(8.0f, 3.0f), 0.0f);
-			ground.createFixture(shape, 0.0f);
-		}
+      PolygonShape shape = new PolygonShape();
+      shape.m_radius = 0.0f;
+      shape.setAsEdge(new Vec2(-8.0f, 1.0f), new Vec2(-6.0f, 1.0f));
+      ground.createFixture(shape, 0.0f);
+      shape.setAsEdge(new Vec2(-6.0f, 1.0f), new Vec2(-4.0f, 1.0f));
+      ground.createFixture(shape, 0.0f);
+      shape.setAsEdge(new Vec2(-4.0f, 1.0f), new Vec2(-2.0f, 1.0f));
+      ground.createFixture(shape, 0.0f);
+    }
 
-		// Square made from edges notice how the edges are shrunk to account
-		// for the polygon radius. This makes it so the square character does
-		// not get snagged. However, ray casts can now go through the cracks.
-		{
-			BodyDef bd = new BodyDef();
-			Body ground = m_world.createBody(bd);
+    // Square tiles
+    {
+      BodyDef bd = new BodyDef();
+      Body ground = m_world.createBody(bd);
 
-			PolygonShape shape = new PolygonShape();
-			float d = 2.0f * Settings.polygonRadius;
-			shape.setAsEdge(new Vec2(-1.0f + d, 3.0f), new Vec2(1.0f - d, 3.0f));
-			ground.createFixture(shape, 0.0f);
-			shape.setAsEdge(new Vec2(1.0f, 3.0f + d), new Vec2(1.0f, 5.0f - d));
-			ground.createFixture(shape, 0.0f);
-			shape.setAsEdge(new Vec2(1.0f - d, 5.0f), new Vec2(-1.0f + d, 5.0f));
-			ground.createFixture(shape, 0.0f);
-			shape.setAsEdge(new Vec2(-1.0f, 5.0f - d), new Vec2(-1.0f, 3.0f + d));
-			ground.createFixture(shape, 0.0f);
-		}
+      PolygonShape shape = new PolygonShape();
+      shape.setAsBox(1.0f, 1.0f, new Vec2(4.0f, 3.0f), 0.0f);
+      ground.createFixture(shape, 0.0f);
+      shape.setAsBox(1.0f, 1.0f, new Vec2(6.0f, 3.0f), 0.0f);
+      ground.createFixture(shape, 0.0f);
+      shape.setAsBox(1.0f, 1.0f, new Vec2(8.0f, 3.0f), 0.0f);
+      ground.createFixture(shape, 0.0f);
+    }
 
-		// Square character
-		{
-			BodyDef bd = new BodyDef();
-			bd.position.set(-3.0f, 5.0f);
-			bd.type = BodyType.DYNAMIC;
-			bd.fixedRotation = true;
-			bd.allowSleep = false;
+    // Square made from edges notice how the edges are shrunk to account
+    // for the polygon radius. This makes it so the square character does
+    // not get snagged. However, ray casts can now go through the cracks.
+    {
+      BodyDef bd = new BodyDef();
+      Body ground = m_world.createBody(bd);
 
-			Body body = m_world.createBody(bd);
+      PolygonShape shape = new PolygonShape();
+      float d = 2.0f * Settings.polygonRadius;
+      shape.setAsEdge(new Vec2(-1.0f + d, 3.0f), new Vec2(1.0f - d, 3.0f));
+      ground.createFixture(shape, 0.0f);
+      shape.setAsEdge(new Vec2(1.0f, 3.0f + d), new Vec2(1.0f, 5.0f - d));
+      ground.createFixture(shape, 0.0f);
+      shape.setAsEdge(new Vec2(1.0f - d, 5.0f), new Vec2(-1.0f + d, 5.0f));
+      ground.createFixture(shape, 0.0f);
+      shape.setAsEdge(new Vec2(-1.0f, 5.0f - d), new Vec2(-1.0f, 3.0f + d));
+      ground.createFixture(shape, 0.0f);
+    }
 
-			PolygonShape shape = new PolygonShape();
-			shape.setAsBox(0.5f, 0.5f);
+    // Square character
+    {
+      BodyDef bd = new BodyDef();
+      bd.position.set(-3.0f, 5.0f);
+      bd.type = BodyType.DYNAMIC;
+      bd.fixedRotation = true;
+      bd.allowSleep = false;
 
-			FixtureDef fd = new FixtureDef();
-			fd.shape = shape;
-			fd.density = 20.0f;
-			body.createFixture(fd);
-		}
+      Body body = m_world.createBody(bd);
 
-		// Hexagon character
-		{
-			BodyDef bd = new BodyDef();
-			bd.position.set(-5.0f, 5.0f);
-			bd.type = BodyType.DYNAMIC;
-			bd.fixedRotation = true;
-			bd.allowSleep = false;
+      PolygonShape shape = new PolygonShape();
+      shape.setAsBox(0.5f, 0.5f);
 
-			Body body = m_world.createBody(bd);
+      FixtureDef fd = new FixtureDef();
+      fd.shape = shape;
+      fd.density = 20.0f;
+      body.createFixture(fd);
+    }
 
-			float angle = 0.0f;
-			float delta = MathUtils.PI / 3.0f;
-			Vec2 vertices[] = new Vec2[6];
-			for (int i = 0; i < 6; ++i)
-			{
-				vertices[i] = new Vec2(0.5f * MathUtils.cos(angle), 0.5f * MathUtils.sin(angle));
-				angle += delta;
-			}
+    // Hexagon character
+    {
+      BodyDef bd = new BodyDef();
+      bd.position.set(-5.0f, 5.0f);
+      bd.type = BodyType.DYNAMIC;
+      bd.fixedRotation = true;
+      bd.allowSleep = false;
 
-			PolygonShape shape = new PolygonShape();
-			shape.set(vertices, 6);
+      Body body = m_world.createBody(bd);
 
-			FixtureDef fd = new FixtureDef();
-			fd.shape = shape;
-			fd.density = 20.0f;
-			body.createFixture(fd);
-		}
+      float angle = 0.0f;
+      float delta = MathUtils.PI / 3.0f;
+      Vec2 vertices[] = new Vec2[6];
+      for (int i = 0; i < 6; ++i) {
+        vertices[i] = new Vec2(0.5f * MathUtils.cos(angle), 0.5f * MathUtils.sin(angle));
+        angle += delta;
+      }
 
-		// Circle character
-		{
-			BodyDef bd = new BodyDef();
-			bd.position.set(3.0f, 5.0f);
-			bd.type = BodyType.DYNAMIC;
-			bd.fixedRotation = true;
-			bd.allowSleep = false;
+      PolygonShape shape = new PolygonShape();
+      shape.set(vertices, 6);
 
-			Body body = m_world.createBody(bd);
+      FixtureDef fd = new FixtureDef();
+      fd.shape = shape;
+      fd.density = 20.0f;
+      body.createFixture(fd);
+    }
 
-			CircleShape shape = new CircleShape();
-			shape.m_radius = 0.5f;
+    // Circle character
+    {
+      BodyDef bd = new BodyDef();
+      bd.position.set(3.0f, 5.0f);
+      bd.type = BodyType.DYNAMIC;
+      bd.fixedRotation = true;
+      bd.allowSleep = false;
 
-			FixtureDef fd = new FixtureDef();
-			fd.shape = shape;
-			fd.density = 20.0f;
-			body.createFixture(fd);
-		}
-	}
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
-	 */
-	@Override
-	public void step(TestbedSettings settings) {
-		super.step(settings);
-		addTextLine("This tests various character collision shapes");
-	}
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-	 */
-	@Override
-	public String getTestName() {
-		return "Character Collision";
-	}
-	
+      Body body = m_world.createBody(bd);
+
+      CircleShape shape = new CircleShape();
+      shape.m_radius = 0.5f;
+
+      FixtureDef fd = new FixtureDef();
+      fd.shape = shape;
+      fd.density = 20.0f;
+      body.createFixture(fd);
+    }
+  }
+
+  /**
+   * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
+   */
+  @Override
+  public void step(TestbedSettings settings) {
+    super.step(settings);
+    addTextLine("This tests various character collision shapes");
+  }
+
+  /**
+   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
+   */
+  @Override
+  public String getTestName() {
+    return "Character Collision";
+  }
+
 }
