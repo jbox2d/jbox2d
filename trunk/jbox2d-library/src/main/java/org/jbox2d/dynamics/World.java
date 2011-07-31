@@ -60,8 +60,8 @@ import org.jbox2d.dynamics.joints.JointEdge;
 import org.jbox2d.dynamics.joints.PulleyJoint;
 import org.jbox2d.pooling.IDynamicStack;
 import org.jbox2d.pooling.IWorldPool;
-import org.jbox2d.pooling.WorldPool;
 import org.jbox2d.pooling.arrays.Vec2Array;
+import org.jbox2d.pooling.normal.DefaultWorldPool;
 
 /**
  * The world class manages all physics entities, dynamic simulation,
@@ -123,7 +123,7 @@ public class World {
 	
 	public World(Vec2 gravity, boolean doSleep){
 		this(gravity, doSleep,
-				new WorldPool(WORLD_POOL_SIZE, WORLD_POOL_CONTAINER_SIZE));
+				new DefaultWorldPool(WORLD_POOL_SIZE, WORLD_POOL_CONTAINER_SIZE));
 	}
 	
 	/**

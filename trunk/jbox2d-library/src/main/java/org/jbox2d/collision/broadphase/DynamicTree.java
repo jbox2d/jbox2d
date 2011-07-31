@@ -37,8 +37,7 @@ import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.pooling.IOrderedStack;
-import org.jbox2d.pooling.OrderedStack;
+import org.jbox2d.pooling.normal.OrderedStack;
 
 // updated to rev 100
 /**
@@ -51,7 +50,7 @@ import org.jbox2d.pooling.OrderedStack;
  * @author daniel
  */
 public class DynamicTree {
-	public static final int MAX_STACK_SIZE = 128;
+	public static final int MAX_STACK_SIZE = 64;
 	
 	private DynamicTreeNode m_root;
 	
@@ -250,7 +249,7 @@ public class DynamicTree {
 	}
 	
 	// stacks because it's recursive
-	private final IOrderedStack<Vec2> vec2s = new OrderedStack<Vec2>(Vec2.class, MAX_STACK_SIZE * 3 + 4, 10);
+	private final OrderedStack<Vec2> vec2s = new OrderedStack<Vec2>(Vec2.class, MAX_STACK_SIZE * 3 + 4, 10);
 	private final AABB aabb = new AABB();
 	private final RayCastInput subInput = new RayCastInput();
 	/**
