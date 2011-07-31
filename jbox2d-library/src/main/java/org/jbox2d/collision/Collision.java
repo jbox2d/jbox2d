@@ -185,7 +185,6 @@ public class Collision {
 	// #### COLLISION STUFF (not from collision.h or collision.cpp) ####
 	
 	// djm pooling
-	private final Vec2 d = new Vec2();
 	
 	/**
 	 * Compute the collision manifold between two circles.
@@ -426,10 +425,7 @@ public class Collision {
 	}
 	
 	// djm pooling
-	private final Vec2 normal1World = new Vec2();
 	private final Vec2 normal1 = new Vec2();
-	private final Vec2 v1 = new Vec2();
-	private final Vec2 v2 = new Vec2();
 	
 	/**
 	 * Find the separation between poly1 and poly2 for a given edge normal on poly1.
@@ -443,27 +439,38 @@ public class Collision {
 	public final float edgeSeparation(final PolygonShape poly1, final Transform xf1, final int edge1,
 			final PolygonShape poly2, final Transform xf2) {
 		
-		int count1 = poly1.m_vertexCount;
+		final int count1 = poly1.m_vertexCount;
 		final Vec2[] vertices1 = poly1.m_vertices;
 		final Vec2[] normals1 = poly1.m_normals;
 		
-		int count2 = poly2.m_vertexCount;
+		final int count2 = poly2.m_vertexCount;
 		final Vec2[] vertices2 = poly2.m_vertices;
 		
 		assert (0 <= edge1 && edge1 < count1);
-		
 		// Convert normal from poly1's frame into poly2's frame.
-		// Vec2 normal1World = Mul(xf1.R, normals1[edge1]);
-		Mat22.mulToOut(xf1.R, normals1[edge1], normal1World);
-		// Vec2 normal1 = MulT(xf2.R, normal1World);
-		Mat22.mulTransToOut(xf2.R, normal1World, normal1);
+		// before inline:
+//		// Vec2 normal1World = Mul(xf1.R, normals1[edge1]);
+//		Mat22.mulToOut(xf1.R, normals1[edge1], normal1World);
+//		// Vec2 normal1 = MulT(xf2.R, normal1World);
+//		Mat22.mulTransToOut(xf2.R, normal1World, normal1);
+		// after inline:
+    // R.mulToOut(v,out);
+    final Mat22 R = xf1.R;
+    final Vec2 v = normals1[edge1];
+    final float normal1Worldy = R.col1.y * v.x + R.col2.y * v.y;
+    final float normal1Worldx = R.col1.x * v.x + R.col2.x * v.y;
+    final Mat22 R1 = xf2.R;
+    final float normal1x = normal1Worldx * R1.col1.x + normal1Worldy * R1.col1.y;
+    final float normal1y = normal1Worldx * R1.col2.x + normal1Worldy * R1.col2.y;
+    // end inline
 		
 		// Find support vertex on poly2 for -normal.
 		int index = 0;
 		float minDot = Float.MAX_VALUE;
 		
 		for (int i = 0; i < count2; ++i) {
-			float dot = Vec2.dot(vertices2[i], normal1);
+			final Vec2 a = vertices2[i];
+      final float dot = a.x * normal1x + a.y * normal1y;
 			if (dot < minDot) {
 				minDot = dot;
 				index = i;
@@ -472,16 +479,24 @@ public class Collision {
 		
 		// Vec2 v1 = Mul(xf1, vertices1[edge1]);
 		// Vec2 v2 = Mul(xf2, vertices2[index]);
-		Transform.mulToOut(xf1, vertices1[edge1], v1);
-		Transform.mulToOut(xf2, vertices2[index], v2);
-		
-		float separation = Vec2.dot(v2.subLocal(v1), normal1World);
-		return separation;
+		// before inline:
+//		Transform.mulToOut(xf1, vertices1[edge1], v1);
+//		Transform.mulToOut(xf2, vertices2[index], v2);
+//		
+//		float separation = Vec2.dot(v2.subLocal(v1), normal1World);
+		// after inline:
+    final Vec2 v3 = vertices1[edge1];
+    final float v1y = xf1.position.y + R.col1.y * v3.x + R.col2.y * v3.y;
+    final float v1x = xf1.position.x + R.col1.x * v3.x + R.col2.x * v3.y;
+    final Vec2 v4 = vertices2[index];
+    final float v2y = xf2.position.y + R1.col1.y * v4.x + R1.col2.y * v4.y - v1y;
+    final float v2x = xf2.position.x + R1.col1.x * v4.x + R1.col2.x * v4.y - v1x;
+        
+		return v2x * normal1Worldx + v2y * normal1Worldy;
+		// end inline
 	}
 	
 	// djm pooling, and from above
-	private final Vec2 dLocal1 = new Vec2();
-	private final Vec2 temp = new Vec2();
 	
 	/**
 	 * Find the max separation between poly1 and poly2 using edge normals from poly1.
@@ -497,20 +512,36 @@ public class Collision {
 			final PolygonShape poly2, final Transform xf2) {
 		int count1 = poly1.m_vertexCount;
 		final Vec2[] normals1 = poly1.m_normals;
+    Vec2 v = poly2.m_centroid;
 		
 		// Vector pointing from the centroid of poly1 to the centroid of poly2.
-		Transform.mulToOut(xf2, poly2.m_centroid, d);
-		Transform.mulToOut(xf1, poly1.m_centroid, temp);
-		d.subLocal(temp);
-		
-		Mat22.mulTransToOut(xf1.R, d, dLocal1);
+		// before inline:
+//		Transform.mulToOut(xf2, poly2.m_centroid, d);
+//		Transform.mulToOut(xf1, poly1.m_centroid, temp);
+//		d.subLocal(temp);
+//		
+//		Mat22.mulTransToOut(xf1.R, d, dLocal1);
+		// after inline:
+		final float predy = xf2.position.y + xf2.R.col1.y * v.x + xf2.R.col2.y * v.y;
+    final float predx = xf2.position.x + xf2.R.col1.x * v.x + xf2.R.col2.x * v.y;
+    final Vec2 v1 = poly1.m_centroid;
+    final float tempy = xf1.position.y + xf1.R.col1.y * v1.x + xf1.R.col2.y * v1.y;
+    final float tempx = xf1.position.x + xf1.R.col1.x * v1.x + xf1.R.col2.x * v1.y;
+    final float dx = predx - tempx;
+    final float dy = predy - tempy;
+    
+    final Mat22 R = xf1.R;
+    final float dLocal1x = dx * R.col1.x + dy * R.col1.y;
+    final float dLocal1y = dx * R.col2.x + dy * R.col2.y;
+    // end inline
 		
 		// Find edge normal on poly1 that has the largest projection onto d.
 		int edge = 0;
 		float dot;
 		float maxDot = Float.MIN_VALUE;
 		for (int i = 0; i < count1; i++) {
-			dot = Vec2.dot(normals1[i], dLocal1);
+		  final Vec2 normal = normals1[i];
+			dot = normal.x * dLocal1x + normal.y * dLocal1y;
 			if (dot > maxDot) {
 				maxDot = dot;
 				edge = i;
