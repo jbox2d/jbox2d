@@ -205,20 +205,22 @@ public class Island {
 			m_contacts = new Contact[m_contactCapacity];
 		}
 		
-		// could do some copy stuff, but just a full creation for now
-		// TODO djm do a copy
+		// dynamic array
 		if(m_velocities == null || m_bodyCapacity > m_velocities.length){
+		  final Velocity[] old = m_velocities == null ? new Velocity[0] : m_velocities;
 			m_velocities = new Velocity[m_bodyCapacity];
-			for(int i=0; i<m_velocities.length; i++){
+			System.arraycopy(old, 0, m_velocities, 0, old.length);
+			for(int i=old.length; i<m_velocities.length; i++){
 				m_velocities[i] = new Velocity();
 			}
 		}
 		
-		// could do some copy stuff, but just a full creation for now
-		// TODO djm do a copy
+		// dynamic array
 		if(m_positions == null || m_bodyCapacity > m_positions.length){
+		  final Position[] old = m_positions == null ? new Position[0] : m_positions;
 			m_positions = new Position[m_bodyCapacity];
-			for(int i=0; i<m_positions.length; i++){
+			System.arraycopy(old, 0, m_positions, 0, old.length);
+			for(int i=old.length; i<m_positions.length; i++){
 				m_positions[i] = new Position();
 			}
 		}
