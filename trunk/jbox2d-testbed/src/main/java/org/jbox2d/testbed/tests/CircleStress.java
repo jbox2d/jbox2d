@@ -216,7 +216,6 @@ public class CircleStress extends TestbedTest {
 	 */
 	@Override
 	public void keyPressed(char argKeyChar, int argKeyCode) {
-		
 		switch(argKeyChar){
 			case 's':
 				joint.setMotorSpeed(0);
