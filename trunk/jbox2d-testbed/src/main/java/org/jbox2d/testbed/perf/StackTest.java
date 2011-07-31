@@ -32,25 +32,25 @@ package org.jbox2d.testbed.perf;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.IWorldPool;
-import org.jbox2d.pooling.WorldPool;
+import org.jbox2d.pooling.normal.DefaultWorldPool;
 
 
 //Test Name               Milliseconds Avg
-//Pop2Sep                          12.8310
-//Pop2Cont                         12.9120
-//Pop3Sep                          19.7939
-//Pop3Cont                         20.0433
-//Pop4Sep                          26.1034
-//Pop4Cont                         26.8309
-//Pop9Sep                          59.5768
-//Pop9Cont                         58.4641
+//Pop2Sep                           6.9922
+//Pop2Cont                          7.0805
+//Pop3Sep                           9.9359
+//Pop3Cont                         10.1472
+//Pop4Sep                          13.8380
+//Pop4Cont                         14.0874
+//Pop9Sep                          31.5494
+//Pop9Cont                         31.0169
 
 /**
  * @author Daniel Murphy
  */
 public class StackTest extends PerfTest {
 	
-	public static final int INNER_ITERS = 100000;
+	public static final int INNER_ITERS = 50000;
 	public static final int OUTER_ITERS = 200;
 	
 	public static String[] tests = new String[]{
@@ -71,7 +71,7 @@ public class StackTest extends PerfTest {
 		return s;
 	}
 	
-	private final IWorldPool wp = new WorldPool(100, 10);
+	private final IWorldPool wp = new DefaultWorldPool(100, 10);
 
 	
 	/**
@@ -92,10 +92,8 @@ public class StackTest extends PerfTest {
 					break;}
 				case 1:{
 					final Vec2[] pc = wp.popVec2(2);
-					final Vec2 v1 = pc[0];
-					final Vec2 v2 = pc[1];
-					a += op(v1);
-					a += op(v2);
+					a += op(pc[0]);
+					a += op(pc[1]);
 					wp.pushVec2(2);
 					break;}
 				case 2:{
@@ -108,13 +106,10 @@ public class StackTest extends PerfTest {
 					wp.pushVec2(3);
 					break;}
 				case 3:{
-					final Vec2[] pc = wp.popVec2(2);
-					final Vec2 v1 = pc[0];
-					final Vec2 v2 = pc[1];
-					final Vec2 v3 = pc[2];
-					a += op(v1);
-					a += op(v2);
-					a += op(v3);
+					final Vec2[] pc = wp.popVec2(3);
+					a += op(pc[0]);
+					a += op(pc[1]);
+					a += op(pc[2]);
 					wp.pushVec2(3);
 					break;}
 				case 4:{
@@ -129,15 +124,11 @@ public class StackTest extends PerfTest {
 					wp.pushVec2(4);
 					break;}
 				case 5:{
-					final Vec2[] pc = wp.popVec2(2);
-					final Vec2 v1 = pc[0];
-					final Vec2 v2 = pc[1];
-					final Vec2 v3 = pc[2];
-					final Vec2 v4 = pc[3];
-					a += op(v1);
-					a += op(v2);
-					a += op(v3);
-					a += op(v4);
+					final Vec2[] pc = wp.popVec2(4);
+					a += op(pc[0]);
+					a += op(pc[1]);
+					a += op(pc[2]);
+					a += op(pc[3]);
 					wp.pushVec2(4);}
 					break;
 				case 6:{
@@ -162,25 +153,16 @@ public class StackTest extends PerfTest {
 					wp.pushVec2(9);
 					break;}
 				case 7:{
-					final Vec2[] pc = wp.popVec2(2);
-					final Vec2 v1 = pc[0];
-					final Vec2 v2 = pc[1];
-					final Vec2 v3 = pc[2];
-					final Vec2 v4 = pc[3];
-					final Vec2 v5 = pc[4];
-					final Vec2 v6 = pc[5];
-					final Vec2 v7 = pc[6];
-					final Vec2 v8 = pc[7];
-					final Vec2 v9 = pc[8];
-					a += op(v1);
-					a += op(v2);
-					a += op(v3);
-					a += op(v4);
-					a += op(v5);
-					a += op(v6);
-					a += op(v7);
-					a += op(v8);
-					a += op(v9);
+					final Vec2[] pc = wp.popVec2(9);
+					a += op(pc[0]);
+					a += op(pc[1]);
+					a += op(pc[2]);
+					a += op(pc[3]);
+					a += op(pc[4]);
+					a += op(pc[5]);
+					a += op(pc[6]);
+					a += op(pc[7]);
+					a += op(pc[8]);
 					wp.pushVec2(9);
 					break;}
 			}

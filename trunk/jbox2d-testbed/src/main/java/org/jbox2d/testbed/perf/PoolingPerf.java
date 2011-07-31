@@ -32,7 +32,7 @@ package org.jbox2d.testbed.perf;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.IWorldPool;
-import org.jbox2d.pooling.WorldPool;
+import org.jbox2d.pooling.normal.DefaultWorldPool;
 
 //Test Name               Milliseconds Avg
 //Creation                         70.6609
@@ -67,8 +67,8 @@ public class PoolingPerf extends PerfTest{
 	
 
 
-	public static final int INNER_ITERS = 1000000;
-	public static final int OUTER_ITERS = 100;
+	public static final int INNER_ITERS = 50000;
+	public static final int OUTER_ITERS = 1000;
 	
 	public static class CirclePool{
 		final Vec2[] pool;
@@ -124,7 +124,7 @@ public class PoolingPerf extends PerfTest{
 	};
 	
 	public float aStore = 0;
-	public IWorldPool wp = new WorldPool(100, 10);
+	public IWorldPool wp = new DefaultWorldPool(100, 10);
 	public CirclePool cp = new CirclePool();
 	public TLVec2 tlv = new TLVec2();
 	public Vec2 mv = new Vec2();
