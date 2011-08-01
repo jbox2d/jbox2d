@@ -68,5 +68,10 @@ public class TestbedModel {
 		public boolean isCategory(){
 		    return category != null;
 		}
+		
+		@Override
+		public String toString() {
+  		return isCategory() ? category : test.getTestName();
+		}
 	}
 }

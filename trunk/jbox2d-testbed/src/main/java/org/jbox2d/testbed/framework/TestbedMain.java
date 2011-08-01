@@ -144,13 +144,15 @@ public class TestbedMain extends JFrame {
     if (argIndex == -1) {
       return;
     }
-    if (!model.isTestAt(argIndex)) {
+    while (!model.isTestAt(argIndex)) {
       if (argIndex + 1 < model.getTestsSize()) {
-        side.tests.setSelectedIndex(argIndex + 1);
-      } else {
+        argIndex++;
+      }else{
         return;
       }
     }
+    side.tests.setSelectedIndex(argIndex);
+    
     currTestIndex = argIndex;
     TestbedTest test = model.getTestAt(argIndex);
     if (panel.getCurrTest() != test) {
@@ -227,11 +229,12 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener {
     top.setBorder(BorderFactory.createCompoundBorder(new EtchedBorder(EtchedBorder.LOWERED),
         BorderFactory.createEmptyBorder(10, 10, 10, 10)));
     tests = new JComboBox(model.getComboModel());
+    tests.setMaximumRowCount(30);
     tests.setMaximumSize(new Dimension(250, 20));
     tests.addActionListener(this);
     tests.setRenderer(new ListCellRenderer() {
-      JLabel categoryLabel = new JLabel();
-      JLabel testLabel = new JLabel();
+      JLabel categoryLabel = null;
+      JLabel testLabel = null;
 
       @Override
       public Component getListCellRendererComponent(JList list, Object value, int index,
@@ -239,14 +242,22 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener {
         ListItem item = (ListItem) value;
 
         if (item.isCategory()) {
-          categoryLabel.setOpaque(true);
-          categoryLabel.setBackground(new Color(.5f, .5f, .6f));
-          categoryLabel.setForeground(Color.white);
-          categoryLabel.setHorizontalAlignment(SwingConstants.CENTER);
+          if(categoryLabel == null){
+            categoryLabel = new JLabel();
+            categoryLabel.setOpaque(true);
+            categoryLabel.setBackground(new Color(.5f, .5f, .6f));
+            categoryLabel.setForeground(Color.white);
+            categoryLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            categoryLabel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+          }
           categoryLabel.setText(item.category);
           return categoryLabel;
         } else {
-          testLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+          if(testLabel == null){
+            testLabel = new JLabel();
+            testLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 1, 0));
+          }
+         
           testLabel.setText(item.test.getTestName());
 
           if (isSelected) {
@@ -516,6 +527,10 @@ class SidePanel extends JPanel implements ChangeListener, ActionListener {
   }
 
   public void actionPerformed(ActionEvent e) {
+    if(e != null){
+      String action = e.getActionCommand();
+      System.out.println(action != null ? action : "null");
+    }
     main.testChanged(tests.getSelectedIndex());
   }
 }
