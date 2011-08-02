@@ -24,9 +24,9 @@
             <phase>generate-sources</phase>
             <configuration>
               <target>
-                <mkdir dir="target/generated-sources" />
+                <mkdir dir="src/generated" />
                 <exec executable="protoc">
-                  <arg value="--java_out=target/generated-sources" />
+                  <arg value="--java_out=src/generated" />
                   <arg value="src/main/resources/proto/box2d.proto" />
                 </exec>
               </target>
