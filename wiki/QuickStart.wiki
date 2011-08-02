@@ -40,8 +40,8 @@ You'll have to include the dependencies yourself if you don't want to use Maven.
 
 Include those and you should be good!
 
-= Quick IDE Setups =
-== Eclipse (tested with [http://www.eclipse.org/downloads/packages/release/helios/sr2 Eclipse Helios]) ==
+== Quick IDE Setups ==
+=== Eclipse (tested with [http://www.eclipse.org/downloads/packages/release/helios/sr2 Eclipse Helios]) ===
 
   # Check out the project through Subversion (you can also do this within Eclipse using the [http://subclipse.tigris.org/ Subclipse] plugin if you don't like the command line):
     `svn checkout http://jbox2d.googlecode.com/svn/trunk/ jbox2d-read-only`
