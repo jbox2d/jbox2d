@@ -1,4 +1,4 @@
-#summary basic guide for building and using jbox2d
+#summary Basic guide for building and using JBox2D
 <wiki:toc max_depth="2" />
 
 = Introduction =
