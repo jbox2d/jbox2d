@@ -1,5 +1,5 @@
 #summary basic guide for building and using jbox2d
-#sidebar TableOfContents
+<wiki:toc max_depth="2" />
 
 = Introduction =
 
