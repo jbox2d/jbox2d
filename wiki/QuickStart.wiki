@@ -1,4 +1,5 @@
 #summary basic guide for building and using jbox2d
+#sidebar TableOfContents
 
 = Introduction =
 
@@ -27,7 +28,7 @@ The most recent versions of JBox2D lean on Maven to help handle dependency manag
 
 If you're planning on doing some more in-depth customization, we would suggest adding each module project independently (jbox2d-library, jbox2d-serialization, jbox2d-testbed) and putting all of those projects in your workspace.
 
-Note: 
+*Note:*
   * You might receive errors about the jbox2d parent POM is not found.  In this case you'll have to run 'mvn install" on the root project (checked out like above).
   * If you're changing the protobuffer definition for serialization, you'll need the protobuffer library installed on your machine.  Download it [http://code.google.com/apis/protocolbuffers/docs/overview.html here].
 
