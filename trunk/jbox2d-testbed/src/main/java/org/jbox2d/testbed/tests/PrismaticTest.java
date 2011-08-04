@@ -37,7 +37,6 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.joints.PrismaticJoint;
 import org.jbox2d.dynamics.joints.PrismaticJointDef;
-import org.jbox2d.testbed.framework.TestPanelJ2D;
 import org.jbox2d.testbed.framework.TestbedSettings;
 import org.jbox2d.testbed.framework.TestbedTest;
 
@@ -56,7 +55,7 @@ public class PrismaticTest extends TestbedTest {
 		Body ground = null;
 		{
 			BodyDef bd = new BodyDef();
-			ground = m_world.createBody(bd);
+			ground = world.createBody(bd);
 			
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
@@ -72,7 +71,7 @@ public class PrismaticTest extends TestbedTest {
 			bd.position.set(-10.0f, 10.0f);
 			bd.angle = 0.5f * MathUtils.PI;
 			bd.allowSleep = false;
-			Body body = m_world.createBody(bd);
+			Body body = world.createBody(bd);
 			body.createFixture(shape, 5.0f);
 			
 			PrismaticJointDef pjd = new PrismaticJointDef();
@@ -92,7 +91,7 @@ public class PrismaticTest extends TestbedTest {
 			pjd.upperTranslation = 20.0f;
 			pjd.enableLimit = true;
 			
-			m_joint = (PrismaticJoint) m_world.createJoint(pjd);
+			m_joint = (PrismaticJoint) world.createJoint(pjd);
 		}
 	}
 	
@@ -116,15 +115,15 @@ public class PrismaticTest extends TestbedTest {
 		switch (argKeyChar) {
 			case 'l' :
 				m_joint.enableLimit(!m_joint.isLimitEnabled());
-				TestPanelJ2D.keys['l'] = false;
+				getModel().getKeys()['l'] = false;
 				break;
 			case 'm' :
 				m_joint.enableMotor(!m_joint.isMotorEnabled());
-				TestPanelJ2D.keys['m'] = false;
+				getModel().getKeys()['m'] = false;
 				break;
 			case 's' :
 				m_joint.setMotorSpeed(-m_joint.getMotorSpeed());
-				TestPanelJ2D.keys['s'] = false;
+				getModel().getKeys()['s'] = false;
 				break;
 		}
 	}

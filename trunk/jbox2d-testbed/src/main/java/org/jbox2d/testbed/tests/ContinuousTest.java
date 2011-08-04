@@ -80,7 +80,7 @@ public class ContinuousTest extends TestbedTest {
 		{
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, 0.0f);
-			Body body = m_world.createBody(bd);
+			Body body = world.createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
 
@@ -100,7 +100,7 @@ public class ContinuousTest extends TestbedTest {
 		bd.type = BodyType.DYNAMIC;
 		bd.position.set(0.0f, 20.0f);
 		
-		m_body = m_world.createBody(bd);
+		m_body = world.createBody(bd);
 		currFixture = m_body.createFixture(m_poly, 1.0f);
 
 		m_angularVelocity = (float)Math.random()*100 - 50;

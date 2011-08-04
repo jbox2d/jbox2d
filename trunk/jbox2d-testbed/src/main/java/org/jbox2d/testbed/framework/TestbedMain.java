@@ -26,6 +26,7 @@ package org.jbox2d.testbed.framework;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
+import org.jbox2d.testbed.framework.j2d.TestPanelJ2D;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,8 +45,9 @@ public class TestbedMain {
           + "Hopefully you're on a mac so the window isn't ugly as crap.");
     }
     TestbedModel model = new TestbedModel();
+    TestbedPanel panel = new TestPanelJ2D(model, true);
     TestList.populateModel(model);
-    JFrame testbed = new TestbedFrame(model);
+    JFrame testbed = new TestbedFrame(model, panel);
     testbed.setVisible(true);
     testbed.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
   }

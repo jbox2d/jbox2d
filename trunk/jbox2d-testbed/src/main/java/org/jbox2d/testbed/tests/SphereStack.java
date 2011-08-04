@@ -52,7 +52,7 @@ public class SphereStack extends TestbedTest {
 	public void initTest(boolean argDeserialized) {
 		{
 			BodyDef bd = new BodyDef();
-			Body ground = m_world.createBody(bd);
+			Body ground = world.createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
@@ -69,7 +69,7 @@ public class SphereStack extends TestbedTest {
 				bd.type = BodyType.DYNAMIC;
 				bd.position.set(0.0f, 4.0f + 3.0f * i);
 
-				m_bodies[i] = m_world.createBody(bd);
+				m_bodies[i] = world.createBody(bd);
 
 				m_bodies[i].createFixture(shape, 1.0f);
 

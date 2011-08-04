@@ -43,119 +43,136 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class VerticalStack extends TestbedTest {
-	
-	public static final int e_columnCount = 5;
-	public static final int e_rowCount = 16;
-	
-	Body m_bullet;
-	Body m_bodies[] = new Body[e_rowCount * e_columnCount];
-	int m_indices[] = new int[e_rowCount * e_columnCount];
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-	 */
-	@Override
-	public void initTest(boolean argDeserialized) {
-		{
-			BodyDef bd = new BodyDef();
-			Body ground = m_world.createBody(bd);
+  private static final long BULLET_TAG = 1;
+  
+  
+  public static final int e_columnCount = 5;
+  public static final int e_rowCount = 16;
 
-			PolygonShape shape = new PolygonShape();
-			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
-			ground.createFixture(shape, 0.0f);
+  Body m_bullet;
+  
+  @Override
+  public Long getTag(Body argBody) {
+    if(argBody == m_bullet){
+      return BULLET_TAG;
+    }
+    return super.getTag(argBody);
+  }
+  
+  @Override
+  public void processBody(Body argBody, Long argTag) {
+    if(argTag == BULLET_TAG){
+      m_bullet = argBody;
+      return;
+    }
+    super.processBody(argBody, argTag);
+  }
+  
+  @Override
+  public boolean isSaveLoadEnabled() {
+    return true;
+  }
 
-			shape.setAsEdge(new Vec2(20.0f, 0.0f), new Vec2(20.0f, 20.0f));
-			ground.createFixture(shape, 0.0f);
-		}
+  /**
+   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
+   */
+  @Override
+  public void initTest(boolean argDeserialized) {
+    if(argDeserialized){
+      return;
+    }
+    {
+      BodyDef bd = new BodyDef();
+      Body ground = world.createBody(bd);
 
-		float xs[] = new float[]{0.0f, -10.0f, -5.0f, 5.0f, 10.0f};
+      PolygonShape shape = new PolygonShape();
+      shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
+      ground.createFixture(shape, 0.0f);
 
-		for (int j = 0; j < e_columnCount; ++j)
-		{
-			PolygonShape shape = new PolygonShape();
-			shape.setAsBox(0.5f, 0.5f);
+      shape.setAsEdge(new Vec2(20.0f, 0.0f), new Vec2(20.0f, 20.0f));
+      ground.createFixture(shape, 0.0f);
+    }
 
-			FixtureDef fd = new FixtureDef();
-			fd.shape = shape;
-			fd.density = 1.0f;
-			fd.friction = 0.3f;
+    float xs[] = new float[] { 0.0f, -10.0f, -5.0f, 5.0f, 10.0f };
 
-			for (int i = 0; i < e_rowCount; ++i)
-			{
-				BodyDef bd = new BodyDef();
-				bd.type = BodyType.DYNAMIC;
+    for (int j = 0; j < e_columnCount; ++j) {
+      PolygonShape shape = new PolygonShape();
+      shape.setAsBox(0.5f, 0.5f);
 
-				int n = j * e_rowCount + i;
-				assert(n < e_rowCount * e_columnCount);
-				m_indices[n] = n;
-				bd.userData = m_indices[n];
+      FixtureDef fd = new FixtureDef();
+      fd.shape = shape;
+      fd.density = 1.0f;
+      fd.friction = 0.3f;
 
-				float x = 0.0f;
-				//float x = RandomFloat(-0.02f, 0.02f);
-				//float x = i % 2 == 0 ? -0.025f : 0.025f;
-				bd.position.set(xs[j] + x, 0.752f + 1.54f * i);
-				Body body = m_world.createBody(bd);
+      for (int i = 0; i < e_rowCount; ++i) {
+        BodyDef bd = new BodyDef();
+        bd.type = BodyType.DYNAMIC;
 
-				m_bodies[n] = body;
+        int n = j * e_rowCount + i;
+        assert (n < e_rowCount * e_columnCount);
 
-				body.createFixture(fd);
-			}
-		}
+        float x = 0.0f;
+        // float x = RandomFloat(-0.02f, 0.02f);
+        // float x = i % 2 == 0 ? -0.025f : 0.025f;
+        bd.position.set(xs[j] + x, 0.752f + 1.54f * i);
+        Body body = world.createBody(bd);
 
-		m_bullet = null;
-	}
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
-	 */
-	@Override
-	public void keyPressed(char argKeyChar, int argKeyCode) {
-		switch (argKeyChar)
-		{
-		case ',':
-			if (m_bullet != null)
-			{
-				m_world.destroyBody(m_bullet);
-				m_bullet = null;
-			}
+        body.createFixture(fd);
+      }
+    }
 
-			{
-				CircleShape shape = new CircleShape();
-				shape.m_radius = 0.25f;
+    m_bullet = null;
+  }
 
-				FixtureDef fd = new FixtureDef();
-				fd.shape = shape;
-				fd.density = 20.0f;
-				fd.restitution = 0.05f;
+  /**
+   * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
+   */
+  @Override
+  public void keyPressed(char argKeyChar, int argKeyCode) {
+    switch (argKeyChar) {
+      case ',':
+        if (m_bullet != null) {
+          world.destroyBody(m_bullet);
+          m_bullet = null;
+        }
 
-				BodyDef bd = new BodyDef();
-				bd.type = BodyType.DYNAMIC;
-				bd.bullet = true;
-				bd.position.set(-31.0f, 5.0f);
+        {
+          CircleShape shape = new CircleShape();
+          shape.m_radius = 0.25f;
 
-				m_bullet = m_world.createBody(bd);
-				m_bullet.createFixture(fd);
+          FixtureDef fd = new FixtureDef();
+          fd.shape = shape;
+          fd.density = 20.0f;
+          fd.restitution = 0.05f;
 
-				m_bullet.setLinearVelocity(new Vec2(400.0f, 0.0f));
-			}
-			break;
-		}
-	}
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
-	 */
-	@Override
-	public void step(TestbedSettings settings) {
-		super.step(settings);
-		addTextLine("Press ',' to launch bullet.");
-	}
+          BodyDef bd = new BodyDef();
+          bd.type = BodyType.DYNAMIC;
+          bd.bullet = true;
+          bd.position.set(-31.0f, 5.0f);
 
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-	 */
-	@Override
-	public String getTestName() {
-		return "Vertical Stack";
-	}
+          m_bullet = world.createBody(bd);
+          m_bullet.createFixture(fd);
 
+          m_bullet.setLinearVelocity(new Vec2(400.0f, 0.0f));
+        }
+        break;
+    }
+  }
+
+  /**
+   * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
+   */
+  @Override
+  public void step(TestbedSettings settings) {
+    super.step(settings);
+    addTextLine("Press ',' to launch bullet.");
+  }
+
+  /**
+   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
+   */
+  @Override
+  public String getTestName() {
+    return "Vertical Stack";
+  }
 }

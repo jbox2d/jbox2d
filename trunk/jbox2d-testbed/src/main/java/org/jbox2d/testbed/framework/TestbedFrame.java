@@ -32,6 +32,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -51,6 +54,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.jbox2d.common.Vec2;
 import org.jbox2d.testbed.framework.TestbedModel.ListItem;
 import org.jbox2d.testbed.framework.TestbedSetting.SettingsType;
 
@@ -63,38 +67,120 @@ import org.jbox2d.testbed.framework.TestbedSetting.SettingsType;
 @SuppressWarnings("serial")
 public class TestbedFrame extends JFrame {
 
-  private TestPanelJ2D panel;
   private int currTestIndex;
   private SidePanel side;
   private TestbedModel model;
 
-  public TestbedFrame(TestbedModel argModel) {
+  public TestbedFrame(final TestbedModel argModel, final TestbedPanel argPanel) {
     super("JBox2D Testbed");
     model = argModel;
     setLayout(new BorderLayout());
-    panel = new TestPanelJ2D(model.getSettings());
 
-    panel.addKeyListener(new KeyListener() {
-
+    final TestbedModel m = argModel;
+    argPanel.addKeyListener(new KeyListener() {
       @Override
       public void keyTyped(KeyEvent e) {
       }
 
       @Override
       public void keyReleased(KeyEvent e) {
+        char key = e.getKeyChar();
+        int code = e.getKeyCode();
+        if (key != KeyEvent.CHAR_UNDEFINED) {
+          m.getKeys()[key] = false;
+        }
+        m.getCodedKeys()[code] = false;
+        if (m.getCurrTest() != null) {
+          m.getCurrTest().queueKeyReleased(key, code);
+        }
       }
 
       @Override
       public void keyPressed(KeyEvent e) {
-        if (e.getKeyChar() == '[') {
+        char key = e.getKeyChar();
+        int code = e.getKeyCode();
+        if (key != KeyEvent.CHAR_UNDEFINED) {
+          m.getKeys()[key] = true;
+        }
+        m.getCodedKeys()[code] = true;
+
+        if (key == ' ' && m.getCurrTest() != null) {
+          m.getCurrTest().lanchBomb();
+        } else if (key == '[') {
           lastTest();
-        } else if (e.getKeyChar() == ']') {
+        } else if (key == ']') {
           nextTest();
+        }
+        if (m.getCurrTest() != null) {
+          m.getCurrTest().queueKeyPressed(key, code);
         }
       }
     });
 
-    add(panel, "Center");
+    argPanel.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseReleased(MouseEvent e) {
+        if (m.getCurrTest() != null) {
+          Vec2 pos = new Vec2(e.getX(), e.getY());
+          m.getDebugDraw().getScreenToWorldToOut(pos, pos);
+          m.getCurrTest().queueMouseUp(pos);
+        }
+      }
+
+      @Override
+      public void mousePressed(MouseEvent e) {
+        argPanel.grabFocus();
+        if (m.getCurrTest() != null) {
+          Vec2 pos = new Vec2(e.getX(), e.getY());
+          if (e.getButton() == MouseEvent.BUTTON1) {
+            m.getDebugDraw().getScreenToWorldToOut(pos, pos);
+            m.getCurrTest().queueMouseDown(pos);
+            if (m.getCodedKeys()[KeyEvent.VK_SHIFT]) {
+              m.getCurrTest().queueShiftMouseDown(pos);
+            }
+          }
+        }
+      }
+    });
+
+    argPanel.addMouseMotionListener(new MouseMotionListener() {
+      final Vec2 posDif = new Vec2();
+      final Vec2 pos = new Vec2();
+      final Vec2 pos2 = new Vec2();
+
+      public void mouseDragged(MouseEvent e) {
+        pos.set(e.getX(), e.getY());
+
+        if (e.getButton() == MouseEvent.BUTTON3) {
+          posDif.set(m.getMouse());
+          m.setMouse(pos);
+          posDif.subLocal(pos);
+          m.getDebugDraw().getViewportTranform().getScreenVectorToWorld(posDif, posDif);
+          m.getDebugDraw().getViewportTranform().getCenter().addLocal(posDif);
+          if (m.getCurrTest() != null) {
+            m.getCurrTest().cachedCameraX = m.getDebugDraw().getViewportTranform().getCenter().x;
+            m.getCurrTest().cachedCameraY = m.getDebugDraw().getViewportTranform().getCenter().y;
+          }
+        }
+        if (m.getCurrTest() != null) {
+          m.setMouse(pos);
+          m.getDebugDraw().getScreenToWorldToOut(pos, pos);
+          m.getCurrTest().queueMouseMove(pos);
+        }
+      }
+
+      @Override
+      public void mouseMoved(MouseEvent e) {
+        pos2.set(e.getX(), e.getY());
+        m.setMouse(pos2);
+        if (m.getCurrTest() != null) {
+          m.getDebugDraw().getScreenToWorldToOut(pos2, pos2);
+          m.getCurrTest().queueMouseMove(pos2);
+        }
+      }
+    });
+
+    add((Component)argPanel, "Center");
     side = new SidePanel(argModel);
     side.setMain(this);
     add(new JScrollPane(side), "East");
@@ -118,11 +204,11 @@ public class TestbedFrame extends JFrame {
   }
 
   public void saveTest() {
-    panel.getCurrTest().save();
+    model.getCurrTest().save();
   }
 
   public void loadTest() {
-    panel.getCurrTest().load();
+    model.getCurrTest().load();
   }
 
   public void lastTest() {
@@ -138,7 +224,7 @@ public class TestbedFrame extends JFrame {
   }
 
   public void resetTest() {
-    panel.resetTest();
+    model.getCurrTest().reset();
   }
 
   public void testChanged(int argIndex) {
@@ -156,12 +242,11 @@ public class TestbedFrame extends JFrame {
 
     currTestIndex = argIndex;
     TestbedTest test = model.getTestAt(argIndex);
-    if (panel.getCurrTest() != test) {
-      panel.changeTest(model.getTestAt(argIndex));
+    if (model.getCurrTest() != test) {
+      model.setCurrTest(model.getTestAt(argIndex));
       side.saveButton.setEnabled(test.isSaveLoadEnabled());
       side.loadButton.setEnabled(test.isSaveLoadEnabled());
     }
-    panel.grabFocus();
   }
 }
 

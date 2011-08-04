@@ -164,35 +164,35 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 				c.set(0.6f, 0.6f, 0.9f);
 			}
 			actor.aabb.getVertices(vecs);
-			m_debugDraw.drawPolygon(vecs, 4, c);
+			getDebugDraw().drawPolygon(vecs, 4, c);
 		}
 
 		Color3f c = new Color3f(0.7f, 0.7f, 0.7f);
 		m_queryAABB.getVertices(vecs);
-		m_debugDraw.drawPolygon(vecs, 4, c);
+		getDebugDraw().drawPolygon(vecs, 4, c);
 
-		m_debugDraw.drawSegment(m_rayCastInput.p1, m_rayCastInput.p2, c);
+		getDebugDraw().drawSegment(m_rayCastInput.p1, m_rayCastInput.p2, c);
 
 		Color3f c1 = new Color3f(0.2f, 0.9f, 0.2f);
 		Color3f c2 = new Color3f(0.9f, 0.2f, 0.2f);
-		m_debugDraw.drawPoint(m_rayCastInput.p1, 6.0f, c1);
-		m_debugDraw.drawPoint(m_rayCastInput.p2, 6.0f, c2);
+		getDebugDraw().drawPoint(m_rayCastInput.p1, 6.0f, c1);
+		getDebugDraw().drawPoint(m_rayCastInput.p2, 6.0f, c2);
 
 		if (m_rayActor != null) {
 			Color3f cr = new Color3f(0.2f, 0.2f, 0.9f);
 			Vec2 p = m_rayCastInput.p2.sub(m_rayCastInput.p1)
 					.mulLocal(m_rayActor.fraction).addLocal(m_rayCastInput.p1);
-			m_debugDraw.drawPoint(p, 6.0f, cr);
+			getDebugDraw().drawPoint(p, 6.0f, cr);
 		}
 
 		++m_stepCount;
 
 		if (settings.getSetting(TestbedSettings.DrawTree).enabled) {
-			m_tree.drawTree(m_debugDraw);
+			m_tree.drawTree(getDebugDraw());
 		}
 
 		m_textLine += 15;
-		m_debugDraw.drawString(5, m_textLine,
+		getDebugDraw().drawString(5, m_textLine,
 				"(c)reate proxy, (d)estroy proxy, (a)utomate", Color3f.WHITE);
 	}
 
@@ -207,7 +207,7 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 		Actor actor = (Actor) proxyId.userData;
 
 		RayCastOutput output = new RayCastOutput();
-		boolean hit = actor.aabb.raycast(output, input, m_world.getPool());
+		boolean hit = actor.aabb.raycast(output, input, world.getPool());
 
 		if (hit) {
 			m_rayCastOutput = output;
@@ -346,7 +346,7 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 
 			RayCastOutput output = new RayCastOutput();
 			boolean hit = m_actors[i].aabb.raycast(output, input,
-					m_world.getPool());
+					world.getPool());
 			if (hit) {
 				bruteActor = m_actors[i];
 				bruteOutput = output;

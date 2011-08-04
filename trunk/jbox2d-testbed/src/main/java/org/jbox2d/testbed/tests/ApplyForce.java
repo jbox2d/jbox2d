@@ -39,7 +39,6 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.joints.FrictionJointDef;
-import org.jbox2d.testbed.framework.TestPanelJ2D;
 import org.jbox2d.testbed.framework.TestbedSettings;
 import org.jbox2d.testbed.framework.TestbedTest;
 
@@ -61,7 +60,7 @@ public class ApplyForce extends TestbedTest {
 	    return;
 	  }
 	  
-		m_world.setGravity(new Vec2(0.0f, 0.0f));
+		world.setGravity(new Vec2(0.0f, 0.0f));
 		
 		final float k_restitution = 0.4f;
 		
@@ -69,7 +68,7 @@ public class ApplyForce extends TestbedTest {
 		{
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, 20.0f);
-			ground = m_world.createBody(bd);
+			ground = world.createBody(bd);
 			
 			PolygonShape shape = new PolygonShape();
 			
@@ -135,7 +134,7 @@ public class ApplyForce extends TestbedTest {
 			bd.position.set(0.0f, 2.0f);
 			bd.angle = MathUtils.PI;
 			bd.allowSleep = false;
-			m_body = m_world.createBody(bd);
+			m_body = world.createBody(bd);
 			m_body.createFixture(sd1);
 			m_body.createFixture(sd2);
 		}
@@ -154,7 +153,7 @@ public class ApplyForce extends TestbedTest {
 				bd.type = BodyType.DYNAMIC;
 				
 				bd.position.set(0.0f, 5.0f + 1.54f * i);
-				Body body = m_world.createBody(bd);
+				Body body = world.createBody(bd);
 				
 				body.createFixture(fd);
 				
@@ -174,7 +173,7 @@ public class ApplyForce extends TestbedTest {
 				jd.maxForce = mass * gravity;
 				jd.maxTorque = mass * radius * gravity;
 				
-				m_world.createJoint(jd);
+				world.createJoint(jd);
 			}
 		}
 	}
@@ -187,32 +186,32 @@ public class ApplyForce extends TestbedTest {
 		super.step(settings);
 		
 		addTextLine("Use 'wasd' to move, 'e' and 's' drift.");
-		if(TestPanelJ2D.keys['w']){
+		if(getModel().getKeys()['w']){
 			Vec2 f = m_body.getWorldVector(new Vec2(0.0f, -30.0f));
 			Vec2 p = m_body.getWorldPoint(m_body.getLocalCenter().add(new Vec2(0.0f, 2.0f)));
 			m_body.applyForce(f, p);
 		}
-		else if(TestPanelJ2D.keys['q']){
+		else if(getModel().getKeys()['q']){
 			Vec2 f = m_body.getWorldVector(new Vec2(0.0f, -30.0f));
 			Vec2 p = m_body.getWorldPoint(m_body.getLocalCenter().add(new Vec2(-.2f, 0f)));
 			m_body.applyForce(f, p);
 		}
-		else if(TestPanelJ2D.keys['e']){
+		else if(getModel().getKeys()['e']){
 			Vec2 f = m_body.getWorldVector(new Vec2(0.0f, -30.0f));
 			Vec2 p = m_body.getWorldPoint(m_body.getLocalCenter().add(new Vec2(.2f, 0f)));
 			m_body.applyForce(f, p);
 		}
-		else if(TestPanelJ2D.keys['s']){
+		else if(getModel().getKeys()['s']){
 			Vec2 f = m_body.getWorldVector(new Vec2(0.0f, 30.0f));
 			Vec2 p = m_body.getWorldCenter();
 			m_body.applyForce(f, p);
 		}
 		
-		if(TestPanelJ2D.keys['a']){
+		if(getModel().getKeys()['a']){
 			m_body.applyTorque(20.0f);
 		}
 		
-		if(TestPanelJ2D.keys['d']){
+		if(getModel().getKeys()['d']){
 			m_body.applyTorque(-20.0f);
 		}
 	}

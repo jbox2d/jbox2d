@@ -89,17 +89,19 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     }
   }
 
-  public Body m_groundBody;
+  protected World world;
+  protected Body groundBody;
+  protected MouseJoint mouseJoint;
+  protected final Vec2 mouseWorld = new Vec2();
   protected int m_pointCount;
-  private DestructionListener destructionListener;
-  public DebugDraw m_debugDraw;
-  public World m_world;
-  protected Body m_bomb;
-  public MouseJoint m_mouseJoint;
+  protected int m_stepCount;
+
+  protected Body bomb;
   private final Vec2 bombSpawnPoint = new Vec2();
   private boolean bombSpawning = false;
-  public final Vec2 m_mouseWorld = new Vec2();
-  protected int m_stepCount;
+
+  protected TestbedModel model;
+  private DestructionListener destructionListener;
 
   private final LinkedList<QueueItem> inputQueue;
 
@@ -113,7 +115,7 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
 
   public boolean hasCachedCamera = false;
 
-  private TestPanelJ2D panel;
+  private TestbedPanel panel;
 
   private JbSerializer serializer;
   private JbDeserializer deserializer;
@@ -128,9 +130,9 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
       @Override
       public Long getTag(Body argBody) {
         if (isSaveLoadEnabled()) {
-          if (argBody == m_groundBody) {
+          if (argBody == groundBody) {
             return GROUND_BODY_TAG;
-          } else if (argBody == m_bomb) {
+          } else if (argBody == bomb) {
             return BOMB_TAG;
           }
         }
@@ -140,7 +142,7 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
       @Override
       public Long getTag(Joint argJoint) {
         if (isSaveLoadEnabled()) {
-          if (argJoint == m_mouseJoint) {
+          if (argJoint == mouseJoint) {
             return MOUSE_JOINT_TAG;
           }
         }
@@ -152,10 +154,10 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
       public void processBody(Body argBody, Long argTag) {
         if (isSaveLoadEnabled()) {
           if (argTag == GROUND_BODY_TAG) {
-            m_groundBody = argBody;
+            groundBody = argBody;
             return;
           } else if (argTag == BOMB_TAG) {
-            m_bomb = argBody;
+            bomb = argBody;
             return;
           }
         }
@@ -166,7 +168,7 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
       public void processJoint(Joint argJoint, Long argTag) {
         if (isSaveLoadEnabled()) {
           if (argTag == MOUSE_JOINT_TAG) {
-            m_mouseJoint = (MouseJoint) argJoint;
+            mouseJoint = (MouseJoint) argJoint;
             return;
           }
         }
@@ -175,20 +177,40 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     });
   }
 
-  public void setPanel(TestPanelJ2D argPanel) {
+  public World getWorld() {
+    return world;
+  }
+
+  public TestbedModel getModel() {
+    return model;
+  }
+
+  public Body getGroundBody() {
+    return groundBody;
+  }
+
+  public DebugDraw getDebugDraw() {
+    return model.getDebugDraw();
+  }
+
+  public Vec2 getWorldMouse() {
+    return mouseWorld;
+  }
+
+  public void setPanel(TestbedPanel argPanel) {
     panel = argPanel;
   }
 
-  public void init(DebugDraw argDebugDraw) {
-    m_debugDraw = argDebugDraw;
+  public void init(TestbedModel argModel) {
+    model = argModel;
     destructionListener = new DestructionListener() {
 
       public void sayGoodbye(Fixture fixture) {
       }
 
       public void sayGoodbye(Joint joint) {
-        if (m_mouseJoint == joint) {
-          m_mouseJoint = null;
+        if (mouseJoint == joint) {
+          mouseJoint = null;
         } else {
           jointDestroyed(joint);
         }
@@ -196,25 +218,25 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     };
 
     Vec2 gravity = new Vec2(0, -10f);
-    m_world = new World(gravity, true);
-    m_bomb = null;
+    world = new World(gravity, true);
+    bomb = null;
     m_textLine = 30;
-    m_mouseJoint = null;
+    mouseJoint = null;
 
     BodyDef bodyDef = new BodyDef();
-    m_groundBody = m_world.createBody(bodyDef);
+    groundBody = world.createBody(bodyDef);
 
-    init(m_debugDraw, m_world, false);
+    init(world, false);
   }
 
-  public void init(DebugDraw argDraw, World argWorld, boolean argDeserialized) {
+  public void init(World argWorld, boolean argDeserialized) {
     m_pointCount = 0;
     m_stepCount = 0;
     bombSpawning = false;
 
     argWorld.setDestructionListener(destructionListener);
     argWorld.setContactListener(this);
-    argWorld.setDebugDraw(m_debugDraw);
+    argWorld.setDebugDraw(model.getDebugDraw());
 
     if (hasCachedCamera) {
       setCamera(cachedCameraX, cachedCameraY, cachedCameraScale);
@@ -255,14 +277,14 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
   }
 
   protected void _reset() {
-    init(m_debugDraw);
+    init(model);
   }
 
   protected void _save() {
 
     SerializationResult result;
     try {
-      result = serializer.serialize(m_world);
+      result = serializer.serialize(world);
     } catch (UnsupportedObjectException e1) {
       log.error("Error serializing world", e1);
       if (dialogSaveLoadErrors) {
@@ -295,10 +317,10 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
 
   protected void _load() {
 
-    World world;
+    World w;
     try {
       FileInputStream fis = new FileInputStream(getFilename());
-      world = deserializer.deserializeWorld(fis);
+      w = deserializer.deserializeWorld(fis);
     } catch (FileNotFoundException e) {
       log.error("File not found error while loading", e);
       if (dialogSaveLoadErrors) {
@@ -321,14 +343,14 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
       }
       return;
     }
-    m_world = world;
+    world = w;
 
-    init(m_debugDraw, m_world, true);
+    init(world, true);
     return;
   }
 
   public void setCamera(float x, float y, float scale) {
-    m_debugDraw.setCamera(x, y, scale);
+    model.getDebugDraw().setCamera(x, y, scale);
     hasCachedCamera = true;
     cachedCameraScale = scale;
     cachedCameraX = x;
@@ -339,7 +361,7 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
 
   public abstract String getTestName();
 
-  public void update(TestbedSettings settings) {
+  public void update() {
     if (resetPending) {
       _reset();
       resetPending = false;
@@ -355,13 +377,13 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
 
     m_textLine = 15;
     // keys!
-    if (TestPanelJ2D.keys['r']) {
-      TestPanelJ2D.keys['r'] = false;
-      init(m_debugDraw);
+    if (model.getKeys()['r']) {
+      model.getKeys()['r'] = false;
+      init(model);
     }
 
     if (title != null) {
-      m_debugDraw.drawString(panel.getWidth() / 2, 15, title, Color3f.WHITE);
+      model.getDebugDraw().drawString(panel.getWidth() / 2, 15, title, Color3f.WHITE);
     }
 
     // process our input
@@ -393,7 +415,7 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
       }
     }
 
-    step(settings);
+    step(model.getSettings());
   }
 
   private final Color3f color1 = new Color3f(.3f, .95f, .3f);
@@ -419,11 +441,12 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
         timeStep = 0;
       }
 
-      m_debugDraw.drawString(5, m_textLine, "****PAUSED****", Color3f.WHITE);
+      model.getDebugDraw().drawString(5, m_textLine, "****PAUSED****", Color3f.WHITE);
       m_textLine += 15;
     }
 
     int flags = 0;
+    model.getDebugDraw();
     flags += settings.getSetting(TestbedSettings.DrawShapes).enabled ? DebugDraw.e_shapeBit : 0;
     flags += settings.getSetting(TestbedSettings.DrawJoints).enabled ? DebugDraw.e_jointBit : 0;
     flags += settings.getSetting(TestbedSettings.DrawAABBs).enabled ? DebugDraw.e_aabbBit : 0;
@@ -431,17 +454,17 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     flags += settings.getSetting(TestbedSettings.DrawCOMs).enabled ? DebugDraw.e_centerOfMassBit
         : 0;
     flags += settings.getSetting(TestbedSettings.DrawTree).enabled ? DebugDraw.e_dynamicTreeBit : 0;
-    m_debugDraw.setFlags(flags);
+    model.getDebugDraw().setFlags(flags);
 
-    m_world.setWarmStarting(settings.getSetting(TestbedSettings.WarmStarting).enabled);
-    m_world.setContinuousPhysics(settings.getSetting(TestbedSettings.ContinuousCollision).enabled);
+    world.setWarmStarting(settings.getSetting(TestbedSettings.WarmStarting).enabled);
+    world.setContinuousPhysics(settings.getSetting(TestbedSettings.ContinuousCollision).enabled);
 
     m_pointCount = 0;
 
-    m_world.step(timeStep, settings.getSetting(TestbedSettings.VelocityIterations).value,
+    world.step(timeStep, settings.getSetting(TestbedSettings.VelocityIterations).value,
         settings.getSetting(TestbedSettings.PositionIterations).value);
 
-    m_world.drawDebugData();
+    world.drawDebugData();
 
     if (timeStep > 0f) {
       ++m_stepCount;
@@ -449,24 +472,25 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
 
     if (settings.getSetting(TestbedSettings.DrawStats).enabled) {
       // Vec2.watchCreations = true;
-      m_debugDraw.drawString(5, m_textLine, "Engine Info", color4);
+      model.getDebugDraw().drawString(5, m_textLine, "Engine Info", color4);
       m_textLine += 15;
-      m_debugDraw.drawString(5, m_textLine, "Framerate: " + panel.getCalculatedFrameRate(),
-          Color3f.WHITE);
+      model.getDebugDraw().drawString(5, m_textLine,
+          "Framerate: " + panel.getCalculatedFrameRate(), Color3f.WHITE);
       m_textLine += 15;
-      m_debugDraw.drawString(
-          5,
-          m_textLine,
-          "bodies/contacts/joints/proxies = " + m_world.getBodyCount() + "/"
-              + m_world.getContactCount() + "/" + m_world.getJointCount() + "/"
-              + m_world.getProxyCount(), Color3f.WHITE);
+      model.getDebugDraw()
+          .drawString(
+              5,
+              m_textLine,
+              "bodies/contacts/joints/proxies = " + world.getBodyCount() + "/"
+                  + world.getContactCount() + "/" + world.getJointCount() + "/"
+                  + world.getProxyCount(), Color3f.WHITE);
       // m_textLine += 20;
-      // m_debugDraw.drawString(5, m_textLine, "Pooling Info", color4);
+      // m_model.getDebugDraw().drawString(5, m_textLine, "Pooling Info", color4);
       // m_textLine += 15;
-      // m_debugDraw.drawString(5, m_textLine, "Vec2 creations: "+ Vec2.creationCount,
+      // m_model.getDebugDraw().drawString(5, m_textLine, "Vec2 creations: "+ Vec2.creationCount,
       // Color3f.WHITE);
       // m_textLine += 15;
-      // m_debugDraw.drawString(5, m_textLine, "Contact pooled/active: "+
+      // m_model.getDebugDraw().drawString(5, m_textLine, "Contact pooled/active: "+
       // Contact.contactPoolCount+"/"+Contact.activeContacts, Color3f.WHITE);
       m_textLine += 20;
 
@@ -476,43 +500,43 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     }
 
     if (settings.getSetting(TestbedSettings.DrawHelp).enabled) {
-      m_debugDraw.drawString(5, m_textLine, "Help", color4);
+      model.getDebugDraw().drawString(5, m_textLine, "Help", color4);
       m_textLine += 15;
-      m_debugDraw.drawString(5, m_textLine,
+      model.getDebugDraw().drawString(5, m_textLine,
           "Click and drag the left mouse button to move objects.", Color3f.WHITE);
       m_textLine += 15;
-      m_debugDraw.drawString(5, m_textLine, "Shift-Click to aim a bullet, or press space.",
-          Color3f.WHITE);
+      model.getDebugDraw().drawString(5, m_textLine,
+          "Shift-Click to aim a bullet, or press space.", Color3f.WHITE);
       m_textLine += 15;
-      m_debugDraw.drawString(5, m_textLine,
+      model.getDebugDraw().drawString(5, m_textLine,
           "Click and drag the right mouse button to move the view.", Color3f.WHITE);
       m_textLine += 15;
-      m_debugDraw.drawString(5, m_textLine, "Scroll to zoom in/out.", Color3f.WHITE);
+      model.getDebugDraw().drawString(5, m_textLine, "Scroll to zoom in/out.", Color3f.WHITE);
       m_textLine += 15;
-      m_debugDraw.drawString(5, m_textLine,
+      model.getDebugDraw().drawString(5, m_textLine,
           "Press '[' or ']' to change tests, and 'r' to restart.", Color3f.WHITE);
       m_textLine += 20;
     }
 
     if (!textList.isEmpty()) {
-      m_debugDraw.drawString(5, m_textLine, "Test Info", color4);
+      model.getDebugDraw().drawString(5, m_textLine, "Test Info", color4);
       m_textLine += 15;
       for (String s : textList) {
-        m_debugDraw.drawString(5, m_textLine, s, Color3f.WHITE);
+        model.getDebugDraw().drawString(5, m_textLine, s, Color3f.WHITE);
         m_textLine += 15;
       }
       textList.clear();
     }
 
-    if (m_mouseJoint != null) {
-      m_mouseJoint.getAnchorB(p1);
-      Vec2 p2 = m_mouseJoint.getTarget();
+    if (mouseJoint != null) {
+      mouseJoint.getAnchorB(p1);
+      Vec2 p2 = mouseJoint.getTarget();
 
-      m_debugDraw.drawSegment(p1, p2, mouseColor);
+      model.getDebugDraw().drawSegment(p1, p2, mouseColor);
     }
 
     if (bombSpawning) {
-      m_debugDraw.drawSegment(bombSpawnPoint, m_mouseWorld, Color3f.WHITE);
+      model.getDebugDraw().drawSegment(bombSpawnPoint, mouseWorld, Color3f.WHITE);
     }
 
     if (settings.getSetting(TestbedSettings.DrawContactPoints).enabled) {
@@ -523,15 +547,15 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
         ContactPoint point = points[i];
 
         if (point.state == PointState.ADD_STATE) {
-          m_debugDraw.drawPoint(point.position, 10f, color1);
+          model.getDebugDraw().drawPoint(point.position, 10f, color1);
         } else if (point.state == PointState.PERSIST_STATE) {
-          m_debugDraw.drawPoint(point.position, 5f, color2);
+          model.getDebugDraw().drawPoint(point.position, 5f, color2);
         }
 
         if (settings.getSetting(TestbedSettings.DrawNormals).enabled) {
           p1.set(point.position);
           p2.set(point.normal).mulLocal(axisScale).addLocal(p1);
-          m_debugDraw.drawSegment(p1, p2, color3);
+          model.getDebugDraw().drawSegment(p1, p2, color3);
         }
       }
     }
@@ -574,9 +598,9 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
   }
 
   public void shiftMouseDown(Vec2 p) {
-    m_mouseWorld.set(p);
+    mouseWorld.set(p);
 
-    if (m_mouseJoint != null) {
+    if (mouseJoint != null) {
       return;
     }
 
@@ -584,9 +608,9 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
   }
 
   public void mouseUp(Vec2 p) {
-    if (m_mouseJoint != null) {
-      m_world.destroyJoint(m_mouseJoint);
-      m_mouseJoint = null;
+    if (mouseJoint != null) {
+      world.destroyJoint(mouseJoint);
+      mouseJoint = null;
     }
 
     if (bombSpawning) {
@@ -598,9 +622,9 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
   private final TestQueryCallback callback = new TestQueryCallback();
 
   public void mouseDown(Vec2 p) {
-    m_mouseWorld.set(p);
+    mouseWorld.set(p);
 
-    if (m_mouseJoint != null) {
+    if (mouseJoint != null) {
       return;
     }
 
@@ -608,25 +632,25 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     queryAABB.upperBound.set(p.x + .001f, p.y + .001f);
     callback.point.set(p);
     callback.fixture = null;
-    m_world.queryAABB(callback, queryAABB);
+    world.queryAABB(callback, queryAABB);
 
     if (callback.fixture != null) {
       Body body = callback.fixture.getBody();
       MouseJointDef def = new MouseJointDef();
-      def.bodyA = m_groundBody;
+      def.bodyA = groundBody;
       def.bodyB = body;
       def.target.set(p);
       def.maxForce = 1000f * body.getMass();
-      m_mouseJoint = (MouseJoint) m_world.createJoint(def);
+      mouseJoint = (MouseJoint) world.createJoint(def);
       body.setAwake(true);
     }
   }
 
   public void mouseMove(Vec2 p) {
-    m_mouseWorld.set(p);
+    mouseWorld.set(p);
 
-    if (m_mouseJoint != null) {
-      m_mouseJoint.setTarget(p);
+    if (mouseJoint != null) {
+      mouseJoint.setTarget(p);
     }
   }
 
@@ -650,17 +674,17 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
   private final AABB aabb = new AABB();
 
   public synchronized void launchBomb(Vec2 position, Vec2 velocity) {
-    if (m_bomb != null) {
-      m_world.destroyBody(m_bomb);
-      m_bomb = null;
+    if (bomb != null) {
+      world.destroyBody(bomb);
+      bomb = null;
     }
     // todo optimize this
     BodyDef bd = new BodyDef();
     bd.type = BodyType.DYNAMIC;
     bd.position.set(position);
     bd.bullet = true;
-    m_bomb = m_world.createBody(bd);
-    m_bomb.setLinearVelocity(velocity);
+    bomb = world.createBody(bd);
+    bomb.setLinearVelocity(velocity);
 
     CircleShape circle = new CircleShape();
     circle.m_radius = 0.3f;
@@ -679,7 +703,7 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     aabb.lowerBound.set(minV);
     aabb.upperBound.set(maxV);
 
-    m_bomb.createFixture(fd);
+    bomb.createFixture(fd);
   }
 
   public synchronized void spawnBomb(Vec2 worldPt) {
@@ -762,25 +786,14 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
   }
 
   public void jointDestroyed(Joint joint) {
-
   }
 
-  /**
-   * @see org.jbox2d.callbacks.ContactListener#beginContact(org.jbox2d.dynamics.contacts.Contact)
-   */
   public void beginContact(Contact contact) {
   }
 
-  /**
-   * @see org.jbox2d.callbacks.ContactListener#endContact(org.jbox2d.dynamics.contacts.Contact)
-   */
   public void endContact(Contact contact) {
   }
 
-  /**
-   * @see org.jbox2d.callbacks.ContactListener#postSolve(org.jbox2d.dynamics.contacts.Contact,
-   *      org.jbox2d.callbacks.ContactImpulse)
-   */
   public void postSolve(Contact contact, ContactImpulse impulse) {
   }
 
@@ -788,10 +801,6 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
   private final PointState[] state2 = new PointState[Settings.maxManifoldPoints];
   private final WorldManifold worldManifold = new WorldManifold();
 
-  /**
-   * @see org.jbox2d.callbacks.ContactListener#preSolve(org.jbox2d.dynamics.contacts.Contact,
-   *      org.jbox2d.collision.Manifold)
-   */
   public void preSolve(Contact contact, Manifold oldManifold) {
     Manifold manifold = contact.getManifold();
 

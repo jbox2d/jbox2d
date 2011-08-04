@@ -67,7 +67,7 @@ public class SensorTest extends TestbedTest {
 		
 		{
 			BodyDef bd = new BodyDef();
-			Body ground = m_world.createBody(bd);
+			Body ground = world.createBody(bd);
 			
 			{
 				PolygonShape shape = new PolygonShape();
@@ -98,7 +98,7 @@ public class SensorTest extends TestbedTest {
 				bd.userData = m_touching[i];
 				
 				m_touching[i].tf = false;
-				m_bodies[i] = m_world.createBody(bd);
+				m_bodies[i] = world.createBody(bd);
 				
 				m_bodies[i].createFixture(shape, 1.0f);
 			}

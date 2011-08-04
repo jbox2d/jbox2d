@@ -93,7 +93,7 @@ public class CircleStress extends TestbedTest {
 		
 		{
 			BodyDef bd = new BodyDef();
-			Body ground = m_world.createBody(bd);
+			Body ground = world.createBody(bd);
 			
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
@@ -109,7 +109,7 @@ public class CircleStress extends TestbedTest {
             BodyDef bd = new BodyDef();
             bd.type = BodyType.STATIC;
             bd.position = new Vec2(0.0f, -10.0f);
-            Body b = m_world.createBody(bd);
+            Body b = world.createBody(bd);
             FixtureDef fd = new FixtureDef();
             fd.shape = sd;
             fd.friction = 1.0f;
@@ -120,10 +120,10 @@ public class CircleStress extends TestbedTest {
             sd.setAsBox(3.0f,50.0f);
             bd = new BodyDef();
             bd.position = new Vec2(45.0f,25.0f);
-            rightWall = m_world.createBody(bd);
+            rightWall = world.createBody(bd);
             rightWall.createFixture(sd, 0);
             bd.position = new Vec2(-45.0f,25.0f);
-            leftWall = m_world.createBody(bd);
+            leftWall = world.createBody(bd);
             leftWall.createFixture(sd, 0);
             
             // Corners 
@@ -131,11 +131,11 @@ public class CircleStress extends TestbedTest {
             sd.setAsBox(20.0f,3.0f);
             bd.angle = (float)(-Math.PI/4.0);
             bd.position = new Vec2(-35f,8.0f);
-            Body myBod = m_world.createBody(bd);
+            Body myBod = world.createBody(bd);
             myBod.createFixture(sd, 0);
             bd.angle = (float)(Math.PI/4.0);
             bd.position = new Vec2(35f,8.0f);
-            myBod = m_world.createBody(bd);
+            myBod = world.createBody(bd);
             myBod.createFixture(sd, 0);
             
             // top
@@ -143,7 +143,7 @@ public class CircleStress extends TestbedTest {
             bd.type = BodyType.STATIC;
             bd.angle = 0;
             bd.position = new Vec2(0.0f, 75.0f);
-            b = m_world.createBody(bd);
+            b = world.createBody(bd);
             fd.shape = sd;
             fd.friction = 1.0f;
             b.createFixture(fd);
@@ -158,7 +158,7 @@ public class CircleStress extends TestbedTest {
         int numPieces = 5;
         float radius = 6f;
         bd.position = new Vec2(0.0f,10.0f);
-        Body body = m_world.createBody(bd);
+        Body body = world.createBody(bd);
         for (int i=0; i<numPieces; i++) {
             cd = new CircleShape();
             cd.m_radius = 1.2f;
@@ -176,11 +176,11 @@ public class CircleStress extends TestbedTest {
         body.setBullet(false);
 
         RevoluteJointDef rjd = new RevoluteJointDef();
-        rjd.initialize(body,m_groundBody,body.getPosition());
+        rjd.initialize(body,groundBody,body.getPosition());
         rjd.motorSpeed = MathUtils.PI;
         rjd.maxMotorTorque = 1000000.0f;
         rjd.enableMotor = true;
-        joint = (RevoluteJoint)m_world.createJoint(rjd);
+        joint = (RevoluteJoint)world.createJoint(rjd);
         
         {
             int loadSize = 41;
@@ -199,7 +199,7 @@ public class CircleStress extends TestbedTest {
                     float xPos = -39f + 2*i;
                     float yPos = 50f+j;
                     bod.position = new Vec2(xPos,yPos);
-                    Body myBody = m_world.createBody(bod);
+                    Body myBody = world.createBody(bod);
                     myBody.createFixture(fd2);
                     
                 }
@@ -208,7 +208,7 @@ public class CircleStress extends TestbedTest {
             
         }
         
-        m_world.setGravity(new Vec2(0, -50));
+        world.setGravity(new Vec2(0, -50));
 	}
 	
 	/**
