@@ -37,7 +37,7 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.joints.PrismaticJoint;
 import org.jbox2d.dynamics.joints.PrismaticJointDef;
-import org.jbox2d.testbed.framework.TestPanel;
+import org.jbox2d.testbed.framework.TestPanelJ2D;
 import org.jbox2d.testbed.framework.TestbedSettings;
 import org.jbox2d.testbed.framework.TestbedTest;
 
@@ -116,15 +116,15 @@ public class PrismaticTest extends TestbedTest {
 		switch (argKeyChar) {
 			case 'l' :
 				m_joint.enableLimit(!m_joint.isLimitEnabled());
-				TestPanel.keys['l'] = false;
+				TestPanelJ2D.keys['l'] = false;
 				break;
 			case 'm' :
 				m_joint.enableMotor(!m_joint.isMotorEnabled());
-				TestPanel.keys['m'] = false;
+				TestPanelJ2D.keys['m'] = false;
 				break;
 			case 's' :
 				m_joint.setMotorSpeed(-m_joint.getMotorSpeed());
-				TestPanel.keys['s'] = false;
+				TestPanelJ2D.keys['s'] = false;
 				break;
 		}
 	}

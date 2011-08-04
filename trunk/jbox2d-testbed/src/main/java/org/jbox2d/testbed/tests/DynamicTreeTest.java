@@ -187,7 +187,7 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 
 		++m_stepCount;
 
-		if (settings.drawDynamicTree) {
+		if (settings.getSetting(TestbedSettings.DrawTree).enabled) {
 			m_tree.drawTree(m_debugDraw);
 		}
 

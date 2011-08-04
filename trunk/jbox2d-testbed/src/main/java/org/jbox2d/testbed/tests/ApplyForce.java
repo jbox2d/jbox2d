@@ -39,7 +39,7 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.joints.FrictionJointDef;
-import org.jbox2d.testbed.framework.TestPanel;
+import org.jbox2d.testbed.framework.TestPanelJ2D;
 import org.jbox2d.testbed.framework.TestbedSettings;
 import org.jbox2d.testbed.framework.TestbedTest;
 
@@ -187,32 +187,32 @@ public class ApplyForce extends TestbedTest {
 		super.step(settings);
 		
 		addTextLine("Use 'wasd' to move, 'e' and 's' drift.");
-		if(TestPanel.keys['w']){
+		if(TestPanelJ2D.keys['w']){
 			Vec2 f = m_body.getWorldVector(new Vec2(0.0f, -30.0f));
 			Vec2 p = m_body.getWorldPoint(m_body.getLocalCenter().add(new Vec2(0.0f, 2.0f)));
 			m_body.applyForce(f, p);
 		}
-		else if(TestPanel.keys['q']){
+		else if(TestPanelJ2D.keys['q']){
 			Vec2 f = m_body.getWorldVector(new Vec2(0.0f, -30.0f));
 			Vec2 p = m_body.getWorldPoint(m_body.getLocalCenter().add(new Vec2(-.2f, 0f)));
 			m_body.applyForce(f, p);
 		}
-		else if(TestPanel.keys['e']){
+		else if(TestPanelJ2D.keys['e']){
 			Vec2 f = m_body.getWorldVector(new Vec2(0.0f, -30.0f));
 			Vec2 p = m_body.getWorldPoint(m_body.getLocalCenter().add(new Vec2(.2f, 0f)));
 			m_body.applyForce(f, p);
 		}
-		else if(TestPanel.keys['s']){
+		else if(TestPanelJ2D.keys['s']){
 			Vec2 f = m_body.getWorldVector(new Vec2(0.0f, 30.0f));
 			Vec2 p = m_body.getWorldCenter();
 			m_body.applyForce(f, p);
 		}
 		
-		if(TestPanel.keys['a']){
+		if(TestPanelJ2D.keys['a']){
 			m_body.applyTorque(20.0f);
 		}
 		
-		if(TestPanel.keys['d']){
+		if(TestPanelJ2D.keys['d']){
 			m_body.applyTorque(-20.0f);
 		}
 	}
