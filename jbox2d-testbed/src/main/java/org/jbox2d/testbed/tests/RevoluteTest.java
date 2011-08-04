@@ -38,7 +38,7 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
-import org.jbox2d.testbed.framework.TestPanel;
+import org.jbox2d.testbed.framework.TestPanelJ2D;
 import org.jbox2d.testbed.framework.TestbedSettings;
 import org.jbox2d.testbed.framework.TestbedTest;
 
@@ -116,20 +116,20 @@ public class RevoluteTest extends TestbedTest {
 		switch (argKeyChar) {
 			case 'l' :
 				m_joint.enableLimit(!m_joint.isLimitEnabled());
-				TestPanel.keys['l'] = false;
+				TestPanelJ2D.keys['l'] = false;
 				break;
 			case 'm' :
 				m_joint.enableMotor(!m_joint.isMotorEnabled());
-				TestPanel.keys['m'] = false;
+				TestPanelJ2D.keys['m'] = false;
 				break;
 			case 'a' :
 				m_joint.setMotorSpeed(1.0f * MathUtils.PI);
-				TestPanel.keys['a'] = false;
+				TestPanelJ2D.keys['a'] = false;
 				isLeft = true;
 				break;
 			case 'd' :
 				m_joint.setMotorSpeed(-1.0f * MathUtils.PI);
-				TestPanel.keys['d'] = false;
+				TestPanelJ2D.keys['d'] = false;
 				isLeft = false;
 				break;
 		}

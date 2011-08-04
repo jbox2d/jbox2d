@@ -41,7 +41,7 @@ import org.jbox2d.dynamics.joints.PrismaticJoint;
 import org.jbox2d.dynamics.joints.PrismaticJointDef;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
-import org.jbox2d.testbed.framework.TestPanel;
+import org.jbox2d.testbed.framework.TestPanelJ2D;
 import org.jbox2d.testbed.framework.TestbedSettings;
 import org.jbox2d.testbed.framework.TestbedTest;
 
@@ -172,11 +172,11 @@ public class SliderCrankTest extends TestbedTest {
 		switch(argKeyChar){
 			case 'f':
 				m_joint2.enableMotor(!m_joint2.isMotorEnabled());
-				TestPanel.keys['f'] = false;
+				TestPanelJ2D.keys['f'] = false;
 				break;
 			case 'm':
 				m_joint1.enableMotor(!m_joint1.isMotorEnabled());
-				TestPanel.keys['m'] = false;
+				TestPanelJ2D.keys['m'] = false;
 				break;
 		}
 	}

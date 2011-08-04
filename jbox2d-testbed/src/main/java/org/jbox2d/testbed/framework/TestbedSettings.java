@@ -29,27 +29,77 @@
  */
 package org.jbox2d.testbed.framework;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.jbox2d.testbed.framework.TestbedSetting.SettingsType;
+
 /**
+ * Stores all the testbed settings
+ * 
  * @author Daniel Murphy
  */
 public class TestbedSettings {
-	public float hz = 60f;
-	public int velocityIterations = 8;
-	public int positionIterations = 3;
-	public boolean drawShapes = true;
-	public boolean drawJoints = true;
-	public boolean drawAABBs = false;
-	public boolean drawPairs = false;
-	public boolean drawContactPoints = false;
-	public boolean drawContactNormals = false;
-	public boolean drawContactForces = false;
-	public boolean drawFrictionForces = false;
-	public boolean drawCOMs = false;
-	public boolean drawStats = true;
-	public boolean drawHelp = false;
-	public boolean drawDynamicTree = false;
-	public boolean enableWarmStarting = true;
-	public boolean enableContinuous = true;
-	public boolean pause = false;
-	public boolean singleStep = false;
+  public static final String Hz = "Hz";
+  public static final String PositionIterations = "Pos Iters";
+  public static final String VelocityIterations = "Vel Iters";
+  public static final String WarmStarting = "Warm Starting";
+  public static final String ContinuousCollision = "Continuous Collision";
+  public static final String DrawShapes = "Draw Shapes";
+  public static final String DrawJoints = "Draw Joints";
+  public static final String DrawAABBs = "Draw AABBs";
+  public static final String DrawPairs = "Draw Pairs";
+  public static final String DrawContactPoints = "Draw Contact Points";
+  public static final String DrawNormals = "Draw Normals";
+  public static final String DrawCOMs = "Draw Center of Mass";
+  public static final String DrawStats = "Draw Stats";
+  public static final String DrawHelp = "Draw Help";
+  public static final String DrawTree = "Draw Dynamic Tree";
+
+  public boolean pause = false;
+  public boolean singleStep = false;
+
+  private ArrayList<TestbedSetting> settings;
+  private final HashMap<String, TestbedSetting> settingsMap;
+
+  public TestbedSettings() {
+    settings = new ArrayList<TestbedSetting>();
+    settingsMap = new HashMap<String, TestbedSetting>();
+    populateDefaultSettings();
+  }
+
+  private void populateDefaultSettings() {
+    addSetting(new TestbedSetting(Hz, SettingsType.ENGINE, 60, 1, 400));
+    addSetting(new TestbedSetting(PositionIterations, SettingsType.ENGINE, 3, 0, 100));
+    addSetting(new TestbedSetting(VelocityIterations, SettingsType.ENGINE, 8, 1, 100));
+    addSetting(new TestbedSetting(WarmStarting, SettingsType.ENGINE, true));
+    addSetting(new TestbedSetting(ContinuousCollision, SettingsType.ENGINE, true));
+    addSetting(new TestbedSetting(DrawShapes, SettingsType.DRAWING, true));
+    addSetting(new TestbedSetting(DrawJoints, SettingsType.DRAWING, true));
+    addSetting(new TestbedSetting(DrawAABBs, SettingsType.DRAWING, false));
+    addSetting(new TestbedSetting(DrawPairs, SettingsType.DRAWING, false));
+    addSetting(new TestbedSetting(DrawContactPoints, SettingsType.DRAWING, false));
+    addSetting(new TestbedSetting(DrawNormals, SettingsType.DRAWING, false));
+    addSetting(new TestbedSetting(DrawCOMs, SettingsType.DRAWING, false));
+    addSetting(new TestbedSetting(DrawStats, SettingsType.DRAWING, true));
+    addSetting(new TestbedSetting(DrawHelp, SettingsType.DRAWING, false));
+    addSetting(new TestbedSetting(DrawTree, SettingsType.DRAWING, false));
+  }
+
+  public void addSetting(TestbedSetting argSetting) {
+    if (settingsMap.containsKey(argSetting.name)) {
+      throw new IllegalArgumentException("Settings already contain a setting with name: "
+          + argSetting.name);
+    }
+    settings.add(argSetting);
+    settingsMap.put(argSetting.name, argSetting);
+  }
+
+  public ArrayList<TestbedSetting> getSettings() {
+    return settings;
+  }
+
+  public TestbedSetting getSetting(String argName) {
+    return settingsMap.get(argName);
+  }
 }

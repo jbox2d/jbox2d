@@ -51,12 +51,12 @@ import org.jbox2d.testbed.pooling.ColorPool;
 public class DebugDrawJ2D extends DebugDraw{
 	public static int circlePoints = 20;
 
-	private final TestPanel panel;
+	private final TestPanelJ2D panel;
 	private final ColorPool cpool = new ColorPool();
 	/**
 	 * @param viewport
 	 */
-	public DebugDrawJ2D(TestPanel argTestPanel) {
+	public DebugDrawJ2D(TestPanelJ2D argTestPanel) {
 		super(new OBBViewportTransform());
 		viewportTransform.setYFlip(true);
 		panel = argTestPanel;

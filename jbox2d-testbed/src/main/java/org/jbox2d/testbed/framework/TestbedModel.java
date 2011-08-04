@@ -1,5 +1,7 @@
 package org.jbox2d.testbed.framework;
 
+import java.util.HashMap;
+
 import javax.swing.DefaultComboBoxModel;
 
 /**
@@ -10,10 +12,12 @@ public class TestbedModel {
 
   private final DefaultComboBoxModel tests;
   private final TestbedSettings settings;
+  private final HashMap<String, TestbedSetting> settings2;
 	
 	public TestbedModel(){
 	    settings = new TestbedSettings();
 	    tests = new DefaultComboBoxModel();
+	    settings2 = new HashMap<String, TestbedSetting>();
 	}
 	
 	public void addTest(TestbedTest argTest){

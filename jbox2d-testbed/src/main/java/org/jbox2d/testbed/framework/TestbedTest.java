@@ -74,11 +74,11 @@ import org.slf4j.LoggerFactory;
 public abstract class TestbedTest implements ContactListener, ObjectListener, ObjectSigner,
     UnsupportedListener {
   public static final int MAX_CONTACT_POINTS = 2048;
-  
+
   protected static final long GROUND_BODY_TAG = 1897450239847L;
   protected static final long BOMB_TAG = 98989788987L;
   protected static final long MOUSE_JOINT_TAG = 4567893364789L;
-  
+
   private static final Logger log = LoggerFactory.getLogger(TestbedTest.class);
 
   // keep these static so we don't have to recreate them every time
@@ -113,13 +113,13 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
 
   public boolean hasCachedCamera = false;
 
-  private TestPanel panel;
+  private TestPanelJ2D panel;
 
   private JbSerializer serializer;
   private JbDeserializer deserializer;
 
   public boolean dialogSaveLoadErrors = true;
-  
+
   public boolean savePending, loadPending, resetPending = false;
 
   public TestbedTest() {
@@ -127,43 +127,45 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     serializer = new PbSerializer(this, new SignerAdapter(this) {
       @Override
       public Long getTag(Body argBody) {
-        if(isSaveLoadEnabled()){
-          if(argBody == m_groundBody){
+        if (isSaveLoadEnabled()) {
+          if (argBody == m_groundBody) {
             return GROUND_BODY_TAG;
-          } else if(argBody == m_bomb){
+          } else if (argBody == m_bomb) {
             return BOMB_TAG;
           }
         }
         return super.getTag(argBody);
       }
+
       @Override
       public Long getTag(Joint argJoint) {
-        if(isSaveLoadEnabled()){
-          if(argJoint == m_mouseJoint){
+        if (isSaveLoadEnabled()) {
+          if (argJoint == m_mouseJoint) {
             return MOUSE_JOINT_TAG;
           }
         }
         return super.getTag(argJoint);
       }
     });
-    deserializer = new PbDeserializer(this, new ListenerAdapter(this){
+    deserializer = new PbDeserializer(this, new ListenerAdapter(this) {
       @Override
       public void processBody(Body argBody, Long argTag) {
-        if(isSaveLoadEnabled()){
-          if(argTag == GROUND_BODY_TAG){
+        if (isSaveLoadEnabled()) {
+          if (argTag == GROUND_BODY_TAG) {
             m_groundBody = argBody;
             return;
-          } else if(argTag == BOMB_TAG){
+          } else if (argTag == BOMB_TAG) {
             m_bomb = argBody;
             return;
           }
         }
         super.processBody(argBody, argTag);
       }
+
       @Override
       public void processJoint(Joint argJoint, Long argTag) {
-        if(isSaveLoadEnabled()){
-          if(argTag == MOUSE_JOINT_TAG){
+        if (isSaveLoadEnabled()) {
+          if (argTag == MOUSE_JOINT_TAG) {
             m_mouseJoint = (MouseJoint) argJoint;
             return;
           }
@@ -173,7 +175,7 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     });
   }
 
-  public void setPanel(TestPanel argPanel) {
+  public void setPanel(TestPanelJ2D argPanel) {
     panel = argPanel;
   }
 
@@ -198,14 +200,14 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     m_bomb = null;
     m_textLine = 30;
     m_mouseJoint = null;
-    
+
     BodyDef bodyDef = new BodyDef();
     m_groundBody = m_world.createBody(bodyDef);
 
     init(m_debugDraw, m_world, false);
   }
-  
-  public void init(DebugDraw argDraw, World argWorld, boolean argDeserialized){
+
+  public void init(DebugDraw argDraw, World argWorld, boolean argDeserialized) {
     m_pointCount = 0;
     m_stepCount = 0;
     bombSpawning = false;
@@ -213,7 +215,7 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     argWorld.setDestructionListener(destructionListener);
     argWorld.setContactListener(this);
     argWorld.setDebugDraw(m_debugDraw);
-    
+
     if (hasCachedCamera) {
       setCamera(cachedCameraX, cachedCameraY, cachedCameraScale);
     } else {
@@ -223,36 +225,36 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
 
     initTest(argDeserialized);
   }
-  
-  public float getDefaultCameraX(){
+
+  public float getDefaultCameraX() {
     return 0;
   }
-  
-  public float getDefaultCameraY(){
+
+  public float getDefaultCameraY() {
     return 10;
   }
-  
-  public float getDefaultCameraScale(){
+
+  public float getDefaultCameraScale() {
     return 10;
   }
 
   public String getFilename() {
     return getTestName().toLowerCase().replaceAll(" ", "_") + ".box2d";
   }
-  
-  public void reset(){
+
+  public void reset() {
     resetPending = true;
   }
-  
-  public void save(){
+
+  public void save() {
     savePending = true;
   }
-  
-  public void load(){
+
+  public void load() {
     loadPending = true;
   }
-  
-  protected void _reset(){
+
+  protected void _reset() {
     init(m_debugDraw);
   }
 
@@ -307,8 +309,8 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     } catch (UnsupportedObjectException e) {
       log.error("Error deserializing world", e);
       if (dialogSaveLoadErrors) {
-        JOptionPane.showConfirmDialog(null, "Error serializing the object: "
-            + e.toString(), "Serialization Error", JOptionPane.OK_OPTION);
+        JOptionPane.showConfirmDialog(null, "Error serializing the object: " + e.toString(),
+            "Serialization Error", JOptionPane.OK_OPTION);
       }
       return;
     } catch (IOException e) {
@@ -320,7 +322,7 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
       return;
     }
     m_world = world;
-    
+
     init(m_debugDraw, m_world, true);
     return;
   }
@@ -338,23 +340,23 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
   public abstract String getTestName();
 
   public void update(TestbedSettings settings) {
-    if(resetPending){
+    if (resetPending) {
       _reset();
       resetPending = false;
     }
-    if(savePending){
+    if (savePending) {
       _save();
       savePending = false;
     }
-    if(loadPending){
+    if (loadPending) {
       _load();
       loadPending = false;
     }
-    
+
     m_textLine = 15;
     // keys!
-    if (TestPanel.keys['r']) {
-      TestPanel.keys['r'] = false;
+    if (TestPanelJ2D.keys['r']) {
+      TestPanelJ2D.keys['r'] = false;
       init(m_debugDraw);
     }
 
@@ -403,7 +405,8 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
   private final Vec2 p2 = new Vec2();
 
   public synchronized void step(TestbedSettings settings) {
-    float timeStep = settings.hz > 0f ? 1f / settings.hz : 0;
+    float hz = settings.getSetting(TestbedSettings.Hz).value;
+    float timeStep = hz > 0f ? 1f / hz : 0;
 
     if (settings.singleStep && !settings.pause) {
       settings.pause = true;
@@ -421,20 +424,22 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     }
 
     int flags = 0;
-    flags += settings.drawShapes ? DebugDraw.e_shapeBit : 0;
-    flags += settings.drawJoints ? DebugDraw.e_jointBit : 0;
-    flags += settings.drawAABBs ? DebugDraw.e_aabbBit : 0;
-    flags += settings.drawPairs ? DebugDraw.e_pairBit : 0;
-    flags += settings.drawCOMs ? DebugDraw.e_centerOfMassBit : 0;
-    flags += settings.drawDynamicTree ? DebugDraw.e_dynamicTreeBit : 0;
+    flags += settings.getSetting(TestbedSettings.DrawShapes).enabled ? DebugDraw.e_shapeBit : 0;
+    flags += settings.getSetting(TestbedSettings.DrawJoints).enabled ? DebugDraw.e_jointBit : 0;
+    flags += settings.getSetting(TestbedSettings.DrawAABBs).enabled ? DebugDraw.e_aabbBit : 0;
+    flags += settings.getSetting(TestbedSettings.DrawPairs).enabled ? DebugDraw.e_pairBit : 0;
+    flags += settings.getSetting(TestbedSettings.DrawCOMs).enabled ? DebugDraw.e_centerOfMassBit
+        : 0;
+    flags += settings.getSetting(TestbedSettings.DrawTree).enabled ? DebugDraw.e_dynamicTreeBit : 0;
     m_debugDraw.setFlags(flags);
 
-    m_world.setWarmStarting(settings.enableWarmStarting);
-    m_world.setContinuousPhysics(settings.enableContinuous);
+    m_world.setWarmStarting(settings.getSetting(TestbedSettings.WarmStarting).enabled);
+    m_world.setContinuousPhysics(settings.getSetting(TestbedSettings.ContinuousCollision).enabled);
 
     m_pointCount = 0;
 
-    m_world.step(timeStep, settings.velocityIterations, settings.positionIterations);
+    m_world.step(timeStep, settings.getSetting(TestbedSettings.VelocityIterations).value,
+        settings.getSetting(TestbedSettings.PositionIterations).value);
 
     m_world.drawDebugData();
 
@@ -442,7 +447,7 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
       ++m_stepCount;
     }
 
-    if (settings.drawStats) {
+    if (settings.getSetting(TestbedSettings.DrawStats).enabled) {
       // Vec2.watchCreations = true;
       m_debugDraw.drawString(5, m_textLine, "Engine Info", color4);
       m_textLine += 15;
@@ -470,7 +475,7 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
       // Vec2.watchCreations = false;
     }
 
-    if (settings.drawHelp) {
+    if (settings.getSetting(TestbedSettings.DrawHelp).enabled) {
       m_debugDraw.drawString(5, m_textLine, "Help", color4);
       m_textLine += 15;
       m_debugDraw.drawString(5, m_textLine,
@@ -510,7 +515,7 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
       m_debugDraw.drawSegment(bombSpawnPoint, m_mouseWorld, Color3f.WHITE);
     }
 
-    if (settings.drawContactPoints) {
+    if (settings.getSetting(TestbedSettings.DrawContactPoints).enabled) {
       final float axisScale = .3f;
 
       for (int i = 0; i < m_pointCount; i++) {
@@ -523,7 +528,7 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
           m_debugDraw.drawPoint(point.position, 5f, color2);
         }
 
-        if (settings.drawContactNormals) {
+        if (settings.getSetting(TestbedSettings.DrawNormals).enabled) {
           p1.set(point.position);
           p2.set(point.normal).mulLocal(axisScale).addLocal(p1);
           m_debugDraw.drawSegment(p1, p2, color3);
@@ -869,49 +874,57 @@ class QueueItem {
   }
 }
 
-class SignerAdapter implements ObjectSigner{
+class SignerAdapter implements ObjectSigner {
   private final ObjectSigner delegate;
-  
-  public SignerAdapter(ObjectSigner argDelegate){
+
+  public SignerAdapter(ObjectSigner argDelegate) {
     delegate = argDelegate;
   }
-  
+
   public Long getTag(World argWorld) {
     return delegate.getTag(argWorld);
   }
+
   public Long getTag(Body argBody) {
     return delegate.getTag(argBody);
   }
+
   public Long getTag(Shape argShape) {
     return delegate.getTag(argShape);
   }
+
   public Long getTag(Fixture argFixture) {
     return delegate.getTag(argFixture);
   }
+
   public Long getTag(Joint argJoint) {
     return delegate.getTag(argJoint);
   }
 }
 
-class ListenerAdapter implements ObjectListener{
+class ListenerAdapter implements ObjectListener {
   private final ObjectListener listener;
-  
-  public ListenerAdapter(ObjectListener argListener){
+
+  public ListenerAdapter(ObjectListener argListener) {
     listener = argListener;
   }
 
   public void processWorld(World argWorld, Long argTag) {
     listener.processWorld(argWorld, argTag);
   }
+
   public void processBody(Body argBody, Long argTag) {
     listener.processBody(argBody, argTag);
   }
+
   public void processFixture(Fixture argFixture, Long argTag) {
     listener.processFixture(argFixture, argTag);
   }
+
   public void processShape(Shape argShape, Long argTag) {
     listener.processShape(argShape, argTag);
   }
+
   public void processJoint(Joint argJoint, Long argTag) {
     listener.processJoint(argJoint, argTag);
   }

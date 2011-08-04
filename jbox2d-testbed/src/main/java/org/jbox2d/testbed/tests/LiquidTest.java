@@ -320,7 +320,8 @@ public class LiquidTest extends TestbedTest {
 	@Override
 	public void step(TestbedSettings settings) {
 		super.step(settings);
-		float dt = 1.0f/settings.hz;
+    float hz = settings.getSetting(TestbedSettings.Hz).value;
+		float dt = 1.0f/hz;
 		
 		int n = 1;
 		for (int i=0; i<n; ++i) {
