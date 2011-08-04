@@ -67,7 +67,7 @@ public class PolyShapes extends TestbedTest {
 		// Ground body
 		{
 			BodyDef bd = new BodyDef();
-			Body ground = m_world.createBody(bd);
+			Body ground = world.createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
@@ -138,7 +138,7 @@ public class PolyShapes extends TestbedTest {
 			bd.angularDamping = 0.02f;
 		}
 
-		m_bodies[m_bodyIndex] = m_world.createBody(bd);
+		m_bodies[m_bodyIndex] = world.createBody(bd);
 
 		if (index < 4)
 		{
@@ -167,7 +167,7 @@ public class PolyShapes extends TestbedTest {
 		{
 			if (m_bodies[i] != null)
 			{
-				m_world.destroyBody(m_bodies[i]);
+				world.destroyBody(m_bodies[i]);
 				m_bodies[i] = null;
 				return;
 			}
@@ -213,19 +213,19 @@ public class PolyShapes extends TestbedTest {
 	public void step(TestbedSettings settings) {
 		super.step(settings);
 		
-		PolyShapesCallback callback = new PolyShapesCallback(m_world.getPool());
+		PolyShapesCallback callback = new PolyShapesCallback(world.getPool());
 		callback.m_circle.m_radius = 2.0f;
 		callback.m_circle.m_p.set(0.0f, 2.1f);
 		callback.m_transform.setIdentity();
-		callback.debugDraw = m_debugDraw;
+		callback.debugDraw = getDebugDraw();
 
 		AABB aabb = new AABB();
 		callback.m_circle.computeAABB(aabb, callback.m_transform);
 
-		m_world.queryAABB(callback, aabb);
+		world.queryAABB(callback, aabb);
 
 		Color3f color = new Color3f(0.4f, 0.7f, 0.8f);
-		m_debugDraw.drawCircle(callback.m_circle.m_p, callback.m_circle.m_radius, color);
+		getDebugDraw().drawCircle(callback.m_circle.m_p, callback.m_circle.m_radius, color);
 
 		addTextLine("Press 1-5 to drop stuff");
 		addTextLine("Press 'a' to (de)activate some bodies");

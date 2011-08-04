@@ -90,7 +90,7 @@ public class DominoTower extends TestbedTest {
 
       BodyDef bd = new BodyDef();
       bd.position = new Vec2(0.0f, -10.0f);
-      m_world.createBody(bd).createFixture(sd, 0f);
+      world.createBody(bd).createFixture(sd, 0f);
     }
 
     {
@@ -108,14 +108,14 @@ public class DominoTower extends TestbedTest {
       bd.bullet = true;
       // bd.addShape(sd);
       bd.position = new Vec2(30f, 50f);
-      Body b = m_world.createBody(bd);
+      Body b = world.createBody(bd);
       b.createFixture(fd);
       b.setLinearVelocity(new Vec2(-25f, -25f));
       b.setAngularVelocity(6.7f);
 
       fd.density = 25f;
       bd.position = new Vec2(-30, 25f);
-      b = m_world.createBody(bd);
+      b = world.createBody(bd);
       b.createFixture(fd);
       b.setLinearVelocity(new Vec2(35f, -10f));
       b.setAngularVelocity(-8.3f);
@@ -126,8 +126,8 @@ public class DominoTower extends TestbedTest {
       // Make base
       for (int i = 0; i < baseCount; ++i) {
         currX = i * 1.5f * dheight - (1.5f * dheight * baseCount / 2f);
-        makeDomino(currX, dheight / 2.0f, false, m_world);
-        makeDomino(currX, dheight + dwidth / 2.0f, true, m_world);
+        makeDomino(currX, dheight / 2.0f, false, world);
+        makeDomino(currX, dheight + dwidth / 2.0f, true, world);
       }
       currX = baseCount * 1.5f * dheight - (1.5f * dheight * baseCount / 2f);
       // Make 'I's
@@ -143,16 +143,16 @@ public class DominoTower extends TestbedTest {
                                                                                // .05f);
           ddensity *= 2.5f;
           if (i == 0) {
-            makeDomino(currX - (1.25f * dheight) + .5f * dwidth, currY - dwidth, false, m_world);
+            makeDomino(currX - (1.25f * dheight) + .5f * dwidth, currY - dwidth, false, world);
           }
           if (i == baseCount - j - 1) {
             // if (j != 1) //djm: why is this here? it makes it off balance
-            makeDomino(currX + (1.25f * dheight) - .5f * dwidth, currY - dwidth, false, m_world);
+            makeDomino(currX + (1.25f * dheight) - .5f * dwidth, currY - dwidth, false, world);
           }
           ddensity /= 2.5f;
-          makeDomino(currX, currY, false, m_world);
-          makeDomino(currX, currY + .5f * (dwidth + dheight), true, m_world);
-          makeDomino(currX, currY - .5f * (dwidth + dheight), true, m_world);
+          makeDomino(currX, currY, false, world);
+          makeDomino(currX, currY + .5f * (dwidth + dheight), true, world);
+          makeDomino(currX, currY - .5f * (dwidth + dheight), true, world);
         }
       }
     }

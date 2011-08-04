@@ -64,7 +64,7 @@ public class BodyTypes extends TestbedTest {
 		Body ground = null;
 		{
 			BodyDef bd = new BodyDef();
-			ground = m_world.createBody(bd);
+			ground = world.createBody(bd);
 			
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-20.0f, 0.0f), new Vec2(20.0f, 0.0f));
@@ -80,7 +80,7 @@ public class BodyTypes extends TestbedTest {
 			BodyDef bd = new BodyDef();
 			bd.type = BodyType.DYNAMIC;
 			bd.position.set(0.0f, 3.0f);
-			m_attachment = m_world.createBody(bd);
+			m_attachment = world.createBody(bd);
 			
 			PolygonShape shape = new PolygonShape();
 			shape.setAsBox(0.5f, 2.0f);
@@ -92,7 +92,7 @@ public class BodyTypes extends TestbedTest {
 			BodyDef bd = new BodyDef();
 			bd.type = BodyType.DYNAMIC;
 			bd.position.set(-4.0f, 5.0f);
-			m_platform = m_world.createBody(bd);
+			m_platform = world.createBody(bd);
 			
 			PolygonShape shape = new PolygonShape();
 			shape.setAsBox(0.5f, 4.0f, new Vec2(4.0f, 0.0f), 0.5f * MathUtils.PI);
@@ -107,7 +107,7 @@ public class BodyTypes extends TestbedTest {
 			rjd.initialize(m_attachment, m_platform, new Vec2(0.0f, 5.0f));
 			rjd.maxMotorTorque = 50.0f;
 			rjd.enableMotor = true;
-			m_world.createJoint(rjd);
+			world.createJoint(rjd);
 			
 			PrismaticJointDef pjd = new PrismaticJointDef();
 			pjd.initialize(ground, m_platform, new Vec2(0.0f, 5.0f), new Vec2(1.0f, 0.0f));
@@ -118,7 +118,7 @@ public class BodyTypes extends TestbedTest {
 			pjd.upperTranslation = 10.0f;
 			pjd.enableLimit = true;
 			
-			m_world.createJoint(pjd);
+			world.createJoint(pjd);
 			
 		}
 		
@@ -127,7 +127,7 @@ public class BodyTypes extends TestbedTest {
 			BodyDef bd = new BodyDef();
 			bd.type = BodyType.DYNAMIC;
 			bd.position.set(0.0f, 8.0f);
-			Body body = m_world.createBody(bd);
+			Body body = world.createBody(bd);
 			
 			PolygonShape shape = new PolygonShape();
 			shape.setAsBox(0.75f, 0.75f);

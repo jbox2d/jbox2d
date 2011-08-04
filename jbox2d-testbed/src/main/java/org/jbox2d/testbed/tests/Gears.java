@@ -63,7 +63,7 @@ public class Gears extends TestbedTest {
 		Body ground = null;
 		{
 			BodyDef bd = new BodyDef();
-			ground = m_world.createBody(bd);
+			ground = world.createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(50.0f, 0.0f), new Vec2(-50.0f, 0.0f));
@@ -83,7 +83,7 @@ public class Gears extends TestbedTest {
 			BodyDef bd1 = new BodyDef();
 			bd1.type = BodyType.DYNAMIC;
 			bd1.position.set(-3.0f, 12.0f);
-			Body body1 = m_world.createBody(bd1);
+			Body body1 = world.createBody(bd1);
 			body1.createFixture(circle1, 5.0f);
 
 			RevoluteJointDef jd1 = new RevoluteJointDef();
@@ -92,22 +92,22 @@ public class Gears extends TestbedTest {
 			jd1.localAnchorA = ground.getLocalPoint(bd1.position);
 			jd1.localAnchorB = body1.getLocalPoint(bd1.position);
 			jd1.referenceAngle = body1.getAngle() - ground.getAngle();
-			m_joint1 = (RevoluteJoint)m_world.createJoint(jd1);
+			m_joint1 = (RevoluteJoint)world.createJoint(jd1);
 
 			BodyDef bd2 = new BodyDef();
 			bd2.type = BodyType.DYNAMIC;
 			bd2.position.set(0.0f, 12.0f);
-			Body body2 = m_world.createBody(bd2);
+			Body body2 = world.createBody(bd2);
 			body2.createFixture(circle2, 5.0f);
 
 			RevoluteJointDef jd2 = new RevoluteJointDef();
 			jd2.initialize(ground, body2, bd2.position);
-			m_joint2 = (RevoluteJoint)m_world.createJoint(jd2);
+			m_joint2 = (RevoluteJoint)world.createJoint(jd2);
 
 			BodyDef bd3 = new BodyDef();
 			bd3.type = BodyType.DYNAMIC;
 			bd3.position.set(2.5f, 12.0f);
-			Body body3 = m_world.createBody(bd3);
+			Body body3 = world.createBody(bd3);
 			body3.createFixture(box, 5.0f);
 
 			PrismaticJointDef jd3 = new PrismaticJointDef();
@@ -116,7 +116,7 @@ public class Gears extends TestbedTest {
 			jd3.upperTranslation = 5.0f;
 			jd3.enableLimit = true;
 
-			m_joint3 = (PrismaticJoint)m_world.createJoint(jd3);
+			m_joint3 = (PrismaticJoint)world.createJoint(jd3);
 
 			GearJointDef jd4 = new GearJointDef();
 			jd4.bodyA = body1;
@@ -124,7 +124,7 @@ public class Gears extends TestbedTest {
 			jd4.joint1 = m_joint1;
 			jd4.joint2 = m_joint2;
 			jd4.ratio = circle2.m_radius / circle1.m_radius;
-			m_joint4 = (GearJoint)m_world.createJoint(jd4);
+			m_joint4 = (GearJoint)world.createJoint(jd4);
 
 			GearJointDef jd5 = new GearJointDef();
 			jd5.bodyA = body2;
@@ -132,7 +132,7 @@ public class Gears extends TestbedTest {
 			jd5.joint1 = m_joint2;
 			jd5.joint2 = m_joint3;
 			jd5.ratio = -1.0f / circle2.m_radius;
-			m_joint5 = (GearJoint)m_world.createJoint(jd5);
+			m_joint5 = (GearJoint)world.createJoint(jd5);
 		}
 	}
 	

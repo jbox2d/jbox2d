@@ -121,7 +121,7 @@ public class TheoJansen extends TestbedTest {
 		// Ground
 		{
 			BodyDef bd = new BodyDef();
-			Body ground = m_world.createBody(bd);
+			Body ground = world.createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-50.0f, 0.0f), new Vec2(50.0f, 0.0f));
@@ -144,7 +144,7 @@ public class TheoJansen extends TestbedTest {
 			bd.type = BodyType.DYNAMIC;
 			bd.position.set(-40.0f + 2.0f * i, 0.5f);
 
-			Body body = m_world.createBody(bd);
+			Body body = world.createBody(bd);
 			body.createFixture(shape, 1.0f);
 		}
 
@@ -160,7 +160,7 @@ public class TheoJansen extends TestbedTest {
 			BodyDef bd = new BodyDef();
 			bd.type = BodyType.DYNAMIC;
 			bd.position.set(pivot).addLocal(m_offset);
-			m_chassis = m_world.createBody(bd);
+			m_chassis = world.createBody(bd);
 			m_chassis.createFixture(sd);
 		}
 
@@ -175,7 +175,7 @@ public class TheoJansen extends TestbedTest {
 			BodyDef bd = new BodyDef();
 			bd.type = BodyType.DYNAMIC;
 			bd.position.set(pivot).addLocal(m_offset);
-			m_wheel = m_world.createBody(bd);
+			m_wheel = world.createBody(bd);
 			m_wheel.createFixture(sd);
 		}
 
@@ -187,7 +187,7 @@ public class TheoJansen extends TestbedTest {
 			jd.motorSpeed = m_motorSpeed;
 			jd.maxMotorTorque = 400.0f;
 			jd.enableMotor = m_motorOn;
-			m_motorJoint = (RevoluteJoint)m_world.createJoint(jd);
+			m_motorJoint = (RevoluteJoint)world.createJoint(jd);
 		}
 
 		Vec2 wheelAnchor;
@@ -265,8 +265,8 @@ public class TheoJansen extends TestbedTest {
 		bd1.angularDamping = 10.0f;
 		bd2.angularDamping = 10.0f;
 
-		Body body1 = m_world.createBody(bd1);
-		Body body2 = m_world.createBody(bd2);
+		Body body1 = world.createBody(bd1);
+		Body body2 = world.createBody(bd2);
 
 		body1.createFixture(fd1);
 		body2.createFixture(fd2);
@@ -280,21 +280,21 @@ public class TheoJansen extends TestbedTest {
 		djd.frequencyHz = 10.0f;
 
 		djd.initialize(body1, body2, p2.add(m_offset), p5.add(m_offset));
-		m_world.createJoint(djd);
+		world.createJoint(djd);
 
 		djd.initialize(body1, body2, p3.add(m_offset), p4.add(m_offset));
-		m_world.createJoint(djd);
+		world.createJoint(djd);
 
 		djd.initialize(body1, m_wheel, p3.add(m_offset), wheelAnchor.add(m_offset));
-		m_world.createJoint(djd);
+		world.createJoint(djd);
 
 		djd.initialize(body2, m_wheel, p6.add(m_offset), wheelAnchor.add(m_offset));
-		m_world.createJoint(djd);
+		world.createJoint(djd);
 
 		RevoluteJointDef rjd = new RevoluteJointDef();
 
 		rjd.initialize(body2, m_chassis, p4.add(m_offset));
-		m_world.createJoint(rjd);
+		world.createJoint(rjd);
 	}
 	
 	/**

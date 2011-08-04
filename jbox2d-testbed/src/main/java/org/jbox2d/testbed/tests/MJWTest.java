@@ -40,7 +40,7 @@ public class MJWTest extends TestbedTest {
    public void initTest(boolean argDeserialized) {
       setTitle("Couple of Things Test");
       
-      m_world.setGravity(new Vec2());
+      world.setGravity(new Vec2());
 
       for (int i = 0; i < 2; i++)
       {
@@ -56,7 +56,7 @@ public class MJWTest extends TestbedTest {
          bodyDef.position.set(5 * i, 0);
          bodyDef.angle = (float) (Math.PI / 4 * i);
          bodyDef.allowSleep = false;
-         Body body = m_world.createBody(bodyDef);
+         Body body = world.createBody(bodyDef);
          body.createFixture(shape, 5.0f);
          
          body.applyForce(new Vec2(-10000 * (i - 1), 0), new Vec2());

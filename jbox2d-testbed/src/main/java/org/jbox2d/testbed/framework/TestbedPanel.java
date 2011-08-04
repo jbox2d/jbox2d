@@ -29,34 +29,106 @@
  */
 package org.jbox2d.testbed.framework;
 
+import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+
+import org.jbox2d.common.Vec2;
+
 /**
+ * A TestbedPanel
+ * <ul>
+ * <li>Contains the update loop
+ * <li>Operates the test by initializing it and updating it
+ * <li>Draws the test
+ * <li>Provides access to ui elements like keys pressed
+ * </ul>
+ * 
  * @author Daniel Murphy
  */
 public interface TestbedPanel {
-	
-	public void updateSize(int argWidth, int argHeight);
-	
-	public TestbedTest getCurrTest();
-	
-	public int getWidth();
-	
-	public void init();
-	
-	public void changeTest(TestbedTest test);
 
-	public void setFrameRate(int fps);
-	
-	public int getFrameRate();
-	
-	public float getCalculatedFrameRate();
-	
-	public long getStartTime();
-	
-	public long getFrameCount();
-	
-	public boolean isAnimating();
-	
-	public void start();
-	
-	public void stop();
+  /**
+   * Adds a key listener
+   * @param argListener
+   */
+  public void addKeyListener(KeyListener argListener);
+
+  /**
+   * Adds a mouse listener
+   * @param argListener
+   */
+  public void addMouseListener(MouseListener argListener);
+
+  /**
+   * Adds a mouse motion listener
+   * @param argListener
+   */
+  public void addMouseMotionListener(MouseMotionListener argListener);
+
+  /**
+   * Gets the calculated current framerate of the panel
+   * 
+   * @return
+   */
+  public float getCalculatedFrameRate();
+
+  /**
+   * Gets the current frame count
+   * 
+   * @return
+   */
+  public long getFrameCount();
+
+  /**
+   * Gets the target frame rate of the panel
+   * 
+   * @return
+   */
+  public int getFrameRate();
+
+  public int getHeight();
+
+  /**
+   * Gets the millisecond start time of the panel
+   * 
+   * @return
+   */
+  public long getStartTime();
+
+  public int getWidth();
+
+  public void grabFocus();
+  
+  /**
+   * If the panel is animating
+   * 
+   * @return
+   */
+  public boolean isAnimating();
+  
+  /**
+   * Sets the target frame rate of the panel
+   * 
+   * @param fps
+   */
+  public void setFrameRate(int fps);
+
+  /**
+   * Starts the update loop and animation
+   */
+  public void start();
+  
+  /**
+   * Stops the update loop
+   */
+  public void stop();
+  
+  /**
+   * Updates the size of the panel
+   * 
+   * @param argWidth
+   * @param argHeight
+   */
+  public void updateSize(int argWidth, int argHeight);
 }

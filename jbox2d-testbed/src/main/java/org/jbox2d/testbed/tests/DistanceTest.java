@@ -100,7 +100,7 @@ public class DistanceTest extends TestbedTest {
 		input.transformB.set(m_transformB);
 		input.useRadii = true;
 		cache.count = 0;
-		m_world.getPool().getDistance().distance(output, cache, input);
+		world.getPool().getDistance().distance(output, cache, input);
 		
 		addTextLine("distance = " + output.distance);
 		addTextLine("iterations = " + output.iterations);
@@ -109,20 +109,20 @@ public class DistanceTest extends TestbedTest {
 			for (int i = 0; i < m_polygonA.m_vertexCount; ++i) {
 				Transform.mulToOut(m_transformA, m_polygonA.m_vertices[i], v[i]);
 			}
-			m_debugDraw.drawPolygon(v, m_polygonA.m_vertexCount, color);
+			getDebugDraw().drawPolygon(v, m_polygonA.m_vertexCount, color);
 			
 			for (int i = 0; i < m_polygonB.m_vertexCount; ++i) {
 				Transform.mulToOut(m_transformB, m_polygonB.m_vertices[i], v[i]);
 			}
-			m_debugDraw.drawPolygon(v, m_polygonB.m_vertexCount, color);
+			getDebugDraw().drawPolygon(v, m_polygonB.m_vertexCount, color);
 		}
 		
 		Vec2 x1 = output.pointA;
 		Vec2 x2 = output.pointB;
 		
-		m_debugDraw.drawPoint(x1, 4.0f, c1);
+		getDebugDraw().drawPoint(x1, 4.0f, c1);
 		
-		m_debugDraw.drawPoint(x2, 4.0f, c2);
+		getDebugDraw().drawPoint(x2, 4.0f, c2);
 	}
 	
 	@Override

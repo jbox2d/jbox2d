@@ -27,7 +27,7 @@
 /**
  * Created at 3:09:27 AM Jul 17, 2010
  */
-package org.jbox2d.testbed.framework;
+package org.jbox2d.testbed.framework.j2d;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

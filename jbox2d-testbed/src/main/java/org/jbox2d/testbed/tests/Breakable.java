@@ -65,7 +65,7 @@ public class Breakable extends TestbedTest {
 		// Ground body
 		{
 			BodyDef bd = new BodyDef();
-			Body ground = m_world.createBody(bd);
+			Body ground = world.createBody(bd);
 			
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
@@ -78,7 +78,7 @@ public class Breakable extends TestbedTest {
 			bd.type = BodyType.DYNAMIC;
 			bd.position.set(0.0f, 40.0f);
 			bd.angle = 0.25f * MathUtils.PI;
-			m_body1 = m_world.createBody(bd);
+			m_body1 = world.createBody(bd);
 			
 			m_shape1 = new PolygonShape();
 			m_shape1.setAsBox(0.5f, 0.5f, new Vec2(-0.5f, 0.0f), 0.0f);
@@ -131,7 +131,7 @@ public class Breakable extends TestbedTest {
 		bd.position = body1.getPosition();
 		bd.angle = body1.getAngle();
 		
-		Body body2 = m_world.createBody(bd);
+		Body body2 = world.createBody(bd);
 		m_piece2 = body2.createFixture(m_shape2, 1.0f);
 		
 		// Compute consistent velocities for new bodies based on

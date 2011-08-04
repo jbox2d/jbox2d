@@ -84,7 +84,7 @@ public class CollisionFiltering extends TestbedTest {
 			sd.friction = 0.3f;
 
 			BodyDef bd = new BodyDef();
-			Body ground = m_world.createBody(bd);
+			Body ground = world.createBody(bd);
 			ground.createFixture(sd);
 		}
 
@@ -108,7 +108,7 @@ public class CollisionFiltering extends TestbedTest {
 		triangleBodyDef.type = BodyType.DYNAMIC;
 		triangleBodyDef.position.set(-5.0f, 2.0f);
 
-		Body body1 = m_world.createBody(triangleBodyDef);
+		Body body1 = world.createBody(triangleBodyDef);
 		body1.createFixture(triangleShapeDef);
 
 		// Large triangle (recycle definitions)
@@ -120,14 +120,14 @@ public class CollisionFiltering extends TestbedTest {
 		triangleBodyDef.position.set(-5.0f, 6.0f);
 		triangleBodyDef.fixedRotation = true; // look at me!
 
-		Body body2 = m_world.createBody(triangleBodyDef);
+		Body body2 = world.createBody(triangleBodyDef);
 		body2.createFixture(triangleShapeDef);
 
 		{
 			BodyDef bd = new BodyDef();
 			bd.type = BodyType.DYNAMIC;
 			bd.position.set(-5.0f, 10.0f);
-			Body body = m_world.createBody(bd);
+			Body body = world.createBody(bd);
 
 			PolygonShape p = new PolygonShape();
 			p.setAsBox(0.5f, 1.0f);
@@ -143,7 +143,7 @@ public class CollisionFiltering extends TestbedTest {
 			jd.lowerTranslation = -1.0f;
 			jd.upperTranslation = 1.0f;
 
-			m_world.createJoint(jd);
+			world.createJoint(jd);
 		}
 
 		// Small box
@@ -161,7 +161,7 @@ public class CollisionFiltering extends TestbedTest {
 		boxBodyDef.type = BodyType.DYNAMIC;
 		boxBodyDef.position.set(0.0f, 2.0f);
 
-		Body body3 = m_world.createBody(boxBodyDef);
+		Body body3 = world.createBody(boxBodyDef);
 		body3.createFixture(boxShapeDef);
 
 		// Large box (recycle definitions)
@@ -169,7 +169,7 @@ public class CollisionFiltering extends TestbedTest {
 		boxShapeDef.filter.groupIndex = k_largeGroup;
 		boxBodyDef.position.set(0.0f, 6.0f);
 
-		Body body4 = m_world.createBody(boxBodyDef);
+		Body body4 = world.createBody(boxBodyDef);
 		body4.createFixture(boxShapeDef);
 
 		// Small circle
@@ -188,7 +188,7 @@ public class CollisionFiltering extends TestbedTest {
 		circleBodyDef.type = BodyType.DYNAMIC;
 		circleBodyDef.position.set(5.0f, 2.0f);
 		
-		Body body5 = m_world.createBody(circleBodyDef);
+		Body body5 = world.createBody(circleBodyDef);
 		body5.createFixture(circleShapeDef);
 
 		// Large circle
@@ -196,7 +196,7 @@ public class CollisionFiltering extends TestbedTest {
 		circleShapeDef.filter.groupIndex = k_largeGroup;
 		circleBodyDef.position.set(5.0f, 6.0f);
 
-		Body body6 = m_world.createBody(circleBodyDef);
+		Body body6 = world.createBody(circleBodyDef);
 		body6.createFixture(circleShapeDef);
 	}
 	

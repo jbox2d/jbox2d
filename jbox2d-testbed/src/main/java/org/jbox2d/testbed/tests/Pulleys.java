@@ -53,7 +53,7 @@ public class Pulleys extends TestbedTest {
 		Body ground = null;
 		{
 			BodyDef bd = new BodyDef();
-			ground = m_world.createBody(bd);
+			ground = world.createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
@@ -73,11 +73,11 @@ public class Pulleys extends TestbedTest {
 			bd.type = BodyType.DYNAMIC;
 
 			bd.position.set(-10.0f, y);
-			Body body1 = m_world.createBody(bd);
+			Body body1 = world.createBody(bd);
 			body1.createFixture(shape, 5.0f);
 
 			bd.position.set(10.0f, y);
-			Body body2 = m_world.createBody(bd);
+			Body body2 = world.createBody(bd);
 			body2.createFixture(shape, 5.0f);
 
 			PulleyJointDef pulleyDef = new PulleyJointDef();
@@ -87,7 +87,7 @@ public class Pulleys extends TestbedTest {
 			Vec2 groundAnchor2 = new Vec2(10.0f, y + b + L);
 			pulleyDef.initialize(body1, body2, groundAnchor1, groundAnchor2, anchor1, anchor2, 2.0f);
 
-			m_joint1 = (PulleyJoint)m_world.createJoint(pulleyDef);
+			m_joint1 = (PulleyJoint)world.createJoint(pulleyDef);
 		}
 	}
 	

@@ -38,7 +38,6 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
-import org.jbox2d.testbed.framework.TestPanelJ2D;
 import org.jbox2d.testbed.framework.TestbedSettings;
 import org.jbox2d.testbed.framework.TestbedTest;
 
@@ -58,7 +57,7 @@ public class RevoluteTest extends TestbedTest {
 		Body ground = null;
 		{
 			BodyDef bd = new BodyDef();
-			ground = m_world.createBody(bd);
+			ground = world.createBody(bd);
 			
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
@@ -75,7 +74,7 @@ public class RevoluteTest extends TestbedTest {
 			RevoluteJointDef rjd = new RevoluteJointDef();
 			
 			bd.position.set(0.0f, 20.0f);
-			Body body = m_world.createBody(bd);
+			Body body = world.createBody(bd);
 			body.createFixture(shape, 5.0f);
 			
 			float w = 100.0f;
@@ -91,7 +90,7 @@ public class RevoluteTest extends TestbedTest {
 			rjd.enableLimit = true;
 			rjd.collideConnected = true;
 			
-			m_joint = (RevoluteJoint) m_world.createJoint(rjd);
+			m_joint = (RevoluteJoint) world.createJoint(rjd);
 		}
 	}
 	
@@ -116,20 +115,20 @@ public class RevoluteTest extends TestbedTest {
 		switch (argKeyChar) {
 			case 'l' :
 				m_joint.enableLimit(!m_joint.isLimitEnabled());
-				TestPanelJ2D.keys['l'] = false;
+				getModel().getKeys()['l'] = false;
 				break;
 			case 'm' :
 				m_joint.enableMotor(!m_joint.isMotorEnabled());
-				TestPanelJ2D.keys['m'] = false;
+				getModel().getKeys()['m'] = false;
 				break;
 			case 'a' :
 				m_joint.setMotorSpeed(1.0f * MathUtils.PI);
-				TestPanelJ2D.keys['a'] = false;
+				getModel().getKeys()['a'] = false;
 				isLeft = true;
 				break;
 			case 'd' :
 				m_joint.setMotorSpeed(-1.0f * MathUtils.PI);
-				TestPanelJ2D.keys['d'] = false;
+				getModel().getKeys()['d'] = false;
 				isLeft = false;
 				break;
 		}

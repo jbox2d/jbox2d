@@ -69,7 +69,7 @@ public class CollisionProcessing extends TestbedTest {
 			sd.shape = shape;
 			
 			BodyDef bd = new BodyDef();
-			Body ground = m_world.createBody(bd);
+			Body ground = world.createBody(bd);
 			ground.createFixture(sd);
 		}
 		
@@ -93,7 +93,7 @@ public class CollisionProcessing extends TestbedTest {
 		triangleBodyDef.type = BodyType.DYNAMIC;
 		triangleBodyDef.position.set(MathUtils.randomFloat(xLo, xHi), MathUtils.randomFloat(yLo, yHi));
 		
-		Body body1 = m_world.createBody(triangleBodyDef);
+		Body body1 = world.createBody(triangleBodyDef);
 		body1.createFixture(triangleShapeDef);
 		
 		// Large triangle (recycle definitions)
@@ -104,7 +104,7 @@ public class CollisionProcessing extends TestbedTest {
 		
 		triangleBodyDef.position.set(MathUtils.randomFloat(xLo, xHi), MathUtils.randomFloat(yLo, yHi));
 		
-		Body body2 = m_world.createBody(triangleBodyDef);
+		Body body2 = world.createBody(triangleBodyDef);
 		body2.createFixture(triangleShapeDef);
 		
 		// Small box
@@ -118,14 +118,14 @@ public class CollisionProcessing extends TestbedTest {
 		boxBodyDef.type = BodyType.DYNAMIC;
 		boxBodyDef.position.set(MathUtils.randomFloat(xLo, xHi), MathUtils.randomFloat(yLo, yHi));
 		
-		Body body3 = m_world.createBody(boxBodyDef);
+		Body body3 = world.createBody(boxBodyDef);
 		body3.createFixture(boxShapeDef);
 		
 		// Large box (recycle definitions)
 		polygon.setAsBox(2.0f, 1.0f);
 		boxBodyDef.position.set(MathUtils.randomFloat(xLo, xHi), MathUtils.randomFloat(yLo, yHi));
 		
-		Body body4 = m_world.createBody(boxBodyDef);
+		Body body4 = world.createBody(boxBodyDef);
 		body4.createFixture(boxShapeDef);
 		
 		// Small circle
@@ -140,14 +140,14 @@ public class CollisionProcessing extends TestbedTest {
 		circleBodyDef.type = BodyType.DYNAMIC;
 		circleBodyDef.position.set(MathUtils.randomFloat(xLo, xHi), MathUtils.randomFloat(yLo, yHi));
 		
-		Body body5 = m_world.createBody(circleBodyDef);
+		Body body5 = world.createBody(circleBodyDef);
 		body5.createFixture(circleShapeDef);
 		
 		// Large circle
 		circle.m_radius *= 2.0f;
 		circleBodyDef.position.set(MathUtils.randomFloat(xLo, xHi), MathUtils.randomFloat(yLo, yHi));
 		
-		Body body6 = m_world.createBody(circleBodyDef);
+		Body body6 = world.createBody(circleBodyDef);
 		body6.createFixture(circleShapeDef);
 	}
 	
@@ -189,8 +189,8 @@ public class CollisionProcessing extends TestbedTest {
 		// Destroy the bodies, skipping duplicates.
 		for (Body b : nuke) {
 			
-			if (b != m_bomb) {
-				m_world.destroyBody(b);
+			if (b != bomb) {
+				world.destroyBody(b);
 			}
 		}
 	}
