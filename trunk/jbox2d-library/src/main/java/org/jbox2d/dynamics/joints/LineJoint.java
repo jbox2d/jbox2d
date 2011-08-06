@@ -40,9 +40,9 @@ import org.jbox2d.pooling.IWorldPool;
  */
 public class LineJoint extends Joint {
 	
-	private final Vec2 m_localAnchor1 = new Vec2();
-	private final Vec2 m_localAnchor2 = new Vec2();
-	private final Vec2 m_localXAxis1 = new Vec2();
+	public final Vec2 m_localAnchor1 = new Vec2();
+	public final Vec2 m_localAnchor2 = new Vec2();
+	public final Vec2 m_localXAxis1 = new Vec2();
 	private final Vec2 m_localYAxis1 = new Vec2();
 	
 	private final Vec2 m_axis = new Vec2();
@@ -226,10 +226,18 @@ public class LineJoint extends Joint {
 		m_motorSpeed = speed;
 	}
 	
+	public float getMotorSpeed(){
+	  return m_motorSpeed;
+	}
+	
 	public void setMaxMotorForce(float force) {
 		m_bodyA.setAwake(true);
 		m_bodyB.setAwake(true);
 		m_maxMotorForce = force;
+	}
+	
+	public float getMaxMotorForce(){
+	  return m_maxMotorForce;
 	}
 	
 	public float getMotorForce() {
