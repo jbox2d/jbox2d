@@ -9,9 +9,6 @@
  * 	* Redistributions in binary form must reproduce the above copyright notice,
  * 	  this list of conditions and the following disclaimer in the documentation
  * 	  and/or other materials provided with the distribution.
- * 	* Neither the name of the <ORGANIZATION> nor the names of its contributors
- * 	  may be used to endorse or promote products derived from this software
- * 	  without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -55,6 +52,7 @@ import org.jbox2d.dynamics.joints.FrictionJointDef;
 import org.jbox2d.dynamics.joints.GearJointDef;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.JointDef;
+import org.jbox2d.dynamics.joints.LineJointDef;
 import org.jbox2d.dynamics.joints.MouseJointDef;
 import org.jbox2d.dynamics.joints.PrismaticJointDef;
 import org.jbox2d.dynamics.joints.PulleyJointDef;
@@ -306,8 +304,8 @@ public class PbDeserializer implements JbDeserializer {
         def.motorSpeed = argJoint.getMotorSpeed();
         def.referenceAngle = argJoint.getRefAngle();
         def.upperTranslation = argJoint.getUpperLimit();
-      }
         break;
+      }
       case REVOLUTE: {
         RevoluteJointDef def = new RevoluteJointDef();
         jd = def;
@@ -320,8 +318,8 @@ public class PbDeserializer implements JbDeserializer {
         def.motorSpeed = argJoint.getMotorSpeed();
         def.referenceAngle = argJoint.getRefAngle();
         def.upperAngle = argJoint.getUpperLimit();
-      }
         break;
+      }
       case DISTANCE: {
         DistanceJointDef def = new DistanceJointDef();
         jd = def;
@@ -330,8 +328,8 @@ public class PbDeserializer implements JbDeserializer {
         def.dampingRatio = argJoint.getDampingRatio();
         def.frequencyHz = argJoint.getFrequency();
         def.length = argJoint.getLength();
-      }
         break;
+      }
       case PULLEY: {
         PulleyJointDef def = new PulleyJointDef();
         jd = def;
@@ -344,8 +342,8 @@ public class PbDeserializer implements JbDeserializer {
         def.maxLengthA = argJoint.getMaxLengthA();
         def.maxLengthB = argJoint.getMaxLengthB();
         def.ratio = argJoint.getRatio();
-      }
         break;
+      }
       case MOUSE: {
         MouseJointDef def = new MouseJointDef();
         jd = def;
@@ -353,8 +351,8 @@ public class PbDeserializer implements JbDeserializer {
         def.frequencyHz = argJoint.getFrequency();
         def.maxForce = argJoint.getMaxForce();
         def.target.set(pbToVec(argJoint.getTarget()));
-      }
         break;
+      }
       case GEAR: {
         GearJointDef def = new GearJointDef();
         jd = def;
@@ -369,8 +367,8 @@ public class PbDeserializer implements JbDeserializer {
         }
         def.joint2 = argJointMap.get(argJoint.getJoint2());
         def.ratio = argJoint.getRatio();
-      }
         break;
+      }
       case WHEEL: {
         UnsupportedObjectException e = new UnsupportedObjectException(
             "Wheel joint not supported yet.", Type.JOINT);
@@ -385,8 +383,8 @@ public class PbDeserializer implements JbDeserializer {
         def.localAnchorA.set(pbToVec(argJoint.getLocalAnchorA()));
         def.localAnchorB.set(pbToVec(argJoint.getLocalAnchorB()));
         def.referenceAngle = argJoint.getRefAngle();
-      }
         break;
+      }
       case FRICTION: {
         FrictionJointDef def = new FrictionJointDef();
         jd = def;
@@ -394,8 +392,8 @@ public class PbDeserializer implements JbDeserializer {
         def.localAnchorB.set(pbToVec(argJoint.getLocalAnchorB()));
         def.maxForce = argJoint.getMaxForce();
         def.maxTorque = argJoint.getMaxTorque();
-      }
         break;
+      }
       case ROPE: {
         UnsupportedObjectException e = new UnsupportedObjectException(
             "Rope joint not supported yet.", Type.JOINT);
@@ -430,8 +428,22 @@ public class PbDeserializer implements JbDeserializer {
           }
           def.addBodyAndJoint(argBodyMap.get(body), (DistanceJoint) djoint);
         }
-      }
         break;
+      }
+      case LINE: {
+        LineJointDef def = new LineJointDef();
+        jd = def;
+        def.localAnchorA.set(pbToVec(argJoint.getLocalAnchorA()));
+        def.localAnchorB.set(pbToVec(argJoint.getLocalAnchorB()));
+        def.localAxisA.set(pbToVec(argJoint.getLocalAxisA()));
+        def.enableLimit = argJoint.getEnableLimit();
+        def.enableMotor = argJoint.getEnableMotor();
+        def.lowerTranslation = argJoint.getLowerLimit();
+        def.upperTranslation = argJoint.getUpperLimit();
+        def.maxMotorForce = argJoint.getMaxForce();
+        def.motorSpeed = argJoint.getMotorSpeed();
+        break;
+      }
       default: {
         UnsupportedObjectException e = new UnsupportedObjectException("Unknown joint type: "
             + argJoint.getType(), Type.JOINT);

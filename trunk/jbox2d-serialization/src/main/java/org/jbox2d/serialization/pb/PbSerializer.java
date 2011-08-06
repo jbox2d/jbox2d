@@ -9,9 +9,6 @@
  * 	* Redistributions in binary form must reproduce the above copyright notice,
  * 	  this list of conditions and the following disclaimer in the documentation
  * 	  and/or other materials provided with the distribution.
- * 	* Neither the name of the <ORGANIZATION> nor the names of its contributors
- * 	  may be used to endorse or promote products derived from this software
- * 	  without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -45,7 +42,6 @@ import org.jbox2d.dynamics.joints.FrictionJoint;
 import org.jbox2d.dynamics.joints.GearJoint;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.LineJoint;
-import org.jbox2d.dynamics.joints.LineJointDef;
 import org.jbox2d.dynamics.joints.MouseJoint;
 import org.jbox2d.dynamics.joints.PrismaticJoint;
 import org.jbox2d.dynamics.joints.PulleyJoint;
@@ -400,8 +396,8 @@ public class PbSerializer implements JbSerializer {
         builder.setMaxMotorTorque(j.m_maxMotorTorque);
         builder.setLocalAnchorA(vecToPb(j.m_localAnchor1));
         builder.setLocalAnchorB(vecToPb(j.m_localAnchor2));
-      }
         break;
+      }
       case PRISMATIC: {
         PrismaticJoint j = (PrismaticJoint) argJoint;
         builder.setType(PbJointType.PRISMATIC);
@@ -415,8 +411,8 @@ public class PbSerializer implements JbSerializer {
         builder.setLocalAnchorB(vecToPb(j.m_localAnchor2));
         builder.setLocalAxisA(vecToPb(j.m_localXAxis1));
         builder.setMaxMotorForce(j.m_maxMotorForce);
-      }
         break;
+      }
       case DISTANCE: {
         DistanceJoint j = (DistanceJoint) argJoint;
         builder.setType(PbJointType.DISTANCE);
@@ -425,8 +421,8 @@ public class PbSerializer implements JbSerializer {
         builder.setLength(j.m_length);
         builder.setFrequency(j.m_frequencyHz);
         builder.setDampingRatio(j.m_dampingRatio);
-      }
         break;
+      }
       case PULLEY: {
         PulleyJoint j = (PulleyJoint) argJoint;
         builder.setType(PbJointType.PULLEY);
@@ -439,8 +435,8 @@ public class PbSerializer implements JbSerializer {
         builder.setMaxLengthA(j.getMaxLength1());
         builder.setMaxLengthB(j.getMaxLength2());
         builder.setRatio(j.getRatio());
-      }
         break;
+      }
       case MOUSE: {
         MouseJoint j = (MouseJoint) argJoint;
         builder.setType(PbJointType.MOUSE);
@@ -448,8 +444,8 @@ public class PbSerializer implements JbSerializer {
         builder.setMaxForce(j.getMaxForce());
         builder.setFrequency(j.getFrequency());
         builder.setDampingRatio(j.getDampingRatio());
-      }
         break;
+      }
       case GEAR: {
         GearJoint j = (GearJoint) argJoint;
         builder.setType(PbJointType.GEAR);
@@ -467,8 +463,8 @@ public class PbSerializer implements JbSerializer {
 
         builder.setJoint1(j1);
         builder.setJoint2(j2);
-      }
         break;
+      }
       case FRICTION: {
         FrictionJoint j = (FrictionJoint) argJoint;
         builder.setType(PbJointType.FRICTION);
@@ -476,8 +472,8 @@ public class PbSerializer implements JbSerializer {
         builder.setLocalAnchorB(vecToPb(j.getLocalAnchorB()));
         builder.setMaxForce(j.getMaxForce());
         builder.setMaxTorque(j.getMaxTorque());
-      }
         break;
+      }
       case CONSTANT_VOLUME: {
         ConstantVolumeJoint j = (ConstantVolumeJoint) argJoint;
         builder.setType(PbJointType.CONSTANT_VOLUME);
@@ -498,8 +494,22 @@ public class PbSerializer implements JbSerializer {
           }
           builder.addJoints(argJointIndexMap.get(djoint));
         }
-      }
         break;
+      }
+      case LINE: {
+        LineJoint j = (LineJoint) argJoint;
+        builder.setType(PbJointType.LINE);
+        builder.setLocalAnchorA(vecToPb(j.m_localAnchor1));
+        builder.setLocalAnchorB(vecToPb(j.m_localAnchor2));
+        builder.setLocalAxisA(vecToPb(j.m_localXAxis1));
+        builder.setLowerLimit(j.getLowerLimit());
+        builder.setUpperLimit(j.getUpperLimit());
+        builder.setMaxMotorForce(j.getMaxMotorForce());
+        builder.setMotorSpeed(j.getMotorSpeed());
+        builder.setEnableLimit(j.isLimitEnabled());
+        builder.setEnableMotor(j.isMotorEnabled());
+        break;
+      }
       default:
         UnsupportedObjectException e = new UnsupportedObjectException("Unknown joint type: "
             + argJoint.getType(), Type.JOINT);
