@@ -1,22 +1,25 @@
 /*******************************************************************************
- * Copyright (c) 2011, Daniel Murphy All rights reserved.
+ * Copyright (c) 2011, Daniel Murphy
+ * All rights reserved.
  * 
- * Redistribution and use in source and binary forms, with or without modification, are permitted
- * provided that the following conditions are met: * Redistributions of source code must retain the
- * above copyright notice, this list of conditions and the following disclaimer. * Redistributions
- * in binary form must reproduce the above copyright notice, this list of conditions and the
- * following disclaimer in the documentation and/or other materials provided with the distribution.
- * * Neither the name of the <organization> nor the names of its contributors may be used to endorse
- * or promote products derived from this software without specific prior written permission.
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 	* Redistributions of source code must retain the above copyright notice,
+ * 	  this list of conditions and the following disclaimer.
+ * 	* Redistributions in binary form must reproduce the above copyright notice,
+ * 	  this list of conditions and the following disclaimer in the documentation
+ * 	  and/or other materials provided with the distribution.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL DANIEL MURPHY BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
- * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 /**
  * Created at 2:21:03 PM Jul 17, 2010
@@ -370,22 +373,22 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     } catch (FileNotFoundException e) {
       log.error("File not found error while loading", e);
       if (dialogOnSaveLoadErrors) {
-        JOptionPane.showConfirmDialog(null, "File not found exception while loading: "
-            + getFilename(), "Serialization Error", JOptionPane.OK_OPTION);
+        JOptionPane.showMessageDialog(null, "File not found exception while loading: "
+            + getFilename(), "Serialization Error", JOptionPane.ERROR_MESSAGE);
       }
       return;
     } catch (UnsupportedObjectException e) {
       log.error("Error deserializing world", e);
       if (dialogOnSaveLoadErrors) {
-        JOptionPane.showConfirmDialog(null, "Error serializing the object: " + e.toString(),
-            "Serialization Error", JOptionPane.OK_OPTION);
+        JOptionPane.showMessageDialog(null, "Error serializing the object: " + e.toString(),
+            "Serialization Error", JOptionPane.ERROR_MESSAGE);
       }
       return;
     } catch (IOException e) {
       log.error("Exception while writing world", e);
       if (dialogOnSaveLoadErrors) {
-        JOptionPane.showConfirmDialog(null, "Error while reading world: " + e.toString(),
-            "Serialization Error", JOptionPane.OK_OPTION);
+        JOptionPane.showMessageDialog(null, "Error while reading world: " + e.toString(),
+            "Serialization Error", JOptionPane.ERROR_MESSAGE);
       }
       return;
     }
