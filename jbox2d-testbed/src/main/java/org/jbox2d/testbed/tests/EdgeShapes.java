@@ -64,7 +64,7 @@ public class EdgeShapes extends TestbedTest {
 		// Ground body
 		{
 			BodyDef bd = new BodyDef();
-			Body ground = world.createBody(bd);
+			Body ground = getWorld().createBody(bd);
 
 			float x1 = -20.0f;
 			float y1 = 2.0f * MathUtils.cos(x1 / 10.0f * MathUtils.PI);
@@ -137,7 +137,7 @@ public class EdgeShapes extends TestbedTest {
 	{
 		if (m_bodies[m_bodyIndex] != null)
 		{
-			world.destroyBody(m_bodies[m_bodyIndex]);
+			getWorld().destroyBody(m_bodies[m_bodyIndex]);
 			m_bodies[m_bodyIndex] = null;
 		}
 
@@ -154,7 +154,7 @@ public class EdgeShapes extends TestbedTest {
 			bd.angularDamping = 0.02f;
 		}
 
-		m_bodies[m_bodyIndex] = world.createBody(bd);
+		m_bodies[m_bodyIndex] = getWorld().createBody(bd);
 		
 		if (index < 4)
 		{
@@ -182,7 +182,7 @@ public class EdgeShapes extends TestbedTest {
 		{
 			if (m_bodies[i] != null)
 			{
-				world.destroyBody(m_bodies[i]);
+				getWorld().destroyBody(m_bodies[i]);
 				m_bodies[i] = null;
 				return;
 			}
@@ -230,7 +230,7 @@ public class EdgeShapes extends TestbedTest {
 
 
 		callback.m_fixture = null;
-		world.raycast(callback, point1, point2);
+		getWorld().raycast(callback, point1, point2);
 
 		if (callback.m_fixture != null)
 		{

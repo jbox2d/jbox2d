@@ -57,7 +57,7 @@ public class VaryingRestitution extends TestbedTest{
 	  }
 		{
 			BodyDef bd = new BodyDef();
-			Body ground = world.createBody(bd);
+			Body ground = getWorld().createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
@@ -80,7 +80,7 @@ public class VaryingRestitution extends TestbedTest{
 				bd.type = BodyType.DYNAMIC;
 				bd.position.set(-10.0f + 3.0f * i, 20.0f);
 
-				Body body = world.createBody(bd);
+				Body body = getWorld().createBody(bd);
 
 				fd.restitution = restitution[i];
 				body.createFixture(fd);

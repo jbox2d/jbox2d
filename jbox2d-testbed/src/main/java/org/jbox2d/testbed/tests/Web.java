@@ -55,7 +55,7 @@ public class Web extends TestbedTest {
 		Body ground = null;
 		{
 			BodyDef bd = new BodyDef();
-			ground = world.createBody(bd);
+			ground = getWorld().createBody(bd);
 			
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
@@ -70,19 +70,19 @@ public class Web extends TestbedTest {
 			bd.type = BodyType.DYNAMIC;
 			
 			bd.position.set(-5.0f, 5.0f);
-			m_bodies[0] = world.createBody(bd);
+			m_bodies[0] = getWorld().createBody(bd);
 			m_bodies[0].createFixture(shape, 5.0f);
 			
 			bd.position.set(5.0f, 5.0f);
-			m_bodies[1] = world.createBody(bd);
+			m_bodies[1] = getWorld().createBody(bd);
 			m_bodies[1].createFixture(shape, 5.0f);
 			
 			bd.position.set(5.0f, 15.0f);
-			m_bodies[2] = world.createBody(bd);
+			m_bodies[2] = getWorld().createBody(bd);
 			m_bodies[2].createFixture(shape, 5.0f);
 			
 			bd.position.set(-5.0f, 15.0f);
-			m_bodies[3] = world.createBody(bd);
+			m_bodies[3] = getWorld().createBody(bd);
 			m_bodies[3].createFixture(shape, 5.0f);
 			
 			DistanceJointDef jd = new DistanceJointDef();
@@ -101,7 +101,7 @@ public class Web extends TestbedTest {
 			p2 = jd.bodyB.getWorldPoint(jd.localAnchorB);
 			d = p2.sub(p1);
 			jd.length = d.length();
-			m_joints[0] = world.createJoint(jd);
+			m_joints[0] = getWorld().createJoint(jd);
 			
 			jd.bodyA = ground;
 			jd.bodyB = m_bodies[1];
@@ -111,7 +111,7 @@ public class Web extends TestbedTest {
 			p2 = jd.bodyB.getWorldPoint(jd.localAnchorB);
 			d = p2.sub(p1);
 			jd.length = d.length();
-			m_joints[1] = world.createJoint(jd);
+			m_joints[1] = getWorld().createJoint(jd);
 			
 			jd.bodyA = ground;
 			jd.bodyB = m_bodies[2];
@@ -121,7 +121,7 @@ public class Web extends TestbedTest {
 			p2 = jd.bodyB.getWorldPoint(jd.localAnchorB);
 			d = p2.sub(p1);
 			jd.length = d.length();
-			m_joints[2] = world.createJoint(jd);
+			m_joints[2] = getWorld().createJoint(jd);
 			
 			jd.bodyA = ground;
 			jd.bodyB = m_bodies[3];
@@ -131,7 +131,7 @@ public class Web extends TestbedTest {
 			p2 = jd.bodyB.getWorldPoint(jd.localAnchorB);
 			d = p2.sub(p1);
 			jd.length = d.length();
-			m_joints[3] = world.createJoint(jd);
+			m_joints[3] = getWorld().createJoint(jd);
 			
 			jd.bodyA = m_bodies[0];
 			jd.bodyB = m_bodies[1];
@@ -141,7 +141,7 @@ public class Web extends TestbedTest {
 			p2 = jd.bodyB.getWorldPoint(jd.localAnchorB);
 			d = p2.sub(p1);
 			jd.length = d.length();
-			m_joints[4] = world.createJoint(jd);
+			m_joints[4] = getWorld().createJoint(jd);
 			
 			jd.bodyA = m_bodies[1];
 			jd.bodyB = m_bodies[2];
@@ -151,7 +151,7 @@ public class Web extends TestbedTest {
 			p2 = jd.bodyB.getWorldPoint(jd.localAnchorB);
 			d = p2.sub(p1);
 			jd.length = d.length();
-			m_joints[5] = world.createJoint(jd);
+			m_joints[5] = getWorld().createJoint(jd);
 			
 			jd.bodyA = m_bodies[2];
 			jd.bodyB = m_bodies[3];
@@ -161,7 +161,7 @@ public class Web extends TestbedTest {
 			p2 = jd.bodyB.getWorldPoint(jd.localAnchorB);
 			d = p2.sub(p1);
 			jd.length = d.length();
-			m_joints[6] = world.createJoint(jd);
+			m_joints[6] = getWorld().createJoint(jd);
 			
 			jd.bodyA = m_bodies[3];
 			jd.bodyB = m_bodies[0];
@@ -171,7 +171,7 @@ public class Web extends TestbedTest {
 			p2 = jd.bodyB.getWorldPoint(jd.localAnchorB);
 			d = p2.sub(p1);
 			jd.length = d.length();
-			m_joints[7] = world.createJoint(jd);
+			m_joints[7] = getWorld().createJoint(jd);
 		}
 	}
 	
@@ -184,7 +184,7 @@ public class Web extends TestbedTest {
 			case 'b' :
 				for (int i = 0; i < 4; ++i) {
 					if (m_bodies[i] != null) {
-						world.destroyBody(m_bodies[i]);
+						getWorld().destroyBody(m_bodies[i]);
 						m_bodies[i] = null;
 						break;
 					}
@@ -194,7 +194,7 @@ public class Web extends TestbedTest {
 			case 'j' :
 				for (int i = 0; i < 8; ++i) {
 					if (m_joints[i] != null) {
-						world.destroyJoint(m_joints[i]);
+						getWorld().destroyJoint(m_joints[i]);
 						m_joints[i] = null;
 						break;
 					}

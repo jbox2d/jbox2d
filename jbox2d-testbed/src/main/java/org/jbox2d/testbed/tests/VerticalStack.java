@@ -83,7 +83,7 @@ public class VerticalStack extends TestbedTest {
     }
     {
       BodyDef bd = new BodyDef();
-      Body ground = world.createBody(bd);
+      Body ground = getWorld().createBody(bd);
 
       PolygonShape shape = new PolygonShape();
       shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
@@ -115,7 +115,7 @@ public class VerticalStack extends TestbedTest {
         // float x = RandomFloat(-0.02f, 0.02f);
         // float x = i % 2 == 0 ? -0.025f : 0.025f;
         bd.position.set(xs[j] + x, 0.752f + 1.54f * i);
-        Body body = world.createBody(bd);
+        Body body = getWorld().createBody(bd);
 
         body.createFixture(fd);
       }
@@ -132,7 +132,7 @@ public class VerticalStack extends TestbedTest {
     switch (argKeyChar) {
       case ',':
         if (m_bullet != null) {
-          world.destroyBody(m_bullet);
+          getWorld().destroyBody(m_bullet);
           m_bullet = null;
         }
 
@@ -150,7 +150,7 @@ public class VerticalStack extends TestbedTest {
           bd.bullet = true;
           bd.position.set(-31.0f, 5.0f);
 
-          m_bullet = world.createBody(bd);
+          m_bullet = getWorld().createBody(bd);
           m_bullet.createFixture(fd);
 
           m_bullet.setLinearVelocity(new Vec2(400.0f, 0.0f));

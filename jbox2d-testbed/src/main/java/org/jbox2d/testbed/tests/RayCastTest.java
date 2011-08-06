@@ -69,7 +69,7 @@ public class RayCastTest extends TestbedTest {
 		m_polygons = new PolygonShape[4];
 		{
 			BodyDef bd = new BodyDef();
-			Body ground = world.createBody(bd);
+			Body ground = getWorld().createBody(bd);
 			
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
@@ -158,7 +158,7 @@ public class RayCastTest extends TestbedTest {
 		
 		if (m_mode == Mode.e_closest) {
 			ccallback.init();
-			world.raycast(ccallback, point1, point2);
+			getWorld().raycast(ccallback, point1, point2);
 			
 			if (ccallback.m_hit) {
 				getDebugDraw().drawPoint(ccallback.m_point, 5.0f, new Color3f(0.4f, 0.9f, 0.4f));
@@ -173,7 +173,7 @@ public class RayCastTest extends TestbedTest {
 		}
 		else if (m_mode == Mode.e_any) {
 			acallback.init();
-			world.raycast(acallback, point1, point2);
+			getWorld().raycast(acallback, point1, point2);
 			
 			if (acallback.m_hit) {
 				getDebugDraw().drawPoint(acallback.m_point, 5.0f, new Color3f(0.4f, 0.9f, 0.4f));
@@ -188,7 +188,7 @@ public class RayCastTest extends TestbedTest {
 		}
 		else if (m_mode == Mode.e_multiple) {
 			mcallback.init();
-			world.raycast(mcallback, point1, point2);
+			getWorld().raycast(mcallback, point1, point2);
 			getDebugDraw().drawSegment(point1, point2, new Color3f(0.8f, 0.8f, 0.8f));
 			
 			for (int i = 0; i < mcallback.m_count; ++i) {
@@ -209,7 +209,7 @@ public class RayCastTest extends TestbedTest {
 	
 	void Create(int index) {
 		if (m_bodies[m_bodyIndex] != null) {
-			world.destroyBody(m_bodies[m_bodyIndex]);
+			getWorld().destroyBody(m_bodies[m_bodyIndex]);
 			m_bodies[m_bodyIndex] = null;
 		}
 		
@@ -227,7 +227,7 @@ public class RayCastTest extends TestbedTest {
 			bd.angularDamping = 0.02f;
 		}
 		
-		m_bodies[m_bodyIndex] = world.createBody(bd);
+		m_bodies[m_bodyIndex] = getWorld().createBody(bd);
 		
 		if (index < 4) {
 			FixtureDef fd = new FixtureDef();
@@ -249,7 +249,7 @@ public class RayCastTest extends TestbedTest {
 	void DestroyBody() {
 		for (int i = 0; i < e_maxBodies; ++i) {
 			if (m_bodies[i] != null) {
-				world.destroyBody(m_bodies[i]);
+				getWorld().destroyBody(m_bodies[i]);
 				m_bodies[i] = null;
 				return;
 			}

@@ -45,7 +45,7 @@ public class TestbedMain {
           + "Hopefully you're on a mac so the window isn't ugly as crap.");
     }
     TestbedModel model = new TestbedModel();
-    TestbedPanel panel = new TestPanelJ2D(model, true);
+    TestbedPanel panel = new TestPanelJ2D(model);
     TestList.populateModel(model);
     JFrame testbed = new TestbedFrame(model, panel);
     testbed.setVisible(true);

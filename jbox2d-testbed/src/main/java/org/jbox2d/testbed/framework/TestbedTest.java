@@ -89,18 +89,22 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     }
   }
 
-  protected World world;
-  protected Body groundBody;
-  protected MouseJoint mouseJoint;
-  protected final Vec2 mouseWorld = new Vec2();
-  protected int m_pointCount;
-  protected int m_stepCount;
+  /**
+   * Only visible for compatibility. Should use {@link #getWorld()} instead.
+   */
+  protected World m_world;
+  private Body groundBody;
+  private MouseJoint mouseJoint;
 
-  protected Body bomb;
+  private Body bomb;
   private final Vec2 bombSpawnPoint = new Vec2();
   private boolean bombSpawning = false;
 
-  protected TestbedModel model;
+  private final Vec2 mouseWorld = new Vec2();
+  private int pointCount;
+  private int stepCount;
+
+  private TestbedModel model;
   private DestructionListener destructionListener;
 
   private final LinkedList<QueueItem> inputQueue;
@@ -109,20 +113,16 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
   protected int m_textLine;
   private final LinkedList<String> textList = new LinkedList<String>();
 
-  public float cachedCameraScale;
-  public float cachedCameraX;
-  public float cachedCameraY;
-
-  public boolean hasCachedCamera = false;
-
-  private TestbedPanel panel;
+  private float cachedCameraScale;
+  private final Vec2 cachedCameraPos = new Vec2();
+  private boolean hasCachedCamera = false;
 
   private JbSerializer serializer;
   private JbDeserializer deserializer;
 
-  public boolean dialogSaveLoadErrors = true;
+  private boolean dialogOnSaveLoadErrors = true;
 
-  public boolean savePending, loadPending, resetPending = false;
+  private boolean savePending, loadPending, resetPending = false;
 
   public TestbedTest() {
     inputQueue = new LinkedList<QueueItem>();
@@ -177,8 +177,55 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     });
   }
 
+  public void init(TestbedModel argModel) {
+    model = argModel;
+    destructionListener = new DestructionListener() {
+
+      public void sayGoodbye(Fixture fixture) {
+      }
+
+      public void sayGoodbye(Joint joint) {
+        if (mouseJoint == joint) {
+          mouseJoint = null;
+        } else {
+          jointDestroyed(joint);
+        }
+      }
+    };
+
+    Vec2 gravity = new Vec2(0, -10f);
+    m_world = new World(gravity, true);
+    bomb = null;
+    m_textLine = 30;
+    mouseJoint = null;
+
+    BodyDef bodyDef = new BodyDef();
+    groundBody = m_world.createBody(bodyDef);
+
+    init(m_world, false);
+  }
+
+  public void init(World argWorld, boolean argDeserialized) {
+    pointCount = 0;
+    stepCount = 0;
+    bombSpawning = false;
+
+    argWorld.setDestructionListener(destructionListener);
+    argWorld.setContactListener(this);
+    argWorld.setDebugDraw(model.getDebugDraw());
+
+    if (hasCachedCamera) {
+      setCamera(cachedCameraPos, cachedCameraScale);
+    } else {
+      setCamera(getDefaultCameraPos(), getDefaultCameraScale());
+    }
+    setTitle(getTestName());
+
+    initTest(argDeserialized);
+  }
+
   public World getWorld() {
-    return world;
+    return m_world;
   }
 
   public TestbedModel getModel() {
@@ -197,65 +244,64 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     return mouseWorld;
   }
 
-  public void setPanel(TestbedPanel argPanel) {
-    panel = argPanel;
+  public int getStepCount() {
+    return stepCount;
   }
 
-  public void init(TestbedModel argModel) {
-    model = argModel;
-    destructionListener = new DestructionListener() {
-
-      public void sayGoodbye(Fixture fixture) {
-      }
-
-      public void sayGoodbye(Joint joint) {
-        if (mouseJoint == joint) {
-          mouseJoint = null;
-        } else {
-          jointDestroyed(joint);
-        }
-      }
-    };
-
-    Vec2 gravity = new Vec2(0, -10f);
-    world = new World(gravity, true);
-    bomb = null;
-    m_textLine = 30;
-    mouseJoint = null;
-
-    BodyDef bodyDef = new BodyDef();
-    groundBody = world.createBody(bodyDef);
-
-    init(world, false);
+  public int getPointCount() {
+    return pointCount;
   }
 
-  public void init(World argWorld, boolean argDeserialized) {
-    m_pointCount = 0;
-    m_stepCount = 0;
-    bombSpawning = false;
-
-    argWorld.setDestructionListener(destructionListener);
-    argWorld.setContactListener(this);
-    argWorld.setDebugDraw(model.getDebugDraw());
-
-    if (hasCachedCamera) {
-      setCamera(cachedCameraX, cachedCameraY, cachedCameraScale);
-    } else {
-      setCamera(getDefaultCameraX(), getDefaultCameraY(), getDefaultCameraScale());
-    }
-    setTitle(getTestName());
-
-    initTest(argDeserialized);
+  public Body getBomb() {
+    return bomb;
   }
 
-  public float getDefaultCameraX() {
-    return 0;
+  public float getCachedCameraScale() {
+    return cachedCameraScale;
   }
 
-  public float getDefaultCameraY() {
-    return 10;
+  public void setCachedCameraScale(float cachedCameraScale) {
+    this.cachedCameraScale = cachedCameraScale;
   }
 
+  public Vec2 getCachedCameraPos() {
+    return cachedCameraPos;
+  }
+  
+  public void setCachedCameraPos(Vec2 argPos) {
+    cachedCameraPos.set(argPos);
+  }
+
+  public boolean isHasCachedCamera() {
+    return hasCachedCamera;
+  }
+
+  public void setHasCachedCamera(boolean hasCachedCamera) {
+    this.hasCachedCamera = hasCachedCamera;
+  }
+
+  public boolean isDialogOnSaveLoadErrors() {
+    return dialogOnSaveLoadErrors;
+  }
+
+  public void setDialogOnSaveLoadErrors(boolean dialogOnSaveLoadErrors) {
+    this.dialogOnSaveLoadErrors = dialogOnSaveLoadErrors;
+  }
+
+  /**
+   * Override for a different default camera pos
+   * 
+   * @return
+   */
+  public Vec2 getDefaultCameraPos() {
+    return new Vec2(0, 10);
+  }
+
+  /**
+   * Override for a different default camera scale
+   * 
+   * @return
+   */
   public float getDefaultCameraScale() {
     return 10;
   }
@@ -284,10 +330,10 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
 
     SerializationResult result;
     try {
-      result = serializer.serialize(world);
+      result = serializer.serialize(m_world);
     } catch (UnsupportedObjectException e1) {
       log.error("Error serializing world", e1);
-      if (dialogSaveLoadErrors) {
+      if (dialogOnSaveLoadErrors) {
         JOptionPane.showConfirmDialog(null, "Error serializing the object: " + e1.toString(),
             "Serialization Error", JOptionPane.OK_OPTION);
       }
@@ -299,14 +345,14 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
       result.writeTo(fos);
     } catch (FileNotFoundException e) {
       log.error("File not found exception while saving", e);
-      if (dialogSaveLoadErrors) {
+      if (dialogOnSaveLoadErrors) {
         JOptionPane.showConfirmDialog(null, "File not found exception while saving: "
             + getFilename(), "Serialization Error", JOptionPane.OK_OPTION);
       }
       return;
     } catch (IOException e) {
       log.error("Exception while writing world", e);
-      if (dialogSaveLoadErrors) {
+      if (dialogOnSaveLoadErrors) {
         JOptionPane.showConfirmDialog(null, "Error while writing world: " + e.toString(),
             "Serialization Error", JOptionPane.OK_OPTION);
       }
@@ -323,38 +369,37 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
       w = deserializer.deserializeWorld(fis);
     } catch (FileNotFoundException e) {
       log.error("File not found error while loading", e);
-      if (dialogSaveLoadErrors) {
+      if (dialogOnSaveLoadErrors) {
         JOptionPane.showConfirmDialog(null, "File not found exception while loading: "
             + getFilename(), "Serialization Error", JOptionPane.OK_OPTION);
       }
       return;
     } catch (UnsupportedObjectException e) {
       log.error("Error deserializing world", e);
-      if (dialogSaveLoadErrors) {
+      if (dialogOnSaveLoadErrors) {
         JOptionPane.showConfirmDialog(null, "Error serializing the object: " + e.toString(),
             "Serialization Error", JOptionPane.OK_OPTION);
       }
       return;
     } catch (IOException e) {
       log.error("Exception while writing world", e);
-      if (dialogSaveLoadErrors) {
+      if (dialogOnSaveLoadErrors) {
         JOptionPane.showConfirmDialog(null, "Error while reading world: " + e.toString(),
             "Serialization Error", JOptionPane.OK_OPTION);
       }
       return;
     }
-    world = w;
+    m_world = w;
 
-    init(world, true);
+    init(m_world, true);
     return;
   }
 
-  public void setCamera(float x, float y, float scale) {
-    model.getDebugDraw().setCamera(x, y, scale);
+  public void setCamera(Vec2 argPos, float scale) {
+    model.getDebugDraw().setCamera(argPos.x, argPos.y, scale);
     hasCachedCamera = true;
     cachedCameraScale = scale;
-    cachedCameraX = x;
-    cachedCameraY = y;
+    cachedCameraPos.set(argPos);
   }
 
   public abstract void initTest(boolean argDeserialized);
@@ -376,14 +421,9 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     }
 
     m_textLine = 15;
-    // keys!
-    if (model.getKeys()['r']) {
-      model.getKeys()['r'] = false;
-      init(model);
-    }
 
     if (title != null) {
-      model.getDebugDraw().drawString(panel.getWidth() / 2, 15, title, Color3f.WHITE);
+      model.getDebugDraw().drawString(model.getPanelWidth() / 2, 15, title, Color3f.WHITE);
     }
 
     // process our input
@@ -456,18 +496,18 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     flags += settings.getSetting(TestbedSettings.DrawTree).enabled ? DebugDraw.e_dynamicTreeBit : 0;
     model.getDebugDraw().setFlags(flags);
 
-    world.setWarmStarting(settings.getSetting(TestbedSettings.WarmStarting).enabled);
-    world.setContinuousPhysics(settings.getSetting(TestbedSettings.ContinuousCollision).enabled);
+    m_world.setWarmStarting(settings.getSetting(TestbedSettings.WarmStarting).enabled);
+    m_world.setContinuousPhysics(settings.getSetting(TestbedSettings.ContinuousCollision).enabled);
 
-    m_pointCount = 0;
+    pointCount = 0;
 
-    world.step(timeStep, settings.getSetting(TestbedSettings.VelocityIterations).value,
+    m_world.step(timeStep, settings.getSetting(TestbedSettings.VelocityIterations).value,
         settings.getSetting(TestbedSettings.PositionIterations).value);
 
-    world.drawDebugData();
+    m_world.drawDebugData();
 
     if (timeStep > 0f) {
-      ++m_stepCount;
+      ++stepCount;
     }
 
     if (settings.getSetting(TestbedSettings.DrawStats).enabled) {
@@ -475,15 +515,14 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
       model.getDebugDraw().drawString(5, m_textLine, "Engine Info", color4);
       m_textLine += 15;
       model.getDebugDraw().drawString(5, m_textLine,
-          "Framerate: " + panel.getCalculatedFrameRate(), Color3f.WHITE);
+          "Framerate: " + model.getCalculatedFps(), Color3f.WHITE);
       m_textLine += 15;
-      model.getDebugDraw()
-          .drawString(
-              5,
-              m_textLine,
-              "bodies/contacts/joints/proxies = " + world.getBodyCount() + "/"
-                  + world.getContactCount() + "/" + world.getJointCount() + "/"
-                  + world.getProxyCount(), Color3f.WHITE);
+      model.getDebugDraw().drawString(
+          5,
+          m_textLine,
+          "bodies/contacts/joints/proxies = " + m_world.getBodyCount() + "/"
+              + m_world.getContactCount() + "/" + m_world.getJointCount() + "/"
+              + m_world.getProxyCount(), Color3f.WHITE);
       // m_textLine += 20;
       // m_model.getDebugDraw().drawString(5, m_textLine, "Pooling Info", color4);
       // m_textLine += 15;
@@ -542,7 +581,7 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     if (settings.getSetting(TestbedSettings.DrawContactPoints).enabled) {
       final float axisScale = .3f;
 
-      for (int i = 0; i < m_pointCount; i++) {
+      for (int i = 0; i < pointCount; i++) {
 
         ContactPoint point = points[i];
 
@@ -609,7 +648,7 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
 
   public void mouseUp(Vec2 p) {
     if (mouseJoint != null) {
-      world.destroyJoint(mouseJoint);
+      m_world.destroyJoint(mouseJoint);
       mouseJoint = null;
     }
 
@@ -632,7 +671,7 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     queryAABB.upperBound.set(p.x + .001f, p.y + .001f);
     callback.point.set(p);
     callback.fixture = null;
-    world.queryAABB(callback, queryAABB);
+    m_world.queryAABB(callback, queryAABB);
 
     if (callback.fixture != null) {
       Body body = callback.fixture.getBody();
@@ -641,7 +680,7 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
       def.bodyB = body;
       def.target.set(p);
       def.maxForce = 1000f * body.getMass();
-      mouseJoint = (MouseJoint) world.createJoint(def);
+      mouseJoint = (MouseJoint) m_world.createJoint(def);
       body.setAwake(true);
     }
   }
@@ -675,7 +714,7 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
 
   public synchronized void launchBomb(Vec2 position, Vec2 velocity) {
     if (bomb != null) {
-      world.destroyBody(bomb);
+      m_world.destroyBody(bomb);
       bomb = null;
     }
     // todo optimize this
@@ -683,7 +722,7 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
     bd.type = BodyType.DYNAMIC;
     bd.position.set(position);
     bd.bullet = true;
-    bomb = world.createBody(bd);
+    bomb = m_world.createBody(bd);
     bomb.setLinearVelocity(velocity);
 
     CircleShape circle = new CircleShape();
@@ -815,14 +854,14 @@ public abstract class TestbedTest implements ContactListener, ObjectListener, Ob
 
     contact.getWorldManifold(worldManifold);
 
-    for (int i = 0; i < manifold.pointCount && m_pointCount < MAX_CONTACT_POINTS; i++) {
-      ContactPoint cp = points[m_pointCount];
+    for (int i = 0; i < manifold.pointCount && pointCount < MAX_CONTACT_POINTS; i++) {
+      ContactPoint cp = points[pointCount];
       cp.fixtureA = fixtureA;
       cp.fixtureB = fixtureB;
       cp.position.set(worldManifold.points[i]);
       cp.normal.set(worldManifold.normal);
       cp.state = state2[i];
-      ++m_pointCount;
+      ++pointCount;
     }
   }
 

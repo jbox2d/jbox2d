@@ -55,7 +55,7 @@ public class PrismaticTest extends TestbedTest {
 		Body ground = null;
 		{
 			BodyDef bd = new BodyDef();
-			ground = world.createBody(bd);
+			ground = getWorld().createBody(bd);
 			
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
@@ -71,7 +71,7 @@ public class PrismaticTest extends TestbedTest {
 			bd.position.set(-10.0f, 10.0f);
 			bd.angle = 0.5f * MathUtils.PI;
 			bd.allowSleep = false;
-			Body body = world.createBody(bd);
+			Body body = getWorld().createBody(bd);
 			body.createFixture(shape, 5.0f);
 			
 			PrismaticJointDef pjd = new PrismaticJointDef();
@@ -91,7 +91,7 @@ public class PrismaticTest extends TestbedTest {
 			pjd.upperTranslation = 20.0f;
 			pjd.enableLimit = true;
 			
-			m_joint = (PrismaticJoint) world.createJoint(pjd);
+			m_joint = (PrismaticJoint) getWorld().createJoint(pjd);
 		}
 	}
 	

@@ -62,7 +62,7 @@ public class OneSidedTest extends TestbedTest{
 		// Ground
 		{
 			BodyDef bd = new BodyDef();
-			Body ground = world.createBody(bd);
+			Body ground = getWorld().createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-20.0f, 0.0f), new Vec2(20.0f, 0.0f));
@@ -73,7 +73,7 @@ public class OneSidedTest extends TestbedTest{
 		{
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, 10.0f);
-			Body body = world.createBody(bd);
+			Body body = getWorld().createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
 			shape.setAsBox(3.0f, 0.5f);
@@ -88,7 +88,7 @@ public class OneSidedTest extends TestbedTest{
 			BodyDef bd = new BodyDef();
 			bd.type = BodyType.DYNAMIC;
 			bd.position.set(0.0f, 12.0f);
-			Body body = world.createBody(bd);
+			Body body = getWorld().createBody(bd);
 
 			m_radius = 0.5f;
 			CircleShape shape = new CircleShape();

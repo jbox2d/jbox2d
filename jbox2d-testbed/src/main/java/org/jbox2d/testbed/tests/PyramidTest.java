@@ -58,7 +58,7 @@ public class PyramidTest extends TestbedTest {
 		int count = 20;
 		{
 			BodyDef bd = new BodyDef();
-			Body ground = world.createBody(bd);
+			Body ground = getWorld().createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0f), new Vec2(40.0f, 0f));
@@ -89,7 +89,7 @@ public class PyramidTest extends TestbedTest {
 					BodyDef bd = new BodyDef();
 					bd.type = BodyType.DYNAMIC;
 					bd.position.set(y);
-					Body body = world.createBody(bd);
+					Body body = getWorld().createBody(bd);
 					body.createFixture(shape, 5.0f);
 					y.addLocal(deltaY);
 				}

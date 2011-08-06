@@ -55,7 +55,7 @@ public class ShapeEditing extends TestbedTest {
 	public void initTest(boolean argDeserialized) {
 		{
 			BodyDef bd = new BodyDef();
-			Body ground = world.createBody(bd);
+			Body ground = getWorld().createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
@@ -65,7 +65,7 @@ public class ShapeEditing extends TestbedTest {
 		BodyDef bd = new BodyDef();
 		bd.type = BodyType.DYNAMIC;
 		bd.position.set(0.0f, 10.0f);
-		m_body = world.createBody(bd);
+		m_body = getWorld().createBody(bd);
 
 		PolygonShape shape = new PolygonShape();
 		shape.setAsBox(4.0f, 4.0f, new Vec2(0.0f, 0.0f), 0.0f);

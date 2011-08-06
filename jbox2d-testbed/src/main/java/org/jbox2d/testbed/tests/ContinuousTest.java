@@ -80,7 +80,7 @@ public class ContinuousTest extends TestbedTest {
 		{
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, 0.0f);
-			Body body = world.createBody(bd);
+			Body body = getWorld().createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
 
@@ -100,7 +100,7 @@ public class ContinuousTest extends TestbedTest {
 		bd.type = BodyType.DYNAMIC;
 		bd.position.set(0.0f, 20.0f);
 		
-		m_body = world.createBody(bd);
+		m_body = getWorld().createBody(bd);
 		currFixture = m_body.createFixture(m_poly, 1.0f);
 
 		m_angularVelocity = (float)Math.random()*100 - 50;
@@ -165,7 +165,7 @@ public class ContinuousTest extends TestbedTest {
 		
 		addTextLine("Press 'c' to change launch shape");
 
-		if (m_stepCount % 60 == 0){
+		if (getStepCount() % 60 == 0){
 			launch();
 		}
 	}

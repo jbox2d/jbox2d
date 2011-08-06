@@ -207,7 +207,7 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 		Actor actor = (Actor) proxyId.userData;
 
 		RayCastOutput output = new RayCastOutput();
-		boolean hit = actor.aabb.raycast(output, input, world.getPool());
+		boolean hit = actor.aabb.raycast(output, input, getWorld().getPool());
 
 		if (hit) {
 			m_rayCastOutput = output;
@@ -346,7 +346,7 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 
 			RayCastOutput output = new RayCastOutput();
 			boolean hit = m_actors[i].aabb.raycast(output, input,
-					world.getPool());
+					getWorld().getPool());
 			if (hit) {
 				bruteActor = m_actors[i];
 				bruteOutput = output;

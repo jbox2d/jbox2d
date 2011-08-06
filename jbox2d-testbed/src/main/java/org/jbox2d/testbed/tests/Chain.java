@@ -60,7 +60,7 @@ public class Chain extends TestbedTest {
 		Body ground = null;
 		{
 			BodyDef bd = new BodyDef();
-			ground = world.createBody(bd);
+			ground = getWorld().createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
@@ -86,12 +86,12 @@ public class Chain extends TestbedTest {
 				BodyDef bd = new BodyDef();
 				bd.type = BodyType.DYNAMIC;
 				bd.position.set(0.5f + i, y);
-				Body body = world.createBody(bd);
+				Body body = getWorld().createBody(bd);
 				body.createFixture(fd);
 
 				Vec2 anchor = new Vec2(i, y);
 				jd.initialize(prevBody, body, anchor);
-				world.createJoint(jd);
+				getWorld().createJoint(jd);
 
 				prevBody = body;
 			}

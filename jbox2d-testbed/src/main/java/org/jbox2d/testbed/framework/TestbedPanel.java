@@ -33,16 +33,11 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
-import org.jbox2d.common.Vec2;
+import org.jbox2d.callbacks.DebugDraw;
 
 /**
- * A TestbedPanel
- * <ul>
- * <li>Contains the update loop
- * <li>Operates the test by initializing it and updating it
- * <li>Draws the test
- * <li>Provides access to ui elements like keys pressed
- * </ul>
+ * A TestbedPanel encapsulates the graphical panel displayed to the user.  Also it
+ * is responsible for populating panel-specific data in the model (like panel width).
  * 
  * @author Daniel Murphy
  */
@@ -66,69 +61,21 @@ public interface TestbedPanel {
    */
   public void addMouseMotionListener(MouseMotionListener argListener);
 
-  /**
-   * Gets the calculated current framerate of the panel
-   * 
-   * @return
-   */
-  public float getCalculatedFrameRate();
-
-  /**
-   * Gets the current frame count
-   * 
-   * @return
-   */
-  public long getFrameCount();
-
-  /**
-   * Gets the target frame rate of the panel
-   * 
-   * @return
-   */
-  public int getFrameRate();
-
   public int getHeight();
-
-  /**
-   * Gets the millisecond start time of the panel
-   * 
-   * @return
-   */
-  public long getStartTime();
 
   public int getWidth();
 
   public void grabFocus();
   
-  /**
-   * If the panel is animating
-   * 
-   * @return
-   */
-  public boolean isAnimating();
-  
-  /**
-   * Sets the target frame rate of the panel
-   * 
-   * @param fps
-   */
-  public void setFrameRate(int fps);
+  public DebugDraw getDebugDraw();
 
   /**
-   * Starts the update loop and animation
+   * Renders the world
    */
-  public void start();
-  
+  public void render();
+
   /**
-   * Stops the update loop
+   * Paints the world to the screen
    */
-  public void stop();
-  
-  /**
-   * Updates the size of the panel
-   * 
-   * @param argWidth
-   * @param argHeight
-   */
-  public void updateSize(int argWidth, int argHeight);
+  public void paintScreen();
 }

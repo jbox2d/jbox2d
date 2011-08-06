@@ -100,7 +100,7 @@ public class DistanceTest extends TestbedTest {
 		input.transformB.set(m_transformB);
 		input.useRadii = true;
 		cache.count = 0;
-		world.getPool().getDistance().distance(output, cache, input);
+		getWorld().getPool().getDistance().distance(output, cache, input);
 		
 		addTextLine("distance = " + output.distance);
 		addTextLine("iterations = " + output.iterations);

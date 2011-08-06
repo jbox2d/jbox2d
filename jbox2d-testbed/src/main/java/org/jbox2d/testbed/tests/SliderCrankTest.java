@@ -60,7 +60,7 @@ public class SliderCrankTest extends TestbedTest {
 		Body ground = null;
 		{
 			BodyDef bd = new BodyDef();
-			ground = world.createBody(bd);
+			ground = getWorld().createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
@@ -78,7 +78,7 @@ public class SliderCrankTest extends TestbedTest {
 				BodyDef bd = new BodyDef();
 				bd.type = BodyType.DYNAMIC;
 				bd.position.set(0.0f, 7.0f);
-				Body body = world.createBody(bd);
+				Body body = getWorld().createBody(bd);
 				body.createFixture(shape, 2.0f);
 
 				RevoluteJointDef rjd = new RevoluteJointDef();
@@ -86,7 +86,7 @@ public class SliderCrankTest extends TestbedTest {
 				rjd.motorSpeed = 1.0f * MathUtils.PI;
 				rjd.maxMotorTorque = 10000.0f;
 				rjd.enableMotor = true;
-				m_joint1 = (RevoluteJoint)world.createJoint(rjd);
+				m_joint1 = (RevoluteJoint)getWorld().createJoint(rjd);
 
 				prevBody = body;
 			}
@@ -99,13 +99,13 @@ public class SliderCrankTest extends TestbedTest {
 				BodyDef bd = new BodyDef();
 				bd.type = BodyType.DYNAMIC;
 				bd.position.set(0.0f, 13.0f);
-				Body body = world.createBody(bd);
+				Body body = getWorld().createBody(bd);
 				body.createFixture(shape, 2.0f);
 
 				RevoluteJointDef rjd = new RevoluteJointDef();
 				rjd.initialize(prevBody, body, new Vec2(0.0f, 9.0f));
 				rjd.enableMotor = false;
-				world.createJoint(rjd);
+				getWorld().createJoint(rjd);
 
 				prevBody = body;
 			}
@@ -118,12 +118,12 @@ public class SliderCrankTest extends TestbedTest {
 				BodyDef bd = new BodyDef();
 				bd.type = BodyType.DYNAMIC;
 				bd.position.set(0.0f, 17.0f);
-				Body body = world.createBody(bd);
+				Body body = getWorld().createBody(bd);
 				body.createFixture(shape, 2.0f);
 
 				RevoluteJointDef rjd = new RevoluteJointDef();
 				rjd.initialize(prevBody, body, new Vec2(0.0f, 17.0f));
-				world.createJoint(rjd);
+				getWorld().createJoint(rjd);
 
 				PrismaticJointDef pjd = new PrismaticJointDef();
 				pjd.initialize(ground, body, new Vec2(0.0f, 17.0f), new Vec2(0.0f, 1.0f));
@@ -131,7 +131,7 @@ public class SliderCrankTest extends TestbedTest {
 				pjd.maxMotorForce = 1000.0f;
 				pjd.enableMotor = true;
 
-				m_joint2 = (PrismaticJoint)world.createJoint(pjd);
+				m_joint2 = (PrismaticJoint)getWorld().createJoint(pjd);
 			}
 
 			// Create a payload
@@ -142,7 +142,7 @@ public class SliderCrankTest extends TestbedTest {
 				BodyDef bd = new BodyDef();
 				bd.type = BodyType.DYNAMIC;
 				bd.position.set(0.0f, 23.0f);
-				Body body = world.createBody(bd);
+				Body body = getWorld().createBody(bd);
 				body.createFixture(shape, 2.0f);
 			}
 		}
