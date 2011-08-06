@@ -231,18 +231,18 @@ public class LiquidTest extends TestbedTest {
 	@Override
 	public void initTest(boolean argDeserialized) {
 		if (firstTime) {
-			setCamera(0f, 2f, 35f);
+			setCamera(new Vec2(0,2), 35f);
 			firstTime = false;
 		}
 		
-		//m_world.setGravity(new Vec2(0.0f,0.0f));
+		//m_getWorld().setGravity(new Vec2(0.0f,0.0f));
 		
 		Body ground = null;
 		{
 
 			BodyDef bd = new BodyDef();
 			bd.position.set(0.0f, 0.0f);
-			ground = world.createBody(bd);
+			ground = getWorld().createBody(bd);
 			PolygonShape shape = new PolygonShape();
 			shape.setAsBox(5.0f, 0.5f);
 			ground.createFixture(shape, 0);
@@ -291,7 +291,7 @@ public class LiquidTest extends TestbedTest {
 					MathUtils.randomFloat(cy-boxHeight*.5f,cy+boxHeight*.5f));
 			bd.fixedRotation = true;
 			bd.type = BodyType.DYNAMIC;
-			Body b = world.createBody(bd);
+			Body b = getWorld().createBody(bd);
 			
 			b.createFixture(fd).setUserData(LIQUID_INT);
 			
@@ -308,7 +308,7 @@ public class LiquidTest extends TestbedTest {
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.position = new Vec2(0.0f,25.0f);
 		bodyDef.type = BodyType.DYNAMIC;
-		bod = world.createBody(bodyDef);
+		bod = getWorld().createBody(bodyDef);
 		bod.createFixture(polyDef, 1f);
 	}
 	
@@ -332,13 +332,13 @@ public class LiquidTest extends TestbedTest {
 		
 		checkBounds();
 		
-		//System.out.println(m_world.getGroundBody().getXForm());
+		//System.out.println(m_getWorld().getGroundBody().getXForm());
 	}
 	
 	private void checkBounds() {
 		for (int i=0; i<liquid.length; ++i) {
 			if (liquid[i].getWorldCenter().y < -10.0f) {
-				world.destroyBody(liquid[i]);
+				getWorld().destroyBody(liquid[i]);
 				float massPerParticle = totalMass / nParticles;
 				
 				CircleShape pd = new CircleShape();
@@ -355,7 +355,7 @@ public class LiquidTest extends TestbedTest {
 				bd.position = new Vec2( cx, cy );
 				bd.fixedRotation = true;
 				bd.type = BodyType.DYNAMIC;
-				Body b = world.createBody(bd);
+				Body b = getWorld().createBody(bd);
 				b.createFixture(fd).setUserData(LIQUID_INT);
 				MassData md = new MassData();
 				md.mass = massPerParticle;
@@ -367,13 +367,13 @@ public class LiquidTest extends TestbedTest {
 		}
 		
 		if (bod.getWorldCenter().y < -15.0f) {
-			world.destroyBody(bod);
+			getWorld().destroyBody(bod);
 			PolygonShape polyDef = new PolygonShape();
 			polyDef.setAsBox(MathUtils.randomFloat(0.3f,0.7f), MathUtils.randomFloat(0.3f,0.7f));
 			BodyDef bodyDef = new BodyDef();
 			bodyDef.position = new Vec2(0.0f,25.0f);
 			bodyDef.type = BodyType.DYNAMIC;
-			bod = world.createBody(bodyDef);
+			bod = getWorld().createBody(bodyDef);
 			bod.createFixture(polyDef, 1f);
 		}
 	}

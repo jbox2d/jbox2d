@@ -59,7 +59,7 @@ public class CharacterCollision extends TestbedTest {
     // Ground body
     {
       BodyDef bd = new BodyDef();
-      Body ground = world.createBody(bd);
+      Body ground = getWorld().createBody(bd);
 
       PolygonShape shape = new PolygonShape();
       shape.setAsEdge(new Vec2(-20.0f, 0.0f), new Vec2(20.0f, 0.0f));
@@ -69,7 +69,7 @@ public class CharacterCollision extends TestbedTest {
     // Collinear edges
     {
       BodyDef bd = new BodyDef();
-      Body ground = world.createBody(bd);
+      Body ground = getWorld().createBody(bd);
 
       PolygonShape shape = new PolygonShape();
       shape.m_radius = 0.0f;
@@ -84,7 +84,7 @@ public class CharacterCollision extends TestbedTest {
     // Square tiles
     {
       BodyDef bd = new BodyDef();
-      Body ground = world.createBody(bd);
+      Body ground = getWorld().createBody(bd);
 
       PolygonShape shape = new PolygonShape();
       shape.setAsBox(1.0f, 1.0f, new Vec2(4.0f, 3.0f), 0.0f);
@@ -100,7 +100,7 @@ public class CharacterCollision extends TestbedTest {
     // not get snagged. However, ray casts can now go through the cracks.
     {
       BodyDef bd = new BodyDef();
-      Body ground = world.createBody(bd);
+      Body ground = getWorld().createBody(bd);
 
       PolygonShape shape = new PolygonShape();
       float d = 2.0f * Settings.polygonRadius;
@@ -122,7 +122,7 @@ public class CharacterCollision extends TestbedTest {
       bd.fixedRotation = true;
       bd.allowSleep = false;
 
-      Body body = world.createBody(bd);
+      Body body = getWorld().createBody(bd);
 
       PolygonShape shape = new PolygonShape();
       shape.setAsBox(0.5f, 0.5f);
@@ -141,7 +141,7 @@ public class CharacterCollision extends TestbedTest {
       bd.fixedRotation = true;
       bd.allowSleep = false;
 
-      Body body = world.createBody(bd);
+      Body body = getWorld().createBody(bd);
 
       float angle = 0.0f;
       float delta = MathUtils.PI / 3.0f;
@@ -168,7 +168,7 @@ public class CharacterCollision extends TestbedTest {
       bd.fixedRotation = true;
       bd.allowSleep = false;
 
-      Body body = world.createBody(bd);
+      Body body = getWorld().createBody(bd);
 
       CircleShape shape = new CircleShape();
       shape.m_radius = 0.5f;

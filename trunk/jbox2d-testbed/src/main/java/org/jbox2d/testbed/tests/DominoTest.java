@@ -54,7 +54,7 @@ public class DominoTest extends TestbedTest {
 
       BodyDef bd = new BodyDef();
       bd.position = new Vec2(0.0f, -10.0f);
-      world.createBody(bd).createFixture(fd);
+      getWorld().createBody(bd).createFixture(fd);
 
     }
 
@@ -67,7 +67,7 @@ public class DominoTest extends TestbedTest {
 
         BodyDef bd = new BodyDef();
         bd.position = new Vec2(0.0f, 5f + 5f * i);
-        world.createBody(bd).createFixture(fd);
+        getWorld().createBody(bd).createFixture(fd);
       }
     }
 
@@ -95,7 +95,7 @@ public class DominoTest extends TestbedTest {
             bd.position.x -= .1f;
           } else
             bd.angle = 0f;
-          Body myBody = world.createBody(bd);
+          Body myBody = getWorld().createBody(bd);
           myBody.createFixture(fd);
         }
       }

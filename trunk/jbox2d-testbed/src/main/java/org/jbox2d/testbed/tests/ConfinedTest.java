@@ -58,7 +58,7 @@ public class ConfinedTest extends TestbedTest {
 	  }
 		{
 			BodyDef bd = new BodyDef();
-			Body ground = world.createBody(bd);
+			Body ground = getWorld().createBody(bd);
 
 			PolygonShape shape = new PolygonShape();
 
@@ -96,13 +96,13 @@ public class ConfinedTest extends TestbedTest {
 				BodyDef bd = new BodyDef();
 				bd.type = BodyType.DYNAMIC;
 				bd.position.set(-10.0f + (2.1f * j + 1.0f + 0.01f * i) * radius, (2.0f * i + 1.0f) * radius);
-				Body body = world.createBody(bd);
+				Body body = getWorld().createBody(bd);
 
 				body.createFixture(fd);
 			}
 		}
 
-		world.setGravity(new Vec2(0.0f, 0.0f));
+		getWorld().setGravity(new Vec2(0.0f, 0.0f));
 	}
 	
 	public void createCircle()
@@ -122,7 +122,7 @@ public class ConfinedTest extends TestbedTest {
 		bd.type = BodyType.DYNAMIC;
 		bd.position = p;
 		//bd.allowSleep = false;
-		Body body = world.createBody(bd);
+		Body body = getWorld().createBody(bd);
 
 		body.createFixture(fd);
 	}
@@ -132,7 +132,7 @@ public class ConfinedTest extends TestbedTest {
 
 		super.step(settings);
 
-		for (Body b = world.getBodyList(); b != null; b = b.getNext())
+		for (Body b = getWorld().getBodyList(); b != null; b = b.getNext())
 		{
 			if (b.getType() != BodyType.DYNAMIC)
 			{

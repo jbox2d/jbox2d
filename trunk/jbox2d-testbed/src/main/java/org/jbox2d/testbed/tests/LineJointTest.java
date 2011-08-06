@@ -59,7 +59,7 @@ public class LineJointTest extends TestbedTest {
 			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
 
 			BodyDef bd = new BodyDef();
-			ground = world.createBody(bd);
+			ground = getWorld().createBody(bd);
 			ground.createFixture(shape, 0.0f);
 		}
 
@@ -70,7 +70,7 @@ public class LineJointTest extends TestbedTest {
 			BodyDef bd = new BodyDef();
 			bd.type = BodyType.DYNAMIC;
 			bd.position.set(0.0f, 7.0f);
-			Body body = world.createBody(bd);
+			Body body = getWorld().createBody(bd);
 			body.createFixture(shape, 1.0f);
 
 			LineJointDef jd = new LineJointDef();
@@ -83,7 +83,7 @@ public class LineJointTest extends TestbedTest {
 			jd.lowerTranslation = -4.0f;
 			jd.upperTranslation = 4.0f;
 			jd.enableLimit = true;
-			world.createJoint(jd);
+			getWorld().createJoint(jd);
 		}
 	}
 	

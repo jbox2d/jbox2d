@@ -8,26 +8,41 @@ import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.common.Vec2;
 
 /**
- * Testbed model
+ * Model for the testbed
  * 
  * @author Daniel
  */
 public class TestbedModel {
 
-  private final DefaultComboBoxModel tests;
-  private final TestbedSettings settings;
+  private final DefaultComboBoxModel tests = new DefaultComboBoxModel();
+  private final TestbedSettings settings = new TestbedSettings();
   private DebugDraw draw;
   private TestbedTest test;
-  private final Vec2 mouse;
-  private final Vector<TestChangedListener> listeners;
-  public final boolean[] keys = new boolean[512];
-  public final boolean[] codedKeys = new boolean[512];
-
+  private final Vec2 mouse = new Vec2();
+  private final Vector<TestChangedListener> listeners = new Vector<TestChangedListener>();
+  private final boolean[] keys = new boolean[512];
+  private final boolean[] codedKeys = new boolean[512];
+  private float calculatedFps;
+  private float panelWidth;
+  private int currTestIndex;
+  
   public TestbedModel() {
-    settings = new TestbedSettings();
-    tests = new DefaultComboBoxModel();
-    listeners = new Vector<TestbedModel.TestChangedListener>();
-    mouse = new Vec2();
+  }
+
+  public void setCalculatedFps(float calculatedFps) {
+    this.calculatedFps = calculatedFps;
+  }
+
+  public float getCalculatedFps() {
+    return calculatedFps;
+  }
+
+  public void setPanelWidth(float panelWidth) {
+    this.panelWidth = panelWidth;
+  }
+
+  public float getPanelWidth() {
+    return panelWidth;
   }
 
   public void setDebugDraw(DebugDraw argDraw) {
@@ -36,13 +51,6 @@ public class TestbedModel {
 
   public DebugDraw getDebugDraw() {
     return draw;
-  }
-
-  public void setCurrTest(TestbedTest argTest) {
-    test = argTest;
-    for (TestChangedListener listener : listeners) {
-      listener.testChanged(test);
-    }
   }
 
   public TestbedTest getCurrTest() {
@@ -75,6 +83,29 @@ public class TestbedModel {
     return codedKeys;
   }
   
+  public void setCurrTestIndex(int argCurrTestIndex) {
+    if(argCurrTestIndex < 0 || argCurrTestIndex >= tests.getSize()){
+      throw new IllegalArgumentException("Invalid test index");
+    }
+    if(currTestIndex == argCurrTestIndex){
+      return;
+    }
+    
+    if(!isTestAt(argCurrTestIndex)){
+      throw new IllegalArgumentException("No test at " + argCurrTestIndex);
+    }
+    currTestIndex = argCurrTestIndex;
+    ListItem item = (ListItem) tests.getElementAt(argCurrTestIndex);
+    test = item.test;
+    for (TestChangedListener listener : listeners) {
+      listener.testChanged(test, currTestIndex);
+    }
+  }
+
+  public int getCurrTestIndex() {
+    return currTestIndex;
+  }
+
   public void addTestChangeListener(TestChangedListener argListener) {
     listeners.add(argListener);
   }
@@ -143,6 +174,6 @@ public class TestbedModel {
   }
 
   public static interface TestChangedListener {
-    public void testChanged(TestbedTest argTest);
+    public void testChanged(TestbedTest argTest, int argIndex);
   }
 }
