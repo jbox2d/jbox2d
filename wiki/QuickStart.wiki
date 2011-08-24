@@ -1,4 +1,5 @@
 #summary Basic guide for building and using JBox2D
+#labels Featured
 <wiki:toc max_depth="2" />
 
 = Introduction =
