@@ -25,12 +25,12 @@
             <configuration>
               <target>
                 <mkdir dir="src/generated" />
-                <exec executable="protoc">
+                <exec executable="protoc" failifexecutionfails="false">
                   <arg value="--java_out=src/generated" />
                   <arg value="src/main/resources/proto/box2d.proto" />
                 </exec>
               </target>
-              <sourceRoot>target/generated-sources</sourceRoot>
+              <sourceRoot>src/generated</sourceRoot>
             </configuration>
             <goals>
               <goal>run</goal>
@@ -38,6 +38,25 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+		  <groupId>org.codehaus.mojo</groupId>
+		  <artifactId>build-helper-maven-plugin</artifactId>
+		  <version>1.7</version>
+		   <executions>
+		      <execution>
+		      	<id>add-source</id>
+	            <phase>generate-sources</phase>
+	            <goals>
+	              <goal>add-source</goal>
+	            </goals>
+	            <configuration>
+	              <sources>
+	                <source>${basedir}/src/generated</source>
+	              </sources>
+	            </configuration>
+		      </execution>
+		   </executions>
+		</plugin>
     </plugins>
     <pluginManagement>
     	<plugins>
@@ -73,8 +92,6 @@
     	</plugins>
     </pluginManagement>
   </build>
-
-
 
   <dependencies>
     <dependency>

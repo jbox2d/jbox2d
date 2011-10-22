@@ -37,7 +37,7 @@ import org.jbox2d.common.Vec2;
  */
 public class TestbedModel {
 
-  private final DefaultComboBoxModel tests = new DefaultComboBoxModel();
+  private final DefaultComboBoxModel<ListItem> tests = new DefaultComboBoxModel<ListItem>();
   private final TestbedSettings settings = new TestbedSettings();
   private DebugDraw draw;
   private TestbedTest test;
@@ -166,7 +166,7 @@ public class TestbedModel {
     return tests.getSize();
   }
 
-  public DefaultComboBoxModel getComboModel() {
+  public DefaultComboBoxModel<ListItem> getComboModel() {
     return tests;
   }
 
