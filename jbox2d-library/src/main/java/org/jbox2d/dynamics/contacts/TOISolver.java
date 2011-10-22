@@ -66,7 +66,7 @@ public class TOISolver {
 		m_count = count;
 		m_toiBody = toiBody;
 		
-		if(m_count >= m_constraints.length){
+		if(m_count > m_constraints.length){
 			TOIConstraint[] old = m_constraints;
 			// thanks zel1990!  Fix for issue 24
 			final int newLen = MathUtils.max(m_count, old.length*2);
