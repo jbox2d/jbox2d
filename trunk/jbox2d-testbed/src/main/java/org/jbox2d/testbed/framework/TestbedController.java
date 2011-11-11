@@ -297,6 +297,9 @@ public class TestbedController implements Runnable {
     while (animating) {
 
       if (nextTest != null) {
+        if(currTest != null) {
+          currTest.exit();    		
+        }
         currTest = nextTest;
         currTest.init(model);
         nextTest = null;
