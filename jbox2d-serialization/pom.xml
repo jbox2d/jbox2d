@@ -25,6 +25,7 @@
             <configuration>
               <target>
                 <mkdir dir="src/generated" />
+                <echo>Generating protobuffer sources</echo>
                 <exec executable="protoc" failifexecutionfails="false">
                   <arg value="--java_out=src/generated" />
                   <arg value="src/main/resources/proto/box2d.proto" />
