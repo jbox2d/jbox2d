@@ -28,13 +28,13 @@ Lets start by taking a look at testbed user interface.
 || Controls || These buttons are pretty self-explanatory, and save/load are only enabled if the test support serialization. ||
 || Reporting Area ||  This area is for any text from the testbed or test. ||
 
-=== Mouse Controls ===
+== Mouse Controls ==
 
 || Right click drag || moves the viewport around ||
 || Mouse wheel || zooms on the mouse cursor ||
 || Left click || drags around physics objects in the scene (if mouse was over one) ||
 
-=== Keyboard Controls ===
+== Keyboard Controls ==
 
 || *R* || restarts the current test ||
 || *[* || goes the last test ||
@@ -108,7 +108,7 @@ The only required methods for a test are `getTestName`, which should return the 
 
 The testbed provides both storage of the mouse + keyboard state and hook methods for state changes.
 
-=== Input State ===
+== Input State ==
 The current input state is stored in the `TestbedModel` and in your superclass `TestbedTest`.  Here is an example of grabbing this:
 
 {{{
@@ -130,7 +130,7 @@ public void step(TestbedSettings settings) {
 }
 }}}
 
-=== Hooks ===
+== Hooks ==
 The testbed also provides overridable hooks for input (and the world) as well.  Here are they are:
 {{{
 // engine hooks
