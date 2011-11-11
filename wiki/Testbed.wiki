@@ -1,6 +1,8 @@
 #summary Easily experiment with jbox2d in a friendly environment.
 #labels Phase-Implementation
 
+<wiki:toc max_depth="1" />
+
 = Introduction =
 
 So getting physics right can be tough, and bugs with physics can often take a while to discover.  So it's always a good idea to create a physics prototype of the behavior you want before you build your application or game around it.  The testbed is the perfect place to to this, as it provides:
@@ -10,6 +12,8 @@ So getting physics right can be tough, and bugs with physics can often take a wh
  * easy input support
  * serialization (saving/loading)
 so you can get down to the hairy details of getting your physics correct instead of worrying about other things going wrong.
+
+*PLEASE NOTE:* The testbed api is provided for easy prototyping and testing.  It is not intended for commercial use and can be subject to changes.
 
 = Testbed UI =
 
@@ -23,3 +27,76 @@ Lets start by taking a look at testbed user interface.
 || Testbed Options || These are options to modify the way the testbed or current test behaves. ||
 || Controls || These buttons are pretty self-explanatory, and save/load are only enabled if the test support serialization. ||
 || Reporting Area ||  This area is for any text from the testbed or test. ||
+
+= Adding Tests/Settings =
+
+Before we start writing tests, let's learn how to add them to the testbed.  The testbed has a `TestbedModel` where it stores all of the tests and settings.  Here is an example of adding our own category, test, and setting to the testbed.
+
+{{{
+TestbedModel model = new TestbedModel();         // create our model
+
+// add tests
+TestList.populateModel(model);                   // populate the provided testbed tests
+model.addCategory("My Super Tests");             // add a category
+model.addTest(new MySuperTest());                // add our test
+
+// add our custom setting "My Range Setting", with a default value of 10, between 0 and 20
+model.getSettings().addSetting(new TestbedSetting("My Range Setting", SettingType.ENGINE, 10, 0, 20));
+
+TestbedPanel panel = new TestPanelJ2D(model);    // create our testbed panel
+
+JFrame testbed = new TestbedFrame(model, panel); // put both into our testbed frame
+// etc
+testbed.setVisible(true);
+testbed.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+}}}
+
+Tests and settings are covered more in-depth later, but that should give you a pretty good idea how to set up your own testbed.
+
+= A Simple Test =
+
+Our friend 'MJW' wrote this test during the re-write to 2.1.2 to highlight a strange bug with corner collisions of polygons:
+
+{{{
+public class MJWTest extends TestbedTest {
+
+  @Override
+  public void initTest(boolean argDeserialized) {
+    setTitle("Couple of Things Test");
+
+    getWorld().setGravity(new Vec2());
+
+    for (int i = 0; i < 2; i++) {
+      PolygonShape polygonShape = new PolygonShape();
+      polygonShape.setAsBox(1, 1);
+      
+      BodyDef bodyDef = new BodyDef();
+      bodyDef.type = BodyType.DYNAMIC;
+      bodyDef.position.set(5 * i, 0);
+      bodyDef.angle = (float) (Math.PI / 4 * i);
+      bodyDef.allowSleep = false;
+      Body body = getWorld().createBody(bodyDef);
+      body.createFixture(polygonShape, 5.0f);
+
+      body.applyForce(new Vec2(-10000 * (i - 1), 0), new Vec2());
+    }
+  }
+
+  @Override
+  public String getTestName() {
+    return "Couple of Things";
+  }
+}
+}}}
+
+The only required methods for a test are `getTestName`, which should return the test name, and 'initTest' for test initialization.  We'll go over the deserialized argument later.
+
+= Handling Input =
+
+The testbed provides hooks for all mouse and keyboard events.
+
+= Serialization (Saving/Loading) =
+
+= Custom Real-Time Settings =
+
+= A slightly more complex test =
