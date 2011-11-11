@@ -1,5 +1,5 @@
 #summary Easily experiment with jbox2d in a friendly environment.
-#labels Phase-Implementation
+#labels Phase-Implementation,Featured
 
 <wiki:toc max_depth="2" />
 
@@ -11,7 +11,7 @@ So getting physics right can be tough, and bugs with physics can often take a wh
  * expandable settings
  * easy input support
  * serialization (saving/loading)
-so you can get down to the hairy details of getting your physics correct instead of worrying about other things going wrong.
+so you can get down to the hairy details of getting your physics correct instead of worrying about other things going wrong.  All of the current testbeds tests are [http://code.google.com/p/jbox2d/source/browse/#svn%2Ftrunk%2Fjbox2d-testbed%2Fsrc%2Fmain%2Fjava%2Forg%2Fjbox2d%2Ftestbed%2Ftests here].
 
 *PLEASE NOTE:* The testbed api is provided for easy prototyping and testing.  It is not intended for commercial use and might be subject to changes in the future.
 
@@ -155,4 +155,4 @@ Keep in mind that the hook methods might also be used by the `TestbedTest` class
 
 = Custom Real-Time Settings =
 
-= Putting it all together =
+= Putting It All Together =
