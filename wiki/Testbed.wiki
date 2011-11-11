@@ -13,7 +13,7 @@ So getting physics right can be tough, and bugs with physics can often take a wh
  * serialization (saving/loading)
 so you can get down to the hairy details of getting your physics correct instead of worrying about other things going wrong.
 
-*PLEASE NOTE:* The testbed api is provided for easy prototyping and testing.  It is not intended for commercial use and can be subject to changes.
+*PLEASE NOTE:* The testbed api is provided for easy prototyping and testing.  It is not intended for commercial use and might be subject to changes in the future.
 
 = Testbed UI =
 
