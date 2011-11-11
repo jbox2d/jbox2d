@@ -1,7 +1,7 @@
 #summary Easily experiment with jbox2d in a friendly environment.
 #labels Phase-Implementation
 
-<wiki:toc max_depth="1" />
+<wiki:toc max_depth="2" />
 
 = Introduction =
 
@@ -27,6 +27,19 @@ Lets start by taking a look at testbed user interface.
 || Testbed Options || These are options to modify the way the testbed or current test behaves. ||
 || Controls || These buttons are pretty self-explanatory, and save/load are only enabled if the test support serialization. ||
 || Reporting Area ||  This area is for any text from the testbed or test. ||
+
+=== Mouse Controls ===
+
+|| Right click drag || moves the viewport around ||
+|| Mouse wheel || zooms on the mouse cursor ||
+|| Left click || drags around physics objects in the scene (if mouse was over one) ||
+
+=== Keyboard Controls ===
+
+|| *R* || restarts the current test ||
+|| *[* || goes the last test ||
+|| *]* || goes to the next test ||
+|| *Space* || launches a 'bomb' in the test ||
 
 = Adding Tests/Settings =
 
@@ -93,10 +106,53 @@ The only required methods for a test are `getTestName`, which should return the 
 
 = Handling Input =
 
-The testbed provides hooks for all mouse and keyboard events.
+The testbed provides both storage of the mouse + keyboard state and hook methods for state changes.
+
+=== Input State ===
+The current input state is stored in the `TestbedModel` and in your superclass `TestbedTest`.  Here is an example of grabbing this:
+
+{{{
+// let's say we're in a custom test
+@Override
+public void step(TestbedSettings settings) {
+  super.step(settings);
+  
+  TestbedModel model = getModel();
+  if (model.getKeys()['a']) { // model also contains the coded key values
+    applyLeftForce();
+  }
+
+  Vec2 screenMouse = model.getMouse();
+  // ^^ this is in screen coordinates, so we'd rather grab:
+  Vec2 worldMouse = super.getWorldMouse(); // which is in world coordinates
+
+  // etc
+}
+}}}
+
+=== Hooks ===
+The testbed also provides overridable hooks for input (and the world) as well.  Here are they are:
+{{{
+// engine hooks
+void jointDestroyed(Joint joint);
+void beginContact(Contact contact);
+void endContact(Contact contact);
+void postSolve(Contact contact, ContactImpulse impulse);
+void preSolve(Contact contact, Manifold oldManifold);
+// mouse hooks
+void shiftMouseDown(Vec2 p);
+void mouseUp(Vec2 p);
+void mouseDown(Vec2 p);
+void mouseMove(Vec2 p);
+// key hooks
+void keyPressed(char argKeyChar, int argKeyCode);
+void keyReleased(char argKeyChar, int argKeyCode);
+}}}
+
+Keep in mind that the hook methods might also be used by the `TestbedTest` class, so make sure to call `super.method()` as well.
 
 = Serialization (Saving/Loading) =
 
 = Custom Real-Time Settings =
 
-= A slightly more complex test =
+= Putting it all together =
