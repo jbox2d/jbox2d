@@ -1,25 +1,20 @@
 /*******************************************************************************
- * Copyright (c) 2011, Daniel Murphy
- * All rights reserved.
+ * Copyright (c) 2011, Daniel Murphy All rights reserved.
  * 
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- * 	* Redistributions of source code must retain the above copyright notice,
- * 	  this list of conditions and the following disclaimer.
- * 	* Redistributions in binary form must reproduce the above copyright notice,
- * 	  this list of conditions and the following disclaimer in the documentation
- * 	  and/or other materials provided with the distribution.
+ * Redistribution and use in source and binary forms, with or without modification, are permitted
+ * provided that the following conditions are met: * Redistributions of source code must retain the
+ * above copyright notice, this list of conditions and the following disclaimer. * Redistributions
+ * in binary form must reproduce the above copyright notice, this list of conditions and the
+ * following disclaimer in the documentation and/or other materials provided with the distribution.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+ * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 package org.jbox2d.testbed.framework.j2d;
 
@@ -32,6 +27,11 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
@@ -68,6 +68,9 @@ public class TestPanelJ2D extends JPanel implements TestbedPanel {
 
   private final TestbedModel model;
   private final DebugDrawJ2D draw;
+
+  private final Vec2 dragginMouse = new Vec2();
+  private boolean drag = false;
 
   public TestPanelJ2D(TestbedModel argModel) {
     setBackground(Color.black);
@@ -108,6 +111,33 @@ public class TestPanelJ2D extends JPanel implements TestbedPanel {
             d.getViewportTranform().getCenter().addLocal(transformedMove));
 
         currTest.setCachedCameraPos(d.getViewportTranform().getCenter());
+      }
+    });
+
+    addMouseListener(new MouseAdapter() {
+      @Override
+      public void mousePressed(MouseEvent e) {
+        dragginMouse.set(e.getX(), e.getY());
+        drag = e.getButton() == MouseEvent.BUTTON3;
+      }
+    });
+
+    addMouseMotionListener(new MouseMotionAdapter() {
+      @Override
+      public void mouseDragged(MouseEvent e) {
+        if (!drag) {
+          return;
+        }
+        TestbedTest currTest = model.getCurrTest();
+        if (currTest == null) {
+          return;
+        }
+        Vec2 diff = new Vec2(e.getX(), e.getY());
+        diff.subLocal(dragginMouse);
+        currTest.getDebugDraw().getViewportTranform().getScreenVectorToWorld(diff, diff);
+        currTest.getDebugDraw().getViewportTranform().getCenter().subLocal(diff);
+
+        dragginMouse.set(e.getX(), e.getY());
       }
     });
 
