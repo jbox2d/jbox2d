@@ -110,8 +110,8 @@ public class CompoundShapesTest extends TestbedTest{
 
 		{
 			Transform xf1 = new Transform();
-			xf1.R.set(0.3524f * MathUtils.PI);
-			xf1.position.set(Mat22.mul(xf1.R, new Vec2(1.0f, 0.0f)));
+			xf1.q.set(0.3524f * MathUtils.PI);
+			xf1.p.set(Mat22.mul(xf1.q, new Vec2(1.0f, 0.0f)));
 
 			Vec2[] vertices = new Vec2[3];
 
@@ -122,8 +122,8 @@ public class CompoundShapesTest extends TestbedTest{
 			triangle1.set(vertices, 3);
 
 			Transform xf2 = new Transform();
-			xf2.R.set(-0.3524f * MathUtils.PI);
-			xf2.position.set(Mat22.mul(xf2.R, new Vec2(-1.0f, 0.0f)));
+			xf2.q.set(-0.3524f * MathUtils.PI);
+			xf2.p.set(Mat22.mul(xf2.q, new Vec2(-1.0f, 0.0f)));
 
 			PolygonShape triangle2 = new PolygonShape();
 			vertices[0] = Transform.mul(xf2, new Vec2(-1.0f, 0.0f));

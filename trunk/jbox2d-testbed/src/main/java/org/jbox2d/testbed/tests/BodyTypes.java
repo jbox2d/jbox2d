@@ -148,7 +148,7 @@ public class BodyTypes extends TestbedTest {
 		addTextLine("Keys: (d) dynamic, (s) static, (k) kinematic");
 		// Drive the kinematic body.
 		if (m_platform.getType() == BodyType.KINEMATIC) {
-			Vec2 p = m_platform.getTransform().position;
+			Vec2 p = m_platform.getTransform().p;
 			Vec2 v = m_platform.getLinearVelocity();
 			
 			if ((p.x < -10.0f && v.x < 0.0f) || (p.x > 10.0f && v.x > 0.0f)) {
