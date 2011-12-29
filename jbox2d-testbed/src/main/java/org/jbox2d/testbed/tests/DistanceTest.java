@@ -58,7 +58,7 @@ public class DistanceTest extends TestbedTest {
 		{
 			m_transformA = new Transform();
 			m_transformA.setIdentity();
-			m_transformA.position.set(0.0f, -0.2f);
+			m_transformA.p.set(0.0f, -0.2f);
 			m_polygonA = new PolygonShape();
 			m_polygonA.setAsBox(10.0f, 0.2f);
 		}

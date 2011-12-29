@@ -217,8 +217,8 @@ public class LiquidTest extends TestbedTest {
         }
 		//multiplier *= deltaT;
 		for (int i=0; i<liquid.length; ++i) {
-			liquid[i].m_xf.position.x += xchange[i] / multiplier;
-			liquid[i].m_xf.position.y += ychange[i] / multiplier;
+			liquid[i].m_xf.p.x += xchange[i] / multiplier;
+			liquid[i].m_xf.p.y += ychange[i] / multiplier;
 			liquid[i].m_linearVelocity.x += xchange[i] / (multiplier*deltaT);
 			liquid[i].m_linearVelocity.y += ychange[i] / (multiplier*deltaT);
 		}
