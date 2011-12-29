@@ -181,7 +181,7 @@ public class Distance {
 					}
 					else {
 						// Origin is right of e12.
-						Vec2.crossToOut(e12, 1f, out);
+						Vec2.crossToOutUnsafe(e12, 1f, out);
 						return;
 					}
 				default :
@@ -675,11 +675,11 @@ public class Distance {
 			// Compute a tentative new simplex vertex using support points.
 			SimplexVertex vertex = vertices[simplex.m_count];
 			
-			Mat22.mulTransToOut(transformA.R, d.negateLocal(), temp);
+			Mat22.mulTransToOutUnsafe(transformA.q, d.negateLocal(), temp);
 			vertex.indexA = proxyA.getSupport(temp);
 			Transform.mulToOut(transformA, proxyA.getVertex(vertex.indexA), vertex.wA);
 			// Vec2 wBLocal;
-			Mat22.mulTransToOut(transformB.R, d.negateLocal(), temp);
+			Mat22.mulTransToOutUnsafe(transformB.q, d.negateLocal(), temp);
 			vertex.indexB = proxyB.getSupport(temp);
 			Transform.mulToOut(transformB, proxyB.getVertex(vertex.indexB), vertex.wB);
 			vertex.w.set(vertex.wB).subLocal(vertex.wA);

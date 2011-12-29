@@ -154,8 +154,8 @@ public class LineJoint extends Joint {
 		
 		r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 		r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
-		Mat22.mulToOut(b1.getTransform().R, r1, r1);
-		Mat22.mulToOut(b2.getTransform().R, r2, r2);
+		Mat22.mulToOut(b1.getTransform().q, r1, r1);
+		Mat22.mulToOut(b2.getTransform().q, r2, r2);
 		
 		p1.set(b1.m_sweep.c).addLocal(r1);
 		p2.set(b2.m_sweep.c).addLocal(r2);
@@ -265,8 +265,8 @@ public class LineJoint extends Joint {
 		
 		r1.set(m_localAnchor1).subLocal(m_localCenterA);
 		r2.set(m_localAnchor2).subLocal(m_localCenterB);
-		Mat22.mulToOut(xf1.R, r1, r1);
-		Mat22.mulToOut(xf2.R, r2, r2);
+		Mat22.mulToOut(xf1.q, r1, r1);
+		Mat22.mulToOut(xf2.q, r2, r2);
 		
 		final Vec2 d = pool.popVec2();
 		d.set(b2.m_sweep.c).addLocal(r2).subLocal(b1.m_sweep.c).subLocal(r1);
@@ -278,7 +278,7 @@ public class LineJoint extends Joint {
 		
 		// Compute motor Jacobian and effective mass.
 		{
-			Mat22.mulToOut(xf1.R, m_localXAxis1, m_axis);
+			Mat22.mulToOutUnsafe(xf1.q, m_localXAxis1, m_axis);
 			temp.set(d).addLocal(r1);
 			m_a1 = Vec2.cross(temp, m_axis);
 			m_a2 = Vec2.cross(r2, m_axis);
@@ -294,7 +294,7 @@ public class LineJoint extends Joint {
 		
 		// Prismatic constraint.
 		{
-			Mat22.mulToOut(xf1.R, m_localYAxis1, m_perp);
+			Mat22.mulToOutUnsafe(xf1.q, m_localYAxis1, m_perp);
 			
 			temp.set(d).addLocal(r1);
 			m_s1 = Vec2.cross(temp, m_perp);
@@ -307,8 +307,8 @@ public class LineJoint extends Joint {
 			float k12 = i1 * m_s1 * m_a1 + i2 * m_s2 * m_a2;
 			float k22 = m1 + m2 + i1 * m_a1 * m_a1 + i2 * m_a2 * m_a2;
 			
-			m_K.col1.set(k11, k12);
-			m_K.col2.set(k12, k22);
+			m_K.ex.set(k11, k12);
+			m_K.ey.set(k12, k22);
 		}
 		
 		// Compute motor and limit terms.
@@ -435,10 +435,10 @@ public class LineJoint extends Joint {
 			}
 			
 			// f2(1) = invK(1,1) * (-Cdot(1) - K(1,2) * (f2(2) - f1(2))) + f1(1)
-			float b = -Cdot1 - (m_impulse.y - f1.y) * m_K.col2.x;
+			float b = -Cdot1 - (m_impulse.y - f1.y) * m_K.ey.x;
 			float f2r;
-			if (m_K.col1.x != 0.0f) {
-				f2r = b / m_K.col1.x + f1.x;
+			if (m_K.ex.x != 0.0f) {
+				f2r = b / m_K.ex.x + f1.x;
 			}
 			else {
 				f2r = f1.x;
@@ -468,8 +468,8 @@ public class LineJoint extends Joint {
 			// Limit is inactive, just solve the prismatic constraint in block
 			// form.
 			float df;
-			if (m_K.col1.x != 0.0f) {
-				df = -Cdot1 / m_K.col1.x;
+			if (m_K.ex.x != 0.0f) {
+				df = -Cdot1 / m_K.ex.x;
 			}
 			else {
 				df = 0.0f;
@@ -534,7 +534,7 @@ public class LineJoint extends Joint {
 		d.set(c2).addLocal(r2).subLocal(c1).subLocal(r1);
 		
 		if (m_enableLimit) {
-			Mat22.mulToOut(R1, m_localXAxis1, m_axis);
+			Mat22.mulToOutUnsafe(R1, m_localXAxis1, m_axis);
 			
 			temp.set(d).addLocal(r1);
 			m_a1 = Vec2.cross(temp, m_axis);
@@ -563,7 +563,7 @@ public class LineJoint extends Joint {
 			}
 		}
 		
-		Mat22.mulToOut(R1, m_localYAxis1, m_perp);
+		Mat22.mulToOutUnsafe(R1, m_localYAxis1, m_perp);
 		
 		temp.set(d).addLocal(r1);
 		m_s1 = Vec2.cross(temp, m_perp);
@@ -584,8 +584,8 @@ public class LineJoint extends Joint {
 			float k12 = i1 * m_s1 * m_a1 + i2 * m_s2 * m_a2;
 			float k22 = m1 + m2 + i1 * m_a1 * m_a1 + i2 * m_a2 * m_a2;
 			
-			m_K.col1.set(k11, k12);
-			m_K.col2.set(k12, k22);
+			m_K.ex.set(k11, k12);
+			m_K.ey.set(k12, k22);
 			
 			final Vec2 C = pool.popVec2();
 			C.x = C1;

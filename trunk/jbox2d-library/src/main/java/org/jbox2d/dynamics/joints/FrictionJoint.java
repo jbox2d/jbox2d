@@ -141,8 +141,8 @@ public class FrictionJoint extends Joint {
 		
 		rA.set(m_localAnchorA).subLocal(bA.getLocalCenter());
 		rB.set(m_localAnchorB).subLocal(bB.getLocalCenter());
-		Mat22.mulToOut(bA.getTransform().R, rA, rA);
-		Mat22.mulToOut(bB.getTransform().R, rB, rB);
+		Mat22.mulToOut(bA.getTransform().q, rA, rA);
+		Mat22.mulToOut(bB.getTransform().q, rB, rB);
 		
 		// J = [-I -r1_skew I r2_skew]
 		// [ 0 -1 0 1]
@@ -157,22 +157,22 @@ public class FrictionJoint extends Joint {
 		float iA = bA.m_invI, iB = bB.m_invI;
 		
 		final Mat22 K1 = pool.popMat22();
-		K1.col1.x = mA + mB;
-		K1.col2.x = 0.0f;
-		K1.col1.y = 0.0f;
-		K1.col2.y = mA + mB;
+		K1.ex.x = mA + mB;
+		K1.ey.x = 0.0f;
+		K1.ex.y = 0.0f;
+		K1.ey.y = mA + mB;
 		
 		final Mat22 K2 = pool.popMat22();
-		K2.col1.x = iA * rA.y * rA.y;
-		K2.col2.x = -iA * rA.x * rA.y;
-		K2.col1.y = -iA * rA.x * rA.y;
-		K2.col2.y = iA * rA.x * rA.x;
+		K2.ex.x = iA * rA.y * rA.y;
+		K2.ey.x = -iA * rA.x * rA.y;
+		K2.ex.y = -iA * rA.x * rA.y;
+		K2.ey.y = iA * rA.x * rA.x;
 		
 		final Mat22 K3 = pool.popMat22();
-		K3.col1.x = iB * rB.y * rB.y;
-		K3.col2.x = -iB * rB.x * rB.y;
-		K3.col1.y = -iB * rB.x * rB.y;
-		K3.col2.y = iB * rB.x * rB.x;
+		K3.ex.x = iB * rB.y * rB.y;
+		K3.ey.x = -iB * rB.x * rB.y;
+		K3.ex.y = -iB * rB.x * rB.y;
+		K3.ey.y = iB * rB.x * rB.x;
 		
 		K1.addLocal(K2).addLocal(K3);
 		m_linearMass.set(K1).invertLocal();
@@ -231,8 +231,8 @@ public class FrictionJoint extends Joint {
 		
 		rA.set(m_localAnchorA).subLocal(bA.getLocalCenter());
 		rB.set(m_localAnchorB).subLocal(bB.getLocalCenter());
-		Mat22.mulToOut(bA.getTransform().R, rA, rA);
-		Mat22.mulToOut(bB.getTransform().R, rB, rB);
+		Mat22.mulToOut(bA.getTransform().q, rA, rA);
+		Mat22.mulToOut(bB.getTransform().q, rB, rB);
 		
 		// Solve angular friction
 		{
@@ -258,7 +258,7 @@ public class FrictionJoint extends Joint {
 			Cdot.addLocal(vB).subLocal(vA).subLocal(temp);
 			
 			final Vec2 impulse = pool.popVec2();
-			Mat22.mulToOut(m_linearMass, Cdot, impulse);
+			Mat22.mulToOutUnsafe(m_linearMass, Cdot, impulse);
 			impulse.negateLocal();
 			
 			

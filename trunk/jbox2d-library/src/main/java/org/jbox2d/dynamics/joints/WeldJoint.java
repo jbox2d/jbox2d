@@ -112,8 +112,8 @@ public class WeldJoint extends Joint {
 		rA.set(m_localAnchorA).subLocal(bA.getLocalCenter());
 		rB.set(m_localAnchorB).subLocal(bB.getLocalCenter());
 		
-		Mat22.mulToOut(bA.getTransform().R, rA, rA);
-		Mat22.mulToOut(bB.getTransform().R, rB, rB);
+		Mat22.mulToOut(bA.getTransform().q, rA, rA);
+		Mat22.mulToOut(bB.getTransform().q, rB, rB);
 
 		// J = [-I -r1_skew I r2_skew]
 		//     [ 0       -1 0       1]
@@ -127,15 +127,15 @@ public class WeldJoint extends Joint {
 		float mA = bA.m_invMass, mB = bB.m_invMass;
 		float iA = bA.m_invI, iB = bB.m_invI;
 
-		m_mass.col1.x = mA + mB + rA.y * rA.y * iA + rB.y * rB.y * iB;
-		m_mass.col2.x = -rA.y * rA.x * iA - rB.y * rB.x * iB;
-		m_mass.col3.x = -rA.y * iA - rB.y * iB;
-		m_mass.col1.y = m_mass.col2.x;
-		m_mass.col2.y = mA + mB + rA.x * rA.x * iA + rB.x * rB.x * iB;
-		m_mass.col3.y = rA.x * iA + rB.x * iB;
-		m_mass.col1.z = m_mass.col3.x;
-		m_mass.col2.z = m_mass.col3.y;
-		m_mass.col3.z = iA + iB;
+		m_mass.ex.x = mA + mB + rA.y * rA.y * iA + rB.y * rB.y * iB;
+		m_mass.ey.x = -rA.y * rA.x * iA - rB.y * rB.x * iB;
+		m_mass.ez.x = -rA.y * iA - rB.y * iB;
+		m_mass.ex.y = m_mass.ey.x;
+		m_mass.ey.y = mA + mB + rA.x * rA.x * iA + rB.x * rB.x * iB;
+		m_mass.ez.y = rA.x * iA + rB.x * iB;
+		m_mass.ex.z = m_mass.ez.x;
+		m_mass.ey.z = m_mass.ez.y;
+		m_mass.ez.z = iA + iB;
 
 		if (step.warmStarting)
 		{
@@ -183,8 +183,8 @@ public class WeldJoint extends Joint {
 		final Vec2 rB = pool.popVec2();
 		rA.set(m_localAnchorA).subLocal(bA.getLocalCenter());
 		rB.set(m_localAnchorB).subLocal(bB.getLocalCenter());
-		Mat22.mulToOut(bA.getTransform().R, rA, rA);
-		Mat22.mulToOut(bB.getTransform().R, rB, rB);
+		Mat22.mulToOut(bA.getTransform().q, rA, rA);
+		Mat22.mulToOut(bB.getTransform().q, rB, rB);
 		
 		
 		final Vec2 Cdot1 = pool.popVec2();
@@ -237,8 +237,8 @@ public class WeldJoint extends Joint {
 		final Vec2 rB = pool.popVec2();
 		rA.set(m_localAnchorA).subLocal(bA.getLocalCenter());
 		rB.set(m_localAnchorB).subLocal(bB.getLocalCenter());
-		Mat22.mulToOut(bA.getTransform().R, rA, rA);
-		Mat22.mulToOut(bB.getTransform().R, rB, rB);
+		Mat22.mulToOut(bA.getTransform().q, rA, rA);
+		Mat22.mulToOut(bB.getTransform().q, rB, rB);
 		
 		final Vec2 C1 = pool.popVec2();
 		C1.set(bB.m_sweep.c).addLocal(rB).subLocal(bA.m_sweep.c).subLocal(rA);
@@ -253,15 +253,15 @@ public class WeldJoint extends Joint {
 			iB *= 1.0f;
 		}
 
-		m_mass.col1.x = mA + mB + rA.y * rA.y * iA + rB.y * rB.y * iB;
-		m_mass.col2.x = -rA.y * rA.x * iA - rB.y * rB.x * iB;
-		m_mass.col3.x = -rA.y * iA - rB.y * iB;
-		m_mass.col1.y = m_mass.col2.x;
-		m_mass.col2.y = mA + mB + rA.x * rA.x * iA + rB.x * rB.x * iB;
-		m_mass.col3.y = rA.x * iA + rB.x * iB;
-		m_mass.col1.z = m_mass.col3.x;
-		m_mass.col2.z = m_mass.col3.y;
-		m_mass.col3.z = iA + iB;
+		m_mass.ex.x = mA + mB + rA.y * rA.y * iA + rB.y * rB.y * iB;
+		m_mass.ey.x = -rA.y * rA.x * iA - rB.y * rB.x * iB;
+		m_mass.ez.x = -rA.y * iA - rB.y * iB;
+		m_mass.ex.y = m_mass.ey.x;
+		m_mass.ey.y = mA + mB + rA.x * rA.x * iA + rB.x * rB.x * iB;
+		m_mass.ez.y = rA.x * iA + rB.x * iB;
+		m_mass.ex.z = m_mass.ez.x;
+		m_mass.ey.z = m_mass.ez.y;
+		m_mass.ez.z = iA + iB;
 
 		final Vec3 C = pool.popVec3();
 		final Vec3 impulse = pool.popVec3();

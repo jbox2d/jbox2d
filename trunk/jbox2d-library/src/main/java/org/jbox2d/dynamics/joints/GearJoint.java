@@ -195,7 +195,7 @@ public class GearJoint extends Joint {
 		final Vec2 p = pool.popVec2();
 		
 		r.set(m_localAnchor2).subLocal(m_bodyB.getLocalCenter());
-		Mat22.mulToOut(m_bodyB.getTransform().R, r, r);
+		Mat22.mulToOut(m_bodyB.getTransform().q, r, r);
 		p.set(m_J.linearB).mulLocal(m_impulse);
 		float L = m_impulse * m_J.angularB - Vec2.cross(r, p);
 		
@@ -231,10 +231,10 @@ public class GearJoint extends Joint {
 		else {
 			final Vec2 ug = pool.popVec2();
 			final Vec2 r = pool.popVec2();
-			Mat22.mulToOut(g1.getTransform().R, m_prismatic1.m_localXAxis1, ug);
+			Mat22.mulToOutUnsafe(g1.getTransform().q, m_prismatic1.m_localXAxis1, ug);
 			
 			r.set(m_localAnchor1).subLocal(b1.getLocalCenter());
-			Mat22.mulToOut(b1.getTransform().R, r, r);
+			Mat22.mulToOut(b1.getTransform().q, r, r);
 			float crug = Vec2.cross(r, ug);
 			m_J.linearA.set(ug).negateLocal();
 			m_J.angularA = -crug;
@@ -250,10 +250,10 @@ public class GearJoint extends Joint {
 			final Vec2 ug = pool.popVec2();
 			final Vec2 r = pool.popVec2();
 			
-			Mat22.mulToOut(g2.getTransform().R, m_prismatic2.m_localXAxis1, ug);
+			Mat22.mulToOutUnsafe(g2.getTransform().q, m_prismatic2.m_localXAxis1, ug);
 			
 			r.set(m_localAnchor2).subLocal(b2.getLocalCenter());
-			Mat22.mulToOut(b2.getTransform().R, r, r);
+			Mat22.mulToOut(b2.getTransform().q, r, r);
 			float crug = Vec2.cross(r, ug);
 			m_J.linearB.set(ug).mulLocal(-m_ratio);
 			m_J.angularB = -m_ratio * crug;

@@ -352,8 +352,8 @@ public class Fixture {
 		m_aabb.upperBound.y = pool1.upperBound.y > pool2.upperBound.y ? pool1.upperBound.y : pool2.upperBound.y;
 		
 		final Vec2 disp = pool1.lowerBound; // just use this vec for pooling
-		disp.x = transform2.position.x - transform1.position.x;
-		disp.y = transform2.position.y - transform1.position.y;
+		disp.x = transform2.p.x - transform1.p.x;
+		disp.y = transform2.p.y - transform1.p.y;
 		
 		broadPhase.moveProxy( m_proxy, m_aabb, disp);
 	}
