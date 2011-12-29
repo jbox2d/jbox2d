@@ -204,12 +204,12 @@ public class Collision {
     
     // after inline:
     final Vec2 v = circle1.m_p;
-		final float pAy = xfA.position.y + xfA.R.col1.y * v.x + xfA.R.col2.y * v.y;
-    final float pAx = xfA.position.x + xfA.R.col1.x * v.x + xfA.R.col2.x * v.y;
+		final float pAy = xfA.p.y + xfA.q.ex.y * v.x + xfA.q.ey.y * v.y;
+    final float pAx = xfA.p.x + xfA.q.ex.x * v.x + xfA.q.ey.x * v.y;
 
     final Vec2 v1 = circle2.m_p;
-		final float pBy = xfB.position.y + xfB.R.col1.y * v1.x + xfB.R.col2.y * v1.y;
-    final float pBx = xfB.position.x + xfB.R.col1.x * v1.x + xfB.R.col2.x * v1.y;
+		final float pBy = xfB.p.y + xfB.q.ex.y * v1.x + xfB.q.ey.y * v1.y;
+    final float pBx = xfB.p.x + xfB.q.ex.x * v1.x + xfB.q.ey.x * v1.y;
     
     final float dx = pBx - pAx;
     final float dy = pBy - pAy;
@@ -252,12 +252,12 @@ public class Collision {
 //    Transform.mulToOut(xfB, circle.m_p, c);
 //    Transform.mulTransToOut(xfA, c, cLocal);
     // after inline:
-		final float cy = xfB.position.y + xfB.R.col1.y * v.x + xfB.R.col2.y * v.y;
-    final float cx = xfB.position.x + xfB.R.col1.x * v.x + xfB.R.col2.x * v.y;
-		final float v1x = cx - xfA.position.x;
-    final float v1y = cy - xfA.position.y;
-    final Vec2 b = xfA.R.col1;
-    final Vec2 b1 = xfA.R.col2;
+		final float cy = xfB.p.y + xfB.q.ex.y * v.x + xfB.q.ey.y * v.y;
+    final float cx = xfB.p.x + xfB.q.ex.x * v.x + xfB.q.ey.x * v.y;
+		final float v1x = cx - xfA.p.x;
+    final float v1y = cy - xfA.p.y;
+    final Vec2 b = xfA.q.ex;
+    final Vec2 b1 = xfA.q.ey;
     final float cLocaly = v1x * b1.x + v1y * b1.y;
     final float cLocalx = v1x * b.x + v1y * b.y;
     // end inline
@@ -452,13 +452,13 @@ public class Collision {
 //		Mat22.mulTransToOut(xf2.R, normal1World, normal1);
 		// after inline:
     // R.mulToOut(v,out);
-    final Mat22 R = xf1.R;
+    final Mat22 R = xf1.q;
     final Vec2 v = normals1[edge1];
-    final float normal1Worldy = R.col1.y * v.x + R.col2.y * v.y;
-    final float normal1Worldx = R.col1.x * v.x + R.col2.x * v.y;
-    final Mat22 R1 = xf2.R;
-    final float normal1x = normal1Worldx * R1.col1.x + normal1Worldy * R1.col1.y;
-    final float normal1y = normal1Worldx * R1.col2.x + normal1Worldy * R1.col2.y;
+    final float normal1Worldy = R.ex.y * v.x + R.ey.y * v.y;
+    final float normal1Worldx = R.ex.x * v.x + R.ey.x * v.y;
+    final Mat22 R1 = xf2.q;
+    final float normal1x = normal1Worldx * R1.ex.x + normal1Worldy * R1.ex.y;
+    final float normal1y = normal1Worldx * R1.ey.x + normal1Worldy * R1.ey.y;
     // end inline
 		
 		// Find support vertex on poly2 for -normal.
@@ -483,11 +483,11 @@ public class Collision {
 //		float separation = Vec2.dot(v2.subLocal(v1), normal1World);
 		// after inline:
     final Vec2 v3 = vertices1[edge1];
-    final float v1y = xf1.position.y + R.col1.y * v3.x + R.col2.y * v3.y;
-    final float v1x = xf1.position.x + R.col1.x * v3.x + R.col2.x * v3.y;
+    final float v1y = xf1.p.y + R.ex.y * v3.x + R.ey.y * v3.y;
+    final float v1x = xf1.p.x + R.ex.x * v3.x + R.ey.x * v3.y;
     final Vec2 v4 = vertices2[index];
-    final float v2y = xf2.position.y + R1.col1.y * v4.x + R1.col2.y * v4.y - v1y;
-    final float v2x = xf2.position.x + R1.col1.x * v4.x + R1.col2.x * v4.y - v1x;
+    final float v2y = xf2.p.y + R1.ex.y * v4.x + R1.ey.y * v4.y - v1y;
+    final float v2x = xf2.p.x + R1.ex.x * v4.x + R1.ey.x * v4.y - v1x;
         
 		return v2x * normal1Worldx + v2y * normal1Worldy;
 		// end inline
@@ -519,17 +519,17 @@ public class Collision {
 //		
 //		Mat22.mulTransToOut(xf1.R, d, dLocal1);
 		// after inline:
-		final float predy = xf2.position.y + xf2.R.col1.y * v.x + xf2.R.col2.y * v.y;
-    final float predx = xf2.position.x + xf2.R.col1.x * v.x + xf2.R.col2.x * v.y;
+		final float predy = xf2.p.y + xf2.q.ex.y * v.x + xf2.q.ey.y * v.y;
+    final float predx = xf2.p.x + xf2.q.ex.x * v.x + xf2.q.ey.x * v.y;
     final Vec2 v1 = poly1.m_centroid;
-    final float tempy = xf1.position.y + xf1.R.col1.y * v1.x + xf1.R.col2.y * v1.y;
-    final float tempx = xf1.position.x + xf1.R.col1.x * v1.x + xf1.R.col2.x * v1.y;
+    final float tempy = xf1.p.y + xf1.q.ex.y * v1.x + xf1.q.ey.y * v1.y;
+    final float tempx = xf1.p.x + xf1.q.ex.x * v1.x + xf1.q.ey.x * v1.y;
     final float dx = predx - tempx;
     final float dy = predy - tempy;
     
-    final Mat22 R = xf1.R;
-    final float dLocal1x = dx * R.col1.x + dy * R.col1.y;
-    final float dLocal1y = dx * R.col2.x + dy * R.col2.y;
+    final Mat22 R = xf1.q;
+    final float dLocal1x = dx * R.ex.x + dy * R.ex.y;
+    final float dLocal1y = dx * R.ey.x + dy * R.ey.y;
     // end inline
 		
 		// Find edge normal on poly1 that has the largest projection onto d.
@@ -600,6 +600,8 @@ public class Collision {
 		results.separation = bestSeparation;
 	}
 	
+	
+	private static final Vec2 out = new Vec2();
 	// djm pooling from above
 	public final void findIncidentEdge(final ClipVertex[] c, final PolygonShape poly1, final Transform xf1, int edge1,
 			final PolygonShape poly2, final Transform xf2) {
@@ -613,9 +615,10 @@ public class Collision {
 		assert (0 <= edge1 && edge1 < count1);
 		
 		// Get the normal of the reference edge in poly2's frame.
-		Mat22.mulToOut(xf1.R, normals1[edge1], normal1); // temporary
+		Mat22.mulToOutUnsafe(xf1.q, normals1[edge1], normal1); // temporary
 		// b2Vec2 normal1 = b2MulT(xf2.R, b2Mul(xf1.R, normals1[edge1]));
-		Mat22.mulTransToOut(xf2.R, normal1, normal1);
+		Mat22.mulTransToOutUnsafe(xf2.q, normal1, out);
+		normal1.set(out);
 		
 		// Find the incident edge on poly2.
 		int index = 0;
@@ -726,15 +729,15 @@ public class Collision {
 		localTangent.set(v12).subLocal(v11);
 		localTangent.normalize();
 		
-		Vec2.crossToOut(localTangent, 1f, localNormal); // Vec2 localNormal = Cross(dv,
+		Vec2.crossToOutUnsafe(localTangent, 1f, localNormal); // Vec2 localNormal = Cross(dv,
 														// 1.0f);
 		
 		planePoint.set(v11).addLocal(v12).mulLocal(.5f); // Vec2 planePoint = 0.5f * (v11
 															// + v12);
 		
-		Mat22.mulToOut(xf1.R, localTangent, tangent); // Vec2 sideNormal = Mul(xf1.R, v12
+		Mat22.mulToOutUnsafe(xf1.q, localTangent, tangent); // Vec2 sideNormal = Mul(xf1.R, v12
 														// - v11);
-		Vec2.crossToOut(tangent, 1f, normal); // Vec2 frontNormal = Cross(sideNormal,
+		Vec2.crossToOutUnsafe(tangent, 1f, normal); // Vec2 frontNormal = Cross(sideNormal,
 												// 1.0f);
 		
 		Transform.mulToOut(xf1, v11, v11);

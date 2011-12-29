@@ -58,33 +58,33 @@ public class Transform implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/** The translation caused by the transform */
-	public final Vec2 position;
+	public final Vec2 p;
 	
 	/** A matrix representing a rotation */
-	public final Mat22 R;
+	public final Mat22 q;
 	
 	/** The default constructor. */
 	public Transform() {
-		position = new Vec2();
-		R = new Mat22();
+		p = new Vec2();
+		q = new Mat22();
 	}
 	
 	/** Initialize as a copy of another transform. */
 	public Transform(final Transform xf) {
-		position = xf.position.clone();
-		R = xf.R.clone();
+		p = xf.p.clone();
+		q = xf.q.clone();
 	}
 	
 	/** Initialize using a position vector and a rotation matrix. */
 	public Transform(final Vec2 _position, final Mat22 _R) {
-		position = _position.clone();
-		R = _R.clone();
+		p = _position.clone();
+		q = _R.clone();
 	}
 	
 	/** Set this to equal another transform. */
 	public final Transform set(final Transform xf) {
-		position.set(xf.position);
-		R.set(xf.R);
+		p.set(xf.p);
+		q.set(xf.q);
 		return this;
 	}
 	
@@ -95,49 +95,48 @@ public class Transform implements Serializable {
 	 * @param angle
 	 */
 	public final void set(Vec2 p, float angle) {
-		position.set(p);
-		R.set(angle);
+		this.p.set(p);
+		q.set(angle);
 	}
 	
 	/**
 	 * Calculate the angle that the rotation matrix represents.
 	 */
 	public final float getAngle() {
-		return MathUtils.atan2(R.col1.y, R.col1.x);
+		return MathUtils.atan2(q.ex.y, q.ex.x);
 	}
 	
 	/** Set this to the identity transform. */
 	public final void setIdentity() {
-		position.setZero();
-		R.setIdentity();
+		p.setZero();
+		q.setIdentity();
 	}
 	
 	public final static Vec2 mul(final Transform T, final Vec2 v) {
-		return new Vec2(T.position.x + T.R.col1.x * v.x + T.R.col2.x * v.y, T.position.y + T.R.col1.y * v.x
-				+ T.R.col2.y * v.y);
+		return new Vec2(T.p.x + T.q.ex.x * v.x + T.q.ey.x * v.y, T.p.y + T.q.ex.y * v.x
+				+ T.q.ey.y * v.y);
 	}
 	
-	/* djm added */
 	public final static void mulToOut(final Transform T, final Vec2 v, final Vec2 out) {
-		final float tempy = T.position.y + T.R.col1.y * v.x + T.R.col2.y * v.y;
-		out.x = T.position.x + T.R.col1.x * v.x + T.R.col2.x * v.y;
+		final float tempy = T.p.y + T.q.ex.y * v.x + T.q.ey.y * v.y;
+		out.x = T.p.x + T.q.ex.x * v.x + T.q.ey.x * v.y;
 		out.y = tempy;
 	}
 	
 	public final static Vec2 mulTrans(final Transform T, final Vec2 v) {
-		final float v1x = v.x - T.position.x;
-		final float v1y = v.y - T.position.y;
-		final Vec2 b = T.R.col1;
-		final Vec2 b1 = T.R.col2;
+		final float v1x = v.x - T.p.x;
+		final float v1y = v.y - T.p.y;
+		final Vec2 b = T.q.ex;
+		final Vec2 b1 = T.q.ey;
 		return new Vec2((v1x * b.x + v1y * b.y), (v1x * b1.x + v1y * b1.y));
 		// return T.R.mulT(v.sub(T.position));
 	}
 	
 	public final static void mulTransToOut(final Transform T, final Vec2 v, final Vec2 out) {
-		final float v1x = v.x - T.position.x;
-		final float v1y = v.y - T.position.y;
-		final Vec2 b = T.R.col1;
-		final Vec2 b1 = T.R.col2;
+		final float v1x = v.x - T.p.x;
+		final float v1y = v.y - T.p.y;
+		final Vec2 b = T.q.ex;
+		final Vec2 b1 = T.q.ey;
 		final float tempy = v1x * b1.x + v1y * b1.y;
 		out.x = v1x * b.x + v1y * b.y;
 		out.y = tempy;
@@ -146,8 +145,8 @@ public class Transform implements Serializable {
 	@Override
 	public final String toString() {
 		String s = "XForm:\n";
-		s += "Position: " + position + "\n";
-		s += "R: \n" + R + "\n";
+		s += "Position: " + p + "\n";
+		s += "R: \n" + q + "\n";
 		return s;
 	}
 }

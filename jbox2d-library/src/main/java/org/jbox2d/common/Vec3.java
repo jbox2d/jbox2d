@@ -47,8 +47,6 @@ package org.jbox2d.common;
 
 import java.io.Serializable;
 
-// updated to rev 100
-
 /**
  * @author Daniel Murphy
  */

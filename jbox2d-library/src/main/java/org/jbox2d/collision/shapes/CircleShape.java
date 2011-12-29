@@ -136,8 +136,8 @@ public class CircleShape extends Shape {
 	@Override
 	public final boolean testPoint(final Transform transform, final Vec2 p) {
 		final Vec2 center = pool1;
-		Mat22.mulToOut(transform.R, m_p, center);
-		center.addLocal(transform.position);
+		Mat22.mulToOutUnsafe(transform.q, m_p, center);
+		center.addLocal(transform.p);
 		
 		final Vec2 d = center.subLocal(p).negateLocal();
 		return Vec2.dot(d, d) <= m_radius * m_radius;
@@ -159,8 +159,8 @@ public class CircleShape extends Shape {
 		final Vec2 s = pool2;
 		final Vec2 r = pool3;
 		
-		Mat22.mulToOut(argTransform.R, m_p, position);
-		position.addLocal(argTransform.position);
+		Mat22.mulToOutUnsafe(argTransform.q, m_p, position);
+		position.addLocal(argTransform.p);
 		s.set(argInput.p1).subLocal(position);
 		final float b = Vec2.dot(s, s) - m_radius * m_radius;
 		
@@ -198,8 +198,8 @@ public class CircleShape extends Shape {
 	@Override
 	public final void computeAABB(final AABB argAabb, final Transform argTransform) {
 		final Vec2 p = pool1;
-		Mat22.mulToOut(argTransform.R, m_p, p);
-		p.addLocal(argTransform.position);
+		Mat22.mulToOutUnsafe(argTransform.q, m_p, p);
+		p.addLocal(argTransform.p);
 		
 		argAabb.lowerBound.x = p.x - m_radius;
 		argAabb.lowerBound.y = p.y - m_radius;

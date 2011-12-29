@@ -147,10 +147,10 @@ public class PrismaticJoint extends Joint {
 		Vec2 temp3 = pc[8];
 		
 		temp.set(m_localAnchor1).subLocal(b1.getLocalCenter());
-		Mat22.mulToOut(b1.getTransform().R, temp, r1);
+		Mat22.mulToOutUnsafe(b1.getTransform().q, temp, r1);
 		
 		temp.set(m_localAnchor2).subLocal(b2.getLocalCenter());
-		Mat22.mulToOut(b2.getTransform().R, temp, r2);
+		Mat22.mulToOutUnsafe(b2.getTransform().q, temp, r2);
 		
 		p1.set(b1.m_sweep.c).addLocal(r1);
 		p2.set(b2.m_sweep.c).addLocal(r2);
@@ -263,8 +263,8 @@ public class PrismaticJoint extends Joint {
 		
 		r1.set(m_localAnchor1).subLocal(m_localCenterA);
 		r2.set(m_localAnchor2).subLocal(m_localCenterB);
-		Mat22.mulToOut(xf1.R, r1, r1);
-		Mat22.mulToOut(xf2.R, r2, r2);
+		Mat22.mulToOut(xf1.q, r1, r1);
+		Mat22.mulToOut(xf2.q, r2, r2);
 		
 		d.set(b2.m_sweep.c).addLocal(r2).subLocal(b1.m_sweep.c).subLocal(r1);
 		
@@ -275,7 +275,7 @@ public class PrismaticJoint extends Joint {
 		
 		// Compute motor Jacobian and effective mass.
 		{
-			Mat22.mulToOut(xf1.R, m_localXAxis1, m_axis);
+			Mat22.mulToOutUnsafe(xf1.q, m_localXAxis1, m_axis);
 			temp.set(d).addLocal(r1);
 			m_a1 = Vec2.cross(temp, m_axis);
 			m_a2 = Vec2.cross(r2, m_axis);
@@ -288,7 +288,7 @@ public class PrismaticJoint extends Joint {
 		
 		// Prismatic constraint.
 		{
-			Mat22.mulToOut(xf1.R, m_localYAxis1, m_perp);
+			Mat22.mulToOutUnsafe(xf1.q, m_localYAxis1, m_perp);
 			
 			temp.set(d).addLocal(r1);
 			m_s1 = Vec2.cross(temp, m_perp);
@@ -304,9 +304,9 @@ public class PrismaticJoint extends Joint {
 			float k23 = i1 * m_a1 + i2 * m_a2;
 			float k33 = m1 + m2 + i1 * m_a1 * m_a1 + i2 * m_a2 * m_a2;
 			
-			m_K.col1.set(k11, k12, k13);
-			m_K.col2.set(k12, k22, k23);
-			m_K.col3.set(k13, k23, k33);
+			m_K.ex.set(k11, k12, k13);
+			m_K.ey.set(k12, k22, k23);
+			m_K.ez.set(k13, k23, k33);
 		}
 		
 		// Compute motor and limit terms.
@@ -406,7 +406,7 @@ public class PrismaticJoint extends Joint {
 		d.set(c2).addLocal(r2).subLocal(c1).subLocal(r1);
 		
 		if (m_enableLimit) {
-			Mat22.mulToOut(R1, m_localXAxis1, m_axis);
+			Mat22.mulToOutUnsafe(R1, m_localXAxis1, m_axis);
 			
 			temp.set(d).addLocal(r1);
 			m_a1 = Vec2.cross(temp, m_axis);
@@ -435,7 +435,7 @@ public class PrismaticJoint extends Joint {
 			}
 		}
 		
-		Mat22.mulToOut(R1, m_localYAxis1, m_perp);
+		Mat22.mulToOutUnsafe(R1, m_localYAxis1, m_perp);
 		
 		temp.set(d).addLocal(r1);
 		m_s1 = Vec2.cross(temp, m_perp);
@@ -461,9 +461,9 @@ public class PrismaticJoint extends Joint {
 			float k23 = i1 * m_a1 + i2 * m_a2;
 			float k33 = m1 + m2 + i1 * m_a1 * m_a1 + i2 * m_a2 * m_a2;
 			
-			m_K.col1.set(k11, k12, k13);
-			m_K.col2.set(k12, k22, k23);
-			m_K.col3.set(k13, k23, k33);
+			m_K.ex.set(k11, k12, k13);
+			m_K.ey.set(k12, k22, k23);
+			m_K.ez.set(k13, k23, k33);
 			
 			final Vec3 C = pool.popVec3();
 			C.x = C1.x;
@@ -481,8 +481,8 @@ public class PrismaticJoint extends Joint {
 			float k12 = i1 * m_s1 + i2 * m_s2;
 			float k22 = i1 + i2;
 			
-			m_K.col1.set(k11, k12, 0.0f);
-			m_K.col2.set(k12, k22, 0.0f);
+			m_K.ex.set(k11, k12, 0.0f);
+			m_K.ey.set(k12, k22, 0.0f);
 			
 			m_K.solve22ToOut(C1.negateLocal(), temp);
 			C1.negateLocal();
@@ -595,7 +595,7 @@ public class PrismaticJoint extends Joint {
 			final Vec2 b = pool.popVec2();
 			final Vec2 f2r = pool.popVec2();
 
-			temp.set(m_K.col3.x, m_K.col3.y).mulLocal(m_impulse.z - f1.z);
+			temp.set(m_K.ez.x, m_K.ez.y).mulLocal(m_impulse.z - f1.z);
 			b.set(Cdot1).negateLocal().subLocal(temp);
 			
 			temp.set(f1.x, f1.y);

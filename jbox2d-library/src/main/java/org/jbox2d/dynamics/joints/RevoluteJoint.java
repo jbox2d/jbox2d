@@ -133,8 +133,8 @@ public class RevoluteJoint extends Joint {
 		// Compute the effective mass matrix.
 		r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 		r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
-		Mat22.mulToOut(b1.getTransform().R, r1, r1);
-		Mat22.mulToOut(b2.getTransform().R, r2, r2);
+		Mat22.mulToOut(b1.getTransform().q, r1, r1);
+		Mat22.mulToOut(b2.getTransform().q, r2, r2);
 		
 		// J = [-I -r1_skew I r2_skew]
 		// [ 0 -1 0 1]
@@ -154,15 +154,15 @@ public class RevoluteJoint extends Joint {
 		float m1 = b1.m_invMass, m2 = b2.m_invMass;
 		float i1 = b1.m_invI, i2 = b2.m_invI;
 		
-		m_mass.col1.x = m1 + m2 + r1.y * r1.y * i1 + r2.y * r2.y * i2;
-		m_mass.col2.x = -r1.y * r1.x * i1 - r2.y * r2.x * i2;
-		m_mass.col3.x = -r1.y * i1 - r2.y * i2;
-		m_mass.col1.y = m_mass.col2.x;
-		m_mass.col2.y = m1 + m2 + r1.x * r1.x * i1 + r2.x * r2.x * i2;
-		m_mass.col3.y = r1.x * i1 + r2.x * i2;
-		m_mass.col1.z = m_mass.col3.x;
-		m_mass.col2.z = m_mass.col3.y;
-		m_mass.col3.z = i1 + i2;
+		m_mass.ex.x = m1 + m2 + r1.y * r1.y * i1 + r2.y * r2.y * i2;
+		m_mass.ey.x = -r1.y * r1.x * i1 - r2.y * r2.x * i2;
+		m_mass.ez.x = -r1.y * i1 - r2.y * i2;
+		m_mass.ex.y = m_mass.ey.x;
+		m_mass.ey.y = m1 + m2 + r1.x * r1.x * i1 + r2.x * r2.x * i2;
+		m_mass.ez.y = r1.x * i1 + r2.x * i2;
+		m_mass.ex.z = m_mass.ez.x;
+		m_mass.ey.z = m_mass.ez.y;
+		m_mass.ez.z = i1 + i2;
 		
 		m_motorMass = i1 + i2;
 		if (m_motorMass > 0.0f) {
@@ -262,8 +262,8 @@ public class RevoluteJoint extends Joint {
 			
 			r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 			r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
-			Mat22.mulToOut(b1.getTransform().R, r1, r1);
-			Mat22.mulToOut(b2.getTransform().R, r2, r2);
+			Mat22.mulToOut(b1.getTransform().q, r1, r1);
+			Mat22.mulToOut(b2.getTransform().q, r2, r2);
 			// Vec2 r1 = b2Mul(b1.getTransform().R, m_localAnchor1 - b1.getLocalCenter());
 			// Vec2 r2 = b2Mul(b2.getTransform().R, m_localAnchor2 - b2.getLocalCenter());
 			
@@ -331,8 +331,8 @@ public class RevoluteJoint extends Joint {
 		else {
 			r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 			r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
-			Mat22.mulToOut(b1.getTransform().R, r1, r1);
-			Mat22.mulToOut(b2.getTransform().R, r2, r2);
+			Mat22.mulToOut(b1.getTransform().q, r1, r1);
+			Mat22.mulToOut(b2.getTransform().q, r2, r2);
 			// Vec2 r1 = b2Mul(b1.getTransform().R, m_localAnchor1 - b1.getLocalCenter());
 			// Vec2 r2 = b2Mul(b2.getTransform().R, m_localAnchor2 - b2.getLocalCenter());
 			
@@ -421,8 +421,8 @@ public class RevoluteJoint extends Joint {
 			
 			r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 			r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
-			Mat22.mulToOut(b1.getTransform().R, r1, r1);
-			Mat22.mulToOut(b2.getTransform().R, r2, r2);
+			Mat22.mulToOut(b1.getTransform().q, r1, r1);
+			Mat22.mulToOut(b2.getTransform().q, r2, r2);
 			
 			C.set(b2.m_sweep.c).addLocal(r2).subLocal(b1.m_sweep.c).subLocal(r1);
 			positionError = C.length();
@@ -456,22 +456,22 @@ public class RevoluteJoint extends Joint {
 			}
 			
 			Mat22 K1 = pool.popMat22();
-			K1.col1.x = invMass1 + invMass2;
-			K1.col2.x = 0.0f;
-			K1.col1.y = 0.0f;
-			K1.col2.y = invMass1 + invMass2;
+			K1.ex.x = invMass1 + invMass2;
+			K1.ey.x = 0.0f;
+			K1.ex.y = 0.0f;
+			K1.ey.y = invMass1 + invMass2;
 			
 			Mat22 K2 = pool.popMat22();
-			K2.col1.x = invI1 * r1.y * r1.y;
-			K2.col2.x = -invI1 * r1.x * r1.y;
-			K2.col1.y = -invI1 * r1.x * r1.y;
-			K2.col2.y = invI1 * r1.x * r1.x;
+			K2.ex.x = invI1 * r1.y * r1.y;
+			K2.ey.x = -invI1 * r1.x * r1.y;
+			K2.ex.y = -invI1 * r1.x * r1.y;
+			K2.ey.y = invI1 * r1.x * r1.x;
 			
 			Mat22 K3 = pool.popMat22();
-			K3.col1.x = invI2 * r2.y * r2.y;
-			K3.col2.x = -invI2 * r2.x * r2.y;
-			K3.col1.y = -invI2 * r2.x * r2.y;
-			K3.col2.y = invI2 * r2.x * r2.x;
+			K3.ex.x = invI2 * r2.y * r2.y;
+			K3.ey.x = -invI2 * r2.x * r2.y;
+			K3.ex.y = -invI2 * r2.x * r2.y;
+			K3.ey.y = invI2 * r2.x * r2.x;
 			
 			K1.addLocal(K2).addLocal(K3);
 			K1.solveToOut(C.negateLocal(), impulse); // just leave c negated

@@ -380,10 +380,10 @@ class SeparationFunction {
 			localPointB2.set(m_proxyB.getVertex(cache.indexB[1]));
 			
 			temp.set(localPointB2).subLocal(localPointB1);
-			Vec2.crossToOut(temp, 1f, m_axis);
+			Vec2.crossToOutUnsafe(temp, 1f, m_axis);
 			m_axis.normalize();
 			
-			Mat22.mulToOut(xfb.R, m_axis, normal);
+			Mat22.mulToOutUnsafe(xfb.q, m_axis, normal);
 			
 			m_localPoint.set(localPointB1).addLocal(localPointB2).mulLocal(.5f);
 			Transform.mulToOut(xfb, m_localPoint, pointB);
@@ -407,10 +407,10 @@ class SeparationFunction {
 			localPointA2.set(m_proxyA.getVertex(cache.indexA[1]));
 			
 			temp.set(localPointA2).subLocal(localPointA1);
-			Vec2.crossToOut(temp, 1.0f, m_axis);
+			Vec2.crossToOutUnsafe(temp, 1.0f, m_axis);
 			m_axis.normalize();
 			
-			Mat22.mulToOut(xfa.R, m_axis, normal);
+			Mat22.mulToOutUnsafe(xfa.q, m_axis, normal);
 			
 			m_localPoint.set(localPointA1).addLocal(localPointA2).mulLocal(.5f);
 			Transform.mulToOut(xfa, m_localPoint, pointA);
@@ -439,8 +439,8 @@ class SeparationFunction {
 		
 		switch (m_type) {
 			case POINTS : {
-				Mat22.mulTransToOut(xfa.R, m_axis, axisA);
-				Mat22.mulTransToOut(xfb.R, m_axis.negateLocal(), axisB);
+				Mat22.mulTransToOutUnsafe(xfa.q, m_axis, axisA);
+				Mat22.mulTransToOutUnsafe(xfb.q, m_axis.negateLocal(), axisB);
 				m_axis.negateLocal();
 				
 				indexes[0] = m_proxyA.getSupport(axisA);
@@ -456,10 +456,10 @@ class SeparationFunction {
 				return separation;
 			}
 			case FACE_A : {
-				Mat22.mulToOut(xfa.R, m_axis, normal);
+				Mat22.mulToOutUnsafe(xfa.q, m_axis, normal);
 				Transform.mulToOut(xfa, m_localPoint, pointA);
 				
-				Mat22.mulTransToOut(xfb.R, normal.negateLocal(), axisB);
+				Mat22.mulTransToOutUnsafe(xfb.q, normal.negateLocal(), axisB);
 				normal.negateLocal();
 				
 				indexes[0] = -1;
@@ -472,10 +472,10 @@ class SeparationFunction {
 				return separation;
 			}
 			case FACE_B : {
-				Mat22.mulToOut(xfb.R, m_axis, normal);
+				Mat22.mulToOutUnsafe(xfb.q, m_axis, normal);
 				Transform.mulToOut(xfb, m_localPoint, pointB);
 				
-				Mat22.mulTransToOut(xfa.R, normal.negateLocal(), axisA);
+				Mat22.mulTransToOutUnsafe(xfa.q, normal.negateLocal(), axisA);
 				normal.negateLocal();
 				
 				indexes[1] = -1;
@@ -501,8 +501,8 @@ class SeparationFunction {
 		
 		switch (m_type) {
 			case POINTS : {
-				Mat22.mulTransToOut(xfa.R, m_axis, axisA);
-				Mat22.mulTransToOut(xfb.R, m_axis.negateLocal(), axisB);
+				Mat22.mulTransToOutUnsafe(xfa.q, m_axis, axisA);
+				Mat22.mulTransToOutUnsafe(xfb.q, m_axis.negateLocal(), axisB);
 				m_axis.negateLocal();
 				
 				localPointA.set(m_proxyA.getVertex(indexA));
@@ -516,10 +516,10 @@ class SeparationFunction {
 			}
 			case FACE_A : {
 				// System.out.printf("We're faceA\n");
-				Mat22.mulToOut(xfa.R, m_axis, normal);
+				Mat22.mulToOutUnsafe(xfa.q, m_axis, normal);
 				Transform.mulToOut(xfa, m_localPoint, pointA);
 				
-				Mat22.mulTransToOut(xfb.R, normal.negateLocal(), axisB);
+				Mat22.mulTransToOutUnsafe(xfb.q, normal.negateLocal(), axisB);
 				normal.negateLocal();
 				
 				localPointB.set(m_proxyB.getVertex(indexB));
@@ -529,10 +529,10 @@ class SeparationFunction {
 			}
 			case FACE_B : {
 				// System.out.printf("We're faceB\n");
-				Mat22.mulToOut(xfb.R, m_axis, normal);
+				Mat22.mulToOutUnsafe(xfb.q, m_axis, normal);
 				Transform.mulToOut(xfb, m_localPoint, pointB);
 				
-				Mat22.mulTransToOut(xfa.R, normal.negateLocal(), axisA);
+				Mat22.mulTransToOutUnsafe(xfa.q, normal.negateLocal(), axisA);
 				normal.negateLocal();
 				
 				localPointA.set(m_proxyA.getVertex(indexA));

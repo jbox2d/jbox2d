@@ -203,14 +203,14 @@ public class ContactSolver {
 				//final float k_maxConditionNumber = 100.0f;
 				if (k11 * k11 < k_maxConditionNumber * (k11 * k22 - k12 * k12)){
 					// K is safe to invert.
-					cc.K.col1.x = k11;
-					cc.K.col1.y = k12;
-					cc.K.col2.x = k12;
-					cc.K.col2.y = k22;
-					cc.normalMass.col1.x = cc.K.col1.x;
-					cc.normalMass.col1.y = cc.K.col1.y;
-					cc.normalMass.col2.x = cc.K.col2.x;
-					cc.normalMass.col2.y = cc.K.col2.y;
+					cc.K.ex.x = k11;
+					cc.K.ex.y = k12;
+					cc.K.ey.x = k12;
+					cc.K.ey.y = k22;
+					cc.normalMass.ex.x = cc.K.ex.x;
+					cc.normalMass.ex.y = cc.K.ex.y;
+					cc.normalMass.ey.x = cc.K.ey.x;
+					cc.normalMass.ey.y = cc.K.ey.y;
 					cc.normalMass.invertLocal();
 				}
 				else{
@@ -237,7 +237,7 @@ public class ContactSolver {
 			final float invMassB = bodyB.m_invMass;
 			final float invIB = bodyB.m_invI;
 			final Vec2 normal = c.normal;
-			Vec2.crossToOut(normal, 1f, tangent);
+			Vec2.crossToOutUnsafe(normal, 1f, tangent);
 
 			for (int j = 0; j < c.pointCount; ++j){
 				final ContactConstraintPoint ccp = c.points[j];
@@ -472,8 +472,8 @@ public class ContactSolver {
 
 				b.x = vn1 - cp1.velocityBias;
 				b.y = vn2 - cp2.velocityBias;
-				temp2.x = c.K.col1.x * a.x + c.K.col2.x * a.y;
-				temp2.y = c.K.col1.y * a.x + c.K.col2.y * a.y;
+				temp2.x = c.K.ex.x * a.x + c.K.ey.x * a.y;
+				temp2.y = c.K.ex.y * a.x + c.K.ey.y * a.y;
 				b.x -= temp2.x;
 				b.y -= temp2.y;
 
@@ -492,7 +492,7 @@ public class ContactSolver {
 					// x' = - inv(A) * b'
 					//
 					//Vec2 x = - Mul(c.normalMass, b);
-					Mat22.mulToOut(c.normalMass, b, x);
+					Mat22.mulToOutUnsafe(c.normalMass, b, x);
 					x.mulLocal(-1);
 					
 					if (x.x >= 0.0f && x.y >= 0.0f){
@@ -549,7 +549,7 @@ public class ContactSolver {
 					x.x = - cp1.normalMass * b.x;
 					x.y = 0.0f;
 					vn1 = 0.0f;
-					vn2 = c.K.col1.y * x.x + b.y;
+					vn2 = c.K.ex.y * x.x + b.y;
 
 					if (x.x >= 0.0f && vn2 >= 0.0f)
 					{
@@ -605,7 +605,7 @@ public class ContactSolver {
 					//
 					x.x = 0.0f;
 					x.y = - cp2.normalMass * b.y;
-					vn1 = c.K.col2.x * x.y + b.x;
+					vn1 = c.K.ey.x * x.y + b.x;
 					vn2 = 0.0f;
 
 					if (x.y >= 0.0f && vn1 >= 0.0f)

@@ -198,8 +198,8 @@ public class PulleyJoint extends Joint {
 		r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 		r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
 		
-		Mat22.mulToOut(b1.getTransform().R, r1, r1);
-		Mat22.mulToOut(b2.getTransform().R, r2, r2);
+		Mat22.mulToOut(b1.getTransform().q, r1, r1);
+		Mat22.mulToOut(b2.getTransform().q, r2, r2);
 		
 		p1.set(b1.m_sweep.c).addLocal(r1);
 		p2.set(b2.m_sweep.c).addLocal(r2);
@@ -314,8 +314,8 @@ public class PulleyJoint extends Joint {
 		r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 		r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
 		
-		Mat22.mulToOut(b1.getTransform().R, r1, r1);
-		Mat22.mulToOut(b2.getTransform().R, r2, r2);
+		Mat22.mulToOut(b1.getTransform().q, r1, r1);
+		Mat22.mulToOut(b2.getTransform().q, r2, r2);
 		
 		if (m_state == LimitState.AT_UPPER) {
 			final Vec2 v1 = pool.popVec2();
@@ -427,8 +427,8 @@ public class PulleyJoint extends Joint {
 			r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 			r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
 			
-			Mat22.mulToOut(b1.getTransform().R, r1, r1);
-			Mat22.mulToOut(b2.getTransform().R, r2, r2);
+			Mat22.mulToOut(b1.getTransform().q, r1, r1);
+			Mat22.mulToOut(b2.getTransform().q, r2, r2);
 			
 			p1.set(b1.m_sweep.c).addLocal(r1);
 			p2.set(b2.m_sweep.c).addLocal(r2);
@@ -487,7 +487,7 @@ public class PulleyJoint extends Joint {
 			
 			r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 			
-			Mat22.mulToOut(b1.getTransform().R, r1, r1);
+			Mat22.mulToOut(b1.getTransform().q, r1, r1);
 			
 			p1.set(b1.m_sweep.c).addLocal(r1);
 			
@@ -527,7 +527,7 @@ public class PulleyJoint extends Joint {
 			
 			r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
 			
-			Mat22.mulToOut(b2.getTransform().R, r2, r2);
+			Mat22.mulToOut(b2.getTransform().q, r2, r2);
 			
 			p2.set(b2.m_sweep.c).addLocal(r2);
 			

@@ -85,10 +85,10 @@ public class WorldManifold {
 				
 				normal.x = 1;
 				normal.y = 0;
-				pointA.x = xfA.position.x + xfA.R.col1.x * manifold.localPoint.x + xfA.R.col2.x * manifold.localPoint.y;
-				pointA.y = xfA.position.y + xfA.R.col1.y * manifold.localPoint.x + xfA.R.col2.y * manifold.localPoint.y;
-				pointB.x = xfB.position.x + xfB.R.col1.x * manifold.points[0].localPoint.x + xfB.R.col2.x * manifold.points[0].localPoint.y;
-				pointB.y = xfB.position.y + xfB.R.col1.y * manifold.points[0].localPoint.x + xfB.R.col2.y * manifold.points[0].localPoint.y;
+				pointA.x = xfA.p.x + xfA.q.ex.x * manifold.localPoint.x + xfA.q.ey.x * manifold.localPoint.y;
+				pointA.y = xfA.p.y + xfA.q.ex.y * manifold.localPoint.x + xfA.q.ey.y * manifold.localPoint.y;
+				pointB.x = xfB.p.x + xfB.q.ex.x * manifold.points[0].localPoint.x + xfB.q.ey.x * manifold.points[0].localPoint.y;
+				pointB.y = xfB.p.y + xfB.q.ex.y * manifold.points[0].localPoint.x + xfB.q.ey.y * manifold.points[0].localPoint.y;
 				
 				if (MathUtils.distanceSquared(pointA, pointB) > Settings.EPSILON * Settings.EPSILON) {
 					normal.x = pointB.x - pointA.x;
@@ -130,10 +130,10 @@ public class WorldManifold {
 //				}
 				final Vec2 planePoint = pool3;
 				
-				normal.x = xfA.R.col1.x * manifold.localNormal.x + xfA.R.col2.x * manifold.localNormal.y;
-				normal.y = xfA.R.col1.y * manifold.localNormal.x + xfA.R.col2.y * manifold.localNormal.y;
-				planePoint.x = xfA.position.x + xfA.R.col1.x * manifold.localPoint.x + xfA.R.col2.x * manifold.localPoint.y;
-				planePoint.y = xfA.position.y + xfA.R.col1.y * manifold.localPoint.x + xfA.R.col2.y * manifold.localPoint.y;
+				normal.x = xfA.q.ex.x * manifold.localNormal.x + xfA.q.ey.x * manifold.localNormal.y;
+				normal.y = xfA.q.ex.y * manifold.localNormal.x + xfA.q.ey.y * manifold.localNormal.y;
+				planePoint.x = xfA.p.x + xfA.q.ex.x * manifold.localPoint.x + xfA.q.ey.x * manifold.localPoint.y;
+				planePoint.y = xfA.p.y + xfA.q.ex.y * manifold.localPoint.x + xfA.q.ey.y * manifold.localPoint.y;
 				
 				final Vec2 clipPoint = pool4;
 				
@@ -145,8 +145,8 @@ public class WorldManifold {
 					// points[i] = 0.5f * (cA + cB);
 					
 
-					clipPoint.x = xfB.position.x + xfB.R.col1.x * manifold.points[i].localPoint.x + xfB.R.col2.x * manifold.points[i].localPoint.y;
-					clipPoint.y = xfB.position.y + xfB.R.col1.y * manifold.points[i].localPoint.x + xfB.R.col2.y * manifold.points[i].localPoint.y;
+					clipPoint.x = xfB.p.x + xfB.q.ex.x * manifold.points[i].localPoint.x + xfB.q.ey.x * manifold.points[i].localPoint.y;
+					clipPoint.y = xfB.p.y + xfB.q.ex.y * manifold.points[i].localPoint.x + xfB.q.ey.y * manifold.points[i].localPoint.y;
 					
 					final float scalar = radiusA - ((clipPoint.x - planePoint.x) * normal.x + (clipPoint.y - planePoint.y) * normal.y);
 					
@@ -164,12 +164,12 @@ public class WorldManifold {
 			case FACE_B :
 				final Vec2 planePoint = pool3;
 				
-				final Mat22 R = xfB.R;
-				normal.x = R.col1.x * manifold.localNormal.x + R.col2.x * manifold.localNormal.y;
-				normal.y = R.col1.y * manifold.localNormal.x + R.col2.y * manifold.localNormal.y;
+				final Mat22 R = xfB.q;
+				normal.x = R.ex.x * manifold.localNormal.x + R.ey.x * manifold.localNormal.y;
+				normal.y = R.ex.y * manifold.localNormal.x + R.ey.y * manifold.localNormal.y;
 				final Vec2 v = manifold.localPoint;
-				planePoint.x = xfB.position.x + xfB.R.col1.x * v.x + xfB.R.col2.x * v.y;
-				planePoint.y = xfB.position.y + xfB.R.col1.y * v.x + xfB.R.col2.y * v.y;
+				planePoint.x = xfB.p.x + xfB.q.ex.x * v.x + xfB.q.ey.x * v.y;
+				planePoint.y = xfB.p.y + xfB.q.ex.y * v.x + xfB.q.ey.y * v.y;
 				
 				final Vec2 clipPoint = pool4;
 				
@@ -190,8 +190,8 @@ public class WorldManifold {
 					// points[i] = 0.5f * (cA + cB);
 					
 					
-					clipPoint.x = xfA.position.x + xfA.R.col1.x * manifold.points[i].localPoint.x + xfA.R.col2.x * manifold.points[i].localPoint.y;
-					clipPoint.y = xfA.position.y + xfA.R.col1.y * manifold.points[i].localPoint.x + xfA.R.col2.y * manifold.points[i].localPoint.y;
+					clipPoint.x = xfA.p.x + xfA.q.ex.x * manifold.points[i].localPoint.x + xfA.q.ey.x * manifold.points[i].localPoint.y;
+					clipPoint.y = xfA.p.y + xfA.q.ex.y * manifold.points[i].localPoint.x + xfA.q.ey.y * manifold.points[i].localPoint.y;
 					
 					final float scalar = radiusB - ((clipPoint.x - planePoint.x) * normal.x + (clipPoint.y - planePoint.y) * normal.y);
 					

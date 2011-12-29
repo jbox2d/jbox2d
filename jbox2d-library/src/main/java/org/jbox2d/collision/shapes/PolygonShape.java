@@ -183,7 +183,7 @@ public class PolygonShape extends Shape {
 			edge.set(m_vertices[i2]).subLocal(m_vertices[i1]);
 			
 			assert (edge.lengthSquared() > Settings.EPSILON * Settings.EPSILON);
-			Vec2.crossToOut(edge, 1f, m_normals[i]);
+			Vec2.crossToOutUnsafe(edge, 1f, m_normals[i]);
 			m_normals[i].normalize();
 		}
 		
@@ -264,13 +264,15 @@ public class PolygonShape extends Shape {
 		m_centroid.set(center);
 		
 		final Transform xf = poolt1;
-		xf.position.set(center);
-		xf.R.set(angle);
+		xf.p.set(center);
+		xf.q.set(angle);
 		
+		final Vec2 temp = new Vec2();
 		// Transform vertices and normals.
 		for (int i = 0; i < m_vertexCount; ++i) {
 			Transform.mulToOut(xf, m_vertices[i], m_vertices[i]);
-			Mat22.mulToOut(xf.R, m_normals[i], m_normals[i]);
+			Mat22.mulToOutUnsafe(xf.q, m_normals[i], temp);
+			m_normals[i].set(temp);
 		}
 	}
 	
@@ -300,9 +302,11 @@ public class PolygonShape extends Shape {
 	public final boolean testPoint(final Transform xf, final Vec2 p) {
 		
 		final Vec2 pLocal = pool1;
-		
-		pLocal.set(p).subLocal(xf.position);
-		Mat22.mulTransToOut(xf.R, pLocal, pLocal);
+        final Vec2 temp = pool2;
+        
+		pLocal.set(p).subLocal(xf.p);
+		Mat22.mulTransToOutUnsafe(xf.q, pLocal, temp);
+		pLocal.set(temp);
 		
 		if (m_debug) {
 			System.out.println("--testPoint debug--");
@@ -313,7 +317,6 @@ public class PolygonShape extends Shape {
 			System.out.println("pLocal: " + pLocal);
 		}
 		
-		final Vec2 temp = pool2;
 		
 		for (int i = 0; i < m_vertexCount; ++i) {
 			temp.set(pLocal).subLocal(m_vertices[i]);
@@ -542,10 +545,10 @@ public class PolygonShape extends Shape {
 		final Vec2 d = pool3;
 		final Vec2 temp = pool4;
 		
-		p1.set(argInput.p1).subLocal(argXf.position);
-		Mat22.mulTransToOut(argXf.R, p1, p1);
-		p2.set(argInput.p2).subLocal(argXf.position);
-		Mat22.mulTransToOut(argXf.R, p2, p2);
+		p1.set(argInput.p1).subLocal(argXf.p);
+		Mat22.mulTransToOut(argXf.q, p1, p1);
+		p2.set(argInput.p2).subLocal(argXf.p);
+		Mat22.mulTransToOut(argXf.q, p2, p2);
 		d.set(p2).subLocal(p1);
 		
 		if (m_vertexCount == 2) {
@@ -650,7 +653,7 @@ public class PolygonShape extends Shape {
 			
 			if (index >= 0) {
 				argOutput.fraction = lower;
-				Mat22.mulToOut(argXf.R, m_normals[index], argOutput.normal);
+				Mat22.mulToOutUnsafe(argXf.q, m_normals[index], argOutput.normal);
 				// normal = Mul(xf.R, m_normals[index]);
 				return true;
 			}

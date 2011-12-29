@@ -152,7 +152,7 @@ public class MouseJoint extends Joint {
 		// Compute the effective mass matrix.
 		//Vec2 r = Mul(b.getTransform().R, m_localAnchor - b.getLocalCenter());
 		r.set(m_localAnchor).subLocal(b.getLocalCenter());
-		Mat22.mulToOut(b.getTransform().R, r, r);
+		Mat22.mulToOut(b.getTransform().q, r, r);
 		
 		// K    = [(1/m1 + 1/m2) * eye(2) - skew(r1) * invI1 * skew(r1) - skew(r2) * invI2 * skew(r2)]
 		//      = [1/m1+1/m2     0    ] + invI1 * [r1.y*r1.y -r1.x*r1.y] + invI2 * [r1.y*r1.y -r1.x*r1.y]
@@ -161,17 +161,17 @@ public class MouseJoint extends Joint {
 		float invI = b.m_invI;
 
 		Mat22 K1 = pool.popMat22();
-		K1.col1.x = invMass;	K1.col2.x = 0.0f;
-		K1.col1.y = 0.0f;		K1.col2.y = invMass;
+		K1.ex.x = invMass;	K1.ey.x = 0.0f;
+		K1.ex.y = 0.0f;		K1.ey.y = invMass;
 
 		Mat22 K2 = pool.popMat22();
-		K2.col1.x =  invI * r.y * r.y;	K2.col2.x = -invI * r.x * r.y;
-		K2.col1.y = -invI * r.x * r.y;	K2.col2.y =  invI * r.x * r.x;
+		K2.ex.x =  invI * r.y * r.y;	K2.ey.x = -invI * r.x * r.y;
+		K2.ex.y = -invI * r.x * r.y;	K2.ey.y =  invI * r.x * r.x;
 
 		Mat22 K = pool.popMat22();
 		K.set(K1).addLocal(K2);
-		K.col1.x += m_gamma;
-		K.col2.y += m_gamma;
+		K.ex.x += m_gamma;
+		K.ey.y += m_gamma;
 
 		K.invertToOut(m_mass);
 
@@ -204,7 +204,7 @@ public class MouseJoint extends Joint {
 		Vec2 r = pool.popVec2();
 
 		r.set(m_localAnchor).subLocal(b.getLocalCenter());
-		Mat22.mulToOut(b.getTransform().R, r, r);
+		Mat22.mulToOut(b.getTransform().q, r, r);
 		
 		// Cdot = v + cross(w, r)
 		Vec2 Cdot = pool.popVec2();
@@ -218,7 +218,7 @@ public class MouseJoint extends Joint {
 		impulse.set(m_C).mulLocal(m_beta);
 		temp.set(m_impulse).mulLocal(m_gamma);
 		temp.addLocal(impulse).addLocal(Cdot).mulLocal(-1);
-		Mat22.mulToOut(m_mass, temp, impulse);
+		Mat22.mulToOutUnsafe(m_mass, temp, impulse);
 
 		Vec2 oldImpulse = temp;
 		oldImpulse.set(m_impulse);

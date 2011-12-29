@@ -682,7 +682,7 @@ public class World {
 		if ((flags & DebugDraw.e_centerOfMassBit) == DebugDraw.e_centerOfMassBit) {
 			for (Body b = m_bodyList; b != null; b = b.getNext()) {
 				xf.set(b.getTransform());
-				xf.position.set(b.getWorldCenter());
+				xf.p.set(b.getWorldCenter());
 				m_debugDraw.drawTransform(xf);
 			}
 		}
@@ -1265,8 +1265,8 @@ public class World {
 		Body bodyB = joint.getBodyB();
 		Transform xf1 = bodyA.getTransform();
 		Transform xf2 = bodyB.getTransform();
-		Vec2 x1 = xf1.position;
-		Vec2 x2 = xf2.position;
+		Vec2 x1 = xf1.p;
+		Vec2 x2 = xf2.p;
 		Vec2 p1 = pool.popVec2();
 		Vec2 p2 = pool.popVec2();
 		joint.getAnchorA(p1);
@@ -1322,7 +1322,7 @@ public class World {
 				// Vec2 center = Mul(xf, circle.m_p);
 				Transform.mulToOut(xf, circle.m_p, center);
 				float radius = circle.m_radius;
-				axis.set(xf.R.col1);
+				axis.set(xf.q.ex);
 				
 				if (fixture.getUserData() != null && fixture.getUserData().equals(LIQUID_INT)) {
 					Body b = fixture.getBody();
