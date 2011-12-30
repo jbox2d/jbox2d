@@ -120,8 +120,8 @@ public class Distance {
 				v.indexB = cache.indexB[i];
 				Vec2 wALocal = proxyA.getVertex(v.indexA);
 				Vec2 wBLocal = proxyB.getVertex(v.indexB);
-				Transform.mulToOut(transformA, wALocal, v.wA);
-				Transform.mulToOut(transformB, wBLocal, v.wB);
+				Transform.mulToOutUnsafe(transformA, wALocal, v.wA);
+				Transform.mulToOutUnsafe(transformB, wBLocal, v.wB);
 				v.w.set(v.wB).subLocal(v.wA);
 				v.a = 0.0f;
 			}
@@ -144,8 +144,8 @@ public class Distance {
 				v.indexB = 0;
 				Vec2 wALocal = proxyA.getVertex(0);
 				Vec2 wBLocal = proxyB.getVertex(0);
-				Transform.mulToOut(transformA, wALocal, v.wA);
-				Transform.mulToOut(transformB, wBLocal, v.wB);
+				Transform.mulToOutUnsafe(transformA, wALocal, v.wA);
+				Transform.mulToOutUnsafe(transformB, wBLocal, v.wB);
 				v.w.set(v.wB).subLocal(v.wA);
 				m_count = 1;
 			}
@@ -176,7 +176,7 @@ public class Distance {
 					
 					if (sgn > 0f) {
 						// Origin is left of e12.
-						Vec2.crossToOut(1f, e12, out);
+						Vec2.crossToOutUnsafe(1f, e12, out);
 						return;
 					}
 					else {
@@ -677,11 +677,11 @@ public class Distance {
 			
 			Mat22.mulTransToOutUnsafe(transformA.q, d.negateLocal(), temp);
 			vertex.indexA = proxyA.getSupport(temp);
-			Transform.mulToOut(transformA, proxyA.getVertex(vertex.indexA), vertex.wA);
+			Transform.mulToOutUnsafe(transformA, proxyA.getVertex(vertex.indexA), vertex.wA);
 			// Vec2 wBLocal;
 			Mat22.mulTransToOutUnsafe(transformB.q, d.negateLocal(), temp);
 			vertex.indexB = proxyB.getSupport(temp);
-			Transform.mulToOut(transformB, proxyB.getVertex(vertex.indexB), vertex.wB);
+			Transform.mulToOutUnsafe(transformB, proxyB.getVertex(vertex.indexB), vertex.wB);
 			vertex.w.set(vertex.wB).subLocal(vertex.wA);
 			
 			// Iteration count is equated to the number of support point calls.

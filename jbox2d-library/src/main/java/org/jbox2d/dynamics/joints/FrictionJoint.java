@@ -253,8 +253,8 @@ public class FrictionJoint extends Joint {
 			final Vec2 Cdot = pool.popVec2();
 			final Vec2 temp = pool.popVec2();
 			
-			Vec2.crossToOut(wA, rA, temp);
-			Vec2.crossToOut(wB, rB, Cdot);
+			Vec2.crossToOutUnsafe(wA, rA, temp);
+			Vec2.crossToOutUnsafe(wB, rB, Cdot);
 			Cdot.addLocal(vB).subLocal(vA).subLocal(temp);
 			
 			final Vec2 impulse = pool.popVec2();

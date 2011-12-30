@@ -323,11 +323,11 @@ public class PolygonShape extends Shape {
     final Vec2 upper = pool2;
     final Vec2 v = pool3;
 
-    Transform.mulToOut(argXf, m_vertices[0], lower);
+    Transform.mulToOutUnsafe(argXf, m_vertices[0], lower);
     upper.set(lower);
 
     for (int i = 1; i < m_vertexCount; ++i) {
-      Transform.mulToOut(argXf, m_vertices[i], v);
+      Transform.mulToOutUnsafe(argXf, m_vertices[i], v);
       // Vec2 v = Mul(xf, m_vertices[i]);
       Vec2.minToOut(lower, v, lower);
       Vec2.maxToOut(upper, v, upper);

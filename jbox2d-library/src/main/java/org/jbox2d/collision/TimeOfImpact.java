@@ -366,8 +366,8 @@ class SeparationFunction {
 			 */
 			localPointA.set(m_proxyA.getVertex(cache.indexA[0]));
 			localPointB.set(m_proxyB.getVertex(cache.indexB[0]));
-			Transform.mulToOut(xfa, localPointA, pointA);
-			Transform.mulToOut(xfb, localPointB, pointB);
+			Transform.mulToOutUnsafe(xfa, localPointA, pointA);
+			Transform.mulToOutUnsafe(xfb, localPointB, pointB);
 			m_axis.set(pointB).subLocal(pointA);
 			float s = m_axis.normalize();
 			return s;
@@ -386,10 +386,10 @@ class SeparationFunction {
 			Mat22.mulToOutUnsafe(xfb.q, m_axis, normal);
 			
 			m_localPoint.set(localPointB1).addLocal(localPointB2).mulLocal(.5f);
-			Transform.mulToOut(xfb, m_localPoint, pointB);
+			Transform.mulToOutUnsafe(xfb, m_localPoint, pointB);
 			
 			localPointA.set(proxyA.getVertex(cache.indexA[0]));
-			Transform.mulToOut(xfa, localPointA, pointA);
+			Transform.mulToOutUnsafe(xfa, localPointA, pointA);
 			
 			temp.set(pointA).subLocal(pointB);
 			float s = Vec2.dot(temp, normal);
@@ -413,10 +413,10 @@ class SeparationFunction {
 			Mat22.mulToOutUnsafe(xfa.q, m_axis, normal);
 			
 			m_localPoint.set(localPointA1).addLocal(localPointA2).mulLocal(.5f);
-			Transform.mulToOut(xfa, m_localPoint, pointA);
+			Transform.mulToOutUnsafe(xfa, m_localPoint, pointA);
 			
 			localPointB.set(m_proxyB.getVertex(cache.indexB[0]));
-			Transform.mulToOut(xfb, localPointB, pointB);
+			Transform.mulToOutUnsafe(xfb, localPointB, pointB);
 			
 			temp.set(pointB).subLocal(pointA);
 			float s = Vec2.dot(temp, normal);
@@ -449,15 +449,15 @@ class SeparationFunction {
 				localPointA.set(m_proxyA.getVertex(indexes[0]));
 				localPointB.set(m_proxyB.getVertex(indexes[1]));
 				
-				Transform.mulToOut(xfa, localPointA, pointA);
-				Transform.mulToOut(xfb, localPointB, pointB);
+				Transform.mulToOutUnsafe(xfa, localPointA, pointA);
+				Transform.mulToOutUnsafe(xfb, localPointB, pointB);
 				
 				float separation = Vec2.dot(pointB.subLocal(pointA), m_axis);
 				return separation;
 			}
 			case FACE_A : {
 				Mat22.mulToOutUnsafe(xfa.q, m_axis, normal);
-				Transform.mulToOut(xfa, m_localPoint, pointA);
+				Transform.mulToOutUnsafe(xfa, m_localPoint, pointA);
 				
 				Mat22.mulTransToOutUnsafe(xfb.q, normal.negateLocal(), axisB);
 				normal.negateLocal();
@@ -466,14 +466,14 @@ class SeparationFunction {
 				indexes[1] = m_proxyB.getSupport(axisB);
 				
 				localPointB.set(m_proxyB.getVertex(indexes[1]));
-				Transform.mulToOut(xfb, localPointB, pointB);
+				Transform.mulToOutUnsafe(xfb, localPointB, pointB);
 				
 				float separation = Vec2.dot(pointB.subLocal(pointA), normal);
 				return separation;
 			}
 			case FACE_B : {
 				Mat22.mulToOutUnsafe(xfb.q, m_axis, normal);
-				Transform.mulToOut(xfb, m_localPoint, pointB);
+				Transform.mulToOutUnsafe(xfb, m_localPoint, pointB);
 				
 				Mat22.mulTransToOutUnsafe(xfa.q, normal.negateLocal(), axisA);
 				normal.negateLocal();
@@ -482,7 +482,7 @@ class SeparationFunction {
 				indexes[0] = m_proxyA.getSupport(axisA);
 				
 				localPointA.set(m_proxyA.getVertex(indexes[0]));
-				Transform.mulToOut(xfa, localPointA, pointA);
+				Transform.mulToOutUnsafe(xfa, localPointA, pointA);
 				
 				float separation = Vec2.dot(pointA.subLocal(pointB), normal);
 				return separation;
@@ -508,8 +508,8 @@ class SeparationFunction {
 				localPointA.set(m_proxyA.getVertex(indexA));
 				localPointB.set(m_proxyB.getVertex(indexB));
 				
-				Transform.mulToOut(xfa, localPointA, pointA);
-				Transform.mulToOut(xfb, localPointB, pointB);
+				Transform.mulToOutUnsafe(xfa, localPointA, pointA);
+				Transform.mulToOutUnsafe(xfb, localPointB, pointB);
 				
 				float separation = Vec2.dot(pointB.subLocal(pointA), m_axis);
 				return separation;
@@ -517,26 +517,26 @@ class SeparationFunction {
 			case FACE_A : {
 				// System.out.printf("We're faceA\n");
 				Mat22.mulToOutUnsafe(xfa.q, m_axis, normal);
-				Transform.mulToOut(xfa, m_localPoint, pointA);
+				Transform.mulToOutUnsafe(xfa, m_localPoint, pointA);
 				
 				Mat22.mulTransToOutUnsafe(xfb.q, normal.negateLocal(), axisB);
 				normal.negateLocal();
 				
 				localPointB.set(m_proxyB.getVertex(indexB));
-				Transform.mulToOut(xfb, localPointB, pointB);
+				Transform.mulToOutUnsafe(xfb, localPointB, pointB);
 				float separation = Vec2.dot(pointB.subLocal(pointA), normal);
 				return separation;
 			}
 			case FACE_B : {
 				// System.out.printf("We're faceB\n");
 				Mat22.mulToOutUnsafe(xfb.q, m_axis, normal);
-				Transform.mulToOut(xfb, m_localPoint, pointB);
+				Transform.mulToOutUnsafe(xfb, m_localPoint, pointB);
 				
 				Mat22.mulTransToOutUnsafe(xfa.q, normal.negateLocal(), axisA);
 				normal.negateLocal();
 				
 				localPointA.set(m_proxyA.getVertex(indexA));
-				Transform.mulToOut(xfa, localPointA, pointA);
+				Transform.mulToOutUnsafe(xfa, localPointA, pointA);
 				
 				float separation = Vec2.dot(pointA.subLocal(pointB), normal);
 				return separation;

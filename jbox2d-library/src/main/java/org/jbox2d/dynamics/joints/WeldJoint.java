@@ -190,8 +190,8 @@ public class WeldJoint extends Joint {
 		final Vec2 Cdot1 = pool.popVec2();
 		final Vec2 temp = pool.popVec2();
 		// Solve point-to-point finalraint
-		Vec2.crossToOut(wA, rA, temp);
-		Vec2.crossToOut(wB, rB, Cdot1);
+		Vec2.crossToOutUnsafe(wA, rA, temp);
+		Vec2.crossToOutUnsafe(wB, rB, Cdot1);
 		Cdot1.addLocal(vB).subLocal(vA).subLocal(temp);
 		float Cdot2 = wB - wA;
 		

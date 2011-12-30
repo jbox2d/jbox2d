@@ -208,7 +208,7 @@ public class MouseJoint extends Joint {
 		
 		// Cdot = v + cross(w, r)
 		Vec2 Cdot = pool.popVec2();
-		Vec2.crossToOut(b.m_angularVelocity, r, Cdot);
+		Vec2.crossToOutUnsafe(b.m_angularVelocity, r, Cdot);
 		Cdot.addLocal(b.m_linearVelocity);
 		
 		Vec2 impulse = pool.popVec2();

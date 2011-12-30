@@ -1320,7 +1320,7 @@ public class World {
 				CircleShape circle = (CircleShape) fixture.getShape();
 				
 				// Vec2 center = Mul(xf, circle.m_p);
-				Transform.mulToOut(xf, circle.m_p, center);
+				Transform.mulToOutUnsafe(xf, circle.m_p, center);
 				float radius = circle.m_radius;
 				axis.set(xf.q.ex);
 				
@@ -1352,7 +1352,7 @@ public class World {
 				
 				for (int i = 0; i < vertexCount; ++i) {
 					// vertices[i] = Mul(xf, poly.m_vertices[i]);
-					Transform.mulToOut(xf, poly.m_vertices[i], vertices[i]);
+					Transform.mulToOutUnsafe(xf, poly.m_vertices[i], vertices[i]);
 				}
 				
 				m_debugDraw.drawSolidPolygon(vertices, vertexCount, color);

@@ -104,12 +104,12 @@ public class DistanceTest extends TestbedTest {
 		
 		{
 			for (int i = 0; i < m_polygonA.m_vertexCount; ++i) {
-				Transform.mulToOut(m_transformA, m_polygonA.m_vertices[i], v[i]);
+				Transform.mulToOutUnsafe(m_transformA, m_polygonA.m_vertices[i], v[i]);
 			}
 			getDebugDraw().drawPolygon(v, m_polygonA.m_vertexCount, color);
 			
 			for (int i = 0; i < m_polygonB.m_vertexCount; ++i) {
-				Transform.mulToOut(m_transformB, m_polygonB.m_vertices[i], v[i]);
+				Transform.mulToOutUnsafe(m_transformB, m_polygonB.m_vertices[i], v[i]);
 			}
 			getDebugDraw().drawPolygon(v, m_polygonB.m_vertexCount, color);
 		}
