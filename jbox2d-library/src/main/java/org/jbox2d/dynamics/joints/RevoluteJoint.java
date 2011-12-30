@@ -49,6 +49,7 @@ package org.jbox2d.dynamics.joints;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Mat33;
 import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.Vec3;
@@ -133,8 +134,8 @@ public class RevoluteJoint extends Joint {
 		// Compute the effective mass matrix.
 		r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 		r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
-		Mat22.mulToOut(b1.getTransform().q, r1, r1);
-		Mat22.mulToOut(b2.getTransform().q, r2, r2);
+		Rot.mulToOut(b1.getTransform().q, r1, r1);
+		Rot.mulToOut(b2.getTransform().q, r2, r2);
 		
 		// J = [-I -r1_skew I r2_skew]
 		// [ 0 -1 0 1]
@@ -262,8 +263,8 @@ public class RevoluteJoint extends Joint {
 			
 			r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 			r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
-			Mat22.mulToOut(b1.getTransform().q, r1, r1);
-			Mat22.mulToOut(b2.getTransform().q, r2, r2);
+			Rot.mulToOut(b1.getTransform().q, r1, r1);
+			Rot.mulToOut(b2.getTransform().q, r2, r2);
 			// Vec2 r1 = b2Mul(b1.getTransform().R, m_localAnchor1 - b1.getLocalCenter());
 			// Vec2 r2 = b2Mul(b2.getTransform().R, m_localAnchor2 - b2.getLocalCenter());
 			
@@ -331,8 +332,8 @@ public class RevoluteJoint extends Joint {
 		else {
 			r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 			r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
-			Mat22.mulToOut(b1.getTransform().q, r1, r1);
-			Mat22.mulToOut(b2.getTransform().q, r2, r2);
+			Rot.mulToOut(b1.getTransform().q, r1, r1);
+			Rot.mulToOut(b2.getTransform().q, r2, r2);
 			// Vec2 r1 = b2Mul(b1.getTransform().R, m_localAnchor1 - b1.getLocalCenter());
 			// Vec2 r2 = b2Mul(b2.getTransform().R, m_localAnchor2 - b2.getLocalCenter());
 			
@@ -421,8 +422,8 @@ public class RevoluteJoint extends Joint {
 			
 			r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 			r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
-			Mat22.mulToOut(b1.getTransform().q, r1, r1);
-			Mat22.mulToOut(b2.getTransform().q, r2, r2);
+			Rot.mulToOut(b1.getTransform().q, r1, r1);
+			Rot.mulToOut(b2.getTransform().q, r2, r2);
 			
 			C.set(b2.m_sweep.c).addLocal(r2).subLocal(b1.m_sweep.c).subLocal(r1);
 			positionError = C.length();

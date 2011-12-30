@@ -28,6 +28,7 @@ package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.Rot;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.TimeStep;
@@ -141,8 +142,8 @@ public class FrictionJoint extends Joint {
 		
 		rA.set(m_localAnchorA).subLocal(bA.getLocalCenter());
 		rB.set(m_localAnchorB).subLocal(bB.getLocalCenter());
-		Mat22.mulToOut(bA.getTransform().q, rA, rA);
-		Mat22.mulToOut(bB.getTransform().q, rB, rB);
+		Rot.mulToOut(bA.getTransform().q, rA, rA);
+		Rot.mulToOut(bB.getTransform().q, rB, rB);
 		
 		// J = [-I -r1_skew I r2_skew]
 		// [ 0 -1 0 1]
@@ -231,8 +232,8 @@ public class FrictionJoint extends Joint {
 		
 		rA.set(m_localAnchorA).subLocal(bA.getLocalCenter());
 		rB.set(m_localAnchorB).subLocal(bB.getLocalCenter());
-		Mat22.mulToOut(bA.getTransform().q, rA, rA);
-		Mat22.mulToOut(bB.getTransform().q, rB, rB);
+		Rot.mulToOut(bA.getTransform().q, rA, rA);
+		Rot.mulToOut(bB.getTransform().q, rB, rB);
 		
 		// Solve angular friction
 		{

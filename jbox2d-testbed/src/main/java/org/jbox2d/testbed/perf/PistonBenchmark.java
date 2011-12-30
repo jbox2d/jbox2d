@@ -28,7 +28,7 @@ import org.jbox2d.dynamics.joints.RevoluteJointDef;
  * 
  */
 public class PistonBenchmark extends PerfTest {
-  public static int iters = 20;
+  public static int iters = 10;
   public static int frames = 800;
   public static float timeStep = 1f/60;
   public static int velIters = 8;

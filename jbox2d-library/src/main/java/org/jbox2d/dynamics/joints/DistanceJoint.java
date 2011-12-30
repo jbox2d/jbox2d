@@ -48,6 +48,7 @@ package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -153,8 +154,8 @@ public class DistanceJoint extends Joint {
 		// Compute the effective mass matrix.
 		r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 		r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
-		Mat22.mulToOut(b1.getTransform().q, r1, r1);
-		Mat22.mulToOut(b2.getTransform().q, r2, r2);
+		Rot.mulToOut(b1.getTransform().q, r1, r1);
+		Rot.mulToOut(b2.getTransform().q, r2, r2);
 		
 		m_u.x = b2.m_sweep.c.x + r2.x - b1.m_sweep.c.x - r1.x;
 		m_u.y = b2.m_sweep.c.y + r2.y - b1.m_sweep.c.y - r1.y;
@@ -231,8 +232,8 @@ public class DistanceJoint extends Joint {
 		
 		r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 		r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
-		Mat22.mulToOut(b1.getTransform().q, r1, r1);
-		Mat22.mulToOut(b2.getTransform().q, r2, r2);
+		Rot.mulToOut(b1.getTransform().q, r1, r1);
+		Rot.mulToOut(b2.getTransform().q, r2, r2);
 		
 		final Vec2 v1 = pool.popVec2();
 		final Vec2 v2 = pool.popVec2();
@@ -275,8 +276,8 @@ public class DistanceJoint extends Joint {
 		
 		r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 		r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
-		Mat22.mulToOut(b1.getTransform().q, r1, r1);
-		Mat22.mulToOut(b2.getTransform().q, r2, r2);
+		Rot.mulToOut(b1.getTransform().q, r1, r1);
+		Rot.mulToOut(b2.getTransform().q, r2, r2);
 		
 		d.x = b2.m_sweep.c.x + r2.x - b1.m_sweep.c.x - r1.x;
 		d.y = b2.m_sweep.c.y + r2.y - b1.m_sweep.c.y - r1.y;

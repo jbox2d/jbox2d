@@ -168,15 +168,15 @@ public class DebugDrawJ2D extends DebugDraw {
     Color c = cpool.getColor(1, 0, 0);
     g.setColor(c);
 
-    temp2.x = xf.p.x + k_axisScale * xf.q.ex.x;
-    temp2.y = xf.p.y + k_axisScale * xf.q.ex.y;
+    temp2.x = xf.p.x + k_axisScale * xf.q.c;
+    temp2.y = xf.p.y + k_axisScale * xf.q.s;
     getWorldToScreenToOut(temp2, temp2);
     g.drawLine((int) temp.x, (int) temp.y, (int) temp2.x, (int) temp2.y);
 
     c = cpool.getColor(0, 1, 0);
     g.setColor(c);
-    temp2.x = xf.p.x + k_axisScale * xf.q.ey.x;
-    temp2.y = xf.p.y + k_axisScale * xf.q.ey.y;
+    temp2.x = xf.p.x + k_axisScale * xf.q.c;
+    temp2.y = xf.p.y + k_axisScale * xf.q.s;
     getWorldToScreenToOut(temp2, temp2);
     g.drawLine((int) temp.x, (int) temp.y, (int) temp2.x, (int) temp2.y);
   }

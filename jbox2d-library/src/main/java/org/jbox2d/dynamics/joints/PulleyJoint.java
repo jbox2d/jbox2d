@@ -28,6 +28,7 @@ package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -198,8 +199,8 @@ public class PulleyJoint extends Joint {
 		r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 		r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
 		
-		Mat22.mulToOut(b1.getTransform().q, r1, r1);
-		Mat22.mulToOut(b2.getTransform().q, r2, r2);
+		Rot.mulToOut(b1.getTransform().q, r1, r1);
+		Rot.mulToOut(b2.getTransform().q, r2, r2);
 		
 		p1.set(b1.m_sweep.c).addLocal(r1);
 		p2.set(b2.m_sweep.c).addLocal(r2);
@@ -314,8 +315,8 @@ public class PulleyJoint extends Joint {
 		r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 		r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
 		
-		Mat22.mulToOut(b1.getTransform().q, r1, r1);
-		Mat22.mulToOut(b2.getTransform().q, r2, r2);
+		Rot.mulToOut(b1.getTransform().q, r1, r1);
+		Rot.mulToOut(b2.getTransform().q, r2, r2);
 		
 		if (m_state == LimitState.AT_UPPER) {
 			final Vec2 v1 = pool.popVec2();
@@ -427,8 +428,8 @@ public class PulleyJoint extends Joint {
 			r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 			r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
 			
-			Mat22.mulToOut(b1.getTransform().q, r1, r1);
-			Mat22.mulToOut(b2.getTransform().q, r2, r2);
+			Rot.mulToOut(b1.getTransform().q, r1, r1);
+			Rot.mulToOut(b2.getTransform().q, r2, r2);
 			
 			p1.set(b1.m_sweep.c).addLocal(r1);
 			p2.set(b2.m_sweep.c).addLocal(r2);
@@ -487,7 +488,7 @@ public class PulleyJoint extends Joint {
 			
 			r1.set(m_localAnchor1).subLocal(b1.getLocalCenter());
 			
-			Mat22.mulToOut(b1.getTransform().q, r1, r1);
+			Rot.mulToOut(b1.getTransform().q, r1, r1);
 			
 			p1.set(b1.m_sweep.c).addLocal(r1);
 			
@@ -527,7 +528,7 @@ public class PulleyJoint extends Joint {
 			
 			r2.set(m_localAnchor2).subLocal(b2.getLocalCenter());
 			
-			Mat22.mulToOut(b2.getTransform().q, r2, r2);
+			Rot.mulToOut(b2.getTransform().q, r2, r2);
 			
 			p2.set(b2.m_sweep.c).addLocal(r2);
 			

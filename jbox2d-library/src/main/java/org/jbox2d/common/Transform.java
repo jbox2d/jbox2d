@@ -39,12 +39,12 @@ public class Transform implements Serializable {
   public final Vec2 p;
 
   /** A matrix representing a rotation */
-  public final Mat22 q;
+  public final Rot q;
 
   /** The default constructor. */
   public Transform() {
     p = new Vec2();
-    q = new Mat22();
+    q = new Rot();
   }
 
   /** Initialize as a copy of another transform. */
@@ -54,7 +54,7 @@ public class Transform implements Serializable {
   }
 
   /** Initialize using a position vector and a rotation matrix. */
-  public Transform(final Vec2 _position, final Mat22 _R) {
+  public Transform(final Vec2 _position, final Rot _R) {
     p = _position.clone();
     q = _R.clone();
   }
@@ -77,13 +77,6 @@ public class Transform implements Serializable {
     q.set(angle);
   }
 
-  /**
-   * Calculate the angle that the rotation matrix represents.
-   */
-  public final float getAngle() {
-    return MathUtils.atan2(q.ex.y, q.ex.x);
-  }
-
   /** Set this to the identity transform. */
   public final void setIdentity() {
     p.setZero();
@@ -91,39 +84,82 @@ public class Transform implements Serializable {
   }
 
   public final static Vec2 mul(final Transform T, final Vec2 v) {
-    return new Vec2(T.p.x + T.q.ex.x * v.x + T.q.ey.x * v.y, T.p.y + T.q.ex.y * v.x + T.q.ey.y
-        * v.y);
+    return new Vec2((T.q.c * v.x - T.q.s * v.y) + T.p.x, (T.q.s * v.x + T.q.c * v.y) + T.p.y);
   }
 
   public final static void mulToOut(final Transform T, final Vec2 v, final Vec2 out) {
-    final float tempy = T.p.y + T.q.ex.y * v.x + T.q.ey.y * v.y;
-    out.x = T.p.x + T.q.ex.x * v.x + T.q.ey.x * v.y;
+    final float tempy = (T.q.s * v.x + T.q.c * v.y) + T.p.y;
+    out.x = (T.q.c * v.x - T.q.s * v.y) + T.p.x;
     out.y = tempy;
   }
 
   public final static void mulToOutUnsafe(final Transform T, final Vec2 v, final Vec2 out) {
-    assert(v != out);
-    out.x = T.p.x + T.q.ex.x * v.x + T.q.ey.x * v.y;
-    out.y = T.p.y + T.q.ex.y * v.x + T.q.ey.y * v.y;
+    assert (v != out);
+    out.x = (T.q.c * v.x - T.q.s * v.y) + T.p.x;
+    out.y = (T.q.s * v.x + T.q.c * v.y) + T.p.y;
   }
 
   public final static Vec2 mulTrans(final Transform T, final Vec2 v) {
-    final float v1x = v.x - T.p.x;
-    final float v1y = v.y - T.p.y;
-    final Vec2 b = T.q.ex;
-    final Vec2 b1 = T.q.ey;
-    return new Vec2((v1x * b.x + v1y * b.y), (v1x * b1.x + v1y * b1.y));
-    // return T.R.mulT(v.sub(T.position));
+    final float px = v.x - T.p.x;
+    final float py = v.y - T.p.y;
+    return new Vec2((T.q.c * px + T.q.s * py), (-T.q.s * px + T.q.c * py));
   }
 
   public final static void mulTransToOut(final Transform T, final Vec2 v, final Vec2 out) {
-    final float v1x = v.x - T.p.x;
-    final float v1y = v.y - T.p.y;
-    final Vec2 b = T.q.ex;
-    final Vec2 b1 = T.q.ey;
-    final float tempy = v1x * b1.x + v1y * b1.y;
-    out.x = v1x * b.x + v1y * b.y;
+    final float px = v.x - T.p.x;
+    final float py = v.y - T.p.y;
+    final float tempy = (-T.q.s * px + T.q.c * py);
+    out.x = (T.q.c * px + T.q.s * py);
     out.y = tempy;
+  }
+
+  public final static Transform mul(final Transform A, final Transform B) {
+    Transform C = new Transform();
+    Rot.mulUnsafe(A.q, B.q, C.q);
+    Rot.mulToOutUnsafe(A.q, B.p, C.p);
+    C.p.addLocal(A.p);
+    return C;
+  }
+
+  public final static void mulToOut(final Transform A, final Transform B, final Transform out) {
+    assert (out != A);
+    Rot.mul(A.q, B.q, out.q);
+    Rot.mulToOut(A.q, B.p, out.p);
+    out.p.addLocal(A.p);
+  }
+
+  public final static void mulToOutUnsafe(final Transform A, final Transform B, final Transform out) {
+    assert (out != B);
+    assert (out != A);
+    Rot.mulUnsafe(A.q, B.q, out.q);
+    Rot.mulToOutUnsafe(A.q, B.p, out.p);
+    out.p.addLocal(A.p);
+  }
+
+  private static Vec2 pool = new Vec2();
+
+  public final static Transform mulTrans(final Transform A, final Transform B) {
+    Transform C = new Transform();
+    Rot.mulTransUnsafe(A.q, B.q, C.q);
+    pool.set(B.p).subLocal(A.p);
+    Rot.mulTransUnsafe(A.q, pool, C.p);
+    return C;
+  }
+
+  public final static void mulTransToOut(final Transform A, final Transform B, final Transform out) {
+    assert (out != A);
+    Rot.mulTrans(A.q, B.q, out.q);
+    pool.set(B.p).subLocal(A.p);
+    Rot.mulTrans(A.q, pool, out.p);
+  }
+
+  public final static void mulTransToOutUnsafe(final Transform A, final Transform B,
+      final Transform out) {
+    assert (out != A);
+    assert (out != B);
+    Rot.mulTransUnsafe(A.q, B.q, out.q);
+    pool.set(B.p).subLocal(A.p);
+    Rot.mulTransUnsafe(A.q, pool, out.p);
   }
 
   @Override

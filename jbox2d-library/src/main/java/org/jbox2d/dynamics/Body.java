@@ -23,6 +23,7 @@ import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.Rot;
 import org.jbox2d.common.Sweep;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
@@ -720,11 +721,11 @@ public class Body {
   }
 
   public final void getWorldVectorToOut(Vec2 localVector, Vec2 out) {
-    Mat22.mulToOut(m_xf.q, localVector, out);
+    Rot.mulToOut(m_xf.q, localVector, out);
   }
 
   public final void getWorldVectorToOutUnsafe(Vec2 localVector, Vec2 out) {
-    Mat22.mulToOutUnsafe(m_xf.q, localVector, out);
+    Rot.mulToOutUnsafe(m_xf.q, localVector, out);
   }
 
   /**
@@ -756,11 +757,11 @@ public class Body {
   }
 
   public final void getLocalVectorToOut(Vec2 worldVector, Vec2 out) {
-    Mat22.mulTransToOut(m_xf.q, worldVector, out);
+    Rot.mulTrans(m_xf.q, worldVector, out);
   }
-  
+
   public final void getLocalVectorToOutUnsafe(Vec2 worldVector, Vec2 out) {
-    Mat22.mulTransToOutUnsafe(m_xf.q, worldVector, out);
+    Rot.mulTransUnsafe(m_xf.q, worldVector, out);
   }
 
   /**
@@ -1051,7 +1052,7 @@ public class Body {
     final Transform xf1 = pxf;
     xf1.q.set(m_sweep.a0);
     // xf1.position = m_sweep.c0 - Mul(xf1.R, m_sweep.localCenter);
-    Mat22.mulToOutUnsafe(xf1.q, m_sweep.localCenter, xf1.p);
+    Rot.mulToOutUnsafe(xf1.q, m_sweep.localCenter, xf1.p);
     xf1.p.mulLocal(-1).addLocal(m_sweep.c0);
 
     BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
@@ -1061,23 +1062,23 @@ public class Body {
   }
 
   public final void synchronizeTransform() {
-    // m_xf.R.set(m_sweep.a);
-    //
-    // //m_xf.position = m_sweep.c - Mul(m_xf.R, m_sweep.localCenter);
-    // Mat22.mulToOut(m_xf.R, m_sweep.localCenter, m_xf.position);
-    // m_xf.position.mulLocal(-1).addLocal(m_sweep.c);
+     m_xf.q.set(m_sweep.a);
+    
+     //m_xf.position = m_sweep.c - Mul(m_xf.R, m_sweep.localCenter);
+     Rot.mulToOutUnsafe(m_xf.q, m_sweep.localCenter, m_xf.p);
+     m_xf.p.mulLocal(-1).addLocal(m_sweep.c);
 
-    final float c = MathUtils.cos(m_sweep.a), s = MathUtils.sin(m_sweep.a);
-    m_xf.q.ex.x = c;
-    m_xf.q.ey.x = -s;
-    m_xf.q.ex.y = s;
-    m_xf.q.ey.y = c;
-    m_xf.p.x = m_xf.q.ex.x * m_sweep.localCenter.x + m_xf.q.ey.x * m_sweep.localCenter.y;
-    m_xf.p.y = m_xf.q.ex.y * m_sweep.localCenter.x + m_xf.q.ey.y * m_sweep.localCenter.y;
-    m_xf.p.x *= (float) (-1);
-    m_xf.p.y *= (float) (-1);
-    m_xf.p.x += m_sweep.c.x;
-    m_xf.p.y += m_sweep.c.y;
+//    final float c = MathUtils.cos(m_sweep.a), s = MathUtils.sin(m_sweep.a);
+//    m_xf.q.ex.x = c;
+//    m_xf.q.ey.x = -s;
+//    m_xf.q.ex.y = s;
+//    m_xf.q.ey.y = c;
+//    m_xf.p.x = m_xf.q.ex.x * m_sweep.localCenter.x + m_xf.q.ey.x * m_sweep.localCenter.y;
+//    m_xf.p.y = m_xf.q.ex.y * m_sweep.localCenter.x + m_xf.q.ey.y * m_sweep.localCenter.y;
+//    m_xf.p.x *= (float) (-1);
+//    m_xf.p.y *= (float) (-1);
+//    m_xf.p.x += m_sweep.c.x;
+//    m_xf.p.y += m_sweep.c.y;
   }
 
   /**
