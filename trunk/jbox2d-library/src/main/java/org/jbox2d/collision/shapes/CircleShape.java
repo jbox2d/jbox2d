@@ -52,6 +52,7 @@ import org.jbox2d.collision.RayCastOutput;
 
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
@@ -136,7 +137,7 @@ public class CircleShape extends Shape {
 	@Override
 	public final boolean testPoint(final Transform transform, final Vec2 p) {
 		final Vec2 center = pool1;
-		Mat22.mulToOutUnsafe(transform.q, m_p, center);
+		Rot.mulToOutUnsafe(transform.q, m_p, center);
 		center.addLocal(transform.p);
 		
 		final Vec2 d = center.subLocal(p).negateLocal();
@@ -159,7 +160,7 @@ public class CircleShape extends Shape {
 		final Vec2 s = pool2;
 		final Vec2 r = pool3;
 		
-		Mat22.mulToOutUnsafe(argTransform.q, m_p, position);
+		Rot.mulToOutUnsafe(argTransform.q, m_p, position);
 		position.addLocal(argTransform.p);
 		s.set(argInput.p1).subLocal(position);
 		final float b = Vec2.dot(s, s) - m_radius * m_radius;
@@ -198,7 +199,7 @@ public class CircleShape extends Shape {
 	@Override
 	public final void computeAABB(final AABB argAabb, final Transform argTransform) {
 		final Vec2 p = pool1;
-		Mat22.mulToOutUnsafe(argTransform.q, m_p, p);
+		Rot.mulToOutUnsafe(argTransform.q, m_p, p);
 		p.addLocal(argTransform.p);
 		
 		argAabb.lowerBound.x = p.x - m_radius;

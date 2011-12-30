@@ -40,6 +40,7 @@ import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.collision.RayCastOutput;
 import org.jbox2d.common.Mat22;
+import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
@@ -255,7 +256,7 @@ public class PolygonShape extends Shape {
     // Transform vertices and normals.
     for (int i = 0; i < m_vertexCount; ++i) {
       Transform.mulToOut(xf, m_vertices[i], m_vertices[i]);
-      Mat22.mulToOutUnsafe(xf.q, m_normals[i], temp);
+      Rot.mulToOutUnsafe(xf.q, m_normals[i], temp);
       m_normals[i].set(temp);
     }
   }
@@ -289,7 +290,7 @@ public class PolygonShape extends Shape {
     final Vec2 temp = pool2;
 
     pLocal.set(p).subLocal(xf.p);
-    Mat22.mulTransToOutUnsafe(xf.q, pLocal, temp);
+    Rot.mulTransUnsafe(xf.q, pLocal, temp);
     pLocal.set(temp);
 
     if (m_debug) {
@@ -435,9 +436,9 @@ public class PolygonShape extends Shape {
     final Vec2 temp = pool4;
 
     p1.set(argInput.p1).subLocal(argXf.p);
-    Mat22.mulTransToOut(argXf.q, p1, p1);
+    Rot.mulTrans(argXf.q, p1, p1);
     p2.set(argInput.p2).subLocal(argXf.p);
-    Mat22.mulTransToOut(argXf.q, p2, p2);
+    Rot.mulTrans(argXf.q, p2, p2);
     d.set(p2).subLocal(p1);
 
     if (m_vertexCount == 2) {
@@ -538,7 +539,7 @@ public class PolygonShape extends Shape {
 
       if (index >= 0) {
         argOutput.fraction = lower;
-        Mat22.mulToOutUnsafe(argXf.q, m_normals[index], argOutput.normal);
+        Rot.mulToOutUnsafe(argXf.q, m_normals[index], argOutput.normal);
         // normal = Mul(xf.R, m_normals[index]);
         return true;
       }

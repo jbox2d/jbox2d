@@ -30,6 +30,7 @@ import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.Rot;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -111,7 +112,7 @@ public class CompoundShapesTest extends TestbedTest{
 		{
 			Transform xf1 = new Transform();
 			xf1.q.set(0.3524f * MathUtils.PI);
-			xf1.p.set(Mat22.mul(xf1.q, new Vec2(1.0f, 0.0f)));
+			Rot.mulToOut(xf1.q, new Vec2(1.0f, 0.0f), xf1.p);
 
 			Vec2[] vertices = new Vec2[3];
 
@@ -123,7 +124,7 @@ public class CompoundShapesTest extends TestbedTest{
 
 			Transform xf2 = new Transform();
 			xf2.q.set(-0.3524f * MathUtils.PI);
-			xf2.p.set(Mat22.mul(xf2.q, new Vec2(-1.0f, 0.0f)));
+			Rot.mulToOut(xf2.q, new Vec2(-1.0f, 0.0f), xf2.p);
 
 			PolygonShape triangle2 = new PolygonShape();
 			vertices[0] = Transform.mul(xf2, new Vec2(-1.0f, 0.0f));

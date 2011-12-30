@@ -26,6 +26,7 @@ package org.jbox2d.dynamics.joints;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Mat33;
 import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
@@ -147,10 +148,10 @@ public class PrismaticJoint extends Joint {
 		Vec2 temp3 = pc[8];
 		
 		temp.set(m_localAnchor1).subLocal(b1.getLocalCenter());
-		Mat22.mulToOutUnsafe(b1.getTransform().q, temp, r1);
+		Rot.mulToOutUnsafe(b1.getTransform().q, temp, r1);
 		
 		temp.set(m_localAnchor2).subLocal(b2.getLocalCenter());
-		Mat22.mulToOutUnsafe(b2.getTransform().q, temp, r2);
+		Rot.mulToOutUnsafe(b2.getTransform().q, temp, r2);
 		
 		p1.set(b1.m_sweep.c).addLocal(r1);
 		p2.set(b2.m_sweep.c).addLocal(r2);
@@ -263,8 +264,8 @@ public class PrismaticJoint extends Joint {
 		
 		r1.set(m_localAnchor1).subLocal(m_localCenterA);
 		r2.set(m_localAnchor2).subLocal(m_localCenterB);
-		Mat22.mulToOut(xf1.q, r1, r1);
-		Mat22.mulToOut(xf2.q, r2, r2);
+		Rot.mulToOut(xf1.q, r1, r1);
+		Rot.mulToOut(xf2.q, r2, r2);
 		
 		d.set(b2.m_sweep.c).addLocal(r2).subLocal(b1.m_sweep.c).subLocal(r1);
 		
@@ -275,7 +276,7 @@ public class PrismaticJoint extends Joint {
 		
 		// Compute motor Jacobian and effective mass.
 		{
-			Mat22.mulToOutUnsafe(xf1.q, m_localXAxis1, m_axis);
+		  Rot.mulToOutUnsafe(xf1.q, m_localXAxis1, m_axis);
 			temp.set(d).addLocal(r1);
 			m_a1 = Vec2.cross(temp, m_axis);
 			m_a2 = Vec2.cross(r2, m_axis);
@@ -288,7 +289,7 @@ public class PrismaticJoint extends Joint {
 		
 		// Prismatic constraint.
 		{
-			Mat22.mulToOutUnsafe(xf1.q, m_localYAxis1, m_perp);
+		  Rot.mulToOutUnsafe(xf1.q, m_localYAxis1, m_perp);
 			
 			temp.set(d).addLocal(r1);
 			m_s1 = Vec2.cross(temp, m_perp);

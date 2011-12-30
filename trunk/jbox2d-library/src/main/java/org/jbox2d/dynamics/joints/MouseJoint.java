@@ -25,6 +25,7 @@ package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
@@ -152,7 +153,7 @@ public class MouseJoint extends Joint {
 		// Compute the effective mass matrix.
 		//Vec2 r = Mul(b.getTransform().R, m_localAnchor - b.getLocalCenter());
 		r.set(m_localAnchor).subLocal(b.getLocalCenter());
-		Mat22.mulToOut(b.getTransform().q, r, r);
+		Rot.mulToOut(b.getTransform().q, r, r);
 		
 		// K    = [(1/m1 + 1/m2) * eye(2) - skew(r1) * invI1 * skew(r1) - skew(r2) * invI2 * skew(r2)]
 		//      = [1/m1+1/m2     0    ] + invI1 * [r1.y*r1.y -r1.x*r1.y] + invI2 * [r1.y*r1.y -r1.x*r1.y]
@@ -204,7 +205,7 @@ public class MouseJoint extends Joint {
 		Vec2 r = pool.popVec2();
 
 		r.set(m_localAnchor).subLocal(b.getLocalCenter());
-		Mat22.mulToOut(b.getTransform().q, r, r);
+		Rot.mulToOut(b.getTransform().q, r, r);
 		
 		// Cdot = v + cross(w, r)
 		Vec2 Cdot = pool.popVec2();

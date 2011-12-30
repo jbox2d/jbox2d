@@ -97,9 +97,10 @@ public class Sweep implements Serializable {
     xf.q.set((1.0f - beta) * a0 + beta * a);
 
     // Shift to origin
-    // xf.position.subLocal(Mat22.mul(xf.R, localCenter));
-    xf.p.x -= xf.q.ex.x * localCenter.x + xf.q.ey.x * localCenter.y;
-    xf.p.y -= xf.q.ex.y * localCenter.x + xf.q.ey.y * localCenter.y;
+    //xf->p -= b2Mul(xf->q, localCenter);
+    final Rot q = xf.q;
+    xf.p.x -= q.c * localCenter.x - q.s * localCenter.y;
+    xf.p.y -= q.s * localCenter.x + q.c * localCenter.y;
   }
 
   /**
@@ -108,12 +109,15 @@ public class Sweep implements Serializable {
    * @param alpha the new initial time.
    */
   public final void advance(final float alpha) {
-    assert (alpha0 < 1f);
-    // c0 = (1.0f - t) * c0 + t*c;
-    float beta = (alpha - alpha0) / (1.0f - alpha0);
-    c0.x = (1.0f - beta) * c0.x + beta * c.x;
-    c0.y = (1.0f - beta) * c0.y + beta * c.y;
-    a0 = (1.0f - beta) * a0 + beta * a;
-    alpha0 = alpha;
+//    assert (alpha0 < 1f);
+//    // c0 = (1.0f - t) * c0 + t*c;
+//    float beta = (alpha - alpha0) / (1.0f - alpha0);
+//    c0.x = (1.0f - beta) * c0.x + beta * c.x;
+//    c0.y = (1.0f - beta) * c0.y + beta * c.y;
+//    a0 = (1.0f - beta) * a0 + beta * a;
+//    alpha0 = alpha;
+    c0.x = (1.0f - alpha) * c0.x + alpha * c.x;
+    c0.y = (1.0f - alpha) * c0.y + alpha * c.y;
+    a0 = (1.0f - alpha) * a0 + alpha * a;
   }
 }

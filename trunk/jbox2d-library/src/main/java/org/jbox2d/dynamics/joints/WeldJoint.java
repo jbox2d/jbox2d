@@ -29,6 +29,7 @@ package org.jbox2d.dynamics.joints;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.Mat33;
 import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.Vec3;
@@ -112,8 +113,8 @@ public class WeldJoint extends Joint {
 		rA.set(m_localAnchorA).subLocal(bA.getLocalCenter());
 		rB.set(m_localAnchorB).subLocal(bB.getLocalCenter());
 		
-		Mat22.mulToOut(bA.getTransform().q, rA, rA);
-		Mat22.mulToOut(bB.getTransform().q, rB, rB);
+		Rot.mulToOut(bA.getTransform().q, rA, rA);
+		Rot.mulToOut(bB.getTransform().q, rB, rB);
 
 		// J = [-I -r1_skew I r2_skew]
 		//     [ 0       -1 0       1]
@@ -183,8 +184,8 @@ public class WeldJoint extends Joint {
 		final Vec2 rB = pool.popVec2();
 		rA.set(m_localAnchorA).subLocal(bA.getLocalCenter());
 		rB.set(m_localAnchorB).subLocal(bB.getLocalCenter());
-		Mat22.mulToOut(bA.getTransform().q, rA, rA);
-		Mat22.mulToOut(bB.getTransform().q, rB, rB);
+		Rot.mulToOut(bA.getTransform().q, rA, rA);
+		Rot.mulToOut(bB.getTransform().q, rB, rB);
 		
 		
 		final Vec2 Cdot1 = pool.popVec2();
@@ -237,8 +238,8 @@ public class WeldJoint extends Joint {
 		final Vec2 rB = pool.popVec2();
 		rA.set(m_localAnchorA).subLocal(bA.getLocalCenter());
 		rB.set(m_localAnchorB).subLocal(bB.getLocalCenter());
-		Mat22.mulToOut(bA.getTransform().q, rA, rA);
-		Mat22.mulToOut(bB.getTransform().q, rB, rB);
+		Rot.mulToOut(bA.getTransform().q, rA, rA);
+		Rot.mulToOut(bB.getTransform().q, rB, rB);
 		
 		final Vec2 C1 = pool.popVec2();
 		C1.set(bB.m_sweep.c).addLocal(rB).subLocal(bA.m_sweep.c).subLocal(rA);

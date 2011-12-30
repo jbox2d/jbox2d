@@ -28,6 +28,7 @@ import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.Transform;
@@ -675,11 +676,11 @@ public class Distance {
 			// Compute a tentative new simplex vertex using support points.
 			SimplexVertex vertex = vertices[simplex.m_count];
 			
-			Mat22.mulTransToOutUnsafe(transformA.q, d.negateLocal(), temp);
+			Rot.mulTransUnsafe(transformA.q, d.negateLocal(), temp);
 			vertex.indexA = proxyA.getSupport(temp);
 			Transform.mulToOutUnsafe(transformA, proxyA.getVertex(vertex.indexA), vertex.wA);
 			// Vec2 wBLocal;
-			Mat22.mulTransToOutUnsafe(transformB.q, d.negateLocal(), temp);
+			Rot.mulTransUnsafe(transformB.q, d.negateLocal(), temp);
 			vertex.indexB = proxyB.getSupport(temp);
 			Transform.mulToOutUnsafe(transformB, proxyB.getVertex(vertex.indexB), vertex.wB);
 			vertex.w.set(vertex.wB).subLocal(vertex.wA);
