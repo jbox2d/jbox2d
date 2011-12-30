@@ -123,7 +123,7 @@ public class Body {
     m_sweep.localCenter.setZero();
     m_sweep.a0 = m_sweep.a = bd.angle;
     // m_sweep.c0 = m_sweep.c = Transform.mul(m_xf, m_sweep.localCenter);
-    Transform.mulToOut(m_xf, m_sweep.localCenter, m_sweep.c0);
+    Transform.mulToOutUnsafe(m_xf, m_sweep.localCenter, m_sweep.c0);
     m_sweep.c.set(m_sweep.c0);
 
     m_jointList = null;
@@ -317,7 +317,7 @@ public class Body {
     m_xf.p.set(position);
 
     // m_sweep.c0 = m_sweep.c = Mul(m_xf, m_sweep.localCenter);
-    Transform.mulToOut(m_xf, m_sweep.localCenter, m_sweep.c0);
+    Transform.mulToOutUnsafe(m_xf, m_sweep.localCenter, m_sweep.c0);
     m_sweep.c.set(m_sweep.c0);
 
     m_sweep.a0 = m_sweep.a = angle;
@@ -597,7 +597,7 @@ public class Body {
     oldCenter.set(m_sweep.c);
     m_sweep.localCenter.set(massData.center);
     // m_sweep.c0 = m_sweep.c = Mul(m_xf, m_sweep.localCenter);
-    Transform.mulToOut(m_xf, m_sweep.localCenter, m_sweep.c0);
+    Transform.mulToOutUnsafe(m_xf, m_sweep.localCenter, m_sweep.c0);
     m_sweep.c.set(m_sweep.c0);
 
     // Update center of mass velocity.
@@ -677,7 +677,7 @@ public class Body {
     oldCenter.set(m_sweep.c);
     m_sweep.localCenter.set(center);
     // m_sweep.c0 = m_sweep.c = Mul(m_xf, m_sweep.localCenter);
-    Transform.mulToOut(m_xf, m_sweep.localCenter, m_sweep.c0);
+    Transform.mulToOutUnsafe(m_xf, m_sweep.localCenter, m_sweep.c0);
     m_sweep.c.set(m_sweep.c0);
 
     // Update center of mass velocity.
@@ -685,7 +685,7 @@ public class Body {
     temp.set(m_sweep.c).subLocal(oldCenter);
 
     final Vec2 temp2 = oldCenter;
-    Vec2.crossToOut(m_angularVelocity, temp, temp2);
+    Vec2.crossToOutUnsafe(m_angularVelocity, temp, temp2);
     m_linearVelocity.addLocal(temp2);
 
     m_world.getPool().pushVec2(3);

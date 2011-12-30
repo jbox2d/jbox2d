@@ -48,6 +48,7 @@ import org.jbox2d.testbed.tests.Gears;
 import org.jbox2d.testbed.tests.LineJointTest;
 import org.jbox2d.testbed.tests.LiquidTest;
 import org.jbox2d.testbed.tests.OneSidedTest;
+import org.jbox2d.testbed.tests.PistonTest;
 import org.jbox2d.testbed.tests.PolyShapes;
 import org.jbox2d.testbed.tests.PrismaticTest;
 import org.jbox2d.testbed.tests.Pulleys;
@@ -83,6 +84,7 @@ public class TestList {
       argModel.addTest(new VaryingFrictionTest());
       argModel.addTest(new SphereStack());
       argModel.addTest(new VerticalStack());
+      argModel.addTest(new PistonTest());
       argModel.addTest(new PyramidTest());
       argModel.addTest(new DominoTower());
       argModel.addTest(new CircleStress());

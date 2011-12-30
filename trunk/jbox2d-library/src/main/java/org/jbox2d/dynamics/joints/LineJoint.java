@@ -71,7 +71,7 @@ public class LineJoint extends Joint {
 		m_localAnchor1.set(def.localAnchorA);
 		m_localAnchor2.set(def.localAnchorB);
 		m_localXAxis1.set(def.localAxisA);
-		Vec2.crossToOut(1.0f, m_localXAxis1, m_localYAxis1);
+		Vec2.crossToOutUnsafe(1.0f, m_localXAxis1, m_localYAxis1);
 		
 		m_impulse.setZero();
 		m_motorMass = 0.0f;
@@ -172,12 +172,12 @@ public class LineJoint extends Joint {
 		final Vec2 temp1 = pool.popVec2();
 		final Vec2 temp2 = pool.popVec2();
 		
-		Vec2.crossToOut(w1, r1, temp1);
-		Vec2.crossToOut(w2, r2, temp2);
+		Vec2.crossToOutUnsafe(w1, r1, temp1);
+		Vec2.crossToOutUnsafe(w2, r2, temp2);
 		temp2.addLocal(v2).subLocal(v1).subLocal(temp1);
 		float s2 = Vec2.dot(axis, temp2);
 		
-		Vec2.crossToOut(w1, axis, temp1);
+		Vec2.crossToOutUnsafe(w1, axis, temp1);
 		float speed = Vec2.dot(p2, temp1) + s2;
 		
 		pool.pushVec2(7);

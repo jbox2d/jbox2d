@@ -321,8 +321,8 @@ public class PulleyJoint extends Joint {
 			final Vec2 v1 = pool.popVec2();
 			final Vec2 v2 = pool.popVec2();
 			
-			Vec2.crossToOut(b1.m_angularVelocity, r1, v1);
-			Vec2.crossToOut(b2.m_angularVelocity, r2, v2);
+			Vec2.crossToOutUnsafe(b1.m_angularVelocity, r1, v1);
+			Vec2.crossToOutUnsafe(b2.m_angularVelocity, r2, v2);
 			
 			v1.addLocal(b1.m_linearVelocity);
 			v2.addLocal(b2.m_linearVelocity);
@@ -354,7 +354,7 @@ public class PulleyJoint extends Joint {
 		if (m_limitState1 == LimitState.AT_UPPER) {
 			final Vec2 v1 = pool.popVec2();
 			
-			Vec2.crossToOut(b1.m_angularVelocity, r1, v1);
+			Vec2.crossToOutUnsafe(b1.m_angularVelocity, r1, v1);
 			v1.addLocal(b1.m_linearVelocity);
 			
 			float Cdot = -Vec2.dot(m_u1, v1);
@@ -378,7 +378,7 @@ public class PulleyJoint extends Joint {
 		if (m_limitState2 == LimitState.AT_UPPER) {
 			
 			final Vec2 v2 = pool.popVec2();
-			Vec2.crossToOut(b2.m_angularVelocity, r2, v2);
+			Vec2.crossToOutUnsafe(b2.m_angularVelocity, r2, v2);
 			v2.addLocal(b2.m_linearVelocity);
 			
 			float Cdot = -Vec2.dot(m_u2, v2);

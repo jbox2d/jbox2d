@@ -635,12 +635,12 @@ public class Collision {
 		int i1 = index;
 		int i2 = i1 + 1 < count2 ? i1 + 1 : 0;
 		
-		Transform.mulToOut(xf2, vertices2[i1], c[0].v); // = Mul(xf2, vertices2[i1]);
+		Transform.mulToOutUnsafe(xf2, vertices2[i1], c[0].v); // = Mul(xf2, vertices2[i1]);
 		c[0].id.features.referenceEdge = edge1;
 		c[0].id.features.incidentEdge = i1;
 		c[0].id.features.incidentVertex = 0;
 		
-		Transform.mulToOut(xf2, vertices2[i2], c[1].v); // = Mul(xf2, vertices2[i2]);
+		Transform.mulToOutUnsafe(xf2, vertices2[i2], c[1].v); // = Mul(xf2, vertices2[i2]);
 		c[1].id.features.referenceEdge = edge1;
 		c[1].id.features.incidentEdge = i2;
 		c[1].id.features.incidentVertex = 1;

@@ -238,8 +238,8 @@ public class DistanceJoint extends Joint {
 		final Vec2 v2 = pool.popVec2();
 		
 		// Cdot = dot(u, v + cross(w, r))
-		Vec2.crossToOut(b1.m_angularVelocity, r1, v1);
-		Vec2.crossToOut(b2.m_angularVelocity, r2, v2);
+		Vec2.crossToOutUnsafe(b1.m_angularVelocity, r1, v1);
+		Vec2.crossToOutUnsafe(b2.m_angularVelocity, r2, v2);
 		v1.addLocal(b1.m_linearVelocity);
 		v2.addLocal(b2.m_linearVelocity);
 		

@@ -67,7 +67,7 @@ public class PrismaticJoint extends Joint {
 		m_localAnchor2 = new Vec2(def.localAnchorB);
 		m_localXAxis1 = new Vec2(def.localAxis1);
 		m_localYAxis1 = new Vec2();
-		Vec2.crossToOut(1f, m_localXAxis1, m_localYAxis1);
+		Vec2.crossToOutUnsafe(1f, m_localXAxis1, m_localYAxis1);
 		m_refAngle = def.referenceAngle;
 		
 		m_impulse = new Vec3();
@@ -164,9 +164,9 @@ public class PrismaticJoint extends Joint {
 		float w2 = b2.m_angularVelocity;
 		
 		
-		Vec2.crossToOut(w1, axis, temp);
-		Vec2.crossToOut(w2, r2, temp2);
-		Vec2.crossToOut(w1, r1, temp3);
+		Vec2.crossToOutUnsafe(w1, axis, temp);
+		Vec2.crossToOutUnsafe(w2, r2, temp2);
+		Vec2.crossToOutUnsafe(w1, r1, temp3);
 		
 		temp2.addLocal(v2).subLocal(v1).subLocal(temp3);
 		float speed = Vec2.dot(d, temp) + Vec2.dot(axis, temp2);

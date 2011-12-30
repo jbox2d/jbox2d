@@ -275,7 +275,7 @@ public class DynamicTree {
 		r.normalize();
 		
 		// v is perpendicular to the segment.
-		Vec2.crossToOut(1f, r, v);
+		Vec2.crossToOutUnsafe(1f, r, v);
 		absV.set(v).absLocal();
 		
 		// Separating axis for segment (Gino, p80).

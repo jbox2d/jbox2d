@@ -271,8 +271,8 @@ public class RevoluteJoint extends Joint {
 			final Vec3 Cdot = pool.popVec3();
 			
 			// Solve point-to-point constraint
-			Vec2.crossToOut(w1, r1, temp);
-			Vec2.crossToOut(w2, r2, Cdot1);
+			Vec2.crossToOutUnsafe(w1, r1, temp);
+			Vec2.crossToOutUnsafe(w2, r2, Cdot1);
 			Cdot1.addLocal(v2).subLocal(v1).subLocal(temp);
 			float Cdot2 = w2 - w1;
 			Cdot.set(Cdot1.x, Cdot1.y, Cdot2);
@@ -340,8 +340,8 @@ public class RevoluteJoint extends Joint {
 			Vec2 Cdot = pool.popVec2();
 			Vec2 impulse = pool.popVec2();
 			
-			Vec2.crossToOut(w1, r1, temp);
-			Vec2.crossToOut(w2, r2, Cdot);
+			Vec2.crossToOutUnsafe(w1, r1, temp);
+			Vec2.crossToOutUnsafe(w2, r2, Cdot);
 			Cdot.addLocal(v2).subLocal(v1).subLocal(temp);
 			m_mass.solve22ToOut(Cdot.negateLocal(), impulse); // just leave negated
 			
