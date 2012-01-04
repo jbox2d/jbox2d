@@ -21,6 +21,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
+
 package org.jbox2d.testbed.tests;
 
 import org.jbox2d.collision.Distance.SimplexCache;
@@ -103,15 +104,15 @@ public class DistanceTest extends TestbedTest {
 		addTextLine("iterations = " + output.iterations);
 		
 		{
-			for (int i = 0; i < m_polygonA.m_vertexCount; ++i) {
+			for (int i = 0; i < m_polygonA.m_count; ++i) {
 				Transform.mulToOutUnsafe(m_transformA, m_polygonA.m_vertices[i], v[i]);
 			}
-			getDebugDraw().drawPolygon(v, m_polygonA.m_vertexCount, color);
+			getDebugDraw().drawPolygon(v, m_polygonA.m_count, color);
 			
-			for (int i = 0; i < m_polygonB.m_vertexCount; ++i) {
+			for (int i = 0; i < m_polygonB.m_count; ++i) {
 				Transform.mulToOutUnsafe(m_transformB, m_polygonB.m_vertices[i], v[i]);
 			}
-			getDebugDraw().drawPolygon(v, m_polygonB.m_vertexCount, color);
+			getDebugDraw().drawPolygon(v, m_polygonB.m_count, color);
 		}
 		
 		Vec2 x1 = output.pointA;

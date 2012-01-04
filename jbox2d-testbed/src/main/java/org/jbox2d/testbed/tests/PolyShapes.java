@@ -217,7 +217,7 @@ public class PolyShapes extends TestbedTest {
 		callback.debugDraw = getDebugDraw();
 
 		AABB aabb = new AABB();
-		callback.m_circle.computeAABB(aabb, callback.m_transform);
+		callback.m_circle.computeAABB(aabb, callback.m_transform, 0);
 
 		getWorld().queryAABB(callback, aabb);
 
@@ -281,7 +281,7 @@ class PolyShapesCallback implements QueryCallback{
 		case POLYGON:
 			{
 				PolygonShape poly = (PolygonShape)fixture.getShape();
-				int vertexCount = poly.m_vertexCount;
+				int vertexCount = poly.m_count;
 				assert(vertexCount <= Settings.maxPolygonVertices);
 				Vec2 vertices[] = new Vec2[Settings.maxPolygonVertices];
 

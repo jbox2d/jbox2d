@@ -26,7 +26,6 @@ package org.jbox2d.collision;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
-import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
@@ -502,7 +501,7 @@ public class Distance {
 					break;
 				case POLYGON:
 					final PolygonShape poly = (PolygonShape) shape;
-					m_count = poly.m_vertexCount;
+					m_count = poly.m_count;
 					m_radius = poly.m_radius;
 					for(int i=0; i<m_count; i++){
 						m_vertices[i].set(poly.m_vertices[i]);

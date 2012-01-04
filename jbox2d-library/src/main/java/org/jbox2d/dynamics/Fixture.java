@@ -207,7 +207,7 @@ public class Fixture {
 	 * @param input
 	 */
 	public boolean raycast(RayCastOutput output, RayCastInput input){
-		return m_shape.raycast( output, input, m_body.m_xf);
+		return m_shape.raycast( output, input, m_body.m_xf, 0);
 	}
 
 	/**
@@ -298,7 +298,7 @@ public class Fixture {
 		assert(m_proxy == null);
 		
 		// Create proxy in the broad-phase.
-		m_shape.computeAABB( m_aabb, xf);
+		m_shape.computeAABB( m_aabb, xf, 0);
 		m_proxy = broadPhase.createProxy( m_aabb, this);
 	}
 	
@@ -344,8 +344,8 @@ public class Fixture {
 //		
 //		broadPhase.moveProxy( m_proxy, m_aabb, disp);
 		
-		m_shape.computeAABB( pool1, transform1);
-		m_shape.computeAABB( pool2, transform2);
+		m_shape.computeAABB( pool1, transform1, 0);
+		m_shape.computeAABB( pool2, transform2, 0);
 		m_aabb.lowerBound.x = pool1.lowerBound.x < pool2.lowerBound.x ? pool1.lowerBound.x : pool2.lowerBound.x;
 		m_aabb.lowerBound.y = pool1.lowerBound.y < pool2.lowerBound.y ? pool1.lowerBound.y : pool2.lowerBound.y;
 		m_aabb.upperBound.x = pool1.upperBound.x > pool2.upperBound.x ? pool1.upperBound.x : pool2.upperBound.x;
