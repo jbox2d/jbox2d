@@ -1,56 +1,48 @@
 /*******************************************************************************
- * Copyright (c) 2011, Daniel Murphy All rights reserved.
+ * Copyright (c) 2011, Daniel Murphy
+ * All rights reserved.
  * 
- * Redistribution and use in source and binary forms, with or without modification, are permitted
- * provided that the following conditions are met: * Redistributions of source code must retain the
- * above copyright notice, this list of conditions and the following disclaimer. * Redistributions
- * in binary form must reproduce the above copyright notice, this list of conditions and the
- * following disclaimer in the documentation and/or other materials provided with the distribution.
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *  * Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-/*
- * JBox2D - A Java Port of Erin Catto's Box2D
- * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/ Box2D homepage: http://www.box2d.org
- * 
- * This software is provided 'as-is', without any express or implied warranty. In no event will the
- * authors be held liable for any damages arising from the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, including commercial
- * applications, and to alter it and redistribute it freely, subject to the following restrictions:
- * 
- * 1. The origin of this software must not be misrepresented; you must not claim that you wrote the
- * original software. If you use this software in a product, an acknowledgment in the product
- * documentation would be appreciated but is not required. 2. Altered source versions must be
- * plainly marked as such, and must not be misrepresented as being the original software. 3. This
- * notice may not be removed or altered from any source distribution.
- */
+
 
 package org.jbox2d.collision.shapes;
 
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.collision.RayCastOutput;
-import org.jbox2d.common.Mat22;
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.pooling.arrays.IntArray;
+import org.jbox2d.pooling.arrays.Vec2Array;
 
-// Updated to rev 100
-
-/** A convex polygon shape */
+/**
+ * A convex polygon shape. Polygons have a maximum number of vertices equal to _maxPolygonVertices.
+ * In most cases you should not need many vertices for a convex polygon.
+ */
 public class PolygonShape extends Shape {
   /** Dump lots of debug information. */
-  private static boolean m_debug = false;
+  private final static boolean m_debug = false;
 
   /**
    * Local position of the shape centroid in parent body frame.
@@ -72,21 +64,19 @@ public class PolygonShape extends Shape {
   /**
    * Number of active vertices in the shape.
    */
-  public int m_vertexCount;
+  public int m_count;
 
   // pooling
   private final Vec2 pool1 = new Vec2();
   private final Vec2 pool2 = new Vec2();
   private final Vec2 pool3 = new Vec2();
   private final Vec2 pool4 = new Vec2();
-  private final Vec2 pool5 = new Vec2();
-  private final Vec2 pool6 = new Vec2();
   private Transform poolt1 = new Transform();
 
   public PolygonShape() {
-    m_type = ShapeType.POLYGON;
+    super(ShapeType.POLYGON);
 
-    m_vertexCount = 0;
+    m_count = 0;
     m_vertices = new Vec2[Settings.maxPolygonVertices];
     for (int i = 0; i < m_vertices.length; i++) {
       m_vertices[i] = new Vec2();
@@ -95,7 +85,7 @@ public class PolygonShape extends Shape {
     for (int i = 0; i < m_normals.length; i++) {
       m_normals[i] = new Vec2();
     }
-    m_radius = Settings.polygonRadius;
+    setRadius(Settings.polygonRadius);
     m_centroid.setZero();
   }
 
@@ -106,9 +96,29 @@ public class PolygonShape extends Shape {
       shape.m_normals[i].set(m_normals[i]);
       shape.m_vertices[i].set(m_vertices[i]);
     }
-    shape.m_radius = this.m_radius;
-    shape.m_vertexCount = this.m_vertexCount;
+    shape.setRadius(this.getRadius());
+    shape.m_count = this.m_count;
     return shape;
+  }
+  
+  /**
+   * Set this as a single edge.
+   * 
+   * @param v1
+   * @param v2
+   * @deprecated
+   */
+  public final void setAsEdge(final Vec2 v1, final Vec2 v2) {
+    m_count = 2;
+    m_vertices[0].set(v1);
+    m_vertices[1].set(v2);
+    m_centroid.set(v1).addLocal(v2).mulLocal(0.5f);
+    // = 0.5f * (v1 + v2);
+    m_normals[0].set(v2).subLocal(v1);
+    Vec2.crossToOut(m_normals[0], 1f, m_normals[0]);
+    // m_normals[0] = Cross(v2 - v1, 1.0f);
+    m_normals[0].normalize();
+    m_normals[1].set(m_normals[0]).negateLocal();
   }
 
   /**
@@ -120,7 +130,7 @@ public class PolygonShape extends Shape {
   public final int getSupport(final Vec2 d) {
     int bestIndex = 0;
     float bestValue = Vec2.dot(m_vertices[0], d);
-    for (int i = 1; i < m_vertexCount; i++) {
+    for (int i = 1; i < m_count; i++) {
       float value = Vec2.dot(m_vertices[i], d);
       if (value > bestValue) {
         bestIndex = i;
@@ -139,7 +149,7 @@ public class PolygonShape extends Shape {
   public final Vec2 getSupportVertex(final Vec2 d) {
     int bestIndex = 0;
     float bestValue = Vec2.dot(m_vertices[0], d);
-    for (int i = 1; i < m_vertexCount; i++) {
+    for (int i = 1; i < m_count; i++) {
       float value = Vec2.dot(m_vertices[i], d);
       if (value > bestValue) {
         bestIndex = i;
@@ -150,27 +160,109 @@ public class PolygonShape extends Shape {
   }
 
   /**
-   * Copy vertices. This assumes the vertices define a convex polygon. It is assumed that the
-   * exterior is the the right of each edge.
+   * Create a convex hull from the given array of points. The count must be in the range [3,
+   * Settings.maxPolygonVertices].
+   * 
+   * @warning the points may be re-ordered, even if they form a convex polygon
+   * @warning collinear points are handled but not removed. Collinear points may lead to poor
+   *          stacking behavior.
    */
   public final void set(final Vec2[] vertices, final int count) {
-    assert (2 <= count && count <= Settings.maxPolygonVertices);
-    m_vertexCount = count;
+    set(vertices, count, null, null);
+  }
+
+  /**
+   * Create a convex hull from the given array of points. The count must be in the range [3,
+   * Settings.maxPolygonVertices]. This method takes an arraypool for pooling
+   * 
+   * @warning the points may be re-ordered, even if they form a convex polygon
+   * @warning collinear points are handled but not removed. Collinear points may lead to poor
+   *          stacking behavior.
+   */
+  public final void set(final Vec2[] verts, final int num, final Vec2Array vecPool,
+      final IntArray intPool) {
+    assert (3 <= num && num <= Settings.maxPolygonVertices);
+    if (num < 3) {
+      setAsBox(1.0f, 1.0f);
+      return;
+    }
+
+    int n = MathUtils.min(num, Settings.maxPolygonVertices);
+
+    // Copy the vertices into a local buffer
+    Vec2[] ps = (vecPool != null) ? vecPool.get(n) : new Vec2[n];
+    for (int i = 0; i < n; ++i) {
+      ps[i] = verts[i];
+    }
+
+    // Create the convex hull using the Gift wrapping algorithm
+    // http://en.wikipedia.org/wiki/Gift_wrapping_algorithm
+
+    // Find the right most point on the hull
+    int i0 = 0;
+    float x0 = ps[0].x;
+    for (int i = 1; i < num; ++i) {
+      float x = ps[i].x;
+      if (x > x0 || (x == x0 && ps[i].y < ps[i0].y)) {
+        i0 = i;
+        x0 = x;
+      }
+    }
+
+    int[] hull =
+        (intPool != null)
+            ? intPool.get(Settings.maxPolygonVertices)
+            : new int[Settings.maxPolygonVertices];
+    int m = 0;
+    int ih = i0;
+
+    while (true) {
+      hull[m] = ih;
+
+      int ie = 0;
+      for (int j = 1; j < n; ++j) {
+        if (ie == ih) {
+          ie = j;
+          continue;
+        }
+
+        Vec2 r = pool1.set(ps[ie]).subLocal(ps[hull[m]]);
+        Vec2 v = pool2.set(ps[j]).subLocal(ps[hull[m]]);
+        float c = Vec2.cross(r, v);
+        if (c < 0.0f) {
+          ie = j;
+        }
+
+        // Collinearity check
+        if (c == 0.0f && v.lengthSquared() > r.lengthSquared()) {
+          ie = j;
+        }
+      }
+
+      ++m;
+      ih = ie;
+
+      if (ie == i0) {
+        break;
+      }
+    }
+
+    this.m_count = m;
 
     // Copy vertices.
-    for (int i = 0; i < m_vertexCount; ++i) {
+    for (int i = 0; i < m_count; ++i) {
       if (m_vertices[i] == null) {
         m_vertices[i] = new Vec2();
       }
-      m_vertices[i].set(vertices[i]);
+      m_vertices[i].set(ps[hull[i]]);
     }
 
     final Vec2 edge = pool1;
 
     // Compute normals. Ensure the edges have non-zero length.
-    for (int i = 0; i < m_vertexCount; ++i) {
+    for (int i = 0; i < m_count; ++i) {
       final int i1 = i;
-      final int i2 = i + 1 < m_vertexCount ? i + 1 : 0;
+      final int i2 = i + 1 < m_count ? i + 1 : 0;
       edge.set(m_vertices[i2]).subLocal(m_vertices[i1]);
 
       assert (edge.lengthSquared() > Settings.EPSILON * Settings.EPSILON);
@@ -178,35 +270,8 @@ public class PolygonShape extends Shape {
       m_normals[i].normalize();
     }
 
-    if (m_debug) {
-
-      final Vec2 r = pool2;
-
-      // Ensure the polygon is convex and the interior
-      // is to the left of each edge.
-      for (int i = 0; i < m_vertexCount; ++i) {
-        final int i1 = i;
-        final int i2 = i + 1 < m_vertexCount ? i + 1 : 0;
-        edge.set(m_vertices[i2]).subLocal(m_vertices[i1]);
-
-        for (int j = 0; j < m_vertexCount; ++j) {
-          // Don't check vertices on the current edge.
-          if (j == i1 || j == i2) {
-            continue;
-          }
-
-          r.set(m_vertices[j]).subLocal(m_vertices[i1]);
-
-          // Your polygon is non-convex (it has an indentation) or
-          // has colinear edges.
-          final float s = Vec2.cross(edge, r);
-          assert (s > 0.0f);
-        }
-      }
-    }
-
     // Compute the polygon centroid.
-    computeCentroidToOut(m_vertices, m_vertexCount, m_centroid);
+    computeCentroidToOut(m_vertices, m_count, m_centroid);
   }
 
   /**
@@ -216,7 +281,7 @@ public class PolygonShape extends Shape {
    * @param hy the half-height.
    */
   public final void setAsBox(final float hx, final float hy) {
-    m_vertexCount = 4;
+    m_count = 4;
     m_vertices[0].set(-hx, -hy);
     m_vertices[1].set(hx, -hy);
     m_vertices[2].set(hx, hy);
@@ -237,7 +302,7 @@ public class PolygonShape extends Shape {
    * @param angle the rotation of the box in local coordinates.
    */
   public final void setAsBox(final float hx, final float hy, final Vec2 center, final float angle) {
-    m_vertexCount = 4;
+    m_count = 4;
     m_vertices[0].set(-hx, -hy);
     m_vertices[1].set(hx, -hy);
     m_vertices[2].set(hx, hy);
@@ -254,35 +319,17 @@ public class PolygonShape extends Shape {
 
     final Vec2 temp = new Vec2();
     // Transform vertices and normals.
-    for (int i = 0; i < m_vertexCount; ++i) {
+    for (int i = 0; i < m_count; ++i) {
       Transform.mulToOut(xf, m_vertices[i], m_vertices[i]);
       Rot.mulToOutUnsafe(xf.q, m_normals[i], temp);
       m_normals[i].set(temp);
     }
   }
 
-  /**
-   * Set this as a single edge.
-   * 
-   * @param v1
-   * @param v2
-   */
-  public final void setAsEdge(final Vec2 v1, final Vec2 v2) {
-    m_vertexCount = 2;
-    m_vertices[0].set(v1);
-    m_vertices[1].set(v2);
-    m_centroid.set(v1).addLocal(v2).mulLocal(0.5f);
-    // = 0.5f * (v1 + v2);
-    m_normals[0].set(v2).subLocal(v1);
-    Vec2.crossToOut(m_normals[0], 1f, m_normals[0]);
-    // m_normals[0] = Cross(v2 - v1, 1.0f);
-    m_normals[0].normalize();
-    m_normals[1].set(m_normals[0]).negateLocal();
+  public int getChildCount() {
+    return m_count;
   }
 
-  /**
-   * @see Shape#testPoint(Transform, Vec2)
-   */
   @Override
   public final boolean testPoint(final Transform xf, final Vec2 p) {
 
@@ -296,14 +343,14 @@ public class PolygonShape extends Shape {
     if (m_debug) {
       System.out.println("--testPoint debug--");
       System.out.println("Vertices: ");
-      for (int i = 0; i < m_vertexCount; ++i) {
+      for (int i = 0; i < m_count; ++i) {
         System.out.println(m_vertices[i]);
       }
       System.out.println("pLocal: " + pLocal);
     }
 
 
-    for (int i = 0; i < m_vertexCount; ++i) {
+    for (int i = 0; i < m_count; ++i) {
       temp.set(pLocal).subLocal(m_vertices[i]);
       final float dot = Vec2.dot(m_normals[i], temp);
       if (dot > 0.0f) {
@@ -314,34 +361,30 @@ public class PolygonShape extends Shape {
     return true;
   }
 
-  /**
-   * @see Shape#computeAABB(AABB, Transform, int)
-   */
   @Override
-  public final void computeAABB(final AABB argAabb, final Transform argXf) {
+  public final void computeAABB(final AABB aabb, final Transform xf, int childIndex) {
+    final Vec2 v = pool1;
+    final Vec2 lower = aabb.lowerBound;
+    final Vec2 upper = aabb.upperBound;
 
-    final Vec2 lower = pool1;
-    final Vec2 upper = pool2;
-    final Vec2 v = pool3;
-
-    Transform.mulToOutUnsafe(argXf, m_vertices[0], lower);
+    Transform.mulToOutUnsafe(xf, m_vertices[0], lower);
     upper.set(lower);
 
-    for (int i = 1; i < m_vertexCount; ++i) {
-      Transform.mulToOutUnsafe(argXf, m_vertices[i], v);
+    for (int i = 1; i < m_count; ++i) {
+      Transform.mulToOutUnsafe(xf, m_vertices[i], v);
       // Vec2 v = Mul(xf, m_vertices[i]);
       Vec2.minToOut(lower, v, lower);
       Vec2.maxToOut(upper, v, upper);
     }
 
     // Vec2 r(m_radius, m_radius);
-    // aabb->lowerBound = lower - r;
-    // aabb->upperBound = upper + r;
+    // aabb.lowerBound = lower - r;
+    // aabb.upperBound = upper + r;
 
-    argAabb.lowerBound.x = lower.x - m_radius;
-    argAabb.lowerBound.y = lower.y - m_radius;
-    argAabb.upperBound.x = upper.x + m_radius;
-    argAabb.upperBound.y = upper.y + m_radius;
+    aabb.lowerBound.x -= m_radius;
+    aabb.lowerBound.y -= m_radius;
+    aabb.upperBound.x += m_radius;
+    aabb.upperBound.y += m_radius;
   }
 
   // djm pooling, and from above
@@ -409,7 +452,7 @@ public class PolygonShape extends Shape {
    * @return
    */
   public final int getVertexCount() {
-    return m_vertexCount;
+    return m_count;
   }
 
   /**
@@ -419,145 +462,83 @@ public class PolygonShape extends Shape {
    * @return
    */
   public final Vec2 getVertex(final int index) {
-    assert (0 <= index && index < m_vertexCount);
+    assert (0 <= index && index < m_count);
     return m_vertices[index];
   }
 
-
-  /**
-   * @see org.jbox2d.collision.shapes.Shape#raycast(org.jbox2d.collision.RayCastOutput,
-   *      org.jbox2d.collision.RayCastInput, org.jbox2d.common.Transform, int)
-   */
   @Override
-  public final boolean raycast(RayCastOutput argOutput, RayCastInput argInput, Transform argXf) {
+  public final boolean raycast(RayCastOutput output, RayCastInput input, Transform xf,
+      int childIndex) {
     final Vec2 p1 = pool1;
     final Vec2 p2 = pool2;
     final Vec2 d = pool3;
     final Vec2 temp = pool4;
 
-    p1.set(argInput.p1).subLocal(argXf.p);
-    Rot.mulTrans(argXf.q, p1, p1);
-    p2.set(argInput.p2).subLocal(argXf.p);
-    Rot.mulTrans(argXf.q, p2, p2);
+    p1.set(input.p1).subLocal(xf.p);
+    Rot.mulTrans(xf.q, p1, p1);
+    p2.set(input.p2).subLocal(xf.p);
+    Rot.mulTrans(xf.q, p2, p2);
     d.set(p2).subLocal(p1);
 
-    if (m_vertexCount == 2) {
-      Vec2 v1 = m_vertices[0];
-      Vec2 v2 = m_vertices[1];
-      Vec2 normal = m_normals[0];
+    // if (count == 2) {
 
-      // q = p1 + t * d
-      // dot(normal, q - v1) = 0
-      // dot(normal, p1 - v1) + t * dot(normal, d) = 0
-      temp.set(v1).subLocal(p1);
-      float numerator = Vec2.dot(normal, temp);
-      float denominator = Vec2.dot(normal, d);
+    // } else {
+
+    float lower = 0, upper = input.maxFraction;
+
+    int index = -1;
+
+    for (int i = 0; i < m_count; ++i) {
+      // p = p1 + a * d
+      // dot(normal, p - v) = 0
+      // dot(normal, p1 - v) + a * dot(normal, d) = 0
+      temp.set(m_vertices[i]).subLocal(p1);
+      final float numerator = Vec2.dot(m_normals[i], temp);
+      final float denominator = Vec2.dot(m_normals[i], d);
 
       if (denominator == 0.0f) {
-        return false;
-      }
-
-      float t = numerator / denominator;
-      if (t < 0.0f || 1.0f < t) {
-        return false;
-      }
-
-      final Vec2 q = pool5;
-      final Vec2 r = pool6;
-
-      // Vec2 q = p1 + t * d;
-      temp.set(d).mulLocal(t);
-      q.set(p1).addLocal(temp);
-
-      // q = v1 + s * r
-      // s = dot(q - v1, r) / dot(r, r)
-      // Vec2 r = v2 - v1;
-      r.set(v2).subLocal(v1);
-
-      float rr = Vec2.dot(r, r);
-      if (rr == 0.0f) {
-        return false;
-      }
-
-      temp.set(q).subLocal(v1);
-      float s = Vec2.dot(temp, r) / rr;
-      if (s < 0.0f || 1.0f < s) {
-        return false;
-      }
-
-      argOutput.fraction = t;
-      if (numerator > 0.0f) {
-        // argOutput.normal = -normal;
-        argOutput.normal.set(normal).mulLocal(-1);
-      } else {
-        // output.normal = normal;
-        argOutput.normal.set(normal);
-      }
-      return true;
-    } else {
-
-      float lower = 0, upper = argInput.maxFraction;
-
-      int index = -1;
-
-      for (int i = 0; i < m_vertexCount; ++i) {
-        // p = p1 + a * d
-        // dot(normal, p - v) = 0
-        // dot(normal, p1 - v) + a * dot(normal, d) = 0
-        temp.set(m_vertices[i]).subLocal(p1);
-        final float numerator = Vec2.dot(m_normals[i], temp);
-        final float denominator = Vec2.dot(m_normals[i], d);
-
-        if (denominator == 0.0f) {
-          if (numerator < 0.0f) {
-            return false;
-          }
-        } else {
-          // Note: we want this predicate without division:
-          // lower < numerator / denominator, where denominator < 0
-          // Since denominator < 0, we have to flip the inequality:
-          // lower < numerator / denominator <==> denominator * lower >
-          // numerator.
-          if (denominator < 0.0f && numerator < lower * denominator) {
-            // Increase lower.
-            // The segment enters this half-space.
-            lower = numerator / denominator;
-            index = i;
-          } else if (denominator > 0.0f && numerator < upper * denominator) {
-            // Decrease upper.
-            // The segment exits this half-space.
-            upper = numerator / denominator;
-          }
-        }
-
-        if (upper < lower) {
+        if (numerator < 0.0f) {
           return false;
         }
+      } else {
+        // Note: we want this predicate without division:
+        // lower < numerator / denominator, where denominator < 0
+        // Since denominator < 0, we have to flip the inequality:
+        // lower < numerator / denominator <==> denominator * lower >
+        // numerator.
+        if (denominator < 0.0f && numerator < lower * denominator) {
+          // Increase lower.
+          // The segment enters this half-space.
+          lower = numerator / denominator;
+          index = i;
+        } else if (denominator > 0.0f && numerator < upper * denominator) {
+          // Decrease upper.
+          // The segment exits this half-space.
+          upper = numerator / denominator;
+        }
       }
 
-      assert (0.0f <= lower && lower <= argInput.maxFraction);
-
-      if (index >= 0) {
-        argOutput.fraction = lower;
-        Rot.mulToOutUnsafe(argXf.q, m_normals[index], argOutput.normal);
-        // normal = Mul(xf.R, m_normals[index]);
-        return true;
+      if (upper < lower) {
+        return false;
       }
+    }
+
+    assert (0.0f <= lower && lower <= input.maxFraction);
+
+    if (index >= 0) {
+      output.fraction = lower;
+      Rot.mulToOutUnsafe(xf.q, m_normals[index], output.normal);
+      // normal = Mul(xf.R, m_normals[index]);
+      return true;
     }
     return false;
   }
-
 
   public final void computeCentroidToOut(final Vec2[] vs, final int count, final Vec2 out) {
     assert (count >= 3);
 
     out.set(0.0f, 0.0f);
     float area = 0.0f;
-
-    if (count == 2) {
-      out.set(vs[0]).addLocal(vs[1]).mulLocal(.5f);
-      return;
-    }
 
     // pRef is the reference point for forming triangles.
     // It's location doesn't change the result (except for rounding error).
@@ -592,9 +573,6 @@ public class PolygonShape extends Shape {
     out.mulLocal(1.0f / area);
   }
 
-  /**
-   * @see Shape#computeMass(MassData)
-   */
   public void computeMass(final MassData massData, float density) {
     // Polygon mass, centroid, and inertia.
     // Let rho be the polygon density in mass per unit area.
@@ -620,16 +598,7 @@ public class PolygonShape extends Shape {
     //
     // The rest of the derivation is handled by computer algebra.
 
-    assert (m_vertexCount >= 2);
-
-    // A line segment has zero mass.
-    if (m_vertexCount == 2) {
-      // massData.center = 0.5f * (m_vertices[0] + m_vertices[1]);
-      massData.center.set(m_vertices[0]).addLocal(m_vertices[1]).mulLocal(0.5f);
-      massData.mass = 0.0f;
-      massData.I = 0.0f;
-      return;
-    }
+    assert (m_count >= 3);
 
     final Vec2 center = pool1;
     center.setZero();
@@ -638,25 +607,23 @@ public class PolygonShape extends Shape {
 
     // pRef is the reference point for forming triangles.
     // It's location doesn't change the result (except for rounding error).
-    final Vec2 pRef = pool2;
-    pRef.setZero();
+    final Vec2 s = pool2;
+    s.setZero();
+    // This code would put the reference point inside the polygon.
+    for (int i = 0; i < m_count; ++i) {
+      s.addLocal(m_vertices[i]);
+    }
+    s.mulLocal(1.0f / m_count);
 
     final float k_inv3 = 1.0f / 3.0f;
 
     final Vec2 e1 = pool3;
     final Vec2 e2 = pool4;
 
-    for (int i = 0; i < m_vertexCount; ++i) {
+    for (int i = 0; i < m_count; ++i) {
       // Triangle vertices.
-      final Vec2 p1 = pRef;
-      final Vec2 p2 = m_vertices[i];
-      final Vec2 p3 = i + 1 < m_vertexCount ? m_vertices[i + 1] : m_vertices[0];
-
-      e1.set(p2);
-      e1.subLocal(p1);
-
-      e2.set(p3);
-      e2.subLocal(p1);
+      e1.set(m_vertices[i]).subLocal(s);
+      e2.set(s).negateLocal().addLocal(i + 1 < m_count ? m_vertices[i + 1] : m_vertices[0]);
 
       final float D = Vec2.cross(e1, e2);
 
@@ -664,21 +631,16 @@ public class PolygonShape extends Shape {
       area += triangleArea;
 
       // Area weighted centroid
-      center.x += triangleArea * k_inv3 * (p1.x + p2.x + p3.x);
-      center.y += triangleArea * k_inv3 * (p1.y + p2.y + p3.y);
+      center.x += triangleArea * k_inv3 * (e1.x + e2.x);
+      center.y += triangleArea * k_inv3 * (e1.y + e2.y);
 
-      final float px = p1.x, py = p1.y;
       final float ex1 = e1.x, ey1 = e1.y;
       final float ex2 = e2.x, ey2 = e2.y;
 
-      final float intx2 =
-          k_inv3 * (0.25f * (ex1 * ex1 + ex2 * ex1 + ex2 * ex2) + (px * ex1 + px * ex2)) + 0.5f
-              * px * px;
-      final float inty2 =
-          k_inv3 * (0.25f * (ey1 * ey1 + ey2 * ey1 + ey2 * ey2) + (py * ey1 + py * ey2)) + 0.5f
-              * py * py;
+      float intx2 = ex1 * ex1 + ex2 * ex1 + ex2 * ex2;
+      float inty2 = ey1 * ey1 + ey2 * ey1 + ey2 * ey2;
 
-      I += D * (intx2 + inty2);
+      I += (0.25f * k_inv3 * D) * (intx2 + inty2);
     }
 
     // Total mass
@@ -687,16 +649,42 @@ public class PolygonShape extends Shape {
     // Center of mass
     assert (area > Settings.EPSILON);
     center.mulLocal(1.0f / area);
-    massData.center.set(center);
+    massData.center.set(center).addLocal(s);
 
-    // Inertia tensor relative to the local origin.
+    // Inertia tensor relative to the local origin (point s)
     massData.I = I * density;
+
+    // Shift to center of mass then to original body origin.
+    massData.I += massData.mass * (Vec2.dot(massData.center, massData.center));
   }
 
-  /*
-   * Get the local centroid relative to the parent body. / public Vec2 getCentroid() { return
-   * m_centroid.clone(); }
+  /**
+   * Validate convexity. This is a very time consuming operation.
+   * 
+   * @return
    */
+  public boolean validate() {
+    for (int i = 0; i < m_count; ++i) {
+      int i1 = i;
+      int i2 = i < m_count - 1 ? i1 + 1 : 0;
+      Vec2 p = m_vertices[i1];
+      Vec2 e = pool1.set(m_vertices[i2]).subLocal(p);
+
+      for (int j = 0; j < m_count; ++j) {
+        if (j == i1 || j == i2) {
+          continue;
+        }
+
+        Vec2 v = pool2.set(m_vertices[j]).subLocal(p);
+        float c = Vec2.cross(e, v);
+        if (c < 0.0f) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
 
   /** Get the vertices in local coordinates. */
   public Vec2[] getVertices() {

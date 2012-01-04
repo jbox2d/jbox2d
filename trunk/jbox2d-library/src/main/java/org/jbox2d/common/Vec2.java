@@ -251,13 +251,11 @@ public class Vec2 implements Serializable {
     return new Vec2(a.x > b.x ? a.x : b.x, a.y > b.y ? a.y : b.y);
   }
 
-  /* djm created */
   public final static void minToOut(Vec2 a, Vec2 b, Vec2 out) {
     out.x = a.x < b.x ? a.x : b.x;
     out.y = a.y < b.y ? a.y : b.y;
   }
 
-  /* djm created */
   public final static void maxToOut(Vec2 a, Vec2 b, Vec2 out) {
     out.x = a.x > b.x ? a.x : b.x;
     out.y = a.y > b.y ? a.y : b.y;

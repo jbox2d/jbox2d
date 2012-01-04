@@ -21,28 +21,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-/*
- * JBox2D - A Java Port of Erin Catto's Box2D
- * 
- * JBox2D homepage: http://jbox2d.sourceforge.net/
- * Box2D homepage: http://www.box2d.org
- * 
- * This software is provided 'as-is', without any express or implied
- * warranty.  In no event will the authors be held liable for any damages
- * arising from the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose,
- * including commercial applications, and to alter it and redistribute it
- * freely, subject to the following restrictions:
- * 
- * 1. The origin of this software must not be misrepresented; you must not
- * claim that you wrote the original software. If you use this software
- * in a product, an acknowledgment in the product documentation would be
- * appreciated but is not required.
- * 2. Altered source versions must be plainly marked as such, and must not be
- * misrepresented as being the original software.
- * 3. This notice may not be removed or altered from any source distribution.
- */
 
 package org.jbox2d.collision.shapes;
 
@@ -50,14 +28,11 @@ import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.collision.RayCastOutput;
 
-import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
-
-//Updated to rev 100
 
 /**
  * A circle shape.
@@ -79,7 +54,7 @@ public class CircleShape extends Shape {
 	 * @param def
 	 */
 	public CircleShape() {
-		m_type = ShapeType.CIRCLE;
+		super(ShapeType.CIRCLE);
 		m_p = new Vec2();
 		m_radius = 0;
 	}
@@ -89,6 +64,10 @@ public class CircleShape extends Shape {
 		shape.m_p.set(m_p);
 		shape.m_radius = m_radius;
 		return shape;
+	}
+	
+	public final int getChildCount() {
+	  return 1;
 	}
 	
 	/**
@@ -131,9 +110,6 @@ public class CircleShape extends Shape {
 		return m_p;
 	}
 	
-	/**
-	 * @see Shape#testPoint(Transform, Vec2)
-	 */
 	@Override
 	public final boolean testPoint(final Transform transform, final Vec2 p) {
 		final Vec2 center = pool1;
@@ -149,24 +125,20 @@ public class CircleShape extends Shape {
 	// x = s + a * r
 	// norm(x) = radius
 	
-	/**
-	 * @see Shape#raycast(org.jbox2d.collision.RayCastOutput,
-	 *      org.jbox2d.collision.RayCastInput, org.jbox2d.common.Transform, int)
-	 */
 	@Override
-	public final boolean raycast(RayCastOutput argOutput, RayCastInput argInput, Transform argTransform) {
+	public final boolean raycast(RayCastOutput output, RayCastInput input, Transform transform, int childIndex) {
 		
 		final Vec2 position = pool1;
 		final Vec2 s = pool2;
 		final Vec2 r = pool3;
 		
-		Rot.mulToOutUnsafe(argTransform.q, m_p, position);
-		position.addLocal(argTransform.p);
-		s.set(argInput.p1).subLocal(position);
+		Rot.mulToOutUnsafe(transform.q, m_p, position);
+		position.addLocal(transform.p);
+		s.set(input.p1).subLocal(position);
 		final float b = Vec2.dot(s, s) - m_radius * m_radius;
 		
 		// Solve quadratic equation.
-		r.set(argInput.p2).subLocal(argInput.p1);
+		r.set(input.p2).subLocal(input.p1);
 		final float c = Vec2.dot(s, r);
 		final float rr = Vec2.dot(r, r);
 		final float sigma = c * c - rr * b;
@@ -180,37 +152,30 @@ public class CircleShape extends Shape {
 		float a = -(c + MathUtils.sqrt(sigma));
 		
 		// Is the intersection point on the segment?
-		if (0.0f <= a && a <= argInput.maxFraction * rr) {
+		if (0.0f <= a && a <= input.maxFraction * rr) {
 			a /= rr;
-			argOutput.fraction = a;
-			argOutput.normal.set(r).mulLocal(a);
-			argOutput.normal.addLocal(s);
-			argOutput.normal.normalize();
+			output.fraction = a;
+			output.normal.set(r).mulLocal(a);
+			output.normal.addLocal(s);
+			output.normal.normalize();
 			return true;
 		}
 		
 		return false;
 	}
 	
-	/**
-	 * @see org.jbox2d.collision.shapes.Shape#computeAABB(org.jbox2d.collision.AABB,
-	 *      org.jbox2d.common.Transform, int)
-	 */
 	@Override
-	public final void computeAABB(final AABB argAabb, final Transform argTransform) {
+	public final void computeAABB(final AABB aabb, final Transform transform, int childIndex) {
 		final Vec2 p = pool1;
-		Rot.mulToOutUnsafe(argTransform.q, m_p, p);
-		p.addLocal(argTransform.p);
+		Rot.mulToOutUnsafe(transform.q, m_p, p);
+		p.addLocal(transform.p);
 		
-		argAabb.lowerBound.x = p.x - m_radius;
-		argAabb.lowerBound.y = p.y - m_radius;
-		argAabb.upperBound.x = p.x + m_radius;
-		argAabb.upperBound.y = p.y + m_radius;
+		aabb.lowerBound.x = p.x - m_radius;
+		aabb.lowerBound.y = p.y - m_radius;
+		aabb.upperBound.x = p.x + m_radius;
+		aabb.upperBound.y = p.y + m_radius;
 	}
 	
-	/**
-	 * @see Shape#computeMass(MassData, float)
-	 */
 	@Override
 	public final void computeMass(final MassData massData, final float density) {
 		massData.mass = density * Settings.PI * m_radius * m_radius;

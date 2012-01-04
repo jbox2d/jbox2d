@@ -270,7 +270,7 @@ public class Collision {
     int normalIndex = 0;
     float separation = Float.MIN_VALUE;
     final float radius = polygon.m_radius + circle.m_radius;
-    final int vertexCount = polygon.m_vertexCount;
+    final int vertexCount = polygon.m_count;
 
     final Vec2[] vertices = polygon.m_vertices;
     final Vec2[] normals = polygon.m_normals;
@@ -441,11 +441,11 @@ public class Collision {
   public final float edgeSeparation(final PolygonShape poly1, final Transform xf1, final int edge1,
       final PolygonShape poly2, final Transform xf2) {
 
-    final int count1 = poly1.m_vertexCount;
+    final int count1 = poly1.m_count;
     final Vec2[] vertices1 = poly1.m_vertices;
     final Vec2[] normals1 = poly1.m_normals;
 
-    final int count2 = poly2.m_vertexCount;
+    final int count2 = poly2.m_count;
     final Vec2[] vertices2 = poly2.m_vertices;
 
     assert (0 <= edge1 && edge1 < count1);
@@ -519,7 +519,7 @@ public class Collision {
    */
   public final void findMaxSeparation(EdgeResults results, final PolygonShape poly1,
       final Transform xf1, final PolygonShape poly2, final Transform xf2) {
-    int count1 = poly1.m_vertexCount;
+    int count1 = poly1.m_count;
     final Vec2[] normals1 = poly1.m_normals;
     Vec2 v = poly2.m_centroid;
 
@@ -613,10 +613,10 @@ public class Collision {
   // djm pooling from above
   public final void findIncidentEdge(final ClipVertex[] c, final PolygonShape poly1,
       final Transform xf1, int edge1, final PolygonShape poly2, final Transform xf2) {
-    int count1 = poly1.m_vertexCount;
+    int count1 = poly1.m_count;
     final Vec2[] normals1 = poly1.m_normals;
 
-    int count2 = poly2.m_vertexCount;
+    int count2 = poly2.m_count;
     final Vec2[] vertices2 = poly2.m_vertices;
     final Vec2[] normals2 = poly2.m_normals;
 
@@ -726,7 +726,7 @@ public class Collision {
 
     findIncidentEdge(incidentEdge, poly1, xf1, edge1, poly2, xf2);
 
-    int count1 = poly1.m_vertexCount;
+    int count1 = poly1.m_count;
     final Vec2[] vertices1 = poly1.m_vertices;
 
     v11.set(vertices1[edge1]);
