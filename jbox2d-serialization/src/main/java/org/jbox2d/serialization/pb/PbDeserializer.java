@@ -247,8 +247,8 @@ public class PbDeserializer implements JbDeserializer {
         PolygonShape p = new PolygonShape();
         p.m_centroid.set(pbToVec(s.getCentroid()));
         p.m_radius = s.getRadius();
-        p.m_vertexCount = s.getPointsCount();
-        for (int i = 0; i < p.m_vertexCount; i++) {
+        p.m_count = s.getPointsCount();
+        for (int i = 0; i < p.m_count; i++) {
           p.m_vertices[i].set(pbToVec(s.getPoints(i)));
           p.m_normals[i].set(pbToVec(s.getNormals(i)));
         }
