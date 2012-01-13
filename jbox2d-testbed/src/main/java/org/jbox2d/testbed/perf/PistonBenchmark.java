@@ -50,7 +50,7 @@ public class PistonBenchmark extends PerfTest {
   public void runTest(int argNum) {
     boolean bullets = argNum == 0;
     
-    World world = new World(new Vec2(0.0f, -10.0f), true);
+    World world = new World(new Vec2(0.0f, -10.0f));
     Body ground = null;
     {
       BodyDef bd = new BodyDef();

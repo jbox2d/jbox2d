@@ -30,27 +30,21 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.pooling.IWorldPool;
 
-// updated to rev 100
-
 public class CircleContact extends Contact {
-	
-	/**
-	 * @param argPool
-	 */
-	public CircleContact(IWorldPool argPool) {
-		super(argPool);
-	}
 
-	public void init(Fixture fixtureA, Fixture fixtureB){
-		super.init(fixtureA, fixtureB);
-		assert(m_fixtureA.getType() == ShapeType.CIRCLE);
-		assert(m_fixtureB.getType() == ShapeType.CIRCLE);
-	}
-	
-	@Override
-	public void evaluate(Manifold manifold, Transform xfA, Transform xfB) {
-		pool.getCollision().collideCircles(manifold,
-				(CircleShape)m_fixtureA.getShape(), xfA,
-				(CircleShape)m_fixtureB.getShape(), xfB);
-	}
+  public CircleContact(IWorldPool argPool) {
+    super(argPool);
+  }
+
+  public void init(Fixture fixtureA, Fixture fixtureB) {
+    super.init(fixtureA, 0, fixtureB, 0);
+    assert (m_fixtureA.getType() == ShapeType.CIRCLE);
+    assert (m_fixtureB.getType() == ShapeType.CIRCLE);
+  }
+
+  @Override
+  public void evaluate(Manifold manifold, Transform xfA, Transform xfB) {
+    pool.getCollision().collideCircles(manifold, (CircleShape) m_fixtureA.getShape(), xfA,
+        (CircleShape) m_fixtureB.getShape(), xfB);
+  }
 }

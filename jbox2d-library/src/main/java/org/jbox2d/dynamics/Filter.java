@@ -48,6 +48,12 @@ public class Filter {
 	 */
 	public int groupIndex;
 	
+	public Filter() {
+	  categoryBits = 0x0001;
+      maskBits = 0xFFFF;
+      groupIndex = 0;
+    }
+	
 	public void set(Filter argOther) {
 		categoryBits = argOther.categoryBits;
 		maskBits = argOther.maskBits;

@@ -39,7 +39,7 @@ public class MJWTest extends TestbedTest {
       
       getWorld().setGravity(new Vec2());
 
-      for (int i = 0; i < 2; i++)
+      for (int i = 0; i < 3; i++)
       {
 //         CircleShape circleShape = new CircleShape();
 //         circleShape.m_radius = 1;
@@ -49,9 +49,9 @@ public class MJWTest extends TestbedTest {
          Shape shape = polygonShape;
 
          BodyDef bodyDef = new BodyDef();
-         bodyDef.type = BodyType.DYNAMIC;
+         bodyDef.type = i == 0 ? BodyType.STATIC : BodyType.DYNAMIC;
          bodyDef.position.set(5 * i, 0);
-         bodyDef.angle = (float) (Math.PI / 4 * i);
+         bodyDef.angle = (float) (Math.PI / 3 * i);
          bodyDef.allowSleep = false;
          Body body = getWorld().createBody(bodyDef);
          body.createFixture(shape, 5.0f);
@@ -60,9 +60,6 @@ public class MJWTest extends TestbedTest {
       }
    }
 
-   /**
-    * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-    */
    @Override
    public String getTestName() {
       return "Couple of Things";

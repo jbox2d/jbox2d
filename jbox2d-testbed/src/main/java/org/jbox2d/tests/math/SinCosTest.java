@@ -38,7 +38,7 @@ public class SinCosTest {
 	
 	// speed
 	public static int speedTrials = 20;
-	public static int speedIterations = 5000;
+	public static int speedIterations = 50000;
 		
 	
 
@@ -47,7 +47,7 @@ public class SinCosTest {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		int overall = 5;
+		int overall = 1;
 		try{
 			numTables = Integer.parseInt(args[0]);
 			mostPreciseTable = Float.parseFloat(args[1]);

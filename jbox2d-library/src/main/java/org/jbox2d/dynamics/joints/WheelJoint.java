@@ -39,7 +39,7 @@ import org.jbox2d.pooling.IWorldPool;
 /**
  * @author Daniel Murphy
  */
-public class LineJoint extends Joint {
+public class WheelJoint extends Joint {
 
   public final Vec2 m_localAnchor1 = new Vec2();
   public final Vec2 m_localAnchor2 = new Vec2();
@@ -67,7 +67,7 @@ public class LineJoint extends Joint {
   private boolean m_enableMotor;
   private LimitState m_limitState;
 
-  public LineJoint(IWorldPool argPool, LineJointDef def) {
+  public WheelJoint(IWorldPool argPool, LineJointDef def) {
     super(argPool, def);
     m_localAnchor1.set(def.localAnchorA);
     m_localAnchor2.set(def.localAnchorB);

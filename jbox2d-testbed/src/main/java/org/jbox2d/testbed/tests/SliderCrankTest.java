@@ -114,6 +114,7 @@ public class SliderCrankTest extends TestbedTest {
 
 				BodyDef bd = new BodyDef();
 				bd.type = BodyType.DYNAMIC;
+				bd.fixedRotation = true;
 				bd.position.set(0.0f, 17.0f);
 				Body body = getWorld().createBody(bd);
 				body.createFixture(shape, 2.0f);
@@ -126,7 +127,7 @@ public class SliderCrankTest extends TestbedTest {
 				pjd.initialize(ground, body, new Vec2(0.0f, 17.0f), new Vec2(0.0f, 1.0f));
 
 				pjd.maxMotorForce = 1000.0f;
-				pjd.enableMotor = true;
+				pjd.enableMotor = false;
 
 				m_joint2 = (PrismaticJoint)getWorld().createJoint(pjd);
 			}
@@ -153,7 +154,7 @@ public class SliderCrankTest extends TestbedTest {
 		super.step(settings);
 		
 		addTextLine("Keys: (f) toggle friction, (m) toggle motor");
-		float torque = m_joint1.getMotorTorque();
+		float torque = m_joint1.getMotorTorque(1);
 		Formatter f = new Formatter();
 		addTextLine(f.format("Friction: %b, Motor Force = %5.0f, ", m_joint2.isMotorEnabled(), torque).toString());
 

@@ -26,6 +26,7 @@
  */
 package org.jbox2d.testbed.tests;
 
+import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -40,73 +41,85 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class Pulleys extends TestbedTest {
-	
-	PulleyJoint m_joint1;
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-	 */
-	@Override
-	public void initTest(boolean argDeserialized) {
-		Body ground = null;
-		{
-			BodyDef bd = new BodyDef();
-			ground = getWorld().createBody(bd);
 
-			PolygonShape shape = new PolygonShape();
-			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
-			ground.createFixture(shape, 0.0f);
-		}
+  PulleyJoint m_joint1;
 
-		{
-			float a = 2.0f;
-			float b = 4.0f;
-			float y = 16.0f;
-			float L = 12.0f;
+  /**
+   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
+   */
+  @Override
+  public void initTest(boolean argDeserialized) {
 
-			PolygonShape shape = new PolygonShape();
-			shape.setAsBox(a, b);
+    float y = 16.0f;
+    float L = 12.0f;
+    float a = 1.0f;
+    float b = 2.0f;
+    Body ground = null;
+    {
+      BodyDef bd = new BodyDef();
+      ground = getWorld().createBody(bd);
 
-			BodyDef bd = new BodyDef();
-			bd.type = BodyType.DYNAMIC;
+      PolygonShape shape = new PolygonShape();
+      shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
+      ground.createFixture(shape, 0.0f);
 
-			bd.position.set(-10.0f, y);
-			Body body1 = getWorld().createBody(bd);
-			body1.createFixture(shape, 5.0f);
+      CircleShape circle = new CircleShape();
+      circle.m_radius = 2.0f;
 
-			bd.position.set(10.0f, y);
-			Body body2 = getWorld().createBody(bd);
-			body2.createFixture(shape, 5.0f);
+      circle.m_p.set(-10.0f, y + b + L);
+      ground.createFixture(circle, 0.0f);
 
-			PulleyJointDef pulleyDef = new PulleyJointDef();
-			Vec2 anchor1 = new Vec2(-10.0f, y + b);
-			Vec2 anchor2 = new Vec2(10.0f, y + b);
-			Vec2 groundAnchor1 = new Vec2(-10.0f, y + b + L);
-			Vec2 groundAnchor2 = new Vec2(10.0f, y + b + L);
-			pulleyDef.initialize(body1, body2, groundAnchor1, groundAnchor2, anchor1, anchor2, 2.0f);
+      circle.m_p.set(10.0f, y + b + L);
+      ground.createFixture(circle, 0.0f);
+    }
 
-			m_joint1 = (PulleyJoint)getWorld().createJoint(pulleyDef);
-		}
-	}
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
-	 */
-	@Override
-	public void step(TestbedSettings settings) {
-		super.step(settings);
-		float ratio = m_joint1.getRatio();
-		float L = m_joint1.getLength1() + ratio * m_joint1.getLength2();
-		addTextLine("L1 + "+ratio+" * L2 = "+L);
-		if(L >= 36){
-			addTextLine("Pulley is taught");
-		}
-	}
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-	 */
-	@Override
-	public String getTestName() {
-		return "Pulleys";
-	}
-	
+    {
+
+      PolygonShape shape = new PolygonShape();
+      shape.setAsBox(a, b);
+
+      BodyDef bd = new BodyDef();
+      bd.type = BodyType.DYNAMIC;
+
+      bd.position.set(-10.0f, y);
+      Body body1 = getWorld().createBody(bd);
+      body1.createFixture(shape, 5.0f);
+
+      bd.position.set(10.0f, y);
+      Body body2 = getWorld().createBody(bd);
+      body2.createFixture(shape, 5.0f);
+
+      PulleyJointDef pulleyDef = new PulleyJointDef();
+      Vec2 anchor1 = new Vec2(-10.0f, y + b);
+      Vec2 anchor2 = new Vec2(10.0f, y + b);
+      Vec2 groundAnchor1 = new Vec2(-10.0f, y + b + L);
+      Vec2 groundAnchor2 = new Vec2(10.0f, y + b + L);
+      pulleyDef.initialize(body1, body2, groundAnchor1, groundAnchor2, anchor1, anchor2, 2.0f);
+
+      m_joint1 = (PulleyJoint) getWorld().createJoint(pulleyDef);
+    }
+  }
+
+  /**
+   * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
+   */
+  @Override
+  public void step(TestbedSettings settings) {
+    super.step(settings);
+    float ratio = m_joint1.getRatio();
+    float L = m_joint1.getLength1() + ratio * m_joint1.getLength2();
+    addTextLine("L1 + " + ratio + " * L2 = " + L);
+    if (L >= 36) {
+      addTextLine("Pulley is taught");
+    }
+  }
+
+  /**
+   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
+   */
+  @Override
+  public String getTestName() {
+    return "Pulleys";
+  }
+
 }

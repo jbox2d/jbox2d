@@ -136,7 +136,7 @@ public class CollisionFiltering extends TestbedTest {
 			jd.enableLimit = true;
 			jd.localAnchorA.set(0.0f, 4.0f);
 			jd.localAnchorB.setZero();
-			jd.localAxis1.set(0.0f, 1.0f);
+			jd.localAxisA.set(0.0f, 1.0f);
 			jd.lowerTranslation = -1.0f;
 			jd.upperTranslation = 1.0f;
 

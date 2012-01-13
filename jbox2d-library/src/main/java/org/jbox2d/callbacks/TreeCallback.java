@@ -24,7 +24,7 @@
 package org.jbox2d.callbacks;
 
 import org.jbox2d.collision.broadphase.DynamicTree;
-import org.jbox2d.collision.broadphase.DynamicTreeNode;
+import org.jbox2d.collision.broadphase.TreeNode;
 
 // update to rev 100
 /**
@@ -36,8 +36,8 @@ public interface TreeCallback {
 	
 	/**
 	 * Callback from a query request.  
-	 * @param node
+	 * @param proxyId the id of the proxy
 	 * @return if the query should be continued
 	 */
-	public boolean treeCallback(DynamicTreeNode node);
+	public boolean treeCallback(int proxyId);
 }

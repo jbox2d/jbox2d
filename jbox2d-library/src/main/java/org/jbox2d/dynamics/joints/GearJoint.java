@@ -123,13 +123,13 @@ public class GearJoint extends Joint {
     m_bodyA = def.joint1.getBodyB();
     if (type1 == JointType.REVOLUTE) {
       m_revolute1 = (RevoluteJoint) def.joint1;
-      m_groundAnchor1.set(m_revolute1.m_localAnchor1);
-      m_localAnchor1.set(m_revolute1.m_localAnchor2);
+      m_groundAnchor1.set(m_revolute1.m_localAnchorA);
+      m_localAnchor1.set(m_revolute1.m_localAnchorB);
       coordinate1 = m_revolute1.getJointAngle();
     } else {
       m_prismatic1 = (PrismaticJoint) def.joint1;
-      m_groundAnchor1.set(m_prismatic1.m_localAnchor1);
-      m_localAnchor1.set(m_prismatic1.m_localAnchor2);
+      m_groundAnchor1.set(m_prismatic1.m_localAnchorA);
+      m_localAnchor1.set(m_prismatic1.m_localAnchorB);
       coordinate1 = m_prismatic1.getJointTranslation();
     }
 
@@ -137,13 +137,13 @@ public class GearJoint extends Joint {
     m_bodyB = def.joint2.getBodyB();
     if (type2 == JointType.REVOLUTE) {
       m_revolute2 = (RevoluteJoint) def.joint2;
-      m_groundAnchor2.set(m_revolute2.m_localAnchor1);
-      m_localAnchor2.set(m_revolute2.m_localAnchor2);
+      m_groundAnchor2.set(m_revolute2.m_localAnchorA);
+      m_localAnchor2.set(m_revolute2.m_localAnchorB);
       coordinate2 = m_revolute2.getJointAngle();
     } else {
       m_prismatic2 = (PrismaticJoint) def.joint2;
-      m_groundAnchor2.set(m_prismatic2.m_localAnchor1);
-      m_localAnchor2.set(m_prismatic2.m_localAnchor2);
+      m_groundAnchor2.set(m_prismatic2.m_localAnchorA);
+      m_localAnchor2.set(m_prismatic2.m_localAnchorB);
       coordinate2 = m_prismatic2.getJointTranslation();
     }
 
@@ -225,7 +225,7 @@ public class GearJoint extends Joint {
     } else {
       final Vec2 ug = pool.popVec2();
       final Vec2 r = pool.popVec2();
-      Rot.mulToOutUnsafe(g1.getTransform().q, m_prismatic1.m_localXAxis1, ug);
+      Rot.mulToOutUnsafe(g1.getTransform().q, m_prismatic1.m_localXAxisA, ug);
 
       r.set(m_localAnchor1).subLocal(b1.getLocalCenter());
       Rot.mulToOut(b1.getTransform().q, r, r);
@@ -243,7 +243,7 @@ public class GearJoint extends Joint {
       final Vec2 ug = pool.popVec2();
       final Vec2 r = pool.popVec2();
 
-      Rot.mulToOutUnsafe(g2.getTransform().q, m_prismatic2.m_localXAxis1, ug);
+      Rot.mulToOutUnsafe(g2.getTransform().q, m_prismatic2.m_localXAxisA, ug);
 
       r.set(m_localAnchor2).subLocal(b2.getLocalCenter());
       Rot.mulToOut(b2.getTransform().q, r, r);

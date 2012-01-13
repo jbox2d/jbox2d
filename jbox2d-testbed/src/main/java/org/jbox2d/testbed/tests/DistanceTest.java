@@ -92,8 +92,8 @@ public class DistanceTest extends TestbedTest {
 	public void step(TestbedSettings settings) {
 		super.step(settings);
 		
-		input.proxyA.set(m_polygonA);
-		input.proxyB.set(m_polygonB);
+		input.proxyA.set(m_polygonA,0);
+		input.proxyB.set(m_polygonB,0);
 		input.transformA.set(m_transformA);
 		input.transformB.set(m_transformB);
 		input.useRadii = true;

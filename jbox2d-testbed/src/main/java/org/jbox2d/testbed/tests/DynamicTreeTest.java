@@ -34,7 +34,7 @@ import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.collision.RayCastOutput;
 import org.jbox2d.collision.broadphase.DynamicTree;
-import org.jbox2d.collision.broadphase.DynamicTreeNode;
+import org.jbox2d.collision.broadphase.TreeNode;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
@@ -149,7 +149,7 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 
 		for (int i = 0; i < e_actorCount; ++i) {
 			Actor actor = m_actors[i];
-			if (actor.proxyId == null)
+			if (actor.proxyId == -1)
 				continue;
 
 			Color3f c = new Color3f(0.9f, 0.9f, 0.9f);
@@ -193,15 +193,15 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 				"(c)reate proxy, (d)estroy proxy, (a)utomate", Color3f.WHITE);
 	}
 
-	public boolean treeCallback(DynamicTreeNode proxyId) {
-		Actor actor = (Actor) proxyId.userData;
+	public boolean treeCallback(int proxyId) {
+		Actor actor = (Actor) m_tree.getUserData(proxyId);
 		actor.overlap = AABB.testOverlap(m_queryAABB, actor.aabb);
 		return true;
 	}
 
 	public float raycastCallback(final RayCastInput input,
-			DynamicTreeNode proxyId) {
-		Actor actor = (Actor) proxyId.userData;
+			int proxyId) {
+		Actor actor = (Actor) m_tree.getUserData(proxyId);
 
 		RayCastOutput output = new RayCastOutput();
 		boolean hit = actor.aabb.raycast(output, input, getWorld().getPool());
@@ -220,7 +220,7 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 		AABB aabb = new AABB();
 		float fraction;
 		boolean overlap;
-		DynamicTreeNode proxyId;
+		int proxyId;
 	}
 
 	public void GetRandomAABB(AABB aabb) {
@@ -259,7 +259,7 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 		for (int i = 0; i < e_actorCount; ++i) {
 			int j = MathUtils.abs(rand.nextInt() % e_actorCount);
 			Actor actor = m_actors[j];
-			if (actor.proxyId == null) {
+			if (actor.proxyId == -1) {
 				GetRandomAABB(actor.aabb);
 				actor.proxyId = m_tree.createProxy(actor.aabb, actor);
 				return;
@@ -271,9 +271,9 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 		for (int i = 0; i < e_actorCount; ++i) {
 			int j = MathUtils.abs(rand.nextInt() % e_actorCount);
 			Actor actor = m_actors[j];
-			if (actor.proxyId != null) {
+			if (actor.proxyId != -1) {
 				m_tree.destroyProxy(actor.proxyId);
-				actor.proxyId = null;
+				actor.proxyId = -1;
 				return;
 			}
 		}
@@ -283,7 +283,7 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 		for (int i = 0; i < e_actorCount; ++i) {
 			int j = MathUtils.abs(rand.nextInt() % e_actorCount);
 			Actor actor = m_actors[j];
-			if (actor.proxyId == null) {
+			if (actor.proxyId == -1) {
 				continue;
 			}
 
@@ -316,7 +316,7 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 		m_tree.query(this, m_queryAABB);
 
 		for (int i = 0; i < e_actorCount; ++i) {
-			if (m_actors[i].proxyId == null) {
+			if (m_actors[i].proxyId == -1) {
 				continue;
 			}
 
@@ -328,7 +328,8 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 	public void RayCast() {
 		m_rayActor = null;
 
-		RayCastInput input = m_rayCastInput;
+		RayCastInput input = new RayCastInput();
+		input.set(m_rayCastInput);
 
 		// Ray cast against the dynamic tree.
 		m_tree.raycast(this, input);
@@ -337,7 +338,7 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 		Actor bruteActor = null;
 		RayCastOutput bruteOutput = new RayCastOutput();
 		for (int i = 0; i < e_actorCount; ++i) {
-			if (m_actors[i].proxyId == null) {
+			if (m_actors[i].proxyId == -1) {
 				continue;
 			}
 
@@ -347,13 +348,18 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 			if (hit) {
 				bruteActor = m_actors[i];
 				bruteOutput = output;
-			    //input.set(m_rayCastInput);
+				input.maxFraction = output.fraction;
 			}
 		}
 
 		if (bruteActor != null) {
-			assert (MathUtils.abs(bruteOutput.fraction
-					- m_rayCastOutput.fraction) <= Settings.EPSILON);
+		  if(MathUtils.abs(bruteOutput.fraction
+                    - m_rayCastOutput.fraction) > Settings.EPSILON) {
+		    System.out.println("wrong!");
+		    assert (MathUtils.abs(bruteOutput.fraction
+              - m_rayCastOutput.fraction) <= 20 * Settings.EPSILON);
+		  }
+			
 		}
 	}
 

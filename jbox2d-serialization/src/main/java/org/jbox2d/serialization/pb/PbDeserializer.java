@@ -105,7 +105,7 @@ public class PbDeserializer implements JbDeserializer {
   }
 
   public World deserializeWorld(PbWorld argWorld) {
-    World world = new World(pbToVec(argWorld.getGravity()), argWorld.getAllowSleep());
+    World world = new World(pbToVec(argWorld.getGravity()));
 
     world.setAutoClearForces(argWorld.getAutoClearForces());
     world.setContinuousPhysics(argWorld.getContinuousPhysics());
@@ -298,7 +298,7 @@ public class PbDeserializer implements JbDeserializer {
         def.enableMotor = argJoint.getEnableMotor();
         def.localAnchorA.set(pbToVec(argJoint.getLocalAnchorA()));
         def.localAnchorB.set(pbToVec(argJoint.getLocalAnchorB()));
-        def.localAxis1.set(pbToVec(argJoint.getLocalAxisA()));
+        def.localAxisA.set(pbToVec(argJoint.getLocalAxisA()));
         def.lowerTranslation = argJoint.getLowerLimit();
         def.maxMotorForce = argJoint.getMaxMotorForce();
         def.motorSpeed = argJoint.getMotorSpeed();
@@ -339,8 +339,6 @@ public class PbDeserializer implements JbDeserializer {
         def.groundAnchorB.set(pbToVec(argJoint.getGroundAnchorB()));
         def.lengthA = argJoint.getLengthA();
         def.lengthB = argJoint.getLengthB();
-        def.maxLengthA = argJoint.getMaxLengthA();
-        def.maxLengthB = argJoint.getMaxLengthB();
         def.ratio = argJoint.getRatio();
         break;
       }
@@ -383,6 +381,8 @@ public class PbDeserializer implements JbDeserializer {
         def.localAnchorA.set(pbToVec(argJoint.getLocalAnchorA()));
         def.localAnchorB.set(pbToVec(argJoint.getLocalAnchorB()));
         def.referenceAngle = argJoint.getRefAngle();
+        def.frequencyHz = argJoint.getFrequency();
+        def.dampingRatio = argJoint.getDampingRatio();
         break;
       }
       case FRICTION: {

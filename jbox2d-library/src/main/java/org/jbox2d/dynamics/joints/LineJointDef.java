@@ -80,7 +80,7 @@ public class LineJointDef extends JointDef {
 	public float motorSpeed;
 	
 	public LineJointDef() {
-		type = JointType.LINE;
+		type = JointType.WHEEL;
 		localAxisA.set(1, 0);
 		enableLimit = false;
 		lowerTranslation = 0;

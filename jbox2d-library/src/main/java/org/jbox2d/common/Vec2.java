@@ -160,8 +160,7 @@ public class Vec2 implements Serializable {
 
   /** True if the vector represents a pair of valid, non-infinite floating point numbers. */
   public final boolean isValid() {
-    return x != Float.NaN && x != Float.NEGATIVE_INFINITY && x != Float.POSITIVE_INFINITY
-        && y != Float.NaN && y != Float.NEGATIVE_INFINITY && y != Float.POSITIVE_INFINITY;
+    return !Float.isNaN(x) && !Float.isInfinite(x) && !Float.isNaN(y) && !Float.isInfinite(y);
   }
 
   /** Return a new vector that has positive components. */
@@ -215,7 +214,7 @@ public class Vec2 implements Serializable {
     out.x = s * a.y;
     out.y = tempy;
   }
-  
+
   public final static void crossToOutUnsafe(Vec2 a, float s, Vec2 out) {
     assert (out != a);
     out.x = s * a.y;
@@ -231,7 +230,7 @@ public class Vec2 implements Serializable {
     out.x = -s * a.y;
     out.y = tempY;
   }
-  
+
   public final static void crossToOutUnsafe(float s, Vec2 a, Vec2 out) {
     assert (out != a);
     out.x = -s * a.y;
