@@ -70,7 +70,7 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
   final TestbedModel model;
   final TestbedController controller;
 
-  public JComboBox tests;
+  public JComboBox<ListItem> tests;
 
   private JButton pauseButton = new JButton("Pause");
   private JButton stepButton = new JButton("Step");
@@ -106,18 +106,18 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
     top.setLayout(new GridLayout(0, 1));
     top.setBorder(BorderFactory.createCompoundBorder(new EtchedBorder(EtchedBorder.LOWERED),
         BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-    tests = new JComboBox(model.getComboModel());
+    tests = new JComboBox<ListItem>(model.getComboModel());
     tests.setMaximumRowCount(30);
     tests.setMaximumSize(new Dimension(250, 20));
     tests.addActionListener(this);
-    tests.setRenderer(new ListCellRenderer() {
+    tests.setRenderer(new ListCellRenderer<ListItem>() {
       JLabel categoryLabel = null;
       JLabel testLabel = null;
 
       @Override
-      public Component getListCellRendererComponent(JList list, Object value, int index,
+      public Component getListCellRendererComponent(JList list, ListItem value, int index,
           boolean isSelected, boolean cellHasFocus) {
-        ListItem item = (ListItem) value;
+        ListItem item = value;
 
         if (item.isCategory()) {
           if (categoryLabel == null) {

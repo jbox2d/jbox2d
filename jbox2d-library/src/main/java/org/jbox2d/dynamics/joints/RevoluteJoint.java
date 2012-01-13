@@ -120,7 +120,6 @@ public class RevoluteJoint extends Joint {
     Vec2 vA = data.velocities[m_indexA].v;
     float wA = data.velocities[m_indexA].w;
 
-    assert(!Float.isNaN(wA));
     // Vec2 cB = data.positions[m_indexB].c;
     float aB = data.positions[m_indexB].a;
     Vec2 vB = data.velocities[m_indexB].v;
@@ -206,25 +205,19 @@ public class RevoluteJoint extends Joint {
       vA.x -= mA * P.x;
       vA.y -= mA * P.y;
       wA -= iA * (Vec2.cross(m_rA, P) + m_motorImpulse + m_impulse.z);
-      assert(!Float.isNaN(wA));
 
       vB.x += mB * P.x;
       vB.y += mB * P.y;
       wB += iB * (Vec2.cross(m_rB, P) + m_motorImpulse + m_impulse.z);
-      assert(!Float.isNaN(wB));
       pool.pushVec2(1);
     } else {
       m_impulse.setZero();
       m_motorImpulse = 0.0f;
     }
-
-    assert(!Float.isNaN(wA));
-    assert(!Float.isNaN(wB));
     data.velocities[m_indexA].v.set(vA);
     data.velocities[m_indexA].w = wA;
     data.velocities[m_indexB].v.set(vB);
     data.velocities[m_indexB].w = wB;
-    
     
     pool.pushVec2(1);
     pool.pushRot(2);

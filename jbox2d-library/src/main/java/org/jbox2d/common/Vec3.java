@@ -121,9 +121,6 @@ public class Vec3 implements Serializable {
     return "(" + x + "," + y + "," + z + ")";
   }
 
-  /**
-   * @see java.lang.Object#hashCode()
-   */
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -134,9 +131,6 @@ public class Vec3 implements Serializable {
     return result;
   }
 
-  /**
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj) return true;
@@ -163,5 +157,13 @@ public class Vec3 implements Serializable {
     out.x = a.y * b.z - a.z * b.y;
     out.y = tempy;
     out.z = tempz;
+  }
+  
+  public final static void crossToOutUnsafe(Vec3 a, Vec3 b, Vec3 out) {
+    assert(out != b);
+    assert(out != a);
+    out.x = a.y * b.z - a.z * b.y;
+    out.y = a.z * b.x - a.x * b.z;
+    out.z = a.x * b.y - a.y * b.x;
   }
 }
