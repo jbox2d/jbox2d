@@ -21,51 +21,39 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-/**
- * Created at 2:26:49 PM Jul 6, 2010
- */
-package org.jbox2d.dynamics.contacts;
+package org.jbox2d.collision.broadphase;
 
-import org.jbox2d.collision.Manifold.ManifoldType;
-import org.jbox2d.common.Settings;
-import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Body;
+import org.jbox2d.collision.AABB;
 
-// updated to rev 100 - ec
-/**
- * @author daniel
- */
-public class TOIConstraint {
-	public final Vec2 localPoints[] = new Vec2[Settings.maxManifoldPoints];
-	public final Vec2 localNormal = new Vec2();
-	public final Vec2 localPoint = new Vec2();
-	public ManifoldType type;
-	public float radius;
-	public int pointCount;
-	public Body bodyA;
-	public Body bodyB;
-	
-	public TOIConstraint(){
-		for(int i=0; i<localPoints.length; i++){
-			localPoints[i] = new Vec2();
-		}
-	}
-	
-	public TOIConstraint(TOIConstraint argToClone){
-		this();
-		set(argToClone);
-	}
-	
-	public void set(TOIConstraint argOther){
-		for(int i=0; i<localPoints.length; i++){
-			localPoints[i].set(argOther.localPoints[i]);
-		}
-		localNormal.set(argOther.localNormal);
-		localPoint.set(argOther.localPoint);
-		type = argOther.type;
-		radius = argOther.radius;
-		pointCount = argOther.pointCount;
-		bodyA = argOther.bodyA;
-		bodyB = argOther.bodyB;
-	}
+public class TreeNode {
+  public static final int NULL_NODE = -1;
+  /**
+   * Enlarged AABB
+   */
+  public final AABB aabb = new AABB();
+
+  public Object userData;
+
+  protected int parent;
+
+  protected int child1;
+  protected int child2;
+  protected int height;
+
+  public final boolean isLeaf() {
+    return child1 == NULL_NODE;
+  }
+
+  public Object getUserData() {
+    return userData;
+  }
+
+  public void setUserData(Object argData) {
+    userData = argData;
+  }
+
+  /**
+   * Should never be constructed outside the engine
+   */
+  protected TreeNode() {}
 }

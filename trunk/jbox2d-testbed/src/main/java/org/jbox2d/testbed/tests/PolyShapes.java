@@ -306,7 +306,7 @@ class PolyShapesCallback implements QueryCallback{
 		Body body = fixture.getBody();
 		Shape shape = fixture.getShape();
 
-		boolean overlap = p.getCollision().testOverlap(shape, m_circle, body.getTransform(), m_transform);
+		boolean overlap = p.getCollision().testOverlap(shape, 0, m_circle, 0, body.getTransform(), m_transform);
 
 		if (overlap)
 		{

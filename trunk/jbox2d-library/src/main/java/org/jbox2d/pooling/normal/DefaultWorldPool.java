@@ -33,6 +33,8 @@ import org.jbox2d.collision.Collision;
 import org.jbox2d.collision.Distance;
 import org.jbox2d.collision.TimeOfImpact;
 import org.jbox2d.common.Mat22;
+import org.jbox2d.common.Mat33;
+import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.Vec3;
@@ -54,23 +56,28 @@ public class DefaultWorldPool implements IWorldPool {
   private final OrderedStack<Vec2> vecs;
   private final OrderedStack<Vec3> vec3s;
   private final OrderedStack<Mat22> mats;
+  private final OrderedStack<Mat33> mat33s;
   private final OrderedStack<AABB> aabbs;
+  private final OrderedStack<Rot> rots;
 
   private final HashMap<Integer, float[]> afloats = new HashMap<Integer, float[]>();
   private final HashMap<Integer, int[]> aints = new HashMap<Integer, int[]>();
   private final HashMap<Integer, Vec2[]> avecs = new HashMap<Integer, Vec2[]>();
 
-  private final Class<?>[] classes = new Class<?>[] { IWorldPool.class };
-  private final Object[] args = new Object[] { this };
+  private final Class<?>[] classes = new Class<?>[] {IWorldPool.class};
+  private final Object[] args = new Object[] {this};
 
-  private final MutableStack<Contact, PolygonContact> pcstack = new MutableStack<Contact, PolygonContact>(
-      PolygonContact.class, Settings.CONTACT_STACK_INIT_SIZE, classes, args);
+  private final MutableStack<Contact, PolygonContact> pcstack =
+      new MutableStack<Contact, PolygonContact>(PolygonContact.class,
+          Settings.CONTACT_STACK_INIT_SIZE, classes, args);
 
-  private final MutableStack<Contact, CircleContact> ccstack = new MutableStack<Contact, CircleContact>(
-      CircleContact.class, Settings.CONTACT_STACK_INIT_SIZE, classes, args);
+  private final MutableStack<Contact, CircleContact> ccstack =
+      new MutableStack<Contact, CircleContact>(CircleContact.class,
+          Settings.CONTACT_STACK_INIT_SIZE, classes, args);
 
-  private final MutableStack<Contact, PolygonAndCircleContact> cpstack = new MutableStack<Contact, PolygonAndCircleContact>(
-      PolygonAndCircleContact.class, Settings.CONTACT_STACK_INIT_SIZE, classes, args);
+  private final MutableStack<Contact, PolygonAndCircleContact> cpstack =
+      new MutableStack<Contact, PolygonAndCircleContact>(PolygonAndCircleContact.class,
+          Settings.CONTACT_STACK_INIT_SIZE, classes, args);
 
   private final Collision collision;
   private final TimeOfImpact toi;
@@ -81,7 +88,9 @@ public class DefaultWorldPool implements IWorldPool {
     vec3s = new OrderedStack<Vec3>(Vec3.class, argSize, argContainerSize);
     mats = new OrderedStack<Mat22>(Mat22.class, argSize, argContainerSize);
     aabbs = new OrderedStack<AABB>(AABB.class, argSize, argContainerSize);
-
+    rots = new OrderedStack<Rot>(Rot.class, argSize, argContainerSize);
+    mat33s = new OrderedStack<Mat33>(Mat33.class, argSize, argContainerSize);
+    
     dist = new Distance();
     collision = new Collision(this);
     toi = new TimeOfImpact(this);
@@ -106,7 +115,7 @@ public class DefaultWorldPool implements IWorldPool {
   public final Vec2[] popVec2(int argNum) {
     return vecs.pop(argNum);
   }
-  
+
   public final void pushVec2(int argNum) {
     vecs.push(argNum);
   }
@@ -114,7 +123,7 @@ public class DefaultWorldPool implements IWorldPool {
   public final Vec3 popVec3() {
     return vec3s.pop();
   }
-  
+
   public final Vec3[] popVec3(int argNum) {
     return vec3s.pop(argNum);
   }
@@ -134,6 +143,14 @@ public class DefaultWorldPool implements IWorldPool {
   public final void pushMat22(int argNum) {
     mats.push(argNum);
   }
+  
+  public final Mat33 popMat33() {
+    return mat33s.pop();
+  }
+
+  public final void pushMat33(int argNum) {
+    mat33s.push(argNum);
+  }
 
   public final AABB popAABB() {
     return aabbs.pop();
@@ -145,6 +162,14 @@ public class DefaultWorldPool implements IWorldPool {
 
   public final void pushAABB(int argNum) {
     aabbs.push(argNum);
+  }
+
+  public final Rot popRot() {
+    return rots.pop();
+  }
+
+  public final void pushRot(int num) {
+    rots.push(num);
   }
 
   public final Collision getCollision() {

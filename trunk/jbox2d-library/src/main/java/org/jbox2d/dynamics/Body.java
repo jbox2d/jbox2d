@@ -21,7 +21,6 @@ package org.jbox2d.dynamics;
 import org.jbox2d.collision.broadphase.BroadPhase;
 import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.collision.shapes.Shape;
-import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Sweep;
@@ -31,8 +30,6 @@ import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.dynamics.joints.JointEdge;
 
-// updated to rev 100
-// thead safe pooling
 /**
  * A rigid body. These are created via World.createBody.
  * 
@@ -86,6 +83,7 @@ public class Body {
 
   public float m_linearDamping;
   public float m_angularDamping;
+  public float m_gravityScale;
 
   public float m_sleepTime;
 
@@ -94,7 +92,7 @@ public class Body {
   public Body(final BodyDef bd, World world) {
     assert (bd.position.isValid());
     assert (bd.linearVelocity.isValid());
-    assert (bd.inertiaScale >= 0.0f);
+    assert (bd.gravityScale >= 0.0f);
     assert (bd.angularDamping >= 0.0f);
     assert (bd.linearDamping >= 0.0f);
 
@@ -122,10 +120,11 @@ public class Body {
     m_xf.q.set(bd.angle);
 
     m_sweep.localCenter.setZero();
-    m_sweep.a0 = m_sweep.a = bd.angle;
-    // m_sweep.c0 = m_sweep.c = Transform.mul(m_xf, m_sweep.localCenter);
-    Transform.mulToOutUnsafe(m_xf, m_sweep.localCenter, m_sweep.c0);
-    m_sweep.c.set(m_sweep.c0);
+    m_sweep.c0.set(m_xf.p);
+    m_sweep.c.set(m_xf.p);
+    m_sweep.a0 = bd.angle;
+    m_sweep.a = bd.angle;
+    m_sweep.alpha0 = 0.0f;
 
     m_jointList = null;
     m_contactList = null;
@@ -137,6 +136,7 @@ public class Body {
 
     m_linearDamping = bd.linearDamping;
     m_angularDamping = bd.angularDamping;
+    m_gravityScale = bd.gravityScale;
 
     m_force.setZero();
     m_torque = 0.0f;
@@ -185,7 +185,7 @@ public class Body {
 
     if ((m_flags & e_activeFlag) == e_activeFlag) {
       BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
-      fixture.createProxy(broadPhase, m_xf);
+      fixture.createProxies(broadPhase, m_xf);
     }
 
     fixture.m_next = m_fixtureList;
@@ -283,11 +283,8 @@ public class Body {
     }
 
     if ((m_flags & e_activeFlag) == e_activeFlag) {
-      assert (fixture.m_proxy != null);
       BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
-      fixture.destroyProxy(broadPhase);
-    } else {
-      assert (fixture.m_proxy == null);
+      fixture.destroyProxies(broadPhase);
     }
 
     fixture.destroy();
@@ -318,10 +315,11 @@ public class Body {
     m_xf.p.set(position);
 
     // m_sweep.c0 = m_sweep.c = Mul(m_xf, m_sweep.localCenter);
-    Transform.mulToOutUnsafe(m_xf, m_sweep.localCenter, m_sweep.c0);
-    m_sweep.c.set(m_sweep.c0);
+    Transform.mulToOutUnsafe(m_xf, m_sweep.localCenter, m_sweep.c);
+    m_sweep.a = angle;
 
-    m_sweep.a0 = m_sweep.a = angle;
+    m_sweep.c0.set(m_sweep.c);
+    m_sweep.a0 = m_sweep.a;
 
     BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
     for (Fixture f = m_fixtureList; f != null; f = f.m_next) {
@@ -426,6 +424,24 @@ public class Body {
   }
 
   /**
+   * Get the gravity scale of the body.
+   * 
+   * @return
+   */
+  public float getGravityScale() {
+    return m_gravityScale;
+  }
+
+  /**
+   * Set the gravity scale of the body.
+   * 
+   * @param gravityScale
+   */
+  public void setGravityScale(float gravityScale) {
+    this.m_gravityScale = gravityScale;
+  }
+
+  /**
    * Apply a force at a world point. If the force is not applied at the center of mass, it will
    * generate a torque and affect the angular velocity. This wakes up the body.
    * 
@@ -450,6 +466,24 @@ public class Body {
     m_force.y += force.y;
 
     m_torque += (point.x - m_sweep.c.x) * force.y - (point.y - m_sweep.c.y) * force.x;
+  }
+
+  /**
+   * Apply a force to the center of mass. This wakes up the body.
+   * 
+   * @param force the world force vector, usually in Newtons (N).
+   */
+  public final void applyForceToCenter(Vec2 force) {
+    if (m_type != BodyType.DYNAMIC) {
+      return;
+    }
+
+    if (isAwake() == false) {
+      setAwake(true);
+    }
+
+    m_force.x += force.x;
+    m_force.y += force.y;
   }
 
   /**
@@ -629,16 +663,17 @@ public class Body {
     // Static and kinematic bodies have zero mass.
     if (m_type == BodyType.STATIC || m_type == BodyType.KINEMATIC) {
       // m_sweep.c0 = m_sweep.c = m_xf.position;
-      m_sweep.c.set(m_xf.p);
       m_sweep.c0.set(m_xf.p);
+      m_sweep.c.set(m_xf.p);
+      m_sweep.a0 = m_sweep.a;
       return;
     }
 
     assert (m_type == BodyType.DYNAMIC);
 
     // Accumulate mass over all fixtures.
-    final Vec2 center = m_world.getPool().popVec2();
-    center.setZero();
+    final Vec2 localCenter = m_world.getPool().popVec2();
+    localCenter.setZero();
     final Vec2 temp = m_world.getPool().popVec2();
     final MassData massData = pmd;
     for (Fixture f = m_fixtureList; f != null; f = f.m_next) {
@@ -649,14 +684,14 @@ public class Body {
       m_mass += massData.mass;
       // center += massData.mass * massData.center;
       temp.set(massData.center).mulLocal(massData.mass);
-      center.addLocal(temp);
+      localCenter.addLocal(temp);
       m_I += massData.I;
     }
 
     // Compute center of mass.
     if (m_mass > 0.0f) {
       m_invMass = 1.0f / m_mass;
-      center.mulLocal(m_invMass);
+      localCenter.mulLocal(m_invMass);
     } else {
       // Force all dynamic bodies to have a positive mass.
       m_mass = 1.0f;
@@ -665,7 +700,7 @@ public class Body {
 
     if (m_I > 0.0f && (m_flags & e_fixedRotationFlag) == 0) {
       // Center the inertia about the center of mass.
-      m_I -= m_mass * Vec2.dot(center, center);
+      m_I -= m_mass * Vec2.dot(localCenter, localCenter);
       assert (m_I > 0.0f);
       m_invI = 1.0f / m_I;
     } else {
@@ -676,7 +711,7 @@ public class Body {
     Vec2 oldCenter = m_world.getPool().popVec2();
     // Move center of mass.
     oldCenter.set(m_sweep.c);
-    m_sweep.localCenter.set(center);
+    m_sweep.localCenter.set(localCenter);
     // m_sweep.c0 = m_sweep.c = Mul(m_xf, m_sweep.localCenter);
     Transform.mulToOutUnsafe(m_xf, m_sweep.localCenter, m_sweep.c0);
     m_sweep.c.set(m_sweep.c0);
@@ -829,6 +864,11 @@ public class Body {
    * @param type
    */
   public void setType(BodyType type) {
+    assert (m_world.isLocked() == false);
+    if (m_world.isLocked() == true) {
+      return;
+    }
+
     if (m_type == type) {
       return;
     }
@@ -840,6 +880,9 @@ public class Body {
     if (m_type == BodyType.STATIC) {
       m_linearVelocity.setZero();
       m_angularVelocity = 0.0f;
+      m_sweep.a0 = m_sweep.a;
+      m_sweep.c0.set(m_sweep.c);
+      synchronizeFixtures();
     }
 
     setAwake(true);
@@ -847,9 +890,22 @@ public class Body {
     m_force.setZero();
     m_torque = 0.0f;
 
-    // Since the body type changed, we need to flag contacts for filtering.
-    for (ContactEdge ce = m_contactList; ce != null; ce = ce.next) {
-      ce.contact.flagForFiltering();
+    // Delete the attached contacts.
+    ContactEdge ce = m_contactList;
+    while (ce != null) {
+      ContactEdge ce0 = ce;
+      ce = ce.next;
+      m_world.m_contactManager.destroy(ce0.contact);
+    }
+    m_contactList = null;
+
+    // Touch the proxies so that new contacts will be created (when appropriate)
+    BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
+    for (Fixture f = m_fixtureList; f != null; f = f.m_next) {
+      int proxyCount = f.m_proxyCount;
+      for (int i = 0; i < proxyCount; ++i) {
+        broadPhase.touchProxy(f.m_proxies[i].proxyId);
+      }
     }
   }
 
@@ -934,6 +990,8 @@ public class Body {
    * @param flag
    */
   public void setActive(boolean flag) {
+    assert (m_world.isLocked() == false);
+
     if (flag == isActive()) {
       return;
     }
@@ -944,7 +1002,7 @@ public class Body {
       // Create all proxies.
       BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
       for (Fixture f = m_fixtureList; f != null; f = f.m_next) {
-        f.createProxy(broadPhase, m_xf);
+        f.createProxies(broadPhase, m_xf);
       }
 
       // Contacts are created the next time step.
@@ -954,7 +1012,7 @@ public class Body {
       // Destroy all proxies.
       BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
       for (Fixture f = m_fixtureList; f != null; f = f.m_next) {
-        f.destroyProxy(broadPhase);
+        f.destroyProxies(broadPhase);
       }
 
       // Destroy the attached contacts.
@@ -1050,35 +1108,41 @@ public class Body {
 
   protected final void synchronizeFixtures() {
     final Transform xf1 = pxf;
-    xf1.q.set(m_sweep.a0);
     // xf1.position = m_sweep.c0 - Mul(xf1.R, m_sweep.localCenter);
-    Rot.mulToOutUnsafe(xf1.q, m_sweep.localCenter, xf1.p);
-    xf1.p.mulLocal(-1).addLocal(m_sweep.c0);
 
-    BroadPhase broadPhase = m_world.m_contactManager.m_broadPhase;
+    // xf1.q.set(m_sweep.a0);
+    // Rot.mulToOutUnsafe(xf1.q, m_sweep.localCenter, xf1.p);
+    // xf1.p.mulLocal(-1).addLocal(m_sweep.c0);
+    // inlined:
+    xf1.q.s = MathUtils.sin(m_sweep.a0);
+    xf1.q.c = MathUtils.cos(m_sweep.a0);
+    xf1.p.x = m_sweep.c0.x - xf1.q.c * m_sweep.localCenter.x - xf1.q.s * m_sweep.localCenter.y;
+    xf1.p.y = m_sweep.c0.y - xf1.q.s * m_sweep.localCenter.x + xf1.q.c * m_sweep.localCenter.y;
+    // end inline
+
     for (Fixture f = m_fixtureList; f != null; f = f.m_next) {
-      f.synchronize(broadPhase, xf1, m_xf);
+      f.synchronize(m_world.m_contactManager.m_broadPhase, xf1, m_xf);
     }
   }
 
   public final void synchronizeTransform() {
-     m_xf.q.set(m_sweep.a);
-    
-     //m_xf.position = m_sweep.c - Mul(m_xf.R, m_sweep.localCenter);
-     Rot.mulToOutUnsafe(m_xf.q, m_sweep.localCenter, m_xf.p);
-     m_xf.p.mulLocal(-1).addLocal(m_sweep.c);
+    m_xf.q.set(m_sweep.a);
 
-//    final float c = MathUtils.cos(m_sweep.a), s = MathUtils.sin(m_sweep.a);
-//    m_xf.q.ex.x = c;
-//    m_xf.q.ey.x = -s;
-//    m_xf.q.ex.y = s;
-//    m_xf.q.ey.y = c;
-//    m_xf.p.x = m_xf.q.ex.x * m_sweep.localCenter.x + m_xf.q.ey.x * m_sweep.localCenter.y;
-//    m_xf.p.y = m_xf.q.ex.y * m_sweep.localCenter.x + m_xf.q.ey.y * m_sweep.localCenter.y;
-//    m_xf.p.x *= (float) (-1);
-//    m_xf.p.y *= (float) (-1);
-//    m_xf.p.x += m_sweep.c.x;
-//    m_xf.p.y += m_sweep.c.y;
+    // m_xf.position = m_sweep.c - Mul(m_xf.R, m_sweep.localCenter);
+    Rot.mulToOutUnsafe(m_xf.q, m_sweep.localCenter, m_xf.p);
+    m_xf.p.mulLocal(-1).addLocal(m_sweep.c);
+
+    // final float c = MathUtils.cos(m_sweep.a), s = MathUtils.sin(m_sweep.a);
+    // m_xf.q.ex.x = c;
+    // m_xf.q.ey.x = -s;
+    // m_xf.q.ex.y = s;
+    // m_xf.q.ey.y = c;
+    // m_xf.p.x = m_xf.q.ex.x * m_sweep.localCenter.x + m_xf.q.ey.x * m_sweep.localCenter.y;
+    // m_xf.p.y = m_xf.q.ex.y * m_sweep.localCenter.x + m_xf.q.ey.y * m_sweep.localCenter.y;
+    // m_xf.p.x *= (float) (-1);
+    // m_xf.p.y *= (float) (-1);
+    // m_xf.p.x += m_sweep.c.x;
+    // m_xf.p.y += m_sweep.c.y;
   }
 
   /**
@@ -1107,10 +1171,13 @@ public class Body {
   }
 
   protected final void advance(float t) {
-    // Advance to the new safe time.
+    // Advance to the new safe time. This doesn't sync the broad-phase.
     m_sweep.advance(t);
     m_sweep.c.set(m_sweep.c0);
     m_sweep.a = m_sweep.a0;
-    synchronizeTransform();
+    m_xf.q.set(m_sweep.a);
+    // m_xf.position = m_sweep.c - Mul(m_xf.R, m_sweep.localCenter);
+    Rot.mulToOutUnsafe(m_xf.q, m_sweep.localCenter, m_xf.p);
+    m_xf.p.mulLocal(-1).addLocal(m_sweep.c);
   }
 }

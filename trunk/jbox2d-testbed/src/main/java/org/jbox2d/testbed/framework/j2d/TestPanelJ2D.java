@@ -165,21 +165,22 @@ public class TestPanelJ2D extends JPanel implements TestbedPanel {
     draw.getViewportTranform().setExtents(argWidth / 2, argHeight / 2);
   }
 
-  public void render() {
+  public boolean render() {
     if (dbImage == null) {
       log.debug("dbImage is null, creating a new one");
       if (panelWidth <= 0 || panelHeight <= 0) {
-        return;
+        return false;
       }
       dbImage = createImage(panelWidth, panelHeight);
       if (dbImage == null) {
         log.error("dbImage is still null, ignoring render call");
-        return;
+        return false;
       }
       dbg = (Graphics2D) dbImage.getGraphics();
     }
     dbg.setColor(Color.black);
     dbg.fillRect(0, 0, panelWidth, panelHeight);
+    return true;
   }
 
   public void paintScreen() {

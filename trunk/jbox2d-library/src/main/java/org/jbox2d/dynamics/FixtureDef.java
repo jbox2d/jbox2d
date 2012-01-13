@@ -77,9 +77,6 @@ public class FixtureDef {
 		restitution = 0f;
 		density = 0f;
 		filter = new Filter();
-		filter.categoryBits = 0x0001;
-		filter.maskBits = 0xFFFF;
-		filter.groupIndex = 0;
 		isSensor = false;
 	}
 }

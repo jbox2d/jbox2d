@@ -327,7 +327,7 @@ public class PolygonShape extends Shape {
   }
 
   public int getChildCount() {
-    return m_count;
+    return 1;
   }
 
   @Override

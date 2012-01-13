@@ -110,7 +110,7 @@ public class Cantilever extends TestbedTest {
 				BodyDef bd = new BodyDef();
 				bd.type = BodyType.DYNAMIC;
 				bd.position.set(-14.5f + 1.0f * i, 15.0f);
-				bd.inertiaScale = 10.0f;
+				bd.gravityScale = 10.0f;
 				Body body = getWorld().createBody(bd);
 				body.createFixture(fd);
 
@@ -168,7 +168,7 @@ public class Cantilever extends TestbedTest {
 				BodyDef bd = new BodyDef();
 				bd.type = BodyType.DYNAMIC;
 				bd.position.set(5.5f + 1.0f * i, 10.0f);
-				bd.inertiaScale = 10.0f;
+				bd.gravityScale = 10.0f;
 				Body body = getWorld().createBody(bd);
 				body.createFixture(fd);
 

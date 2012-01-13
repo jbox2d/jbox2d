@@ -84,7 +84,7 @@ public class RevoluteTest extends TestbedTest {
 			rjd.enableMotor = false;
 			rjd.lowerAngle = -0.25f * MathUtils.PI;
 			rjd.upperAngle = 0.5f * MathUtils.PI;
-			rjd.enableLimit = true;
+			rjd.enableLimit = false;
 			rjd.collideConnected = true;
 			
 			m_joint = (RevoluteJoint) getWorld().createJoint(rjd);

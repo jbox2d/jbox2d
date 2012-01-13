@@ -25,6 +25,7 @@ package org.jbox2d.dynamics.joints;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.SolverData;
 import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.pooling.IWorldPool;
@@ -53,10 +54,10 @@ public abstract class Joint {
 				return new WeldJoint(argWorld.getPool(), (WeldJointDef) def);
 			case FRICTION:
 				return new FrictionJoint(argWorld.getPool(), (FrictionJointDef) def);
-			case LINE:
-				return new LineJoint(argWorld.getPool(), (LineJointDef) def);
-			case GEAR:
-				return new GearJoint(argWorld.getPool(), (GearJointDef) def);
+//			case WHEEL:
+//				return new WheelJoint(argWorld.getPool(), (LineJointDef) def);
+//			case GEAR:
+//				return new GearJoint(argWorld.getPool(), (GearJointDef) def);
 			case PULLEY:
 				return new PulleyJoint(argWorld.getPool(), (PulleyJointDef) def);
 			case CONSTANT_VOLUME:
@@ -76,6 +77,7 @@ public abstract class Joint {
 	public JointEdge m_edgeB;
 	public Body m_bodyA;
 	public Body m_bodyB;
+	public int m_index;
 	
 	public boolean m_islandFlag;
 	public boolean m_collideConnected;
@@ -85,9 +87,9 @@ public abstract class Joint {
 	protected IWorldPool pool;
 	
 	// Cache here per time step to reduce cache misses.
-	final Vec2 m_localCenterA, m_localCenterB;
-	float m_invMassA, m_invIA;
-	float m_invMassB, m_invIB;
+//	final Vec2 m_localCenterA, m_localCenterB;
+//	float m_invMassA, m_invIA;
+//	float m_invMassB, m_invIB;
 	
 	protected Joint(IWorldPool argWorldPool, JointDef def) {
 		assert (def.bodyA != def.bodyB);
@@ -101,6 +103,7 @@ public abstract class Joint {
 		m_collideConnected = def.collideConnected;
 		m_islandFlag = false;
 		m_userData = def.userData;
+		m_index = 0;
 		
 		m_edgeA = new JointEdge();
 		m_edgeA.joint = null;
@@ -114,8 +117,8 @@ public abstract class Joint {
 		m_edgeB.prev = null;
 		m_edgeB.next = null;
 		
-		m_localCenterA = new Vec2();
-		m_localCenterB = new Vec2();
+//		m_localCenterA = new Vec2();
+//		m_localCenterB = new Vec2();
 	}
 	
 	/**
@@ -194,6 +197,13 @@ public abstract class Joint {
 		m_userData = data;
 	}
 	
+	/// Get collide connected.
+    /// Note: modifying the collide connect flag won't work correctly because
+    /// the flag is only checked when fixture AABBs begin to overlap.
+    public boolean getCollideConnected() {
+      return m_collideConnected;
+    }
+	
 	/**
 	 * Short-cut function to determine if either body is inactive.
 	 * 
@@ -203,9 +213,9 @@ public abstract class Joint {
 		return m_bodyA.isActive() && m_bodyB.isActive();
 	}
 	
-	public abstract void initVelocityConstraints(TimeStep step);
+	public abstract void initVelocityConstraints(SolverData data);
 	
-	public abstract void solveVelocityConstraints(TimeStep step);
+	public abstract void solveVelocityConstraints(SolverData data);
 	
 	/**
 	 * This returns true if the position errors are within tolerance.
@@ -213,7 +223,7 @@ public abstract class Joint {
 	 * @param baumgarte
 	 * @return
 	 */
-	public abstract boolean solvePositionConstraints(float baumgarte);
+	public abstract boolean solvePositionConstraints(SolverData data);
 	
 	/**
 	 * Override to handle destruction of joint

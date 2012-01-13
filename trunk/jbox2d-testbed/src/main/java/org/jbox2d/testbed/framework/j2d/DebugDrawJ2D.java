@@ -146,7 +146,9 @@ public class DebugDrawJ2D extends DebugDraw {
   @Override
   public void drawString(float x, float y, String s, Color3f color) {
     Graphics2D g = getGraphics();
-
+    if ( g== null)  {
+      return;
+    }
     Color c = cpool.getColor(color.x, color.y, color.z);
     g.setColor(c);
     g.drawString(s, x, y);

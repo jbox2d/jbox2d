@@ -50,6 +50,17 @@ public class WeldJointDef extends JointDef {
 	 */
 	public float referenceAngle;
 	
+	/**
+	 * The mass-spring-damper frequency in Hertz. Rotation only.
+	 * Disable softness with a value of 0.
+	 */
+	public float frequencyHz;
+	
+	/**
+	 * The damping ratio. 0 = no damping, 1 = critical damping.
+	 */
+	public float dampingRatio;
+	
 	public WeldJointDef(){
 		type = JointType.WELD;
 		localAnchorA = new Vec2();

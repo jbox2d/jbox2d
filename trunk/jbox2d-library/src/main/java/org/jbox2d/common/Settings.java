@@ -42,7 +42,7 @@ public class Settings {
    */
   public static final boolean FAST_MATH = true;
   public static final int CONTACT_STACK_INIT_SIZE = 10;
-  public static final boolean SINCOS_LUT_ENABLED = false;
+  public static final boolean SINCOS_LUT_ENABLED = true;
   /**
    * smaller the precision, the larger the table. If a small table is used (eg, precision is .006 or
    * greater), make sure you set the table to lerp it's results. Accuracy chart is in the MathUtils
@@ -76,7 +76,6 @@ public class Settings {
    */
   public static final boolean SINCOS_LUT_LERP = false;
 
-  public static final int TREE_REBALANCE_STEPS = 4;
 
   // Collision
 
@@ -167,7 +166,9 @@ public class Settings {
    * This scale factor controls how fast overlap is resolved. Ideally this would be 1 so that
    * overlap is removed in one time step. However using values close to 1 often lead to overshoot.
    */
-  public static final float contactBaumgarte = 0.2f;
+  public static final float baumgarte = 0.2f;
+  public static final float toiBaugarte = 0.75f;
+
 
   // Sleep
 

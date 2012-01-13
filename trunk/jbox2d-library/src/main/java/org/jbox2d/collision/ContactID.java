@@ -45,97 +45,62 @@
  */
 package org.jbox2d.collision;
 
+/**
+ * Contact ids to facilitate warm starting. Note: the ContactFeatures class is just embedded in here
+ */
+public class ContactID implements Comparable<ContactID> {
 
-//FIXME: In the C++ version, this class is a union of
-//the key and the features, meaning not that it contains
-//both separately, but that the same data can be accessed
-//as either.  The key there is 32 bit, and each member of
-//features is 8 bits.
-//
-//We need to figure out if this is a problem or not, because
-//I have a feeling that as of right now, key is never being
-//set anyways.  Initial examination seems to show that key is
-//always zero. [hacked around for the moment]
-//
-//Also, it might be better performance-wise to pull features
-//to a top level class if inner classes have more overhead (check this).
+  public static enum Type {
+    VERTEX, FACE
+  }
 
-// updated to rev 100
+  public byte indexA;
+  public byte indexB;
+  public byte typeA;
+  public byte typeB;
 
-/** Contact ids to facilitate warm starting.*/
-public class ContactID {
+  public int getKey() {
+    return ((int) indexA) << 24 | ((int) indexB) << 16 | ((int) typeA) << 8 | ((int) typeB);
+  }
 
-	/** The features that intersect to form the contact point */
-	public final Features features;
+  public boolean isEqual(final ContactID cid) {
+    return getKey() == cid.getKey();
+  }
 
-	/** The features that intersect to form the contact point */
-	public static class Features {
-		/** The edge that defines the outward contact normal. */
-		public int referenceEdge;
-		/** The edge most anti-parallel to the reference edge. */
-		public int incidentEdge;
-		/** The vertex (0 or 1) on the incident edge that was clipped. */
-		public int incidentVertex;
-		/** A value of 1 indicates that the reference edge is on shape2. */
-		public int flip;
+  public ContactID() {}
 
-		public Features() {
-			referenceEdge = incidentEdge = incidentVertex = flip = 0;
-		}
+  public ContactID(final ContactID c) {
+    set(c);
+  }
 
-		private Features(final Features f) {
-			referenceEdge = f.referenceEdge;
-			incidentEdge = f.incidentEdge;
-			incidentVertex = f.incidentVertex;
-			flip = f.flip;
-		}
+  public void set(final ContactID c) {
+    indexA = c.indexA;
+    indexB = c.indexA;
+    typeA = c.typeA;
+    typeB = c.typeB;
+  }
 
-		private void set(final Features f){
-			referenceEdge = f.referenceEdge;
-			incidentEdge = f.incidentEdge;
-			incidentVertex = f.incidentVertex;
-			flip = f.flip;
-		}
+  public void flip() {
+    byte tempA = indexA;
+    indexA = indexB;
+    indexB = tempA;
+    tempA = typeA;
+    typeA = typeB;
+    typeB = tempA;
+  }
 
-		private boolean isEqual(final Features f){
-			return (referenceEdge==f.referenceEdge &&
-					incidentEdge==f.incidentEdge &&
-					incidentVertex==f.incidentVertex &&
-					flip==f.flip);
-		}
+  /**
+   * zeros out the data
+   */
+  public void zero() {
+    indexA = 0;
+    indexB = 0;
+    typeA = 0;
+    typeB = 0;
+  }
 
-		@Override
-		public String toString() {
-			final String s = "Features: (" + this.flip + " ," + this.incidentEdge + " ," + this.incidentVertex + " ," + this.referenceEdge + ")";
-			return s;
-		}
-
-	}
-
-	public boolean isEqual(final ContactID cid) {
-		return cid.features.isEqual(this.features);
-	}
-
-	public ContactID() {
-		features = new Features();
-	}
-
-	public ContactID(final ContactID c) {
-		features = new Features(c.features);
-	}
-
-	public void set(final ContactID c){
-		features.set(c.features);
-	}
-	
-	/**
-	 * zeros out the data
-	 */
-	public void zero() {
-		features.flip = 0;
-		features.incidentEdge = 0;
-		features.incidentVertex = 0;
-		features.referenceEdge = 0;
-	}
-
+  @Override
+  public int compareTo(ContactID o) {
+    return getKey() - o.getKey();
+  }
 }
