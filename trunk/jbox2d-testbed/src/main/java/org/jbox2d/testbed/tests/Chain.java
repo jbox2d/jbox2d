@@ -78,7 +78,7 @@ public class Chain extends TestbedTest {
 
 			final float y = 25.0f;
 			Body prevBody = ground;
-			for (int i = 0; i < 30; ++i)
+			for (int i = 0; i < 10; ++i)
 			{
 				BodyDef bd = new BodyDef();
 				bd.type = BodyType.DYNAMIC;

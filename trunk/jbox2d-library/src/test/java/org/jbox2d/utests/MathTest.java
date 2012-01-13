@@ -24,8 +24,10 @@ package org.jbox2d.utests;
 import java.util.Random;
 
 import org.jbox2d.common.Mat22;
+import org.jbox2d.common.Mat33;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.common.Vec3;
 
 import junit.framework.TestCase;
 
@@ -84,8 +86,6 @@ public class MathTest extends TestCase {
     assertEquals(-9f, v2.x);
     assertEquals(-8f, v2.y);
     assertFalse(v.equals(v2));
-
-    // TODO write tests for the rest of common lib
   }
 
   public void testMat22Unsafes() {
@@ -97,14 +97,35 @@ public class MathTest extends TestCase {
 
     Mat22.mulToOutUnsafe(m1, m2, mo);
     assertEquals(Mat22.mul(m1, m2), mo);
-    
+
     Mat22.mulToOutUnsafe(m1, v1, vo);
     assertEquals(Mat22.mul(m1, v1), vo);
-    
+
     Mat22.mulTransToOutUnsafe(m1, m2, mo);
     assertEquals(Mat22.mulTrans(m1, m2), mo);
-    
+
     Mat22.mulTransToOutUnsafe(m1, v1, vo);
     assertEquals(Mat22.mulTrans(m1, v1), vo);
+  }
+
+  public void testMat33() {
+    Mat33 mat = new Mat33();
+
+    mat.ex.set(3, 19, -5);
+    mat.ey.set(-1, 1, 4);
+    mat.ez.set(-10, 4, 4);
+
+    Vec3 b = new Vec3(4, 1, 2);
+    assertEquals(new Vec3(0.096f, 1.1013334f, -.48133332f), mat.solve33(b));
+
+    Vec2 b2 = new Vec2(4, 1);
+    assertEquals(new Vec2(0.22727273f, -3.318182f), mat.solve22(b2));
+  }
+
+  public void testVec3() {
+    Vec3 v1 = new Vec3();
+    Vec3 v2 = new Vec3();
+
+    assertEquals(new Vec3(1, -15, 36), Vec3.cross(v1.set(9, 3, 1), v2.set(3, 5, 2)));
   }
 }

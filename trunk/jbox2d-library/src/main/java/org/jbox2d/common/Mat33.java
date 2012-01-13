@@ -147,16 +147,16 @@ public class Mat33 implements Serializable {
    */
   public final void solve33ToOut(Vec3 b, Vec3 out) {
     assert(b != out);
-    Vec3.crossToOut(ey, ez, out);
+    Vec3.crossToOutUnsafe(ey, ez, out);
     float det = Vec3.dot(ex, out);
     if (det != 0.0f) {
       det = 1.0f / det;
     }
-    Vec3.crossToOut(ey, ez, out);
+    Vec3.crossToOutUnsafe(ey, ez, out);
     final float x = det * Vec3.dot(b, out);
-    Vec3.crossToOut(b, ez, out);
+    Vec3.crossToOutUnsafe(b, ez, out);
     final float y = det * Vec3.dot(ex, out);
-    Vec3.crossToOut(ey, b, out);
+    Vec3.crossToOutUnsafe(ey, b, out);
     float z = det * Vec3.dot(ex, out);
     out.x = x;
     out.y = y;
@@ -205,5 +205,33 @@ public class Mat33 implements Serializable {
     M.ey.x = M.ex.z;
     M.ey.y = M.ey.z;
     M.ey.z = det * (a11 * a22 - a12 * a12);
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((ex == null) ? 0 : ex.hashCode());
+    result = prime * result + ((ey == null) ? 0 : ey.hashCode());
+    result = prime * result + ((ez == null) ? 0 : ez.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    Mat33 other = (Mat33) obj;
+    if (ex == null) {
+      if (other.ex != null) return false;
+    } else if (!ex.equals(other.ex)) return false;
+    if (ey == null) {
+      if (other.ey != null) return false;
+    } else if (!ey.equals(other.ey)) return false;
+    if (ez == null) {
+      if (other.ez != null) return false;
+    } else if (!ez.equals(other.ez)) return false;
+    return true;
   }
 }
