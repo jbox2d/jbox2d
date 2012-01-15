@@ -1,4 +1,5 @@
 #summary Answers to common questions
+#labels Featured,Phase-Implementation
 
 *NOTE:* If your question has to do with the engine behavior itself, please also look [http://www.box2d.org/forum/viewtopic.php?f=9&t=558 here].  Most of these have to do specifically with the jbox2d distribution.
 
