@@ -1,0 +1,34 @@
+#summary Answers to common questions
+
+*NOTE:* If your question has to do with the engine behavior itself, please also look [http://www.box2d.org/forum/viewtopic.php?f=9&t=558 here].  Most of these have to do specifically with the jbox2d distribution.
+
+<wiki:toc max_depth="2" />
+
+=Building=
+==What is the project structure?  What's with all of these sub-projects?==
+JBox2D uses Maven for building.  Most IDE's support maven, eclipse-specific instructions are in the getting started wiki page, but basically you go to 'import' then 'import maven projects'.  Navigate to the jbox2d folder, and import all of the projects.
+
+==How do I customize the settings?==
+Most of the engine-specific settings are `static final` for performance.  If you need to customize these settings (we recommend you don't), build from the source and look at the Settings.java file in the common package of the library.
+
+==I don't care about having my own build, where are the jars?==
+Take a look in the `target` folder of each project, there should be jars there.
+
+==I'm have trouble with `protoc` failing when I build the serialization project, what is that?  Does that matter?==
+That project requires the [http://code.google.com/p/protobuf/ protocol buffer] library to be installed.  This is only required if you change things in the .proto file for proto serialization.  Otherwise, the sources are already generated and in source control.
+
+=Running=
+==What is the SLF4J error?  Static logger?==
+This does *not* mean anything is wrong.  It is just letting you know that the library uses [http://www.slf4j.org/ SLF4J] to log messages, and there isn't a logger binding available.  If you wish to see error messages, include a logging jar and config file (See the website for details).
+
+=Bugs=
+==I think I found a bug, what do I do?==
+Please report all bugs in the issues tab.  We greatly appreciate if you could:
+  * Make a testbed test of the bug.
+  * Give the smallest example possible that demonstrates the bug.
+
+This allows us to easily run the test and see the bug, and ensures we fix it as quickly as possible.
+
+=Contributing=
+==I want to help out, what do I do?==
+First of all, that's awesome! We'd love your help. Please contact Daniel Murphy (toucansam99 at gmail).
