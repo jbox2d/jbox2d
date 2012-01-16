@@ -565,7 +565,8 @@ public class PolygonShape extends Shape {
       area += triangleArea;
 
       // Area weighted centroid
-      out.addLocal(p1).addLocal(p2).addLocal(p3).mulLocal(triangleArea * inv3);
+      e1.set(p1).addLocal(p2).addLocal(p3).mulLocal(triangleArea * inv3);
+      out.addLocal(e1);
     }
 
     // Centroid
