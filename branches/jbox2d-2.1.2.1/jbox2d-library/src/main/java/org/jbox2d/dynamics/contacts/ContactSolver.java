@@ -824,15 +824,16 @@ public class ContactSolver {
 				// Compute normal impulse
 				final float impulse = K > 0.0f ? - C / K : 0.0f;
 
-				P.set(normal).mulLocal(impulse);
+				final float Px = normal.x * impulse;
+				final float Py = normal.y * impulse;
 
-				temp1.set(P).mulLocal(invMassA);
-				bodyA.m_sweep.c.subLocal(temp1);;
+				bodyA.m_sweep.c.x -= Px * invMassA;
+				bodyA.m_sweep.c.y -= Py * invMassA;
 				bodyA.m_sweep.a -= invIA * Vec2.cross(rA, P);
 				bodyA.synchronizeTransform();
 
-				temp1.set(P).mulLocal(invMassB);
-				bodyB.m_sweep.c.addLocal(temp1);
+				bodyB.m_sweep.c.x += Px * invMassB;
+				bodyB.m_sweep.c.y += Py * invMassB;
 				bodyB.m_sweep.a += invIB * Vec2.cross(rB, P);
 				bodyB.synchronizeTransform();
 			}

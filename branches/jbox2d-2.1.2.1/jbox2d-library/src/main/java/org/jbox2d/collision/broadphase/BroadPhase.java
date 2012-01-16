@@ -181,8 +181,8 @@ public class BroadPhase implements TreeCallback {
 		int i = 0;
 		while (i < m_pairCount) {
 			Pair primaryPair = m_pairBuffer[i];
-			Object userDataA = primaryPair.proxyA.userData;
-			Object userDataB = primaryPair.proxyB.userData;
+			Object userDataA = m_tree.getUserData(primaryPair.proxyIdA);
+			Object userDataB = m_tree.getUserData(primaryPair.proxyIdB);
 			
 			// log.debug("returning pair: "+userDataA+", "+userDataB);
 			callback.addPair(userDataA, userDataB);
@@ -191,7 +191,7 @@ public class BroadPhase implements TreeCallback {
 			// Skip any duplicate pairs.
 			while (i < m_pairCount) {
 				Pair pair = m_pairBuffer[i];
-				if (pair.proxyA != primaryPair.proxyA || pair.proxyB != primaryPair.proxyB) {
+				if (pair.proxyIdA != primaryPair.proxyIdA || pair.proxyIdB != primaryPair.proxyIdB) {
 					break;
 				}
 				// log.debug("skipping duplicate");
@@ -291,13 +291,13 @@ public class BroadPhase implements TreeCallback {
 		
 		if (proxy.id < m_queryProxy.id) {
 			// log.debug("new proxy is first");
-			m_pairBuffer[m_pairCount].proxyA = proxy;
-			m_pairBuffer[m_pairCount].proxyB = m_queryProxy;
+			m_pairBuffer[m_pairCount].proxyIdA = proxy.id;
+			m_pairBuffer[m_pairCount].proxyIdB = m_queryProxy.id;
 		}
 		else {
 			// log.debug("new proxy is second");
-			m_pairBuffer[m_pairCount].proxyA = m_queryProxy;
-			m_pairBuffer[m_pairCount].proxyB = proxy;
+			m_pairBuffer[m_pairCount].proxyIdA = m_queryProxy.id;
+			m_pairBuffer[m_pairCount].proxyIdB = proxy.id;
 		}
 		
 		++m_pairCount;
