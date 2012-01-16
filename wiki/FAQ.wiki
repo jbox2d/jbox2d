@@ -22,6 +22,9 @@ That project requires the [http://code.google.com/p/protobuf/ protocol buffer] l
 ==I want to see some examples.  How do I run the testbed?==
 Grab the lastest version and navigate to the `jbox2d-testbed` folder.  This is the testbed project.  There should be an executable jar in the `target` folder, with the suffix "with-dependencies".  Double click that one, or run it from the command line with the command `java -jar jbox2d-<version>-with-dependencies.jar`
 
+==I want to make something with this engine.  What's the best way to start?==
+It is HIGHLY recommended to start out by making a testbed test.  The purpose of the testbed is to provide all of the graphics, animation, and settings, so you only have to work with the physics engine itself.  Take a look at the Testbed page for more info.
+ 
 ==What is the SLF4J error?  Static logger?==
 This does *not* mean anything is wrong.  It is just letting you know that the library uses [http://www.slf4j.org/ SLF4J] to log messages, and there isn't a logger binding available.  If you wish to see error messages, include a logging jar and config file (See the website for details).
 
