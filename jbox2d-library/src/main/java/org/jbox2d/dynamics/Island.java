@@ -340,8 +340,8 @@ public class Island {
 
 			// Integrate
 			//b.m_sweep.c += step.dt * b.m_linearVelocity;
-			temp.set(b.m_linearVelocity).mulLocal(step.dt);
-			b.m_sweep.c.addLocal(temp);
+			b.m_sweep.c.x += b.m_linearVelocity.x * step.dt;
+			b.m_sweep.c.y += b.m_linearVelocity.y * step.dt;
 			b.m_sweep.a += step.dt * b.m_angularVelocity;
 
 			// Compute new transform

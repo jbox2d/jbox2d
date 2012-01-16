@@ -328,7 +328,8 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 	public void RayCast() {
 		m_rayActor = null;
 
-		RayCastInput input = m_rayCastInput;
+		RayCastInput input = new RayCastInput();
+		input.set(m_rayCastInput);
 
 		// Ray cast against the dynamic tree.
 		m_tree.raycast(this, input);
@@ -347,6 +348,7 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 			if (hit) {
 				bruteActor = m_actors[i];
 				bruteOutput = output;
+				input.maxFraction = output.fraction;
 			    //input.set(m_rayCastInput);
 			}
 		}
