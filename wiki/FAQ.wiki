@@ -19,6 +19,9 @@ Take a look in the `target` folder of each project, there should be jars there.
 That project requires the [http://code.google.com/p/protobuf/ protocol buffer] library to be installed.  This is only required if you change things in the .proto file for proto serialization.  Otherwise, the sources are already generated and in source control.
 
 =Running=
+==I want to see some examples.  How do I run the testbed?==
+Grab the lastest version and navigate to the `jbox2d-testbed` folder.  This is the testbed project.  There should be an executable jar in the `target` folder, with the suffix "with-dependencies".  Double click that one, or run it from the command line with the command `java -jar jbox2d-<version>-with-dependencies.jar`
+
 ==What is the SLF4J error?  Static logger?==
 This does *not* mean anything is wrong.  It is just letting you know that the library uses [http://www.slf4j.org/ SLF4J] to log messages, and there isn't a logger binding available.  If you wish to see error messages, include a logging jar and config file (See the website for details).
 
