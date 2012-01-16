@@ -33,17 +33,17 @@ public class Pair implements Comparable<Pair> {
 	public DynamicTreeNode proxyB;
 	
 	public int compareTo(Pair pair2) {
-		if (this.proxyA.key < pair2.proxyA.key) {
+		if (this.proxyA.id < pair2.proxyA.id) {
 			return -1;
 		}
 		
-		if (this.proxyA.key == pair2.proxyA.key) {
+		if (this.proxyA.id == pair2.proxyA.id) {
 			
-			if (proxyB.key < pair2.proxyB.key) {
+			if (proxyB.id < pair2.proxyB.id) {
 				return -1;
 			}
 			else {
-				if (proxyB.key == pair2.proxyB.key) {
+				if (proxyB.id == pair2.proxyB.id) {
 					return 0;
 				}
 				else {

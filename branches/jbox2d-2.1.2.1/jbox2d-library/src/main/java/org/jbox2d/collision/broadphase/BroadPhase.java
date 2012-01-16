@@ -198,9 +198,6 @@ public class BroadPhase implements TreeCallback {
 				++i;
 			}
 		}
-		
-		// Try to keep the tree balanced.
-		m_tree.rebalance(Settings.TREE_REBALANCE_STEPS);
 	}
 	
 	/**
@@ -292,7 +289,7 @@ public class BroadPhase implements TreeCallback {
 		// m_pairBuffer[m_pairCount]proxyIdA = b2Min(proxyId, m_queryProxyId);
 		// m_pairBuffer[m_pairCount].proxyIdB = b2Max(proxyId, m_queryProxyId);
 		
-		if (proxy.key < m_queryProxy.key) {
+		if (proxy.id < m_queryProxy.id) {
 			// log.debug("new proxy is first");
 			m_pairBuffer[m_pairCount].proxyA = proxy;
 			m_pairBuffer[m_pairCount].proxyB = m_queryProxy;

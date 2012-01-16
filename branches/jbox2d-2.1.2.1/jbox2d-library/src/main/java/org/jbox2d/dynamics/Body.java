@@ -1106,7 +1106,6 @@ public class Body {
 		// //m_xf.position = m_sweep.c - Mul(m_xf.R, m_sweep.localCenter);
 		// Mat22.mulToOut(m_xf.R, m_sweep.localCenter, m_xf.position);
 		// m_xf.position.mulLocal(-1).addLocal(m_sweep.c);
-		
 		final float c = MathUtils.cos(m_sweep.a), s = MathUtils.sin(m_sweep.a);
 		m_xf.R.col1.x = c;
 		m_xf.R.col2.x = -s;

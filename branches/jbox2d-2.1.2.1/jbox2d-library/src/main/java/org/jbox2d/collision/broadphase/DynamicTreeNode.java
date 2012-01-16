@@ -26,6 +26,7 @@ package org.jbox2d.collision.broadphase;
 import org.jbox2d.collision.AABB;
 
 public class DynamicTreeNode {
+	public static final int NULL_NODE = -1;
 	/**
 	 * This is the fattened AABB
 	 */
@@ -33,19 +34,16 @@ public class DynamicTreeNode {
 	
 	public Object userData;
 	
-	protected DynamicTreeNode parent;
-	protected DynamicTreeNode next;
+	protected int parent;
 	
-	protected DynamicTreeNode child1;
-	protected DynamicTreeNode child2;
+	protected int child1;
+	protected int child2;
+	protected int height;
 	
-	/**
-	 * used for sorting purposes, don't modify
-	 */
-	public int key;
+	protected int id;
 	
 	public final boolean isLeaf() {
-		return child1 == null;
+		return child1 == NULL_NODE;
 	}
 	
 	public Object getUserData() {
