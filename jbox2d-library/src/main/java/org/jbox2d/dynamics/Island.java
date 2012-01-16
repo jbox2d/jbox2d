@@ -229,7 +229,6 @@ public class Island {
 		m_jointCount = 0;
 	}
 	
-	private final Vec2 temp = new Vec2();
 	private final ContactSolver contactSolver = new ContactSolver();
 	private final Vec2 translation = new Vec2();
 	
@@ -384,10 +383,11 @@ public class Island {
 					b.m_sleepTime = 0.0f;
 					minSleepTime = 0.0f;
 				}
+				Vec2 linVel = b.m_linearVelocity;
 
 				if ((b.m_flags & Body.e_autoSleepFlag) == 0 ||
 					b.m_angularVelocity * b.m_angularVelocity > angTolSqr ||
-					Vec2.dot(b.m_linearVelocity, b.m_linearVelocity) > linTolSqr){
+					linVel.x * linVel.x + linVel.y * linVel.y > linTolSqr){
 					b.m_sleepTime = 0.0f;
 					minSleepTime = 0.0f;
 				}

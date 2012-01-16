@@ -29,21 +29,21 @@ package org.jbox2d.collision.broadphase;
  * that node, and that's what we sort from.
  */
 public class Pair implements Comparable<Pair> {
-	public DynamicTreeNode proxyA;
-	public DynamicTreeNode proxyB;
+	public int proxyIdA;
+	public int proxyIdB;
 	
 	public int compareTo(Pair pair2) {
-		if (this.proxyA.id < pair2.proxyA.id) {
+		if (this.proxyIdA < pair2.proxyIdA) {
 			return -1;
 		}
 		
-		if (this.proxyA.id == pair2.proxyA.id) {
+		if (this.proxyIdA == pair2.proxyIdA) {
 			
-			if (proxyB.id < pair2.proxyB.id) {
+			if (proxyIdB < pair2.proxyIdB) {
 				return -1;
 			}
 			else {
-				if (proxyB.id == pair2.proxyB.id) {
+				if (proxyIdB == pair2.proxyIdB) {
 					return 0;
 				}
 				else {
