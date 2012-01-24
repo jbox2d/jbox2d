@@ -43,8 +43,8 @@ public class VerticalStack extends TestbedTest {
   private static final long BULLET_TAG = 1;
   
   
-  public static final int e_columnCount = 5;
-  public static final int e_rowCount = 16;
+  public static final int e_columnCount = 1;
+  public static final int e_rowCount = 1;
 
   Body m_bullet;
   
@@ -83,7 +83,8 @@ public class VerticalStack extends TestbedTest {
       Body ground = getWorld().createBody(bd);
 
       PolygonShape shape = new PolygonShape();
-      shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
+      shape.setAsBox(40, 10, new Vec2(0,-10), 0);
+      //shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
       ground.createFixture(shape, 0.0f);
 
       shape.setAsEdge(new Vec2(20.0f, 0.0f), new Vec2(20.0f, 20.0f));

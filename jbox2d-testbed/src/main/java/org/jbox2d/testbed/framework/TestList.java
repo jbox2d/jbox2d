@@ -45,6 +45,9 @@ import org.jbox2d.testbed.tests.DominoTower;
 import org.jbox2d.testbed.tests.DynamicTreeTest;
 import org.jbox2d.testbed.tests.EdgeShapes;
 //import org.jbox2d.testbed.tests.Gears;
+import org.jbox2d.testbed.tests.CharacterCollisionProblem;
+import org.jbox2d.testbed.tests.FixedPendulumTest;
+import org.jbox2d.testbed.tests.FreePendulumTest;
 import org.jbox2d.testbed.tests.LiquidTest;
 import org.jbox2d.testbed.tests.MJWTest;
 import org.jbox2d.testbed.tests.OneSidedTest;
@@ -73,6 +76,12 @@ public class TestList {
   public static void populateModel(TestbedModel argModel){
       
       argModel.addCategory("Featured");
+      argModel.addTest(new FixedPendulumTest(false));
+      argModel.addTest(new FixedPendulumTest(true));
+      argModel.addTest(new FreePendulumTest(false));
+      argModel.addTest(new FreePendulumTest(true));
+      argModel.addTest(new VerticalStack());
+      argModel.addTest(new CharacterCollisionProblem());
       argModel.addTest(new Chain());
       argModel.addTest(new MJWTest());
       argModel.addTest(new DominoTest());
@@ -85,7 +94,6 @@ public class TestList {
       argModel.addTest(new VaryingRestitution());
       argModel.addTest(new VaryingFrictionTest());
       argModel.addTest(new SphereStack());
-      argModel.addTest(new VerticalStack());
       argModel.addTest(new PistonTest());
       argModel.addTest(new PyramidTest());
       argModel.addTest(new DominoTower());
