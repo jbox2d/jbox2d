@@ -147,42 +147,6 @@ public class WorldManifold {
           points[i].x = (cAx + cBx) * .5f;
           points[i].y = (cAy + cBy) * .5f;
         }
-        // final Vec2 planePoint = pool3;
-        //
-        // normal.x = xfA.q.ex.x * manifold.localNormal.x + xfA.q.ey.x * manifold.localNormal.y;
-        // normal.y = xfA.q.ex.y * manifold.localNormal.x + xfA.q.ey.y * manifold.localNormal.y;
-        // planePoint.x = xfA.p.x + xfA.q.ex.x * manifold.localPoint.x + xfA.q.ey.x *
-        // manifold.localPoint.y;
-        // planePoint.y = xfA.p.y + xfA.q.ex.y * manifold.localPoint.x + xfA.q.ey.y *
-        // manifold.localPoint.y;
-        //
-        // final Vec2 clipPoint = pool4;
-        //
-        // for (int i = 0; i < manifold.pointCount; i++) {
-        // // b2Vec2 clipPoint = b2Mul(xfB, manifold->points[i].localPoint);
-        // // b2Vec2 cA = clipPoint + (radiusA - b2Dot(clipPoint - planePoint,
-        // // normal)) * normal;
-        // // b2Vec2 cB = clipPoint - radiusB * normal;
-        // // points[i] = 0.5f * (cA + cB);
-        //
-        //
-        // clipPoint.x = xfB.p.x + xfB.q.ex.x * manifold.points[i].localPoint.x + xfB.q.ey.x *
-        // manifold.points[i].localPoint.y;
-        // clipPoint.y = xfB.p.y + xfB.q.ex.y * manifold.points[i].localPoint.x + xfB.q.ey.y *
-        // manifold.points[i].localPoint.y;
-        //
-        // final float scalar = radiusA - ((clipPoint.x - planePoint.x) * normal.x + (clipPoint.y -
-        // planePoint.y) * normal.y);
-        //
-        // final float cAx = normal.x * scalar + clipPoint.x;
-        // final float cAy = normal.y * scalar + clipPoint.y;
-        //
-        // final float cBx = - normal.x * radiusB + clipPoint.x;
-        // final float cBy = - normal.y * radiusB + clipPoint.y;
-        //
-        // points[i].x = (cAx + cBx)*.5f;
-        // points[i].y = (cAy + cBy)*.5f;
-        // }
       }
         break;
       case FACE_B:

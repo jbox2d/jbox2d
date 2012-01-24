@@ -122,44 +122,6 @@ public class PolygonShape extends Shape {
   }
 
   /**
-   * Get the supporting vertex index in the given direction.
-   * 
-   * @param d
-   * @return
-   */
-  public final int getSupport(final Vec2 d) {
-    int bestIndex = 0;
-    float bestValue = Vec2.dot(m_vertices[0], d);
-    for (int i = 1; i < m_count; i++) {
-      float value = Vec2.dot(m_vertices[i], d);
-      if (value > bestValue) {
-        bestIndex = i;
-        bestValue = value;
-      }
-    }
-    return bestIndex;
-  }
-
-  /**
-   * Get the supporting vertex in the given direction.
-   * 
-   * @param d
-   * @return
-   */
-  public final Vec2 getSupportVertex(final Vec2 d) {
-    int bestIndex = 0;
-    float bestValue = Vec2.dot(m_vertices[0], d);
-    for (int i = 1; i < m_count; i++) {
-      float value = Vec2.dot(m_vertices[i], d);
-      if (value > bestValue) {
-        bestIndex = i;
-        bestValue = value;
-      }
-    }
-    return m_vertices[bestIndex];
-  }
-
-  /**
    * Create a convex hull from the given array of points. The count must be in the range [3,
    * Settings.maxPolygonVertices].
    * 
@@ -317,12 +279,10 @@ public class PolygonShape extends Shape {
     xf.p.set(center);
     xf.q.set(angle);
 
-    final Vec2 temp = new Vec2();
     // Transform vertices and normals.
     for (int i = 0; i < m_count; ++i) {
       Transform.mulToOut(xf, m_vertices[i], m_vertices[i]);
-      Rot.mulToOutUnsafe(xf.q, m_normals[i], temp);
-      m_normals[i].set(temp);
+      Rot.mulToOutUnsafe(xf.q, m_normals[i], m_normals[i]);
     }
   }
 
@@ -366,12 +326,15 @@ public class PolygonShape extends Shape {
     final Vec2 v = pool1;
     final Vec2 lower = aabb.lowerBound;
     final Vec2 upper = aabb.upperBound;
-
-    Transform.mulToOutUnsafe(xf, m_vertices[0], lower);
+    final Vec2 v1 = m_vertices[0];
+    lower.x = (xf.q.c * v1.x - xf.q.s * v1.y) + xf.p.x;
+    lower.y = (xf.q.s * v1.x + xf.q.c * v1.y) + xf.p.y;
     upper.set(lower);
 
     for (int i = 1; i < m_count; ++i) {
-      Transform.mulToOutUnsafe(xf, m_vertices[i], v);
+      Vec2 v2 = m_vertices[i];
+      v.x = (xf.q.c * v2.x - xf.q.s * v2.y) + xf.p.x;
+      v.y = (xf.q.s * v2.x + xf.q.c * v2.y) + xf.p.y;
       // Vec2 v = Mul(xf, m_vertices[i]);
       Vec2.minToOut(lower, v, lower);
       Vec2.maxToOut(upper, v, upper);
