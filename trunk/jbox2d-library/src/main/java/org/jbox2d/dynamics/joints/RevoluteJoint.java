@@ -102,6 +102,7 @@ public class RevoluteJoint extends Joint {
     m_motorSpeed = def.motorSpeed;
     m_enableLimit = def.enableLimit;
     m_enableMotor = def.enableMotor;
+    m_limitState = LimitState.INACTIVE;
   }
 
   @Override
@@ -124,8 +125,6 @@ public class RevoluteJoint extends Joint {
     float aB = data.positions[m_indexB].a;
     Vec2 vB = data.velocities[m_indexB].v;
     float wB = data.velocities[m_indexB].w;
-    assert(!Float.isNaN(wB));
-
     final Rot qA = pool.popRot();
     final Rot qB = pool.popRot();
     final Vec2 temp = pool.popVec2();
@@ -331,7 +330,7 @@ public class RevoluteJoint extends Joint {
 
       vA.x -= mA * impulse.x;
       vA.y -= mA * impulse.y;
-      wB -= iA * Vec2.cross(m_rA, impulse);
+      wA -= iA * Vec2.cross(m_rA, impulse);
 
       vB.x += mB * impulse.x;
       vB.y += mB * impulse.y;
@@ -356,7 +355,7 @@ public class RevoluteJoint extends Joint {
     float aA = data.positions[m_indexA].a;
     Vec2 cB = data.positions[m_indexB].c;
     float aB = data.positions[m_indexB].a;
-    
+  
     qA.set(aA);
     qB.set(aB);
 
@@ -419,10 +418,10 @@ public class RevoluteJoint extends Joint {
       K.ex.y = -iA * rA.x * rA.y - iB * rB.x * rB.y;
       K.ey.x = K.ex.y;
       K.ey.y = mA + mB + iA * rA.x * rA.x + iB * rB.x * rB.x;
-
       K.solveToOut(C, impulse);
       impulse.negateLocal();
 
+//      System.out.println(impulse);
       cA.x -= mA * impulse.x;
       cA.y -= mA * impulse.y;
       aA -= iA * Vec2.cross(rA, impulse);
