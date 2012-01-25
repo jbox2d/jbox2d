@@ -26,10 +26,10 @@ public class PistonTest extends TestbedTest {
   public boolean isSaveLoadEnabled() {
     return true;
   }
-  
+
   @Override
   public void initTest(boolean argDeserialized) {
-    if(argDeserialized) {
+    if (argDeserialized) {
       return;
     }
     World world = getWorld();
@@ -39,23 +39,59 @@ public class PistonTest extends TestbedTest {
       ground = getWorld().createBody(bd);
 
       PolygonShape shape = new PolygonShape();
-      shape.setAsBox(1.0f, 100.0f);
+      shape.setAsBox(5.0f, 100.0f);
       bd = new BodyDef();
       bd.type = BodyType.STATIC;
       FixtureDef sides = new FixtureDef();
       sides.shape = shape;
       sides.density = 0;
       sides.friction = 0;
+      sides.restitution = .8f;
       sides.filter.categoryBits = 4;
       sides.filter.maskBits = 2;
 
-      bd.position.set(-6.01f, 50.0f);
+      bd.position.set(-10.01f, 50.0f);
       Body bod = world.createBody(bd);
       bod.createFixture(sides);
-      bd.position.set(6.01f, 50.0f);
+      bd.position.set(10.01f, 50.0f);
       bod = world.createBody(bd);
       bod.createFixture(sides);
     }
+
+    // turney
+    {
+      CircleShape cd;
+      FixtureDef fd = new FixtureDef();
+      BodyDef bd = new BodyDef();
+      bd.type = BodyType.DYNAMIC;
+      int numPieces = 5;
+      float radius = 4f;
+      bd.position = new Vec2(0.0f, 25.0f);
+      Body body = getWorld().createBody(bd);
+      for (int i = 0; i < numPieces; i++) {
+        cd = new CircleShape();
+        cd.m_radius = .5f;
+        fd.shape = cd;
+        fd.density = 25;
+        fd.friction = .1f;
+        fd.restitution = .9f;
+        float xPos = radius * (float) Math.cos(2f * Math.PI * (i / (float) (numPieces)));
+        float yPos = radius * (float) Math.sin(2f * Math.PI * (i / (float) (numPieces)));
+        cd.m_p.set(xPos, yPos);
+
+        body.createFixture(fd);
+      }
+
+      body.setBullet(false);
+
+      RevoluteJointDef rjd = new RevoluteJointDef();
+      rjd.initialize(body, getGroundBody(), body.getPosition());
+      rjd.motorSpeed = MathUtils.PI;
+      rjd.maxMotorTorque = 1000000.0f;
+      rjd.enableMotor = true;
+      RevoluteJoint joint = (RevoluteJoint) getWorld().createJoint(rjd);
+    }
+
 
     {
       Body prevBody = ground;
@@ -103,7 +139,7 @@ public class PistonTest extends TestbedTest {
       // Define piston
       {
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(7f, 1.5f);
+        shape.setAsBox(7f, 2f);
 
         BodyDef bd = new BodyDef();
         bd.type = BodyType.DYNAMIC;

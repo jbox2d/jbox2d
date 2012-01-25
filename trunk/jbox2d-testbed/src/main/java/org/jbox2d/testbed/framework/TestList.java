@@ -59,6 +59,7 @@ import org.jbox2d.testbed.tests.PyramidTest;
 import org.jbox2d.testbed.tests.RayCastTest;
 import org.jbox2d.testbed.tests.RevoluteTest;
 import org.jbox2d.testbed.tests.SensorTest;
+import org.jbox2d.testbed.tests.SetAsRotatedBoxTest;
 import org.jbox2d.testbed.tests.ShapeEditing;
 import org.jbox2d.testbed.tests.SliderCrankTest;
 import org.jbox2d.testbed.tests.SphereStack;
@@ -76,6 +77,7 @@ public class TestList {
   public static void populateModel(TestbedModel argModel){
       
       argModel.addCategory("Featured");
+      argModel.addTest(new SetAsRotatedBoxTest());
       argModel.addTest(new FixedPendulumTest(false));
       argModel.addTest(new FixedPendulumTest(true));
       argModel.addTest(new FreePendulumTest(false));

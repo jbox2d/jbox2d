@@ -282,7 +282,7 @@ public class PolygonShape extends Shape {
     // Transform vertices and normals.
     for (int i = 0; i < m_count; ++i) {
       Transform.mulToOut(xf, m_vertices[i], m_vertices[i]);
-      Rot.mulToOutUnsafe(xf.q, m_normals[i], m_normals[i]);
+      Rot.mulToOut(xf.q, m_normals[i], m_normals[i]);
     }
   }
 

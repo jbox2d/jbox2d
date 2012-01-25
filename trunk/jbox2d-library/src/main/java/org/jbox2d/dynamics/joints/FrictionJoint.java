@@ -273,6 +273,7 @@ public class FrictionJoint extends Joint {
       temp.set(impulse).mulLocal(mB);
       vB.addLocal(temp);
       wB += iB * Vec2.cross(m_rB, impulse);
+      
     }
 
     data.velocities[m_indexA].v.set(vA);
@@ -280,7 +281,7 @@ public class FrictionJoint extends Joint {
     data.velocities[m_indexB].v.set(vB);
     data.velocities[m_indexB].w = wB;
 
-    pool.pushVec2(6);
+    pool.pushVec2(4);
   }
 
   @Override
