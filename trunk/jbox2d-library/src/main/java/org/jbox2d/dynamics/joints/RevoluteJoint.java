@@ -217,7 +217,7 @@ public class RevoluteJoint extends Joint {
     data.velocities[m_indexA].w = wA;
     data.velocities[m_indexB].v.set(vB);
     data.velocities[m_indexB].w = wB;
-    
+
     pool.pushVec2(1);
     pool.pushRot(2);
   }
@@ -324,7 +324,7 @@ public class RevoluteJoint extends Joint {
       Vec2.crossToOutUnsafe(wB, m_rB, Cdot);
       Cdot.addLocal(vB).subLocal(vA).subLocal(temp);
       m_mass.solve22ToOut(Cdot.negateLocal(), impulse); // just leave negated
-      
+
       m_impulse.x += impulse.x;
       m_impulse.y += impulse.y;
 
@@ -355,7 +355,7 @@ public class RevoluteJoint extends Joint {
     float aA = data.positions[m_indexA].a;
     Vec2 cB = data.positions[m_indexB].c;
     float aB = data.positions[m_indexB].a;
-  
+
     qA.set(aA);
     qB.set(aB);
 
@@ -421,7 +421,6 @@ public class RevoluteJoint extends Joint {
       K.solveToOut(C, impulse);
       impulse.negateLocal();
 
-//      System.out.println(impulse);
       cA.x -= mA * impulse.x;
       cA.y -= mA * impulse.y;
       aA -= iA * Vec2.cross(rA, impulse);
@@ -429,7 +428,7 @@ public class RevoluteJoint extends Joint {
       cB.x += mB * impulse.x;
       cB.y += mB * impulse.y;
       aB += iB * Vec2.cross(rB, impulse);
-      
+
       pool.pushVec2(4);
       pool.pushMat22(1);
     }
@@ -437,7 +436,7 @@ public class RevoluteJoint extends Joint {
     data.positions[m_indexA].a = aA;
     data.positions[m_indexB].c.set(cB);
     data.positions[m_indexB].a = aB;
-    
+
     pool.pushRot(2);
 
     return positionError <= Settings.linearSlop && angularError <= Settings.angularSlop;
