@@ -112,6 +112,14 @@ public class Transform implements Serializable {
     out.x = (T.q.c * px + T.q.s * py);
     out.y = tempy;
   }
+  
+  public final static void mulTransToOutUnsafe(final Transform T, final Vec2 v, final Vec2 out) {
+    assert(v != out);
+    final float px = v.x - T.p.x;
+    final float py = v.y - T.p.y;
+    out.x = (T.q.c * px + T.q.s * py);
+    out.y = (-T.q.s * px + T.q.c * py);
+  }
 
   public final static Transform mul(final Transform A, final Transform B) {
     Transform C = new Transform();
