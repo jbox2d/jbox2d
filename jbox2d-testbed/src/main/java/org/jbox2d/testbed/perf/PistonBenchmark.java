@@ -36,6 +36,7 @@ public class PistonBenchmark extends PerfTest {
 
   public RevoluteJoint m_joint1;
   public PrismaticJoint m_joint2;
+  public World world;
 
   public PistonBenchmark() {
     super(2, iters);
@@ -48,32 +49,68 @@ public class PistonBenchmark extends PerfTest {
 
   @Override
   public void runTest(int argNum) {
-    boolean bullets = argNum == 0;
+    boolean bullet = argNum == 0;
     
-    World world = new World(new Vec2(0.0f, -10.0f));
+    world = new World(new Vec2(0.0f, -10.0f));
     Body ground = null;
     {
       BodyDef bd = new BodyDef();
       ground = world.createBody(bd);
 
       PolygonShape shape = new PolygonShape();
-      shape.setAsBox(1.0f, 100.0f);
+      shape.setAsBox(5.0f, 100.0f);
       bd = new BodyDef();
       bd.type = BodyType.STATIC;
       FixtureDef sides = new FixtureDef();
       sides.shape = shape;
       sides.density = 0;
       sides.friction = 0;
+      sides.restitution = .8f;
       sides.filter.categoryBits = 4;
       sides.filter.maskBits = 2;
 
-      bd.position.set(-6.01f, 50.0f);
+      bd.position.set(-10.01f, 50.0f);
       Body bod = world.createBody(bd);
       bod.createFixture(sides);
-      bd.position.set(6.01f, 50.0f);
+      bd.position.set(10.01f, 50.0f);
       bod = world.createBody(bd);
       bod.createFixture(sides);
     }
+
+    // turney
+    {
+      CircleShape cd;
+      FixtureDef fd = new FixtureDef();
+      BodyDef bd = new BodyDef();
+      bd.type = BodyType.DYNAMIC;
+      int numPieces = 5;
+      float radius = 4f;
+      bd.position = new Vec2(0.0f, 25.0f);
+      Body body = world.createBody(bd);
+      for (int i = 0; i < numPieces; i++) {
+        cd = new CircleShape();
+        cd.m_radius = .5f;
+        fd.shape = cd;
+        fd.density = 25;
+        fd.friction = .1f;
+        fd.restitution = .9f;
+        float xPos = radius * (float) Math.cos(2f * Math.PI * (i / (float) (numPieces)));
+        float yPos = radius * (float) Math.sin(2f * Math.PI * (i / (float) (numPieces)));
+        cd.m_p.set(xPos, yPos);
+
+        body.createFixture(fd);
+      }
+
+      body.setBullet(false);
+
+      RevoluteJointDef rjd = new RevoluteJointDef();
+      rjd.initialize(body, ground, body.getPosition());
+      rjd.motorSpeed = MathUtils.PI;
+      rjd.maxMotorTorque = 1000000.0f;
+      rjd.enableMotor = true;
+      RevoluteJoint joint = (RevoluteJoint) world.createJoint(rjd);
+    }
+
 
     {
       Body prevBody = ground;
@@ -121,7 +158,7 @@ public class PistonBenchmark extends PerfTest {
       // Define piston
       {
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(7f, 1.5f);
+        shape.setAsBox(7f, 2f);
 
         BodyDef bd = new BodyDef();
         bd.type = BodyType.DYNAMIC;
@@ -158,7 +195,7 @@ public class PistonBenchmark extends PerfTest {
           sd.setAsBox(0.4f, 0.3f);
           bd.position.set(-1.0f, 23.0f + i);
 
-          bd.bullet = bullets;
+          bd.bullet = false;
           body = world.createBody(bd);
           fixture.shape = sd;
           fixture.density = .1f;
@@ -171,7 +208,7 @@ public class PistonBenchmark extends PerfTest {
         cd.m_radius = 0.36f;
         for (int i = 0; i < 100; ++i) {
           bd.position.set(1.0f, 23.0f + i);
-          bd.bullet = bullets;
+          bd.bullet = false;
           fixture.shape = cd;
           fixture.density = 2f;
           fixture.filter.categoryBits = 2;
@@ -181,7 +218,6 @@ public class PistonBenchmark extends PerfTest {
         }
       }
     }
-
 
     for (int i = 0; i < frames; i++) {
       world.step(timeStep, posIters, velIters);
