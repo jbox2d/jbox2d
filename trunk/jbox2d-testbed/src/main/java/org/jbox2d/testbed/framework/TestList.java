@@ -53,6 +53,7 @@ import org.jbox2d.testbed.tests.MJWTest;
 import org.jbox2d.testbed.tests.OneSidedTest;
 import org.jbox2d.testbed.tests.PistonTest;
 import org.jbox2d.testbed.tests.PolyShapes;
+import org.jbox2d.testbed.tests.PrismaticStrangenessTEst;
 import org.jbox2d.testbed.tests.PrismaticTest;
 import org.jbox2d.testbed.tests.Pulleys;
 import org.jbox2d.testbed.tests.PyramidTest;
@@ -77,6 +78,7 @@ public class TestList {
   public static void populateModel(TestbedModel argModel){
       
       argModel.addCategory("Featured");
+      argModel.addTest(new PrismaticStrangenessTEst());
       argModel.addTest(new SetAsRotatedBoxTest());
       argModel.addTest(new FixedPendulumTest(false));
       argModel.addTest(new FixedPendulumTest(true));

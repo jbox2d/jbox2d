@@ -100,7 +100,13 @@ import org.jbox2d.pooling.IWorldPool;
 //
 //Now compute impulse to be applied:
 //df = f2 - f1
-
+/**
+ * A prismatic joint. This joint provides one degree of freedom: translation along an axis fixed in
+ * bodyA. Relative rotation is prevented. You can use a joint limit to restrict the range of motion
+ * and a joint motor to drive the motion or to model joint friction.
+ * 
+ * @author Daniel
+ */
 public class PrismaticJoint extends Joint {
 
   // Solver shared
@@ -194,25 +200,18 @@ public class PrismaticJoint extends Joint {
     return inv_dt * m_impulse.y;
   }
 
-  /**Get the current joint translation, usually in meters.
-  public float getJointTranslation() {
-    Vec2 pA = pool.popVec2();
-    Vec2 pB = pool.popVec2();
-    Vec2 axis = pool.popVec2();
-
-    m_bodyA.getWorldPointToOut(m_localAnchorA, pA);
-    m_bodyB.getWorldPointToOut(m_localAnchorB, pB);
-    pB.subLocal(pA);
-    m_bodyA.getWorldVectorToOut(m_localXAxisA, axis);
-
-    float translation = Vec2.dot(pB, axis);
-
-    pool.pushVec2(3);
-    return translation;
-  }
-
   /**
-   * Get the current joint translation speed, usually in meters per second.
+   * Get the current joint translation, usually in meters. public float getJointTranslation() { Vec2
+   * pA = pool.popVec2(); Vec2 pB = pool.popVec2(); Vec2 axis = pool.popVec2();
+   * 
+   * m_bodyA.getWorldPointToOut(m_localAnchorA, pA); m_bodyB.getWorldPointToOut(m_localAnchorB, pB);
+   * pB.subLocal(pA); m_bodyA.getWorldVectorToOut(m_localXAxisA, axis);
+   * 
+   * float translation = Vec2.dot(pB, axis);
+   * 
+   * pool.pushVec2(3); return translation; }
+   * 
+   * /** Get the current joint translation speed, usually in meters per second.
    * 
    * @return
    */
@@ -286,6 +285,7 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Get the lower joint limit, usually in meters.
+   * 
    * @return
    */
   public float getLowerLimit() {
@@ -294,6 +294,7 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Get the upper joint limit, usually in meters.
+   * 
    * @return
    */
   public float getUpperLimit() {
@@ -302,6 +303,7 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Set the joint limits, usually in meters.
+   * 
    * @param lower
    * @param upper
    */
@@ -318,6 +320,7 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Is the joint motor enabled?
+   * 
    * @return
    */
   public boolean isMotorEnabled() {
@@ -326,6 +329,7 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Enable/disable the joint motor.
+   * 
    * @param flag
    */
   public void enableMotor(boolean flag) {
@@ -336,6 +340,7 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Set the motor speed, usually in meters per second.
+   * 
    * @param speed
    */
   public void setMotorSpeed(float speed) {
@@ -346,6 +351,7 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Get the motor speed, usually in meters per second.
+   * 
    * @return
    */
   public float getMotorSpeed() {
@@ -354,6 +360,7 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Set the maximum motor force, usually in N.
+   * 
    * @param force
    */
   public void setMaxMotorForce(float force) {
@@ -364,6 +371,7 @@ public class PrismaticJoint extends Joint {
 
   /**
    * Get the current motor force, usually in N.
+   * 
    * @param inv_dt
    * @return
    */
@@ -512,6 +520,153 @@ public class PrismaticJoint extends Joint {
   }
 
   @Override
+  public void solveVelocityConstraints(final SolverData data) {
+    Vec2 vA = data.velocities[m_indexA].v;
+    float wA = data.velocities[m_indexA].w;
+    Vec2 vB = data.velocities[m_indexB].v;
+    float wB = data.velocities[m_indexB].w;
+
+    float mA = m_invMassA, mB = m_invMassB;
+    float iA = m_invIA, iB = m_invIB;
+
+    final Vec2 temp = pool.popVec2();
+
+    // Solve linear motor constraint.
+    if (m_enableMotor && m_limitState != LimitState.EQUAL) {
+      temp.set(vB).subLocal(vA);
+      float Cdot = Vec2.dot(m_axis, temp) + m_a2 * wB - m_a1 * wA;
+      float impulse = m_motorMass * (m_motorSpeed - Cdot);
+      float oldImpulse = m_motorImpulse;
+      float maxImpulse = data.step.dt * m_maxMotorForce;
+      m_motorImpulse = MathUtils.clamp(m_motorImpulse + impulse, -maxImpulse, maxImpulse);
+      impulse = m_motorImpulse - oldImpulse;
+
+      final Vec2 P = pool.popVec2();
+      P.set(m_axis).mulLocal(impulse);
+      float LA = impulse * m_a1;
+      float LB = impulse * m_a2;
+
+      vA.x -= mA * P.x;
+      vA.y -= mA * P.y;
+      wA -= iA * LA;
+
+      vB.x += mB * P.x;
+      vB.y += mB * P.y;
+      wB += iB * LB;
+
+      pool.pushVec2(1);
+    }
+
+    final Vec2 Cdot1 = pool.popVec2();
+    temp.set(vB).subLocal(vA);
+    Cdot1.x = Vec2.dot(m_perp, temp) + m_s2 * wB - m_s1 * wA;
+    Cdot1.y = wB - wA;
+    // System.out.println(Cdot1);
+
+    if (m_enableLimit && m_limitState != LimitState.INACTIVE) {
+      // Solve prismatic and limit constraint in block form.
+      float Cdot2;
+      temp.set(vB).subLocal(vA);
+      Cdot2 = Vec2.dot(m_axis, temp) + m_a2 * wB - m_a1 * wA;
+
+      final Vec3 Cdot = pool.popVec3();
+      Cdot.set(Cdot1.x, Cdot1.y, Cdot2);
+      Cdot.negateLocal();
+
+      final Vec3 f1 = pool.popVec3();
+      final Vec3 df = pool.popVec3();
+
+      f1.set(m_impulse);
+      m_K.solve33ToOut(Cdot.negateLocal(), df);
+      // Cdot.negateLocal(); not used anymore
+      m_impulse.addLocal(df);
+
+      if (m_limitState == LimitState.AT_LOWER) {
+        m_impulse.z = MathUtils.max(m_impulse.z, 0.0f);
+      } else if (m_limitState == LimitState.AT_UPPER) {
+        m_impulse.z = MathUtils.min(m_impulse.z, 0.0f);
+      }
+
+      // f2(1:2) = invK(1:2,1:2) * (-Cdot(1:2) - K(1:2,3) * (f2(3) - f1(3))) +
+      // f1(1:2)
+      final Vec2 b = pool.popVec2();
+      final Vec2 f2r = pool.popVec2();
+
+      temp.set(m_K.ez.x, m_K.ez.y).mulLocal(m_impulse.z - f1.z);
+      b.set(Cdot1).negateLocal().subLocal(temp);
+
+      temp.set(f1.x, f1.y);
+      m_K.solve22ToOut(b, f2r);
+      f2r.addLocal(temp);
+      m_impulse.x = f2r.x;
+      m_impulse.y = f2r.y;
+
+      df.set(m_impulse).subLocal(f1);
+
+      final Vec2 P = pool.popVec2();
+      temp.set(m_axis).mulLocal(df.z);
+      P.set(m_perp).mulLocal(df.x).addLocal(temp);
+
+      float LA = df.x * m_s1 + df.y + df.z * m_a1;
+      float LB = df.x * m_s2 + df.y + df.z * m_a2;
+
+      vA.x -= mA * P.x;
+      vA.y -= mA * P.y;
+      wA -= iA * LA;
+
+      vB.x += mB * P.x;
+      vB.y += mB * P.y;
+      wB += iB * LB;
+
+      pool.pushVec2(3);
+      pool.pushVec3(3);
+    } else {
+      // Limit is inactive, just solve the prismatic constraint in block form.
+      final Vec2 df = pool.popVec2();
+      m_K.solve22ToOut(Cdot1.negateLocal(), df);
+      Cdot1.negateLocal();
+
+      m_impulse.x += df.x;
+      m_impulse.y += df.y;
+
+      final Vec2 P = pool.popVec2();
+      P.set(m_perp).mulLocal(df.x);
+      float LA = df.x * m_s1 + df.y;
+      float LB = df.x * m_s2 + df.y;
+
+      vA.x -= mA * P.x;
+      vA.y -= mA * P.y;
+      wA -= iA * LA;
+
+      vB.x += mB * P.x;
+      vB.y += mB * P.y;
+      wB += iB * LB;
+
+      final Vec2 Cdot10 = pool.popVec2();
+      Cdot10.set(Cdot1);
+
+      Cdot1.x = Vec2.dot(m_perp, temp.set(vB).subLocal(vA)) + m_s2 * wB - m_s1 * wA;
+      Cdot1.y = wB - wA;
+
+      if (MathUtils.abs(Cdot1.x) > 0.01f || MathUtils.abs(Cdot1.y) > 0.01f) {
+        // djm note: what's happening here?
+        Mat33.mul22ToOutUnsafe(m_K, df, temp);
+        Cdot1.x += 0.0f;
+      }
+
+      pool.pushVec2(3);
+    }
+
+    data.velocities[m_indexA].v.set(vA);
+    data.velocities[m_indexA].w = wA;
+    data.velocities[m_indexB].v.set(vB);
+    data.velocities[m_indexB].w = wB;
+
+    pool.pushVec2(2);
+  }
+
+
+  @Override
   public boolean solvePositionConstraints(final SolverData data) {
 
     final Rot qA = pool.popRot();
@@ -637,11 +792,11 @@ public class PrismaticJoint extends Joint {
     float LA = impulse.x * s1 + impulse.y + impulse.z * a1;
     float LB = impulse.x * s2 + impulse.y + impulse.z * a2;
 
-    cA.x -= m_invMassA * Px;
-    cA.y -= m_invMassA * Py;
+    cA.x -= mA * Px;
+    cA.y -= mA * Py;
     aA -= iA * LA;
-    cB.x += m_invMassB * Px;
-    cB.y += m_invMassB * Py;
+    cB.x += mB * Px;
+    cB.y += mB * Py;
     aB += iB * LB;
 
     data.positions[m_indexA].c.set(cA);
@@ -654,151 +809,5 @@ public class PrismaticJoint extends Joint {
     pool.pushRot(2);
 
     return linearError <= Settings.linearSlop && angularError <= Settings.angularSlop;
-  }
-
-  @Override
-  public void solveVelocityConstraints(final SolverData data) {
-    Vec2 vA = data.velocities[m_indexA].v;
-    float wA = data.velocities[m_indexA].w;
-    Vec2 vB = data.velocities[m_indexB].v;
-    float wB = data.velocities[m_indexB].w;
-
-    float mA = m_invMassA, mB = m_invMassB;
-    float iA = m_invIA, iB = m_invIB;
-
-    final Vec2 temp = pool.popVec2();
-
-    // Solve linear motor constraint.
-    if (m_enableMotor && m_limitState != LimitState.EQUAL) {
-      temp.set(vB).subLocal(vA);
-      float Cdot = Vec2.dot(m_axis, temp) + m_a2 * wB - m_a1 * wA;
-      float impulse = m_motorMass * (m_motorSpeed - Cdot);
-      float oldImpulse = m_motorImpulse;
-      float maxImpulse = data.step.dt * m_maxMotorForce;
-      m_motorImpulse = MathUtils.clamp(m_motorImpulse + impulse, -maxImpulse, maxImpulse);
-      impulse = m_motorImpulse - oldImpulse;
-
-      final Vec2 P = pool.popVec2();
-      P.set(m_axis).mulLocal(impulse);
-      float LA = impulse * m_a1;
-      float LB = impulse * m_a2;
-
-      vA.x -= mA * P.x;
-      vA.y -= mA * P.y;
-      wA -= iA * LA;
-
-      vB.x += mB * P.x;
-      vB.y += mB * P.y;
-      wB += iB * LB;
-
-      pool.pushVec2(1);
-    }
-
-    final Vec2 Cdot1 = pool.popVec2();
-    temp.set(vB).subLocal(vA);
-    Cdot1.x = Vec2.dot(m_perp, temp) + m_s2 * wB - m_s1 * wA;
-    Cdot1.y = wB - wA;
-    // System.out.println(Cdot1);
-
-    if (m_enableLimit && m_limitState != LimitState.INACTIVE) {
-      // Solve prismatic and limit constraint in block form.
-      float Cdot2;
-      temp.set(vB).subLocal(vA);
-      Cdot2 = Vec2.dot(m_axis, temp) + m_a2 * wB - m_a1 * wA;
-
-      final Vec3 Cdot = pool.popVec3();
-      Cdot.set(Cdot1.x, Cdot1.y, Cdot2);
-      Cdot.negateLocal();
-
-      final Vec3 f1 = pool.popVec3();
-      final Vec3 df = pool.popVec3();
-
-      f1.set(m_impulse);
-      m_K.solve33ToOut(Cdot.negateLocal(), df);
-      //Cdot.negateLocal(); not used anymore
-      m_impulse.addLocal(df);
-
-      if (m_limitState == LimitState.AT_LOWER) {
-        m_impulse.z = MathUtils.max(m_impulse.z, 0.0f);
-      } else if (m_limitState == LimitState.AT_UPPER) {
-        m_impulse.z = MathUtils.min(m_impulse.z, 0.0f);
-      }
-
-      // f2(1:2) = invK(1:2,1:2) * (-Cdot(1:2) - K(1:2,3) * (f2(3) - f1(3))) +
-      // f1(1:2)
-      final Vec2 b = pool.popVec2();
-      final Vec2 f2r = pool.popVec2();
-
-      temp.set(m_K.ez.x, m_K.ez.y).mulLocal(m_impulse.z - f1.z);
-      b.set(Cdot1).negateLocal().subLocal(temp);
-
-      temp.set(f1.x, f1.y);
-      m_K.solve22ToOut(b, f2r);
-      f2r.addLocal(temp);
-      m_impulse.x = f2r.x;
-      m_impulse.y = f2r.y;
-
-      df.set(m_impulse).subLocal(f1);
-
-      final Vec2 P = pool.popVec2();
-      temp.set(m_axis).mulLocal(df.z);
-      P.set(m_perp).mulLocal(df.x).addLocal(temp);
-
-      float LA = df.x * m_s1 + df.y + df.z * m_a1;
-      float LB = df.x * m_s2 + df.y + df.z * m_a2;
-
-      vA.x -= mA * P.x;
-      vA.y -= mA * P.y;
-      wA -= iA * LA;
-
-      vB.x += mB * P.x;
-      vB.y += mB * P.y;
-      wB += iB * LB;
-
-      pool.pushVec2(3);
-      pool.pushVec3(3);
-    } else {
-      // Limit is inactive, just solve the prismatic constraint in block form.
-      final Vec2 df = pool.popVec2();
-      m_K.solve22ToOut(Cdot1.negateLocal(), df);
-      Cdot1.negateLocal();
-
-      m_impulse.x += df.x;
-      m_impulse.y += df.y;
-
-      final Vec2 P = pool.popVec2();
-      P.set(m_perp).mulLocal(df.x);
-      float LA = df.x * m_s1 + df.y;
-      float LB = df.x * m_s2 + df.y;
-
-      vA.x -= mA * P.x;
-      vA.y -= mA * P.y;
-      wA -= iA * LA;
-
-      vB.x += mB * P.x;
-      vB.y += mB * P.y;
-      wB += iB * LB;
-
-      final Vec2 Cdot10 = pool.popVec2();
-      Cdot10.set(Cdot1);
-
-      Cdot1.x = Vec2.dot(m_perp, temp.set(vB).subLocal(vA)) + m_s2 * wB - m_s1 * wA;
-      Cdot1.y = wB - wA;
-
-      if (MathUtils.abs(Cdot1.x) > 0.01f || MathUtils.abs(Cdot1.y) > 0.01f) {
-        // djm note: what's happening here?
-        Mat33.mul22ToOutUnsafe(m_K, df, temp);
-        Cdot1.x += 0.0f;
-      }
-
-      pool.pushVec2(3);
-    }
-
-    data.velocities[m_indexA].v.set(vA);
-    data.velocities[m_indexA].w = wA;
-    data.velocities[m_indexB].v.set(vB);
-    data.velocities[m_indexB].w = wB;
-
-    pool.pushVec2(2);
   }
 }
