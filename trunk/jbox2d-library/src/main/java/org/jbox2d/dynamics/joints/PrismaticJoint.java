@@ -413,7 +413,7 @@ public class PrismaticJoint extends Joint {
     // Compute the effective masses.
     Rot.mulToOutUnsafe(qA, d.set(m_localAnchorA).subLocal(m_localCenterA), rA);
     Rot.mulToOutUnsafe(qB, d.set(m_localAnchorB).subLocal(m_localCenterB), rB);
-    d.set(cB).addLocal(rB).subLocal(cA).subLocal(rA);
+    d.set(cB).subLocal(cA).addLocal(rB).subLocal(rA);
 
     float mA = m_invMassA, mB = m_invMassB;
     float iA = m_invIA, iB = m_invIB;
@@ -571,7 +571,6 @@ public class PrismaticJoint extends Joint {
 
       final Vec3 Cdot = pool.popVec3();
       Cdot.set(Cdot1.x, Cdot1.y, Cdot2);
-      Cdot.negateLocal();
 
       final Vec3 f1 = pool.popVec3();
       final Vec3 df = pool.popVec3();
