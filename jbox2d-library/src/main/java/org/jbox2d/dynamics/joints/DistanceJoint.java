@@ -279,7 +279,7 @@ public class DistanceJoint extends Joint {
     Vec2.crossToOutUnsafe(wA, m_rA, vpA);
     vpA.addLocal(vA);
     Vec2.crossToOutUnsafe(wB, m_rB, vpB);
-    vpA.addLocal(vB);
+    vpB.addLocal(vB);
     float Cdot = Vec2.dot(m_u, vpB.subLocal(vpA));
 
     float impulse = -m_mass * (Cdot + m_bias + m_gamma * m_impulse);
