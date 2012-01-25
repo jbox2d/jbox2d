@@ -1116,8 +1116,8 @@ public class Body {
     // inlined:
     xf1.q.s = MathUtils.sin(m_sweep.a0);
     xf1.q.c = MathUtils.cos(m_sweep.a0);
-    xf1.p.x = m_sweep.c0.x - xf1.q.c * m_sweep.localCenter.x - xf1.q.s * m_sweep.localCenter.y;
-    xf1.p.y = m_sweep.c0.y - xf1.q.s * m_sweep.localCenter.x + xf1.q.c * m_sweep.localCenter.y;
+    xf1.p.x = m_sweep.c0.x - xf1.q.c * m_sweep.localCenter.x + xf1.q.s * m_sweep.localCenter.y;
+    xf1.p.y = m_sweep.c0.y - xf1.q.s * m_sweep.localCenter.x - xf1.q.c * m_sweep.localCenter.y;
     // end inline
 
     for (Fixture f = m_fixtureList; f != null; f = f.m_next) {
@@ -1126,23 +1126,18 @@ public class Body {
   }
 
   public final void synchronizeTransform() {
-    m_xf.q.set(m_sweep.a);
-
-    // m_xf.position = m_sweep.c - Mul(m_xf.R, m_sweep.localCenter);
-    Rot.mulToOutUnsafe(m_xf.q, m_sweep.localCenter, m_xf.p);
-    m_xf.p.mulLocal(-1).addLocal(m_sweep.c);
-
-    // final float c = MathUtils.cos(m_sweep.a), s = MathUtils.sin(m_sweep.a);
-    // m_xf.q.ex.x = c;
-    // m_xf.q.ey.x = -s;
-    // m_xf.q.ex.y = s;
-    // m_xf.q.ey.y = c;
-    // m_xf.p.x = m_xf.q.ex.x * m_sweep.localCenter.x + m_xf.q.ey.x * m_sweep.localCenter.y;
-    // m_xf.p.y = m_xf.q.ex.y * m_sweep.localCenter.x + m_xf.q.ey.y * m_sweep.localCenter.y;
-    // m_xf.p.x *= (float) (-1);
-    // m_xf.p.y *= (float) (-1);
-    // m_xf.p.x += m_sweep.c.x;
-    // m_xf.p.y += m_sweep.c.y;
+    // m_xf.q.set(m_sweep.a);
+    //
+    // // m_xf.position = m_sweep.c - Mul(m_xf.R, m_sweep.localCenter);
+    // Rot.mulToOutUnsafe(m_xf.q, m_sweep.localCenter, m_xf.p);
+    // m_xf.p.mulLocal(-1).addLocal(m_sweep.c);
+    //
+    m_xf.q.s = MathUtils.sin(m_sweep.a);
+    m_xf.q.c = MathUtils.cos(m_sweep.a);
+    Rot q = m_xf.q;
+    Vec2 v = m_sweep.localCenter;
+    m_xf.p.x = m_sweep.c.x - q.c * v.x + q.s * v.y;
+    m_xf.p.y = m_sweep.c.y - q.s * v.x - q.c * v.y;
   }
 
   /**

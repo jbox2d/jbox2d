@@ -72,7 +72,7 @@ public class TestbedSettings {
     addSetting(new TestbedSetting(PositionIterations, SettingType.ENGINE, 3, 0, 100));
     addSetting(new TestbedSetting(VelocityIterations, SettingType.ENGINE, 8, 1, 100));
     addSetting(new TestbedSetting(WarmStarting, SettingType.ENGINE, true));
-    addSetting(new TestbedSetting(ContinuousCollision, SettingType.ENGINE, false));
+    addSetting(new TestbedSetting(ContinuousCollision, SettingType.ENGINE, true));
     addSetting(new TestbedSetting(DrawShapes, SettingType.DRAWING, true));
     addSetting(new TestbedSetting(DrawJoints, SettingType.DRAWING, true));
     addSetting(new TestbedSetting(DrawAABBs, SettingType.DRAWING, false));
