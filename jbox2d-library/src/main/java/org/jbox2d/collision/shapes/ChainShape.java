@@ -126,7 +126,7 @@ public class ChainShape extends Shape {
     final Vec2 v1 = pool1;
     final Vec2 v2 = pool2;
     Transform.mulToOutUnsafe(xf, m_vertices[i1], v1);
-    Transform.mulToOutUnsafe(xf, m_vertices[i2], v1);
+    Transform.mulToOutUnsafe(xf, m_vertices[i2], v2);
 
     Vec2.minToOut(v1, v2, aabb.lowerBound);
     Vec2.maxToOut(v1, v2, aabb.upperBound);

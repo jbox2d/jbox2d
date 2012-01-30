@@ -268,7 +268,7 @@ public class WeldJoint extends Joint {
 
     pool.pushVec2(1);
     pool.pushRot(2);
-    pool.pushMat22(1);
+    pool.pushMat33(1);
   }
 
   /**
@@ -427,12 +427,17 @@ public class WeldJoint extends Joint {
       cB.x += mB * P.x;
       cB.y += mB * P.y;
       aB += iB * (Vec2.cross(rB, P) + impulse.z);
+      pool.pushVec3(2);
     }
 
     data.positions[m_indexA].c.set(cA);
     data.positions[m_indexA].a = aA;
     data.positions[m_indexB].c.set(cB);
     data.positions[m_indexB].a = aB;
+    
+    pool.pushVec2(5);
+    pool.pushRot(2);
+    pool.pushMat33(1);
 
     return positionError <= Settings.linearSlop && angularError <= Settings.angularSlop;
   }

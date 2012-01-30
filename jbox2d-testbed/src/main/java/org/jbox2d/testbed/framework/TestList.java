@@ -36,7 +36,7 @@ import org.jbox2d.testbed.tests.CharacterCollision;
 import org.jbox2d.testbed.tests.CircleStress;
 import org.jbox2d.testbed.tests.CollisionFiltering;
 import org.jbox2d.testbed.tests.CollisionProcessing;
-import org.jbox2d.testbed.tests.CompoundShapesTest;
+import org.jbox2d.testbed.tests.CompoundShapes;
 import org.jbox2d.testbed.tests.ConfinedTest;
 import org.jbox2d.testbed.tests.ContinuousTest;
 import org.jbox2d.testbed.tests.DistanceTest;
@@ -46,6 +46,8 @@ import org.jbox2d.testbed.tests.DynamicTreeTest;
 import org.jbox2d.testbed.tests.EdgeShapes;
 //import org.jbox2d.testbed.tests.Gears;
 import org.jbox2d.testbed.tests.CharacterCollisionProblem;
+import org.jbox2d.testbed.tests.ConvexHull;
+import org.jbox2d.testbed.tests.ConveyorBelt;
 import org.jbox2d.testbed.tests.FixedPendulumTest;
 import org.jbox2d.testbed.tests.FreePendulumTest;
 import org.jbox2d.testbed.tests.LiquidTest;
@@ -75,76 +77,72 @@ import org.jbox2d.testbed.tests.Web;
  */
 public class TestList {
   
-  public static void populateModel(TestbedModel argModel){
+  public static void populateModel(TestbedModel model){
       
-      argModel.addCategory("Featured");
-      argModel.addTest(new VerticalStack());
-      argModel.addTest(new PrismaticStrangenessTEst());
-      argModel.addTest(new SetAsRotatedBoxTest());
-      argModel.addTest(new FixedPendulumTest(false));
-      argModel.addTest(new FixedPendulumTest(true));
-      argModel.addTest(new FreePendulumTest(false));
-      argModel.addTest(new FreePendulumTest(true));
-      argModel.addTest(new CharacterCollisionProblem());
-      argModel.addTest(new Chain());
-      argModel.addTest(new MJWTest());
-      argModel.addTest(new DominoTest());
-      argModel.addTest(new CompoundShapesTest());
-      argModel.addTest(new BlobTest4());
-      argModel.addTest(new TheoJansen());
+      model.addCategory("Featured");
+
+      model.addTest(new SphereStack());
+      model.addTest(new MJWTest());
+      model.addTest(new DominoTest());
+      model.addTest(new CompoundShapes());
+      model.addTest(new BlobTest4());
+      model.addTest(new TheoJansen());
       
       // watching...
-      argModel.addCategory("Collision Watching");
-      argModel.addTest(new VaryingRestitution());
-      argModel.addTest(new VaryingFrictionTest());
-      argModel.addTest(new SphereStack());
-      argModel.addTest(new PistonTest());
-      argModel.addTest(new PyramidTest());
-      argModel.addTest(new DominoTower());
-      argModel.addTest(new CircleStress());
+      model.addCategory("Collision Watching");
+      model.addTest(new VaryingRestitution());
+      model.addTest(new VaryingFrictionTest());
+      model.addTest(new ConveyorBelt());
+      model.addTest(new SphereStack());
+      model.addTest(new PistonTest());
+      model.addTest(new PyramidTest());
+      model.addTest(new DominoTower());
+      model.addTest(new CircleStress());
       
       // more interactive..
-      argModel.addCategory("Interactive");
-      argModel.addTest(new ShapeEditing());
-      argModel.addTest(new Breakable());
-      argModel.addTest(new OneSidedTest());
-      argModel.addTest(new PolyShapes());
-      argModel.addTest(new BodyTypes());
-      argModel.addTest(new CharacterCollision());
-      argModel.addTest(new ApplyForce());
+      model.addCategory("Interactive");
+      model.addTest(new VerticalStack());
+      model.addTest(new ShapeEditing());
+      model.addTest(new Breakable());
+      model.addTest(new OneSidedTest());
+      model.addTest(new PolyShapes());
+      model.addTest(new BodyTypes());
+      model.addTest(new CharacterCollision());
+      model.addTest(new ApplyForce());
 
       // processing/filtering
-      argModel.addCategory("Processing/Filtering");
-      argModel.addTest(new CollisionFiltering());
-      argModel.addTest(new CollisionProcessing());
-      argModel.addTest(new SensorTest());
+      model.addCategory("Processing/Filtering");
+      model.addTest(new CollisionFiltering());
+      model.addTest(new CollisionProcessing());
+      model.addTest(new SensorTest());
 
       // joints
-      argModel.addCategory("Joints");
-      argModel.addTest(new PrismaticTest());
-      argModel.addTest(new RevoluteTest());
-      argModel.addTest(new Pulleys());
+      model.addCategory("Joints");
+      model.addTest(new PrismaticTest());
+      model.addTest(new RevoluteTest());
+      model.addTest(new Pulleys());
 //      argModel.addTest(new LineJointTest());
 //      argModel.addTest(new Gears());
-      argModel.addTest(new Web());
-      argModel.addTest(new Chain());
-      argModel.addTest(new Cantilever());
-      argModel.addTest(new SliderCrankTest());
+      model.addTest(new Web());
+      model.addTest(new Chain());
+      model.addTest(new Cantilever());
+      model.addTest(new SliderCrankTest());
       
       // ccd
-      argModel.addCategory("CCD");
-      argModel.addTest(new ContinuousTest());
-      argModel.addTest(new ConfinedTest());
+      model.addCategory("CCD");
+      model.addTest(new ContinuousTest());
+      model.addTest(new ConfinedTest());
       
       // raycast
-      argModel.addCategory("Raycast");
-      argModel.addTest(new RayCastTest());
-      argModel.addTest(new EdgeShapes());
+      model.addCategory("Raycast");
+      model.addTest(new RayCastTest());
+      model.addTest(new EdgeShapes());
 
       // misc
-      argModel.addCategory("Misc");
-      argModel.addTest(new DynamicTreeTest());
-      argModel.addTest(new DistanceTest());
-      argModel.addTest(new LiquidTest());
+      model.addCategory("Misc");
+      model.addTest(new ConvexHull());
+      model.addTest(new DynamicTreeTest());
+      model.addTest(new DistanceTest());
+      model.addTest(new LiquidTest());
   }
 }

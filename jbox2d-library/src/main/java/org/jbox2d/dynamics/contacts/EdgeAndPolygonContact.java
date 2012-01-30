@@ -33,7 +33,7 @@ import org.jbox2d.pooling.IWorldPool;
 
 public class EdgeAndPolygonContact extends Contact {
 
-  protected EdgeAndPolygonContact(IWorldPool argPool) {
+  public EdgeAndPolygonContact(IWorldPool argPool) {
     super(argPool);
   }
 

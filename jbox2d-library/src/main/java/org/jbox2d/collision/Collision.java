@@ -249,7 +249,7 @@ public class Collision {
   public final void collidePolygonAndCircle(Manifold manifold, final PolygonShape polygon,
       final Transform xfA, final CircleShape circle, final Transform xfB) {
     manifold.pointCount = 0;
-    Vec2 v = circle.m_p;
+//    Vec2 v = circle.m_p;
 
     // Compute circle position in the frame of the polygon.
     // before inline:
@@ -524,7 +524,7 @@ public class Collision {
       final Transform xf1, final PolygonShape poly2, final Transform xf2) {
     int count1 = poly1.m_count;
     final Vec2[] normals1 = poly1.m_normals;
-    Vec2 v = poly2.m_centroid;
+//    Vec2 v = poly2.m_centroid;
 
     // Vector pointing from the centroid of poly1 to the centroid of poly2.
     // before inline:
@@ -831,7 +831,7 @@ public class Collision {
 
     final Vec2 A = edgeA.m_vertex1;
     final Vec2 B = edgeA.m_vertex2;
-    e.set(A).subLocal(B);
+    e.set(B).subLocal(A);
 
     // Barycentric coordinates
     float u = Vec2.dot(e, temp.set(B).subLocal(Q));
@@ -1022,6 +1022,13 @@ public class Collision {
     final Vec2[] vertices = new Vec2[Settings.maxPolygonVertices];
     final Vec2[] normals = new Vec2[Settings.maxPolygonVertices];
     int count;
+    
+    public TempPolygon() {
+      for(int i=0; i<vertices.length; i++) {
+        vertices[i] = new Vec2();
+        normals[i] = new Vec2();
+      }
+    }
   }
 
   /**
@@ -1068,6 +1075,13 @@ public class Collision {
     float m_radius;
     boolean m_front;
 
+    public EPCollider() {
+      for(int i=0; i<2; i++) {
+        ie[i] = new ClipVertex();
+        clipPoints1[i] = new ClipVertex();
+        clipPoints2[i] = new ClipVertex();
+      }
+    }
 
     private final Vec2 edge1 = new Vec2();
     private final Vec2 temp = new Vec2();
@@ -1077,6 +1091,8 @@ public class Collision {
     private final ClipVertex[] clipPoints1 = new ClipVertex[2];
     private final ClipVertex[] clipPoints2 = new ClipVertex[2];
     private final ReferenceFace rf = new ReferenceFace();
+    private final EPAxis edgeAxis = new EPAxis();
+    private final EPAxis polygonAxis = new EPAxis();
 
     public void collide(Manifold manifold, final EdgeShape edgeA, final Transform xfA,
         final PolygonShape polygonB, final Transform xfB) {
@@ -1236,7 +1252,7 @@ public class Collision {
 
       manifold.pointCount = 0;
 
-      EPAxis edgeAxis = computeEdgeSeparation();
+      computeEdgeSeparation(edgeAxis);
 
       // If no valid normal can be found than this edge should not collide.
       if (edgeAxis.type == EPAxis.Type.UNKNOWN) {
@@ -1247,7 +1263,7 @@ public class Collision {
         return;
       }
 
-      EPAxis polygonAxis = computePolygonSeparation();
+      computePolygonSeparation(polygonAxis);
       if (polygonAxis.type != EPAxis.Type.UNKNOWN && polygonAxis.separation > m_radius) {
         return;
       }
@@ -1389,9 +1405,8 @@ public class Collision {
       manifold.pointCount = pointCount;
     }
 
-    private final EPAxis axis = new EPAxis();
 
-    public EPAxis computeEdgeSeparation() {
+    public void computeEdgeSeparation(EPAxis axis) {
       axis.type = EPAxis.Type.EDGE_A;
       axis.index = m_front ? 0 : 1;
       axis.separation = Float.MAX_VALUE;
@@ -1402,14 +1417,12 @@ public class Collision {
           axis.separation = s;
         }
       }
-
-      return axis;
     }
 
     private final Vec2 perp = new Vec2();
     private final Vec2 n = new Vec2();
 
-    public EPAxis computePolygonSeparation() {
+    public void computePolygonSeparation(EPAxis axis) {
       axis.type = EPAxis.Type.UNKNOWN;
       axis.index = -1;
       axis.separation = Float.MIN_VALUE;
@@ -1428,7 +1441,7 @@ public class Collision {
           axis.type = EPAxis.Type.EDGE_B;
           axis.index = i;
           axis.separation = s;
-          return axis;
+          return;
         }
 
         // Adjacency
@@ -1448,8 +1461,6 @@ public class Collision {
           axis.separation = s;
         }
       }
-
-      return axis;
     }
   }
 }
