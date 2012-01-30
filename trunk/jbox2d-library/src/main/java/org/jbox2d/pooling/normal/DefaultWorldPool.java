@@ -38,8 +38,12 @@ import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.common.Vec3;
+import org.jbox2d.dynamics.contacts.ChainAndCircleContact;
+import org.jbox2d.dynamics.contacts.ChainAndPolygonContact;
 import org.jbox2d.dynamics.contacts.CircleContact;
 import org.jbox2d.dynamics.contacts.Contact;
+import org.jbox2d.dynamics.contacts.EdgeAndCircleContact;
+import org.jbox2d.dynamics.contacts.EdgeAndPolygonContact;
 import org.jbox2d.dynamics.contacts.PolygonAndCircleContact;
 import org.jbox2d.dynamics.contacts.PolygonContact;
 import org.jbox2d.pooling.IDynamicStack;
@@ -79,6 +83,22 @@ public class DefaultWorldPool implements IWorldPool {
       new MutableStack<Contact, PolygonAndCircleContact>(PolygonAndCircleContact.class,
           Settings.CONTACT_STACK_INIT_SIZE, classes, args);
 
+  private final MutableStack<Contact, EdgeAndCircleContact> ecstack =
+      new MutableStack<Contact, EdgeAndCircleContact>(EdgeAndCircleContact.class,
+          Settings.CONTACT_STACK_INIT_SIZE, classes, args);
+
+  private final MutableStack<Contact, EdgeAndPolygonContact> epstack =
+      new MutableStack<Contact, EdgeAndPolygonContact>(EdgeAndPolygonContact.class,
+          Settings.CONTACT_STACK_INIT_SIZE, classes, args);
+
+  private final MutableStack<Contact, ChainAndCircleContact> chcstack =
+      new MutableStack<Contact, ChainAndCircleContact>(ChainAndCircleContact.class,
+          Settings.CONTACT_STACK_INIT_SIZE, classes, args);
+
+  private final MutableStack<Contact, ChainAndPolygonContact> chpstack =
+      new MutableStack<Contact, ChainAndPolygonContact>(ChainAndPolygonContact.class,
+          Settings.CONTACT_STACK_INIT_SIZE, classes, args);
+
   private final Collision collision;
   private final TimeOfImpact toi;
   private final Distance dist;
@@ -90,7 +110,7 @@ public class DefaultWorldPool implements IWorldPool {
     aabbs = new OrderedStack<AABB>(AABB.class, argSize, argContainerSize);
     rots = new OrderedStack<Rot>(Rot.class, argSize, argContainerSize);
     mat33s = new OrderedStack<Mat33>(Mat33.class, argSize, argContainerSize);
-    
+
     dist = new Distance();
     collision = new Collision(this);
     toi = new TimeOfImpact(this);
@@ -106,6 +126,26 @@ public class DefaultWorldPool implements IWorldPool {
 
   public final IDynamicStack<Contact> getPolyCircleContactStack() {
     return cpstack;
+  }
+
+  @Override
+  public IDynamicStack<Contact> getEdgeCircleContactStack() {
+    return ecstack;
+  }
+
+  @Override
+  public IDynamicStack<Contact> getEdgePolyContactStack() {
+    return epstack;
+  }
+
+  @Override
+  public IDynamicStack<Contact> getChainCircleContactStack() {
+    return chcstack;
+  }
+
+  @Override
+  public IDynamicStack<Contact> getChainPolyContactStack() {
+    return chpstack;
   }
 
   public final Vec2 popVec2() {
@@ -143,7 +183,7 @@ public class DefaultWorldPool implements IWorldPool {
   public final void pushMat22(int argNum) {
     mats.push(argNum);
   }
-  
+
   public final Mat33 popMat33() {
     return mat33s.pop();
   }
