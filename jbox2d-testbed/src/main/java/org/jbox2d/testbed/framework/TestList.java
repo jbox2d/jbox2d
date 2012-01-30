@@ -78,13 +78,13 @@ public class TestList {
   public static void populateModel(TestbedModel argModel){
       
       argModel.addCategory("Featured");
+      argModel.addTest(new VerticalStack());
       argModel.addTest(new PrismaticStrangenessTEst());
       argModel.addTest(new SetAsRotatedBoxTest());
       argModel.addTest(new FixedPendulumTest(false));
       argModel.addTest(new FixedPendulumTest(true));
       argModel.addTest(new FreePendulumTest(false));
       argModel.addTest(new FreePendulumTest(true));
-      argModel.addTest(new VerticalStack());
       argModel.addTest(new CharacterCollisionProblem());
       argModel.addTest(new Chain());
       argModel.addTest(new MJWTest());

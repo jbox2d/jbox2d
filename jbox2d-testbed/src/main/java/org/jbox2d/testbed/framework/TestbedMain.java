@@ -28,13 +28,13 @@ package org.jbox2d.testbed.framework;
 
 import javax.swing.JFrame;
 import javax.swing.UIManager;
-
 import org.jbox2d.testbed.framework.j2d.TestPanelJ2D;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * The entry point for the testbed application
+ * 
  * @author Daniel Murphy
  */
 public class TestbedMain {

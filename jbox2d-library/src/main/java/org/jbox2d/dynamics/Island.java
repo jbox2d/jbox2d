@@ -233,8 +233,6 @@ public class Island {
     m_jointCount = 0;
   }
 
-  private final Vec2 temp = new Vec2();
-  private final Vec2 temp2 = new Vec2();
   private final ContactSolver contactSolver = new ContactSolver();
   private final Vec2 translation = new Vec2();
   private final Timer timer = new Timer();
