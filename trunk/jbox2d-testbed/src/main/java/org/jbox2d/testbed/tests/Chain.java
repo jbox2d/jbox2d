@@ -26,6 +26,7 @@
  */
 package org.jbox2d.testbed.tests;
 
+import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -59,8 +60,8 @@ public class Chain extends TestbedTest {
 			BodyDef bd = new BodyDef();
 			ground = getWorld().createBody(bd);
 
-			PolygonShape shape = new PolygonShape();
-			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
+			EdgeShape shape = new EdgeShape();
+			shape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
 			ground.createFixture(shape, 0.0f);
 		}
 
@@ -78,7 +79,7 @@ public class Chain extends TestbedTest {
 
 			final float y = 25.0f;
 			Body prevBody = ground;
-			for (int i = 0; i < 10; ++i)
+			for (int i = 0; i < 30; ++i)
 			{
 				BodyDef bd = new BodyDef();
 				bd.type = BodyType.DYNAMIC;

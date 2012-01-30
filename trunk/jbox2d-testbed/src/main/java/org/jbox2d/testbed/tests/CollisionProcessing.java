@@ -29,6 +29,7 @@ package org.jbox2d.testbed.tests;
 import java.util.HashSet;
 
 import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
@@ -57,8 +58,8 @@ public class CollisionProcessing extends TestbedTest {
     }
     // Ground body
     {
-      PolygonShape shape = new PolygonShape();
-      shape.setAsEdge(new Vec2(-50.0f, 0.0f), new Vec2(50.0f, 0.0f));
+      EdgeShape shape = new EdgeShape();
+      shape.set(new Vec2(-50.0f, 0.0f), new Vec2(50.0f, 0.0f));
 
       FixtureDef sd = new FixtureDef();
       sd.shape = shape;

@@ -34,7 +34,7 @@ import org.jbox2d.pooling.IWorldPool;
 
 public class ChainAndPolygonContact extends Contact {
 
-  protected ChainAndPolygonContact(IWorldPool argPool) {
+  public ChainAndPolygonContact(IWorldPool argPool) {
     super(argPool);
   }
 
