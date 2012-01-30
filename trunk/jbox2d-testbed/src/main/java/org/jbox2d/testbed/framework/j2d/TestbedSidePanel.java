@@ -57,7 +57,7 @@ import org.jbox2d.testbed.framework.TestbedSetting.SettingType;
 
 
 /**
- * The testbed side panel.  Facilitates test and setting changes.
+ * The testbed side panel. Facilitates test and setting changes.
  * 
  * @author Daniel Murphy
  */
@@ -84,6 +84,7 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
     model = argModel;
     controller = argController;
     initComponents();
+    tests.setSelectedIndex(1);
     addListeners();
 
     model.addTestChangeListener(new TestbedModel.TestChangedListener() {
@@ -115,11 +116,9 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
       JLabel testLabel = null;
 
       @Override
-      public Component getListCellRendererComponent(JList list, ListItem value, int index,
-          boolean isSelected, boolean cellHasFocus) {
-        ListItem item = value;
-
-        if (item.isCategory()) {
+      public Component getListCellRendererComponent(JList<? extends ListItem> list, ListItem value,
+          int index, boolean isSelected, boolean cellHasFocus) {
+        if (value.isCategory()) {
           if (categoryLabel == null) {
             categoryLabel = new JLabel();
             categoryLabel.setOpaque(true);
@@ -128,7 +127,7 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
             categoryLabel.setHorizontalAlignment(SwingConstants.CENTER);
             categoryLabel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
           }
-          categoryLabel.setText(item.category);
+          categoryLabel.setText(value.category);
           return categoryLabel;
         } else {
           if (testLabel == null) {
@@ -136,7 +135,7 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
             testLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 1, 0));
           }
 
-          testLabel.setText(item.test.getTestName());
+          testLabel.setText(value.test.getTestName());
 
           if (isSelected) {
             testLabel.setBackground(list.getSelectionBackground());
@@ -149,11 +148,8 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
         }
       }
     });
-    JPanel testsp = new JPanel();
-    testsp.setLayout(new GridLayout(1, 2));
-    testsp.add(new JLabel("Choose a test:"));
-    testsp.add(tests);
 
+    top.add(new JLabel("Choose a test:"));
     top.add(tests);
 
     addSettings(top, settings, SettingType.DRAWING);

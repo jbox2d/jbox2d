@@ -43,8 +43,8 @@ public class VerticalStack extends TestbedTest {
   private static final long BULLET_TAG = 1;
   
   
-  public static final int e_columnCount = 1;
-  public static final int e_rowCount = 1;
+  public static final int e_columnCount = 5;
+  public static final int e_rowCount = 10;
 
   Body m_bullet;
   
