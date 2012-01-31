@@ -107,8 +107,6 @@ public class WeldJoint extends Joint {
     return m_localAnchorB;
   }
 
-
-
   public float getFrequency() {
     return m_frequencyHz;
   }
@@ -135,26 +133,17 @@ public class WeldJoint extends Joint {
     m_bodyB.getWorldPointToOut(m_localAnchorB, argOut);
   }
 
-  /**
-   * @see org.jbox2d.dynamics.joints.Joint#getReactionForce(float, org.jbox2d.common.Vec2)
-   */
   @Override
   public void getReactionForce(float inv_dt, Vec2 argOut) {
     argOut.set(m_impulse.x, m_impulse.y);
     argOut.mulLocal(inv_dt);
   }
 
-  /**
-   * @see org.jbox2d.dynamics.joints.Joint#getReactionTorque(float)
-   */
   @Override
   public float getReactionTorque(float inv_dt) {
     return inv_dt * m_impulse.z;
   }
 
-  /**
-   * @see org.jbox2d.dynamics.joints.Joint#initVelocityConstraints(org.jbox2d.dynamics.TimeStep)
-   */
   @Override
   public void initVelocityConstraints(final SolverData data) {
     m_indexA = m_bodyA.m_islandIndex;
@@ -166,12 +155,12 @@ public class WeldJoint extends Joint {
     m_invIA = m_bodyA.m_invI;
     m_invIB = m_bodyB.m_invI;
 
-//    Vec2 cA = data.positions[m_indexA].c;
+    // Vec2 cA = data.positions[m_indexA].c;
     float aA = data.positions[m_indexA].a;
     Vec2 vA = data.velocities[m_indexA].v;
     float wA = data.velocities[m_indexA].w;
 
-//    Vec2 cB = data.positions[m_indexB].c;
+    // Vec2 cB = data.positions[m_indexB].c;
     float aB = data.positions[m_indexB].a;
     Vec2 vB = data.velocities[m_indexB].v;
     float wB = data.velocities[m_indexB].w;
@@ -271,9 +260,6 @@ public class WeldJoint extends Joint {
     pool.pushMat33(1);
   }
 
-  /**
-   * @see org.jbox2d.dynamics.joints.Joint#solveVelocityConstraints(org.jbox2d.dynamics.TimeStep)
-   */
   @Override
   public void solveVelocityConstraints(final SolverData data) {
     Vec2 vA = data.velocities[m_indexA].v;
@@ -287,7 +273,6 @@ public class WeldJoint extends Joint {
     final Vec2 Cdot1 = pool.popVec2();
     final Vec2 P = pool.popVec2();
     final Vec2 temp = pool.popVec2();
-
     if (m_frequencyHz > 0.0f) {
       float Cdot2 = wB - wA;
 
@@ -350,9 +335,6 @@ public class WeldJoint extends Joint {
     pool.pushVec2(3);
   }
 
-  /**
-   * @see org.jbox2d.dynamics.joints.Joint#solvePositionConstraints(float)
-   */
   @Override
   public boolean solvePositionConstraints(final SolverData data) {
     Vec2 cA = data.positions[m_indexA].c;
@@ -388,7 +370,6 @@ public class WeldJoint extends Joint {
     K.ex.z = K.ez.x;
     K.ey.z = K.ez.y;
     K.ez.z = iA + iB;
-
     if (m_frequencyHz > 0.0f) {
       C1.set(cB).addLocal(rB).subLocal(cA).subLocal(rA);
 
@@ -434,7 +415,7 @@ public class WeldJoint extends Joint {
     data.positions[m_indexA].a = aA;
     data.positions[m_indexB].c.set(cB);
     data.positions[m_indexB].a = aB;
-    
+
     pool.pushVec2(5);
     pool.pushRot(2);
     pool.pushMat33(1);

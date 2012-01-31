@@ -43,7 +43,7 @@ import org.jbox2d.testbed.framework.TestbedTest;
 public class Cantilever extends TestbedTest {
 
 
-  int e_count = 8;
+  int e_count = 10;
 
   @Override
   public boolean isSaveLoadEnabled() {
@@ -83,7 +83,6 @@ public class Cantilever extends TestbedTest {
         BodyDef bd = new BodyDef();
         bd.type = BodyType.DYNAMIC;
         bd.position.set(-14.5f + 1.0f * i, 5.0f);
-        bd.gravityScale = 10.0f;
         Body body = getWorld().createBody(bd);
         body.createFixture(fd);
 
@@ -108,10 +107,10 @@ public class Cantilever extends TestbedTest {
       jd.dampingRatio = .7f;
 
       Body prevBody = ground;
-      for (int i = 0; i < e_count; ++i) {
+      for (int i = 0; i < 3; ++i) {
         BodyDef bd = new BodyDef();
         bd.type = BodyType.DYNAMIC;
-        bd.position.set(-14.5f + 2.0f * i, 15.0f);
+        bd.position.set(-14.0f + 2.0f * i, 15.0f);
         Body body = getWorld().createBody(bd);
         body.createFixture(fd);
 
@@ -168,7 +167,6 @@ public class Cantilever extends TestbedTest {
         BodyDef bd = new BodyDef();
         bd.type = BodyType.DYNAMIC;
         bd.position.set(5.5f + 1.0f * i, 10.0f);
-        bd.gravityScale = 10.0f;
         Body body = getWorld().createBody(bd);
         body.createFixture(fd);
 
@@ -218,12 +216,8 @@ public class Cantilever extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-   */
   @Override
   public String getTestName() {
     return "Cantilever";
   }
-
 }

@@ -82,14 +82,14 @@ public class Mat33 implements Serializable {
   public static final void mulToOut(Mat33 A, Vec3 v, Vec3 out) {
     final float tempy = v.x * A.ex.y + v.y * A.ey.y + v.z * A.ez.y;
     final float tempz = v.x * A.ex.z + v.y * A.ey.z + v.z * A.ez.z;
-    out.x = v.x * A.ex.x + v.y * A.ey.x + v.z + A.ez.x;
+    out.x = v.x * A.ex.x + v.y * A.ey.x + v.z * A.ez.x;
     out.y = tempy;
     out.z = tempz;
   }
 
   public static final void mulToOutUnsafe(Mat33 A, Vec3 v, Vec3 out) {
     assert (out != v);
-    out.x = v.x * A.ex.x + v.y * A.ey.x + v.z + A.ez.x;
+    out.x = v.x * A.ex.x + v.y * A.ey.x + v.z * A.ez.x;
     out.y = v.x * A.ex.y + v.y * A.ey.y + v.z * A.ez.y;
     out.z = v.x * A.ex.z + v.y * A.ey.z + v.z * A.ez.z;
   }
@@ -146,7 +146,7 @@ public class Mat33 implements Serializable {
    * @param out the result
    */
   public final void solve33ToOut(Vec3 b, Vec3 out) {
-    assert(b != out);
+    assert (b != out);
     Vec3.crossToOutUnsafe(ey, ez, out);
     float det = Vec3.dot(ex, out);
     if (det != 0.0f) {
@@ -164,7 +164,7 @@ public class Mat33 implements Serializable {
   }
 
   public void getInverse22(Mat33 M) {
-    float a = ex.x, b = ey.x, c = ey.y, d = ey.y;
+    float a = ex.x, b = ey.x, c = ex.y, d = ey.y;
     float det = a * d - b * c;
     if (det != 0.0f) {
       det = 1.0f / det;
@@ -176,23 +176,24 @@ public class Mat33 implements Serializable {
     M.ex.y = -det * c;
     M.ey.y = det * a;
     M.ey.z = 0.0f;
-    M.ey.x = 0.0f;
-    M.ey.y = 0.0f;
-    M.ey.z = 0.0f;
+    M.ez.x = 0.0f;
+    M.ez.y = 0.0f;
+    M.ez.z = 0.0f;
   }
 
   // / Returns the zero matrix if singular.
   public void getSymInverse33(Mat33 M) {
-    float det =
-        ex.x * ey.y * ey.z - ey.z * ey.y + ex.y * ey.z * ey.x - ey.x * ey.z + ex.z * ey.x * ey.y
-            - ey.y * ey.x;
+    float bx = ey.y * ez.z - ey.z * ez.y;
+    float by = ey.z * ez.x - ey.x * ez.z;
+    float bz = ey.x * ez.y - ey.y * ez.x;
+    float det = ex.x * bx + ex.y * by + ex.z * bz;
     if (det != 0.0f) {
       det = 1.0f / det;
     }
 
     float a11 = ex.x, a12 = ey.x, a13 = ez.x;
-    float a22 = ey.y, a23 = ey.y;
-    float a33 = ey.z;
+    float a22 = ey.y, a23 = ez.y;
+    float a33 = ez.z;
 
     M.ex.x = det * (a22 * a33 - a23 * a23);
     M.ex.y = det * (a13 * a23 - a12 * a33);
@@ -202,9 +203,9 @@ public class Mat33 implements Serializable {
     M.ey.y = det * (a11 * a33 - a13 * a13);
     M.ey.z = det * (a13 * a12 - a11 * a23);
 
-    M.ey.x = M.ex.z;
-    M.ey.y = M.ey.z;
-    M.ey.z = det * (a11 * a22 - a12 * a12);
+    M.ez.x = M.ex.z;
+    M.ez.y = M.ey.z;
+    M.ez.z = det * (a11 * a22 - a12 * a12);
   }
 
   @Override
