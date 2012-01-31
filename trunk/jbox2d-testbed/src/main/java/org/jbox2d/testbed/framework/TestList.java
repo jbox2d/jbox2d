@@ -80,6 +80,7 @@ public class TestList {
   public static void populateModel(TestbedModel model){
       
       model.addCategory("Featured");
+      model.addTest(new Cantilever());
 
       model.addTest(new SphereStack());
       model.addTest(new MJWTest());
