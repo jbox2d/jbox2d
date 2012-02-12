@@ -307,7 +307,7 @@ public class VerticalStack extends TestbedTest {
 }}}
 
 = Custom Real-Time Settings =
-Like mentioned [Adding_Tests/Settings above], when you initialize the testbed you can add your own real-time settings.  For example, say we would like to test adding gravity to our MJW test.  First, we want to add the setting to testbed when we create it:
+Like mentioned [#Adding_Tests/Settings above], when you initialize the testbed you can add your own real-time settings.  For example, say we would like to test adding gravity to our MJW test.  First, we want to add the setting to testbed when we create it:
 
 {{{
 public static final String GRAVITY_SETTING = "Gravity"; // put our setting key somewhere
