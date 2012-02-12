@@ -54,8 +54,9 @@ Include those and you should be good!
   # In Package Explorer, find the jbox2d-testbed project, navigate to _src/main/java_ and find the _org.jbox2d.testbed.framework_ package - right click on TestbedMain.java and run it as a Java application.
   # If the JBox2D testbed runs, congratulations, you've successfully set up the project!  You can add the jbox2d-library project as a reference to other projects to use it, or you can browse through the jbox2d-testbed project to see how things are done (navigate to the org.jbox2d.testbed.tests directory to see code examples)
 
-
 *NOTE* make sure the src/generated folder is included if you're using the serialization library
+=== NetBeans ===
+R.A. Nagy made a blog post [http://www.soft9000.com/blog9000/index.php?entry=Angry-Buddha-Springs? here] about importing/building with NetBeans. Thanks R.A. Nagy!
 
 =Using JBox2D =
 Please see the [Testbed Testbed] wiki article.
