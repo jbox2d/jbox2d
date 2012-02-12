@@ -59,4 +59,4 @@ Include those and you should be good!
 R.A. Nagy made a blog post [http://www.soft9000.com/blog9000/index.php?entry=Angry-Buddha-Springs? here] about importing/building with !NetBeans. Thanks R.A. Nagy!
 
 =Using JBox2D =
-Please see the [Testbed Testbed] wiki article.
+*Please* see the [Testbed Testbed] wiki article.
