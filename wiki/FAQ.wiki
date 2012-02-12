@@ -18,6 +18,10 @@ Take a look in the `target` folder of each project, there should be jars there.
 ==I'm have trouble with `protoc` failing when I build the serialization project, what is that?  Does that matter?==
 That project requires the [http://code.google.com/p/protobuf/ protocol buffer] library to be installed.  This is only required if you change things in the .proto file for proto serialization.  Otherwise, the sources are already generated and in source control.
 
+=Learning=
+===How does the engine work?  How do I get it to do stuff I want?===
+Please look at the [Testbed testbed] wiki page.
+
 =Running=
 ==I want to see some examples.  How do I run the testbed?==
 Grab the lastest version and navigate to the `jbox2d-testbed` folder.  This is the testbed project.  There should be an executable jar in the `target` folder, with the suffix "with-dependencies".  Double click that one, or run it from the command line with the command `java -jar jbox2d-<version>-with-dependencies.jar`
