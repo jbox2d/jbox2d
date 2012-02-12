@@ -322,7 +322,8 @@ public class Island {
 			translation.set(b.m_linearVelocity).mulLocal(step.dt);
 			if (Vec2.dot(translation, translation) > Settings.maxTranslationSquared){
 				float ratio = Settings.maxTranslation / translation.length();
-				b.m_linearVelocity.mulLocal(ratio);
+				b.m_linearVelocity.x *= ratio;
+				b.m_linearVelocity.y *= ratio;
 			}
 
 			float rotation = step.dt * b.m_angularVelocity;

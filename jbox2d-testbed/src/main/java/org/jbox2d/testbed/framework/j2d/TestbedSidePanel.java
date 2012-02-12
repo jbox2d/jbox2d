@@ -85,6 +85,7 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
     controller = argController;
     initComponents();
     addListeners();
+    tests.setSelectedIndex(1);
 
     model.addTestChangeListener(new TestbedModel.TestChangedListener() {
       @Override
@@ -149,10 +150,6 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
         }
       }
     });
-    JPanel testsp = new JPanel();
-    testsp.setLayout(new GridLayout(1, 2));
-    testsp.add(new JLabel("Choose a test:"));
-    testsp.add(tests);
 
     top.add(tests);
 

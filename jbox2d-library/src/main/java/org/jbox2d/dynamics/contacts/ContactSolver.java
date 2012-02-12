@@ -492,8 +492,10 @@ public class ContactSolver {
 					// x' = - inv(A) * b'
 					//
 					//Vec2 x = - Mul(c.normalMass, b);
-					Mat22.mulToOut(c.normalMass, b, x);
-					x.mulLocal(-1);
+					final Mat22 R = c.normalMass;
+					// R.mulToOut(v,out);
+					x.x = - R.col1.x * b.x - R.col2.x * b.y;
+					x.y = - R.col1.y * b.x - R.col2.y * b.y;
 					
 					if (x.x >= 0.0f && x.y >= 0.0f){
 						// Resubstitute for the incremental impulse
@@ -512,11 +514,10 @@ public class ContactSolver {
 						vB += invMassB * (P1 + P2);
 						wB += invIB * (b2Cross(cp1->rB, P1) + b2Cross(cp2->rB, P2));*/
 						
-						temp1.set(P1).addLocal(P2);
-						temp2.set(temp1).mulLocal(invMassA);
-						vA.subLocal(temp2);
-						temp2.set(temp1).mulLocal(invMassB);
-						vB.addLocal(temp2);
+						vA.x -= invMassA * (P1.x + P2.x);
+						vA.y -= invMassA * (P1.y + P2.y);
+						vB.x += invMassB * (P1.x + P2.x);
+						vB.y += invMassB * (P1.y + P2.y);
 												
 						wA -= invIA * (Vec2.cross(cp1.rA, P1) + Vec2.cross(cp2.rA, P2));
 						wB += invIB * (Vec2.cross(cp1.rB, P1) + Vec2.cross(cp2.rB, P2));
@@ -554,13 +555,14 @@ public class ContactSolver {
 					if (x.x >= 0.0f && vn2 >= 0.0f)
 					{
 						// Resubstitute for the incremental impulse
-						d.set(x).subLocal(a);
+						final float dx = x.x - a.x;
+						final float dy = x.y - a.y;
 
 						// Apply incremental impulse
 						//Vec2 P1 = d.x * normal;
 						//Vec2 P2 = d.y * normal;
-						P1.set(c.normal).mulLocal(d.x);
-						P2.set(c.normal).mulLocal(d.y);
+						P1.set(c.normal).mulLocal(dx);
+						P2.set(c.normal).mulLocal(dy);
 						
 						/*Vec2 P1 = d.x * normal;
 						Vec2 P2 = d.y * normal;
@@ -570,11 +572,10 @@ public class ContactSolver {
 						vB += invMassB * (P1 + P2);
 						wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2));*/
 						
-						temp1.set(P1).addLocal(P2);
-						temp2.set(temp1).mulLocal(invMassA);
-						vA.subLocal(temp2);
-						temp2.set(temp1).mulLocal(invMassB);
-						vB.addLocal(temp2);
+						vA.x -= invMassA * (P1.x + P2.x);
+						vA.y -= invMassA * (P1.y + P2.y);
+						vB.x += invMassB * (P1.x + P2.x);
+						vB.y += invMassB * (P1.y + P2.y);
 												
 						wA -= invIA * (Vec2.cross(cp1.rA, P1) + Vec2.cross(cp2.rA, P2));
 						wB += invIB * (Vec2.cross(cp1.rB, P1) + Vec2.cross(cp2.rB, P2));
@@ -611,7 +612,8 @@ public class ContactSolver {
 					if (x.y >= 0.0f && vn1 >= 0.0f)
 					{
 						// Resubstitute for the incremental impulse
-						d.set(x).subLocal(a);
+						final float dx = x.x - a.x;
+						final float dy = x.y - a.y;
 
 						// Apply incremental impulse
 						/*Vec2 P1 = d.x * normal;
@@ -622,14 +624,13 @@ public class ContactSolver {
 						vB += invMassB * (P1 + P2);
 						wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2));*/
 						
-						P1.set(c.normal).mulLocal(d.x);
-						P2.set(c.normal).mulLocal(d.y);
+						P1.set(c.normal).mulLocal(dx);
+						P2.set(c.normal).mulLocal(dy);
 						
-						temp1.set(P1).addLocal(P2);
-						temp2.set(temp1).mulLocal(invMassA);
-						vA.subLocal(temp2);
-						temp2.set(temp1).mulLocal(invMassB);
-						vB.addLocal(temp2);
+						vA.x -= invMassA * (P1.x + P2.x);
+						vA.y -= invMassA * (P1.y + P2.y);
+						vB.x += invMassB * (P1.x + P2.x);
+						vB.y += invMassB * (P1.y + P2.y);
 												
 						wA -= invIA * (Vec2.cross(cp1.rA, P1) + Vec2.cross(cp2.rA, P2));
 						wB += invIB * (Vec2.cross(cp1.rB, P1) + Vec2.cross(cp2.rB, P2));
@@ -663,7 +664,8 @@ public class ContactSolver {
 					if (vn1 >= 0.0f && vn2 >= 0.0f )
 					{
 						// Resubstitute for the incremental impulse
-						d.set(x).subLocal(a);
+						final float dx = x.x - a.x;
+						final float dy = x.y - a.y;
 
 						// Apply incremental impulse
 						/*Vec2 P1 = d.x * normal;
@@ -674,14 +676,13 @@ public class ContactSolver {
 						vB += invMassB * (P1 + P2);
 						wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2));*/
 
-						P1.set(c.normal).mulLocal(d.x);
-						P2.set(c.normal).mulLocal(d.y);
+						P1.set(c.normal).mulLocal(dx);
+						P2.set(c.normal).mulLocal(dy);
 						
-						temp1.set(P1).addLocal(P2);
-						temp2.set(temp1).mulLocal(invMassA);
-						vA.subLocal(temp2);
-						temp2.set(temp1).mulLocal(invMassB);
-						vB.addLocal(temp2);
+						vA.x -= invMassA * (P1.x + P2.x);
+						vA.y -= invMassA * (P1.y + P2.y);
+						vB.x += invMassB * (P1.x + P2.x);
+						vB.y += invMassB * (P1.y + P2.y);
 												
 						wA -= invIA * (Vec2.cross(cp1.rA, P1) + Vec2.cross(cp2.rA, P2));
 						wB += invIB * (Vec2.cross(cp1.rB, P1) + Vec2.cross(cp2.rB, P2));
@@ -699,9 +700,7 @@ public class ContactSolver {
 				}
 			}
 
-			bodyA.m_linearVelocity.set(vA);
 			bodyA.m_angularVelocity = wA;
-			bodyB.m_linearVelocity.set(vB);
 			bodyB.m_angularVelocity = wB;
 		}
 	}

@@ -31,7 +31,6 @@ import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
-import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 
 // updated to rev 100
@@ -255,7 +254,6 @@ public class BroadPhase implements TreeCallback {
 		for (int i = 0; i < m_moveCount; i++) {
 			if (m_moveBuffer[i] == proxy) {
 				m_moveBuffer[i] = null;
-				return;
 			}
 		}
 	}
