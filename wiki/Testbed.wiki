@@ -1,4 +1,4 @@
-#summary Easily experiment with jbox2d in a friendly environment.
+#summary Easily experiment with jbox2d in a friendly environment.  Invaluable!
 #labels Phase-Implementation,Featured
 
 <wiki:toc max_depth="2" />
