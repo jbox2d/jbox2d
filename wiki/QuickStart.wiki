@@ -1,4 +1,4 @@
-#summary Basic guide for building and using JBox2D
+#summary Basic guide for importing and building JBox2D
 #labels Featured
 <wiki:toc max_depth="2" />
 
@@ -8,7 +8,7 @@ JBox2D is a Java rigid body physics engine library.  It does not include any gra
 
 This page will show you how to generally use/build jbox2d in any environment.
 
-= Using JBox2D =
+= Importing JBox2D =
 == Jar Releases ==
 The jar releases have all dependencies included, so you just need to include them as an external library in your project.  This is a common option with most IDE's, and usually consists of:
   # Placing the jar in your project
@@ -56,3 +56,6 @@ Include those and you should be good!
 
 
 *NOTE* make sure the src/generated folder is included if you're using the serialization library
+
+=Using JBox2D =
+Please see the [Testbed Testbed] wiki article.
