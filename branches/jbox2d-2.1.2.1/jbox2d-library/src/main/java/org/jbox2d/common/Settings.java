@@ -102,8 +102,6 @@ public class Settings {
 	 */
 	public static final boolean SINCOS_LUT_LERP = false;
 	
-	public static final int TREE_REBALANCE_STEPS = 4;
-	
 	// Collision
 	
 	/**
