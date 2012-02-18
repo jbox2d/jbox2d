@@ -48,3 +48,6 @@ This allows us to easily run the test and see the bug, and ensures we fix it as 
 =Contributing=
 ==I want to help out, what do I do?==
 First of all, that's awesome! We'd love your help. Please contact Daniel Murphy (toucansam99 at gmail).
+
+==I want to support the project!==
+Awesome!  You'll be the first and we'll love you forever!  See the [http://jbox2d.org webpage] for donation links.
