@@ -45,14 +45,6 @@ public class CircleShape extends Shape {
 	private final Vec2 pool2 = new Vec2();
 	private final Vec2 pool3 = new Vec2();
 	
-	/**
-	 * this is used internally, instead use {@link Body#createShape(ShapeDef)} with a
-	 * {@link CircleDef}
-	 * 
-	 * @see Body#createShape(ShapeDef)
-	 * @see CircleDef
-	 * @param def
-	 */
 	public CircleShape() {
 		super(ShapeType.CIRCLE);
 		m_p = new Vec2();
