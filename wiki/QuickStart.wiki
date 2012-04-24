@@ -23,9 +23,12 @@ JBox2D is released in Maven (or will be soon), so you should see it listed as an
 == Maven ==
 The most recent versions of JBox2D lean on Maven to help handle dependency management, and if your IDE supports Maven, then this should be pretty easy.  To quickly get a project running you:
 
-  # Check out the project through Subversion: `svn checkout http://jbox2d.googlecode.com/svn/trunk/ jbox2d-read-only`
+
+  # Check out the project through Subversion: `svn checkout http://jbox2d.googlecode.com/svn/tags/jbox2d-2.1.2.2/ jbox2d-read-only`
   # Import to your IDE as a Maven project (using the pom.xml descriptor in the root folder)
   # Run the `org.jbox2d.testbed.framework.TestbedMain` class
+
+Note: the trunk is not completely stable at this time.  It should compile, but features still have bugs.
 
 If you're planning on doing some more in-depth customization, we would suggest adding each module project independently (jbox2d-library, jbox2d-serialization, jbox2d-testbed) and putting all of those projects in your workspace.
 
