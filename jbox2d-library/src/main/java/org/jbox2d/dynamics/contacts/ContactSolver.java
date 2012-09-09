@@ -828,12 +828,12 @@ public class ContactSolver {
 
 				bodyA.m_sweep.c.x -= Px * invMassA;
 				bodyA.m_sweep.c.y -= Py * invMassA;
-				bodyA.m_sweep.a -= invIA * Vec2.cross(rA, P);
+				bodyA.m_sweep.a -= invIA * (rA.x * Py - rA.y * Px);
 				bodyA.synchronizeTransform();
 
 				bodyB.m_sweep.c.x += Px * invMassB;
 				bodyB.m_sweep.c.y += Py * invMassB;
-				bodyB.m_sweep.a += invIB * Vec2.cross(rB, P);
+				bodyB.m_sweep.a += invIB * (rB.x * Py - rB.y * Px);
 				bodyB.synchronizeTransform();
 			}
 		}
