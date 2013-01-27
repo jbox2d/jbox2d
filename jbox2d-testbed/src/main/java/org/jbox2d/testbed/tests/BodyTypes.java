@@ -26,6 +26,7 @@
  */
 package org.jbox2d.testbed.tests;
 
+import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
@@ -42,150 +43,150 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class BodyTypes extends TestbedTest {
-	
-	Body m_attachment;
-	Body m_platform;
-	float m_speed;
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-	 */
-	@Override
-	public void initTest(boolean argDeserialized) {
+
+  Body m_attachment;
+  Body m_platform;
+  float m_speed;
+
+  /**
+   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
+   */
+  @Override
+  public void initTest(boolean argDeserialized) {
     m_speed = 3.0f;
-    
-    if(argDeserialized){
+
+    if (argDeserialized) {
       return;
     }
-    
-		Body ground = null;
-		{
-			BodyDef bd = new BodyDef();
-			ground = getWorld().createBody(bd);
-			
-			PolygonShape shape = new PolygonShape();
-			shape.setAsEdge(new Vec2(-20.0f, 0.0f), new Vec2(20.0f, 0.0f));
-			
-			FixtureDef fd = new FixtureDef();
-			fd.shape = shape;
-			
-			ground.createFixture(fd);
-		}
-		
-		// Define attachment
-		{
-			BodyDef bd = new BodyDef();
-			bd.type = BodyType.DYNAMIC;
-			bd.position.set(0.0f, 3.0f);
-			m_attachment = getWorld().createBody(bd);
-			
-			PolygonShape shape = new PolygonShape();
-			shape.setAsBox(0.5f, 2.0f);
-			m_attachment.createFixture(shape, 2.0f);
-		}
-		
-		// Define platform
-		{
-			BodyDef bd = new BodyDef();
-			bd.type = BodyType.DYNAMIC;
-			bd.position.set(-4.0f, 5.0f);
-			m_platform = getWorld().createBody(bd);
-			
-			PolygonShape shape = new PolygonShape();
-			shape.setAsBox(0.5f, 4.0f, new Vec2(4.0f, 0.0f), 0.5f * MathUtils.PI);
-			
-			FixtureDef fd = new FixtureDef();
-			fd.shape = shape;
-			fd.friction = 0.6f;
-			fd.density = 2.0f;
-			m_platform.createFixture(fd);
-			
-			RevoluteJointDef rjd = new RevoluteJointDef();
-			rjd.initialize(m_attachment, m_platform, new Vec2(0.0f, 5.0f));
-			rjd.maxMotorTorque = 50.0f;
-			rjd.enableMotor = true;
-			getWorld().createJoint(rjd);
-			
-			PrismaticJointDef pjd = new PrismaticJointDef();
-			pjd.initialize(ground, m_platform, new Vec2(0.0f, 5.0f), new Vec2(1.0f, 0.0f));
-			
-			pjd.maxMotorForce = 1000.0f;
-			pjd.enableMotor = true;
-			pjd.lowerTranslation = -10.0f;
-			pjd.upperTranslation = 10.0f;
-			pjd.enableLimit = true;
-			
-			getWorld().createJoint(pjd);
-			
-		}
-		
-		// .create a payload
-		{
-			BodyDef bd = new BodyDef();
-			bd.type = BodyType.DYNAMIC;
-			bd.position.set(0.0f, 8.0f);
-			Body body = getWorld().createBody(bd);
-			
-			PolygonShape shape = new PolygonShape();
-			shape.setAsBox(0.75f, 0.75f);
-			
-			FixtureDef fd = new FixtureDef();
-			fd.shape = shape;
-			fd.friction = 0.6f;
-			fd.density = 2.0f;
-			
-			body.createFixture(fd);
-		}
-	}
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
-	 */
-	@Override
-	public void step(TestbedSettings settings) {
-		super.step(settings);
-		
-		addTextLine("Keys: (d) dynamic, (s) static, (k) kinematic");
-		// Drive the kinematic body.
-		if (m_platform.getType() == BodyType.KINEMATIC) {
-			Vec2 p = m_platform.getTransform().p;
-			Vec2 v = m_platform.getLinearVelocity();
-			
-			if ((p.x < -10.0f && v.x < 0.0f) || (p.x > 10.0f && v.x > 0.0f)) {
-				v.x = -v.x;
-				m_platform.setLinearVelocity(v);
-			}
-		}
-	}
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
-	 */
-	@Override
-	public void keyPressed(char argKeyChar, int argKeyCode) {
-		switch (argKeyChar) {
-			case 'd' :
-				m_platform.setType(BodyType.DYNAMIC);
-				break;
-			
-			case 's' :
-				m_platform.setType(BodyType.STATIC);
-				break;
-			
-			case 'k' :
-				m_platform.setType(BodyType.KINEMATIC);
-				m_platform.setLinearVelocity(new Vec2(-m_speed, 0.0f));
-				m_platform.setAngularVelocity(0.0f);
-				break;
-		}
-	}
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-	 */
-	@Override
-	public String getTestName() {
-		return "Body Types";
-	}
-	
+
+    Body ground = null;
+    {
+      BodyDef bd = new BodyDef();
+      ground = getWorld().createBody(bd);
+
+      EdgeShape shape = new EdgeShape();
+      shape.set(new Vec2(-20.0f, 0.0f), new Vec2(20.0f, 0.0f));
+
+      FixtureDef fd = new FixtureDef();
+      fd.shape = shape;
+
+      ground.createFixture(fd);
+    }
+
+    // Define attachment
+    {
+      BodyDef bd = new BodyDef();
+      bd.type = BodyType.DYNAMIC;
+      bd.position.set(0.0f, 3.0f);
+      m_attachment = getWorld().createBody(bd);
+
+      PolygonShape shape = new PolygonShape();
+      shape.setAsBox(0.5f, 2.0f);
+      m_attachment.createFixture(shape, 2.0f);
+    }
+
+    // Define platform
+    {
+      BodyDef bd = new BodyDef();
+      bd.type = BodyType.DYNAMIC;
+      bd.position.set(-4.0f, 5.0f);
+      m_platform = getWorld().createBody(bd);
+
+      PolygonShape shape = new PolygonShape();
+      shape.setAsBox(0.5f, 4.0f, new Vec2(4.0f, 0.0f), 0.5f * MathUtils.PI);
+
+      FixtureDef fd = new FixtureDef();
+      fd.shape = shape;
+      fd.friction = 0.6f;
+      fd.density = 2.0f;
+      m_platform.createFixture(fd);
+
+      RevoluteJointDef rjd = new RevoluteJointDef();
+      rjd.initialize(m_attachment, m_platform, new Vec2(0.0f, 5.0f));
+      rjd.maxMotorTorque = 50.0f;
+      rjd.enableMotor = true;
+      getWorld().createJoint(rjd);
+
+      PrismaticJointDef pjd = new PrismaticJointDef();
+      pjd.initialize(ground, m_platform, new Vec2(0.0f, 5.0f), new Vec2(1.0f, 0.0f));
+
+      pjd.maxMotorForce = 1000.0f;
+      pjd.enableMotor = true;
+      pjd.lowerTranslation = -10.0f;
+      pjd.upperTranslation = 10.0f;
+      pjd.enableLimit = true;
+
+      getWorld().createJoint(pjd);
+
+    }
+
+    // .create a payload
+    {
+      BodyDef bd = new BodyDef();
+      bd.type = BodyType.DYNAMIC;
+      bd.position.set(0.0f, 8.0f);
+      Body body = getWorld().createBody(bd);
+
+      PolygonShape shape = new PolygonShape();
+      shape.setAsBox(0.75f, 0.75f);
+
+      FixtureDef fd = new FixtureDef();
+      fd.shape = shape;
+      fd.friction = 0.6f;
+      fd.density = 2.0f;
+
+      body.createFixture(fd);
+    }
+  }
+
+  /**
+   * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
+   */
+  @Override
+  public void step(TestbedSettings settings) {
+    super.step(settings);
+
+    addTextLine("Keys: (d) dynamic, (s) static, (k) kinematic");
+    // Drive the kinematic body.
+    if (m_platform.getType() == BodyType.KINEMATIC) {
+      Vec2 p = m_platform.getTransform().p;
+      Vec2 v = m_platform.getLinearVelocity();
+
+      if ((p.x < -10.0f && v.x < 0.0f) || (p.x > 10.0f && v.x > 0.0f)) {
+        v.x = -v.x;
+        m_platform.setLinearVelocity(v);
+      }
+    }
+  }
+
+  /**
+   * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
+   */
+  @Override
+  public void keyPressed(char argKeyChar, int argKeyCode) {
+    switch (argKeyChar) {
+      case 'd':
+        m_platform.setType(BodyType.DYNAMIC);
+        break;
+
+      case 's':
+        m_platform.setType(BodyType.STATIC);
+        break;
+
+      case 'k':
+        m_platform.setType(BodyType.KINEMATIC);
+        m_platform.setLinearVelocity(new Vec2(-m_speed, 0.0f));
+        m_platform.setAngularVelocity(0.0f);
+        break;
+    }
+  }
+
+  /**
+   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
+   */
+  @Override
+  public String getTestName() {
+    return "Body Types";
+  }
+
 }

@@ -28,6 +28,7 @@ package org.jbox2d.testbed.tests;
 
 import java.util.Formatter;
 
+import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
@@ -45,145 +46,146 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class SliderCrankTest extends TestbedTest {
-	
-	private RevoluteJoint m_joint1;
-	private PrismaticJoint m_joint2;
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-	 */
-	@Override
-	public void initTest(boolean argDeserialized) {
-		Body ground = null;
-		{
-			BodyDef bd = new BodyDef();
-			ground = getWorld().createBody(bd);
 
-			PolygonShape shape = new PolygonShape();
-			shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
-			ground.createFixture(shape, 0.0f);
-		}
+  private RevoluteJoint m_joint1;
+  private PrismaticJoint m_joint2;
 
-		{
-			Body prevBody = ground;
+  /**
+   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
+   */
+  @Override
+  public void initTest(boolean argDeserialized) {
+    Body ground = null;
+    {
+      BodyDef bd = new BodyDef();
+      ground = getWorld().createBody(bd);
 
-			// Define crank.
-			{
-				PolygonShape shape = new PolygonShape();
-				shape.setAsBox(0.5f, 2.0f);
+      EdgeShape shape = new EdgeShape();
+      shape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
+      ground.createFixture(shape, 0.0f);
+    }
 
-				BodyDef bd = new BodyDef();
-				bd.type = BodyType.DYNAMIC;
-				bd.position.set(0.0f, 7.0f);
-				Body body = getWorld().createBody(bd);
-				body.createFixture(shape, 2.0f);
+    {
+      Body prevBody = ground;
 
-				RevoluteJointDef rjd = new RevoluteJointDef();
-				rjd.initialize(prevBody, body, new Vec2(0.0f, 5.0f));
-				rjd.motorSpeed = 1.0f * MathUtils.PI;
-				rjd.maxMotorTorque = 10000.0f;
-				rjd.enableMotor = true;
-				m_joint1 = (RevoluteJoint)getWorld().createJoint(rjd);
+      // Define crank.
+      {
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(0.5f, 2.0f);
 
-				prevBody = body;
-			}
+        BodyDef bd = new BodyDef();
+        bd.type = BodyType.DYNAMIC;
+        bd.position.set(0.0f, 7.0f);
+        Body body = getWorld().createBody(bd);
+        body.createFixture(shape, 2.0f);
 
-			// Define follower.
-			{
-				PolygonShape shape = new PolygonShape();
-				shape.setAsBox(0.5f, 4.0f);
+        RevoluteJointDef rjd = new RevoluteJointDef();
+        rjd.initialize(prevBody, body, new Vec2(0.0f, 5.0f));
+        rjd.motorSpeed = 1.0f * MathUtils.PI;
+        rjd.maxMotorTorque = 10000.0f;
+        rjd.enableMotor = true;
+        m_joint1 = (RevoluteJoint) getWorld().createJoint(rjd);
 
-				BodyDef bd = new BodyDef();
-				bd.type = BodyType.DYNAMIC;
-				bd.position.set(0.0f, 13.0f);
-				Body body = getWorld().createBody(bd);
-				body.createFixture(shape, 2.0f);
+        prevBody = body;
+      }
 
-				RevoluteJointDef rjd = new RevoluteJointDef();
-				rjd.initialize(prevBody, body, new Vec2(0.0f, 9.0f));
-				rjd.enableMotor = false;
-				getWorld().createJoint(rjd);
+      // Define follower.
+      {
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(0.5f, 4.0f);
 
-				prevBody = body;
-			}
+        BodyDef bd = new BodyDef();
+        bd.type = BodyType.DYNAMIC;
+        bd.position.set(0.0f, 13.0f);
+        Body body = getWorld().createBody(bd);
+        body.createFixture(shape, 2.0f);
 
-			// Define piston
-			{
-				PolygonShape shape = new PolygonShape();
-				shape.setAsBox(1.5f, 1.5f);
+        RevoluteJointDef rjd = new RevoluteJointDef();
+        rjd.initialize(prevBody, body, new Vec2(0.0f, 9.0f));
+        rjd.enableMotor = false;
+        getWorld().createJoint(rjd);
 
-				BodyDef bd = new BodyDef();
-				bd.type = BodyType.DYNAMIC;
-				bd.fixedRotation = true;
-				bd.position.set(0.0f, 17.0f);
-				Body body = getWorld().createBody(bd);
-				body.createFixture(shape, 2.0f);
+        prevBody = body;
+      }
 
-				RevoluteJointDef rjd = new RevoluteJointDef();
-				rjd.initialize(prevBody, body, new Vec2(0.0f, 17.0f));
-				getWorld().createJoint(rjd);
+      // Define piston
+      {
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(1.5f, 1.5f);
 
-				PrismaticJointDef pjd = new PrismaticJointDef();
-				pjd.initialize(ground, body, new Vec2(0.0f, 17.0f), new Vec2(0.0f, 1.0f));
+        BodyDef bd = new BodyDef();
+        bd.type = BodyType.DYNAMIC;
+        bd.fixedRotation = true;
+        bd.position.set(0.0f, 17.0f);
+        Body body = getWorld().createBody(bd);
+        body.createFixture(shape, 2.0f);
 
-				pjd.maxMotorForce = 1000.0f;
-				pjd.enableMotor = false;
+        RevoluteJointDef rjd = new RevoluteJointDef();
+        rjd.initialize(prevBody, body, new Vec2(0.0f, 17.0f));
+        getWorld().createJoint(rjd);
 
-				m_joint2 = (PrismaticJoint)getWorld().createJoint(pjd);
-			}
+        PrismaticJointDef pjd = new PrismaticJointDef();
+        pjd.initialize(ground, body, new Vec2(0.0f, 17.0f), new Vec2(0.0f, 1.0f));
 
-			// Create a payload
-			{
-				PolygonShape shape = new PolygonShape();
-				shape.setAsBox(1.5f, 1.5f);
+        pjd.maxMotorForce = 1000.0f;
+        pjd.enableMotor = false;
 
-				BodyDef bd = new BodyDef();
-				bd.type = BodyType.DYNAMIC;
-				bd.position.set(0.0f, 23.0f);
-				Body body = getWorld().createBody(bd);
-				body.createFixture(shape, 2.0f);
-			}
-		}
-	}
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
-	 */
-	@Override
-	public void step(TestbedSettings settings) {
-		super.step(settings);
-		
-		addTextLine("Keys: (f) toggle friction, (m) toggle motor");
-		float torque = m_joint1.getMotorTorque(1);
-		Formatter f = new Formatter();
-		addTextLine(f.format("Friction: %b, Motor Force = %5.0f, ", m_joint2.isMotorEnabled(), torque).toString());
+        m_joint2 = (PrismaticJoint) getWorld().createJoint(pjd);
+      }
 
-	}
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
-	 */
-	@Override
-	public void keyPressed(char argKeyChar, int argKeyCode) {
-		
-		switch(argKeyChar){
-			case 'f':
-				m_joint2.enableMotor(!m_joint2.isMotorEnabled());
-				getModel().getKeys()['f'] = false;
-				break;
-			case 'm':
-				m_joint1.enableMotor(!m_joint1.isMotorEnabled());
-				getModel().getKeys()['m'] = false;
-				break;
-		}
-	}
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-	 */
-	@Override
-	public String getTestName() {
-		return "Slider Crank";
-	}
-	
+      // Create a payload
+      {
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(1.5f, 1.5f);
+
+        BodyDef bd = new BodyDef();
+        bd.type = BodyType.DYNAMIC;
+        bd.position.set(0.0f, 23.0f);
+        Body body = getWorld().createBody(bd);
+        body.createFixture(shape, 2.0f);
+      }
+    }
+  }
+
+  /**
+   * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
+   */
+  @Override
+  public void step(TestbedSettings settings) {
+    super.step(settings);
+
+    addTextLine("Keys: (f) toggle friction, (m) toggle motor");
+    float torque = m_joint1.getMotorTorque(1);
+    Formatter f = new Formatter();
+    addTextLine(f.format("Friction: %b, Motor Force = %5.0f, ", m_joint2.isMotorEnabled(), torque)
+        .toString());
+
+  }
+
+  /**
+   * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
+   */
+  @Override
+  public void keyPressed(char argKeyChar, int argKeyCode) {
+
+    switch (argKeyChar) {
+      case 'f':
+        m_joint2.enableMotor(!m_joint2.isMotorEnabled());
+        getModel().getKeys()['f'] = false;
+        break;
+      case 'm':
+        m_joint1.enableMotor(!m_joint1.isMotorEnabled());
+        getModel().getKeys()['m'] = false;
+        break;
+    }
+  }
+
+  /**
+   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
+   */
+  @Override
+  public String getTestName() {
+    return "Slider Crank";
+  }
+
 }
