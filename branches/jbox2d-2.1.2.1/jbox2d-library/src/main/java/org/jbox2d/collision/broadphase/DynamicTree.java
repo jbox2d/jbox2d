@@ -112,7 +112,7 @@ public class DynamicTree {
   public final void destroyProxy(DynamicTreeNode proxy) {
     assert (proxy != null);
     int proxyId = proxy.id;
-    assert(0 <= proxyId && proxyId < m_nodeCount);
+    assert (0 <= proxyId && proxyId < m_nodeCapacity);
     assert (m_nodes[proxyId].isLeaf());
 
     removeLeaf(proxyId);
@@ -186,7 +186,7 @@ public class DynamicTree {
    * overlaps the supplied AABB.
    * 
    * @param callback
-   * @param araabbgAABB
+   * @param aabb
    */
   public final void query(TreeCallback callback, AABB aabb) {
     intStack.reset();
