@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="org/jbox2d/testbed/tests/Gears.java|org/jbox2d/testbed/tests/LineJointTest.java" kind="src" output="target/classes" path="src/main/java"/>
+	<classpathentry excluding="org/jbox2d/testbed/tests/LineJointTest.java" kind="src" output="target/classes" path="src/main/java"/>
 	<classpathentry excluding="**" kind="src" output="target/classes" path="src/main/resources"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry excluding="**" kind="src" output="target/test-classes" path="src/test/resources"/>

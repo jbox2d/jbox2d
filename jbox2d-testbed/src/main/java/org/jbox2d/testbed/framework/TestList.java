@@ -47,6 +47,7 @@ import org.jbox2d.testbed.tests.DominoTest;
 import org.jbox2d.testbed.tests.DominoTower;
 import org.jbox2d.testbed.tests.DynamicTreeTest;
 import org.jbox2d.testbed.tests.EdgeShapes;
+import org.jbox2d.testbed.tests.Gears;
 import org.jbox2d.testbed.tests.LiquidTest;
 import org.jbox2d.testbed.tests.MJWTest;
 import org.jbox2d.testbed.tests.OneSidedTest;
@@ -75,6 +76,7 @@ public class TestList {
   public static void populateModel(TestbedModel model){
       
       model.addCategory("Featured");
+      model.addTest(new Gears());
       model.addTest(new Car());
 //      model.addTest(new Cantilever());
 
@@ -119,8 +121,7 @@ public class TestList {
       model.addTest(new PrismaticTest());
       model.addTest(new RevoluteTest());
       model.addTest(new Pulleys());
-//      argModel.addTest(new LineJointTest());
-//      argModel.addTest(new Gears());
+      model.addTest(new Gears());
       model.addTest(new Web());
       model.addTest(new Chain());
       model.addTest(new Cantilever());
