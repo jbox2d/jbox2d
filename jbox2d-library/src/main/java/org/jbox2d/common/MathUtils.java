@@ -343,34 +343,6 @@ public class MathUtils {
 		return theta;
 	}
 	
-	/**
-	 * Computes a fast approximation to <code>Math.pow(a, b)</code>.
-	 * Adapted from <url>http://www.dctsystems.co.uk/Software/power.html</url>.
-	 * 
-	 * @param a
-	 *            a positive number
-	 * @param b
-	 *            a number
-	 * @return a^b
-	 */
-	// UNTESTED
-	public static final float pow(final float a, float b) {
-		// adapted from: http://www.dctsystems.co.uk/Software/power.html
-		if (Settings.FAST_MATH) {
-			float x = Float.floatToRawIntBits(a);
-			x *= 1.0f / (1 << 23);
-			x = x - 127;
-			float y = x - MathUtils.floor(x);
-			b *= x + (y - y * y) * 0.346607f;
-			y = b - MathUtils.floor(b);
-			y = (y - y * y) * 0.33971f;
-			return Float.intBitsToFloat((int) ((b + 127 - y) * (1 << 23)));
-		}
-		else {
-			return (float) Math.pow(a, b);
-		}
-	}
-	
 	public static final float randomFloat(float argLow, float argHigh) {
 		return (float) Math.random() * (argHigh - argLow) + argLow;
 	}
