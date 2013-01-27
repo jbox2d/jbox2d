@@ -2,7 +2,6 @@ package org.jbox2d.collision.broadphase;
 
 import org.jbox2d.callbacks.QueryCallback;
 import org.jbox2d.callbacks.RayCastCallback;
-import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
 

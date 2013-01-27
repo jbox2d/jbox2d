@@ -425,12 +425,6 @@ public class Collision {
     }
   }
 
-  // djm pooling
-  private final Vec2 normal1 = new Vec2();
-  private final Vec2 normal1World = new Vec2();
-  private final Vec2 v1 = new Vec2();
-  private final Vec2 v2 = new Vec2();
-
   /**
    * Find the separation between poly1 and poly2 for a given edge normal on poly1.
    * 
@@ -453,23 +447,22 @@ public class Collision {
     assert (0 <= edge1 && edge1 < count1);
     // Convert normal from poly1's frame into poly2's frame.
     // before inline:
-    // Vec2 normal1World = Mul(xf1.R, normals1[edge1]);
-    Rot.mulToOutUnsafe(xf1.q, normals1[edge1], normal1World);
-    // Vec2 normal1 = MulT(xf2.R, normal1World);
-    Rot.mulTransUnsafe(xf2.q, normal1World, normal1);
-    final float normal1x = normal1.x;
-    final float normal1y = normal1.y;
-    final float normal1Worldx = normal1World.x;
-    final float normal1Worldy = normal1World.y;
+//    // Vec2 normal1World = Mul(xf1.R, normals1[edge1]);
+//    Rot.mulToOutUnsafe(xf1.q, normals1[edge1], normal1World);
+//    // Vec2 normal1 = MulT(xf2.R, normal1World);
+//    Rot.mulTransUnsafe(xf2.q, normal1World, normal1);
+//    final float normal1x = normal1.x;
+//    final float normal1y = normal1.y;
+//    final float normal1Worldx = normal1World.x;
+//    final float normal1Worldy = normal1World.y;
     // after inline:
-    // R.mulToOut(v,out);
-    // final Mat22 R = xf1.q;
-    // final Vec2 v = normals1[edge1];
-    // final float normal1Worldy = R.ex.y * v.x + R.ey.y * v.y;
-    // final float normal1Worldx = R.ex.x * v.x + R.ey.x * v.y;
-    // final Mat22 R1 = xf2.q;
-    // final float normal1x = normal1Worldx * R1.ex.x + normal1Worldy * R1.ex.y;
-    // final float normal1y = normal1Worldx * R1.ey.x + normal1Worldy * R1.ey.y;
+    Rot q = xf1.q;
+    Vec2 v = normals1[edge1];
+    final float normal1Worldx = q.c * v.x - q.s * v.y;
+    final float normal1Worldy = q.s * v.x + q.c * v.y;
+    Rot q1 = xf2.q;
+    final float normal1x = q1.c * normal1Worldx + q1.s * normal1Worldy;
+    final float normal1y = -q1.s * normal1Worldx + q1.c * normal1Worldy;
     // end inline
 
     // Find support vertex on poly2 for -normal.
@@ -488,21 +481,23 @@ public class Collision {
     // Vec2 v1 = Mul(xf1, vertices1[edge1]);
     // Vec2 v2 = Mul(xf2, vertices2[index]);
     // before inline:
-    Transform.mulToOut(xf1, vertices1[edge1], v1);
-    Transform.mulToOut(xf2, vertices2[index], v2);
-
-    float separation = Vec2.dot(v2.subLocal(v1), normal1World);
-    return separation;
+//    Transform.mulToOut(xf1, vertices1[edge1], v1);
+//    Transform.mulToOut(xf2, vertices2[index], v2);
+//
+//    float separation = Vec2.dot(v2.subLocal(v1), normal1World);
+//    return separation;
 
     // after inline:
-    // final Vec2 v3 = vertices1[edge1];
-    // final float v1y = xf1.p.y + R.ex.y * v3.x + R.ey.y * v3.y;
-    // final float v1x = xf1.p.x + R.ex.x * v3.x + R.ey.x * v3.y;
-    // final Vec2 v4 = vertices2[index];
-    // final float v2y = xf2.p.y + R1.ex.y * v4.x + R1.ey.y * v4.y - v1y;
-    // final float v2x = xf2.p.x + R1.ex.x * v4.x + R1.ey.x * v4.y - v1x;
-    //
-    // return v2x * normal1Worldx + v2y * normal1Worldy;
+
+    Vec2 v3 = vertices1[edge1];
+    final float v1x = (xf1.q.c * v3.x - xf1.q.s * v3.y) + xf1.p.x;
+    final float v1y = (xf1.q.s * v3.x + xf1.q.c * v3.y) + xf1.p.y;
+    Vec2 v4 = vertices2[index];
+    final float v2x = (xf2.q.c * v4.x - xf2.q.s * v4.y) + xf2.p.x - v1x;
+    final float v2y = (xf2.q.s * v4.x + xf2.q.c * v4.y) + xf2.p.y - v1y;
+
+    float separation = v2x * normal1Worldx + v2y * normal1Worldy;
+    return separation;
     // end inline
   }
 
@@ -613,7 +608,8 @@ public class Collision {
     results.separation = bestSeparation;
   }
 
-  // djm pooling from above
+  private final Vec2 normal1 = new Vec2();
+
   public final void findIncidentEdge(final ClipVertex[] c, final PolygonShape poly1,
       final Transform xf1, int edge1, final PolygonShape poly2, final Transform xf2) {
     int count1 = poly1.m_count;

@@ -25,7 +25,6 @@ package org.jbox2d.collision;
 
 import org.jbox2d.collision.Distance.DistanceProxy;
 import org.jbox2d.collision.Distance.SimplexCache;
-import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
