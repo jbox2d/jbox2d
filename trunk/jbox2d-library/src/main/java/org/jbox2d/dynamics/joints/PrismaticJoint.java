@@ -260,6 +260,17 @@ public class PrismaticJoint extends Joint {
     return speed;
   }
 
+  public float getJointTranslation() {
+    Vec2 pA = pool.popVec2(), pB = pool.popVec2(), axis = pool.popVec2();
+    m_bodyA.getWorldPointToOut(m_localAnchorA, pA);
+    m_bodyB.getWorldPointToOut(m_localAnchorB, pB);
+    m_bodyA.getWorldVectorToOutUnsafe(m_localXAxisA, axis);
+    pB.subLocal(pA);
+    float translation = Vec2.dot(pB, axis);
+    pool.pushVec2(3);
+    return translation;
+  }
+
   /**
    * Is the joint limit enabled?
    * 
