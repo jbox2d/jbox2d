@@ -26,7 +26,6 @@ package org.jbox2d.dynamics.joints;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.SolverData;
-import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.pooling.IWorldPool;
 
@@ -54,8 +53,8 @@ public abstract class Joint {
 				return new WeldJoint(argWorld.getPool(), (WeldJointDef) def);
 			case FRICTION:
 				return new FrictionJoint(argWorld.getPool(), (FrictionJointDef) def);
-//			case WHEEL:
-//				return new WheelJoint(argWorld.getPool(), (LineJointDef) def);
+			case WHEEL:
+				return new WheelJoint(argWorld.getPool(), (WheelJointDef) def);
 //			case GEAR:
 //				return new GearJoint(argWorld.getPool(), (GearJointDef) def);
 			case PULLEY:

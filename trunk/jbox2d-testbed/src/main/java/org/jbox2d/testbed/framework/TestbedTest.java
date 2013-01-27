@@ -461,6 +461,10 @@ public abstract class TestbedTest
     init(m_world, true);
     return;
   }
+  
+  public void setCamera(Vec2 argPos) {
+    model.getDebugDraw().getViewportTranform().setCenter(argPos);
+  }
 
   /**
    * Sets the current testbed camera

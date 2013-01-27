@@ -31,6 +31,7 @@ import org.jbox2d.testbed.tests.BlobTest4;
 import org.jbox2d.testbed.tests.BodyTypes;
 import org.jbox2d.testbed.tests.Breakable;
 import org.jbox2d.testbed.tests.Cantilever;
+import org.jbox2d.testbed.tests.Car;
 import org.jbox2d.testbed.tests.Chain;
 import org.jbox2d.testbed.tests.CharacterCollision;
 import org.jbox2d.testbed.tests.CircleStress;
@@ -39,30 +40,24 @@ import org.jbox2d.testbed.tests.CollisionProcessing;
 import org.jbox2d.testbed.tests.CompoundShapes;
 import org.jbox2d.testbed.tests.ConfinedTest;
 import org.jbox2d.testbed.tests.ContinuousTest;
+import org.jbox2d.testbed.tests.ConvexHull;
+import org.jbox2d.testbed.tests.ConveyorBelt;
 import org.jbox2d.testbed.tests.DistanceTest;
 import org.jbox2d.testbed.tests.DominoTest;
 import org.jbox2d.testbed.tests.DominoTower;
 import org.jbox2d.testbed.tests.DynamicTreeTest;
 import org.jbox2d.testbed.tests.EdgeShapes;
-//import org.jbox2d.testbed.tests.Gears;
-import org.jbox2d.testbed.tests.CharacterCollisionProblem;
-import org.jbox2d.testbed.tests.ConvexHull;
-import org.jbox2d.testbed.tests.ConveyorBelt;
-import org.jbox2d.testbed.tests.FixedPendulumTest;
-import org.jbox2d.testbed.tests.FreePendulumTest;
 import org.jbox2d.testbed.tests.LiquidTest;
 import org.jbox2d.testbed.tests.MJWTest;
 import org.jbox2d.testbed.tests.OneSidedTest;
 import org.jbox2d.testbed.tests.PistonTest;
 import org.jbox2d.testbed.tests.PolyShapes;
-import org.jbox2d.testbed.tests.PrismaticStrangenessTEst;
 import org.jbox2d.testbed.tests.PrismaticTest;
 import org.jbox2d.testbed.tests.Pulleys;
 import org.jbox2d.testbed.tests.PyramidTest;
 import org.jbox2d.testbed.tests.RayCastTest;
 import org.jbox2d.testbed.tests.RevoluteTest;
 import org.jbox2d.testbed.tests.SensorTest;
-import org.jbox2d.testbed.tests.SetAsRotatedBoxTest;
 import org.jbox2d.testbed.tests.ShapeEditing;
 import org.jbox2d.testbed.tests.SliderCrankTest;
 import org.jbox2d.testbed.tests.SphereStack;
@@ -80,6 +75,7 @@ public class TestList {
   public static void populateModel(TestbedModel model){
       
       model.addCategory("Featured");
+      model.addTest(new Car());
 //      model.addTest(new Cantilever());
 
       model.addTest(new SphereStack());
