@@ -32,8 +32,6 @@ import org.jbox2d.callbacks.TreeRayCastCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.common.Vec2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The broad-phase is used for computing pairs and performing volume queries and ray casts. This
@@ -43,8 +41,6 @@ import org.slf4j.LoggerFactory;
  * @author Daniel Murphy
  */
 public class BroadPhase implements TreeCallback {
-
-  private static final Logger log = LoggerFactory.getLogger(BroadPhase.class);
 
   public static final int NULL_PROXY = -1;
 
@@ -281,8 +277,6 @@ public class BroadPhase implements TreeCallback {
    * This is called from DynamicTree::query when we are gathering pairs.
    */
   public final boolean treeCallback(int proxyId) {
-
-    // log.debug("Got a proxy back: " + proxyId);
     // A proxy cannot form a pair with itself.
     if (proxyId == m_queryProxyId) {
       // log.debug("It was us...");
