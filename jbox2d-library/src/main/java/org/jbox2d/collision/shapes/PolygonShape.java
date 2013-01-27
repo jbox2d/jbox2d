@@ -57,8 +57,7 @@ import org.jbox2d.common.Vec2;
 //Updated to rev 100
 
 /**
- * A convex polygon shape. Create using Body.createShape(ShapeDef), not the
- * ructor here.
+ * A polygon shape
  */
 public class PolygonShape extends Shape {
 	/** Dump lots of debug information. */
