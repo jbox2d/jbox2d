@@ -52,7 +52,6 @@ import org.jbox2d.dynamics.joints.FrictionJointDef;
 import org.jbox2d.dynamics.joints.GearJointDef;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.JointDef;
-import org.jbox2d.dynamics.joints.LineJointDef;
 import org.jbox2d.dynamics.joints.MouseJointDef;
 import org.jbox2d.dynamics.joints.PrismaticJointDef;
 import org.jbox2d.dynamics.joints.PulleyJointDef;
@@ -68,8 +67,7 @@ public class PbDeserializer implements JbDeserializer {
   private ObjectListener listener = null;
   private UnsupportedListener ulistener = null;
 
-  public PbDeserializer() {
-  }
+  public PbDeserializer() {}
 
   public PbDeserializer(UnsupportedListener argListener) {
     ulistener = argListener;
@@ -168,7 +166,7 @@ public class PbDeserializer implements JbDeserializer {
     bd.linearDamping = b.getLinearDamping();
     bd.linearVelocity.set(pbToVec(b.getLinearVelocity()));
     bd.position.set(pbToVec(b.getPosition()));
-    
+
     switch (b.getType()) {
       case DYNAMIC:
         bd.type = BodyType.DYNAMIC;
@@ -180,8 +178,8 @@ public class PbDeserializer implements JbDeserializer {
         bd.type = BodyType.STATIC;
         break;
       default:
-        UnsupportedObjectException e = new UnsupportedObjectException("Unknown body type: "
-            + argBody.getType(), Type.BODY);
+        UnsupportedObjectException e =
+            new UnsupportedObjectException("Unknown body type: " + argBody.getType(), Type.BODY);
         if (ulistener == null || ulistener.isUnsupported(e)) {
           throw e;
         }
@@ -256,16 +254,16 @@ public class PbDeserializer implements JbDeserializer {
         break;
       case EDGE:
       case LOOP: {
-        UnsupportedObjectException e = new UnsupportedObjectException(
-            "Edge and loop shapes are not yet supported", Type.SHAPE);
+        UnsupportedObjectException e =
+            new UnsupportedObjectException("Edge and loop shapes are not yet supported", Type.SHAPE);
         if (ulistener == null || ulistener.isUnsupported(e)) {
           throw e;
         }
         return null;
       }
       default: {
-        UnsupportedObjectException e = new UnsupportedObjectException("Unknown shape type: "
-            + s.getType(), Type.SHAPE);
+        UnsupportedObjectException e =
+            new UnsupportedObjectException("Unknown shape type: " + s.getType(), Type.SHAPE);
         if (ulistener == null || ulistener.isUnsupported(e)) {
           throw e;
         }
@@ -368,8 +366,8 @@ public class PbDeserializer implements JbDeserializer {
         break;
       }
       case WHEEL: {
-        UnsupportedObjectException e = new UnsupportedObjectException(
-            "Wheel joint not supported yet.", Type.JOINT);
+        UnsupportedObjectException e =
+            new UnsupportedObjectException("Wheel joint not supported yet.", Type.JOINT);
         if (ulistener == null || ulistener.isUnsupported(e)) {
           throw e;
         }
@@ -395,8 +393,8 @@ public class PbDeserializer implements JbDeserializer {
         break;
       }
       case ROPE: {
-        UnsupportedObjectException e = new UnsupportedObjectException(
-            "Rope joint not supported yet.", Type.JOINT);
+        UnsupportedObjectException e =
+            new UnsupportedObjectException("Rope joint not supported yet.", Type.JOINT);
         if (ulistener == null || ulistener.isUnsupported(e)) {
           throw e;
         }
@@ -431,22 +429,16 @@ public class PbDeserializer implements JbDeserializer {
         break;
       }
       case LINE: {
-        LineJointDef def = new LineJointDef();
-        jd = def;
-        def.localAnchorA.set(pbToVec(argJoint.getLocalAnchorA()));
-        def.localAnchorB.set(pbToVec(argJoint.getLocalAnchorB()));
-        def.localAxisA.set(pbToVec(argJoint.getLocalAxisA()));
-        def.enableLimit = argJoint.getEnableLimit();
-        def.enableMotor = argJoint.getEnableMotor();
-        def.lowerTranslation = argJoint.getLowerLimit();
-        def.upperTranslation = argJoint.getUpperLimit();
-        def.maxMotorForce = argJoint.getMaxForce();
-        def.motorSpeed = argJoint.getMotorSpeed();
-        break;
+        UnsupportedObjectException e =
+            new UnsupportedObjectException("Line joint no longer supported.", Type.JOINT);
+        if (ulistener == null || ulistener.isUnsupported(e)) {
+          throw e;
+        }
+        return null;
       }
       default: {
-        UnsupportedObjectException e = new UnsupportedObjectException("Unknown joint type: "
-            + argJoint.getType(), Type.JOINT);
+        UnsupportedObjectException e =
+            new UnsupportedObjectException("Unknown joint type: " + argJoint.getType(), Type.JOINT);
         if (ulistener == null || ulistener.isUnsupported(e)) {
           throw e;
         }

@@ -74,14 +74,14 @@ public class TestbedSettings {
     addSetting(new TestbedSetting(WarmStarting, SettingType.ENGINE, true));
     addSetting(new TestbedSetting(ContinuousCollision, SettingType.ENGINE, true));
     addSetting(new TestbedSetting(DrawShapes, SettingType.DRAWING, true));
-    addSetting(new TestbedSetting(DrawJoints, SettingType.DRAWING, true));
+    addSetting(new TestbedSetting(DrawJoints, SettingType.DRAWING, false));
     addSetting(new TestbedSetting(DrawAABBs, SettingType.DRAWING, false));
     addSetting(new TestbedSetting(DrawPairs, SettingType.DRAWING, false));
     addSetting(new TestbedSetting(DrawContactPoints, SettingType.DRAWING, false));
     addSetting(new TestbedSetting(DrawNormals, SettingType.DRAWING, false));
     addSetting(new TestbedSetting(DrawCOMs, SettingType.DRAWING, false));
-    addSetting(new TestbedSetting(DrawStats, SettingType.DRAWING, true));
-    addSetting(new TestbedSetting(DrawHelp, SettingType.DRAWING, false));
+    addSetting(new TestbedSetting(DrawStats, SettingType.DRAWING, false));
+    addSetting(new TestbedSetting(DrawHelp, SettingType.DRAWING, true));
     addSetting(new TestbedSetting(DrawTree, SettingType.DRAWING, false));
   }
 

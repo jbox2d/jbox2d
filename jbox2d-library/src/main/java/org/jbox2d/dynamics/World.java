@@ -663,13 +663,11 @@ public class World {
     if ((flags & DebugDraw.e_pairBit) == DebugDraw.e_pairBit) {
       color.set(0.3f, 0.9f, 0.9f);
       for (Contact c = m_contactManager.m_contactList; c != null; c = c.getNext()) {
-        // Fixture fixtureA = c.getFixtureA();
-        // Fixture fixtureB = c.getFixtureB();
-        //
-        // fixtureA.getAABB(childIndex).getCenterToOut(cA);
-        // fixtureB.getAABB().getCenterToOut(cB);
-        //
-        // m_debugDraw.drawSegment(cA, cB, color);
+        Fixture fixtureA = c.getFixtureA();
+        Fixture fixtureB = c.getFixtureB();
+        fixtureA.getAABB(c.getChildIndexA()).getCenterToOut(cA);
+        fixtureB.getAABB(c.getChildIndexB()).getCenterToOut(cB);
+        m_debugDraw.drawSegment(cA, cB, color);
       }
     }
 
@@ -682,7 +680,6 @@ public class World {
         }
 
         for (Fixture f = b.getFixtureList(); f != null; f = f.getNext()) {
-
           for (int i = 0; i < f.m_proxyCount; ++i) {
             FixtureProxy proxy = f.m_proxies[i];
             AABB aabb = m_contactManager.m_broadPhase.getFatAABB(proxy.proxyId);
@@ -691,10 +688,8 @@ public class World {
             vs[1].set(aabb.upperBound.x, aabb.lowerBound.y);
             vs[2].set(aabb.upperBound.x, aabb.upperBound.y);
             vs[3].set(aabb.lowerBound.x, aabb.upperBound.y);
-
             m_debugDraw.drawPolygon(vs, 4, color);
           }
-
         }
       }
     }
@@ -1114,7 +1109,8 @@ public class World {
   private void solveTOI(final TimeStep step) {
 
     final Island island = toiIsland;
-    island.init(2 * Settings.maxTOIContacts, Settings.maxTOIContacts, 0, m_contactManager.m_contactListener);
+    island.init(2 * Settings.maxTOIContacts, Settings.maxTOIContacts, 0,
+        m_contactManager.m_contactListener);
     if (m_stepComplete) {
       for (Body b = m_bodyList; b != null; b = b.m_next) {
         b.m_flags &= ~Body.e_islandFlag;
