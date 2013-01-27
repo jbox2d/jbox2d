@@ -27,6 +27,7 @@
 package org.jbox2d.testbed.tests;
 
 import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -59,8 +60,8 @@ public class Pulleys extends TestbedTest {
       BodyDef bd = new BodyDef();
       ground = getWorld().createBody(bd);
 
-      PolygonShape shape = new PolygonShape();
-      shape.setAsEdge(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
+      EdgeShape shape = new EdgeShape();
+      shape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
       ground.createFixture(shape, 0.0f);
 
       CircleShape circle = new CircleShape();

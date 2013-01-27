@@ -962,8 +962,8 @@ public class ContactSolver {
         iA = pc.invIA;
       }
 
-      float mB = pc.invMassB;
-      float iB = pc.invIB;
+      float mB = 0f;
+      float iB = 0f;
       if (indexB == toiIndexA || indexB == toiIndexB) {
         mB = pc.invMassB;
         iB = pc.invIB;

@@ -100,26 +100,6 @@ public class PolygonShape extends Shape {
     shape.m_count = this.m_count;
     return shape;
   }
-  
-  /**
-   * Set this as a single edge.
-   * 
-   * @param v1
-   * @param v2
-   * @deprecated
-   */
-  public final void setAsEdge(final Vec2 v1, final Vec2 v2) {
-    m_count = 2;
-    m_vertices[0].set(v1);
-    m_vertices[1].set(v2);
-    m_centroid.set(v1).addLocal(v2).mulLocal(0.5f);
-    // = 0.5f * (v1 + v2);
-    m_normals[0].set(v2).subLocal(v1);
-    Vec2.crossToOut(m_normals[0], 1f, m_normals[0]);
-    // m_normals[0] = Cross(v2 - v1, 1.0f);
-    m_normals[0].normalize();
-    m_normals[1].set(m_normals[0]).negateLocal();
-  }
 
   /**
    * Create a convex hull from the given array of points. The count must be in the range [3,
