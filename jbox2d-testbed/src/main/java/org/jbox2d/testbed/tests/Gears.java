@@ -175,6 +175,150 @@ public class Gears extends TestbedTest {
       jd5.ratio = 1f / circle2.m_radius;
       m_joint5 = (GearJoint) m_world.createJoint(jd5);
     }
+    
+    {
+      CircleShape circle1 = new CircleShape();
+      circle1.m_radius = 1.0f;
+
+      CircleShape circle2 = new CircleShape();
+      circle2.m_radius = 2.0f;
+
+      PolygonShape box = new PolygonShape();
+      box.setAsBox(0.5f, 5.0f);
+
+      BodyDef bd2 = new BodyDef();
+      bd2.type = BodyType.DYNAMIC;
+      bd2.position.set(-10f, 12.0f);
+      Body body2 = m_world.createBody(bd2);
+      body2.createFixture(circle2, 5.0f);
+
+      RevoluteJointDef jd2 = new RevoluteJointDef();
+      jd2.initialize(ground, body2, bd2.position);
+      m_joint2 = (RevoluteJoint) m_world.createJoint(jd2);
+
+      BodyDef bd3 = new BodyDef();
+      bd3.type = BodyType.DYNAMIC;
+      bd3.position.set(-10f, 19.0f);
+      Body body3 = m_world.createBody(bd3);
+      body3.createFixture(box, 5.0f);
+
+      PrismaticJointDef jd3 = new PrismaticJointDef();
+      jd3.initialize(ground, body3, bd3.position, new Vec2(1.0f, 0f));
+      jd3.lowerTranslation = -.5f;
+      jd3.upperTranslation = .5f;
+      jd3.enableLimit = true;
+
+      m_joint3 = (PrismaticJoint) m_world.createJoint(jd3);
+      
+      GearJointDef jd5 = new GearJointDef();
+      jd5.bodyA = body2;
+      jd5.bodyB = body3;
+      jd5.joint1 = m_joint2;
+      jd5.joint2 = m_joint3;
+      jd5.ratio = 1f / circle2.m_radius;
+      m_joint5 = (GearJoint) m_world.createJoint(jd5);
+    }
+    
+    {
+      CircleShape circle1 = new CircleShape();
+      circle1.m_radius = 1.0f;
+
+      CircleShape circle2 = new CircleShape();
+      circle2.m_radius = 2.0f;
+
+      PolygonShape box = new PolygonShape();
+      box.setAsBox(0.5f, 5.0f);
+      
+      PolygonShape box2 = new PolygonShape();
+      box2.setAsBox(5f, .5f);
+
+      BodyDef bd2 = new BodyDef();
+      bd2.type = BodyType.DYNAMIC;
+      bd2.position.set(0f, 25.0f);
+      Body body2 = m_world.createBody(bd2);
+      body2.createFixture(box2, 5.0f);
+
+
+      PrismaticJointDef jd2 = new PrismaticJointDef();
+      jd2.initialize(ground, body2, bd2.position, new Vec2(1.0f, 0f));
+      jd2.lowerTranslation = -2.5f;
+      jd2.upperTranslation = 2.5f;
+      jd2.enableLimit = true;
+      
+
+      BodyDef bd3 = new BodyDef();
+      bd3.type = BodyType.DYNAMIC;
+      bd3.position.set(0f, 30.5f);
+      Body body3 = m_world.createBody(bd3);
+      body3.createFixture(box, 5.0f);
+
+      PrismaticJointDef jd3 = new PrismaticJointDef();
+      jd3.initialize(ground, body3, bd3.position, new Vec2(1.0f, 0f));
+      jd3.lowerTranslation = -2.5f;
+      jd3.upperTranslation = 2.5f;
+      jd3.enableLimit = true;
+
+      PrismaticJoint a = (PrismaticJoint) m_world.createJoint(jd2);
+      m_joint3 = (PrismaticJoint) m_world.createJoint(jd3);
+
+      GearJointDef jd5 = new GearJointDef();
+      jd5.bodyA = body2;
+      jd5.bodyB = body3;
+      jd5.joint1 = a;
+      jd5.joint2 = m_joint3;
+      jd5.ratio = 1;
+      m_joint5 = (GearJoint) m_world.createJoint(jd5);
+    }
+    
+    {
+      CircleShape circle1 = new CircleShape();
+      circle1.m_radius = 1.0f;
+
+      CircleShape circle2 = new CircleShape();
+      circle2.m_radius = 2.0f;
+
+      PolygonShape box = new PolygonShape();
+      box.setAsBox(0.5f, 5.0f);
+      
+      PolygonShape box2 = new PolygonShape();
+      box2.setAsBox(5f, .5f);
+
+      BodyDef bd2 = new BodyDef();
+      bd2.type = BodyType.DYNAMIC;
+      bd2.position.set(25f, 25.0f);
+      Body body2 = m_world.createBody(bd2);
+      body2.createFixture(box, 5.0f);
+
+
+      PrismaticJointDef jd2 = new PrismaticJointDef();
+      jd2.initialize(ground, body2, bd2.position, new Vec2(0f, 1f));
+      jd2.lowerTranslation = -2.5f;
+      jd2.upperTranslation = 2.5f;
+      jd2.enableLimit = true;
+
+      BodyDef bd3 = new BodyDef();
+      bd3.type = BodyType.DYNAMIC;
+      bd3.position.set(26f, 25f);
+      Body body3 = m_world.createBody(bd3);
+      body3.createFixture(box, 5.0f);
+
+      PrismaticJointDef jd3 = new PrismaticJointDef();
+      jd3.initialize(ground, body3, bd3.position, new Vec2(0f, 1f));
+      jd3.lowerTranslation = -2.5f;
+      jd3.upperTranslation = 2.5f;
+      jd3.enableLimit = true;
+
+      PrismaticJoint a = (PrismaticJoint) m_world.createJoint(jd2);
+      m_joint3 = (PrismaticJoint) m_world.createJoint(jd3);
+
+      GearJointDef jd5 = new GearJointDef();
+      jd5.bodyA = body2;
+      jd5.bodyB = body3;
+      jd5.joint1 = a;
+      jd5.joint2 = m_joint3;
+      jd5.ratio = 1;
+      m_joint5 = (GearJoint) m_world.createJoint(jd5);
+    }
   }
 
   @Override

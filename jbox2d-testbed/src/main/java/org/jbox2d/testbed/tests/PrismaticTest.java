@@ -91,6 +91,38 @@ public class PrismaticTest extends TestbedTest {
 			
 			m_joint = (PrismaticJoint) getWorld().createJoint(pjd);
 		}
+		
+		{
+          PolygonShape shape = new PolygonShape();
+          shape.setAsBox(2.0f, 0.5f);
+          
+          BodyDef bd = new BodyDef();
+          bd.type = BodyType.DYNAMIC;
+          bd.position.set(5f, 5.0f);
+          bd.angle = 0.5f * MathUtils.PI;
+          bd.allowSleep = false;
+          Body body = getWorld().createBody(bd);
+          body.createFixture(shape, 5.0f);
+          
+          PrismaticJointDef pjd = new PrismaticJointDef();
+          
+          // Bouncy limit
+          Vec2 axis = new Vec2(0f, 1.0f);
+          axis.normalize();
+          pjd.initialize(ground, body, bd.position, axis);
+          
+          // Non-bouncy limit
+          // pjd.Initialize(ground, body, Vec2(-10.0f, 10.0f), Vec2(1.0f, 0.0f));
+          
+          pjd.motorSpeed = 10.0f;
+          pjd.maxMotorForce = 10000.0f;
+          pjd.enableMotor = false;
+          pjd.lowerTranslation = -2.0f;
+          pjd.upperTranslation = 2.0f;
+          pjd.enableLimit = true;
+          
+          getWorld().createJoint(pjd);
+      }
 	}
 	
 	/**
