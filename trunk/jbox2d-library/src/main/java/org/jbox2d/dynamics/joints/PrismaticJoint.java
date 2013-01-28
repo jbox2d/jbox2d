@@ -521,9 +521,9 @@ public class PrismaticJoint extends Joint {
       m_motorImpulse = 0.0f;
     }
 
-    data.velocities[m_indexA].v.set(vA);
+//    data.velocities[m_indexA].v.set(vA);
     data.velocities[m_indexA].w = wA;
-    data.velocities[m_indexB].v.set(vB);
+//    data.velocities[m_indexB].v.set(vB);
     data.velocities[m_indexB].w = wB;
 
     pool.pushRot(2);
@@ -667,9 +667,9 @@ public class PrismaticJoint extends Joint {
       pool.pushVec2(3);
     }
 
-    data.velocities[m_indexA].v.set(vA);
+//    data.velocities[m_indexA].v.set(vA);
     data.velocities[m_indexA].w = wA;
-    data.velocities[m_indexB].v.set(vB);
+//    data.velocities[m_indexB].v.set(vB);
     data.velocities[m_indexB].w = wB;
 
     pool.pushVec2(2);

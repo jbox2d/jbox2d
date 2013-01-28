@@ -339,9 +339,9 @@ public class RevoluteJoint extends Joint {
       pool.pushVec2(2);
     }
 
-    data.velocities[m_indexA].v.set(vA);
+//    data.velocities[m_indexA].v.set(vA);
     data.velocities[m_indexA].w = wA;
-    data.velocities[m_indexB].v.set(vB);
+//    data.velocities[m_indexB].v.set(vB);
     data.velocities[m_indexB].w = wB;
 
     pool.pushVec2(1);
@@ -432,9 +432,9 @@ public class RevoluteJoint extends Joint {
       pool.pushVec2(4);
       pool.pushMat22(1);
     }
-    data.positions[m_indexA].c.set(cA);
+//    data.positions[m_indexA].c.set(cA);
     data.positions[m_indexA].a = aA;
-    data.positions[m_indexB].c.set(cB);
+//    data.positions[m_indexB].c.set(cB);
     data.positions[m_indexB].a = aB;
 
     pool.pushRot(2);

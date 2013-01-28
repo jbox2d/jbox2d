@@ -248,22 +248,22 @@ public class GearJoint extends Joint {
     m_iC = m_bodyC.m_invI;
     m_iD = m_bodyD.m_invI;
 
-    Vec2 cA = data.positions[m_indexA].c;
+    // Vec2 cA = data.positions[m_indexA].c;
     float aA = data.positions[m_indexA].a;
     Vec2 vA = data.velocities[m_indexA].v;
     float wA = data.velocities[m_indexA].w;
 
-    Vec2 cB = data.positions[m_indexB].c;
+    // Vec2 cB = data.positions[m_indexB].c;
     float aB = data.positions[m_indexB].a;
     Vec2 vB = data.velocities[m_indexB].v;
     float wB = data.velocities[m_indexB].w;
 
-    Vec2 cC = data.positions[m_indexC].c;
+    // Vec2 cC = data.positions[m_indexC].c;
     float aC = data.positions[m_indexC].a;
     Vec2 vC = data.velocities[m_indexC].v;
     float wC = data.velocities[m_indexC].w;
 
-    Vec2 cD = data.positions[m_indexD].c;
+    // Vec2 cD = data.positions[m_indexD].c;
     float aD = data.positions[m_indexD].a;
     Vec2 vD = data.velocities[m_indexD].v;
     float wD = data.velocities[m_indexD].w;
