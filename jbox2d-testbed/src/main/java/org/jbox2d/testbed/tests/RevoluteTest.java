@@ -28,11 +28,13 @@ package org.jbox2d.testbed.tests;
 
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.EdgeShape;
+import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jbox2d.testbed.framework.TestbedSettings;
@@ -42,101 +44,144 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class RevoluteTest extends TestbedTest {
-	
-	private RevoluteJoint m_joint;
-	private boolean isLeft = false;
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-	 */
-	@Override
-	public void initTest(boolean argDeserialized) {
-		Body ground = null;
-		{
-			BodyDef bd = new BodyDef();
-			ground = getWorld().createBody(bd);
-			
-			EdgeShape shape = new EdgeShape();
-			shape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
-			ground.createFixture(shape, 0.0f);
-		}
-		
-		{
-			CircleShape shape = new CircleShape();
-			shape.m_radius = 0.5f;
-			
-			BodyDef bd = new BodyDef();
-			bd.type = BodyType.DYNAMIC;
-			
-			RevoluteJointDef rjd = new RevoluteJointDef();
-			
-			bd.position.set(0.0f, 20.0f);
-			Body body = getWorld().createBody(bd);
-			body.createFixture(shape, 5.0f);
-			
-			float w = 100.0f;
-			body.setAngularVelocity(w);
-			body.setLinearVelocity(new Vec2(-8.0f * w, 0.0f));
-			
-			rjd.initialize(ground, body, new Vec2(0.0f, 12.0f));
-			rjd.motorSpeed = -1.0f * MathUtils.PI;
-			rjd.maxMotorTorque = 10000.0f;
-			rjd.enableMotor = false;
-			rjd.lowerAngle = -0.25f * MathUtils.PI;
-			rjd.upperAngle = 0.5f * MathUtils.PI;
-			rjd.enableLimit = false;
-			rjd.collideConnected = true;
-			
-			m_joint = (RevoluteJoint) getWorld().createJoint(rjd);
-		}
-	}
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
-	 */
-	@Override
-	public void step(TestbedSettings settings) {
-		super.step(settings);
-		addTextLine("Limits " + (m_joint.isLimitEnabled() ? "on" : "off") + ", Motor "
-				+ (m_joint.isMotorEnabled() ? "on " : "off ") + (isLeft ? "left" : "right"));
-		addTextLine("Keys: (l) limits, (m) motor, (a) left, (d) right");
-		
-	}
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
-	 */
-	@Override
-	public void keyPressed(char argKeyChar, int argKeyCode) {
-		
-		switch (argKeyChar) {
-			case 'l' :
-				m_joint.enableLimit(!m_joint.isLimitEnabled());
-				getModel().getKeys()['l'] = false;
-				break;
-			case 'm' :
-				m_joint.enableMotor(!m_joint.isMotorEnabled());
-				getModel().getKeys()['m'] = false;
-				break;
-			case 'a' :
-				m_joint.setMotorSpeed(1.0f * MathUtils.PI);
-				getModel().getKeys()['a'] = false;
-				isLeft = true;
-				break;
-			case 'd' :
-				m_joint.setMotorSpeed(-1.0f * MathUtils.PI);
-				getModel().getKeys()['d'] = false;
-				isLeft = false;
-				break;
-		}
-	}
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-	 */
-	@Override
-	public String getTestName() {
-		return "Revolute";
-	}
-	
+
+  private RevoluteJoint m_joint;
+  private Body m_ball;
+  private boolean isLeft = false;
+
+  @Override
+  public void initTest(boolean argDeserialized) {
+    Body ground = null;
+    {
+      BodyDef bd = new BodyDef();
+      ground = getWorld().createBody(bd);
+
+      EdgeShape shape = new EdgeShape();
+      shape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
+      ground.createFixture(shape, 0.0f);
+    }
+
+    {
+      CircleShape shape = new CircleShape();
+      shape.m_radius = 0.5f;
+
+      BodyDef bd = new BodyDef();
+      bd.type = BodyType.DYNAMIC;
+
+      RevoluteJointDef rjd = new RevoluteJointDef();
+
+      bd.position.set(-10f, 20.0f);
+      Body body = getWorld().createBody(bd);
+      body.createFixture(shape, 5.0f);
+
+      float w = 100.0f;
+      body.setAngularVelocity(w);
+      body.setLinearVelocity(new Vec2(-8.0f * w, 0.0f));
+
+      rjd.initialize(ground, body, new Vec2(-10.0f, 12.0f));
+      rjd.motorSpeed = -1.0f * MathUtils.PI;
+      rjd.maxMotorTorque = 10000.0f;
+      rjd.enableMotor = false;
+      rjd.lowerAngle = -0.25f * MathUtils.PI;
+      rjd.upperAngle = 0.5f * MathUtils.PI;
+      rjd.enableLimit = true;
+      rjd.collideConnected = true;
+
+      m_joint = (RevoluteJoint) getWorld().createJoint(rjd);
+    }
+    
+    {
+      CircleShape circle_shape = new CircleShape();
+      circle_shape.m_radius = 3.0f;
+
+      BodyDef circle_bd = new BodyDef();
+      circle_bd.type = BodyType.DYNAMIC;
+      circle_bd.position.set(5.0f, 30.0f);
+
+      FixtureDef fd = new FixtureDef();
+      fd.density = 5.0f;
+      fd.filter.maskBits = 1;
+      fd.shape = circle_shape;
+
+      m_ball = m_world.createBody(circle_bd);
+      m_ball.createFixture(fd);
+
+      PolygonShape polygon_shape = new PolygonShape();
+      polygon_shape.setAsBox(10.0f, 0.2f, new Vec2 (-10.0f, 0.0f), 0.0f);
+
+      BodyDef polygon_bd = new BodyDef();
+      polygon_bd.position.set(20.0f, 10.0f);
+      polygon_bd.type = BodyType.DYNAMIC;
+      polygon_bd.bullet = true;
+      Body polygon_body = m_world.createBody(polygon_bd);
+      polygon_body.createFixture(polygon_shape, 2.0f);
+
+      RevoluteJointDef rjd = new RevoluteJointDef();
+      rjd.initialize(ground, polygon_body, new Vec2(20.0f, 10.0f));
+      rjd.lowerAngle = -0.25f * MathUtils.PI;
+      rjd.upperAngle = 0.0f * MathUtils.PI;
+      rjd.enableLimit = true;
+      m_world.createJoint(rjd);
+  }
+
+  // Tests mass computation of a small object far from the origin
+  {
+      BodyDef bodyDef = new BodyDef();
+      bodyDef.type = BodyType.DYNAMIC;
+      Body body = m_world.createBody(bodyDef);
+  
+      PolygonShape polyShape = new PolygonShape();       
+      Vec2 verts[] = new Vec2[3];
+      verts[0] = new Vec2( 17.63f, 36.31f );
+      verts[1] = new Vec2( 17.52f, 36.69f );
+      verts[2] = new Vec2( 17.19f, 36.36f );
+      polyShape.set(verts, 3);
+  
+      FixtureDef polyFixtureDef = new FixtureDef();
+      polyFixtureDef.shape = polyShape;
+      polyFixtureDef.density = 1;
+
+      body.createFixture(polyFixtureDef);   //assertion hits inside here
+  }
+  }
+
+  @Override
+  public void step(TestbedSettings settings) {
+    super.step(settings);
+    addTextLine("Limits " + (m_joint.isLimitEnabled() ? "on" : "off") + ", Motor "
+        + (m_joint.isMotorEnabled() ? "on " : "off ") + (isLeft ? "left" : "right"));
+    addTextLine("Keys: (l) limits, (m) motor, (a) left, (d) right");
+
+  }
+
+  @Override
+  public void keyPressed(char argKeyChar, int argKeyCode) {
+
+    switch (argKeyChar) {
+      case 'l':
+        m_joint.enableLimit(!m_joint.isLimitEnabled());
+        getModel().getKeys()['l'] = false;
+        break;
+      case 'm':
+        m_joint.enableMotor(!m_joint.isMotorEnabled());
+        getModel().getKeys()['m'] = false;
+        break;
+      case 'a':
+        m_joint.setMotorSpeed(1.0f * MathUtils.PI);
+        getModel().getKeys()['a'] = false;
+        isLeft = true;
+        break;
+      case 'd':
+        m_joint.setMotorSpeed(-1.0f * MathUtils.PI);
+        getModel().getKeys()['d'] = false;
+        isLeft = false;
+        break;
+    }
+  }
+
+  @Override
+  public String getTestName() {
+    return "Revolute";
+  }
+
 }

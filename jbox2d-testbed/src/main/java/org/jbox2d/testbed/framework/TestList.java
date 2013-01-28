@@ -77,8 +77,9 @@ public class TestList {
       
       model.addCategory("Featured");
       model.addTest(new Gears());
+      model.addTest(new RevoluteTest());
       model.addTest(new Car());
-//      model.addTest(new Cantilever());
+      model.addTest(new Cantilever());
 
       model.addTest(new SphereStack());
       model.addTest(new MJWTest());
