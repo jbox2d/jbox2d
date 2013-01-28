@@ -605,9 +605,8 @@ public class PrismaticJoint extends Joint {
       temp.set(m_K.ez.x, m_K.ez.y).mulLocal(m_impulse.z - f1.z);
       b.set(Cdot1).negateLocal().subLocal(temp);
 
-      temp.set(f1.x, f1.y);
       m_K.solve22ToOut(b, f2r);
-      f2r.addLocal(temp);
+      f2r.addLocal(f1.x, f1.y);
       m_impulse.x = f2r.x;
       m_impulse.y = f2r.y;
 
