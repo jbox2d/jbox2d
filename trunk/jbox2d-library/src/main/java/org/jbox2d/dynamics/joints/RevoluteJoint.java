@@ -213,9 +213,9 @@ public class RevoluteJoint extends Joint {
       m_impulse.setZero();
       m_motorImpulse = 0.0f;
     }
-    data.velocities[m_indexA].v.set(vA);
+//    data.velocities[m_indexA].v.set(vA);
     data.velocities[m_indexA].w = wA;
-    data.velocities[m_indexB].v.set(vB);
+//    data.velocities[m_indexB].v.set(vB);
     data.velocities[m_indexB].w = wB;
 
     pool.pushVec2(1);

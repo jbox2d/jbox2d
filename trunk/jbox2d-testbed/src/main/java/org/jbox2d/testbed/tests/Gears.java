@@ -95,6 +95,9 @@ public class Gears extends TestbedTest {
       body3.createFixture(circle2, 5.0f);
 
       RevoluteJointDef jd1 = new RevoluteJointDef();
+      jd1.enableLimit = true;
+      jd1.upperAngle = 6;
+      jd1.lowerAngle = 1;
       jd1.initialize(body2, body1, bd1.position);
       Joint joint1 = m_world.createJoint(jd1);
 
