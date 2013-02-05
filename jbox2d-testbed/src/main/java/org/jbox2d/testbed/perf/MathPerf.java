@@ -85,7 +85,7 @@ public class MathPerf extends PerfTest{
 	 */
 	@Override
 	public void runTest(int argNum) {
-		float random = MathUtils.randomFloat(Float.MIN_VALUE/3, Float.MAX_VALUE/3);
+		float random = MathUtils.randomFloat(-Float.MAX_VALUE/3, Float.MAX_VALUE/3);
 		switch(argNum){
 			case 0:
 				runSinTest(random);

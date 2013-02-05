@@ -253,7 +253,7 @@ public class Collision {
 
     // Compute circle position in the frame of the polygon.
     // before inline:
-    Transform.mulToOut(xfB, circle.m_p, c);
+    Transform.mulToOutUnsafe(xfB, circle.m_p, c);
     Transform.mulTransToOut(xfA, c, cLocal);
     final float cLocalx = cLocal.x;
     final float cLocaly = cLocal.y;
@@ -270,10 +270,10 @@ public class Collision {
 
     // Find the min separating edge.
     int normalIndex = 0;
-    float separation = Float.MIN_VALUE;
+    float separation = -Float.MAX_VALUE;
     final float radius = polygon.m_radius + circle.m_radius;
     final int vertexCount = polygon.m_count;
-
+    float s;
     final Vec2[] vertices = polygon.m_vertices;
     final Vec2[] normals = polygon.m_normals;
 
@@ -285,8 +285,7 @@ public class Collision {
       final Vec2 vertex = vertices[i];
       final float tempx = cLocalx - vertex.x;
       final float tempy = cLocaly - vertex.y;
-      final Vec2 normal = normals[i];
-      final float s = normal.x * tempx + normal.y * tempy;
+      s = normals[i].x * tempx + normals[i].y * tempy;
 
 
       if (s > radius) {
@@ -326,6 +325,7 @@ public class Collision {
       mpoint.localPoint.y = circle.m_p.y;
       mpoint.id.zero();
       // end inline
+      
       return;
     }
 
@@ -547,7 +547,7 @@ public class Collision {
     // Find edge normal on poly1 that has the largest projection onto d.
     int edge = 0;
     float dot;
-    float maxDot = Float.MIN_VALUE;
+    float maxDot = -Float.MAX_VALUE;
     for (int i = 0; i < count1; i++) {
       final Vec2 normal = normals1[i];
       dot = normal.x * dLocal1x + normal.y * dLocal1y;
@@ -1421,7 +1421,7 @@ public class Collision {
     public void computePolygonSeparation(EPAxis axis) {
       axis.type = EPAxis.Type.UNKNOWN;
       axis.index = -1;
-      axis.separation = Float.MIN_VALUE;
+      axis.separation = -Float.MAX_VALUE;
 
       perp.set(-m_normal.y, m_normal.x);
 

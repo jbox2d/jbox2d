@@ -204,7 +204,7 @@ public class AABB {
    */
   public final boolean raycast(final RayCastOutput output, final RayCastInput input,
       IWorldPool argPool) {
-    float tmin = Float.MIN_VALUE;
+    float tmin = -Float.MAX_VALUE;
     float tmax = Float.MAX_VALUE;
 
     final Vec2 p = argPool.popVec2();

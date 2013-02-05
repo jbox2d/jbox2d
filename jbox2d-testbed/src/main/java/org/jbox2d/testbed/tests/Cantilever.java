@@ -43,7 +43,7 @@ import org.jbox2d.testbed.framework.TestbedTest;
 public class Cantilever extends TestbedTest {
 
 
-  int e_count = 10;
+  int e_count = 8;
 
   @Override
   public boolean isSaveLoadEnabled() {

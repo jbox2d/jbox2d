@@ -45,7 +45,7 @@ import org.jbox2d.testbed.framework.TestbedTest;
 public class Breakable extends TestbedTest {
 
   Body m_body1;
-  Vec2 m_velocity;
+  Vec2 m_velocity = new Vec2();
   float m_angularVelocity;
   PolygonShape m_shape1;
   PolygonShape m_shape2;
@@ -55,9 +55,6 @@ public class Breakable extends TestbedTest {
   boolean m_broke;
   boolean m_break;
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-   */
   @Override
   public void initTest(boolean argDeserialized) {
     // Ground body
@@ -91,10 +88,6 @@ public class Breakable extends TestbedTest {
     m_broke = false;
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#postSolve(org.jbox2d.dynamics.contacts.Contact,
-   *      org.jbox2d.callbacks.ContactImpulse)
-   */
   @Override
   public void postSolve(Contact contact, ContactImpulse impulse) {
     if (m_broke) {
@@ -147,11 +140,9 @@ public class Breakable extends TestbedTest {
     body2.setLinearVelocity(velocity2);
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
-   */
   @Override
   public void step(TestbedSettings settings) {
+    super.step(settings);
 
     if (m_break) {
       Break();
@@ -161,19 +152,14 @@ public class Breakable extends TestbedTest {
 
     // Cache velocities to improve movement on breakage.
     if (m_broke == false) {
-      m_velocity = m_body1.getLinearVelocity();
+      m_velocity.set(m_body1.getLinearVelocity());
       m_angularVelocity = m_body1.getAngularVelocity();
     }
 
-    super.step(settings);
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-   */
   @Override
   public String getTestName() {
     return "Breakable";
   }
-
 }
