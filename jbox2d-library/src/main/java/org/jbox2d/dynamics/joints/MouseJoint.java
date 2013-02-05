@@ -145,7 +145,6 @@ public class MouseJoint extends Joint {
 
   @Override
   public void initVelocityConstraints(final SolverData data) {
-    m_indexA = m_bodyA.m_islandIndex;
     m_indexB = m_bodyB.m_islandIndex;
     m_localCenterB.set(m_bodyB.m_sweep.localCenter);
     m_invMassB = m_bodyB.m_invMass;
@@ -213,7 +212,7 @@ public class MouseJoint extends Joint {
       m_impulse.setZero();
     }
 
-    data.velocities[m_indexB].v.set(vB);
+//    data.velocities[m_indexB].v.set(vB);
     data.velocities[m_indexB].w = wB;
 
     pool.pushVec2(1);
@@ -252,11 +251,11 @@ public class MouseJoint extends Joint {
     }
     impulse.set(m_impulse).subLocal(oldImpulse);
 
-    vB.x += m_invMassB * m_impulse.x;
-    vB.y += m_invMassB * m_impulse.y;
+    vB.x += m_invMassB * impulse.x;
+    vB.y += m_invMassB * impulse.y;
     wB += m_invIB * Vec2.cross(m_rB, impulse);
 
-    data.velocities[m_indexB].v.set(vB);
+//    data.velocities[m_indexB].v.set(vB);
     data.velocities[m_indexB].w = wB;
     
     pool.pushVec2(3);
