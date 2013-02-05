@@ -264,7 +264,7 @@ public class Collision {
 		
 		// Find the min separating edge.
 		int normalIndex = 0;
-		float separation = Float.MIN_VALUE;
+		float separation = -Float.MAX_VALUE;
 		final float radius = polygon.m_radius + circle.m_radius;
 		final int vertexCount = polygon.m_vertexCount;
 		
@@ -535,7 +535,7 @@ public class Collision {
 		// Find edge normal on poly1 that has the largest projection onto d.
 		int edge = 0;
 		float dot;
-		float maxDot = Float.MIN_VALUE;
+		float maxDot = -Float.MAX_VALUE;
 		for (int i = 0; i < count1; i++) {
 		  final Vec2 normal = normals1[i];
 			dot = normal.x * dLocal1x + normal.y * dLocal1y;
