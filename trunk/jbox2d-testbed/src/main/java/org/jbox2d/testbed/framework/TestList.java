@@ -49,11 +49,9 @@ import org.jbox2d.testbed.tests.DynamicTreeTest;
 import org.jbox2d.testbed.tests.EdgeShapes;
 import org.jbox2d.testbed.tests.Gears;
 import org.jbox2d.testbed.tests.LiquidTest;
-import org.jbox2d.testbed.tests.MJWTest;
 import org.jbox2d.testbed.tests.OneSidedTest;
 import org.jbox2d.testbed.tests.PistonTest;
 import org.jbox2d.testbed.tests.PolyShapes;
-import org.jbox2d.testbed.tests.PrismaticStrangenessTEst;
 import org.jbox2d.testbed.tests.PrismaticTest;
 import org.jbox2d.testbed.tests.Pulleys;
 import org.jbox2d.testbed.tests.PyramidTest;
@@ -81,10 +79,8 @@ public class TestList {
       model.addTest(new PrismaticTest());
       model.addTest(new RevoluteTest());
       model.addTest(new Car());
-      model.addTest(new Cantilever());
 
       model.addTest(new SphereStack());
-      model.addTest(new MJWTest());
       model.addTest(new DominoTest());
       model.addTest(new CompoundShapes());
       model.addTest(new BlobTest4());
@@ -99,14 +95,14 @@ public class TestList {
       model.addTest(new SphereStack());
       model.addTest(new PistonTest());
       model.addTest(new PyramidTest());
-      model.addTest(new DominoTower());
       model.addTest(new CircleStress());
+      model.addTest(new DominoTower());
       
       // more interactive..
       model.addCategory("Interactive");
       model.addTest(new VerticalStack());
-      model.addTest(new ShapeEditing());
       model.addTest(new Breakable());
+      model.addTest(new ShapeEditing());
       model.addTest(new OneSidedTest());
       model.addTest(new PolyShapes());
       model.addTest(new BodyTypes());

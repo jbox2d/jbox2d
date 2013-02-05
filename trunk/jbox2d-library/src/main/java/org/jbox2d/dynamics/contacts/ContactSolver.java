@@ -50,8 +50,6 @@ public class ContactSolver {
    * needed.
    */
   public static final int INITIAL_NUM_CONSTRAINTS = 256;
-  
-  
 
   /**
    * Ensure a reasonable condition number. for the block solver
@@ -430,12 +428,12 @@ public class ContactSolver {
         // Relative velocity at contact
         // Vec2 dv = vB + Cross(wB, vcp.rB) - vA - Cross(wA, vcp.rA);
 
-//         Vec2.crossToOut(wA, vcp.rA, temp1);
-//         Vec2.crossToOut(wB, vcp.rB, dv);
-//         dv.addLocal(vB).subLocal(vA).subLocal(temp1);
+         Vec2.crossToOut(wA, vcp.rA, temp1);
+         Vec2.crossToOut(wB, vcp.rB, dv);
+         dv.addLocal(vB).subLocal(vA).subLocal(temp1);
 //
-        dv.x = -wB * vcp.rB.y + vB.x - vA.x + wA * a1.y;
-        dv.y = wB * vcp.rB.x + vB.y - vA.y - wA * a1.x;
+//        dv.x = -wB * vcp.rB.y + vB.x - vA.x + wA * a1.y;
+//        dv.y = wB * vcp.rB.x + vB.y - vA.y - wA * a1.x;
 
         // Compute normal impulse
         final float vn = dv.x * normal.x + dv.y * normal.y;

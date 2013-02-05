@@ -86,15 +86,6 @@ public class CircleStress extends TestbedTest {
       return;
     }
 
-    {
-      BodyDef bd = new BodyDef();
-      Body ground = getWorld().createBody(bd);
-
-      EdgeShape shape = new EdgeShape();
-      shape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
-      ground.createFixture(shape, 0.0f);
-    }
-
     Body leftWall = null;
     Body rightWall = null;
     {

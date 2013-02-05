@@ -686,10 +686,14 @@ public abstract class TestbedTest
           model.getDebugDraw().drawPoint(point.position, 5f, color2);
         }
 
+        model.getDebugDraw().drawSegment(point.fixtureA.getBody().getWorldCenter(), point.position, color3);
+        model.getDebugDraw().drawSegment(point.fixtureB.getBody().getWorldCenter(), point.position, color3);
+
         if (settings.getSetting(TestbedSettings.DrawNormals).enabled) {
           p1.set(point.position);
           p2.set(point.normal).mulLocal(axisScale).addLocal(p1);
           model.getDebugDraw().drawSegment(p1, p2, color3);
+          
         }
       }
     }
