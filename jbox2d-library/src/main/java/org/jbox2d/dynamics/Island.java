@@ -215,7 +215,6 @@ public class Island {
       }
     }
 
-
     // dynamic array
     if (m_positions == null || m_bodyCapacity > m_positions.length) {
       final Position[] old = m_positions == null ? new Position[0] : m_positions;
@@ -234,7 +233,6 @@ public class Island {
   }
 
   private final ContactSolver contactSolver = new ContactSolver();
-  private final Vec2 translation = new Vec2();
   private final Timer timer = new Timer();
   private final SolverData solverData = new SolverData();
   private final ContactSolverDef solverDef = new ContactSolverDef();
@@ -271,14 +269,17 @@ public class Island {
         // v2 = exp(-c * dt) * v1
         // Taylor expansion:
         // v2 = (1.0f - c * dt) * v1
-        v.mulLocal(MathUtils.clamp(1.0f - h * b.m_linearDamping, 0.0f, 1.0f));
+        float a1 = MathUtils.clamp(1.0f - h * b.m_linearDamping, 0.0f, 1.0f);
+        v.x *= a1;
+        v.y *= a1;
         w *= MathUtils.clamp(1.0f - h * b.m_angularDamping, 0.0f, 1.0f);
       }
-//      assert (v.x == 0);
 
-      m_positions[i].c.set(c);
+      m_positions[i].c.x = c.x;
+      m_positions[i].c.y = c.y;
       m_positions[i].a = a;
-      m_velocities[i].v.set(v);
+      m_velocities[i].v.x = v.x;
+      m_velocities[i].v.y = v.y;
       m_velocities[i].w = w;
     }
 
@@ -334,11 +335,12 @@ public class Island {
       float w = m_velocities[i].w;
 
       // Check for large velocities
-      translation.x = v.x * h;
-      translation.y = v.y * h;
+      float translationx = v.x * h;
+      float translationy = v.y * h;
 
-      if (Vec2.dot(translation, translation) > Settings.maxTranslationSquared) {
-        float ratio = Settings.maxTranslation / translation.length();
+      if (translationx * translationx + translationy * translationy > Settings.maxTranslationSquared) {
+        float ratio = Settings.maxTranslation
+            / MathUtils.sqrt(translationx * translationx + translationy * translationy);
         v.x *= ratio;
         v.y *= ratio;
       }
@@ -380,9 +382,11 @@ public class Island {
     // Copy state buffers back to the bodies
     for (int i = 0; i < m_bodyCount; ++i) {
       Body body = m_bodies[i];
-      body.m_sweep.c.set(m_positions[i].c);
+      body.m_sweep.c.x = m_positions[i].c.x;
+      body.m_sweep.c.y = m_positions[i].c.y;
       body.m_sweep.a = m_positions[i].a;
-      body.m_linearVelocity.set(m_velocities[i].v);
+      body.m_linearVelocity.x = m_velocities[i].v.x;
+      body.m_linearVelocity.y = m_velocities[i].v.y;
       body.m_angularVelocity = m_velocities[i].w;
       body.synchronizeTransform();
     }
@@ -432,11 +436,12 @@ public class Island {
 
     // Initialize the body state.
     for (int i = 0; i < m_bodyCount; ++i) {
-      Body b = m_bodies[i];
-      m_positions[i].c.set(b.m_sweep.c);
-      m_positions[i].a = b.m_sweep.a;
-      m_velocities[i].v.set(b.m_linearVelocity);
-      m_velocities[i].w = b.m_angularVelocity;
+      m_positions[i].c.x = m_bodies[i].m_sweep.c.x;
+      m_positions[i].c.y = m_bodies[i].m_sweep.c.y;
+      m_positions[i].a = m_bodies[i].m_sweep.a;
+      m_velocities[i].v.x = m_bodies[i].m_linearVelocity.x;
+      m_velocities[i].v.y = m_bodies[i].m_linearVelocity.y;
+      m_velocities[i].w = m_bodies[i].m_angularVelocity;
     }
 
     toiSolverDef.contacts = m_contacts;
@@ -453,7 +458,6 @@ public class Island {
         break;
       }
     }
-
     // #if 0
     // // Is the new position really safe?
     // for (int i = 0; i < m_contactCount; ++i)
@@ -488,7 +492,8 @@ public class Island {
     // #endif
 
     // Leap of faith to new safe state.
-    m_bodies[toiIndexA].m_sweep.c0.set(m_positions[toiIndexA].c);
+    m_bodies[toiIndexA].m_sweep.c0.x = m_positions[toiIndexA].c.x;
+    m_bodies[toiIndexA].m_sweep.c0.y = m_positions[toiIndexA].c.y;
     m_bodies[toiIndexA].m_sweep.a0 = m_positions[toiIndexA].a;
     m_bodies[toiIndexB].m_sweep.c0.set(m_positions[toiIndexB].c);
     m_bodies[toiIndexB].m_sweep.a0 = m_positions[toiIndexB].a;
@@ -515,9 +520,11 @@ public class Island {
       float w = m_velocities[i].w;
 
       // Check for large velocities
-      translation.set(v).mulLocal(h);
-      if (Vec2.dot(translation, translation) > Settings.maxTranslationSquared) {
-        float ratio = Settings.maxTranslation / translation.length();
+      float translationx = v.x * h;
+      float translationy = v.y * h;
+      if (translationx * translationx + translationy * translationy > Settings.maxTranslationSquared) {
+        float ratio = Settings.maxTranslation
+            / MathUtils.sqrt(translationx * translationx + translationy * translationy);
         v.mulLocal(ratio);
       }
 
@@ -532,16 +539,20 @@ public class Island {
       c.y += v.y * h;
       a += h * w;
 
-      m_positions[i].c.set(c);
+      m_positions[i].c.x = c.x;
+      m_positions[i].c.y = c.y;
       m_positions[i].a = a;
-      m_velocities[i].v.set(v);
+      m_velocities[i].v.x = v.x;
+      m_velocities[i].v.y = v.y;
       m_velocities[i].w = w;
 
       // Sync bodies
       Body body = m_bodies[i];
-      body.m_sweep.c.set(c);
+      body.m_sweep.c.x = c.x;
+      body.m_sweep.c.y = c.y;
       body.m_sweep.a = a;
-      body.m_linearVelocity.set(v);
+      body.m_linearVelocity.x = v.x;
+      body.m_linearVelocity.y = v.y;
       body.m_angularVelocity = w;
       body.synchronizeTransform();
     }

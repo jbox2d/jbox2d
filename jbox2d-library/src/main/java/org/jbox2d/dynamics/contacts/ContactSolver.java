@@ -79,10 +79,9 @@ public class ContactSolver {
   private final Vec2 temp2 = new Vec2();
 
   public final void init(ContactSolverDef def) {
-    //System.out.println("Initializing contact solver");
+    // System.out.println("Initializing contact solver");
     m_step = def.step;
     m_count = def.count;
-
 
     if (m_positionConstraints.length < m_count) {
       ContactPositionConstraint[] old = m_positionConstraints;
@@ -107,7 +106,7 @@ public class ContactSolver {
     m_contacts = def.contacts;
 
     for (int i = 0; i < m_count; ++i) {
-      //System.out.println("contacts: " + m_count);
+      // System.out.println("contacts: " + m_count);
       final Contact contact = m_contacts[i];
 
       final Fixture fixtureA = contact.m_fixtureA;
@@ -154,14 +153,14 @@ public class ContactSolver {
       pc.radiusB = radiusB;
       pc.type = manifold.type;
 
-      //System.out.println("contact point count: " + pointCount);
+      // System.out.println("contact point count: " + pointCount);
       for (int j = 0; j < pointCount; j++) {
         ManifoldPoint cp = manifold.points[j];
         VelocityConstraintPoint vcp = vc.points[j];
 
         if (m_step.warmStarting) {
-//          assert(cp.normalImpulse == 0);
-          //System.out.println("contact normal impulse: " + cp.normalImpulse);
+          // assert(cp.normalImpulse == 0);
+          // System.out.println("contact normal impulse: " + cp.normalImpulse);
           vcp.normalImpulse = m_step.dtRatio * cp.normalImpulse;
           vcp.tangentImpulse = m_step.dtRatio * cp.tangentImpulse;
         } else {
@@ -174,8 +173,8 @@ public class ContactSolver {
         vcp.normalMass = 0;
         vcp.tangentMass = 0;
         vcp.velocityBias = 0;
-
-        pc.localPoints[j].set(cp.localPoint);
+        pc.localPoints[j].x = cp.localPoint.x;
+        pc.localPoints[j].y = cp.localPoint.y;
       }
     }
   }
@@ -197,35 +196,29 @@ public class ContactSolver {
       float iB = vc.invIB;
       int pointCount = vc.pointCount;
 
-
       Vec2 vA = m_velocities[indexA].v;
       float wA = m_velocities[indexA].w;
       Vec2 vB = m_velocities[indexB].v;
       float wB = m_velocities[indexB].w;
 
       Vec2 normal = vc.normal;
-      Vec2.crossToOutUnsafe(normal, 1.0f, tangent);
+      float tangentx = 1.0f * normal.y;
+      float tangenty = -1.0f * normal.x;
 
       for (int j = 0; j < pointCount; ++j) {
         VelocityConstraintPoint vcp = vc.points[j];
-        //System.out.println("vcp normal impulse is " + vcp.normalImpulse);
-        temp.set(normal).mulLocal(vcp.normalImpulse);
-        P.set(tangent).mulLocal(vcp.tangentImpulse).addLocal(temp);
-       
-        wA -= iA * Vec2.cross(vcp.rA, P);
-        vA.subLocal(temp.set(P).mulLocal(mA));
-//        assert(vA.x == 0);
-//        assert(wA == 0);
-        wB += iB * Vec2.cross(vcp.rB, P);
-        vB.addLocal(temp.set(P).mulLocal(mB));
-//        assert(vB.x == 0);
-//        assert(wB == 0);
+        float Px = tangentx * vcp.tangentImpulse + normal.x * vcp.normalImpulse;
+        float Py = tangenty * vcp.tangentImpulse + normal.y * vcp.normalImpulse;
+
+        wA -= iA * (vcp.rA.x * Py - vcp.rA.y * Px);
+        vA.x -= Px * mA;
+        vA.y -= Py * mA;
+        wB += iB * (vcp.rB.x * Py - vcp.rB.y * Px);
+        vB.x += Px * mB;
+        vB.y += Py * mB;
       }
       m_velocities[indexA].w = wA;
       m_velocities[indexB].w = wB;
-
-      //System.out.println("Ending velocity for " + indexA + " is " + vA.x + "," + vA.y + " - " + wA);
-      //System.out.println("Ending velocity for " + indexB + " is " + vB.x + "," + vB.y + " - " + wB);
     }
   }
 
@@ -236,7 +229,6 @@ public class ContactSolver {
 
   public final void initializeVelocityConstraints() {
 
-    //System.out.println("Initializing velocity constraints for " + m_count + " contacts");
     // Warm start.
     for (int i = 0; i < m_count; ++i) {
       ContactVelocityConstraint vc = m_velocityConstraints[i];
@@ -270,10 +262,10 @@ public class ContactSolver {
 
       xfA.q.set(aA);
       xfB.q.set(aB);
-      Rot.mulToOutUnsafe(xfA.q, localCenterA, temp);
-      xfA.p.set(cA).subLocal(temp);
-      Rot.mulToOutUnsafe(xfB.q, localCenterB, temp);
-      xfB.p.set(cB).subLocal(temp);
+      xfA.p.x = cA.x - (xfA.q.c * localCenterA.x - xfA.q.s * localCenterA.y);
+      xfA.p.y = cA.y - (xfA.q.s * localCenterA.x + xfA.q.c * localCenterA.y);
+      xfB.p.x = cB.x - (xfB.q.c * localCenterB.x - xfB.q.s * localCenterB.y);
+      xfB.p.y = cB.y - (xfB.q.s * localCenterB.x + xfB.q.c * localCenterB.y);
 
       worldManifold.initialize(manifold, xfA, radiusA, xfB, radiusB);
 
@@ -286,17 +278,18 @@ public class ContactSolver {
         vcp.rA.set(worldManifold.points[j]).subLocal(cA);
         vcp.rB.set(worldManifold.points[j]).subLocal(cB);
 
-        float rnA = Vec2.cross(vcp.rA, vc.normal);
-        float rnB = Vec2.cross(vcp.rB, vc.normal);
+        float rnA = vcp.rA.x * vc.normal.y - vcp.rA.y * vc.normal.x;
+        float rnB = vcp.rB.x * vc.normal.y - vcp.rB.y * vc.normal.x;
 
         float kNormal = mA + mB + iA * rnA * rnA + iB * rnB * rnB;
 
         vcp.normalMass = kNormal > 0.0f ? 1.0f / kNormal : 0.0f;
 
-        Vec2.crossToOutUnsafe(vc.normal, 1.0f, tangent);
+        float tangentx = 1.0f * vc.normal.y;
+        float tangenty = -1.0f * vc.normal.x;
 
-        float rtA = Vec2.cross(vcp.rA, tangent);
-        float rtB = Vec2.cross(vcp.rB, tangent);
+        float rtA = vcp.rA.x * tangenty - vcp.rA.y * tangentx;
+        float rtB = vcp.rB.x * tangenty - vcp.rB.y * tangentx;
 
         float kTangent = mA + mB + iA * rtA * rtA + iB * rtB * rtB;
 
@@ -304,10 +297,9 @@ public class ContactSolver {
 
         // Setup a velocity bias for restitution.
         vcp.velocityBias = 0.0f;
-        Vec2.crossToOutUnsafe(wB, vcp.rB, temp1);
-        Vec2.crossToOutUnsafe(wA, vcp.rA, temp2);
-        temp.set(vB).addLocal(temp1).subLocal(vA).subLocal(temp2);
-        float vRel = Vec2.dot(vc.normal, temp);
+        float tempx = vB.x + -wB * vcp.rB.y - vA.x - (-wA * vcp.rA.y);
+        float tempy = vB.y + wB * vcp.rB.x - vA.y - (wA * vcp.rA.x);
+        float vRel = vc.normal.x * tempx + vc.normal.y * tempy;
         if (vRel < -Settings.velocityThreshold) {
           vcp.velocityBias = -vc.restitution * vRel;
         }
@@ -341,7 +333,6 @@ public class ContactSolver {
   }
 
   // djm pooling from above
-  private final Vec2 dv = new Vec2();
   private final Vec2 a = new Vec2();
   private final Vec2 b = new Vec2();
   private final Vec2 dv1 = new Vec2();
@@ -368,11 +359,8 @@ public class ContactSolver {
       float wA = m_velocities[indexA].w;
       Vec2 vB = m_velocities[indexB].v;
       float wB = m_velocities[indexB].w;
-//      assert(wA == 0);
-//      assert(wB == 0);
 
       Vec2 normal = vc.normal;
-//      Vec2.crossToOutUnsafe(normal, 1f, tangent);
       tangent.x = 1.0f * vc.normal.y;
       tangent.y = -1.0f * vc.normal.x;
       final float friction = vc.friction;
@@ -382,21 +370,18 @@ public class ContactSolver {
       // Solve tangent constraints
       for (int j = 0; j < pointCount; ++j) {
         final VelocityConstraintPoint vcp = vc.points[j];
-//        Vec2.crossToOutUnsafe(wA, vcp.rA, temp);
-//        Vec2.crossToOutUnsafe(wB, vcp.rB, dv);
-//        dv.addLocal(vB).subLocal(vA).subLocal(temp);
         final Vec2 a = vcp.rA;
-        dv.x = -wB * vcp.rB.y + vB.x - vA.x + wA * a.y;
-        dv.y = wB * vcp.rB.x + vB.y - vA.y - wA * a.x;
+        float dvx = -wB * vcp.rB.y + vB.x - vA.x + wA * a.y;
+        float dvy = wB * vcp.rB.x + vB.y - vA.y - wA * a.x;
 
         // Compute tangent force
-        final float vt = dv.x * tangent.x + dv.y * tangent.y - vc.tangentSpeed;
+        final float vt = dvx * tangent.x + dvy * tangent.y - vc.tangentSpeed;
         float lambda = vcp.tangentMass * (-vt);
 
         // Clamp the accumulated force
         final float maxFriction = friction * vcp.normalImpulse;
-        final float newImpulse =
-            MathUtils.clamp(vcp.tangentImpulse + lambda, -maxFriction, maxFriction);
+        final float newImpulse = MathUtils.clamp(vcp.tangentImpulse + lambda, -maxFriction,
+            maxFriction);
         lambda = newImpulse - vcp.tangentImpulse;
         vcp.tangentImpulse = newImpulse;
 
@@ -415,35 +400,26 @@ public class ContactSolver {
         vB.x += Px * mB;
         vB.y += Py * mB;
         wB += iB * (vcp.rB.x * Py - vcp.rB.y * Px);
-
-        //System.out.println("tangent solve velocity (point "+j+") for " + indexA + " is " + vA.x + "," + vA.y + " rot " + wA);
-        //System.out.println("tangent solve velocity (point "+j+") for " + indexB + " is " + vB.x + "," + vB.y + " rot " + wB);
       }
 
       // Solve normal constraints
       if (vc.pointCount == 1) {
         final VelocityConstraintPoint vcp = vc.points[0];
-        Vec2 a1 = vcp.rA;
 
         // Relative velocity at contact
         // Vec2 dv = vB + Cross(wB, vcp.rB) - vA - Cross(wA, vcp.rA);
 
-         Vec2.crossToOut(wA, vcp.rA, temp1);
-         Vec2.crossToOut(wB, vcp.rB, dv);
-         dv.addLocal(vB).subLocal(vA).subLocal(temp1);
-//
-//        dv.x = -wB * vcp.rB.y + vB.x - vA.x + wA * a1.y;
-//        dv.y = wB * vcp.rB.x + vB.y - vA.y - wA * a1.x;
+        float dvx = -wB * vcp.rB.y + vB.x - vA.x + wA * vcp.rA.y;
+        float dvy = wB * vcp.rB.x + vB.y - vA.y - wA * vcp.rA.x;
 
         // Compute normal impulse
-        final float vn = dv.x * normal.x + dv.y * normal.y;
+        final float vn = dvx * normal.x + dvy * normal.y;
         float lambda = -vcp.normalMass * (vn - vcp.velocityBias);
 
         // Clamp the accumulated impulse
         float a = vcp.normalImpulse + lambda;
         final float newImpulse = (a > 0.0f ? a : 0.0f);
         lambda = newImpulse - vcp.normalImpulse;
-//        assert(newImpulse == 0);
         vcp.normalImpulse = newImpulse;
 
         // Apply contact impulse
@@ -454,13 +430,11 @@ public class ContactSolver {
         vA.x -= Px * mA;
         vA.y -= Py * mA;
         wA -= iA * (vcp.rA.x * Py - vcp.rA.y * Px);
-//        assert(vA.x == 0);
 
         // vB += invMassB * P;
         vB.x += Px * mB;
         vB.y += Py * mB;
         wB += iB * (vcp.rB.x * Py - vcp.rB.y * Px);
-//        assert(vB.x == 0);
       } else {
         // Block solver developed in collaboration with Dirk Gregorius (back in 01/07 on
         // Box2D_Lite).
@@ -522,13 +496,13 @@ public class ContactSolver {
 
         b.x = vn1 - cp1.velocityBias;
         b.y = vn2 - cp2.velocityBias;
-        //System.out.println("b is " + b.x + "," + b.y);
+        // System.out.println("b is " + b.x + "," + b.y);
 
         // Compute b'
         Mat22 R = vc.K;
         b.x -= R.ex.x * a.x + R.ey.x * a.y;
         b.y -= R.ex.y * a.x + R.ey.y * a.y;
-        //System.out.println("b' is " + b.x + "," + b.y);
+        // System.out.println("b' is " + b.x + "," + b.y);
 
         // final float k_errorTol = 1e-3f;
         // B2_NOT_USED(k_errorTol);
@@ -544,10 +518,11 @@ public class ContactSolver {
           //
           // Vec2 x = - Mul(c.normalMass, b);
           Mat22.mulToOutUnsafe(vc.normalMass, b, x);
-          x.mulLocal(-1);
+          x.x *= -1;
+          x.y *= -1;
 
           if (x.x >= 0.0f && x.y >= 0.0f) {
-            //System.out.println("case 1");
+            // System.out.println("case 1");
             // Get the incremental impulse
             // Vec2 d = x - a;
             d.set(x).subLocal(a);
@@ -558,51 +533,42 @@ public class ContactSolver {
             P1.set(normal).mulLocal(d.x);
             P2.set(normal).mulLocal(d.y);
 
-            /*
-             * vA -= invMassA * (P1 + P2); wA -= invIA * (Cross(cp1.rA, P1) + Cross(cp2.rA, P2));
+            /* vA -= invMassA * (P1 + P2); wA -= invIA * (Cross(cp1.rA, P1) + Cross(cp2.rA, P2));
              * 
-             * vB += invMassB * (P1 + P2); wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2));
-             */
+             * vB += invMassB * (P1 + P2); wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2)); */
 
             temp1.set(P1).addLocal(P2);
             temp2.set(temp1).mulLocal(mA);
             vA.subLocal(temp2);
             temp2.set(temp1).mulLocal(mB);
             vB.addLocal(temp2);
-//            assert(vA.x == 0);
-//            assert(vB.x == 0);
 
             wA -= iA * (Vec2.cross(cp1.rA, P1) + Vec2.cross(cp2.rA, P2));
             wB += iB * (Vec2.cross(cp1.rB, P1) + Vec2.cross(cp2.rB, P2));
 
             // Accumulate
-//            if(x.x != 0 || x.y != 0) {
-//              assert(x.x != 0 || x.y != 0);              
-//            }
             cp1.normalImpulse = x.x;
             cp2.normalImpulse = x.y;
 
-            /*
-             * #if B2_DEBUG_SOLVER == 1 // Postconditions dv1 = vB + Cross(wB, cp1.rB) - vA -
+            /* #if B2_DEBUG_SOLVER == 1 // Postconditions dv1 = vB + Cross(wB, cp1.rB) - vA -
              * Cross(wA, cp1.rA); dv2 = vB + Cross(wB, cp2.rB) - vA - Cross(wA, cp2.rA);
              * 
              * // Compute normal velocity vn1 = Dot(dv1, normal); vn2 = Dot(dv2, normal);
              * 
              * assert(Abs(vn1 - cp1.velocityBias) < k_errorTol); assert(Abs(vn2 - cp2.velocityBias)
-             * < k_errorTol); #endif
-             */
+             * < k_errorTol); #endif */
             if (DEBUG_SOLVER) {
               // Postconditions
-              Vec2 dv1 =
-                  vB.add(Vec2.cross(wB, cp1.rB).subLocal(vA).subLocal(Vec2.cross(wA, cp1.rA)));
-              Vec2 dv2 =
-                  vB.add(Vec2.cross(wB, cp2.rB).subLocal(vA).subLocal(Vec2.cross(wA, cp2.rA)));
+              Vec2 dv1 = vB.add(Vec2.cross(wB, cp1.rB).subLocal(vA)
+                  .subLocal(Vec2.cross(wA, cp1.rA)));
+              Vec2 dv2 = vB.add(Vec2.cross(wB, cp2.rB).subLocal(vA)
+                  .subLocal(Vec2.cross(wA, cp2.rA)));
               // Compute normal velocity
               vn1 = Vec2.dot(dv1, normal);
               vn2 = Vec2.dot(dv2, normal);
-              
-              assert(MathUtils.abs(vn1 - cp1.velocityBias) < k_errorTol);
-              assert(MathUtils.abs(vn2 - cp2.velocityBias) < k_errorTol);
+
+              assert (MathUtils.abs(vn1 - cp1.velocityBias) < k_errorTol);
+              assert (MathUtils.abs(vn2 - cp2.velocityBias) < k_errorTol);
             }
             break;
           }
@@ -619,7 +585,7 @@ public class ContactSolver {
           vn2 = vc.K.ex.y * x.x + b.y;
 
           if (x.x >= 0.0f && vn2 >= 0.0f) {
-            //System.out.println("case 2");
+            // System.out.println("case 2");
             // Get the incremental impulse
             d.set(x).subLocal(a);
 
@@ -629,49 +595,41 @@ public class ContactSolver {
             P1.set(normal).mulLocal(d.x);
             P2.set(normal).mulLocal(d.y);
 
-            /*
-             * Vec2 P1 = d.x * normal; Vec2 P2 = d.y * normal; vA -= invMassA * (P1 + P2); wA -=
+            /* Vec2 P1 = d.x * normal; Vec2 P2 = d.y * normal; vA -= invMassA * (P1 + P2); wA -=
              * invIA * (Cross(cp1.rA, P1) + Cross(cp2.rA, P2));
              * 
-             * vB += invMassB * (P1 + P2); wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2));
-             */
+             * vB += invMassB * (P1 + P2); wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2)); */
 
             temp1.set(P1).addLocal(P2);
             temp2.set(temp1).mulLocal(mA);
             vA.subLocal(temp2);
             temp2.set(temp1).mulLocal(mB);
             vB.addLocal(temp2);
-//            assert(vA.x == 0);
-//            assert(vB.x == 0);
 
             wA -= iA * (Vec2.cross(cp1.rA, P1) + Vec2.cross(cp2.rA, P2));
             wB += iB * (Vec2.cross(cp1.rB, P1) + Vec2.cross(cp2.rB, P2));
 
-
             // Accumulate
-//            assert(x.x == 0 && x.y == 0);
             cp1.normalImpulse = x.x;
             cp2.normalImpulse = x.y;
 
-            /*
-             * #if B2_DEBUG_SOLVER == 1 // Postconditions dv1 = vB + Cross(wB, cp1.rB) - vA -
+            /* #if B2_DEBUG_SOLVER == 1 // Postconditions dv1 = vB + Cross(wB, cp1.rB) - vA -
              * Cross(wA, cp1.rA);
              * 
              * // Compute normal velocity vn1 = Dot(dv1, normal);
              * 
-             * assert(Abs(vn1 - cp1.velocityBias) < k_errorTol); #endif
-             */
-            if(DEBUG_SOLVER) {
+             * assert(Abs(vn1 - cp1.velocityBias) < k_errorTol); #endif */
+            if (DEBUG_SOLVER) {
               // Postconditions
-              Vec2 dv1 = vB.add(Vec2.cross(wB, cp1.rB).subLocal(vA).subLocal(Vec2.cross(wA, cp1.rA)));
+              Vec2 dv1 = vB.add(Vec2.cross(wB, cp1.rB).subLocal(vA)
+                  .subLocal(Vec2.cross(wA, cp1.rA)));
               // Compute normal velocity
               vn1 = Vec2.dot(dv1, normal);
-              
-              assert(MathUtils.abs(vn1 - cp1.velocityBias) < k_errorTol);
+
+              assert (MathUtils.abs(vn1 - cp1.velocityBias) < k_errorTol);
             }
             break;
           }
-
 
           //
           // Case 3: wB = 0 and x1 = 0
@@ -685,17 +643,15 @@ public class ContactSolver {
           vn2 = 0.0f;
 
           if (x.y >= 0.0f && vn1 >= 0.0f) {
-            //System.out.println("case 3");
+            // System.out.println("case 3");
             // Resubstitute for the incremental impulse
             d.set(x).subLocal(a);
 
             // Apply incremental impulse
-            /*
-             * Vec2 P1 = d.x * normal; Vec2 P2 = d.y * normal; vA -= invMassA * (P1 + P2); wA -=
+            /* Vec2 P1 = d.x * normal; Vec2 P2 = d.y * normal; vA -= invMassA * (P1 + P2); wA -=
              * invIA * (Cross(cp1.rA, P1) + Cross(cp2.rA, P2));
              * 
-             * vB += invMassB * (P1 + P2); wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2));
-             */
+             * vB += invMassB * (P1 + P2); wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2)); */
 
             P1.set(normal).mulLocal(d.x);
             P2.set(normal).mulLocal(d.y);
@@ -705,33 +661,28 @@ public class ContactSolver {
             vA.subLocal(temp2);
             temp2.set(temp1).mulLocal(mB);
             vB.addLocal(temp2);
-//            assert(vA.x == 0);
-//            assert(vB.x == 0);
 
             wA -= iA * (Vec2.cross(cp1.rA, P1) + Vec2.cross(cp2.rA, P2));
             wB += iB * (Vec2.cross(cp1.rB, P1) + Vec2.cross(cp2.rB, P2));
 
             // Accumulate
-//            assert(x.x == 0 && x.y == 0);
             cp1.normalImpulse = x.x;
             cp2.normalImpulse = x.y;
 
-            /*
-             * #if B2_DEBUG_SOLVER == 1 // Postconditions dv2 = vB + Cross(wB, cp2.rB) - vA -
+            /* #if B2_DEBUG_SOLVER == 1 // Postconditions dv2 = vB + Cross(wB, cp2.rB) - vA -
              * Cross(wA, cp2.rA);
              * 
              * // Compute normal velocity vn2 = Dot(dv2, normal);
              * 
-             * assert(Abs(vn2 - cp2.velocityBias) < k_errorTol); #endif
-             */
+             * assert(Abs(vn2 - cp2.velocityBias) < k_errorTol); #endif */
             if (DEBUG_SOLVER) {
               // Postconditions
-              Vec2 dv2 =
-                  vB.add(Vec2.cross(wB, cp2.rB).subLocal(vA).subLocal(Vec2.cross(wA, cp2.rA)));
+              Vec2 dv2 = vB.add(Vec2.cross(wB, cp2.rB).subLocal(vA)
+                  .subLocal(Vec2.cross(wA, cp2.rA)));
               // Compute normal velocity
               vn2 = Vec2.dot(dv2, normal);
-              
-              assert(MathUtils.abs(vn2 - cp2.velocityBias) < k_errorTol);
+
+              assert (MathUtils.abs(vn2 - cp2.velocityBias) < k_errorTol);
             }
             break;
           }
@@ -747,17 +698,15 @@ public class ContactSolver {
           vn2 = b.y;
 
           if (vn1 >= 0.0f && vn2 >= 0.0f) {
-            //System.out.println("case 4");
+            // System.out.println("case 4");
             // Resubstitute for the incremental impulse
             d.set(x).subLocal(a);
 
             // Apply incremental impulse
-            /*
-             * Vec2 P1 = d.x * normal; Vec2 P2 = d.y * normal; vA -= invMassA * (P1 + P2); wA -=
+            /* Vec2 P1 = d.x * normal; Vec2 P2 = d.y * normal; vA -= invMassA * (P1 + P2); wA -=
              * invIA * (Cross(cp1.rA, P1) + Cross(cp2.rA, P2));
              * 
-             * vB += invMassB * (P1 + P2); wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2));
-             */
+             * vB += invMassB * (P1 + P2); wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2)); */
 
             P1.set(normal).mulLocal(d.x);
             P2.set(normal).mulLocal(d.y);
@@ -767,15 +716,11 @@ public class ContactSolver {
             vA.subLocal(temp2);
             temp2.set(temp1).mulLocal(mB);
             vB.addLocal(temp2);
-//            assert(vA.x == 0);
-//            assert(vB.x == 0);
 
             wA -= iA * (Vec2.cross(cp1.rA, P1) + Vec2.cross(cp2.rA, P2));
             wB += iB * (Vec2.cross(cp1.rB, P1) + Vec2.cross(cp2.rB, P2));
 
-
             // Accumulate
-//            assert(x.x == 0 && x.y == 0);
             cp1.normalImpulse = x.x;
             cp2.normalImpulse = x.y;
 
@@ -787,13 +732,10 @@ public class ContactSolver {
         }
       }
 
-      m_velocities[indexA].v.set(vA);
+      // m_velocities[indexA].v.set(vA);
       m_velocities[indexA].w = wA;
-      m_velocities[indexB].v.set(vB);
+      // m_velocities[indexB].v.set(vB);
       m_velocities[indexB].w = wB;
-
-      //System.out.println("Ending velocity for " + indexA + " is " + vA.x + "," + vA.y + " rot " + wA);
-      //System.out.println("Ending velocity for " + indexB + " is " + vB.x + "," + vB.y + " rot " + wB);
     }
   }
 
@@ -809,8 +751,7 @@ public class ContactSolver {
     }
   }
 
-  /*
-   * #if 0 // Sequential solver. bool ContactSolver::SolvePositionConstraints(float baumgarte) {
+  /* #if 0 // Sequential solver. bool ContactSolver::SolvePositionConstraints(float baumgarte) {
    * float minSeparation = 0.0f;
    * 
    * for (int i = 0; i < m_constraintCount; ++i) { ContactConstraint* c = m_constraints + i; Body*
@@ -846,8 +787,7 @@ public class ContactSolver {
    * bodyB.SynchronizeTransform(); } }
    * 
    * // We can't expect minSpeparation >= -_linearSlop because we don't // push the separation above
-   * -_linearSlop. return minSeparation >= -1.5f * _linearSlop; }
-   */
+   * -_linearSlop. return minSeparation >= -1.5f * _linearSlop; } */
 
   // djm pooling, and from above
   private final PositionSolverManifold psolver = new PositionSolverManifold();
@@ -878,8 +818,8 @@ public class ContactSolver {
       float aA = m_positions[indexA].a;
       Vec2 cB = m_positions[indexB].c;
       float aB = m_positions[indexB].a;
-      //System.out.println("cA: " + cA.x + "," + cA.y + " - rot " + aA);
-      //System.out.println("cB: " + cB.x + "," + cB.y + " - rot " + aB);
+      // System.out.println("cA: " + cA.x + "," + cA.y + " - rot " + aA);
+      // System.out.println("cB: " + cB.x + "," + cB.y + " - rot " + aB);
 
       // Solve normal constraints
       for (int j = 0; j < pointCount; ++j) {
@@ -904,9 +844,8 @@ public class ContactSolver {
         minSeparation = MathUtils.min(minSeparation, separation);
 
         // Prevent large corrections and allow slop.
-        final float C =
-            MathUtils.clamp(Settings.baumgarte * (separation + Settings.linearSlop),
-                -Settings.maxLinearCorrection, 0.0f);
+        final float C = MathUtils.clamp(Settings.baumgarte * (separation + Settings.linearSlop),
+            -Settings.maxLinearCorrection, 0.0f);
 
         // Compute the effective mass.
         final float rnA = Vec2.cross(rA, normal);
@@ -921,7 +860,6 @@ public class ContactSolver {
         cA.subLocal(temp.set(P).mulLocal(mA));
         aA -= iA * Vec2.cross(rA, P);
 
-
         cB.addLocal(temp.set(P).mulLocal(mB));
         aB += iB * Vec2.cross(rB, P);
       }
@@ -931,8 +869,8 @@ public class ContactSolver {
 
       m_positions[indexB].c.set(cB);
       m_positions[indexB].a = aB;
-      //System.out.println("ending pos "+indexA+": " + cA.x + "," + cA.y + " - rot " + aA);
-      //System.out.println("ending pos "+indexB+": " + cB.x + "," + cB.y + " - rot " + aB);
+      // System.out.println("ending pos "+indexA+": " + cA.x + "," + cA.y + " - rot " + aA);
+      // System.out.println("ending pos "+indexB+": " + cB.x + "," + cB.y + " - rot " + aB);
     }
 
     // We can't expect minSpeparation >= -linearSlop because we don't
@@ -996,9 +934,8 @@ public class ContactSolver {
         minSeparation = MathUtils.min(minSeparation, separation);
 
         // Prevent large corrections and allow slop.
-        float C =
-            MathUtils.clamp(Settings.toiBaugarte * (separation + Settings.linearSlop),
-                -Settings.maxLinearCorrection, 0.0f);
+        float C = MathUtils.clamp(Settings.toiBaugarte * (separation + Settings.linearSlop),
+            -Settings.maxLinearCorrection, 0.0f);
 
         // Compute the effective mass.
         float rnA = Vec2.cross(rA, normal);
@@ -1037,8 +974,6 @@ public class ContactSolver {
     public Velocity[] velocities;
   }
 }
-
-
 
 class PositionSolverManifold {
 
