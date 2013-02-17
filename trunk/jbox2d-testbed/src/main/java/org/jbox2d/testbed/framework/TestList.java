@@ -75,12 +75,7 @@ public class TestList {
   public static void populateModel(TestbedModel model){
       
       model.addCategory("Featured");
-      model.addTest(new Gears());
-      model.addTest(new PrismaticTest());
-      model.addTest(new RevoluteTest());
       model.addTest(new Car());
-
-      model.addTest(new SphereStack());
       model.addTest(new DominoTest());
       model.addTest(new CompoundShapes());
       model.addTest(new BlobTest4());
