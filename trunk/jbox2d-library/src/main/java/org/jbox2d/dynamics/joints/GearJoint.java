@@ -370,21 +370,21 @@ public class GearJoint extends Joint {
     float impulse = -m_mass * Cdot;
     m_impulse += impulse;
 
-    vA.x += (m_mA * m_impulse) * m_JvAC.x;
-    vA.y += (m_mA * m_impulse) * m_JvAC.y;
-    wA += m_iA * m_impulse * m_JwA;
+    vA.x += (m_mA * impulse) * m_JvAC.x;
+    vA.y += (m_mA * impulse) * m_JvAC.y;
+    wA += m_iA * impulse * m_JwA;
 
-    vB.x += (m_mB * m_impulse) * m_JvBD.x;
-    vB.y += (m_mB * m_impulse) * m_JvBD.y;
-    wB += m_iB * m_impulse * m_JwB;
+    vB.x += (m_mB * impulse) * m_JvBD.x;
+    vB.y += (m_mB * impulse) * m_JvBD.y;
+    wB += m_iB * impulse * m_JwB;
 
-    vC.x -= (m_mC * m_impulse) * m_JvAC.x;
-    vC.y -= (m_mC * m_impulse) * m_JvAC.y;
-    wC -= m_iC * m_impulse * m_JwC;
+    vC.x -= (m_mC * impulse) * m_JvAC.x;
+    vC.y -= (m_mC * impulse) * m_JvAC.y;
+    wC -= m_iC * impulse * m_JwC;
 
-    vD.x -= (m_mD * m_impulse) * m_JvBD.x;
-    vD.y -= (m_mD * m_impulse) * m_JvBD.y;
-    wD -= m_iD * m_impulse * m_JwD;
+    vD.x -= (m_mD * impulse) * m_JvBD.x;
+    vD.y -= (m_mD * impulse) * m_JvBD.y;
+    wD -= m_iD * impulse * m_JwD;
 
 
     // data.velocities[m_indexA].v = vA;
