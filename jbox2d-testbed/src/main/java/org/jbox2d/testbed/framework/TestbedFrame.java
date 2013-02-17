@@ -47,13 +47,13 @@ public class TestbedFrame extends JFrame {
   private TestbedModel model;
   private TestbedController controller;
 
-  public TestbedFrame(final TestbedModel argModel, final TestbedPanel argPanel) {
+  public TestbedFrame(final TestbedModel argModel, final TestbedPanel argPanel, TestbedController.UpdateBehavior behavior) {
     super("JBox2D Testbed");
     setLayout(new BorderLayout());
 
     model = argModel;
     model.setDebugDraw(argPanel.getDebugDraw());
-    controller = new TestbedController(model, argPanel);
+    controller = new TestbedController(model, argPanel, behavior);
     side = new TestbedSidePanel(model, controller);
     
     add((Component) argPanel, "Center");

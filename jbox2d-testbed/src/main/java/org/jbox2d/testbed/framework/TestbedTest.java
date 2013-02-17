@@ -517,6 +517,7 @@ public abstract class TestbedTest
 
     if (title != null) {
       model.getDebugDraw().drawString(model.getPanelWidth() / 2, 15, title, Color3f.WHITE);
+      m_textLine += 15;
     }
 
     // process our input
@@ -579,7 +580,6 @@ public abstract class TestbedTest
     }
 
     int flags = 0;
-    model.getDebugDraw();
     flags += settings.getSetting(TestbedSettings.DrawShapes).enabled ? DebugDraw.e_shapeBit : 0;
     flags += settings.getSetting(TestbedSettings.DrawJoints).enabled ? DebugDraw.e_jointBit : 0;
     flags += settings.getSetting(TestbedSettings.DrawAABBs).enabled ? DebugDraw.e_aabbBit : 0;

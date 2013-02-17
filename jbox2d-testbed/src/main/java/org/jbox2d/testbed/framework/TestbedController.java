@@ -42,6 +42,10 @@ import org.slf4j.LoggerFactory;
 public class TestbedController implements Runnable {
   private static final Logger log = LoggerFactory.getLogger(TestbedController.class);
 
+  public static enum UpdateBehavior {
+    UPDATE_CALLED, UPDATE_IGNORED 
+  }
+  
   public static final int DEFAULT_FPS = 60;
 
   private TestbedTest currTest = null;
@@ -56,12 +60,15 @@ public class TestbedController implements Runnable {
 
   private final TestbedModel model;
   private final TestbedPanel panel;
+  
+  private UpdateBehavior updateBehavior;
 
-  public TestbedController(TestbedModel argModel, TestbedPanel argPanel) {
+  public TestbedController(TestbedModel argModel, TestbedPanel argPanel, UpdateBehavior behavior) {
     model = argModel;
     setFrameRate(DEFAULT_FPS);
     panel = argPanel;
     animator = new Thread(this, "Testbed");
+    updateBehavior = behavior;
     addListeners();
   }
   
@@ -154,6 +161,9 @@ public class TestbedController implements Runnable {
           posDif.set(model.getMouse());
           model.setMouse(pos);
           posDif.subLocal(pos);
+          if(!model.getDebugDraw().getViewportTranform().isYFlip()){
+            posDif.y *= -1;
+          }
           model.getDebugDraw().getViewportTranform().getScreenVectorToWorld(posDif, posDif);
           model.getDebugDraw().getViewportTranform().getCenter().addLocal(posDif);
           if (model.getCurrTest() != null) {
@@ -189,7 +199,7 @@ public class TestbedController implements Runnable {
   }
 
   protected void update() {
-    if (currTest != null) {
+    if (currTest != null && updateBehavior == UpdateBehavior.UPDATE_CALLED) {
       currTest.update();
     }
   }
@@ -297,11 +307,12 @@ public class TestbedController implements Runnable {
     while (animating) {
 
       if (nextTest != null) {
+        nextTest.init(model);
+        model.setRunningTest(nextTest);
         if(currTest != null) {
           currTest.exit();    		
         }
         currTest = nextTest;
-        currTest.init(model);
         nextTest = null;
       }
 

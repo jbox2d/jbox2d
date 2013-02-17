@@ -95,9 +95,6 @@ public class Gears extends TestbedTest {
       body3.createFixture(circle2, 5.0f);
 
       RevoluteJointDef jd1 = new RevoluteJointDef();
-      jd1.enableLimit = true;
-      jd1.upperAngle = 6;
-      jd1.lowerAngle = 1;
       jd1.initialize(body2, body1, bd1.position);
       Joint joint1 = m_world.createJoint(jd1);
 
@@ -124,19 +121,19 @@ public class Gears extends TestbedTest {
       PolygonShape box = new PolygonShape();
       box.setAsBox(0.5f, 5.0f);
 
-      // BodyDef bd1 = new BodyDef();
-      // bd1.type = BodyType.DYNAMIC;
-      // bd1.position.set(-3.0f, 12.0f);
-      // //Body body1 = m_world.createBody(bd1);
-      // //body1.createFixture(circle1, 5.0f);
-      //
-      // RevoluteJointDef jd1 = new RevoluteJointDef();
-      // jd1.bodyA = ground;
-      // jd1.bodyB = body1;
-      // ground.getLocalPointToOut(bd1.position, jd1.localAnchorA);
-      // body1.getLocalPointToOut(bd1.position, jd1.localAnchorB);
-      // jd1.referenceAngle = body1.getAngle() - ground.getAngle();
-      // m_joint1 = (RevoluteJoint)m_world.createJoint(jd1);
+      BodyDef bd1 = new BodyDef();
+      bd1.type = BodyType.DYNAMIC;
+      bd1.position.set(-3.0f, 12.0f);
+      Body body1 = m_world.createBody(bd1);
+      body1.createFixture(circle1, 5.0f);
+
+      RevoluteJointDef jd1 = new RevoluteJointDef();
+      jd1.bodyA = ground;
+      jd1.bodyB = body1;
+      ground.getLocalPointToOut(bd1.position, jd1.localAnchorA);
+      body1.getLocalPointToOut(bd1.position, jd1.localAnchorB);
+      jd1.referenceAngle = body1.getAngle() - ground.getAngle();
+      m_joint1 = (RevoluteJoint) m_world.createJoint(jd1);
 
       BodyDef bd2 = new BodyDef();
       bd2.type = BodyType.DYNAMIC;
@@ -162,13 +159,13 @@ public class Gears extends TestbedTest {
 
       m_joint3 = (PrismaticJoint) m_world.createJoint(jd3);
 
-      // GearJointDef jd4 = new GearJointDef();
-      // jd4.bodyA = body1;
-      // jd4.bodyB = body2;
-      // jd4.joint1 = m_joint1;
-      // jd4.joint2 = m_joint2;
-      // jd4.ratio = circle2.m_radius / circle1.m_radius;
-      // m_joint4 = (GearJoint)m_world.createJoint(jd4);
+      GearJointDef jd4 = new GearJointDef();
+      jd4.bodyA = body1;
+      jd4.bodyB = body2;
+      jd4.joint1 = m_joint1;
+      jd4.joint2 = m_joint2;
+      jd4.ratio = circle2.m_radius / circle1.m_radius;
+      m_joint4 = (GearJoint) m_world.createJoint(jd4);
 
       GearJointDef jd5 = new GearJointDef();
       jd5.bodyA = body2;
@@ -176,150 +173,6 @@ public class Gears extends TestbedTest {
       jd5.joint1 = m_joint2;
       jd5.joint2 = m_joint3;
       jd5.ratio = 1f / circle2.m_radius;
-      m_joint5 = (GearJoint) m_world.createJoint(jd5);
-    }
-    
-    {
-      CircleShape circle1 = new CircleShape();
-      circle1.m_radius = 1.0f;
-
-      CircleShape circle2 = new CircleShape();
-      circle2.m_radius = 2.0f;
-
-      PolygonShape box = new PolygonShape();
-      box.setAsBox(0.5f, 5.0f);
-
-      BodyDef bd2 = new BodyDef();
-      bd2.type = BodyType.DYNAMIC;
-      bd2.position.set(-10f, 12.0f);
-      Body body2 = m_world.createBody(bd2);
-      body2.createFixture(circle2, 5.0f);
-
-      RevoluteJointDef jd2 = new RevoluteJointDef();
-      jd2.initialize(ground, body2, bd2.position);
-      m_joint2 = (RevoluteJoint) m_world.createJoint(jd2);
-
-      BodyDef bd3 = new BodyDef();
-      bd3.type = BodyType.DYNAMIC;
-      bd3.position.set(-10f, 19.0f);
-      Body body3 = m_world.createBody(bd3);
-      body3.createFixture(box, 5.0f);
-
-      PrismaticJointDef jd3 = new PrismaticJointDef();
-      jd3.initialize(ground, body3, bd3.position, new Vec2(1.0f, 0f));
-      jd3.lowerTranslation = -.5f;
-      jd3.upperTranslation = .5f;
-      jd3.enableLimit = true;
-
-      m_joint3 = (PrismaticJoint) m_world.createJoint(jd3);
-      
-      GearJointDef jd5 = new GearJointDef();
-      jd5.bodyA = body2;
-      jd5.bodyB = body3;
-      jd5.joint1 = m_joint2;
-      jd5.joint2 = m_joint3;
-      jd5.ratio = 1f / circle2.m_radius;
-      m_joint5 = (GearJoint) m_world.createJoint(jd5);
-    }
-    
-    {
-      CircleShape circle1 = new CircleShape();
-      circle1.m_radius = 1.0f;
-
-      CircleShape circle2 = new CircleShape();
-      circle2.m_radius = 2.0f;
-
-      PolygonShape box = new PolygonShape();
-      box.setAsBox(0.5f, 5.0f);
-      
-      PolygonShape box2 = new PolygonShape();
-      box2.setAsBox(5f, .5f);
-
-      BodyDef bd2 = new BodyDef();
-      bd2.type = BodyType.DYNAMIC;
-      bd2.position.set(0f, 25.0f);
-      Body body2 = m_world.createBody(bd2);
-      body2.createFixture(box2, 5.0f);
-
-
-      PrismaticJointDef jd2 = new PrismaticJointDef();
-      jd2.initialize(ground, body2, bd2.position, new Vec2(1.0f, 0f));
-      jd2.lowerTranslation = -2.5f;
-      jd2.upperTranslation = 2.5f;
-      jd2.enableLimit = true;
-      
-
-      BodyDef bd3 = new BodyDef();
-      bd3.type = BodyType.DYNAMIC;
-      bd3.position.set(0f, 30.5f);
-      Body body3 = m_world.createBody(bd3);
-      body3.createFixture(box, 5.0f);
-
-      PrismaticJointDef jd3 = new PrismaticJointDef();
-      jd3.initialize(ground, body3, bd3.position, new Vec2(1.0f, 0f));
-      jd3.lowerTranslation = -2.5f;
-      jd3.upperTranslation = 2.5f;
-      jd3.enableLimit = true;
-
-      PrismaticJoint a = (PrismaticJoint) m_world.createJoint(jd2);
-      m_joint3 = (PrismaticJoint) m_world.createJoint(jd3);
-
-      GearJointDef jd5 = new GearJointDef();
-      jd5.bodyA = body2;
-      jd5.bodyB = body3;
-      jd5.joint1 = a;
-      jd5.joint2 = m_joint3;
-      jd5.ratio = 1;
-      m_joint5 = (GearJoint) m_world.createJoint(jd5);
-    }
-    
-    {
-      CircleShape circle1 = new CircleShape();
-      circle1.m_radius = 1.0f;
-
-      CircleShape circle2 = new CircleShape();
-      circle2.m_radius = 2.0f;
-
-      PolygonShape box = new PolygonShape();
-      box.setAsBox(0.5f, 5.0f);
-      
-      PolygonShape box2 = new PolygonShape();
-      box2.setAsBox(5f, .5f);
-
-      BodyDef bd2 = new BodyDef();
-      bd2.type = BodyType.DYNAMIC;
-      bd2.position.set(25f, 25.0f);
-      Body body2 = m_world.createBody(bd2);
-      body2.createFixture(box, 5.0f);
-
-
-      PrismaticJointDef jd2 = new PrismaticJointDef();
-      jd2.initialize(ground, body2, bd2.position, new Vec2(0f, 1f));
-      jd2.lowerTranslation = -2.5f;
-      jd2.upperTranslation = 2.5f;
-      jd2.enableLimit = true;
-
-      BodyDef bd3 = new BodyDef();
-      bd3.type = BodyType.DYNAMIC;
-      bd3.position.set(26f, 25f);
-      Body body3 = m_world.createBody(bd3);
-      body3.createFixture(box, 5.0f);
-
-      PrismaticJointDef jd3 = new PrismaticJointDef();
-      jd3.initialize(ground, body3, bd3.position, new Vec2(0f, 1f));
-      jd3.lowerTranslation = -2.5f;
-      jd3.upperTranslation = 2.5f;
-      jd3.enableLimit = true;
-
-      PrismaticJoint a = (PrismaticJoint) m_world.createJoint(jd2);
-      m_joint3 = (PrismaticJoint) m_world.createJoint(jd3);
-
-      GearJointDef jd5 = new GearJointDef();
-      jd5.bodyA = body2;
-      jd5.bodyB = body3;
-      jd5.joint1 = a;
-      jd5.joint2 = m_joint3;
-      jd5.ratio = 1;
       m_joint5 = (GearJoint) m_world.createJoint(jd5);
     }
   }
@@ -330,8 +183,8 @@ public class Gears extends TestbedTest {
 
     float ratio, value;
 
-    ratio = 0;// m_joint4.getRatio();
-    value = 10;// m_joint1.getJointAngle() + ratio * m_joint2.getJointAngle();
+    ratio = m_joint4.getRatio();
+    value = m_joint1.getJointAngle() + ratio * m_joint2.getJointAngle();
 
     addTextLine("theta1 + " + ratio + " * theta2 = " + value);
 
