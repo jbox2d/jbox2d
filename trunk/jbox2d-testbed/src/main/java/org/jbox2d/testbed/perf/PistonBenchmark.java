@@ -101,14 +101,14 @@ public class PistonBenchmark extends PerfTest {
         body.createFixture(fd);
       }
 
-      body.setBullet(false);
+      body.setBullet(bullet);
 
       RevoluteJointDef rjd = new RevoluteJointDef();
       rjd.initialize(body, ground, body.getPosition());
       rjd.motorSpeed = MathUtils.PI;
       rjd.maxMotorTorque = 1000000.0f;
       rjd.enableMotor = true;
-      RevoluteJoint joint = (RevoluteJoint) world.createJoint(rjd);
+      world.createJoint(rjd);
     }
 
 

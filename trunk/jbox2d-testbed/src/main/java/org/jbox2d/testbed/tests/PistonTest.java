@@ -89,7 +89,7 @@ public class PistonTest extends TestbedTest {
       rjd.motorSpeed = MathUtils.PI;
       rjd.maxMotorTorque = 1000000.0f;
       rjd.enableMotor = true;
-      RevoluteJoint joint = (RevoluteJoint) getWorld().createJoint(rjd);
+      getWorld().createJoint(rjd);
     }
 
 
