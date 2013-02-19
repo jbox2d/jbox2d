@@ -461,7 +461,7 @@ public abstract class TestbedTest
     init(m_world, true);
     return;
   }
-  
+
   public void setCamera(Vec2 argPos) {
     model.getDebugDraw().getViewportTranform().setCenter(argPos);
   }
@@ -556,9 +556,11 @@ public abstract class TestbedTest
   private final Color3f color2 = new Color3f(.3f, .3f, .95f);
   private final Color3f color3 = new Color3f(.9f, .9f, .9f);
   private final Color3f color4 = new Color3f(.6f, .61f, 1);
+  private final Color3f color5 = new Color3f(.9f, .9f, .3f);
   private final Color3f mouseColor = new Color3f(0f, 1f, 0f);
   private final Vec2 p1 = new Vec2();
   private final Vec2 p2 = new Vec2();
+  private final Vec2 tangent = new Vec2();
   private final List<String> statsList = new ArrayList<String>();
 
   public synchronized void step(TestbedSettings settings) {
@@ -568,6 +570,7 @@ public abstract class TestbedTest
       settings.pause = true;
     }
 
+    final DebugDraw debugDraw = model.getDebugDraw();
     if (settings.pause) {
       if (settings.singleStep) {
         settings.singleStep = false;
@@ -575,7 +578,7 @@ public abstract class TestbedTest
         timeStep = 0;
       }
 
-      model.getDebugDraw().drawString(5, m_textLine, "****PAUSED****", Color3f.WHITE);
+      debugDraw.drawString(5, m_textLine, "****PAUSED****", Color3f.WHITE);
       m_textLine += 15;
     }
 
@@ -583,13 +586,14 @@ public abstract class TestbedTest
     flags += settings.getSetting(TestbedSettings.DrawShapes).enabled ? DebugDraw.e_shapeBit : 0;
     flags += settings.getSetting(TestbedSettings.DrawJoints).enabled ? DebugDraw.e_jointBit : 0;
     flags += settings.getSetting(TestbedSettings.DrawAABBs).enabled ? DebugDraw.e_aabbBit : 0;
-    flags += settings.getSetting(TestbedSettings.DrawPairs).enabled ? DebugDraw.e_pairBit : 0;
     flags +=
         settings.getSetting(TestbedSettings.DrawCOMs).enabled ? DebugDraw.e_centerOfMassBit : 0;
     flags += settings.getSetting(TestbedSettings.DrawTree).enabled ? DebugDraw.e_dynamicTreeBit : 0;
-    model.getDebugDraw().setFlags(flags);
+    debugDraw.setFlags(flags);
 
+    m_world.setAllowSleep(settings.getSetting(TestbedSettings.AllowSleep).enabled);
     m_world.setWarmStarting(settings.getSetting(TestbedSettings.WarmStarting).enabled);
+    m_world.setSubStepping(settings.getSetting(TestbedSettings.SubStepping).enabled);
     m_world.setContinuousPhysics(settings.getSetting(TestbedSettings.ContinuousCollision).enabled);
 
     pointCount = 0;
@@ -605,20 +609,19 @@ public abstract class TestbedTest
 
     if (settings.getSetting(TestbedSettings.DrawStats).enabled) {
       // Vec2.watchCreations = true;
-      model.getDebugDraw().drawString(5, m_textLine, "Engine Info", color4);
+      debugDraw.drawString(5, m_textLine, "Engine Info", color4);
       m_textLine += 15;
-      model.getDebugDraw().drawString(5, m_textLine, "Framerate: " + model.getCalculatedFps(),
-          Color3f.WHITE);
+      debugDraw.drawString(5, m_textLine, "Framerate: " + model.getCalculatedFps(), Color3f.WHITE);
       m_textLine += 15;
-      model.getDebugDraw().drawString(
+      debugDraw.drawString(
           5,
           m_textLine,
           "bodies/contacts/joints/proxies = " + m_world.getBodyCount() + "/"
               + m_world.getContactCount() + "/" + m_world.getJointCount() + "/"
               + m_world.getProxyCount(), Color3f.WHITE);
       m_textLine += 15;
-      model.getDebugDraw().drawString(5, m_textLine,
-          "World mouse position: " + mouseWorld.toString(), Color3f.WHITE);
+      debugDraw.drawString(5, m_textLine, "World mouse position: " + mouseWorld.toString(),
+          Color3f.WHITE);
       m_textLine += 15;
 
 
@@ -627,36 +630,36 @@ public abstract class TestbedTest
       p.toDebugStrings(statsList);
 
       for (String s : statsList) {
-        model.getDebugDraw().drawString(5, m_textLine, s, Color3f.WHITE);
+        debugDraw.drawString(5, m_textLine, s, Color3f.WHITE);
         m_textLine += 15;
       }
       m_textLine += 5;
     }
 
     if (settings.getSetting(TestbedSettings.DrawHelp).enabled) {
-      model.getDebugDraw().drawString(5, m_textLine, "Help", color4);
+      debugDraw.drawString(5, m_textLine, "Help", color4);
       m_textLine += 15;
-      model.getDebugDraw().drawString(5, m_textLine,
-          "Click and drag the left mouse button to move objects.", Color3f.WHITE);
+      debugDraw.drawString(5, m_textLine, "Click and drag the left mouse button to move objects.",
+          Color3f.WHITE);
       m_textLine += 15;
-      model.getDebugDraw().drawString(5, m_textLine,
-          "Shift-Click to aim a bullet, or press space.", Color3f.WHITE);
+      debugDraw.drawString(5, m_textLine, "Shift-Click to aim a bullet, or press space.",
+          Color3f.WHITE);
       m_textLine += 15;
-      model.getDebugDraw().drawString(5, m_textLine,
+      debugDraw.drawString(5, m_textLine,
           "Click and drag the right mouse button to move the view.", Color3f.WHITE);
       m_textLine += 15;
-      model.getDebugDraw().drawString(5, m_textLine, "Scroll to zoom in/out.", Color3f.WHITE);
+      debugDraw.drawString(5, m_textLine, "Scroll to zoom in/out.", Color3f.WHITE);
       m_textLine += 15;
-      model.getDebugDraw().drawString(5, m_textLine,
-          "Press '[' or ']' to change tests, and 'r' to restart.", Color3f.WHITE);
+      debugDraw.drawString(5, m_textLine, "Press '[' or ']' to change tests, and 'r' to restart.",
+          Color3f.WHITE);
       m_textLine += 20;
     }
 
     if (!textList.isEmpty()) {
-      model.getDebugDraw().drawString(5, m_textLine, "Test Info", color4);
+      debugDraw.drawString(5, m_textLine, "Test Info", color4);
       m_textLine += 15;
       for (String s : textList) {
-        model.getDebugDraw().drawString(5, m_textLine, s, Color3f.WHITE);
+        debugDraw.drawString(5, m_textLine, s, Color3f.WHITE);
         m_textLine += 15;
       }
       textList.clear();
@@ -666,34 +669,43 @@ public abstract class TestbedTest
       mouseJoint.getAnchorB(p1);
       Vec2 p2 = mouseJoint.getTarget();
 
-      model.getDebugDraw().drawSegment(p1, p2, mouseColor);
+      debugDraw.drawSegment(p1, p2, mouseColor);
     }
 
     if (bombSpawning) {
-      model.getDebugDraw().drawSegment(bombSpawnPoint, mouseWorld, Color3f.WHITE);
+      debugDraw.drawSegment(bombSpawnPoint, mouseWorld, Color3f.WHITE);
     }
 
     if (settings.getSetting(TestbedSettings.DrawContactPoints).enabled) {
-      final float axisScale = .3f;
+      final float k_impulseScale = 0.1f;
+      final float axisScale = 0.3f;
 
       for (int i = 0; i < pointCount; i++) {
 
         ContactPoint point = points[i];
 
         if (point.state == PointState.ADD_STATE) {
-          model.getDebugDraw().drawPoint(point.position, 10f, color1);
+          debugDraw.drawPoint(point.position, 10f, color1);
         } else if (point.state == PointState.PERSIST_STATE) {
-          model.getDebugDraw().drawPoint(point.position, 5f, color2);
+          debugDraw.drawPoint(point.position, 5f, color2);
         }
 
-        model.getDebugDraw().drawSegment(point.fixtureA.getBody().getWorldCenter(), point.position, color3);
-        model.getDebugDraw().drawSegment(point.fixtureB.getBody().getWorldCenter(), point.position, color3);
-
-        if (settings.getSetting(TestbedSettings.DrawNormals).enabled) {
+        if (settings.getSetting(TestbedSettings.DrawContactNormals).enabled) {
           p1.set(point.position);
           p2.set(point.normal).mulLocal(axisScale).addLocal(p1);
-          model.getDebugDraw().drawSegment(p1, p2, color3);
-          
+          debugDraw.drawSegment(p1, p2, color3);
+
+        } else if (settings.getSetting(TestbedSettings.DrawContactImpulses).enabled) {
+          p1.set(point.position);
+          p2.set(point.normal).mulLocal(k_impulseScale).mulLocal(point.normalImpulse).addLocal(p1);
+          debugDraw.drawSegment(p1, p2, color5);
+        }
+
+        if (settings.getSetting(TestbedSettings.DrawFrictionImpulses).enabled) {
+          Vec2.crossToOutUnsafe(point.normal, 1, tangent);
+          p1.set(point.position);
+          p2.set(tangent).mulLocal(k_impulseScale).mulLocal(point.tangentImpulse).addLocal(p1);
+          debugDraw.drawSegment(p1, p2, color5);
         }
       }
     }
@@ -981,6 +993,8 @@ public abstract class TestbedTest
       cp.position.set(worldManifold.points[i]);
       cp.normal.set(worldManifold.normal);
       cp.state = state2[i];
+      cp.normalImpulse = manifold.points[i].normalImpulse;
+      cp.tangentImpulse = manifold.points[i].tangentImpulse;
       ++pointCount;
     }
   }

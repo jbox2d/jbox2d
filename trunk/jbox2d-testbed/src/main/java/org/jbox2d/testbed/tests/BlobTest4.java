@@ -117,13 +117,13 @@ public class BlobTest4 extends TestbedTest {
 			cd.m_radius = bodyRadius;
 			fd.shape = cd;
 			fd.density = 1.0f;
-			fd.filter.groupIndex = -2;
 			body.createFixture(fd);
 			cvjd.addBody(body);
 		}
 
 		cvjd.frequencyHz = 10.0f;
 		cvjd.dampingRatio = 1.0f;
+		cvjd.collideConnected = false;
 		getWorld().createJoint(cvjd);
 		
 		BodyDef bd2 = new BodyDef();

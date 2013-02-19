@@ -49,11 +49,11 @@ import javax.swing.event.ChangeListener;
 
 import org.jbox2d.testbed.framework.TestbedController;
 import org.jbox2d.testbed.framework.TestbedModel;
+import org.jbox2d.testbed.framework.TestbedModel.ListItem;
 import org.jbox2d.testbed.framework.TestbedSetting;
+import org.jbox2d.testbed.framework.TestbedSetting.SettingType;
 import org.jbox2d.testbed.framework.TestbedSettings;
 import org.jbox2d.testbed.framework.TestbedTest;
-import org.jbox2d.testbed.framework.TestbedModel.ListItem;
-import org.jbox2d.testbed.framework.TestbedSetting.SettingType;
 
 
 /**

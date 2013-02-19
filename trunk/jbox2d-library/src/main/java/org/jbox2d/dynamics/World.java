@@ -170,7 +170,15 @@ public class World {
       }
     }
   }
+  
+  public void setSubStepping(boolean subStepping) {
+    this.m_subStepping = subStepping;
+  }
 
+  public boolean isSubStepping() {
+    return m_subStepping;
+  }
+  
   public boolean isAllowSleep() {
     return m_allowSleep;
   }
