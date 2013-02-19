@@ -28,6 +28,7 @@ package org.jbox2d.collision.shapes;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.collision.RayCastOutput;
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
@@ -160,7 +161,17 @@ public class ChainShape extends Shape {
     assert (m_vertices == null && m_count == 0);
     assert (count >= 3);
     m_count = count + 1;
+    Vec2 e = new Vec2();
     m_vertices = new Vec2[m_count];
+    for (int i = 1; i < m_count; i++) {
+      Vec2 v1 = vertices[i - 1];
+      Vec2 v2 = vertices[i];
+      e.set(v1).subLocal(v2);
+      // If the code crashes here, it means your vertices are too close together.
+      if (MathUtils.distanceSquared(v1, v2) > Settings.linearSlop * Settings.linearSlop) {
+        throw new RuntimeException("Vertices of chain shape are too close together");
+      }
+    }
     for (int i = 0; i < count; i++) {
       m_vertices[i] = new Vec2(vertices[i]);
     }
@@ -181,7 +192,17 @@ public class ChainShape extends Shape {
     assert (m_vertices == null && m_count == 0);
     assert (count >= 2);
     m_count = count;
+    Vec2 e = new Vec2();
     m_vertices = new Vec2[m_count];
+    for (int i = 1; i < m_count; i++) {
+      Vec2 v1 = vertices[i - 1];
+      Vec2 v2 = vertices[i];
+      e.set(v1).subLocal(v2);
+      // If the code crashes here, it means your vertices are too close together.
+      if (MathUtils.distanceSquared(v1, v2) > Settings.linearSlop * Settings.linearSlop) {
+        throw new RuntimeException("Vertices of chain shape are too close together");
+      }
+    }
     for (int i = 0; i < m_count; i++) {
       m_vertices[i] = new Vec2(vertices[i]);
     }

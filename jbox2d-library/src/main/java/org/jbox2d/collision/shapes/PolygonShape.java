@@ -330,65 +330,6 @@ public class PolygonShape extends Shape {
     aabb.upperBound.y += m_radius;
   }
 
-  // djm pooling, and from above
-  /*
-   * private static final TLVec2 tlNormalL = new TLVec2(); private static final TLMassData tlMd =
-   * new TLMassData(); private static final FloatArray tldepths = new FloatArray(); private static
-   * final TLVec2 tlIntoVec = new TLVec2(); private static final TLVec2 tlOutoVec = new TLVec2();
-   * private static final TLVec2 tlP2b = new TLVec2(); private static final TLVec2 tlP3 = new
-   * TLVec2(); private static final TLVec2 tlcenter = new TLVec2(); /*
-   * 
-   * @see Shape#computeSubmergedArea(Vec2, float, XForm, Vec2) public float
-   * computeSubmergedArea(final Vec2 normal, float offset, Transform xf, Vec2 c) { final Vec2
-   * normalL = tlNormalL.get(); final MassData md = tlMd.get(); //Transform plane into shape
-   * co-ordinates Mat22.mulTransToOut(xf.R,normal, normalL); float offsetL = offset -
-   * Vec2.dot(normal,xf.position); final Float[] depths = tldepths.get(Settings.maxPolygonVertices);
-   * int diveCount = 0; int intoIndex = -1; int outoIndex = -1; boolean lastSubmerged = false; int i
-   * = 0; for (i = 0; i < m_vertexCount; ++i){ depths[i] = Vec2.dot(normalL,m_vertices[i]) -
-   * offsetL; boolean isSubmerged = depths[i]<-Settings.EPSILON; if (i > 0){ if (isSubmerged){ if
-   * (!lastSubmerged){ intoIndex = i-1; diveCount++; } } else{ if (lastSubmerged){ outoIndex = i-1;
-   * diveCount++; } } } lastSubmerged = isSubmerged; } switch(diveCount){ case 0: if
-   * (lastSubmerged){ //Completely submerged computeMass(md, 1.0f); Transform.mulToOut(xf,md.center,
-   * c); return md.mass; } else{ return 0; } case 1: if(intoIndex==-1){ intoIndex = m_vertexCount-1;
-   * } else{ outoIndex = m_vertexCount-1; } break; } final Vec2 intoVec = tlIntoVec.get(); final
-   * Vec2 outoVec = tlOutoVec.get(); final Vec2 e1 = tle1.get(); final Vec2 e2 = tle2.get(); int
-   * intoIndex2 = (intoIndex+1) % m_vertexCount; int outoIndex2 = (outoIndex+1) % m_vertexCount;
-   * float intoLambda = (0 - depths[intoIndex]) / (depths[intoIndex2] - depths[intoIndex]); float
-   * outoLambda = (0 - depths[outoIndex]) / (depths[outoIndex2] - depths[outoIndex]);
-   * intoVec.set(m_vertices[intoIndex].x*(1-intoLambda)+m_vertices[intoIndex2].x*intoLambda ,
-   * m_vertices[intoIndex].y*(1-intoLambda)+m_vertices[intoIndex2].y*intoLambda);
-   * outoVec.set(m_vertices[outoIndex].x*(1-outoLambda)+m_vertices[outoIndex2].x*outoLambda ,
-   * m_vertices[outoIndex].y*(1-outoLambda)+m_vertices[outoIndex2].y*outoLambda); // Initialize
-   * accumulator float area = 0; final Vec2 center = tlcenter.get(); center.setZero(); final Vec2
-   * p2b = tlP2b.get().set(m_vertices[intoIndex2]); final Vec2 p3 = tlP3.get(); p3.setZero(); float
-   * k_inv3 = 1.0f / 3.0f; // An awkward loop from intoIndex2+1 to outIndex2 i = intoIndex2; while
-   * (i != outoIndex2){ i = (i+1) % m_vertexCount; if (i == outoIndex2){ p3.set(outoVec); } else{
-   * p3.set(m_vertices[i]); } // Add the triangle formed by intoVec,p2,p3 {
-   * e1.set(p2b).subLocal(intoVec); e2.set(p3).subLocal(intoVec); float D = Vec2.cross(e1, e2);
-   * float triangleArea = 0.5f * D; area += triangleArea; // Area weighted centroid center.x +=
-   * triangleArea * k_inv3 * (intoVec.x + p2b.x + p3.x); center.y += triangleArea * k_inv3 *
-   * (intoVec.y + p2b.y + p3.y); } // p2b.set(p3); } // Normalize and transform centroid center.x *=
-   * 1.0f / area; center.y *= 1.0f / area; Transform.mulToOut(xf, center, c); return area; }
-   */
-
-  /*
-   * Get the supporting vertex index in the given direction.
-   * 
-   * @param d
-   * 
-   * @return public final int getSupport( final Vec2 d){ int bestIndex = 0; float bestValue =
-   * Vec2.dot(m_vertices[0], d); for (int i = 1; i < m_vertexCount; ++i){ final float value =
-   * Vec2.dot(m_vertices[i], d); if (value > bestValue){ bestIndex = i; bestValue = value; } }
-   * return bestIndex; } /** Get the supporting vertex in the given direction.
-   * 
-   * @param d
-   * 
-   * @return public final Vec2 getSupportVertex( final Vec2 d){ int bestIndex = 0; float bestValue =
-   * Vec2.dot(m_vertices[0], d); for (int i = 1; i < m_vertexCount; ++i){ final float value =
-   * Vec2.dot(m_vertices[i], d); if (value > bestValue){ bestIndex = i; bestValue = value; } }
-   * return m_vertices[bestIndex]; }
-   */
-
   /**
    * Get the vertex count.
    * 

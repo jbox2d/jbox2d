@@ -160,8 +160,10 @@ public class ContactManager implements PairCallback {
     bodyB.m_contactList = c.m_nodeB;
 
     // wake up the bodies
-    bodyA.setAwake(true);
-    bodyB.setAwake(true);
+    if (!fixtureA.isSensor() && !fixtureB.isSensor()) {
+      bodyA.setAwake(true);
+      bodyB.setAwake(true);
+    }
 
     ++m_contactCount;
   }

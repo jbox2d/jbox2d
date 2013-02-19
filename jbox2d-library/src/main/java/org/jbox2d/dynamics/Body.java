@@ -28,8 +28,6 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
-import org.jbox2d.dynamics.contacts.Position;
-import org.jbox2d.dynamics.contacts.Velocity;
 import org.jbox2d.dynamics.joints.JointEdge;
 
 /**
