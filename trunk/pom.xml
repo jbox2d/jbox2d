@@ -11,6 +11,7 @@
 		<module>jbox2d-library</module>
 		<module>jbox2d-serialization</module>
 		<module>jbox2d-testbed</module>
+		<module>jbox2d-testbed-jogl</module>
 	</modules>
 
 	<url>http://code.google.com/p/jbox2d/</url>
