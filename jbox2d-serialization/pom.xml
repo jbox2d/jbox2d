@@ -31,7 +31,6 @@
                   <arg value="src/main/resources/proto/box2d.proto" />
                 </exec>
               </target>
-              <sourceRoot>src/generated</sourceRoot>
             </configuration>
             <goals>
               <goal>run</goal>
