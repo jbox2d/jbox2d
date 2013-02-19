@@ -26,12 +26,8 @@ package org.jbox2d.pooling.normal;
 import java.lang.reflect.Array;
 
 import org.jbox2d.pooling.IOrderedStack;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CircleStack<E> implements IOrderedStack<E>{
-  private static final Logger log = LoggerFactory.getLogger(CircleStack.class);
-
   private final E[] pool;
   private int index;
   private final int size;
@@ -44,12 +40,8 @@ public class CircleStack<E> implements IOrderedStack<E>{
     for (int i = 0; i < argStackSize; i++) {
       try {
         pool[i] = argClass.newInstance();
-      } catch (InstantiationException e) {
-        log.error("Error creating pooled object " + argClass.getSimpleName(), e);
-        assert (false) : "Error creating pooled object " + argClass.getCanonicalName();
-      } catch (IllegalAccessException e) {
-        log.error("Error creating pooled object " + argClass.getSimpleName(), e);
-        assert (false) : "Error creating pooled object " + argClass.getCanonicalName();
+      } catch (Exception e) {
+        throw new RuntimeException("Error creating pooled object " + argClass.getSimpleName(), e);
       }
     }
     index = 0;

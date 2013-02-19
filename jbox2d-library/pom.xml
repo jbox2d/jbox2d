@@ -3,7 +3,7 @@
   <parent>
     <artifactId>jbox2d</artifactId>
     <groupId>org.jbox2d</groupId>
-    <version>2.3.0-SNAPSHOT</version>
+    <version>2.2.1-SNAPSHOT</version>
   </parent>
   <artifactId>jbox2d-library</artifactId>
   <name>jbox2d-library</name>
@@ -17,13 +17,6 @@
   		<version>4.8.2</version>
   		<type>jar</type>
   		<scope>test</scope>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.slf4j</groupId>
-  		<artifactId>slf4j-api</artifactId>
-  		<version>1.6.4</version>
-  		<type>jar</type>
-  		<scope>compile</scope>
   	</dependency>
   </dependencies>
 </project>
