@@ -62,6 +62,7 @@ import org.jbox2d.testbed.tests.ShapeEditing;
 import org.jbox2d.testbed.tests.SliderCrankTest;
 import org.jbox2d.testbed.tests.SphereStack;
 import org.jbox2d.testbed.tests.TheoJansen;
+import org.jbox2d.testbed.tests.Tumbler;
 import org.jbox2d.testbed.tests.VaryingFrictionTest;
 import org.jbox2d.testbed.tests.VaryingRestitution;
 import org.jbox2d.testbed.tests.VerticalStack;
@@ -88,6 +89,7 @@ public class TestList {
       model.addTest(new VerticalStack());
       model.addTest(new ConveyorBelt());
       model.addTest(new SphereStack());
+      model.addTest(new Tumbler());
       model.addTest(new PistonTest());
       model.addTest(new PyramidTest());
       model.addTest(new CircleStress());
