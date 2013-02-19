@@ -25,7 +25,7 @@ The most recent versions of JBox2D lean on Maven to help handle dependency manag
 
 
   # Check out the project through Subversion:
-    # For 2.1.2 branch:`svn checkout http://jbox2d.googlecode.com/svn/tags/jbox2d-2.1.2.3/ jbox2d-read-only`
+    # For 2.1.2 branch:  `svn checkout http://jbox2d.googlecode.com/svn/branch/jbox2d-2.1.2.1/ jbox2d-read-only`
     # For trunk `svn checkout http://jbox2d.googlecode.com/svn/trunk jbox2d-read-only`
   # Import to your IDE as a Maven project (using the pom.xml descriptor in the root folder)
   # Run the `org.jbox2d.testbed.framework.TestbedMain` class
