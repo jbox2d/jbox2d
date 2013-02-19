@@ -84,7 +84,6 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
     model = argModel;
     controller = argController;
     initComponents();
-    tests.setSelectedIndex(1);
     addListeners();
 
     model.addTestChangeListener(new TestbedModel.TestChangedListener() {
