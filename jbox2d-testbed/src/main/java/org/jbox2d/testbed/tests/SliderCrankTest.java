@@ -50,9 +50,6 @@ public class SliderCrankTest extends TestbedTest {
   private RevoluteJoint m_joint1;
   private PrismaticJoint m_joint2;
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-   */
   @Override
   public void initTest(boolean argDeserialized) {
     Body ground = null;
@@ -147,9 +144,6 @@ public class SliderCrankTest extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
-   */
   @Override
   public void step(TestbedSettings settings) {
     super.step(settings);
@@ -159,12 +153,10 @@ public class SliderCrankTest extends TestbedTest {
     Formatter f = new Formatter();
     addTextLine(f.format("Friction: %b, Motor Force = %5.0f, ", m_joint2.isMotorEnabled(), torque)
         .toString());
+    f.close();
 
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
-   */
   @Override
   public void keyPressed(char argKeyChar, int argKeyCode) {
 
@@ -180,9 +172,6 @@ public class SliderCrankTest extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-   */
   @Override
   public String getTestName() {
     return "Slider Crank";
