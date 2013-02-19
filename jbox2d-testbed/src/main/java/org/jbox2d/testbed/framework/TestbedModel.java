@@ -47,7 +47,7 @@ public class TestbedModel {
   private final boolean[] codedKeys = new boolean[512];
   private float calculatedFps;
   private float panelWidth;
-  private int currTestIndex;
+  private int currTestIndex = -1;
   private TestbedTest runningTest;
   
   public TestbedModel() {

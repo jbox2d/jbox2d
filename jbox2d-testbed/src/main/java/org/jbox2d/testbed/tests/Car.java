@@ -9,6 +9,7 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
+import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jbox2d.dynamics.joints.WheelJoint;
 import org.jbox2d.dynamics.joints.WheelJointDef;
@@ -16,6 +17,11 @@ import org.jbox2d.testbed.framework.TestbedSettings;
 import org.jbox2d.testbed.framework.TestbedTest;
 
 public class Car extends TestbedTest {
+  private static final long CAR_TAG = 100l;
+  private static final long WHEEL1_TAG = 101l;
+  private static final long WHEEL2_TAG = 102l;
+  private static final long SPRING1_TAG = 103l;
+  private static final long SPRING2_TAG = 104l;
 
   private Body m_car;
   private Body m_wheel1;
@@ -26,6 +32,55 @@ public class Car extends TestbedTest {
   private float m_speed;
   private WheelJoint m_spring1;
   private WheelJoint m_spring2;
+
+  @Override
+  public Long getTag(Body body) {
+    if (body == m_car) {
+      return CAR_TAG;
+    }
+    if (body == m_wheel1) {
+      return WHEEL1_TAG;
+    }
+    if (body == m_wheel2) {
+      return WHEEL2_TAG;
+    }
+    return super.getTag(body);
+  }
+
+  @Override
+  public Long getTag(Joint joint) {
+    if (joint == m_spring1) {
+      return SPRING1_TAG;
+    }
+    if (joint == m_spring2) {
+      return SPRING2_TAG;
+    }
+    return super.getTag(joint);
+  }
+
+  @Override
+  public void processBody(Body body, Long tag) {
+    if (tag == CAR_TAG) {
+      m_car = body;
+    } else if (tag == WHEEL1_TAG) {
+      m_wheel1 = body;
+    } else if (tag == WHEEL2_TAG) {
+      m_wheel2 = body;
+    } else {
+      super.processBody(body, tag);
+    }
+  }
+
+  @Override
+  public void processJoint(Joint joint, Long tag) {
+    if (tag == SPRING1_TAG) {
+      m_spring1 = (WheelJoint) joint;
+    } else if (tag == SPRING2_TAG) {
+      m_spring2 = (WheelJoint) joint;
+    } else {
+      super.processJoint(joint, tag);
+    }
+  }
 
   @Override
   public String getTestName() {
@@ -56,7 +111,7 @@ public class Car extends TestbedTest {
       shape.set(new Vec2(-20.0f, 0.0f), new Vec2(20.0f, 0.0f));
       ground.createFixture(fd);
 
-      float hs[] = {0.25f, 1.0f, 4.0f, 0.0f, 0.0f, -1.0f, -2.0f, -2.0f, -1.25f, 0.0f};
+      float hs[] = { 0.25f, 1.0f, 4.0f, 0.0f, 0.0f, -1.0f, -2.0f, -2.0f, -1.25f, 0.0f };
 
       float x = 20.0f, y1 = 0.0f, dx = 5.0f;
 

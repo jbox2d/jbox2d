@@ -904,47 +904,47 @@ public abstract class TestbedTest
   }
 
   @Override
-  public Long getTag(Body argBody) {
+  public Long getTag(Body body) {
     return null;
   }
 
   @Override
-  public Long getTag(Fixture argFixture) {
+  public Long getTag(Fixture fixture) {
     return null;
   }
 
   @Override
-  public Long getTag(Joint argJoint) {
+  public Long getTag(Joint joint) {
     return null;
   }
 
   @Override
-  public Long getTag(Shape argShape) {
+  public Long getTag(Shape shape) {
     return null;
   }
 
   @Override
-  public Long getTag(World argWorld) {
+  public Long getTag(World world) {
     return null;
   }
 
   @Override
-  public void processBody(Body argBody, Long argTag) {}
+  public void processBody(Body body, Long tag) {}
 
   @Override
-  public void processFixture(Fixture argFixture, Long argTag) {}
+  public void processFixture(Fixture fixture, Long tag) {}
 
   @Override
-  public void processJoint(Joint argJoint, Long argTag) {}
+  public void processJoint(Joint joint, Long tag) {}
 
   @Override
-  public void processShape(Shape argShape, Long argTag) {}
+  public void processShape(Shape shape, Long tag) {}
 
   @Override
-  public void processWorld(World argWorld, Long argTag) {}
+  public void processWorld(World world, Long tag) {}
 
   @Override
-  public boolean isUnsupported(UnsupportedObjectException argException) {
+  public boolean isUnsupported(UnsupportedObjectException exception) {
     return true;
   }
 
