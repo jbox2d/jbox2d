@@ -28,7 +28,19 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.box2d.proto.Box2D.PbBody;
+import org.box2d.proto.Box2D.PbBodyType;
+import org.box2d.proto.Box2D.PbFilter;
+import org.box2d.proto.Box2D.PbFixture;
+import org.box2d.proto.Box2D.PbJoint;
+import org.box2d.proto.Box2D.PbJointType;
+import org.box2d.proto.Box2D.PbShape;
+import org.box2d.proto.Box2D.PbShapeType;
+import org.box2d.proto.Box2D.PbVec2;
+import org.box2d.proto.Box2D.PbWorld;
+import org.jbox2d.collision.shapes.ChainShape;
 import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
@@ -44,16 +56,6 @@ import org.jbox2d.dynamics.joints.MouseJoint;
 import org.jbox2d.dynamics.joints.PrismaticJoint;
 import org.jbox2d.dynamics.joints.PulleyJoint;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
-import org.box2d.proto.Box2D.PbBody;
-import org.box2d.proto.Box2D.PbBodyType;
-import org.box2d.proto.Box2D.PbFilter;
-import org.box2d.proto.Box2D.PbFixture;
-import org.box2d.proto.Box2D.PbJoint;
-import org.box2d.proto.Box2D.PbJointType;
-import org.box2d.proto.Box2D.PbShape;
-import org.box2d.proto.Box2D.PbShapeType;
-import org.box2d.proto.Box2D.PbVec2;
-import org.box2d.proto.Box2D.PbWorld;
 import org.jbox2d.serialization.JbSerializer;
 import org.jbox2d.serialization.SerializationHelper;
 import org.jbox2d.serialization.SerializationResult;
@@ -312,23 +314,44 @@ public class PbSerializer implements JbSerializer {
     switch (argShape.m_type) {
       case CIRCLE:
         CircleShape c = (CircleShape) argShape;
-        builder.setCenter(vecToPb(c.m_p));
         builder.setType(PbShapeType.CIRCLE);
+        builder.setCenter(vecToPb(c.m_p));
         break;
       case POLYGON:
         PolygonShape p = (PolygonShape) argShape;
-        builder.setCentroid(vecToPb(p.m_centroid));
         builder.setType(PbShapeType.POLYGON);
+        builder.setCentroid(vecToPb(p.m_centroid));
         for (int i = 0; i < p.m_count; i++) {
           builder.addPoints(vecToPb(p.m_vertices[i]));
           builder.addNormals(vecToPb(p.m_normals[i]));
         }
         break;
+      case EDGE:
+        EdgeShape e = (EdgeShape) argShape;
+        builder.setType(PbShapeType.EDGE);
+        builder.setV0(vecToPb(e.m_vertex0));
+        builder.setV1(vecToPb(e.m_vertex1));
+        builder.setV2(vecToPb(e.m_vertex2));
+        builder.setV3(vecToPb(e.m_vertex3));
+        builder.setHas0(e.m_hasVertex0);
+        builder.setHas3(e.m_hasVertex3);
+        break;
+      case CHAIN:
+        ChainShape h = (ChainShape) argShape;
+        builder.setType(PbShapeType.CHAIN);
+        for (int i = 0; i < h.m_count; i++) {
+          builder.addPoints(vecToPb(h.m_vertices[i]));
+        }
+        builder.setPrev(vecToPb(h.m_prevVertex));
+        builder.setNext(vecToPb(h.m_nextVertex));
+        builder.setHas0(h.m_hasPrevVertex);
+        builder.setHas3(h.m_hasNextVertex);
+        break;
       default:
-        UnsupportedObjectException e = new UnsupportedObjectException(
+        UnsupportedObjectException ex = new UnsupportedObjectException(
             "Currently only encodes circle and polygon shapes", Type.SHAPE);
-        if (listener == null || listener.isUnsupported(e)) {
-          throw e;
+        if (listener == null || listener.isUnsupported(ex)) {
+          throw ex;
         }
         return null;
     }
@@ -442,11 +465,11 @@ public class PbSerializer implements JbSerializer {
         builder.setDampingRatio(j.getDampingRatio());
         break;
       }
-//      case GEAR: {
+      case GEAR: {
 //        GearJoint j = (GearJoint) argJoint;
 //        builder.setType(PbJointType.GEAR);
-//        builder.setLocalAnchorA(vecToPb(j.m_localAnchor1));
-//        builder.setLocalAnchorB(vecToPb(j.m_localAnchor2));
+//        builder.setLocalAnchorA(vecToPb(j.m_localAnchorA));
+//        builder.setLocalAnchorB(vecToPb(j.m_localAnchorB));
 //        builder.setRatio(j.getRatio());
 //        if (!argJointIndexMap.containsKey(j.getJoint1())) {
 //          throw new IllegalArgumentException("Joint 1 not in map");
@@ -460,7 +483,7 @@ public class PbSerializer implements JbSerializer {
 //        builder.setJoint1(j1);
 //        builder.setJoint2(j2);
 //        break;
-//      }
+      }
       case FRICTION: {
         FrictionJoint j = (FrictionJoint) argJoint;
         builder.setType(PbJointType.FRICTION);

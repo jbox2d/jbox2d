@@ -35,7 +35,9 @@ import org.box2d.proto.Box2D.PbJointType;
 import org.box2d.proto.Box2D.PbShape;
 import org.box2d.proto.Box2D.PbVec2;
 import org.box2d.proto.Box2D.PbWorld;
+import org.jbox2d.collision.shapes.ChainShape;
 import org.jbox2d.collision.shapes.CircleShape;
+import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
@@ -238,13 +240,11 @@ public class PbDeserializer implements JbDeserializer {
       case CIRCLE:
         CircleShape c = new CircleShape();
         c.m_p.set(pbToVec(s.getCenter()));
-        c.m_radius = s.getRadius();
         shape = c;
         break;
       case POLYGON:
         PolygonShape p = new PolygonShape();
         p.m_centroid.set(pbToVec(s.getCentroid()));
-        p.m_radius = s.getRadius();
         p.m_count = s.getPointsCount();
         for (int i = 0; i < p.m_count; i++) {
           p.m_vertices[i].set(pbToVec(s.getPoints(i)));
@@ -253,13 +253,27 @@ public class PbDeserializer implements JbDeserializer {
         shape = p;
         break;
       case EDGE:
-      case LOOP: {
-        UnsupportedObjectException e =
-            new UnsupportedObjectException("Edge and loop shapes are not yet supported", Type.SHAPE);
-        if (ulistener == null || ulistener.isUnsupported(e)) {
-          throw e;
+        EdgeShape edge = new EdgeShape();
+        edge.m_vertex0.set(pbToVec(s.getV0()));
+        edge.m_vertex1.set(pbToVec(s.getV1()));
+        edge.m_vertex2.set(pbToVec(s.getV2()));
+        edge.m_vertex3.set(pbToVec(s.getV3()));
+        edge.m_hasVertex0 = s.getHas0();
+        edge.m_hasVertex3 = s.getHas3();
+        shape = edge;
+        break;
+      case CHAIN: {
+        ChainShape chain = new ChainShape();
+        chain.m_count = s.getPointsCount();
+        for (int i = 0; i < chain.m_count; i++) {
+          chain.m_vertices[i].set(pbToVec(s.getPoints(i)));
         }
-        return null;
+        chain.m_hasPrevVertex = s.getHas0();
+        chain.m_hasNextVertex = s.getHas3();
+        chain.m_prevVertex.set(pbToVec(s.getPrev()));
+        chain.m_nextVertex.set(pbToVec(s.getNext()));
+        shape = chain;
+        break;
       }
       default: {
         UnsupportedObjectException e =
@@ -270,6 +284,7 @@ public class PbDeserializer implements JbDeserializer {
         return null;
       }
     }
+    shape.m_radius = s.getRadius();
 
     if (listener != null) {
       listener.processShape(shape, s.getTag());
