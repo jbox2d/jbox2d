@@ -818,8 +818,6 @@ public class ContactSolver {
       float aA = m_positions[indexA].a;
       Vec2 cB = m_positions[indexB].c;
       float aB = m_positions[indexB].a;
-      // System.out.println("cA: " + cA.x + "," + cA.y + " - rot " + aA);
-      // System.out.println("cB: " + cB.x + "," + cB.y + " - rot " + aB);
 
       // Solve normal constraints
       for (int j = 0; j < pointCount; ++j) {
@@ -864,13 +862,11 @@ public class ContactSolver {
         aB += iB * Vec2.cross(rB, P);
       }
 
-      m_positions[indexA].c.set(cA);
+//      m_positions[indexA].c.set(cA);
       m_positions[indexA].a = aA;
 
-      m_positions[indexB].c.set(cB);
+//      m_positions[indexB].c.set(cB);
       m_positions[indexB].a = aB;
-      // System.out.println("ending pos "+indexA+": " + cA.x + "," + cA.y + " - rot " + aA);
-      // System.out.println("ending pos "+indexB+": " + cB.x + "," + cB.y + " - rot " + aB);
     }
 
     // We can't expect minSpeparation >= -linearSlop because we don't
@@ -954,10 +950,10 @@ public class ContactSolver {
         aB += iB * Vec2.cross(rB, P);
       }
 
-      m_positions[indexA].c.set(cA);
+      // m_positions[indexA].c.set(cA);
       m_positions[indexA].a = aA;
 
-      m_positions[indexB].c.set(cB);
+      // m_positions[indexB].c.set(cB);
       m_positions[indexB].a = aB;
     }
 

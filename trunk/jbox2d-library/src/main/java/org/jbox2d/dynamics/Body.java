@@ -28,6 +28,8 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
+import org.jbox2d.dynamics.contacts.Position;
+import org.jbox2d.dynamics.contacts.Velocity;
 import org.jbox2d.dynamics.joints.JointEdge;
 
 /**
@@ -88,6 +90,7 @@ public class Body {
   public float m_sleepTime;
 
   public Object m_userData;
+
 
   public Body(final BodyDef bd, World world) {
     assert (bd.position.isValid());
@@ -162,7 +165,6 @@ public class Body {
     m_fixtureCount = 0;
   }
 
-  // TODO djm: check out about this new fixture here
   /**
    * Creates a fixture and attach it to this body. Use this function if you need to set some fixture
    * parameters, like friction. Otherwise you can create the fixture directly from a shape. If the
@@ -179,7 +181,6 @@ public class Body {
       return null;
     }
 
-    // djm TODO from pool?
     Fixture fixture = new Fixture();
     fixture.create(this, def);
 

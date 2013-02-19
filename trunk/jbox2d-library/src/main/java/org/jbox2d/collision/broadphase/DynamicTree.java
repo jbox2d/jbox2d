@@ -522,9 +522,6 @@ public class DynamicTree {
     return m_insertionCount;
   }
 
-  private final Vec2 center = new Vec2();
-  private final Vec2 delta1 = new Vec2();
-  private final Vec2 delta2 = new Vec2();
   private final AABB combinedAABB = new AABB();
 
   private final void insertLeaf(int leaf) {
