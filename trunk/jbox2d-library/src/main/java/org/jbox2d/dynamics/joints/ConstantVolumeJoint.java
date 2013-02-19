@@ -90,6 +90,7 @@ public class ConstantVolumeJoint extends Joint {
         final int next = (i == targetLengths.length - 1) ? 0 : i + 1;
         djd.frequencyHz = def.frequencyHz;// 20.0f;
         djd.dampingRatio = def.dampingRatio;// 50.0f;
+        djd.collideConnected = def.collideConnected;
         djd.initialize(bodies[i], bodies[next], bodies[i].getWorldCenter(),
             bodies[next].getWorldCenter());
         distanceJoints[i] = (DistanceJoint) world.createJoint(djd);
@@ -108,7 +109,7 @@ public class ConstantVolumeJoint extends Joint {
 
     this.m_bodyA = bodies[0];
     this.m_bodyB = bodies[1];
-    this.m_collideConnected = false;
+    this.m_collideConnected = def.collideConnected;
   }
 
   @Override

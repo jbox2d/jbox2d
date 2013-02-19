@@ -221,14 +221,16 @@ public class World {
   }
 
   public void pushContact(Contact contact) {
-
-    if (contact.m_manifold.pointCount > 0) {
-      contact.getFixtureA().getBody().setAwake(true);
-      contact.getFixtureB().getBody().setAwake(true);
+    Fixture fixtureA = contact.getFixtureA();
+    Fixture fixtureB = contact.getFixtureB();
+    
+    if (contact.m_manifold.pointCount > 0 && !fixtureA.isSensor() && !fixtureB.isSensor()) {
+      fixtureA.getBody().setAwake(true);
+      fixtureB.getBody().setAwake(true);
     }
 
-    ShapeType type1 = contact.getFixtureA().getType();
-    ShapeType type2 = contact.getFixtureB().getType();
+    ShapeType type1 = fixtureA.getType();
+    ShapeType type2 = fixtureB.getType();
 
     IDynamicStack<Contact> creator = contactStacks[type1.ordinal()][type2.ordinal()].creator;
     creator.push(contact);
