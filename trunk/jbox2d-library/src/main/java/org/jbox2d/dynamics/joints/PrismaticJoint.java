@@ -651,19 +651,7 @@ public class PrismaticJoint extends Joint {
       vB.y += mB * P.y;
       wB += iB * LB;
 
-      final Vec2 Cdot10 = pool.popVec2();
-      Cdot10.set(Cdot1);
-
-      Cdot1.x = Vec2.dot(m_perp, temp.set(vB).subLocal(vA)) + m_s2 * wB - m_s1 * wA;
-      Cdot1.y = wB - wA;
-
-      if (MathUtils.abs(Cdot1.x) > 0.01f || MathUtils.abs(Cdot1.y) > 0.01f) {
-        // djm note: what's happening here?
-        Mat33.mul22ToOutUnsafe(m_K, df, temp);
-        Cdot1.x += 0.0f;
-      }
-
-      pool.pushVec2(3);
+      pool.pushVec2(2);
     }
 
 //    data.velocities[m_indexA].v.set(vA);
