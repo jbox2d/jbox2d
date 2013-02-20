@@ -999,9 +999,9 @@ public abstract class TestbedTest
     }
   }
 
-  public void keyPressed(char argKeyChar, int argKeyCode) {}
+  public void keyPressed(char keyCar, int keyCode) {}
 
-  public void keyReleased(char argKeyChar, int argKeyCode) {}
+  public void keyReleased(char keyChar, int keyCode) {}
 }
 
 

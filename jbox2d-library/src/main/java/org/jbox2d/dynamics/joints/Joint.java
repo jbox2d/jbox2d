@@ -38,29 +38,31 @@ import org.jbox2d.pooling.IWorldPool;
  */
 public abstract class Joint {
 
-  public static Joint create(World argWorld, JointDef def) {
+  public static Joint create(World world, JointDef def) {
     // Joint joint = null;
     switch (def.type) {
       case MOUSE:
-        return new MouseJoint(argWorld.getPool(), (MouseJointDef) def);
+        return new MouseJoint(world.getPool(), (MouseJointDef) def);
       case DISTANCE:
-        return new DistanceJoint(argWorld.getPool(), (DistanceJointDef) def);
+        return new DistanceJoint(world.getPool(), (DistanceJointDef) def);
       case PRISMATIC:
-        return new PrismaticJoint(argWorld.getPool(), (PrismaticJointDef) def);
+        return new PrismaticJoint(world.getPool(), (PrismaticJointDef) def);
       case REVOLUTE:
-        return new RevoluteJoint(argWorld.getPool(), (RevoluteJointDef) def);
+        return new RevoluteJoint(world.getPool(), (RevoluteJointDef) def);
       case WELD:
-        return new WeldJoint(argWorld.getPool(), (WeldJointDef) def);
+        return new WeldJoint(world.getPool(), (WeldJointDef) def);
       case FRICTION:
-        return new FrictionJoint(argWorld.getPool(), (FrictionJointDef) def);
+        return new FrictionJoint(world.getPool(), (FrictionJointDef) def);
       case WHEEL:
-        return new WheelJoint(argWorld.getPool(), (WheelJointDef) def);
+        return new WheelJoint(world.getPool(), (WheelJointDef) def);
       case GEAR:
-        return new GearJoint(argWorld.getPool(), (GearJointDef) def);
+        return new GearJoint(world.getPool(), (GearJointDef) def);
       case PULLEY:
-        return new PulleyJoint(argWorld.getPool(), (PulleyJointDef) def);
+        return new PulleyJoint(world.getPool(), (PulleyJointDef) def);
       case CONSTANT_VOLUME:
-        return new ConstantVolumeJoint(argWorld, (ConstantVolumeJointDef) def);
+        return new ConstantVolumeJoint(world, (ConstantVolumeJointDef) def);
+      case ROPE:
+        return new RopeJoint(world.getPool(), (RopeJointDef) def);
       case UNKNOWN:
       default:
         return null;
@@ -92,10 +94,10 @@ public abstract class Joint {
   // float m_invMassA, m_invIA;
   // float m_invMassB, m_invIB;
 
-  protected Joint(IWorldPool argWorldPool, JointDef def) {
+  protected Joint(IWorldPool worldPool, JointDef def) {
     assert (def.bodyA != def.bodyB);
 
-    pool = argWorldPool;
+    pool = worldPool;
     m_type = def.type;
     m_prev = null;
     m_next = null;
@@ -152,14 +154,14 @@ public abstract class Joint {
    * 
    * @return
    */
-  public abstract void getAnchorA(Vec2 argOut);
+  public abstract void getAnchorA(Vec2 out);
 
   /**
    * get the anchor point on bodyB in world coordinates.
    * 
    * @return
    */
-  public abstract void getAnchorB(Vec2 argOut);
+  public abstract void getAnchorB(Vec2 out);
 
   /**
    * get the reaction force on body2 at the joint anchor in Newtons.
@@ -167,7 +169,7 @@ public abstract class Joint {
    * @param inv_dt
    * @return
    */
-  public abstract void getReactionForce(float inv_dt, Vec2 argOut);
+  public abstract void getReactionForce(float inv_dt, Vec2 out);
 
   /**
    * get the reaction torque on body2 in N*m.
