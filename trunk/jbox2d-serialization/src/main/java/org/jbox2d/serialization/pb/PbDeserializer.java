@@ -162,13 +162,10 @@ public class PbDeserializer implements JbDeserializer {
     BodyDef bd = new BodyDef();
     bd.position.set(pbToVec(b.getPosition()));
     bd.angle = b.getAngle();
-    bd.linearVelocity.set(pbToVec(b.getLinearVelocity()));
-    bd.angularVelocity = b.getAngularVelocity();
     bd.linearDamping = b.getLinearDamping();
     bd.angularDamping = b.getAngularDamping();
     bd.gravityScale = b.getGravityScale();
-
-    
+    // velocities are populated after fixture addition
     
     bd.bullet = b.getBullet();
     bd.allowSleep = b.getAllowSleep();
@@ -200,6 +197,10 @@ public class PbDeserializer implements JbDeserializer {
     for (int i = 0; i < b.getFixturesCount(); i++) {
       deserializeFixture(body, b.getFixtures(i));
     }
+    
+    // adding fixtures can change this, so we put this here and set it directly in the body
+    body.m_linearVelocity.set(pbToVec(b.getLinearVelocity()));
+    body.m_angularVelocity = b.getAngularVelocity();
 
     if (listener != null && b.hasTag()) {
       listener.processBody(body, b.getTag());
