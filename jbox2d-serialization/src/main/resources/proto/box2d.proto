@@ -145,11 +145,6 @@ message PbBody {
   optional float angle = 11;
   optional PbVec2 linear_velocity = 12;
   optional float angular_velocity = 13;
-  optional PbVec2 force = 14;
-  optional float torque = 15;
-  // mass
-  optional float mass = 16;
-  optional float I = 17;
   
   // configuration
   optional float linear_damping = 50;

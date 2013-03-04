@@ -274,7 +274,7 @@ public class PbDeserializer implements JbDeserializer {
         chain.m_count = s.getPointsCount();
         chain.m_vertices = new Vec2[chain.m_count];
         for (int i = 0; i < chain.m_count; i++) {
-          chain.m_vertices[i].set(pbToVec(s.getPoints(i)));
+          chain.m_vertices[i] = new Vec2(pbToVec(s.getPoints(i)));
         }
         chain.m_hasPrevVertex = s.getHas0();
         chain.m_hasNextVertex = s.getHas3();

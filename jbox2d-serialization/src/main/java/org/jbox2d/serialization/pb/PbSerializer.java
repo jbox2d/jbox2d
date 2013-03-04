@@ -226,17 +226,11 @@ public class PbSerializer implements JbSerializer {
     builder.setAngularDamping(argBody.getAngularDamping());
     builder.setGravityScale(argBody.getGravityScale());
 
-    builder.setForce(vecToPb(argBody.m_force));
-    builder.setTorque(argBody.m_torque);
-
     builder.setBullet(argBody.isBullet());
     builder.setAllowSleep(argBody.isSleepingAllowed());
     builder.setAwake(argBody.isAwake());
     builder.setActive(argBody.isActive());
     builder.setFixedRotation(argBody.isFixedRotation());
-
-    builder.setMass(argBody.m_mass);
-    builder.setI(argBody.m_I);
 
     Fixture curr = argBody.m_fixtureList;
     while (curr != null) {

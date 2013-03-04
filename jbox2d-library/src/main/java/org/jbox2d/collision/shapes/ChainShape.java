@@ -174,7 +174,7 @@ public class ChainShape extends Shape {
     for (int i = 0; i < count; i++) {
       m_vertices[i] = new Vec2(vertices[i]);
     }
-    m_vertices[count] = m_vertices[0];
+    m_vertices[count] = new Vec2(m_vertices[0]);
     m_prevVertex.set(m_vertices[m_count - 2]);
     m_nextVertex.set(m_vertices[1]);
     m_hasPrevVertex = true;
