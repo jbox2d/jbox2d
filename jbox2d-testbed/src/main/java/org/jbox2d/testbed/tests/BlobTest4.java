@@ -59,7 +59,6 @@ import org.jbox2d.testbed.framework.TestbedTest;
 
 public class BlobTest4 extends TestbedTest {
 
-
   @Override
   public float getDefaultCameraScale() {
     return 20;
