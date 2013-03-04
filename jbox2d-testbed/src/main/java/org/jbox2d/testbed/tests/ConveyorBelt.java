@@ -109,12 +109,8 @@ public class ConveyorBelt extends TestbedTest {
     Fixture fixtureA = contact.getFixtureA();
     Fixture fixtureB = contact.getFixtureB();
 
-    if (fixtureA == m_platform) {
+    if (fixtureA == m_platform || fixtureB == m_platform) {
       contact.setTangentSpeed(5.0f);
-    }
-
-    if (fixtureB == m_platform) {
-      contact.setTangentSpeed(-5.0f);
     }
   }
 
