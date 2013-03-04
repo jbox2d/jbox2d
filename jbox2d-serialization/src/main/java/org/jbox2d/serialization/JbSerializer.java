@@ -43,65 +43,65 @@ public interface JbSerializer {
 	 * Sets the object signer for the serializer.  This allows
 	 * the user to specify an 'tag' for each main physics object,
 	 * which is then referenced later at deserialization for the user.
-	 * @param argSigner
+	 * @param signer
 	 */
-	public void setObjectSigner(ObjectSigner argSigner);
+	public void setObjectSigner(ObjectSigner signer);
 	
 	/**
 	 * Sets a listener for unsupported exception instead of 
 	 * stopping the whole serialization process by throwing
 	 * and exception.
-	 * @param argListener
+	 * @param listener
 	 */
-	public void setUnsupportedListener(UnsupportedListener argListener);
+	public void setUnsupportedListener(UnsupportedListener listener);
 
 	/**
 	 * Serializes the world
-	 * @param argWorld
+	 * @param world
 	 * @return
    * @throws UnsupportedObjectException if a physics object is unsupported by this library.
    * @see #setUnsupportedListener(UnsupportedListener)
 	 */
-	public SerializationResult serialize(World argWorld) throws UnsupportedObjectException;
+	public SerializationResult serialize(World world) throws UnsupportedObjectException;
 	
 	/**
 	 * Serializes a body
-	 * @param argBody
+	 * @param body
 	 * @return
    * @throws UnsupportedObjectException if a physics object is unsupported by this library.
    * @see #setUnsupportedListener(UnsupportedListener)
 	 */
-	public SerializationResult serialize(Body argBody) throws UnsupportedObjectException;
+	public SerializationResult serialize(Body body) throws UnsupportedObjectException;
 	
 	/**
 	 * Serializes a fixture
-	 * @param argFixture
+	 * @param fixture
 	 * @return
 	 * @throws UnsupportedObjectException if a physics object is unsupported by this library.
 	 * @see #setUnsupportedListener(UnsupportedListener)
 	 */
-	public SerializationResult serialize(Fixture argFixture) throws UnsupportedObjectException;
+	public SerializationResult serialize(Fixture fixture) throws UnsupportedObjectException;
 	
 	/**
 	 * Serializes a shape
-	 * @param argShape
+	 * @param shape
 	 * @return
    * @throws UnsupportedObjectException if a physics object is unsupported by this library.
    * @see #setUnsupportedListener(UnsupportedListener)
 	 */
-	public SerializationResult serialize(Shape argShape) throws UnsupportedObjectException;
+	public SerializationResult serialize(Shape shape) throws UnsupportedObjectException;
 	
 	/**
 	 * Serializes joints.  Joints need to reference bodies
 	 * and sometimes other joints.
-	 * @param argJoint
-	 * @param argBodyIndexMap
-	 * @param argJointIndexMap
+	 * @param joint
+	 * @param bodyIndexMap
+	 * @param jointIndexMap
 	 * @return
 	 */
-	public SerializationResult serialize(Joint argJoint,
-			Map<Body, Integer> argBodyIndexMap,
-			Map<Joint, Integer> argJointIndexMap);
+	public SerializationResult serialize(Joint joint,
+			Map<Body, Integer> bodyIndexMap,
+			Map<Joint, Integer> jointIndexMap);
 	
 	/**
 	 * Interface that allows the serializer to
@@ -111,29 +111,29 @@ public interface JbSerializer {
 	 */
 	public static interface ObjectSigner {
 		/**
-		 * @param argWorld
+		 * @param world
 		 * @return the tag for the world. can be null.
 		 */
-		public Long getTag(World argWorld);
+		public Long getTag(World world);
 		/**
-		 * @param argBody
+		 * @param body
 		 * @return the tag for the body.  can be null.
 		 */
-		public Long getTag(Body argBody);
+		public Long getTag(Body body);
 		/**
-		 * @param argShape
+		 * @param shape
 		 * @return the tag for the shape. can be null.
 		 */
-		public Long getTag(Shape argShape);
+		public Long getTag(Shape shape);
 		/**
-		 * @param argFixture
+		 * @param fixture
 		 * @return the tag for the fixture. can be null.
 		 */
-		public Long getTag(Fixture argFixture);
+		public Long getTag(Fixture fixture);
 		/**
-		 * @param argJoint
+		 * @param joint
 		 * @return the tag for the joint. can be null.
 		 */
-		public Long getTag(Joint argJoint);
+		public Long getTag(Joint joint);
 	}
 }

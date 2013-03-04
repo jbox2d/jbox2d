@@ -162,12 +162,12 @@ public class ChainShape extends Shape {
     m_count = count + 1;
     Vec2 e = new Vec2();
     m_vertices = new Vec2[m_count];
-    for (int i = 1; i < m_count; i++) {
+    for (int i = 1; i < count; i++) {
       Vec2 v1 = vertices[i - 1];
       Vec2 v2 = vertices[i];
       e.set(v1).subLocal(v2);
       // If the code crashes here, it means your vertices are too close together.
-      if (MathUtils.distanceSquared(v1, v2) > Settings.linearSlop * Settings.linearSlop) {
+      if (MathUtils.distanceSquared(v1, v2) < Settings.linearSlop * Settings.linearSlop) {
         throw new RuntimeException("Vertices of chain shape are too close together");
       }
     }

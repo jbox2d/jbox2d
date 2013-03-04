@@ -106,6 +106,11 @@ public class Car extends TestbedTest {
   }
 
   @Override
+  public boolean isSaveLoadEnabled() {
+    return true;
+  }
+
+  @Override
   public String getTestName() {
     return "Car";
   }
@@ -134,7 +139,7 @@ public class Car extends TestbedTest {
       shape.set(new Vec2(-20.0f, 0.0f), new Vec2(20.0f, 0.0f));
       ground.createFixture(fd);
 
-      float hs[] = { 0.25f, 1.0f, 4.0f, 0.0f, 0.0f, -1.0f, -2.0f, -2.0f, -1.25f, 0.0f };
+      float hs[] = {0.25f, 1.0f, 4.0f, 0.0f, 0.0f, -1.0f, -2.0f, -2.0f, -1.25f, 0.0f};
 
       float x = 20.0f, y1 = 0.0f, dx = 5.0f;
 

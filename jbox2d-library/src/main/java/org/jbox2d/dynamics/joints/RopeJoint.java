@@ -20,9 +20,9 @@ public class RopeJoint extends Joint {
   // Solver shared
   public final Vec2 m_localAnchorA = new Vec2();
   public final Vec2 m_localAnchorB = new Vec2();
-  float m_maxLength;
-  float m_length;
-  float m_impulse;
+  public float m_maxLength;
+  public float m_length;
+  public float m_impulse;
 
   // Solver temp
   public int m_indexA;

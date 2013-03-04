@@ -74,25 +74,25 @@ public class GearJoint extends Joint {
 
   // Body A is connected to body C
   // Body B is connected to body D
-  private final Body m_bodyC;
-  private final Body m_bodyD;
+  public final Body m_bodyC;
+  public final Body m_bodyD;
 
   // Solver shared
-  private final Vec2 m_localAnchorA = new Vec2();
-  private final Vec2 m_localAnchorB = new Vec2();
-  private final Vec2 m_localAnchorC = new Vec2();
-  private final Vec2 m_localAnchorD = new Vec2();
+  public final Vec2 m_localAnchorA = new Vec2();
+  public final Vec2 m_localAnchorB = new Vec2();
+  public final Vec2 m_localAnchorC = new Vec2();
+  public final Vec2 m_localAnchorD = new Vec2();
 
-  private final Vec2 m_localAxisC = new Vec2();
-  private final Vec2 m_localAxisD = new Vec2();
+  public final Vec2 m_localAxisC = new Vec2();
+  public final Vec2 m_localAxisD = new Vec2();
 
-  private float m_referenceAngleA;
-  private float m_referenceAngleB;
+  public float m_referenceAngleA;
+  public float m_referenceAngleB;
 
-  private float m_constant;
-  private float m_ratio;
+  public float m_constant;
+  public float m_ratio;
 
-  private float m_impulse;
+  public float m_impulse;
 
   // Solver temp
   private int m_indexA, m_indexB, m_indexC, m_indexD;

@@ -58,7 +58,9 @@ import org.jbox2d.dynamics.joints.MouseJointDef;
 import org.jbox2d.dynamics.joints.PrismaticJointDef;
 import org.jbox2d.dynamics.joints.PulleyJointDef;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
+import org.jbox2d.dynamics.joints.RopeJointDef;
 import org.jbox2d.dynamics.joints.WeldJointDef;
+import org.jbox2d.dynamics.joints.WheelJointDef;
 import org.jbox2d.serialization.JbDeserializer;
 import org.jbox2d.serialization.UnsupportedListener;
 import org.jbox2d.serialization.UnsupportedObjectException;
@@ -104,26 +106,27 @@ public class PbDeserializer implements JbDeserializer {
     return deserializeWorld(world);
   }
 
-  public World deserializeWorld(PbWorld argWorld) {
-    World world = new World(pbToVec(argWorld.getGravity()));
+  public World deserializeWorld(PbWorld pbWorld) {
+    World world = new World(pbToVec(pbWorld.getGravity()));
 
-    world.setAutoClearForces(argWorld.getAutoClearForces());
-    world.setContinuousPhysics(argWorld.getContinuousPhysics());
-    world.setWarmStarting(argWorld.getWarmStarting());
+    world.setAutoClearForces(pbWorld.getAutoClearForces());
+    world.setContinuousPhysics(pbWorld.getContinuousPhysics());
+    world.setWarmStarting(pbWorld.getWarmStarting());
+    world.setSubStepping(pbWorld.getSubStepping());
 
     HashMap<Integer, Body> bodyMap = new HashMap<Integer, Body>();
     HashMap<Integer, Joint> jointMap = new HashMap<Integer, Joint>();
 
-    for (int i = 0; i < argWorld.getBodiesCount(); i++) {
-      PbBody pbBody = argWorld.getBodies(i);
+    for (int i = 0; i < pbWorld.getBodiesCount(); i++) {
+      PbBody pbBody = pbWorld.getBodies(i);
       Body body = deserializeBody(world, pbBody);
       bodyMap.put(i, body);
     }
 
     // first pass, indep joints
     int cnt = 0;
-    for (int i = 0; i < argWorld.getJointsCount(); i++) {
-      PbJoint pbJoint = argWorld.getJoints(i);
+    for (int i = 0; i < pbWorld.getJointsCount(); i++) {
+      PbJoint pbJoint = pbWorld.getJoints(i);
       if (isIndependentJoint(pbJoint.getType())) {
         Joint joint = deserializeJoint(world, pbJoint, bodyMap, jointMap);
         jointMap.put(cnt, joint);
@@ -132,8 +135,8 @@ public class PbDeserializer implements JbDeserializer {
     }
 
     // second pass, dep joints
-    for (int i = 0; i < argWorld.getJointsCount(); i++) {
-      PbJoint pbJoint = argWorld.getJoints(i);
+    for (int i = 0; i < pbWorld.getJointsCount(); i++) {
+      PbJoint pbJoint = pbWorld.getJoints(i);
       if (!isIndependentJoint(pbJoint.getType())) {
         Joint joint = deserializeJoint(world, pbJoint, bodyMap, jointMap);
         jointMap.put(cnt, joint);
@@ -141,8 +144,8 @@ public class PbDeserializer implements JbDeserializer {
       }
     }
 
-    if (listener != null && argWorld.hasTag()) {
-      listener.processWorld(world, argWorld.getTag());
+    if (listener != null && pbWorld.hasTag()) {
+      listener.processWorld(world, pbWorld.getTag());
     }
     return world;
   }
@@ -157,17 +160,21 @@ public class PbDeserializer implements JbDeserializer {
     PbBody b = argBody;
 
     BodyDef bd = new BodyDef();
-    bd.active = b.getActive();
-    bd.allowSleep = b.getAllowSleep();
-    bd.angle = b.getAngle();
-    bd.angularDamping = b.getAngularDamping();
-    bd.angularVelocity = b.getAngularVelocity();
-    bd.awake = b.getAwake();
-    bd.bullet = b.getBullet();
-    bd.fixedRotation = b.getFixedRotation();
-    bd.linearDamping = b.getLinearDamping();
-    bd.linearVelocity.set(pbToVec(b.getLinearVelocity()));
     bd.position.set(pbToVec(b.getPosition()));
+    bd.angle = b.getAngle();
+    bd.linearVelocity.set(pbToVec(b.getLinearVelocity()));
+    bd.angularVelocity = b.getAngularVelocity();
+    bd.linearDamping = b.getLinearDamping();
+    bd.angularDamping = b.getAngularDamping();
+    bd.gravityScale = b.getGravityScale();
+
+    
+    
+    bd.bullet = b.getBullet();
+    bd.allowSleep = b.getAllowSleep();
+    bd.awake = b.getAwake();
+    bd.active = b.getActive();
+    bd.fixedRotation = b.getFixedRotation();
 
     switch (b.getType()) {
       case DYNAMIC:
@@ -220,7 +227,7 @@ public class PbDeserializer implements JbDeserializer {
     fd.shape = deserializeShape(f.getShape());
 
     Fixture fixture = argBody.createFixture(fd);
-    if (listener != null) {
+    if (listener != null && f.hasTag()) {
       listener.processFixture(fixture, f.getTag());
     }
     return fixture;
@@ -265,6 +272,7 @@ public class PbDeserializer implements JbDeserializer {
       case CHAIN: {
         ChainShape chain = new ChainShape();
         chain.m_count = s.getPointsCount();
+        chain.m_vertices = new Vec2[chain.m_count];
         for (int i = 0; i < chain.m_count; i++) {
           chain.m_vertices[i].set(pbToVec(s.getPoints(i)));
         }
@@ -286,7 +294,7 @@ public class PbDeserializer implements JbDeserializer {
     }
     shape.m_radius = s.getRadius();
 
-    if (listener != null) {
+    if (listener != null && s.hasTag()) {
       listener.processShape(shape, s.getTag());
     }
     return shape;
@@ -294,147 +302,152 @@ public class PbDeserializer implements JbDeserializer {
 
   @Override
   public Joint deserializeJoint(World argWorld, InputStream argInput,
-      Map<Integer, Body> argBodyMap, Map<Integer, Joint> argJointMap) throws IOException {
+      Map<Integer, Body> argBodyMap, Map<Integer, Joint> jointMap) throws IOException {
     PbJoint joint = PbJoint.parseFrom(argInput);
-    return deserializeJoint(argWorld, joint, argBodyMap, argJointMap);
+    return deserializeJoint(argWorld, joint, argBodyMap, jointMap);
   }
 
-  public Joint deserializeJoint(World argWorld, PbJoint argJoint, Map<Integer, Body> argBodyMap,
-      Map<Integer, Joint> argJointMap) {
+  public Joint deserializeJoint(World argWorld, PbJoint joint, Map<Integer, Body> argBodyMap,
+      Map<Integer, Joint> jointMap) {
     JointDef jd = null;
 
-    switch (argJoint.getType()) {
+    switch (joint.getType()) {
       case PRISMATIC: {
         PrismaticJointDef def = new PrismaticJointDef();
         jd = def;
-        def.enableLimit = argJoint.getEnableLimit();
-        def.enableMotor = argJoint.getEnableMotor();
-        def.localAnchorA.set(pbToVec(argJoint.getLocalAnchorA()));
-        def.localAnchorB.set(pbToVec(argJoint.getLocalAnchorB()));
-        def.localAxisA.set(pbToVec(argJoint.getLocalAxisA()));
-        def.lowerTranslation = argJoint.getLowerLimit();
-        def.maxMotorForce = argJoint.getMaxMotorForce();
-        def.motorSpeed = argJoint.getMotorSpeed();
-        def.referenceAngle = argJoint.getRefAngle();
-        def.upperTranslation = argJoint.getUpperLimit();
+        def.enableLimit = joint.getEnableLimit();
+        def.enableMotor = joint.getEnableMotor();
+        def.localAnchorA.set(pbToVec(joint.getLocalAnchorA()));
+        def.localAnchorB.set(pbToVec(joint.getLocalAnchorB()));
+        def.localAxisA.set(pbToVec(joint.getLocalAxisA()));
+        def.lowerTranslation = joint.getLowerLimit();
+        def.maxMotorForce = joint.getMaxMotorForce();
+        def.motorSpeed = joint.getMotorSpeed();
+        def.referenceAngle = joint.getRefAngle();
+        def.upperTranslation = joint.getUpperLimit();
         break;
       }
       case REVOLUTE: {
         RevoluteJointDef def = new RevoluteJointDef();
         jd = def;
-        def.enableLimit = argJoint.getEnableLimit();
-        def.enableMotor = argJoint.getEnableMotor();
-        def.localAnchorA.set(pbToVec(argJoint.getLocalAnchorA()));
-        def.localAnchorB.set(pbToVec(argJoint.getLocalAnchorB()));
-        def.lowerAngle = argJoint.getLowerLimit();
-        def.maxMotorTorque = argJoint.getMaxMotorTorque();
-        def.motorSpeed = argJoint.getMotorSpeed();
-        def.referenceAngle = argJoint.getRefAngle();
-        def.upperAngle = argJoint.getUpperLimit();
+        def.enableLimit = joint.getEnableLimit();
+        def.enableMotor = joint.getEnableMotor();
+        def.localAnchorA.set(pbToVec(joint.getLocalAnchorA()));
+        def.localAnchorB.set(pbToVec(joint.getLocalAnchorB()));
+        def.lowerAngle = joint.getLowerLimit();
+        def.maxMotorTorque = joint.getMaxMotorTorque();
+        def.motorSpeed = joint.getMotorSpeed();
+        def.referenceAngle = joint.getRefAngle();
+        def.upperAngle = joint.getUpperLimit();
         break;
       }
       case DISTANCE: {
         DistanceJointDef def = new DistanceJointDef();
         jd = def;
-        def.localAnchorA.set(pbToVec(argJoint.getLocalAnchorA()));
-        def.localAnchorB.set(pbToVec(argJoint.getLocalAnchorB()));
-        def.dampingRatio = argJoint.getDampingRatio();
-        def.frequencyHz = argJoint.getFrequency();
-        def.length = argJoint.getLength();
+        def.localAnchorA.set(pbToVec(joint.getLocalAnchorA()));
+        def.localAnchorB.set(pbToVec(joint.getLocalAnchorB()));
+        def.dampingRatio = joint.getDampingRatio();
+        def.frequencyHz = joint.getFrequency();
+        def.length = joint.getLength();
         break;
       }
       case PULLEY: {
         PulleyJointDef def = new PulleyJointDef();
         jd = def;
-        def.localAnchorA.set(pbToVec(argJoint.getLocalAnchorA()));
-        def.localAnchorB.set(pbToVec(argJoint.getLocalAnchorB()));
-        def.groundAnchorA.set(pbToVec(argJoint.getGroundAnchorA()));
-        def.groundAnchorB.set(pbToVec(argJoint.getGroundAnchorB()));
-        def.lengthA = argJoint.getLengthA();
-        def.lengthB = argJoint.getLengthB();
-        def.ratio = argJoint.getRatio();
+        def.localAnchorA.set(pbToVec(joint.getLocalAnchorA()));
+        def.localAnchorB.set(pbToVec(joint.getLocalAnchorB()));
+        def.groundAnchorA.set(pbToVec(joint.getGroundAnchorA()));
+        def.groundAnchorB.set(pbToVec(joint.getGroundAnchorB()));
+        def.lengthA = joint.getLengthA();
+        def.lengthB = joint.getLengthB();
+        def.ratio = joint.getRatio();
         break;
       }
       case MOUSE: {
         MouseJointDef def = new MouseJointDef();
         jd = def;
-        def.dampingRatio = argJoint.getDampingRatio();
-        def.frequencyHz = argJoint.getFrequency();
-        def.maxForce = argJoint.getMaxForce();
-        def.target.set(pbToVec(argJoint.getTarget()));
+        def.dampingRatio = joint.getDampingRatio();
+        def.frequencyHz = joint.getFrequency();
+        def.maxForce = joint.getMaxForce();
+        def.target.set(pbToVec(joint.getTarget()));
         break;
       }
       case GEAR: {
         GearJointDef def = new GearJointDef();
         jd = def;
-        if (!argJointMap.containsKey(argJoint.getJoint1())) {
-          throw new IllegalArgumentException("Index " + argJoint.getJoint1()
+        if (!jointMap.containsKey(joint.getJoint1())) {
+          throw new IllegalArgumentException("Index " + joint.getJoint1()
               + " is not present in the joint map.");
         }
-        def.joint1 = argJointMap.get(argJoint.getJoint1());
-        if (!argJointMap.containsKey(argJoint.getJoint2())) {
-          throw new IllegalArgumentException("Index " + argJoint.getJoint2()
+        def.joint1 = jointMap.get(joint.getJoint1());
+        if (!jointMap.containsKey(joint.getJoint2())) {
+          throw new IllegalArgumentException("Index " + joint.getJoint2()
               + " is not present in the joint map.");
         }
-        def.joint2 = argJointMap.get(argJoint.getJoint2());
-        def.ratio = argJoint.getRatio();
+        def.joint2 = jointMap.get(joint.getJoint2());
+        def.ratio = joint.getRatio();
         break;
       }
       case WHEEL: {
-        UnsupportedObjectException e =
-            new UnsupportedObjectException("Wheel joint not supported yet.", Type.JOINT);
-        if (ulistener == null || ulistener.isUnsupported(e)) {
-          throw e;
-        }
-        return null;
+        WheelJointDef def = new WheelJointDef();
+        jd = def;
+        def.localAnchorA.set(pbToVec(joint.getLocalAnchorA()));
+        def.localAnchorB.set(pbToVec(joint.getLocalAnchorB()));
+        def.localAxisA.set(pbToVec(joint.getLocalAxisA()));
+        def.enableMotor = joint.getEnableMotor();
+        def.maxMotorTorque = joint.getMaxMotorTorque();
+        def.motorSpeed = joint.getMotorSpeed();
+        def.frequencyHz = joint.getFrequency();
+        def.dampingRatio = joint.getDampingRatio();
+        break;
       }
       case WELD: {
         WeldJointDef def = new WeldJointDef();
         jd = def;
-        def.localAnchorA.set(pbToVec(argJoint.getLocalAnchorA()));
-        def.localAnchorB.set(pbToVec(argJoint.getLocalAnchorB()));
-        def.referenceAngle = argJoint.getRefAngle();
-        def.frequencyHz = argJoint.getFrequency();
-        def.dampingRatio = argJoint.getDampingRatio();
+        def.localAnchorA.set(pbToVec(joint.getLocalAnchorA()));
+        def.localAnchorB.set(pbToVec(joint.getLocalAnchorB()));
+        def.referenceAngle = joint.getRefAngle();
+        def.frequencyHz = joint.getFrequency();
+        def.dampingRatio = joint.getDampingRatio();
         break;
       }
       case FRICTION: {
         FrictionJointDef def = new FrictionJointDef();
         jd = def;
-        def.localAnchorA.set(pbToVec(argJoint.getLocalAnchorA()));
-        def.localAnchorB.set(pbToVec(argJoint.getLocalAnchorB()));
-        def.maxForce = argJoint.getMaxForce();
-        def.maxTorque = argJoint.getMaxTorque();
+        def.localAnchorA.set(pbToVec(joint.getLocalAnchorA()));
+        def.localAnchorB.set(pbToVec(joint.getLocalAnchorB()));
+        def.maxForce = joint.getMaxForce();
+        def.maxTorque = joint.getMaxTorque();
         break;
       }
       case ROPE: {
-        UnsupportedObjectException e =
-            new UnsupportedObjectException("Rope joint not supported yet.", Type.JOINT);
-        if (ulistener == null || ulistener.isUnsupported(e)) {
-          throw e;
-        }
+        RopeJointDef def = new RopeJointDef();
+        jd = def;
+        def.localAnchorA.set(pbToVec(joint.getLocalAnchorA()));
+        def.localAnchorB.set(pbToVec(joint.getLocalAnchorB()));
+        def.maxLength = joint.getMaxLength();
         return null;
       }
       case CONSTANT_VOLUME: {
         ConstantVolumeJointDef def = new ConstantVolumeJointDef();
         jd = def;
-        def.dampingRatio = argJoint.getDampingRatio();
-        def.frequencyHz = argJoint.getFrequency();
-        if (argJoint.getBodiesCount() != argJoint.getJointsCount()) {
+        def.dampingRatio = joint.getDampingRatio();
+        def.frequencyHz = joint.getFrequency();
+        if (joint.getBodiesCount() != joint.getJointsCount()) {
           throw new IllegalArgumentException(
               "Constant volume joint must have bodies and joints defined");
         }
-        for (int i = 0; i < argJoint.getBodiesCount(); i++) {
-          int body = argJoint.getBodies(i);
+        for (int i = 0; i < joint.getBodiesCount(); i++) {
+          int body = joint.getBodies(i);
           if (!argBodyMap.containsKey(body)) {
             throw new IllegalArgumentException("Index " + body + " is not present in the body map");
           }
-          int joint = argJoint.getJoints(i);
-          if (!argJointMap.containsKey(joint)) {
-            throw new IllegalArgumentException("Index " + joint
+          int jointIndex = joint.getJoints(i);
+          if (!jointMap.containsKey(jointIndex)) {
+            throw new IllegalArgumentException("Index " + jointIndex
                 + " is not present in the joint map");
           }
-          Joint djoint = argJointMap.get(joint);
+          Joint djoint = jointMap.get(jointIndex);
           if (!(djoint instanceof DistanceJoint)) {
             throw new IllegalArgumentException(
                 "Joints for constant volume joint must be distance joints");
@@ -453,7 +466,7 @@ public class PbDeserializer implements JbDeserializer {
       }
       default: {
         UnsupportedObjectException e =
-            new UnsupportedObjectException("Unknown joint type: " + argJoint.getType(), Type.JOINT);
+            new UnsupportedObjectException("Unknown joint type: " + joint.getType(), Type.JOINT);
         if (ulistener == null || ulistener.isUnsupported(e)) {
           throw e;
         }
@@ -461,26 +474,26 @@ public class PbDeserializer implements JbDeserializer {
       }
     }
 
-    jd.collideConnected = argJoint.getCollideConnected();
+    jd.collideConnected = joint.getCollideConnected();
 
-    if (!argBodyMap.containsKey(argJoint.getBodyA())) {
-      throw new IllegalArgumentException("Index " + argJoint.getBodyA()
+    if (!argBodyMap.containsKey(joint.getBodyA())) {
+      throw new IllegalArgumentException("Index " + joint.getBodyA()
           + " is not present in the body map");
     }
-    jd.bodyA = argBodyMap.get(argJoint.getBodyA());
+    jd.bodyA = argBodyMap.get(joint.getBodyA());
 
-    if (!argBodyMap.containsKey(argJoint.getBodyB())) {
-      throw new IllegalArgumentException("Index " + argJoint.getBodyB()
+    if (!argBodyMap.containsKey(joint.getBodyB())) {
+      throw new IllegalArgumentException("Index " + joint.getBodyB()
           + " is not present in the body map");
     }
-    jd.bodyB = argBodyMap.get(argJoint.getBodyB());
+    jd.bodyB = argBodyMap.get(joint.getBodyB());
 
-    Joint joint = argWorld.createJoint(jd);
-    if (listener != null && argJoint.hasTag()) {
-      listener.processJoint(joint, argJoint.getTag());
+    Joint realJoint = argWorld.createJoint(jd);
+    if (listener != null && joint.hasTag()) {
+      listener.processJoint(realJoint, joint.getTag());
     }
 
-    return joint;
+    return realJoint;
   }
 
   private Vec2 pbToVec(PbVec2 argVec) {

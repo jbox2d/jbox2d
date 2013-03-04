@@ -53,59 +53,59 @@ public interface JbDeserializer {
 	
 	/**
 	 * Deserializes a world
-	 * @param argInput
+	 * @param input
 	 * @return
 	 * @throws IOException
 	 * @throws UnsupportedObjectException if a read physics object is unsupported by this library
 	 * @see #setUnsupportedListener(UnsupportedListener)
 	 */
-	public World deserializeWorld(InputStream argInput) throws IOException, UnsupportedObjectException;
+	public World deserializeWorld(InputStream input) throws IOException, UnsupportedObjectException;
 
 	/**
    * Deserializes a body
-   * @param argWorld
-   * @param argInput
+   * @param world
+   * @param input
    * @return
    * @throws IOException
    * @throws UnsupportedObjectException if a read physics object is unsupported by this library
    * @see #setUnsupportedListener(UnsupportedListener)
    */
-	public Body deserializeBody(World argWorld, InputStream argInput) throws IOException, UnsupportedObjectException;
+	public Body deserializeBody(World world, InputStream input) throws IOException, UnsupportedObjectException;
 	
 	/**
    * Deserializes a fixture
-   * @param argBody
-   * @param argInput
+   * @param body
+   * @param input
    * @return
    * @throws IOException
    * @throws UnsupportedObjectException if a read physics object is unsupported by this library
    * @see #setUnsupportedListener(UnsupportedListener)
    */
-	public Fixture deserializeFixture(Body argBody, InputStream argInput) throws IOException, UnsupportedObjectException;
+	public Fixture deserializeFixture(Body body, InputStream input) throws IOException, UnsupportedObjectException;
 	
 	/**
    * Deserializes a shape
-   * @param argInput
+   * @param input
    * @return
    * @throws IOException
    * @throws UnsupportedObjectException if a read physics object is unsupported by this library
    * @see #setUnsupportedListener(UnsupportedListener)
    */
-	public Shape deserializeShape(InputStream argInput) throws IOException, UnsupportedObjectException;
+	public Shape deserializeShape(InputStream input) throws IOException, UnsupportedObjectException;
 	
 	/**
    * Deserializes a joint
-   * @param argWorld
-   * @param argInput
-   * @param argBodyMap
-   * @param argJointMap
+   * @param world
+   * @param input
+   * @param bodyMap
+   * @param jointMap
    * @return
    * @throws IOException
    * @throws UnsupportedObjectException if a read physics object is unsupported by this library
    * @see #setUnsupportedListener(UnsupportedListener)
    */
-	public Joint deserializeJoint(World argWorld, InputStream argInput, Map<Integer, 
-								  Body> argBodyMap, Map<Integer, Joint> argJointMap) throws IOException, UnsupportedObjectException;
+	public Joint deserializeJoint(World world, InputStream input, Map<Integer, 
+								  Body> bodyMap, Map<Integer, Joint> jointMap) throws IOException, UnsupportedObjectException;
 	
 	/**
 	 * Called for each physics object with a tag defined.
@@ -114,14 +114,14 @@ public interface JbDeserializer {
 	 */
 	public static interface ObjectListener{
 		
-		public void processWorld(World argWorld, Long argTag);
+		public void processWorld(World world, Long tag);
 		
-		public void processBody(Body argBody, Long argTag);
+		public void processBody(Body body, Long tag);
 		
-		public void processFixture(Fixture argFixture, Long argTag);
+		public void processFixture(Fixture fixture, Long tag);
 		
-		public void processShape(Shape argShape, Long argTag);
+		public void processShape(Shape shape, Long tag);
 		
-		public void processJoint(Joint argJoint, Long argTag);
+		public void processJoint(Joint joint, Long tag);
 	}
 }

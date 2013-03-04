@@ -100,6 +100,7 @@ import org.jbox2d.pooling.IWorldPool;
 //
 //Now compute impulse to be applied:
 //df = f2 - f1
+
 /**
  * A prismatic joint. This joint provides one degree of freedom: translation along an axis fixed in
  * bodyA. Relative rotation is prevented. You can use a joint limit to restrict the range of motion

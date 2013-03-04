@@ -42,6 +42,7 @@ public class ConveyorBelt extends TestbedTest {
   @Override
   public Long getTag(Fixture argFixture) {
     if (argFixture == m_platform) {
+      System.out.println("tagging platform");
       return platformTag;
     }
     return super.getTag(argFixture);
@@ -50,6 +51,7 @@ public class ConveyorBelt extends TestbedTest {
   @Override
   public void processFixture(Fixture argFixture, Long argTag) {
     if(argTag == platformTag) {
+      System.out.println("got platform tag: " + argTag);
       m_platform = argFixture;
       return;
     }

@@ -48,17 +48,22 @@ import org.jbox2d.pooling.IWorldPool;
 //J = [0 0 -1 0 0 1]
 
 /**
+ * A wheel joint. This joint provides two degrees of freedom: translation along an axis fixed in
+ * bodyA and rotation in the plane. You can use a joint limit to restrict the range of motion and a
+ * joint motor to drive the rotation or to model rotational friction. This joint is designed for
+ * vehicle suspensions.
+ * 
  * @author Daniel Murphy
  */
 public class WheelJoint extends Joint {
 
-  private float m_frequencyHz;
-  private float m_dampingRatio;
+  public float m_frequencyHz;
+  public float m_dampingRatio;
 
   // Solver shared
-  private final Vec2 m_localAnchorA = new Vec2();
-  private final Vec2 m_localAnchorB = new Vec2();
-  private final Vec2 m_localXAxisA = new Vec2();
+  public final Vec2 m_localAnchorA = new Vec2();
+  public final Vec2 m_localAnchorB = new Vec2();
+  public final Vec2 m_localXAxisA = new Vec2();
   private final Vec2 m_localYAxisA = new Vec2();
 
   private float m_impulse;
@@ -173,6 +178,10 @@ public class WheelJoint extends Joint {
   public float getMotorSpeed() {
     return m_motorSpeed;
   }
+  
+  public float getMaxMotorTorque() {
+    return m_maxMotorTorque;
+  }
 
   public void setMaxMotorTorque(float torque) {
     m_bodyA.setAwake(true);
@@ -183,11 +192,11 @@ public class WheelJoint extends Joint {
   public float getMotorTorque(float inv_dt) {
     return m_motorImpulse * inv_dt;
   }
-  
+
   public void setSpringFrequencyHz(float hz) {
     m_frequencyHz = hz;
   }
-  
+
   public float getSpringFrequencyHz() {
     return m_frequencyHz;
   }
@@ -195,11 +204,11 @@ public class WheelJoint extends Joint {
   public void setSpringDampingRatio(float ratio) {
     m_dampingRatio = ratio;
   }
-  
+
   public float getSpringDampingRatio() {
     return m_dampingRatio;
   }
-  
+
   // pooling
   private final Vec2 rA = new Vec2();
   private final Vec2 rB = new Vec2();
