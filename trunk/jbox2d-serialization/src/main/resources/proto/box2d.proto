@@ -96,15 +96,15 @@ message PbJoint {
   optional PbVec2 local_anchor_b = 7;
   
   optional float ref_angle = 10; // revolute, prismatic, joint
-  optional bool enable_limit = 12; // revolute, prismatic, line
-  optional float lower_limit = 13; // revolute, prismatic, line
-  optional float upper_limit = 14; // revolute, prismatic, line
-  optional bool enable_motor = 15; // revolute, prismatic, wheel, line
+  optional bool enable_limit = 12; // revolute, prismatic
+  optional float lower_limit = 13; // revolute, prismatic
+  optional float upper_limit = 14; // revolute, prismatic
+  optional bool enable_motor = 15; // revolute, prismatic, wheel
   optional float motor_speed = 16; // revolute, prismatic, wheel
   optional float max_motor_torque = 17; // revolute, wheel
   
-  optional PbVec2 local_axis_a = 20; // prismatic, line
-  optional float max_motor_force = 21; // prismatic, line
+  optional PbVec2 local_axis_a = 20; // prismatic, wheel
+  optional float max_motor_force = 21; // prismatic
   
   optional float length = 30; // distance
   optional float frequency = 31; // distance, mouse, wheel, weld, con vol
@@ -122,10 +122,7 @@ message PbJoint {
   optional int32 joint1 = 61; // gear
   optional int32 joint2 = 62; // gear
   
-  optional float spring_frequency = 70; // wheel
-  optional float spring_damping_ratio = 71; // wheel
-  optional PbVec2 local_x_axis_a = 72; // wheel
-  optional PbVec2 local_y_axis_a = 73; // wheel
+  // wheel joint 70
   
   // weld joint 80
   
@@ -135,7 +132,6 @@ message PbJoint {
   
   repeated int32 bodies = 110; // con vol
   repeated int32 joints = 111; // con vol
-  optional float target_volume = 112; // con vol
   
   // line joint 120
 }

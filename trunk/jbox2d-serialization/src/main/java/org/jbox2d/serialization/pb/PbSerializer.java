@@ -51,11 +51,15 @@ import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.joints.ConstantVolumeJoint;
 import org.jbox2d.dynamics.joints.DistanceJoint;
 import org.jbox2d.dynamics.joints.FrictionJoint;
+import org.jbox2d.dynamics.joints.GearJoint;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.MouseJoint;
 import org.jbox2d.dynamics.joints.PrismaticJoint;
 import org.jbox2d.dynamics.joints.PulleyJoint;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
+import org.jbox2d.dynamics.joints.RopeJoint;
+import org.jbox2d.dynamics.joints.WeldJoint;
+import org.jbox2d.dynamics.joints.WheelJoint;
 import org.jbox2d.serialization.JbSerializer;
 import org.jbox2d.serialization.SerializationHelper;
 import org.jbox2d.serialization.SerializationResult;
@@ -129,7 +133,7 @@ public class PbSerializer implements JbSerializer {
     builder.setAllowSleep(argWorld.isAllowSleep());
     builder.setContinuousPhysics(argWorld.isContinuousPhysics());
     builder.setWarmStarting(argWorld.isWarmStarting());
-    // TODO(dmurph): substepping
+    builder.setSubStepping(argWorld.isSubStepping());
 
     Body cbody = argWorld.getBodyList();
     int cnt = 0;
@@ -220,8 +224,7 @@ public class PbSerializer implements JbSerializer {
     builder.setAngularVelocity(argBody.getAngularVelocity());
     builder.setLinearDamping(argBody.getLinearDamping());
     builder.setAngularDamping(argBody.getAngularDamping());
-    // TODO
-    // builder.setGravityScale(argBody.getGravityScale());
+    builder.setGravityScale(argBody.getGravityScale());
 
     builder.setForce(vecToPb(argBody.m_force));
     builder.setTorque(argBody.m_torque);
@@ -380,17 +383,19 @@ public class PbSerializer implements JbSerializer {
     };
   }
 
-  public PbJoint.Builder serializeJoint(Joint argJoint, Map<Body, Integer> argBodyIndexMap,
+  public PbJoint.Builder serializeJoint(Joint joint, Map<Body, Integer> argBodyIndexMap,
       Map<Joint, Integer> argJointIndexMap) {
     final PbJoint.Builder builder = PbJoint.newBuilder();
     if (signer != null) {
-      Long tag = signer.getTag(argJoint);
+      Long tag = signer.getTag(joint);
       if (tag != null) {
         builder.setTag(tag);
+      } else {
+        builder.clearTag();
       }
     }
-    Body bA = argJoint.m_bodyA;
-    Body bB = argJoint.m_bodyB;
+    Body bA = joint.m_bodyA;
+    Body bB = joint.m_bodyB;
 
     if (!argBodyIndexMap.containsKey(bA)) {
       throw new IllegalArgumentException("Body " + bA + " is not present in the index map");
@@ -402,12 +407,14 @@ public class PbSerializer implements JbSerializer {
     }
     builder.setBodyB(argBodyIndexMap.get(bB));
 
-    builder.setCollideConnected(argJoint.m_collideConnected);
+    builder.setCollideConnected(joint.m_collideConnected);
 
-    switch (argJoint.m_type) {
+    switch (joint.m_type) {
       case REVOLUTE: {
-        RevoluteJoint j = (RevoluteJoint) argJoint;
+        RevoluteJoint j = (RevoluteJoint) joint;
         builder.setType(PbJointType.REVOLUTE);
+        builder.setLocalAnchorA(vecToPb(j.m_localAnchorA));
+        builder.setLocalAnchorB(vecToPb(j.m_localAnchorB));
         builder.setRefAngle(j.m_referenceAngle);
         builder.setEnableLimit(j.m_enableLimit);
         builder.setLowerLimit(j.m_lowerAngle);
@@ -415,27 +422,25 @@ public class PbSerializer implements JbSerializer {
         builder.setEnableMotor(j.m_enableMotor);
         builder.setMotorSpeed(j.m_motorSpeed);
         builder.setMaxMotorTorque(j.m_maxMotorTorque);
-        builder.setLocalAnchorA(vecToPb(j.m_localAnchorA));
-        builder.setLocalAnchorB(vecToPb(j.m_localAnchorB));
         break;
       }
       case PRISMATIC: {
-        PrismaticJoint j = (PrismaticJoint) argJoint;
+        PrismaticJoint j = (PrismaticJoint) joint;
         builder.setType(PbJointType.PRISMATIC);
+        builder.setLocalAnchorA(vecToPb(j.m_localAnchorA));
+        builder.setLocalAnchorB(vecToPb(j.m_localAnchorB));
+        builder.setLocalAxisA(vecToPb(j.m_localXAxisA));
         builder.setRefAngle(j.m_referenceAngle);
         builder.setEnableLimit(j.m_enableLimit);
         builder.setLowerLimit(j.m_lowerTranslation);
         builder.setUpperLimit(j.m_upperTranslation);
         builder.setEnableMotor(j.m_enableMotor);
-        builder.setMotorSpeed(j.m_motorSpeed);
-        builder.setLocalAnchorA(vecToPb(j.m_localAnchorA));
-        builder.setLocalAnchorB(vecToPb(j.m_localAnchorB));
-        builder.setLocalAxisA(vecToPb(j.m_localXAxisA));
         builder.setMaxMotorForce(j.m_maxMotorForce);
+        builder.setMotorSpeed(j.m_motorSpeed);
         break;
       }
       case DISTANCE: {
-        DistanceJoint j = (DistanceJoint) argJoint;
+        DistanceJoint j = (DistanceJoint) joint;
         builder.setType(PbJointType.DISTANCE);
         builder.setLocalAnchorA(vecToPb(j.m_localAnchorA));
         builder.setLocalAnchorB(vecToPb(j.m_localAnchorB));
@@ -445,7 +450,7 @@ public class PbSerializer implements JbSerializer {
         break;
       }
       case PULLEY: {
-        PulleyJoint j = (PulleyJoint) argJoint;
+        PulleyJoint j = (PulleyJoint) joint;
         builder.setType(PbJointType.PULLEY);
         builder.setLocalAnchorA(vecToPb(j.m_localAnchorA));
         builder.setLocalAnchorB(vecToPb(j.m_localAnchorB));
@@ -457,7 +462,7 @@ public class PbSerializer implements JbSerializer {
         break;
       }
       case MOUSE: {
-        MouseJoint j = (MouseJoint) argJoint;
+        MouseJoint j = (MouseJoint) joint;
         builder.setType(PbJointType.MOUSE);
         builder.setTarget(vecToPb(j.getTarget()));
         builder.setMaxForce(j.getMaxForce());
@@ -466,26 +471,24 @@ public class PbSerializer implements JbSerializer {
         break;
       }
       case GEAR: {
-//        GearJoint j = (GearJoint) argJoint;
-//        builder.setType(PbJointType.GEAR);
-//        builder.setLocalAnchorA(vecToPb(j.m_localAnchorA));
-//        builder.setLocalAnchorB(vecToPb(j.m_localAnchorB));
-//        builder.setRatio(j.getRatio());
-//        if (!argJointIndexMap.containsKey(j.getJoint1())) {
-//          throw new IllegalArgumentException("Joint 1 not in map");
-//        }
-//        int j1 = argJointIndexMap.get(j.getJoint1());
-//        if (!argJointIndexMap.containsKey(j.getJoint2())) {
-//          throw new IllegalArgumentException("Joint 2 not in map");
-//        }
-//        int j2 = argJointIndexMap.get(j.getJoint2());
-//
-//        builder.setJoint1(j1);
-//        builder.setJoint2(j2);
-//        break;
+        GearJoint j = (GearJoint) joint;
+        builder.setType(PbJointType.GEAR);
+        builder.setRatio(j.getRatio());
+        if (!argJointIndexMap.containsKey(j.getJoint1())) {
+          throw new IllegalArgumentException("Joint 1 not in map");
+        }
+        int j1 = argJointIndexMap.get(j.getJoint1());
+        if (!argJointIndexMap.containsKey(j.getJoint2())) {
+          throw new IllegalArgumentException("Joint 2 not in map");
+        }
+        int j2 = argJointIndexMap.get(j.getJoint2());
+
+        builder.setJoint1(j1);
+        builder.setJoint2(j2);
+        break;
       }
       case FRICTION: {
-        FrictionJoint j = (FrictionJoint) argJoint;
+        FrictionJoint j = (FrictionJoint) joint;
         builder.setType(PbJointType.FRICTION);
         builder.setLocalAnchorA(vecToPb(j.getLocalAnchorA()));
         builder.setLocalAnchorB(vecToPb(j.getLocalAnchorB()));
@@ -494,11 +497,10 @@ public class PbSerializer implements JbSerializer {
         break;
       }
       case CONSTANT_VOLUME: {
-        ConstantVolumeJoint j = (ConstantVolumeJoint) argJoint;
+        ConstantVolumeJoint j = (ConstantVolumeJoint) joint;
         builder.setType(PbJointType.CONSTANT_VOLUME);
         builder.setFrequency(j.frequencyHz);
         builder.setDampingRatio(j.dampingRatio);
-        builder.setTargetVolume(j.targetVolume);
 
         for (int i = 0; i < j.bodies.length; i++) {
           Body b = j.bodies[i];
@@ -515,23 +517,40 @@ public class PbSerializer implements JbSerializer {
         }
         break;
       }
-//      case WHEEL: {
-//        WheelJoint j = (WheelJoint) argJoint;
-//        builder.setType(PbJointType.LINE);
-//        builder.setLocalAnchorA(vecToPb(j.m_localAnchor1));
-//        builder.setLocalAnchorB(vecToPb(j.m_localAnchor2));
-//        builder.setLocalAxisA(vecToPb(j.m_localXAxis1));
-//        builder.setLowerLimit(j.getLowerLimit());
-//        builder.setUpperLimit(j.getUpperLimit());
-//        builder.setMaxMotorForce(j.getMaxMotorForce());
-//        builder.setMotorSpeed(j.getMotorSpeed());
-//        builder.setEnableLimit(j.isLimitEnabled());
-//        builder.setEnableMotor(j.isMotorEnabled());
-//        break;
-//      }
+      case WHEEL: {
+        WheelJoint j = (WheelJoint) joint;
+        builder.setType(PbJointType.WHEEL);
+        builder.setLocalAnchorA(vecToPb(j.m_localAnchorA));
+        builder.setLocalAnchorB(vecToPb(j.m_localAnchorB));
+        builder.setLocalAxisA(vecToPb(j.m_localXAxisA));
+        builder.setEnableMotor(j.isMotorEnabled());
+        builder.setMaxMotorTorque(j.getMaxMotorTorque());
+        builder.setMotorSpeed(j.getMotorSpeed());
+        builder.setFrequency(j.m_frequencyHz);
+        builder.setDampingRatio(j.m_dampingRatio);
+        break;
+      }
+      case ROPE: {
+        RopeJoint j = (RopeJoint) joint;
+        builder.setType(PbJointType.ROPE);
+        builder.setLocalAnchorA(vecToPb(j.m_localAnchorA));
+        builder.setLocalAnchorB(vecToPb(j.m_localAnchorB));
+        builder.setMaxLength(j.m_maxLength);
+        break;
+      }
+      case WELD: {
+        WeldJoint j = (WeldJoint) joint;
+        builder.setType(PbJointType.WELD);
+        builder.setLocalAnchorA(vecToPb(j.m_localAnchorA));
+        builder.setLocalAnchorB(vecToPb(j.m_localAnchorB));
+        builder.setRefAngle(j.m_referenceAngle);
+        builder.setFrequency(j.m_frequencyHz);
+        builder.setDampingRatio(j.m_dampingRatio);
+        break;
+      }
       default:
         UnsupportedObjectException e = new UnsupportedObjectException("Unknown joint type: "
-            + argJoint.getType(), Type.JOINT);
+            + joint.getType(), Type.JOINT);
         if (listener == null || listener.isUnsupported(e)) {
           throw e;
         }

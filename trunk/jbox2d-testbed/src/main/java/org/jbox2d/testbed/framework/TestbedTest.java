@@ -1015,9 +1015,6 @@ class TestQueryCallback implements QueryCallback {
     fixture = null;
   }
 
-  /**
-   * @see org.jbox2d.callbacks.QueryCallback#reportFixture(org.jbox2d.dynamics.Fixture)
-   */
   public boolean reportFixture(Fixture argFixture) {
     Body body = argFixture.getBody();
     if (body.getType() == BodyType.DYNAMIC) {

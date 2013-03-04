@@ -49,14 +49,14 @@ public class PulleyJoint extends Joint {
   public final Vec2 m_groundAnchorA = new Vec2();
   public final Vec2 m_groundAnchorB = new Vec2();
   private float m_lengthA;
-  private float m_LengthB;
+  private float m_lengthB;
 
   // Solver shared
   public final Vec2 m_localAnchorA = new Vec2();
   public final Vec2 m_localAnchorB = new Vec2();
-  private float m_constant;
-  private float m_ratio;
-  private float m_impulse;
+  public float m_constant;
+  public float m_ratio;
+  public float m_impulse;
 
   // Solver temp
   public int m_indexA;
@@ -88,7 +88,7 @@ public class PulleyJoint extends Joint {
     m_ratio = def.ratio;
 
     m_lengthA = def.lengthA;
-    m_LengthB = def.lengthB;
+    m_lengthB = def.lengthB;
 
     m_constant = def.lengthA + m_ratio * def.lengthB;
     m_impulse = 0.0f;
@@ -99,7 +99,7 @@ public class PulleyJoint extends Joint {
   }
 
   public float getLengthB() {
-    return m_LengthB;
+    return m_lengthB;
   }
 
   public float getCurrentLengthA() {

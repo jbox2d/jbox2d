@@ -38,13 +38,10 @@ public class ConstantVolumeJointDef extends JointDef {
 	ArrayList<Body> bodies;
 	ArrayList<DistanceJoint> joints;
 	
-	//public float relaxationFactor;//1.0 is perfectly stiff (but doesn't work, unstable)
-
 	public ConstantVolumeJointDef() {
 		type = JointType.CONSTANT_VOLUME;
 		bodies = new ArrayList<Body>();
 		joints = null;
-		//relaxationFactor = 0.9f;
 		collideConnected = false;
 		frequencyHz = 0.0f;
 		dampingRatio = 0.0f;
