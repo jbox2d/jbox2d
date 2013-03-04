@@ -58,86 +58,86 @@ import org.jbox2d.dynamics.joints.ConstantVolumeJointDef;
 import org.jbox2d.testbed.framework.TestbedTest;
 
 public class BlobTest4 extends TestbedTest {
-  
-	
-	@Override
-	public float getDefaultCameraScale() {
-	  return 20;
-	}
-	
-	@Override
-	public boolean isSaveLoadEnabled() {
-	  return true;
-	}
-	
-	@Override
-	public void initTest(boolean argDeserialized) {
-	  if(argDeserialized){
-	    return;
-	  }
-		
-    	Body ground = null;
-		{
-			PolygonShape sd = new PolygonShape();
-			sd.setAsBox(50.0f, 0.4f);
 
-			BodyDef bd = new BodyDef();
-			bd.position.set(0.0f, 0.0f);
-			ground = getWorld().createBody(bd);
-			ground.createFixture(sd,0f);
-			
-			sd.setAsBox(0.4f,50.0f,new Vec2(-10.0f,0.0f), 0.0f);
-			ground.createFixture(sd, 0f);
-			sd.setAsBox(0.4f,50.0f,new Vec2(10.0f,0.0f), 0.0f);
-			ground.createFixture(sd, 0f);
-		}
-		
-		ConstantVolumeJointDef cvjd = new ConstantVolumeJointDef();
-		
-		float cx = 0.0f;
-		float cy = 10.0f;
-		float rx = 5.0f;
-		float ry = 5.0f;
-		int nBodies = 20;
-		float bodyRadius = 0.5f;
-		for (int i=0; i<nBodies; ++i) {
-			float angle = MathUtils.map(i, 0, nBodies, 0, 2*3.1415f);
-			BodyDef bd = new BodyDef();
-			//bd.isBullet = true;
-			bd.fixedRotation = true;
-		
-			float x = cx + rx * (float)Math.sin(angle);
-			float y = cy + ry * (float)Math.cos(angle);
-			bd.position.set(new Vec2(x,y));
-			bd.type = BodyType.DYNAMIC;
-			Body body = getWorld().createBody(bd);
-			
-			FixtureDef fd = new FixtureDef();
-			CircleShape cd = new CircleShape();
-			cd.m_radius = bodyRadius;
-			fd.shape = cd;
-			fd.density = 1.0f;
-			body.createFixture(fd);
-			cvjd.addBody(body);
-		}
 
-		cvjd.frequencyHz = 10.0f;
-		cvjd.dampingRatio = 1.0f;
-		cvjd.collideConnected = false;
-		getWorld().createJoint(cvjd);
-		
-		BodyDef bd2 = new BodyDef();
-		bd2.type = BodyType.DYNAMIC;
-		PolygonShape psd = new PolygonShape();
-		psd.setAsBox(3.0f,1.5f,new Vec2(cx,cy+15.0f),0.0f);
-		bd2.position = new Vec2(cx,cy+15.0f);
-		Body fallingBox = getWorld().createBody(bd2);
-		fallingBox.createFixture(psd,1.0f);
-	}
+  @Override
+  public float getDefaultCameraScale() {
+    return 20;
+  }
 
-	@Override
-	public String getTestName() {
-		return "Blob Joint";
-	}
+  @Override
+  public boolean isSaveLoadEnabled() {
+    return true;
+  }
+
+  @Override
+  public void initTest(boolean argDeserialized) {
+    if (argDeserialized) {
+      return;
+    }
+
+    Body ground = null;
+    {
+      PolygonShape sd = new PolygonShape();
+      sd.setAsBox(50.0f, 0.4f);
+
+      BodyDef bd = new BodyDef();
+      bd.position.set(0.0f, 0.0f);
+      ground = getWorld().createBody(bd);
+      ground.createFixture(sd, 0f);
+
+      sd.setAsBox(0.4f, 50.0f, new Vec2(-10.0f, 0.0f), 0.0f);
+      ground.createFixture(sd, 0f);
+      sd.setAsBox(0.4f, 50.0f, new Vec2(10.0f, 0.0f), 0.0f);
+      ground.createFixture(sd, 0f);
+    }
+
+    ConstantVolumeJointDef cvjd = new ConstantVolumeJointDef();
+
+    float cx = 0.0f;
+    float cy = 10.0f;
+    float rx = 5.0f;
+    float ry = 5.0f;
+    int nBodies = 20;
+    float bodyRadius = 0.5f;
+    for (int i = 0; i < nBodies; ++i) {
+      float angle = MathUtils.map(i, 0, nBodies, 0, 2 * 3.1415f);
+      BodyDef bd = new BodyDef();
+      // bd.isBullet = true;
+      bd.fixedRotation = true;
+
+      float x = cx + rx * (float) Math.sin(angle);
+      float y = cy + ry * (float) Math.cos(angle);
+      bd.position.set(new Vec2(x, y));
+      bd.type = BodyType.DYNAMIC;
+      Body body = getWorld().createBody(bd);
+
+      FixtureDef fd = new FixtureDef();
+      CircleShape cd = new CircleShape();
+      cd.m_radius = bodyRadius;
+      fd.shape = cd;
+      fd.density = 1.0f;
+      body.createFixture(fd);
+      cvjd.addBody(body);
+    }
+
+    cvjd.frequencyHz = 10.0f;
+    cvjd.dampingRatio = 1.0f;
+    cvjd.collideConnected = false;
+    getWorld().createJoint(cvjd);
+
+    BodyDef bd2 = new BodyDef();
+    bd2.type = BodyType.DYNAMIC;
+    PolygonShape psd = new PolygonShape();
+    psd.setAsBox(3.0f, 1.5f, new Vec2(cx, cy + 15.0f), 0.0f);
+    bd2.position = new Vec2(cx, cy + 15.0f);
+    Body fallingBox = getWorld().createBody(bd2);
+    fallingBox.createFixture(psd, 1.0f);
+  }
+
+  @Override
+  public String getTestName() {
+    return "Blob Joint";
+  }
 
 }

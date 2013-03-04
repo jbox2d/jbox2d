@@ -7215,23 +7215,6 @@ public final class Box2D {
     boolean hasAngularVelocity();
     float getAngularVelocity();
     
-    // optional .box2d.PbVec2 force = 14;
-    boolean hasForce();
-    org.box2d.proto.Box2D.PbVec2 getForce();
-    org.box2d.proto.Box2D.PbVec2OrBuilder getForceOrBuilder();
-    
-    // optional float torque = 15;
-    boolean hasTorque();
-    float getTorque();
-    
-    // optional float mass = 16;
-    boolean hasMass();
-    float getMass();
-    
-    // optional float I = 17;
-    boolean hasI();
-    float getI();
-    
     // optional float linear_damping = 50;
     boolean hasLinearDamping();
     float getLinearDamping();
@@ -7369,54 +7352,11 @@ public final class Box2D {
       return angularVelocity_;
     }
     
-    // optional .box2d.PbVec2 force = 14;
-    public static final int FORCE_FIELD_NUMBER = 14;
-    private org.box2d.proto.Box2D.PbVec2 force_;
-    public boolean hasForce() {
-      return ((bitField0_ & 0x00000040) == 0x00000040);
-    }
-    public org.box2d.proto.Box2D.PbVec2 getForce() {
-      return force_;
-    }
-    public org.box2d.proto.Box2D.PbVec2OrBuilder getForceOrBuilder() {
-      return force_;
-    }
-    
-    // optional float torque = 15;
-    public static final int TORQUE_FIELD_NUMBER = 15;
-    private float torque_;
-    public boolean hasTorque() {
-      return ((bitField0_ & 0x00000080) == 0x00000080);
-    }
-    public float getTorque() {
-      return torque_;
-    }
-    
-    // optional float mass = 16;
-    public static final int MASS_FIELD_NUMBER = 16;
-    private float mass_;
-    public boolean hasMass() {
-      return ((bitField0_ & 0x00000100) == 0x00000100);
-    }
-    public float getMass() {
-      return mass_;
-    }
-    
-    // optional float I = 17;
-    public static final int I_FIELD_NUMBER = 17;
-    private float i_;
-    public boolean hasI() {
-      return ((bitField0_ & 0x00000200) == 0x00000200);
-    }
-    public float getI() {
-      return i_;
-    }
-    
     // optional float linear_damping = 50;
     public static final int LINEAR_DAMPING_FIELD_NUMBER = 50;
     private float linearDamping_;
     public boolean hasLinearDamping() {
-      return ((bitField0_ & 0x00000400) == 0x00000400);
+      return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     public float getLinearDamping() {
       return linearDamping_;
@@ -7426,7 +7366,7 @@ public final class Box2D {
     public static final int ANGULAR_DAMPING_FIELD_NUMBER = 51;
     private float angularDamping_;
     public boolean hasAngularDamping() {
-      return ((bitField0_ & 0x00000800) == 0x00000800);
+      return ((bitField0_ & 0x00000080) == 0x00000080);
     }
     public float getAngularDamping() {
       return angularDamping_;
@@ -7436,7 +7376,7 @@ public final class Box2D {
     public static final int GRAVITY_SCALE_FIELD_NUMBER = 52;
     private float gravityScale_;
     public boolean hasGravityScale() {
-      return ((bitField0_ & 0x00001000) == 0x00001000);
+      return ((bitField0_ & 0x00000100) == 0x00000100);
     }
     public float getGravityScale() {
       return gravityScale_;
@@ -7446,7 +7386,7 @@ public final class Box2D {
     public static final int BULLET_FIELD_NUMBER = 53;
     private boolean bullet_;
     public boolean hasBullet() {
-      return ((bitField0_ & 0x00002000) == 0x00002000);
+      return ((bitField0_ & 0x00000200) == 0x00000200);
     }
     public boolean getBullet() {
       return bullet_;
@@ -7456,7 +7396,7 @@ public final class Box2D {
     public static final int ALLOW_SLEEP_FIELD_NUMBER = 54;
     private boolean allowSleep_;
     public boolean hasAllowSleep() {
-      return ((bitField0_ & 0x00004000) == 0x00004000);
+      return ((bitField0_ & 0x00000400) == 0x00000400);
     }
     public boolean getAllowSleep() {
       return allowSleep_;
@@ -7466,7 +7406,7 @@ public final class Box2D {
     public static final int AWAKE_FIELD_NUMBER = 55;
     private boolean awake_;
     public boolean hasAwake() {
-      return ((bitField0_ & 0x00008000) == 0x00008000);
+      return ((bitField0_ & 0x00000800) == 0x00000800);
     }
     public boolean getAwake() {
       return awake_;
@@ -7476,7 +7416,7 @@ public final class Box2D {
     public static final int ACTIVE_FIELD_NUMBER = 56;
     private boolean active_;
     public boolean hasActive() {
-      return ((bitField0_ & 0x00010000) == 0x00010000);
+      return ((bitField0_ & 0x00001000) == 0x00001000);
     }
     public boolean getActive() {
       return active_;
@@ -7486,7 +7426,7 @@ public final class Box2D {
     public static final int FIXED_ROTATION_FIELD_NUMBER = 57;
     private boolean fixedRotation_;
     public boolean hasFixedRotation() {
-      return ((bitField0_ & 0x00020000) == 0x00020000);
+      return ((bitField0_ & 0x00002000) == 0x00002000);
     }
     public boolean getFixedRotation() {
       return fixedRotation_;
@@ -7520,10 +7460,6 @@ public final class Box2D {
       angle_ = 0F;
       linearVelocity_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
       angularVelocity_ = 0F;
-      force_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
-      torque_ = 0F;
-      mass_ = 0F;
-      i_ = 0F;
       linearDamping_ = 0F;
       angularDamping_ = 0F;
       gravityScale_ = 0F;
@@ -7551,12 +7487,6 @@ public final class Box2D {
       }
       if (hasLinearVelocity()) {
         if (!getLinearVelocity().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
-      if (hasForce()) {
-        if (!getForce().isInitialized()) {
           memoizedIsInitialized = 0;
           return false;
         }
@@ -7593,39 +7523,27 @@ public final class Box2D {
         output.writeFloat(13, angularVelocity_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
-        output.writeMessage(14, force_);
-      }
-      if (((bitField0_ & 0x00000080) == 0x00000080)) {
-        output.writeFloat(15, torque_);
-      }
-      if (((bitField0_ & 0x00000100) == 0x00000100)) {
-        output.writeFloat(16, mass_);
-      }
-      if (((bitField0_ & 0x00000200) == 0x00000200)) {
-        output.writeFloat(17, i_);
-      }
-      if (((bitField0_ & 0x00000400) == 0x00000400)) {
         output.writeFloat(50, linearDamping_);
       }
-      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
         output.writeFloat(51, angularDamping_);
       }
-      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
         output.writeFloat(52, gravityScale_);
       }
-      if (((bitField0_ & 0x00002000) == 0x00002000)) {
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
         output.writeBool(53, bullet_);
       }
-      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
         output.writeBool(54, allowSleep_);
       }
-      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
         output.writeBool(55, awake_);
       }
-      if (((bitField0_ & 0x00010000) == 0x00010000)) {
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
         output.writeBool(56, active_);
       }
-      if (((bitField0_ & 0x00020000) == 0x00020000)) {
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
         output.writeBool(57, fixedRotation_);
       }
       for (int i = 0; i < fixtures_.size(); i++) {
@@ -7666,49 +7584,33 @@ public final class Box2D {
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(14, force_);
+          .computeFloatSize(50, linearDamping_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(15, torque_);
+          .computeFloatSize(51, angularDamping_);
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(16, mass_);
+          .computeFloatSize(52, gravityScale_);
       }
       if (((bitField0_ & 0x00000200) == 0x00000200)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(17, i_);
+          .computeBoolSize(53, bullet_);
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(50, linearDamping_);
+          .computeBoolSize(54, allowSleep_);
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(51, angularDamping_);
+          .computeBoolSize(55, awake_);
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(52, gravityScale_);
-      }
-      if (((bitField0_ & 0x00002000) == 0x00002000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(53, bullet_);
-      }
-      if (((bitField0_ & 0x00004000) == 0x00004000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(54, allowSleep_);
-      }
-      if (((bitField0_ & 0x00008000) == 0x00008000)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(55, awake_);
-      }
-      if (((bitField0_ & 0x00010000) == 0x00010000)) {
-        size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(56, active_);
       }
-      if (((bitField0_ & 0x00020000) == 0x00020000)) {
+      if (((bitField0_ & 0x00002000) == 0x00002000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(57, fixedRotation_);
       }
@@ -7834,7 +7736,6 @@ public final class Box2D {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           getPositionFieldBuilder();
           getLinearVelocityFieldBuilder();
-          getForceFieldBuilder();
           getFixturesFieldBuilder();
         }
       }
@@ -7864,37 +7765,25 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00000010);
         angularVelocity_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000020);
-        if (forceBuilder_ == null) {
-          force_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
-        } else {
-          forceBuilder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000040);
-        torque_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000080);
-        mass_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000100);
-        i_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000200);
         linearDamping_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000400);
+        bitField0_ = (bitField0_ & ~0x00000040);
         angularDamping_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00000800);
+        bitField0_ = (bitField0_ & ~0x00000080);
         gravityScale_ = 0F;
-        bitField0_ = (bitField0_ & ~0x00001000);
+        bitField0_ = (bitField0_ & ~0x00000100);
         bullet_ = false;
-        bitField0_ = (bitField0_ & ~0x00002000);
+        bitField0_ = (bitField0_ & ~0x00000200);
         allowSleep_ = false;
-        bitField0_ = (bitField0_ & ~0x00004000);
+        bitField0_ = (bitField0_ & ~0x00000400);
         awake_ = false;
-        bitField0_ = (bitField0_ & ~0x00008000);
+        bitField0_ = (bitField0_ & ~0x00000800);
         active_ = false;
-        bitField0_ = (bitField0_ & ~0x00010000);
+        bitField0_ = (bitField0_ & ~0x00001000);
         fixedRotation_ = false;
-        bitField0_ = (bitField0_ & ~0x00020000);
+        bitField0_ = (bitField0_ & ~0x00002000);
         if (fixturesBuilder_ == null) {
           fixtures_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00040000);
+          bitField0_ = (bitField0_ & ~0x00004000);
         } else {
           fixturesBuilder_.clear();
         }
@@ -7971,59 +7860,39 @@ public final class Box2D {
         if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
           to_bitField0_ |= 0x00000040;
         }
-        if (forceBuilder_ == null) {
-          result.force_ = force_;
-        } else {
-          result.force_ = forceBuilder_.build();
-        }
+        result.linearDamping_ = linearDamping_;
         if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
           to_bitField0_ |= 0x00000080;
         }
-        result.torque_ = torque_;
+        result.angularDamping_ = angularDamping_;
         if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
           to_bitField0_ |= 0x00000100;
         }
-        result.mass_ = mass_;
+        result.gravityScale_ = gravityScale_;
         if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
           to_bitField0_ |= 0x00000200;
         }
-        result.i_ = i_;
+        result.bullet_ = bullet_;
         if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
           to_bitField0_ |= 0x00000400;
         }
-        result.linearDamping_ = linearDamping_;
+        result.allowSleep_ = allowSleep_;
         if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
           to_bitField0_ |= 0x00000800;
         }
-        result.angularDamping_ = angularDamping_;
+        result.awake_ = awake_;
         if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
           to_bitField0_ |= 0x00001000;
         }
-        result.gravityScale_ = gravityScale_;
+        result.active_ = active_;
         if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
           to_bitField0_ |= 0x00002000;
         }
-        result.bullet_ = bullet_;
-        if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
-          to_bitField0_ |= 0x00004000;
-        }
-        result.allowSleep_ = allowSleep_;
-        if (((from_bitField0_ & 0x00008000) == 0x00008000)) {
-          to_bitField0_ |= 0x00008000;
-        }
-        result.awake_ = awake_;
-        if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
-          to_bitField0_ |= 0x00010000;
-        }
-        result.active_ = active_;
-        if (((from_bitField0_ & 0x00020000) == 0x00020000)) {
-          to_bitField0_ |= 0x00020000;
-        }
         result.fixedRotation_ = fixedRotation_;
         if (fixturesBuilder_ == null) {
-          if (((bitField0_ & 0x00040000) == 0x00040000)) {
+          if (((bitField0_ & 0x00004000) == 0x00004000)) {
             fixtures_ = java.util.Collections.unmodifiableList(fixtures_);
-            bitField0_ = (bitField0_ & ~0x00040000);
+            bitField0_ = (bitField0_ & ~0x00004000);
           }
           result.fixtures_ = fixtures_;
         } else {
@@ -8063,18 +7932,6 @@ public final class Box2D {
         if (other.hasAngularVelocity()) {
           setAngularVelocity(other.getAngularVelocity());
         }
-        if (other.hasForce()) {
-          mergeForce(other.getForce());
-        }
-        if (other.hasTorque()) {
-          setTorque(other.getTorque());
-        }
-        if (other.hasMass()) {
-          setMass(other.getMass());
-        }
-        if (other.hasI()) {
-          setI(other.getI());
-        }
         if (other.hasLinearDamping()) {
           setLinearDamping(other.getLinearDamping());
         }
@@ -8103,7 +7960,7 @@ public final class Box2D {
           if (!other.fixtures_.isEmpty()) {
             if (fixtures_.isEmpty()) {
               fixtures_ = other.fixtures_;
-              bitField0_ = (bitField0_ & ~0x00040000);
+              bitField0_ = (bitField0_ & ~0x00004000);
             } else {
               ensureFixturesIsMutable();
               fixtures_.addAll(other.fixtures_);
@@ -8116,7 +7973,7 @@ public final class Box2D {
               fixturesBuilder_.dispose();
               fixturesBuilder_ = null;
               fixtures_ = other.fixtures_;
-              bitField0_ = (bitField0_ & ~0x00040000);
+              bitField0_ = (bitField0_ & ~0x00004000);
               fixturesBuilder_ = 
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    getFixturesFieldBuilder() : null;
@@ -8142,12 +7999,6 @@ public final class Box2D {
         }
         if (hasLinearVelocity()) {
           if (!getLinearVelocity().isInitialized()) {
-            
-            return false;
-          }
-        }
-        if (hasForce()) {
-          if (!getForce().isInitialized()) {
             
             return false;
           }
@@ -8228,67 +8079,43 @@ public final class Box2D {
               angularVelocity_ = input.readFloat();
               break;
             }
-            case 114: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              if (hasForce()) {
-                subBuilder.mergeFrom(getForce());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setForce(subBuilder.buildPartial());
-              break;
-            }
-            case 125: {
-              bitField0_ |= 0x00000080;
-              torque_ = input.readFloat();
-              break;
-            }
-            case 133: {
-              bitField0_ |= 0x00000100;
-              mass_ = input.readFloat();
-              break;
-            }
-            case 141: {
-              bitField0_ |= 0x00000200;
-              i_ = input.readFloat();
-              break;
-            }
             case 405: {
-              bitField0_ |= 0x00000400;
+              bitField0_ |= 0x00000040;
               linearDamping_ = input.readFloat();
               break;
             }
             case 413: {
-              bitField0_ |= 0x00000800;
+              bitField0_ |= 0x00000080;
               angularDamping_ = input.readFloat();
               break;
             }
             case 421: {
-              bitField0_ |= 0x00001000;
+              bitField0_ |= 0x00000100;
               gravityScale_ = input.readFloat();
               break;
             }
             case 424: {
-              bitField0_ |= 0x00002000;
+              bitField0_ |= 0x00000200;
               bullet_ = input.readBool();
               break;
             }
             case 432: {
-              bitField0_ |= 0x00004000;
+              bitField0_ |= 0x00000400;
               allowSleep_ = input.readBool();
               break;
             }
             case 440: {
-              bitField0_ |= 0x00008000;
+              bitField0_ |= 0x00000800;
               awake_ = input.readBool();
               break;
             }
             case 448: {
-              bitField0_ |= 0x00010000;
+              bitField0_ |= 0x00001000;
               active_ = input.readBool();
               break;
             }
             case 456: {
-              bitField0_ |= 0x00020000;
+              bitField0_ |= 0x00002000;
               fixedRotation_ = input.readBool();
               break;
             }
@@ -8571,175 +8398,22 @@ public final class Box2D {
         return this;
       }
       
-      // optional .box2d.PbVec2 force = 14;
-      private org.box2d.proto.Box2D.PbVec2 force_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
-          org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> forceBuilder_;
-      public boolean hasForce() {
-        return ((bitField0_ & 0x00000040) == 0x00000040);
-      }
-      public org.box2d.proto.Box2D.PbVec2 getForce() {
-        if (forceBuilder_ == null) {
-          return force_;
-        } else {
-          return forceBuilder_.getMessage();
-        }
-      }
-      public Builder setForce(org.box2d.proto.Box2D.PbVec2 value) {
-        if (forceBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          force_ = value;
-          onChanged();
-        } else {
-          forceBuilder_.setMessage(value);
-        }
-        bitField0_ |= 0x00000040;
-        return this;
-      }
-      public Builder setForce(
-          org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
-        if (forceBuilder_ == null) {
-          force_ = builderForValue.build();
-          onChanged();
-        } else {
-          forceBuilder_.setMessage(builderForValue.build());
-        }
-        bitField0_ |= 0x00000040;
-        return this;
-      }
-      public Builder mergeForce(org.box2d.proto.Box2D.PbVec2 value) {
-        if (forceBuilder_ == null) {
-          if (((bitField0_ & 0x00000040) == 0x00000040) &&
-              force_ != org.box2d.proto.Box2D.PbVec2.getDefaultInstance()) {
-            force_ =
-              org.box2d.proto.Box2D.PbVec2.newBuilder(force_).mergeFrom(value).buildPartial();
-          } else {
-            force_ = value;
-          }
-          onChanged();
-        } else {
-          forceBuilder_.mergeFrom(value);
-        }
-        bitField0_ |= 0x00000040;
-        return this;
-      }
-      public Builder clearForce() {
-        if (forceBuilder_ == null) {
-          force_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
-          onChanged();
-        } else {
-          forceBuilder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000040);
-        return this;
-      }
-      public org.box2d.proto.Box2D.PbVec2.Builder getForceBuilder() {
-        bitField0_ |= 0x00000040;
-        onChanged();
-        return getForceFieldBuilder().getBuilder();
-      }
-      public org.box2d.proto.Box2D.PbVec2OrBuilder getForceOrBuilder() {
-        if (forceBuilder_ != null) {
-          return forceBuilder_.getMessageOrBuilder();
-        } else {
-          return force_;
-        }
-      }
-      private com.google.protobuf.SingleFieldBuilder<
-          org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> 
-          getForceFieldBuilder() {
-        if (forceBuilder_ == null) {
-          forceBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder>(
-                  force_,
-                  getParentForChildren(),
-                  isClean());
-          force_ = null;
-        }
-        return forceBuilder_;
-      }
-      
-      // optional float torque = 15;
-      private float torque_ ;
-      public boolean hasTorque() {
-        return ((bitField0_ & 0x00000080) == 0x00000080);
-      }
-      public float getTorque() {
-        return torque_;
-      }
-      public Builder setTorque(float value) {
-        bitField0_ |= 0x00000080;
-        torque_ = value;
-        onChanged();
-        return this;
-      }
-      public Builder clearTorque() {
-        bitField0_ = (bitField0_ & ~0x00000080);
-        torque_ = 0F;
-        onChanged();
-        return this;
-      }
-      
-      // optional float mass = 16;
-      private float mass_ ;
-      public boolean hasMass() {
-        return ((bitField0_ & 0x00000100) == 0x00000100);
-      }
-      public float getMass() {
-        return mass_;
-      }
-      public Builder setMass(float value) {
-        bitField0_ |= 0x00000100;
-        mass_ = value;
-        onChanged();
-        return this;
-      }
-      public Builder clearMass() {
-        bitField0_ = (bitField0_ & ~0x00000100);
-        mass_ = 0F;
-        onChanged();
-        return this;
-      }
-      
-      // optional float I = 17;
-      private float i_ ;
-      public boolean hasI() {
-        return ((bitField0_ & 0x00000200) == 0x00000200);
-      }
-      public float getI() {
-        return i_;
-      }
-      public Builder setI(float value) {
-        bitField0_ |= 0x00000200;
-        i_ = value;
-        onChanged();
-        return this;
-      }
-      public Builder clearI() {
-        bitField0_ = (bitField0_ & ~0x00000200);
-        i_ = 0F;
-        onChanged();
-        return this;
-      }
-      
       // optional float linear_damping = 50;
       private float linearDamping_ ;
       public boolean hasLinearDamping() {
-        return ((bitField0_ & 0x00000400) == 0x00000400);
+        return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       public float getLinearDamping() {
         return linearDamping_;
       }
       public Builder setLinearDamping(float value) {
-        bitField0_ |= 0x00000400;
+        bitField0_ |= 0x00000040;
         linearDamping_ = value;
         onChanged();
         return this;
       }
       public Builder clearLinearDamping() {
-        bitField0_ = (bitField0_ & ~0x00000400);
+        bitField0_ = (bitField0_ & ~0x00000040);
         linearDamping_ = 0F;
         onChanged();
         return this;
@@ -8748,19 +8422,19 @@ public final class Box2D {
       // optional float angular_damping = 51;
       private float angularDamping_ ;
       public boolean hasAngularDamping() {
-        return ((bitField0_ & 0x00000800) == 0x00000800);
+        return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       public float getAngularDamping() {
         return angularDamping_;
       }
       public Builder setAngularDamping(float value) {
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00000080;
         angularDamping_ = value;
         onChanged();
         return this;
       }
       public Builder clearAngularDamping() {
-        bitField0_ = (bitField0_ & ~0x00000800);
+        bitField0_ = (bitField0_ & ~0x00000080);
         angularDamping_ = 0F;
         onChanged();
         return this;
@@ -8769,19 +8443,19 @@ public final class Box2D {
       // optional float gravity_scale = 52;
       private float gravityScale_ ;
       public boolean hasGravityScale() {
-        return ((bitField0_ & 0x00001000) == 0x00001000);
+        return ((bitField0_ & 0x00000100) == 0x00000100);
       }
       public float getGravityScale() {
         return gravityScale_;
       }
       public Builder setGravityScale(float value) {
-        bitField0_ |= 0x00001000;
+        bitField0_ |= 0x00000100;
         gravityScale_ = value;
         onChanged();
         return this;
       }
       public Builder clearGravityScale() {
-        bitField0_ = (bitField0_ & ~0x00001000);
+        bitField0_ = (bitField0_ & ~0x00000100);
         gravityScale_ = 0F;
         onChanged();
         return this;
@@ -8790,19 +8464,19 @@ public final class Box2D {
       // optional bool bullet = 53;
       private boolean bullet_ ;
       public boolean hasBullet() {
-        return ((bitField0_ & 0x00002000) == 0x00002000);
+        return ((bitField0_ & 0x00000200) == 0x00000200);
       }
       public boolean getBullet() {
         return bullet_;
       }
       public Builder setBullet(boolean value) {
-        bitField0_ |= 0x00002000;
+        bitField0_ |= 0x00000200;
         bullet_ = value;
         onChanged();
         return this;
       }
       public Builder clearBullet() {
-        bitField0_ = (bitField0_ & ~0x00002000);
+        bitField0_ = (bitField0_ & ~0x00000200);
         bullet_ = false;
         onChanged();
         return this;
@@ -8811,19 +8485,19 @@ public final class Box2D {
       // optional bool allow_sleep = 54;
       private boolean allowSleep_ ;
       public boolean hasAllowSleep() {
-        return ((bitField0_ & 0x00004000) == 0x00004000);
+        return ((bitField0_ & 0x00000400) == 0x00000400);
       }
       public boolean getAllowSleep() {
         return allowSleep_;
       }
       public Builder setAllowSleep(boolean value) {
-        bitField0_ |= 0x00004000;
+        bitField0_ |= 0x00000400;
         allowSleep_ = value;
         onChanged();
         return this;
       }
       public Builder clearAllowSleep() {
-        bitField0_ = (bitField0_ & ~0x00004000);
+        bitField0_ = (bitField0_ & ~0x00000400);
         allowSleep_ = false;
         onChanged();
         return this;
@@ -8832,19 +8506,19 @@ public final class Box2D {
       // optional bool awake = 55;
       private boolean awake_ ;
       public boolean hasAwake() {
-        return ((bitField0_ & 0x00008000) == 0x00008000);
+        return ((bitField0_ & 0x00000800) == 0x00000800);
       }
       public boolean getAwake() {
         return awake_;
       }
       public Builder setAwake(boolean value) {
-        bitField0_ |= 0x00008000;
+        bitField0_ |= 0x00000800;
         awake_ = value;
         onChanged();
         return this;
       }
       public Builder clearAwake() {
-        bitField0_ = (bitField0_ & ~0x00008000);
+        bitField0_ = (bitField0_ & ~0x00000800);
         awake_ = false;
         onChanged();
         return this;
@@ -8853,19 +8527,19 @@ public final class Box2D {
       // optional bool active = 56;
       private boolean active_ ;
       public boolean hasActive() {
-        return ((bitField0_ & 0x00010000) == 0x00010000);
+        return ((bitField0_ & 0x00001000) == 0x00001000);
       }
       public boolean getActive() {
         return active_;
       }
       public Builder setActive(boolean value) {
-        bitField0_ |= 0x00010000;
+        bitField0_ |= 0x00001000;
         active_ = value;
         onChanged();
         return this;
       }
       public Builder clearActive() {
-        bitField0_ = (bitField0_ & ~0x00010000);
+        bitField0_ = (bitField0_ & ~0x00001000);
         active_ = false;
         onChanged();
         return this;
@@ -8874,19 +8548,19 @@ public final class Box2D {
       // optional bool fixed_rotation = 57;
       private boolean fixedRotation_ ;
       public boolean hasFixedRotation() {
-        return ((bitField0_ & 0x00020000) == 0x00020000);
+        return ((bitField0_ & 0x00002000) == 0x00002000);
       }
       public boolean getFixedRotation() {
         return fixedRotation_;
       }
       public Builder setFixedRotation(boolean value) {
-        bitField0_ |= 0x00020000;
+        bitField0_ |= 0x00002000;
         fixedRotation_ = value;
         onChanged();
         return this;
       }
       public Builder clearFixedRotation() {
-        bitField0_ = (bitField0_ & ~0x00020000);
+        bitField0_ = (bitField0_ & ~0x00002000);
         fixedRotation_ = false;
         onChanged();
         return this;
@@ -8896,9 +8570,9 @@ public final class Box2D {
       private java.util.List<org.box2d.proto.Box2D.PbFixture> fixtures_ =
         java.util.Collections.emptyList();
       private void ensureFixturesIsMutable() {
-        if (!((bitField0_ & 0x00040000) == 0x00040000)) {
+        if (!((bitField0_ & 0x00004000) == 0x00004000)) {
           fixtures_ = new java.util.ArrayList<org.box2d.proto.Box2D.PbFixture>(fixtures_);
-          bitField0_ |= 0x00040000;
+          bitField0_ |= 0x00004000;
          }
       }
       
@@ -9014,7 +8688,7 @@ public final class Box2D {
       public Builder clearFixtures() {
         if (fixturesBuilder_ == null) {
           fixtures_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00040000);
+          bitField0_ = (bitField0_ & ~0x00004000);
           onChanged();
         } else {
           fixturesBuilder_.clear();
@@ -9070,7 +8744,7 @@ public final class Box2D {
           fixturesBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
               org.box2d.proto.Box2D.PbFixture, org.box2d.proto.Box2D.PbFixture.Builder, org.box2d.proto.Box2D.PbFixtureOrBuilder>(
                   fixtures_,
-                  ((bitField0_ & 0x00040000) == 0x00040000),
+                  ((bitField0_ & 0x00004000) == 0x00004000),
                   getParentForChildren(),
                   isClean());
           fixtures_ = null;
@@ -10517,32 +10191,30 @@ public final class Box2D {
       "2 \001(\0132\r.box2d.PbVec2\022\021\n\tmax_force\0303 \001(\002\022" +
       "\016\n\006joint1\030= \001(\005\022\016\n\006joint2\030> \001(\005\022\022\n\nmax_t" +
       "orque\030Z \001(\002\022\022\n\nmax_length\030d \001(\002\022\016\n\006bodie" +
-      "s\030n \003(\005\022\016\n\006joints\030o \003(\005\"\267\003\n\006PbBody\022\013\n\003ta" +
+      "s\030n \003(\005\022\016\n\006joints\030o \003(\005\"\360\002\n\006PbBody\022\013\n\003ta" +
       "g\030\001 \001(\003\022\037\n\004type\030\002 \002(\0162\021.box2d.PbBodyType" +
       "\022\037\n\010position\030\n \001(\0132\r.box2d.PbVec2\022\r\n\005ang" +
       "le\030\013 \001(\002\022&\n\017linear_velocity\030\014 \001(\0132\r.box2",
-      "d.PbVec2\022\030\n\020angular_velocity\030\r \001(\002\022\034\n\005fo" +
-      "rce\030\016 \001(\0132\r.box2d.PbVec2\022\016\n\006torque\030\017 \001(\002" +
-      "\022\014\n\004mass\030\020 \001(\002\022\t\n\001I\030\021 \001(\002\022\026\n\016linear_damp" +
-      "ing\0302 \001(\002\022\027\n\017angular_damping\0303 \001(\002\022\025\n\rgr" +
-      "avity_scale\0304 \001(\002\022\016\n\006bullet\0305 \001(\010\022\023\n\013all" +
-      "ow_sleep\0306 \001(\010\022\r\n\005awake\0307 \001(\010\022\016\n\006active\030" +
-      "8 \001(\010\022\026\n\016fixed_rotation\0309 \001(\010\022\"\n\010fixture" +
-      "s\030d \003(\0132\020.box2d.PbFixture\"\356\001\n\007PbWorld\022\013\n" +
-      "\003tag\030\001 \001(\003\022\036\n\007gravity\030\002 \001(\0132\r.box2d.PbVe" +
-      "c2\022\023\n\013allow_sleep\030\003 \001(\010\022\031\n\021auto_clear_fo",
-      "rces\030\004 \001(\010\022\025\n\rwarm_starting\030\005 \001(\010\022\032\n\022con" +
-      "tinuous_physics\030\006 \001(\010\022\024\n\014sub_stepping\030\007 " +
-      "\001(\010\022\035\n\006bodies\030\024 \003(\0132\r.box2d.PbBody\022\036\n\006jo" +
-      "ints\030\025 \003(\0132\016.box2d.PbJoint*4\n\nPbBodyType" +
-      "\022\n\n\006STATIC\020\000\022\013\n\007DYNAMIC\020\001\022\r\n\tKINEMATIC\020\002" +
-      "*;\n\013PbShapeType\022\n\n\006CIRCLE\020\001\022\013\n\007POLYGON\020\002" +
-      "\022\010\n\004EDGE\020\003\022\t\n\005CHAIN\020\004*\245\001\n\013PbJointType\022\014\n" +
-      "\010DISTANCE\020\001\022\014\n\010REVOLUTE\020\002\022\r\n\tPRISMATIC\020\003" +
-      "\022\n\n\006PULLEY\020\004\022\t\n\005MOUSE\020\005\022\010\n\004GEAR\020\006\022\t\n\005WHE" +
-      "EL\020\007\022\010\n\004WELD\020\010\022\014\n\010FRICTION\020\t\022\010\n\004ROPE\020\n\022\023",
-      "\n\017CONSTANT_VOLUME\020\013\022\010\n\004LINE\020\014B\030\n\017org.box" +
-      "2d.protoB\005Box2D"
+      "d.PbVec2\022\030\n\020angular_velocity\030\r \001(\002\022\026\n\016li" +
+      "near_damping\0302 \001(\002\022\027\n\017angular_damping\0303 " +
+      "\001(\002\022\025\n\rgravity_scale\0304 \001(\002\022\016\n\006bullet\0305 \001" +
+      "(\010\022\023\n\013allow_sleep\0306 \001(\010\022\r\n\005awake\0307 \001(\010\022\016" +
+      "\n\006active\0308 \001(\010\022\026\n\016fixed_rotation\0309 \001(\010\022\"" +
+      "\n\010fixtures\030d \003(\0132\020.box2d.PbFixture\"\356\001\n\007P" +
+      "bWorld\022\013\n\003tag\030\001 \001(\003\022\036\n\007gravity\030\002 \001(\0132\r.b" +
+      "ox2d.PbVec2\022\023\n\013allow_sleep\030\003 \001(\010\022\031\n\021auto" +
+      "_clear_forces\030\004 \001(\010\022\025\n\rwarm_starting\030\005 \001" +
+      "(\010\022\032\n\022continuous_physics\030\006 \001(\010\022\024\n\014sub_st",
+      "epping\030\007 \001(\010\022\035\n\006bodies\030\024 \003(\0132\r.box2d.PbB" +
+      "ody\022\036\n\006joints\030\025 \003(\0132\016.box2d.PbJoint*4\n\nP" +
+      "bBodyType\022\n\n\006STATIC\020\000\022\013\n\007DYNAMIC\020\001\022\r\n\tKI" +
+      "NEMATIC\020\002*;\n\013PbShapeType\022\n\n\006CIRCLE\020\001\022\013\n\007" +
+      "POLYGON\020\002\022\010\n\004EDGE\020\003\022\t\n\005CHAIN\020\004*\245\001\n\013PbJoi" +
+      "ntType\022\014\n\010DISTANCE\020\001\022\014\n\010REVOLUTE\020\002\022\r\n\tPR" +
+      "ISMATIC\020\003\022\n\n\006PULLEY\020\004\022\t\n\005MOUSE\020\005\022\010\n\004GEAR" +
+      "\020\006\022\t\n\005WHEEL\020\007\022\010\n\004WELD\020\010\022\014\n\010FRICTION\020\t\022\010\n" +
+      "\004ROPE\020\n\022\023\n\017CONSTANT_VOLUME\020\013\022\010\n\004LINE\020\014B\030" +
+      "\n\017org.box2d.protoB\005Box2D"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -10594,7 +10266,7 @@ public final class Box2D {
           internal_static_box2d_PbBody_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_box2d_PbBody_descriptor,
-              new java.lang.String[] { "Tag", "Type", "Position", "Angle", "LinearVelocity", "AngularVelocity", "Force", "Torque", "Mass", "I", "LinearDamping", "AngularDamping", "GravityScale", "Bullet", "AllowSleep", "Awake", "Active", "FixedRotation", "Fixtures", },
+              new java.lang.String[] { "Tag", "Type", "Position", "Angle", "LinearVelocity", "AngularVelocity", "LinearDamping", "AngularDamping", "GravityScale", "Bullet", "AllowSleep", "Awake", "Active", "FixedRotation", "Fixtures", },
               org.box2d.proto.Box2D.PbBody.class,
               org.box2d.proto.Box2D.PbBody.Builder.class);
           internal_static_box2d_PbWorld_descriptor =
