@@ -270,13 +270,13 @@ public class PolygonShape extends Shape {
 
   @Override
   public final boolean testPoint(final Transform xf, final Vec2 p) {
+    float tempx, tempy;
+    final Rot xfq = xf.q;
 
-    final Vec2 pLocal = pool1;
-    final Vec2 temp = pool2;
-
-    pLocal.set(p).subLocal(xf.p);
-    Rot.mulTransUnsafe(xf.q, pLocal, temp);
-    pLocal.set(temp);
+    tempx = p.x - xf.p.x;
+    tempy = p.y - xf.p.y;
+    final float pLocalx = xfq.c * tempx + xfq.s * tempy;
+    final float pLocaly = -xfq.s * tempx + xfq.c * tempy;
 
     if (m_debug) {
       System.out.println("--testPoint debug--");
@@ -284,13 +284,15 @@ public class PolygonShape extends Shape {
       for (int i = 0; i < m_count; ++i) {
         System.out.println(m_vertices[i]);
       }
-      System.out.println("pLocal: " + pLocal);
+      System.out.println("pLocal: " + pLocalx + ", " + pLocaly);
     }
 
-
     for (int i = 0; i < m_count; ++i) {
-      temp.set(pLocal).subLocal(m_vertices[i]);
-      final float dot = Vec2.dot(m_normals[i], temp);
+      Vec2 vertex = m_vertices[i];
+      Vec2 normal = m_normals[i];
+      tempx = pLocalx - vertex.x;
+      tempy = pLocaly - vertex.y;
+      final float dot = normal.x * tempx + normal.y * tempy;
       if (dot > 0.0f) {
         return false;
       }
@@ -301,26 +303,27 @@ public class PolygonShape extends Shape {
 
   @Override
   public final void computeAABB(final AABB aabb, final Transform xf, int childIndex) {
-    final Vec2 v = pool1;
     final Vec2 lower = aabb.lowerBound;
     final Vec2 upper = aabb.upperBound;
     final Vec2 v1 = m_vertices[0];
-    lower.x = (xf.q.c * v1.x - xf.q.s * v1.y) + xf.p.x;
-    lower.y = (xf.q.s * v1.x + xf.q.c * v1.y) + xf.p.y;
-    upper.set(lower);
+    final Rot xfq = xf.q;
+    final Vec2 xfp = xf.p;
+    float vx, vy;
+    lower.x = (xfq.c * v1.x - xfq.s * v1.y) + xfp.x;
+    lower.y = (xfq.s * v1.x + xfq.c * v1.y) + xfp.y;
+    upper.x = lower.x;
+    upper.y = lower.y;
 
     for (int i = 1; i < m_count; ++i) {
       Vec2 v2 = m_vertices[i];
-      v.x = (xf.q.c * v2.x - xf.q.s * v2.y) + xf.p.x;
-      v.y = (xf.q.s * v2.x + xf.q.c * v2.y) + xf.p.y;
       // Vec2 v = Mul(xf, m_vertices[i]);
-      Vec2.minToOut(lower, v, lower);
-      Vec2.maxToOut(upper, v, upper);
+      vx = (xfq.c * v2.x - xfq.s * v2.y) + xfp.x;
+      vy = (xfq.s * v2.x + xfq.c * v2.y) + xfp.y;
+      lower.x = lower.x < vx ? lower.x : vx;
+      lower.y = lower.y < vy ? lower.y : vy;
+      upper.x = upper.x > vx ? upper.x : vx;
+      upper.y = upper.y > vy ? upper.y : vy;
     }
-
-    // Vec2 r(m_radius, m_radius);
-    // aabb.lowerBound = lower - r;
-    // aabb.upperBound = upper + r;
 
     lower.x -= m_radius;
     lower.y -= m_radius;
@@ -351,28 +354,38 @@ public class PolygonShape extends Shape {
   @Override
   public final boolean raycast(RayCastOutput output, RayCastInput input, Transform xf,
       int childIndex) {
-    final Vec2 p1 = pool1;
-    final Vec2 p2 = pool2;
-    final Vec2 d = pool3;
-    final Vec2 temp = pool4;
+    final Rot xfq = xf.q;
+    final Vec2 xfp = xf.p;
+    float tempx, tempy;
+    // b2Vec2 p1 = b2MulT(xf.q, input.p1 - xf.p);
+    // b2Vec2 p2 = b2MulT(xf.q, input.p2 - xf.p);
+    tempx = input.p1.x - xfp.x;
+    tempy = input.p1.y - xfp.y;
+    final float p1x = xfq.c * tempx + xfq.s * tempy;
+    final float p1y = -xfq.s * tempx + xfq.c * tempy;
 
-    p1.set(input.p1).subLocal(xf.p);
-    Rot.mulTrans(xf.q, p1, p1);
-    p2.set(input.p2).subLocal(xf.p);
-    Rot.mulTrans(xf.q, p2, p2);
-    d.set(p2).subLocal(p1);
+    tempx = input.p2.x - xfp.x;
+    tempy = input.p2.y - xfp.y;
+    final float p2x = xfq.c * tempx + xfq.s * tempy;
+    final float p2y = -xfq.s * tempx + xfq.c * tempy;
+
+    final float dx = p2x - p1x;
+    final float dy = p2y - p1y;
 
     float lower = 0, upper = input.maxFraction;
 
     int index = -1;
 
     for (int i = 0; i < m_count; ++i) {
+      Vec2 normal = m_normals[i];
+      Vec2 vertex = m_vertices[i];
       // p = p1 + a * d
       // dot(normal, p - v) = 0
       // dot(normal, p1 - v) + a * dot(normal, d) = 0
-      temp.set(m_vertices[i]).subLocal(p1);
-      final float numerator = Vec2.dot(m_normals[i], temp);
-      final float denominator = Vec2.dot(m_normals[i], d);
+      float tempxn = vertex.x - p1x;
+      float tempyn = vertex.y - p1y;
+      final float numerator = normal.x * tempxn + normal.y * tempyn;
+      final float denominator = normal.x * dx + normal.y * dy;
 
       if (denominator == 0.0f) {
         if (numerator < 0.0f) {
@@ -405,8 +418,11 @@ public class PolygonShape extends Shape {
 
     if (index >= 0) {
       output.fraction = lower;
-      Rot.mulToOutUnsafe(xf.q, m_normals[index], output.normal);
       // normal = Mul(xf.R, m_normals[index]);
+      Vec2 normal = m_normals[index];
+      Vec2 out = output.normal;
+      out.x = xfq.c * normal.x - xfq.s * normal.y;
+      out.y = xfq.s * normal.x + xfq.c * normal.y;
       return true;
     }
     return false;
@@ -582,7 +598,7 @@ public class PolygonShape extends Shape {
 
   /** Get the centroid and apply the supplied transform. */
   public Vec2 centroidToOut(final Transform xf, final Vec2 out) {
-    Transform.mulToOut(xf, m_centroid, out);
+    Transform.mulToOutUnsafe(xf, m_centroid, out);
     return out;
   }
 }
