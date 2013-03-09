@@ -57,13 +57,13 @@ import org.jbox2d.pooling.IWorldPool;
  */
 public class WheelJoint extends Joint {
 
-  public float m_frequencyHz;
-  public float m_dampingRatio;
+  private float m_frequencyHz;
+  private float m_dampingRatio;
 
   // Solver shared
-  public final Vec2 m_localAnchorA = new Vec2();
-  public final Vec2 m_localAnchorB = new Vec2();
-  public final Vec2 m_localXAxisA = new Vec2();
+  private final Vec2 m_localAnchorA = new Vec2();
+  private final Vec2 m_localAnchorB = new Vec2();
+  private final Vec2 m_localXAxisA = new Vec2();
   private final Vec2 m_localYAxisA = new Vec2();
 
   private float m_impulse;
@@ -96,7 +96,7 @@ public class WheelJoint extends Joint {
   private float m_bias;
   private float m_gamma;
 
-  public WheelJoint(IWorldPool argPool, WheelJointDef def) {
+  protected WheelJoint(IWorldPool argPool, WheelJointDef def) {
     super(argPool, def);
     m_localAnchorA.set(def.localAnchorA);
     m_localAnchorB.set(def.localAnchorB);
@@ -113,6 +113,14 @@ public class WheelJoint extends Joint {
 
     m_frequencyHz = def.frequencyHz;
     m_dampingRatio = def.dampingRatio;
+  }
+
+  public Vec2 getLocalAnchorA() {
+    return m_localAnchorA;
+  }
+
+  public Vec2 getLocalAnchorB() {
+    return m_localAnchorB;
   }
 
   @Override
@@ -155,6 +163,11 @@ public class WheelJoint extends Joint {
     return translation;
   }
 
+  /** For serialization */
+  public Vec2 getLocalAxisA() {
+    return m_localXAxisA;
+  }
+
   public float getJointSpeed() {
     return m_bodyA.m_angularVelocity - m_bodyB.m_angularVelocity;
   }
@@ -163,7 +176,7 @@ public class WheelJoint extends Joint {
     return m_enableMotor;
   }
 
-  public void EnableMotor(boolean flag) {
+  public void enableMotor(boolean flag) {
     m_bodyA.setAwake(true);
     m_bodyB.setAwake(true);
     m_enableMotor = flag;
@@ -178,7 +191,7 @@ public class WheelJoint extends Joint {
   public float getMotorSpeed() {
     return m_motorSpeed;
   }
-  
+
   public float getMaxMotorTorque() {
     return m_maxMotorTorque;
   }

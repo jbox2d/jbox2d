@@ -103,7 +103,7 @@ public abstract class TestbedTest
    * Only visible for compatibility. Should use {@link #getWorld()} instead.
    */
   protected World m_world;
-  private Body groundBody;
+  protected Body groundBody;
   private MouseJoint mouseJoint;
 
   private Body bomb;
@@ -115,7 +115,7 @@ public abstract class TestbedTest
   private int stepCount;
 
   private TestbedModel model;
-  private DestructionListener destructionListener;
+  protected DestructionListener destructionListener;
 
   private final LinkedList<QueueItem> inputQueue;
 

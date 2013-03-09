@@ -350,7 +350,7 @@ class RayCastAnyCallback implements RayCastCallback {
 
 // This ray cast collects multiple hits along the ray. Polygon 0 is filtered.
 class RayCastMultipleCallback implements RayCastCallback {
-	public int e_maxCount = 5;
+	public int e_maxCount = 30;
 	Vec2 m_points[] = new Vec2[e_maxCount];
 	Vec2 m_normals[] = new Vec2[e_maxCount];
 	int m_count;

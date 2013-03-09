@@ -74,25 +74,25 @@ public class GearJoint extends Joint {
 
   // Body A is connected to body C
   // Body B is connected to body D
-  public final Body m_bodyC;
-  public final Body m_bodyD;
+  private final Body m_bodyC;
+  private final Body m_bodyD;
 
   // Solver shared
-  public final Vec2 m_localAnchorA = new Vec2();
-  public final Vec2 m_localAnchorB = new Vec2();
-  public final Vec2 m_localAnchorC = new Vec2();
-  public final Vec2 m_localAnchorD = new Vec2();
+  private final Vec2 m_localAnchorA = new Vec2();
+  private final Vec2 m_localAnchorB = new Vec2();
+  private final Vec2 m_localAnchorC = new Vec2();
+  private final Vec2 m_localAnchorD = new Vec2();
 
-  public final Vec2 m_localAxisC = new Vec2();
-  public final Vec2 m_localAxisD = new Vec2();
+  private final Vec2 m_localAxisC = new Vec2();
+  private final Vec2 m_localAxisD = new Vec2();
 
-  public float m_referenceAngleA;
-  public float m_referenceAngleB;
+  private float m_referenceAngleA;
+  private float m_referenceAngleB;
 
-  public float m_constant;
-  public float m_ratio;
+  private float m_constant;
+  private float m_ratio;
 
-  public float m_impulse;
+  private float m_impulse;
 
   // Solver temp
   private int m_indexA, m_indexB, m_indexC, m_indexD;
@@ -104,11 +104,7 @@ public class GearJoint extends Joint {
   private float m_JwA, m_JwB, m_JwC, m_JwD;
   private float m_mass;
 
-  /**
-   * @param argWorldPool
-   * @param def
-   */
-  public GearJoint(IWorldPool argWorldPool, GearJointDef def) {
+  protected GearJoint(IWorldPool argWorldPool, GearJointDef def) {
     super(argWorldPool, def);
 
     m_joint1 = def.joint1;

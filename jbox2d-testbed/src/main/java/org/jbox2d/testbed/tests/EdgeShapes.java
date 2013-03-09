@@ -26,8 +26,6 @@
  */
 package org.jbox2d.testbed.tests;
 
-import java.util.Arrays;
-
 import org.jbox2d.callbacks.RayCastCallback;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.EdgeShape;

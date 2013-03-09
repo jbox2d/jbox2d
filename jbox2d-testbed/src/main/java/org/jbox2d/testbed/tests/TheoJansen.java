@@ -91,7 +91,7 @@ public class TheoJansen extends TestbedTest {
   public void processJoint(Joint argJoint, Long argTag) {
     if (argTag == MOTOR_TAG) {
       m_motorJoint = (RevoluteJoint) argJoint;
-      m_motorOn = m_motorJoint.m_enableMotor;
+      m_motorOn = m_motorJoint.isMotorEnabled();
     }
   }
 

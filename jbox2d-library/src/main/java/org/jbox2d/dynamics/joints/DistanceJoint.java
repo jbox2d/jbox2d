@@ -66,32 +66,32 @@ import org.jbox2d.pooling.IWorldPool;
  */
 public class DistanceJoint extends Joint {
 
-  public float m_frequencyHz;
-  public float m_dampingRatio;
-  public float m_bias;
+  private float m_frequencyHz;
+  private float m_dampingRatio;
+  private float m_bias;
 
   // Solver shared
-  public final Vec2 m_localAnchorA;
-  public final Vec2 m_localAnchorB;
-  public float m_gamma;
-  public float m_impulse;
-  public float m_length;
+  private final Vec2 m_localAnchorA;
+  private final Vec2 m_localAnchorB;
+  private float m_gamma;
+  private float m_impulse;
+  private float m_length;
 
   // Solver temp
-  public int m_indexA;
-  public int m_indexB;
-  public final Vec2 m_u = new Vec2();
-  public final Vec2 m_rA = new Vec2();
-  public final Vec2 m_rB = new Vec2();
-  public final Vec2 m_localCenterA = new Vec2();
-  public final Vec2 m_localCenterB = new Vec2();
-  public float m_invMassA;
-  public float m_invMassB;
-  public float m_invIA;
-  public float m_invIB;
-  public float m_mass;
+  private int m_indexA;
+  private int m_indexB;
+  private final Vec2 m_u = new Vec2();
+  private final Vec2 m_rA = new Vec2();
+  private final Vec2 m_rB = new Vec2();
+  private final Vec2 m_localCenterA = new Vec2();
+  private final Vec2 m_localCenterB = new Vec2();
+  private float m_invMassA;
+  private float m_invMassB;
+  private float m_invIA;
+  private float m_invIB;
+  private float m_mass;
 
-  public DistanceJoint(IWorldPool argWorld, final DistanceJointDef def) {
+  protected DistanceJoint(IWorldPool argWorld, final DistanceJointDef def) {
     super(argWorld, def);
     m_localAnchorA = def.localAnchorA.clone();
     m_localAnchorB = def.localAnchorB.clone();

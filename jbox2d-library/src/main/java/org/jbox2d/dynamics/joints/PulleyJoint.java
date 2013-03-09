@@ -46,38 +46,34 @@ public class PulleyJoint extends Joint {
 
   public static final float MIN_PULLEY_LENGTH = 2.0f;
 
-  public final Vec2 m_groundAnchorA = new Vec2();
-  public final Vec2 m_groundAnchorB = new Vec2();
+  private final Vec2 m_groundAnchorA = new Vec2();
+  private final Vec2 m_groundAnchorB = new Vec2();
   private float m_lengthA;
   private float m_lengthB;
 
   // Solver shared
-  public final Vec2 m_localAnchorA = new Vec2();
-  public final Vec2 m_localAnchorB = new Vec2();
-  public float m_constant;
-  public float m_ratio;
-  public float m_impulse;
+  private final Vec2 m_localAnchorA = new Vec2();
+  private final Vec2 m_localAnchorB = new Vec2();
+  private float m_constant;
+  private float m_ratio;
+  private float m_impulse;
 
   // Solver temp
-  public int m_indexA;
-  public int m_indexB;
+  private int m_indexA;
+  private int m_indexB;
   private final Vec2 m_uA = new Vec2();
   private final Vec2 m_uB = new Vec2();
-  public final Vec2 m_rA = new Vec2();
-  public final Vec2 m_rB = new Vec2();
+  private final Vec2 m_rA = new Vec2();
+  private final Vec2 m_rB = new Vec2();
   private final Vec2 m_localCenterA = new Vec2();
   private final Vec2 m_localCenterB = new Vec2();
-  public float m_invMassA;
-  public float m_invMassB;
-  public float m_invIA;
-  public float m_invIB;
+  private float m_invMassA;
+  private float m_invMassB;
+  private float m_invIA;
+  private float m_invIB;
   private float m_mass;
 
-  /**
-   * @param argWorldPool
-   * @param def
-   */
-  public PulleyJoint(IWorldPool argWorldPool, PulleyJointDef def) {
+  protected PulleyJoint(IWorldPool argWorldPool, PulleyJointDef def) {
     super(argWorldPool, def);
     m_groundAnchorA.set(def.groundAnchorA);
     m_groundAnchorB.set(def.groundAnchorB);
@@ -119,6 +115,16 @@ public class PulleyJoint extends Joint {
     pool.pushVec2(1);
     return length;
   }
+
+
+  public Vec2 getLocalAnchorA() {
+    return m_localAnchorA;
+  }
+
+  public Vec2 getLocalAnchorB() {
+    return m_localAnchorB;
+  }
+
 
   @Override
   public void getAnchorA(Vec2 argOut) {
@@ -203,7 +209,7 @@ public class PulleyJoint extends Joint {
     // Compute the effective masses.
     Rot.mulToOutUnsafe(qA, temp.set(m_localAnchorA).subLocal(m_localCenterA), m_rA);
     Rot.mulToOutUnsafe(qB, temp.set(m_localAnchorB).subLocal(m_localCenterB), m_rB);
-    
+
     m_uA.set(cA).addLocal(m_rA).subLocal(m_groundAnchorA);
     m_uB.set(cB).addLocal(m_rB).subLocal(m_groundAnchorB);
 

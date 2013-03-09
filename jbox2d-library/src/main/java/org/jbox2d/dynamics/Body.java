@@ -1160,7 +1160,7 @@ public class Body {
     // Does a joint prevent collision?
     for (JointEdge jn = m_jointList; jn != null; jn = jn.next) {
       if (jn.other == other) {
-        if (jn.joint.m_collideConnected == false) {
+        if (jn.joint.getCollideConnected() == false) {
           return false;
         }
       }
