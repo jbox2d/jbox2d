@@ -48,24 +48,20 @@ public class FrictionJoint extends Joint {
   private float m_maxTorque;
 
   // Solver temp
-  public int m_indexA;
-  public int m_indexB;
-  public final Vec2 m_rA = new Vec2();
-  public final Vec2 m_rB = new Vec2();
-  public final Vec2 m_localCenterA = new Vec2();
-  public final Vec2 m_localCenterB = new Vec2();
-  public float m_invMassA;
-  public float m_invMassB;
-  public float m_invIA;
-  public float m_invIB;
-  public final Mat22 m_linearMass = new Mat22();
-  public float m_angularMass;
+  private int m_indexA;
+  private int m_indexB;
+  private final Vec2 m_rA = new Vec2();
+  private final Vec2 m_rB = new Vec2();
+  private final Vec2 m_localCenterA = new Vec2();
+  private final Vec2 m_localCenterB = new Vec2();
+  private float m_invMassA;
+  private float m_invMassB;
+  private float m_invIA;
+  private float m_invIB;
+  private final Mat22 m_linearMass = new Mat22();
+  private float m_angularMass;
 
-  /**
-   * @param argWorldPool
-   * @param def
-   */
-  public FrictionJoint(IWorldPool argWorldPool, FrictionJointDef def) {
+  protected FrictionJoint(IWorldPool argWorldPool, FrictionJointDef def) {
     super(argWorldPool, def);
     m_localAnchorA = new Vec2(def.localAnchorA);
     m_localAnchorB = new Vec2(def.localAnchorB);

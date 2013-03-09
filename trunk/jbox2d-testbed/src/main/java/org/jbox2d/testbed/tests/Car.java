@@ -322,17 +322,17 @@ public class Car extends TestbedTest {
   public void keyPressed(char argKeyChar, int argKeyCode) {
     switch (argKeyChar) {
       case 'a':
-        m_spring1.EnableMotor(true);
+        m_spring1.enableMotor(true);
         m_spring1.setMotorSpeed(m_speed);
         break;
 
       case 's':
-        m_spring1.EnableMotor(true);
+        m_spring1.enableMotor(true);
         m_spring1.setMotorSpeed(0.0f);
         break;
 
       case 'd':
-        m_spring1.EnableMotor(true);
+        m_spring1.enableMotor(true);
         m_spring1.setMotorSpeed(-m_speed);
         break;
 
@@ -357,7 +357,7 @@ public class Car extends TestbedTest {
       case 'a':
       case 's':
       case 'd':
-        m_spring1.EnableMotor(false);
+        m_spring1.enableMotor(false);
         break;
     }
   }

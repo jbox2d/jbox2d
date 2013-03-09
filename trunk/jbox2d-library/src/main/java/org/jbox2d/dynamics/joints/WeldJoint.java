@@ -57,14 +57,14 @@ import org.jbox2d.pooling.IWorldPool;
  */
 public class WeldJoint extends Joint {
 
-  public float m_frequencyHz;
-  public float m_dampingRatio;
+  private float m_frequencyHz;
+  private float m_dampingRatio;
   private float m_bias;
 
   // Solver shared
-  public final Vec2 m_localAnchorA;
-  public final Vec2 m_localAnchorB;
-  public float m_referenceAngle;
+  private final Vec2 m_localAnchorA;
+  private final Vec2 m_localAnchorB;
+  private float m_referenceAngle;
   private float m_gamma;
   private final Vec3 m_impulse;
 
@@ -82,10 +82,6 @@ public class WeldJoint extends Joint {
   private float m_invIB;
   private final Mat33 m_mass = new Mat33();
 
-  /**
-   * @param argWorld
-   * @param def
-   */
   protected WeldJoint(IWorldPool argWorld, WeldJointDef def) {
     super(argWorld, def);
     m_localAnchorA = new Vec2(def.localAnchorA);
@@ -96,6 +92,10 @@ public class WeldJoint extends Joint {
 
     m_impulse = new Vec3();
     m_impulse.setZero();
+  }
+  
+  public float getReferenceAngle() {
+    return m_referenceAngle;
   }
 
   public Vec2 getLocalAnchorA() {

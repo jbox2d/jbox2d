@@ -18,28 +18,28 @@ import org.jbox2d.pooling.IWorldPool;
  */
 public class RopeJoint extends Joint {
   // Solver shared
-  public final Vec2 m_localAnchorA = new Vec2();
-  public final Vec2 m_localAnchorB = new Vec2();
-  public float m_maxLength;
-  public float m_length;
-  public float m_impulse;
+  private final Vec2 m_localAnchorA = new Vec2();
+  private final Vec2 m_localAnchorB = new Vec2();
+  private float m_maxLength;
+  private float m_length;
+  private float m_impulse;
 
   // Solver temp
-  public int m_indexA;
-  public int m_indexB;
-  public final Vec2 m_u = new Vec2();
-  public final Vec2 m_rA = new Vec2();
-  public final Vec2 m_rB = new Vec2();
-  public final Vec2 m_localCenterA = new Vec2();
-  public final Vec2 m_localCenterB = new Vec2();
-  public float m_invMassA;
-  public float m_invMassB;
-  public float m_invIA;
-  public float m_invIB;
-  public float m_mass;
-  public LimitState m_state;
+  private int m_indexA;
+  private int m_indexB;
+  private final Vec2 m_u = new Vec2();
+  private final Vec2 m_rA = new Vec2();
+  private final Vec2 m_rB = new Vec2();
+  private final Vec2 m_localCenterA = new Vec2();
+  private final Vec2 m_localCenterB = new Vec2();
+  private float m_invMassA;
+  private float m_invMassB;
+  private float m_invIA;
+  private float m_invIB;
+  private float m_mass;
+  private LimitState m_state;
 
-  public RopeJoint(IWorldPool worldPool, RopeJointDef def) {
+  protected RopeJoint(IWorldPool worldPool, RopeJointDef def) {
     super(worldPool, def);
     m_localAnchorA.set(def.localAnchorA);
     m_localAnchorB.set(def.localAnchorB);

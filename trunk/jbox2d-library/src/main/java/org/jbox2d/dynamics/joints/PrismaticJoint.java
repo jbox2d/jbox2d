@@ -111,39 +111,37 @@ import org.jbox2d.pooling.IWorldPool;
 public class PrismaticJoint extends Joint {
 
   // Solver shared
-  public final Vec2 m_localAnchorA;
-  public final Vec2 m_localAnchorB;
-  public final Vec2 m_localXAxisA;
-  public final Vec2 m_localYAxisA;
-  public float m_referenceAngle;
-  public final Vec3 m_impulse;
-  public float m_motorImpulse;
-  public float m_lowerTranslation;
-  public float m_upperTranslation;
-  public float m_maxMotorForce;
-  public float m_motorSpeed;
-  public boolean m_enableLimit;
-  public boolean m_enableMotor;
-  public LimitState m_limitState;
+  protected final Vec2 m_localAnchorA;
+  protected final Vec2 m_localAnchorB;
+  protected final Vec2 m_localXAxisA;
+  protected final Vec2 m_localYAxisA;
+  protected float m_referenceAngle;
+  private final Vec3 m_impulse;
+  private float m_motorImpulse;
+  private float m_lowerTranslation;
+  private float m_upperTranslation;
+  private float m_maxMotorForce;
+  private float m_motorSpeed;
+  private boolean m_enableLimit;
+  private boolean m_enableMotor;
+  private LimitState m_limitState;
 
   // Solver temp
-  public int m_indexA;
-  public int m_indexB;
-  public final Vec2 m_rA = new Vec2();
-  public final Vec2 m_rB = new Vec2();
-  public final Vec2 m_localCenterA = new Vec2();
-  public final Vec2 m_localCenterB = new Vec2();
-  public float m_invMassA;
-  public float m_invMassB;
-  public float m_invIA;
-  public float m_invIB;
-  public final Vec2 m_axis, m_perp;
-  public float m_s1, m_s2;
-  public float m_a1, m_a2;
-  public final Mat33 m_K;
-  public float m_motorMass; // effective mass for motor/limit translational constraint.
+  private int m_indexA;
+  private int m_indexB;
+  private final Vec2 m_localCenterA = new Vec2();
+  private final Vec2 m_localCenterB = new Vec2();
+  private float m_invMassA;
+  private float m_invMassB;
+  private float m_invIA;
+  private float m_invIB;
+  private final Vec2 m_axis, m_perp;
+  private float m_s1, m_s2;
+  private float m_a1, m_a2;
+  private final Mat33 m_K;
+  private float m_motorMass; // effective mass for motor/limit translational constraint.
 
-  public PrismaticJoint(IWorldPool argWorld, PrismaticJointDef def) {
+  protected PrismaticJoint(IWorldPool argWorld, PrismaticJointDef def) {
     super(argWorld, def);
     m_localAnchorA = new Vec2(def.localAnchorA);
     m_localAnchorB = new Vec2(def.localAnchorB);
@@ -391,6 +389,18 @@ public class PrismaticJoint extends Joint {
     return m_motorImpulse * inv_dt;
   }
 
+  public float getMaxMotorForce() {
+    return m_maxMotorForce;
+  }
+
+  public float getReferenceAngle() {
+    return m_referenceAngle;
+  }
+
+  public Vec2 getLocalAxisA() {
+    return m_localXAxisA;
+  }
+
   @Override
   public void initVelocityConstraints(final SolverData data) {
     m_indexA = m_bodyA.m_islandIndex;
@@ -522,9 +532,9 @@ public class PrismaticJoint extends Joint {
       m_motorImpulse = 0.0f;
     }
 
-//    data.velocities[m_indexA].v.set(vA);
+    // data.velocities[m_indexA].v.set(vA);
     data.velocities[m_indexA].w = wA;
-//    data.velocities[m_indexB].v.set(vB);
+    // data.velocities[m_indexB].v.set(vB);
     data.velocities[m_indexB].w = wB;
 
     pool.pushRot(2);
@@ -655,9 +665,9 @@ public class PrismaticJoint extends Joint {
       pool.pushVec2(2);
     }
 
-//    data.velocities[m_indexA].v.set(vA);
+    // data.velocities[m_indexA].v.set(vA);
     data.velocities[m_indexA].w = wA;
-//    data.velocities[m_indexB].v.set(vB);
+    // data.velocities[m_indexB].v.set(vB);
     data.velocities[m_indexB].w = wB;
 
     pool.pushVec2(2);
@@ -797,9 +807,9 @@ public class PrismaticJoint extends Joint {
     cB.y += mB * Py;
     aB += iB * LB;
 
-//    data.positions[m_indexA].c.set(cA);
+    // data.positions[m_indexA].c.set(cA);
     data.positions[m_indexA].a = aA;
-//    data.positions[m_indexB].c.set(cB);
+    // data.positions[m_indexB].c.set(cB);
     data.positions[m_indexB].a = aB;
 
     pool.pushVec2(7);

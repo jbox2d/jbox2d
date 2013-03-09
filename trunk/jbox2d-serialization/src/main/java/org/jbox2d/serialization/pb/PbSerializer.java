@@ -388,8 +388,8 @@ public class PbSerializer implements JbSerializer {
         builder.clearTag();
       }
     }
-    Body bA = joint.m_bodyA;
-    Body bB = joint.m_bodyB;
+    Body bA = joint.getBodyA();
+    Body bB = joint.getBodyB();
 
     if (!argBodyIndexMap.containsKey(bA)) {
       throw new IllegalArgumentException("Body " + bA + " is not present in the index map");
@@ -401,55 +401,55 @@ public class PbSerializer implements JbSerializer {
     }
     builder.setBodyB(argBodyIndexMap.get(bB));
 
-    builder.setCollideConnected(joint.m_collideConnected);
+    builder.setCollideConnected(joint.getCollideConnected());
 
-    switch (joint.m_type) {
+    switch (joint.getType()) {
       case REVOLUTE: {
         RevoluteJoint j = (RevoluteJoint) joint;
         builder.setType(PbJointType.REVOLUTE);
-        builder.setLocalAnchorA(vecToPb(j.m_localAnchorA));
-        builder.setLocalAnchorB(vecToPb(j.m_localAnchorB));
-        builder.setRefAngle(j.m_referenceAngle);
-        builder.setEnableLimit(j.m_enableLimit);
-        builder.setLowerLimit(j.m_lowerAngle);
-        builder.setUpperLimit(j.m_upperAngle);
-        builder.setEnableMotor(j.m_enableMotor);
-        builder.setMotorSpeed(j.m_motorSpeed);
-        builder.setMaxMotorTorque(j.m_maxMotorTorque);
+        builder.setLocalAnchorA(vecToPb(j.getLocalAnchorA()));
+        builder.setLocalAnchorB(vecToPb(j.getLocalAnchorB()));
+        builder.setRefAngle(j.getReferenceAngle());
+        builder.setEnableLimit(j.isLimitEnabled());
+        builder.setLowerLimit(j.getLowerLimit());
+        builder.setUpperLimit(j.getUpperLimit());
+        builder.setEnableMotor(j.isMotorEnabled());
+        builder.setMotorSpeed(j.getMotorSpeed());
+        builder.setMaxMotorTorque(j.getMaxMotorTorque());
         break;
       }
       case PRISMATIC: {
         PrismaticJoint j = (PrismaticJoint) joint;
         builder.setType(PbJointType.PRISMATIC);
-        builder.setLocalAnchorA(vecToPb(j.m_localAnchorA));
-        builder.setLocalAnchorB(vecToPb(j.m_localAnchorB));
-        builder.setLocalAxisA(vecToPb(j.m_localXAxisA));
-        builder.setRefAngle(j.m_referenceAngle);
-        builder.setEnableLimit(j.m_enableLimit);
-        builder.setLowerLimit(j.m_lowerTranslation);
-        builder.setUpperLimit(j.m_upperTranslation);
-        builder.setEnableMotor(j.m_enableMotor);
-        builder.setMaxMotorForce(j.m_maxMotorForce);
-        builder.setMotorSpeed(j.m_motorSpeed);
+        builder.setLocalAnchorA(vecToPb(j.getLocalAnchorA()));
+        builder.setLocalAnchorB(vecToPb(j.getLocalAnchorB()));
+        builder.setLocalAxisA(vecToPb(j.getLocalAxisA()));
+        builder.setRefAngle(j.getReferenceAngle());
+        builder.setEnableLimit(j.isLimitEnabled());
+        builder.setLowerLimit(j.getLowerLimit());
+        builder.setUpperLimit(j.getUpperLimit());
+        builder.setEnableMotor(j.isMotorEnabled());
+        builder.setMaxMotorForce(j.getMaxMotorForce());
+        builder.setMotorSpeed(j.getMotorSpeed());
         break;
       }
       case DISTANCE: {
         DistanceJoint j = (DistanceJoint) joint;
         builder.setType(PbJointType.DISTANCE);
-        builder.setLocalAnchorA(vecToPb(j.m_localAnchorA));
-        builder.setLocalAnchorB(vecToPb(j.m_localAnchorB));
-        builder.setLength(j.m_length);
-        builder.setFrequency(j.m_frequencyHz);
-        builder.setDampingRatio(j.m_dampingRatio);
+        builder.setLocalAnchorA(vecToPb(j.getLocalAnchorA()));
+        builder.setLocalAnchorB(vecToPb(j.getLocalAnchorB()));
+        builder.setLength(j.getLength());
+        builder.setFrequency(j.getFrequency());
+        builder.setDampingRatio(j.getDampingRatio());
         break;
       }
       case PULLEY: {
         PulleyJoint j = (PulleyJoint) joint;
         builder.setType(PbJointType.PULLEY);
-        builder.setLocalAnchorA(vecToPb(j.m_localAnchorA));
-        builder.setLocalAnchorB(vecToPb(j.m_localAnchorB));
-        builder.setGroundAnchorA(vecToPb(j.m_groundAnchorA));
-        builder.setGroundAnchorB(vecToPb(j.m_groundAnchorB));
+        builder.setLocalAnchorA(vecToPb(j.getLocalAnchorA()));
+        builder.setLocalAnchorB(vecToPb(j.getLocalAnchorB()));
+        builder.setGroundAnchorA(vecToPb(j.getGroundAnchorA()));
+        builder.setGroundAnchorB(vecToPb(j.getGroundAnchorB()));
         builder.setLengthA(j.getLengthA());
         builder.setLengthB(j.getLengthB());
         builder.setRatio(j.getRatio());
@@ -493,11 +493,9 @@ public class PbSerializer implements JbSerializer {
       case CONSTANT_VOLUME: {
         ConstantVolumeJoint j = (ConstantVolumeJoint) joint;
         builder.setType(PbJointType.CONSTANT_VOLUME);
-        builder.setFrequency(j.frequencyHz);
-        builder.setDampingRatio(j.dampingRatio);
 
-        for (int i = 0; i < j.bodies.length; i++) {
-          Body b = j.bodies[i];
+        for (int i = 0; i < j.getBodies().length; i++) {
+          Body b = j.getBodies()[i];
           DistanceJoint djoint = j.getJoints()[i];
           if (!argBodyIndexMap.containsKey(b)) {
             throw new IllegalArgumentException("Body " + b + " is not present in the index map");
@@ -514,32 +512,32 @@ public class PbSerializer implements JbSerializer {
       case WHEEL: {
         WheelJoint j = (WheelJoint) joint;
         builder.setType(PbJointType.WHEEL);
-        builder.setLocalAnchorA(vecToPb(j.m_localAnchorA));
-        builder.setLocalAnchorB(vecToPb(j.m_localAnchorB));
-        builder.setLocalAxisA(vecToPb(j.m_localXAxisA));
+        builder.setLocalAnchorA(vecToPb(j.getLocalAnchorA()));
+        builder.setLocalAnchorB(vecToPb(j.getLocalAnchorB()));
+        builder.setLocalAxisA(vecToPb(j.getLocalAxisA()));
         builder.setEnableMotor(j.isMotorEnabled());
         builder.setMaxMotorTorque(j.getMaxMotorTorque());
         builder.setMotorSpeed(j.getMotorSpeed());
-        builder.setFrequency(j.m_frequencyHz);
-        builder.setDampingRatio(j.m_dampingRatio);
+        builder.setFrequency(j.getSpringFrequencyHz());
+        builder.setDampingRatio(j.getSpringDampingRatio());
         break;
       }
       case ROPE: {
         RopeJoint j = (RopeJoint) joint;
         builder.setType(PbJointType.ROPE);
-        builder.setLocalAnchorA(vecToPb(j.m_localAnchorA));
-        builder.setLocalAnchorB(vecToPb(j.m_localAnchorB));
-        builder.setMaxLength(j.m_maxLength);
+        builder.setLocalAnchorA(vecToPb(j.getLocalAnchorA()));
+        builder.setLocalAnchorB(vecToPb(j.getLocalAnchorB()));
+        builder.setMaxLength(j.getMaxLength());
         break;
       }
       case WELD: {
         WeldJoint j = (WeldJoint) joint;
         builder.setType(PbJointType.WELD);
-        builder.setLocalAnchorA(vecToPb(j.m_localAnchorA));
-        builder.setLocalAnchorB(vecToPb(j.m_localAnchorB));
-        builder.setRefAngle(j.m_referenceAngle);
-        builder.setFrequency(j.m_frequencyHz);
-        builder.setDampingRatio(j.m_dampingRatio);
+        builder.setLocalAnchorA(vecToPb(j.getLocalAnchorA()));
+        builder.setLocalAnchorB(vecToPb(j.getLocalAnchorB()));
+        builder.setRefAngle(j.getReferenceAngle());
+        builder.setFrequency(j.getFrequency());
+        builder.setDampingRatio(j.getDampingRatio());
         break;
       }
       default:

@@ -54,15 +54,13 @@ public class MouseJoint extends Joint {
   private float m_gamma;
 
   // Solver temp
-  public int m_indexA;
-  public int m_indexB;
-  public final Vec2 m_rB = new Vec2();
-  public final Vec2 m_localCenterB = new Vec2();
-  public float m_invMassB;
-  public float m_invIB;
+  private int m_indexB;
+  private final Vec2 m_rB = new Vec2();
+  private final Vec2 m_localCenterB = new Vec2();
+  private float m_invMassB;
+  private float m_invIB;
   private final Mat22 m_mass = new Mat22();
   private final Vec2 m_C = new Vec2();
-
 
   protected MouseJoint(IWorldPool argWorld, MouseJointDef def) {
     super(argWorld, def);

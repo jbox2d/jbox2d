@@ -32,23 +32,18 @@ import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.contacts.Position;
 import org.jbox2d.dynamics.contacts.Velocity;
 
-// TODO(dmurph): clean this up a bit, add docs
 public class ConstantVolumeJoint extends Joint {
 
-  public final Body[] bodies;
-  float[] targetLengths;
-  public float targetVolume;
-  // float relaxationFactor;//1.0 is perfectly stiff (but doesn't work, unstable)
+  private final Body[] bodies;
+  private float[] targetLengths;
+  private float targetVolume;
 
-  Vec2[] normals;
+  private Vec2[] normals;
   private float m_impulse = 0.0f;
 
   private World world;
 
-  DistanceJoint[] distanceJoints;
-
-  public final float frequencyHz;
-  public final float dampingRatio;
+  private DistanceJoint[] distanceJoints;
 
   public Body[] getBodies() {
     return bodies;
@@ -99,17 +94,10 @@ public class ConstantVolumeJoint extends Joint {
       distanceJoints = def.joints.toArray(new DistanceJoint[0]);
     }
 
-    frequencyHz = def.frequencyHz;
-    dampingRatio = def.dampingRatio;
-
     normals = new Vec2[bodies.length];
     for (int i = 0; i < normals.length; ++i) {
       normals[i] = new Vec2();
     }
-
-    this.m_bodyA = bodies[0];
-    this.m_bodyB = bodies[1];
-    this.m_collideConnected = def.collideConnected;
   }
 
   @Override
@@ -123,8 +111,9 @@ public class ConstantVolumeJoint extends Joint {
     float area = 0.0f;
     for (int i = 0; i < bodies.length - 1; ++i) {
       final int next = (i == bodies.length - 1) ? 0 : i + 1;
-      area += bodies[i].getWorldCenter().x * bodies[next].getWorldCenter().y
-          - bodies[next].getWorldCenter().x * bodies[i].getWorldCenter().y;
+      area +=
+          bodies[i].getWorldCenter().x * bodies[next].getWorldCenter().y
+              - bodies[next].getWorldCenter().x * bodies[i].getWorldCenter().y;
     }
     area *= .5f;
     return area;
@@ -134,8 +123,9 @@ public class ConstantVolumeJoint extends Joint {
     float area = 0.0f;
     for (int i = 0; i < bodies.length; ++i) {
       final int next = (i == bodies.length - 1) ? 0 : i + 1;
-      area += positions[bodies[i].m_islandIndex].c.x * positions[bodies[next].m_islandIndex].c.y
-          - positions[bodies[next].m_islandIndex].c.x * positions[bodies[i].m_islandIndex].c.y;
+      area +=
+          positions[bodies[i].m_islandIndex].c.x * positions[bodies[next].m_islandIndex].c.y
+              - positions[bodies[next].m_islandIndex].c.x * positions[bodies[i].m_islandIndex].c.y;
     }
     area *= .5f;
     return area;
@@ -248,21 +238,21 @@ public class ConstantVolumeJoint extends Joint {
     }
   }
 
+  /** No-op */
   @Override
-  public void getAnchorA(Vec2 argOut) {
-  }
+  public void getAnchorA(Vec2 argOut) {}
 
+  /** No-op */
   @Override
-  public void getAnchorB(Vec2 argOut) {
-  }
+  public void getAnchorB(Vec2 argOut) {}
 
+  /** No-op */
   @Override
-  public void getReactionForce(float inv_dt, Vec2 argOut) {
-  }
+  public void getReactionForce(float inv_dt, Vec2 argOut) {}
 
+  /** No-op */
   @Override
   public float getReactionTorque(float inv_dt) {
     return 0;
   }
-
 }

@@ -73,17 +73,16 @@ public abstract class Joint {
     joint.destructor();
   }
 
-  public JointType m_type;
+  private final JointType m_type;
   public Joint m_prev;
   public Joint m_next;
   public JointEdge m_edgeA;
   public JointEdge m_edgeB;
-  public Body m_bodyA;
-  public Body m_bodyB;
-  public int m_index;
+  protected Body m_bodyA;
+  protected Body m_bodyB;
 
   public boolean m_islandFlag;
-  public boolean m_collideConnected;
+  private boolean m_collideConnected;
 
   public Object m_userData;
 
@@ -106,7 +105,6 @@ public abstract class Joint {
     m_collideConnected = def.collideConnected;
     m_islandFlag = false;
     m_userData = def.userData;
-    m_index = 0;
 
     m_edgeA = new JointEdge();
     m_edgeA.joint = null;
@@ -136,7 +134,7 @@ public abstract class Joint {
   /**
    * get the first body attached to this joint.
    */
-  public Body getBodyA() {
+  public final Body getBodyA() {
     return m_bodyA;
   }
 
@@ -145,7 +143,7 @@ public abstract class Joint {
    * 
    * @return
    */
-  public Body getBodyB() {
+  public final Body getBodyB() {
     return m_bodyB;
   }
 
@@ -203,7 +201,7 @@ public abstract class Joint {
   // / Get collide connected.
   // / Note: modifying the collide connect flag won't work correctly because
   // / the flag is only checked when fixture AABBs begin to overlap.
-  public boolean getCollideConnected() {
+  public final boolean getCollideConnected() {
     return m_collideConnected;
   }
 
@@ -212,7 +210,7 @@ public abstract class Joint {
    * 
    * @return
    */
-  public boolean IsActive() {
+  public boolean isActive() {
     return m_bodyA.isActive() && m_bodyB.isActive();
   }
 

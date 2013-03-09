@@ -414,22 +414,22 @@ public class World {
 
     // Connect to the bodies' doubly linked lists.
     j.m_edgeA.joint = j;
-    j.m_edgeA.other = j.m_bodyB;
+    j.m_edgeA.other = j.getBodyB();
     j.m_edgeA.prev = null;
-    j.m_edgeA.next = j.m_bodyA.m_jointList;
-    if (j.m_bodyA.m_jointList != null) {
-      j.m_bodyA.m_jointList.prev = j.m_edgeA;
+    j.m_edgeA.next = j.getBodyA().m_jointList;
+    if (j.getBodyA().m_jointList != null) {
+      j.getBodyA().m_jointList.prev = j.m_edgeA;
     }
-    j.m_bodyA.m_jointList = j.m_edgeA;
+    j.getBodyA().m_jointList = j.m_edgeA;
 
     j.m_edgeB.joint = j;
-    j.m_edgeB.other = j.m_bodyA;
+    j.m_edgeB.other = j.getBodyA();
     j.m_edgeB.prev = null;
-    j.m_edgeB.next = j.m_bodyB.m_jointList;
-    if (j.m_bodyB.m_jointList != null) {
-      j.m_bodyB.m_jointList.prev = j.m_edgeB;
+    j.m_edgeB.next = j.getBodyB().m_jointList;
+    if (j.getBodyB().m_jointList != null) {
+      j.getBodyB().m_jointList.prev = j.m_edgeB;
     }
-    j.m_bodyB.m_jointList = j.m_edgeB;
+    j.getBodyB().m_jointList = j.m_edgeB;
 
     Body bodyA = def.bodyA;
     Body bodyB = def.bodyB;
@@ -465,7 +465,7 @@ public class World {
       return;
     }
 
-    boolean collideConnected = j.m_collideConnected;
+    boolean collideConnected = j.getCollideConnected();
 
     // Remove from the doubly linked list.
     if (j.m_prev != null) {
@@ -481,8 +481,8 @@ public class World {
     }
 
     // Disconnect from island graph.
-    Body bodyA = j.m_bodyA;
-    Body bodyB = j.m_bodyB;
+    Body bodyA = j.getBodyA();
+    Body bodyB = j.getBodyB();
 
     // Wake up connected bodies.
     bodyA.setAwake(true);
