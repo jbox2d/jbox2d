@@ -2,24 +2,20 @@
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
  * 
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- * 	* Redistributions of source code must retain the above copyright notice,
- * 	  this list of conditions and the following disclaimer.
- * 	* Redistributions in binary form must reproduce the above copyright notice,
- * 	  this list of conditions and the following disclaimer in the documentation
- * 	  and/or other materials provided with the distribution.
+ * Redistribution and use in source and binary forms, with or without modification, are permitted
+ * provided that the following conditions are met: * Redistributions of source code must retain the
+ * above copyright notice, this list of conditions and the following disclaimer. * Redistributions
+ * in binary form must reproduce the above copyright notice, this list of conditions and the
+ * following disclaimer in the documentation and/or other materials provided with the distribution.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+ * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 package org.jbox2d.collision.broadphase;
 
@@ -127,8 +123,8 @@ public class DynamicTree {
    * @return true if the proxy was re-inserted.
    */
   public final boolean moveProxy(DynamicTreeNode proxy, final AABB aabb, Vec2 displacement) {
-	assert(proxy != null);
-	int proxyId = proxy.id;
+    assert (proxy != null);
+    int proxyId = proxy.id;
     assert (0 <= proxyId && proxyId < m_nodeCapacity);
     final DynamicTreeNode node = m_nodes[proxyId];
     assert (node.isLeaf());
@@ -147,7 +143,7 @@ public class DynamicTree {
     upperBound.x += Settings.aabbExtension;
     upperBound.y += Settings.aabbExtension;
 
-    
+
     // Predict AABB displacement.
     final float dx = displacement.x * Settings.aabbMultiplier;
     final float dy = displacement.y * Settings.aabbMultiplier;
@@ -215,12 +211,6 @@ public class DynamicTree {
   }
 
   private final Vec2 r = new Vec2();
-  private final Vec2 v = new Vec2();
-  private final Vec2 absV = new Vec2();
-  private final Vec2 temp = new Vec2();
-  private final Vec2 c = new Vec2();
-  private final Vec2 h = new Vec2();
-  private final Vec2 t = new Vec2();
   private final AABB aabb = new AABB();
   private final RayCastInput subInput = new RayCastInput();
 
@@ -236,13 +226,25 @@ public class DynamicTree {
   public void raycast(TreeRayCastCallback callback, RayCastInput input) {
     final Vec2 p1 = input.p1;
     final Vec2 p2 = input.p2;
-    r.set(p2).subLocal(p1);
-    assert (r.lengthSquared() > 0f);
+    float p1x = p1.x, p2x = p2.x, p1y = p1.y, p2y = p2.y;
+    float vx, vy;
+    float rx, ry;
+    float absVx, absVy;
+    float cx, cy;
+    float hx, hy;
+    float tempx, tempy;
+    r.x = p2x - p1x;
+    r.y = p2y - p1y;
+    assert ((r.x * r.x + r.y * r.y) > 0f);
     r.normalize();
+    rx = r.x;
+    ry = r.y;
 
     // v is perpendicular to the segment.
-    Vec2.crossToOut(1f, r, v);
-    absV.set(v).absLocal();
+    vx = -1f * ry;
+    vy = 1f * rx;
+    absVx = MathUtils.abs(vx);
+    absVy = MathUtils.abs(vy);
 
     // Separating axis for segment (Gino, p80).
     // |dot(v, p1 - c)| > dot(|v|, h)
@@ -252,10 +254,19 @@ public class DynamicTree {
     // Build a bounding box for the segment.
     final AABB segAABB = aabb;
     // Vec2 t = p1 + maxFraction * (p2 - p1);
-    temp.set(p2).subLocal(p1).mulLocal(maxFraction).addLocal(p1);
-    Vec2.minToOut(p1, temp, segAABB.lowerBound);
-    Vec2.maxToOut(p1, temp, segAABB.upperBound);
+    // before inline
+    // temp.set(p2).subLocal(p1).mulLocal(maxFraction).addLocal(p1);
+    // Vec2.minToOut(p1, temp, segAABB.lowerBound);
+    // Vec2.maxToOut(p1, temp, segAABB.upperBound);
+    tempx = (p2x - p1x) * maxFraction + p1x;
+    tempy = (p2y - p1y) * maxFraction + p1y;
+    segAABB.lowerBound.x = p1x < tempx ? p1x : tempx;
+    segAABB.lowerBound.y = p1y < tempy ? p1y : tempy;
+    segAABB.upperBound.x = p1x > tempx ? p1x : tempx;
+    segAABB.upperBound.y = p1y > tempy ? p1y : tempy;
+    // end inline
 
+    intStack.reset();
     intStack.push(m_root);
     while (intStack.getCount() > 0) {
       int nodeId = intStack.pop();
@@ -264,24 +275,31 @@ public class DynamicTree {
       }
 
       final DynamicTreeNode node = m_nodes[nodeId];
-
-      if (!AABB.testOverlap(node.aabb, segAABB)) {
+      final AABB nodeAABB = node.aabb;
+      if (!AABB.testOverlap(nodeAABB, segAABB)) {
         continue;
       }
 
       // Separating axis for segment (Gino, p80).
       // |dot(v, p1 - c)| > dot(|v|, h)
-      node.aabb.getCenterToOut(c);
-      node.aabb.getExtentsToOut(h);
-      temp.set(p1).subLocal(c);
-      float separation = MathUtils.abs(Vec2.dot(v, temp)) - Vec2.dot(absV, h);
+      // node.aabb.getCenterToOut(c);
+      // node.aabb.getExtentsToOut(h);
+      cx = (nodeAABB.lowerBound.x + nodeAABB.upperBound.x) * .5f;
+      cy = (nodeAABB.lowerBound.y + nodeAABB.upperBound.y) * .5f;
+      hx = (nodeAABB.upperBound.x - nodeAABB.lowerBound.x) * .5f;
+      hy = (nodeAABB.upperBound.y - nodeAABB.lowerBound.y) * .5f;
+      tempx = p1x - cx;
+      tempy = p1y - cy;
+      float separation = MathUtils.abs(vx * tempx + vy * tempy) - (absVx * hx + absVy * hy);
       if (separation > 0.0f) {
         continue;
       }
 
       if (node.isLeaf()) {
-        subInput.p1.set(input.p1);
-        subInput.p2.set(input.p2);
+        subInput.p1.x = p1x;
+        subInput.p1.y = p1y;
+        subInput.p2.x = p2x;
+        subInput.p2.y = p2y;
         subInput.maxFraction = maxFraction;
 
         float value = callback.raycastCallback(subInput, node);
@@ -294,9 +312,15 @@ public class DynamicTree {
         if (value > 0.0f) {
           // Update segment bounding box.
           maxFraction = value;
-          t.set(p2).subLocal(p1).mulLocal(maxFraction).addLocal(p1);
-          Vec2.minToOut(p1, t, segAABB.lowerBound);
-          Vec2.maxToOut(p1, t, segAABB.upperBound);
+          // temp.set(p2).subLocal(p1).mulLocal(maxFraction).addLocal(p1);
+          // Vec2.minToOut(p1, temp, segAABB.lowerBound);
+          // Vec2.maxToOut(p1, temp, segAABB.upperBound);
+          tempx = (p2x - p1x) * maxFraction + p1x;
+          tempy = (p2y - p1y) * maxFraction + p1y;
+          segAABB.lowerBound.x = p1x < tempx ? p1x : tempx;
+          segAABB.lowerBound.y = p1y < tempy ? p1y : tempy;
+          segAABB.upperBound.x = p1x > tempx ? p1x : tempx;
+          segAABB.upperBound.y = p1y > tempy ? p1y : tempy;
         }
       } else {
         intStack.push(node.child1);
