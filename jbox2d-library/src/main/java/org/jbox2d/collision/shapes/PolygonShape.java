@@ -322,10 +322,10 @@ public class PolygonShape extends Shape {
     // aabb.lowerBound = lower - r;
     // aabb.upperBound = upper + r;
 
-    aabb.lowerBound.x -= m_radius;
-    aabb.lowerBound.y -= m_radius;
-    aabb.upperBound.x += m_radius;
-    aabb.upperBound.y += m_radius;
+    lower.x -= m_radius;
+    lower.y -= m_radius;
+    upper.x += m_radius;
+    upper.y += m_radius;
   }
 
   /**
@@ -361,10 +361,6 @@ public class PolygonShape extends Shape {
     p2.set(input.p2).subLocal(xf.p);
     Rot.mulTrans(xf.q, p2, p2);
     d.set(p2).subLocal(p1);
-
-    // if (count == 2) {
-
-    // } else {
 
     float lower = 0, upper = input.maxFraction;
 

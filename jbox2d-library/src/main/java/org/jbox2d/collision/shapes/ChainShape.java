@@ -28,6 +28,7 @@ import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.collision.RayCastOutput;
 import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
@@ -48,8 +49,6 @@ public class ChainShape extends Shape {
   public boolean m_hasPrevVertex = false, m_hasNextVertex = false;
 
   private final EdgeShape pool0 = new EdgeShape();
-  private final Vec2 pool1 = new Vec2();
-  private final Vec2 pool2 = new Vec2();
 
   public ChainShape() {
     super(ShapeType.CHAIN);
@@ -69,23 +68,33 @@ public class ChainShape extends Shape {
   public void getChildEdge(EdgeShape edge, int index) {
     assert (0 <= index && index < m_count - 1);
     edge.m_radius = m_radius;
-
-    edge.m_vertex1.set(m_vertices[index + 0]);
-    edge.m_vertex2.set(m_vertices[index + 1]);
+    
+    final Vec2 v0 = m_vertices[index + 0];
+    final Vec2 v1 = m_vertices[index + 1];
+    edge.m_vertex1.x = v0.x;
+    edge.m_vertex1.y = v0.y;
+    edge.m_vertex2.x = v1.x;
+    edge.m_vertex2.y = v1.y;
 
     if (index > 0) {
-      edge.m_vertex0.set(m_vertices[index - 1]);
+      Vec2 v = m_vertices[index - 1];
+      edge.m_vertex0.x = v.x;
+      edge.m_vertex0.y = v.y;
       edge.m_hasVertex0 = true;
     } else {
-      edge.m_vertex0.set(m_prevVertex);
+      edge.m_vertex0.x = m_prevVertex.x;
+      edge.m_vertex0.y = m_prevVertex.y;
       edge.m_hasVertex0 = m_hasPrevVertex;
     }
 
     if (index < m_count - 2) {
-      edge.m_vertex3.set(m_vertices[index + 2]);
+      Vec2 v = m_vertices[index + 2];
+      edge.m_vertex3.x = v.x;
+      edge.m_vertex3.y = v.y;
       edge.m_hasVertex3 = true;
     } else {
-      edge.m_vertex3.set(m_nextVertex);
+      edge.m_vertex3.x = m_nextVertex.x;
+      edge.m_vertex3.y = m_nextVertex.y;
       edge.m_hasVertex3 = m_hasNextVertex;
     }
   }
@@ -106,9 +115,12 @@ public class ChainShape extends Shape {
     if (i2 == m_count) {
       i2 = 0;
     }
-
-    edgeShape.m_vertex1.set(m_vertices[i1]);
-    edgeShape.m_vertex2.set(m_vertices[i2]);
+    Vec2 v = m_vertices[i1];
+    edgeShape.m_vertex1.x = v.x;
+    edgeShape.m_vertex1.y = v.y;
+    Vec2 v1 = m_vertices[i2];
+    edgeShape.m_vertex2.x = v1.x;
+    edgeShape.m_vertex2.y = v1.y;
 
     return edgeShape.raycast(output, input, xf, 0);
   }
@@ -116,20 +128,29 @@ public class ChainShape extends Shape {
   @Override
   public void computeAABB(AABB aabb, Transform xf, int childIndex) {
     assert (childIndex < m_count);
-
+    float v1x, v1y, v2x, v2y;
+    final Vec2 lower = aabb.lowerBound;
+    final Vec2 upper = aabb.upperBound;
+    
     int i1 = childIndex;
     int i2 = childIndex + 1;
     if (i2 == m_count) {
       i2 = 0;
     }
 
-    final Vec2 v1 = pool1;
-    final Vec2 v2 = pool2;
-    Transform.mulToOutUnsafe(xf, m_vertices[i1], v1);
-    Transform.mulToOutUnsafe(xf, m_vertices[i2], v2);
+    final Vec2 vi1 = m_vertices[i1];
+    final Vec2 vi2 = m_vertices[i2];
+    final Rot xfq = xf.q;
+    final Vec2 xfp = xf.p;
+    v1x = (xfq.c * vi1.x - xfq.s * vi1.y) + xfp.x;
+    v1y = (xfq.s * vi1.x + xfq.c * vi1.y) + xfp.y;
+    v2x = (xfq.c * vi2.x - xfq.s * vi2.y) + xfp.x;
+    v2y = (xfq.s * vi2.x + xfq.c * vi2.y) + xfp.y;
 
-    Vec2.minToOut(v1, v2, aabb.lowerBound);
-    Vec2.maxToOut(v1, v2, aabb.upperBound);
+    lower.x = v1x < v2x ? v1x : v2x;
+    lower.y = v1y < v2y ? v1y : v2y;
+    upper.x = v1x > v2x ? v1x : v2x;
+    upper.y = v1y > v2y ? v1y : v2y;
   }
 
   @Override
@@ -160,12 +181,10 @@ public class ChainShape extends Shape {
     assert (m_vertices == null && m_count == 0);
     assert (count >= 3);
     m_count = count + 1;
-    Vec2 e = new Vec2();
     m_vertices = new Vec2[m_count];
     for (int i = 1; i < count; i++) {
       Vec2 v1 = vertices[i - 1];
       Vec2 v2 = vertices[i];
-      e.set(v1).subLocal(v2);
       // If the code crashes here, it means your vertices are too close together.
       if (MathUtils.distanceSquared(v1, v2) < Settings.linearSlop * Settings.linearSlop) {
         throw new RuntimeException("Vertices of chain shape are too close together");
@@ -191,12 +210,10 @@ public class ChainShape extends Shape {
     assert (m_vertices == null && m_count == 0);
     assert (count >= 2);
     m_count = count;
-    Vec2 e = new Vec2();
     m_vertices = new Vec2[m_count];
     for (int i = 1; i < m_count; i++) {
       Vec2 v1 = vertices[i - 1];
       Vec2 v2 = vertices[i];
-      e.set(v1).subLocal(v2);
       // If the code crashes here, it means your vertices are too close together.
       if (MathUtils.distanceSquared(v1, v2) < Settings.linearSlop * Settings.linearSlop) {
         throw new RuntimeException("Vertices of chain shape are too close together");

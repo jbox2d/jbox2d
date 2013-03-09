@@ -63,12 +63,12 @@ import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.MouseJoint;
 import org.jbox2d.dynamics.joints.MouseJointDef;
 import org.jbox2d.serialization.JbDeserializer;
+import org.jbox2d.serialization.JbDeserializer.ObjectListener;
 import org.jbox2d.serialization.JbSerializer;
+import org.jbox2d.serialization.JbSerializer.ObjectSigner;
 import org.jbox2d.serialization.SerializationResult;
 import org.jbox2d.serialization.UnsupportedListener;
 import org.jbox2d.serialization.UnsupportedObjectException;
-import org.jbox2d.serialization.JbDeserializer.ObjectListener;
-import org.jbox2d.serialization.JbSerializer.ObjectSigner;
 import org.jbox2d.serialization.pb.PbDeserializer;
 import org.jbox2d.serialization.pb.PbSerializer;
 import org.slf4j.Logger;
@@ -402,7 +402,7 @@ public abstract class TestbedTest
       log.error("Error serializing world", e1);
       if (dialogOnSaveLoadErrors) {
         JOptionPane.showConfirmDialog(null, "Error serializing the object: " + e1.toString(),
-            "Serialization Error", JOptionPane.OK_OPTION);
+            "Serialization Error", JOptionPane.ERROR_MESSAGE);
       }
       return;
     }
@@ -414,14 +414,14 @@ public abstract class TestbedTest
       log.error("File not found exception while saving", e);
       if (dialogOnSaveLoadErrors) {
         JOptionPane.showConfirmDialog(null, "File not found exception while saving: "
-            + getFilename(), "Serialization Error", JOptionPane.OK_OPTION);
+            + getFilename(), "Serialization Error", JOptionPane.ERROR_MESSAGE);
       }
       return;
     } catch (IOException e) {
       log.error("Exception while writing world", e);
       if (dialogOnSaveLoadErrors) {
         JOptionPane.showConfirmDialog(null, "Error while writing world: " + e.toString(),
-            "Serialization Error", JOptionPane.OK_OPTION);
+            "Serialization Error", JOptionPane.ERROR_MESSAGE);
       }
       return;
     }

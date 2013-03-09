@@ -93,10 +93,11 @@ public class DynamicTree {
 
     // Fatten the aabb
     final TreeNode node = m_nodes[proxyId];
-    node.aabb.lowerBound.x = aabb.lowerBound.x - Settings.aabbExtension;
-    node.aabb.lowerBound.y = aabb.lowerBound.y - Settings.aabbExtension;
-    node.aabb.upperBound.x = aabb.upperBound.x + Settings.aabbExtension;
-    node.aabb.upperBound.y = aabb.upperBound.y + Settings.aabbExtension;
+    final AABB nodeAABB = node.aabb;
+    nodeAABB.lowerBound.x = aabb.lowerBound.x - Settings.aabbExtension;
+    nodeAABB.lowerBound.y = aabb.lowerBound.y - Settings.aabbExtension;
+    nodeAABB.upperBound.x = aabb.upperBound.x + Settings.aabbExtension;
+    nodeAABB.upperBound.y = aabb.upperBound.y + Settings.aabbExtension;
     node.userData = userData;
 
     insertLeaf(proxyId);
@@ -129,7 +130,10 @@ public class DynamicTree {
     final TreeNode node = m_nodes[proxyId];
     assert (node.isLeaf());
 
-    if (node.aabb.contains(aabb)) {
+    final AABB nodeAABB = node.aabb;
+    // if (nodeAABB.contains(aabb)) {
+    if (nodeAABB.lowerBound.x > aabb.lowerBound.x && nodeAABB.lowerBound.y > aabb.lowerBound.y
+        && aabb.upperBound.x > nodeAABB.upperBound.x && aabb.upperBound.y > nodeAABB.upperBound.y) {
       return false;
     }
 
@@ -143,7 +147,7 @@ public class DynamicTree {
     upperBound.x += Settings.aabbExtension;
     upperBound.y += Settings.aabbExtension;
 
-    
+
     // Predict AABB displacement.
     final float dx = displacement.x * Settings.aabbMultiplier;
     final float dy = displacement.y * Settings.aabbMultiplier;
@@ -158,10 +162,10 @@ public class DynamicTree {
     } else {
       upperBound.y += dy;
     }
-    node.aabb.lowerBound.x = lowerBound.x;
-    node.aabb.lowerBound.y = lowerBound.y;
-    node.aabb.upperBound.x = upperBound.x;
-    node.aabb.upperBound.y = upperBound.y;
+    nodeAABB.lowerBound.x = lowerBound.x;
+    nodeAABB.lowerBound.y = lowerBound.y;
+    nodeAABB.upperBound.x = upperBound.x;
+    nodeAABB.upperBound.y = upperBound.y;
 
     insertLeaf(proxyId);
     return true;
@@ -211,12 +215,6 @@ public class DynamicTree {
   }
 
   private final Vec2 r = new Vec2();
-  private final Vec2 v = new Vec2();
-  private final Vec2 absV = new Vec2();
-  private final Vec2 temp = new Vec2();
-  private final Vec2 c = new Vec2();
-  private final Vec2 h = new Vec2();
-  private final Vec2 t = new Vec2();
   private final AABB aabb = new AABB();
   private final RayCastInput subInput = new RayCastInput();
 
@@ -232,13 +230,25 @@ public class DynamicTree {
   public void raycast(TreeRayCastCallback callback, RayCastInput input) {
     final Vec2 p1 = input.p1;
     final Vec2 p2 = input.p2;
-    r.set(p2).subLocal(p1);
-    assert (r.lengthSquared() > 0f);
+    float p1x = p1.x, p2x = p2.x, p1y = p1.y, p2y = p2.y;
+    float vx, vy;
+    float rx, ry;
+    float absVx, absVy;
+    float cx, cy;
+    float hx, hy;
+    float tempx, tempy;
+    r.x = p2x - p1x;
+    r.y = p2y - p1y;
+    assert ((r.x * r.x + r.y * r.y) > 0f);
     r.normalize();
+    rx = r.x;
+    ry = r.y;
 
     // v is perpendicular to the segment.
-    Vec2.crossToOutUnsafe(1f, r, v);
-    absV.set(v).absLocal();
+    vx = -1f * ry;
+    vy = 1f * rx;
+    absVx = MathUtils.abs(vx);
+    absVy = MathUtils.abs(vy);
 
     // Separating axis for segment (Gino, p80).
     // |dot(v, p1 - c)| > dot(|v|, h)
@@ -248,10 +258,19 @@ public class DynamicTree {
     // Build a bounding box for the segment.
     final AABB segAABB = aabb;
     // Vec2 t = p1 + maxFraction * (p2 - p1);
-    temp.set(p2).subLocal(p1).mulLocal(maxFraction).addLocal(p1);
-    Vec2.minToOut(p1, temp, segAABB.lowerBound);
-    Vec2.maxToOut(p1, temp, segAABB.upperBound);
+    // before inline
+    // temp.set(p2).subLocal(p1).mulLocal(maxFraction).addLocal(p1);
+    // Vec2.minToOut(p1, temp, segAABB.lowerBound);
+    // Vec2.maxToOut(p1, temp, segAABB.upperBound);
+    tempx = (p2x - p1x) * maxFraction + p1x;
+    tempy = (p2y - p1y) * maxFraction + p1y;
+    segAABB.lowerBound.x = p1x < tempx ? p1x : tempx;
+    segAABB.lowerBound.y = p1y < tempy ? p1y : tempy;
+    segAABB.upperBound.x = p1x > tempx ? p1x : tempx;
+    segAABB.upperBound.y = p1y > tempy ? p1y : tempy;
+    // end inline
 
+    intStack.reset();
     intStack.push(m_root);
     while (intStack.getCount() > 0) {
       int nodeId = intStack.pop();
@@ -260,24 +279,31 @@ public class DynamicTree {
       }
 
       final TreeNode node = m_nodes[nodeId];
-
-      if (!AABB.testOverlap(node.aabb, segAABB)) {
+      final AABB nodeAABB = node.aabb;
+      if (!AABB.testOverlap(nodeAABB, segAABB)) {
         continue;
       }
 
       // Separating axis for segment (Gino, p80).
       // |dot(v, p1 - c)| > dot(|v|, h)
-      node.aabb.getCenterToOut(c);
-      node.aabb.getExtentsToOut(h);
-      temp.set(p1).subLocal(c);
-      float separation = MathUtils.abs(Vec2.dot(v, temp)) - Vec2.dot(absV, h);
+      // node.aabb.getCenterToOut(c);
+      // node.aabb.getExtentsToOut(h);
+      cx = (nodeAABB.lowerBound.x + nodeAABB.upperBound.x) * .5f;
+      cy = (nodeAABB.lowerBound.y + nodeAABB.upperBound.y) * .5f;
+      hx = (nodeAABB.upperBound.x - nodeAABB.lowerBound.x) * .5f;
+      hy = (nodeAABB.upperBound.y - nodeAABB.lowerBound.y) * .5f;
+      tempx = p1x - cx;
+      tempy = p1y - cy;
+      float separation = MathUtils.abs(vx * tempx + vy * tempy) - (absVx * hx + absVy * hy);
       if (separation > 0.0f) {
         continue;
       }
 
       if (node.isLeaf()) {
-        subInput.p1.set(input.p1);
-        subInput.p2.set(input.p2);
+        subInput.p1.x = p1x;
+        subInput.p1.y = p1y;
+        subInput.p2.x = p2x;
+        subInput.p2.y = p2y;
         subInput.maxFraction = maxFraction;
 
         float value = callback.raycastCallback(subInput, nodeId);
@@ -290,9 +316,15 @@ public class DynamicTree {
         if (value > 0.0f) {
           // Update segment bounding box.
           maxFraction = value;
-          t.set(p2).subLocal(p1).mulLocal(maxFraction).addLocal(p1);
-          Vec2.minToOut(p1, t, segAABB.lowerBound);
-          Vec2.maxToOut(p1, t, segAABB.upperBound);
+          // temp.set(p2).subLocal(p1).mulLocal(maxFraction).addLocal(p1);
+          // Vec2.minToOut(p1, temp, segAABB.lowerBound);
+          // Vec2.maxToOut(p1, temp, segAABB.upperBound);
+          tempx = (p2x - p1x) * maxFraction + p1x;
+          tempy = (p2y - p1y) * maxFraction + p1y;
+          segAABB.lowerBound.x = p1x < tempx ? p1x : tempx;
+          segAABB.lowerBound.y = p1y < tempy ? p1y : tempy;
+          segAABB.upperBound.x = p1x > tempx ? p1x : tempx;
+          segAABB.upperBound.y = p1y > tempy ? p1y : tempy;
         }
       } else {
         intStack.push(node.child1);
@@ -492,13 +524,14 @@ public class DynamicTree {
       m_freeList = m_nodeCount;
     }
     int nodeId = m_freeList;
-    m_freeList = m_nodes[nodeId].parent;
+    final TreeNode treeNode = m_nodes[nodeId];
+    m_freeList = treeNode.parent;
 
-    m_nodes[nodeId].parent = NULL_NODE;
-    m_nodes[nodeId].child1 = NULL_NODE;
-    m_nodes[nodeId].child2 = NULL_NODE;
-    m_nodes[nodeId].height = 0;
-    m_nodes[nodeId].userData = null;
+    treeNode.parent = NULL_NODE;
+    treeNode.child1 = NULL_NODE;
+    treeNode.child2 = NULL_NODE;
+    treeNode.height = 0;
+    treeNode.userData = null;
     ++m_nodeCount;
     return nodeId;
   }
