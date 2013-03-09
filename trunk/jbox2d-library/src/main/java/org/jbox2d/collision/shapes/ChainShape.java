@@ -128,7 +128,6 @@ public class ChainShape extends Shape {
   @Override
   public void computeAABB(AABB aabb, Transform xf, int childIndex) {
     assert (childIndex < m_count);
-    float v1x, v1y, v2x, v2y;
     final Vec2 lower = aabb.lowerBound;
     final Vec2 upper = aabb.upperBound;
     
@@ -142,10 +141,10 @@ public class ChainShape extends Shape {
     final Vec2 vi2 = m_vertices[i2];
     final Rot xfq = xf.q;
     final Vec2 xfp = xf.p;
-    v1x = (xfq.c * vi1.x - xfq.s * vi1.y) + xfp.x;
-    v1y = (xfq.s * vi1.x + xfq.c * vi1.y) + xfp.y;
-    v2x = (xfq.c * vi2.x - xfq.s * vi2.y) + xfp.x;
-    v2y = (xfq.s * vi2.x + xfq.c * vi2.y) + xfp.y;
+    float v1x = (xfq.c * vi1.x - xfq.s * vi1.y) + xfp.x;
+    float v1y = (xfq.s * vi1.x + xfq.c * vi1.y) + xfp.y;
+    float v2x = (xfq.c * vi2.x - xfq.s * vi2.y) + xfp.x;
+    float v2y = (xfq.s * vi2.x + xfq.c * vi2.y) + xfp.y;
 
     lower.x = v1x < v2x ? v1x : v2x;
     lower.y = v1y < v2y ? v1y : v2y;

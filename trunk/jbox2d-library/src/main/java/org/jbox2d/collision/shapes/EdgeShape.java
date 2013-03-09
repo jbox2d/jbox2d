@@ -93,19 +93,17 @@ public class EdgeShape extends Shape {
     final Vec2 xfp = xf.p;
 
     // Put the ray into the edge's frame of reference.
-    // final Vec2 p1 = pool0.set(input.p1).subLocal(xf.p);
-    // Rot.mulTrans(xf.q, p1, p1);
-    // final Vec2 p2 = pool1.set(input.p2).subLocal(xf.p);
-    // Rot.mulTrans(xf.q, p1, p1);
+    //b2Vec2 p1 = b2MulT(xf.q, input.p1 - xf.p);
+    //b2Vec2 p2 = b2MulT(xf.q, input.p2 - xf.p);
     tempx = input.p1.x - xfp.x;
     tempy = input.p1.y - xfp.y;
-    final float p1tempx = xfq.c * tempx + xfq.s * tempy;
-    final float p1tempy = -xfq.s * tempx + xfq.c * tempy;
+    final float p1x = xfq.c * tempx + xfq.s * tempy;
+    final float p1y = -xfq.s * tempx + xfq.c * tempy;
 
-    final float p2x = input.p2.x - xfp.x;
-    final float p2y = input.p2.y - xfp.y;
-    final float p1x = xfq.c * p1tempx + xfq.s * p1tempy;
-    final float p1y = -xfq.s * p1tempx + xfq.c * p1tempy;
+    tempx = input.p2.x - xfp.x;
+    tempy = input.p2.y - xfp.y;
+    final float p2x = xfq.c * tempx + xfq.s * tempy;
+    final float p2y = -xfq.s * tempx + xfq.c * tempy;
 
     final float dx = p2x - p1x;
     final float dy = p2y - p1y;

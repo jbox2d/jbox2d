@@ -121,9 +121,6 @@ public class CircleShape extends Shape {
   @Override
   public final boolean raycast(RayCastOutput output, RayCastInput input, Transform transform,
       int childIndex) {
-
-    float sx, sy, rx, ry;
-    float positionx, positiony;
     final Vec2 inputp1 = input.p1;
     final Vec2 inputp2 = input.p2;
     final Rot tq = transform.q;
@@ -131,17 +128,17 @@ public class CircleShape extends Shape {
 
     // Rot.mulToOutUnsafe(transform.q, m_p, position);
     // position.addLocal(transform.p);
-    positionx = tq.c * m_p.x - tq.s * m_p.y + tp.x;
-    positiony = tq.s * m_p.x + tq.c * m_p.y + tp.y;
+    final float positionx = tq.c * m_p.x - tq.s * m_p.y + tp.x;
+    final float positiony = tq.s * m_p.x + tq.c * m_p.y + tp.y;
 
-    sx = inputp1.x - positionx;
-    sy = inputp1.y - positiony;
+    final float sx = inputp1.x - positionx;
+    final float sy = inputp1.y - positiony;
     // final float b = Vec2.dot(s, s) - m_radius * m_radius;
     final float b = sx * sx + sy * sy - m_radius * m_radius;
 
     // Solve quadratic equation.
-    rx = inputp2.x - inputp1.x;
-    ry = inputp2.y - inputp1.y;
+    final float rx = inputp2.x - inputp1.x;
+    final float ry = inputp2.y - inputp1.y;
     // final float c = Vec2.dot(s, r);
     // final float rr = Vec2.dot(r, r);
     final float c = sx * rx + sy * ry;
@@ -171,11 +168,10 @@ public class CircleShape extends Shape {
 
   @Override
   public final void computeAABB(final AABB aabb, final Transform transform, int childIndex) {
-    float px, py;
     final Rot tq = transform.q;
     final Vec2 tp = transform.p;
-    px = tq.c * m_p.x - tq.s * m_p.y + tp.x;
-    py = tq.s * m_p.x + tq.c * m_p.y + tp.y;
+    final float px = tq.c * m_p.x - tq.s * m_p.y + tp.x;
+    final float py = tq.s * m_p.x + tq.c * m_p.y + tp.y;
 
     aabb.lowerBound.x = px - m_radius;
     aabb.lowerBound.y = py - m_radius;
