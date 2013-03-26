@@ -86,7 +86,7 @@ public class Rot implements Serializable {
     yAxis.set(-s, c);
   }
 
-  @Override
+  // @Override // annotation omitted for GWT-compatibility
   public Rot clone() {
     Rot copy = new Rot();
     copy.s = s;
