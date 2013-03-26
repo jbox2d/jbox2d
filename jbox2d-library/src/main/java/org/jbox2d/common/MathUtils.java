@@ -51,7 +51,7 @@ import java.util.Random;
 /**
  * A few math methods that don't fit very well anywhere else.
  */
-public class MathUtils {
+public class MathUtils extends PlatformMathUtils {
   public static final float PI = (float) Math.PI;
   public static final float TWOPI = (float) (Math.PI * 2);
   public static final float INV_PI = 1f / PI;
@@ -68,9 +68,6 @@ public class MathUtils {
    * Radians to degrees conversion factor
    */
   public static final float RAD2DEG = 180 / PI;
-
-  private static final float SHIFT23 = 1 << 23;
-  private static final float INV_SHIFT23 = 1.0f / SHIFT23;
 
   public static final float[] sinLUT = new float[Settings.SINCOS_LUT_LENGTH];
   public static final float[] cosLUT = new float[Settings.SINCOS_LUT_LENGTH];
@@ -274,17 +271,6 @@ public class MathUtils {
 
   public final static boolean isPowerOfTwo(final int x) {
     return x > 0 && (x & x - 1) == 0;
-  }
-
-  public static final float fastPow(float a, float b) {
-    float x = Float.floatToRawIntBits(a);
-    x *= INV_SHIFT23;
-    x -= 127;
-    float y = x - (x >= 0 ? (int) x : (int) x - 1);
-    b *= x + (y - y * y) * 0.346607f;
-    y = b - (b >= 0 ? (int) b : (int) b - 1);
-    y = (y - y * y) * 0.33971f;
-    return Float.intBitsToFloat((int) ((b + 127 - y) * SHIFT23));
   }
 
   public static final float atan2(final float y, final float x) {
