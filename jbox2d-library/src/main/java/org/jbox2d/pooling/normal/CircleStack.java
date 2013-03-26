@@ -27,25 +27,21 @@ import java.lang.reflect.Array;
 
 import org.jbox2d.pooling.IOrderedStack;
 
-public class CircleStack<E> implements IOrderedStack<E>{
-  private final E[] pool;
+public abstract class CircleStack<E> implements IOrderedStack<E>{
+
+  private final Object[] pool;
   private int index;
   private final int size;
-  private final E[] container;
+  private final Object[] container;
 
-  @SuppressWarnings("unchecked")
-  public CircleStack(Class<E> argClass, int argStackSize, int argContainerSize) {
+  public CircleStack(int argStackSize, int argContainerSize) {
     size = argStackSize;
-    pool = (E[]) Array.newInstance(argClass, argStackSize);
+    pool = new Object[argStackSize];
     for (int i = 0; i < argStackSize; i++) {
-      try {
-        pool[i] = argClass.newInstance();
-      } catch (Exception e) {
-        throw new RuntimeException("Error creating pooled object " + argClass.getSimpleName(), e);
-      }
+      pool[i] = newInstance();
     }
     index = 0;
-    container = (E[]) Array.newInstance(argClass, argContainerSize);
+    container = new Object[argContainerSize];
   }
 
   public final E pop() {
@@ -53,7 +49,7 @@ public class CircleStack<E> implements IOrderedStack<E>{
     if(index >= size){
       index = 0;
     }
-    return pool[index];
+    return (E) pool[index];
   }
 
   public final E[] pop(int argNum) {
@@ -67,9 +63,12 @@ public class CircleStack<E> implements IOrderedStack<E>{
       System.arraycopy(pool, 0, container, argNum - overlap, overlap);
       index = overlap;
     }
-    return container;
+    return (E[]) container;
   }
 
   @Override
   public void push(int argNum) {}
+
+  /** Creates a new instance of the object contained by this stack. */
+  protected abstract E newInstance();
 }
