@@ -168,17 +168,15 @@ public class OBBViewportTransform implements IViewportTransform {
     }
   }
 
-  /**
-   * @see IViewportTransform#getWorldToScreen(Vec2, Vec2)
-   */
   public void getWorldToScreen(Vec2 argWorld, Vec2 argScreen) {
-    argScreen.set(argWorld);
-    argScreen.subLocal(box.center);
+    argScreen.x = argWorld.x - box.center.x;
+    argScreen.y = argWorld.y - box.center.y;
     box.R.mulToOut(argScreen, argScreen);
     if (yFlip) {
       yFlipMat.mulToOut(argScreen, argScreen);
     }
-    argScreen.addLocal(box.extents);
+    argScreen.x += box.extents.x;
+    argScreen.y += box.extents.y;
   }
 
   private final Mat22 inv2 = new Mat22();

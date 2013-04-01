@@ -201,7 +201,7 @@ public class DynamicTree {
       final TreeNode node = m_nodes[nodeId];
 
       if (AABB.testOverlap(node.aabb, aabb)) {
-        if (node.isLeaf()) {
+        if (node.child1 == TreeNode.NULL_NODE) {
           boolean proceed = callback.treeCallback(nodeId);
           if (!proceed) {
             return;
@@ -569,7 +569,7 @@ public class DynamicTree {
     // find the best sibling
     AABB leafAABB = m_nodes[leaf].aabb;
     int index = m_root;
-    while (m_nodes[index].isLeaf() == false) {
+    while (m_nodes[index].child1 != TreeNode.NULL_NODE) {
       final TreeNode node = m_nodes[index];
       int child1 = node.child1;
       int child2 = node.child2;
