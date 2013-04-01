@@ -380,8 +380,8 @@ public class ContactSolver {
 
         // Clamp the accumulated force
         final float maxFriction = friction * vcp.normalImpulse;
-        final float newImpulse = MathUtils.clamp(vcp.tangentImpulse + lambda, -maxFriction,
-            maxFriction);
+        final float newImpulse =
+            MathUtils.clamp(vcp.tangentImpulse + lambda, -maxFriction, maxFriction);
         lambda = newImpulse - vcp.tangentImpulse;
         vcp.tangentImpulse = newImpulse;
 
@@ -533,9 +533,11 @@ public class ContactSolver {
             P1.set(normal).mulLocal(d.x);
             P2.set(normal).mulLocal(d.y);
 
-            /* vA -= invMassA * (P1 + P2); wA -= invIA * (Cross(cp1.rA, P1) + Cross(cp2.rA, P2));
+            /*
+             * vA -= invMassA * (P1 + P2); wA -= invIA * (Cross(cp1.rA, P1) + Cross(cp2.rA, P2));
              * 
-             * vB += invMassB * (P1 + P2); wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2)); */
+             * vB += invMassB * (P1 + P2); wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2));
+             */
 
             temp1.set(P1).addLocal(P2);
             temp2.set(temp1).mulLocal(mA);
@@ -550,19 +552,21 @@ public class ContactSolver {
             cp1.normalImpulse = x.x;
             cp2.normalImpulse = x.y;
 
-            /* #if B2_DEBUG_SOLVER == 1 // Postconditions dv1 = vB + Cross(wB, cp1.rB) - vA -
+            /*
+             * #if B2_DEBUG_SOLVER == 1 // Postconditions dv1 = vB + Cross(wB, cp1.rB) - vA -
              * Cross(wA, cp1.rA); dv2 = vB + Cross(wB, cp2.rB) - vA - Cross(wA, cp2.rA);
              * 
              * // Compute normal velocity vn1 = Dot(dv1, normal); vn2 = Dot(dv2, normal);
              * 
              * assert(Abs(vn1 - cp1.velocityBias) < k_errorTol); assert(Abs(vn2 - cp2.velocityBias)
-             * < k_errorTol); #endif */
+             * < k_errorTol); #endif
+             */
             if (DEBUG_SOLVER) {
               // Postconditions
-              Vec2 dv1 = vB.add(Vec2.cross(wB, cp1.rB).subLocal(vA)
-                  .subLocal(Vec2.cross(wA, cp1.rA)));
-              Vec2 dv2 = vB.add(Vec2.cross(wB, cp2.rB).subLocal(vA)
-                  .subLocal(Vec2.cross(wA, cp2.rA)));
+              Vec2 dv1 =
+                  vB.add(Vec2.cross(wB, cp1.rB).subLocal(vA).subLocal(Vec2.cross(wA, cp1.rA)));
+              Vec2 dv2 =
+                  vB.add(Vec2.cross(wB, cp2.rB).subLocal(vA).subLocal(Vec2.cross(wA, cp2.rA)));
               // Compute normal velocity
               vn1 = Vec2.dot(dv1, normal);
               vn2 = Vec2.dot(dv2, normal);
@@ -595,10 +599,12 @@ public class ContactSolver {
             P1.set(normal).mulLocal(d.x);
             P2.set(normal).mulLocal(d.y);
 
-            /* Vec2 P1 = d.x * normal; Vec2 P2 = d.y * normal; vA -= invMassA * (P1 + P2); wA -=
+            /*
+             * Vec2 P1 = d.x * normal; Vec2 P2 = d.y * normal; vA -= invMassA * (P1 + P2); wA -=
              * invIA * (Cross(cp1.rA, P1) + Cross(cp2.rA, P2));
              * 
-             * vB += invMassB * (P1 + P2); wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2)); */
+             * vB += invMassB * (P1 + P2); wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2));
+             */
 
             temp1.set(P1).addLocal(P2);
             temp2.set(temp1).mulLocal(mA);
@@ -613,16 +619,18 @@ public class ContactSolver {
             cp1.normalImpulse = x.x;
             cp2.normalImpulse = x.y;
 
-            /* #if B2_DEBUG_SOLVER == 1 // Postconditions dv1 = vB + Cross(wB, cp1.rB) - vA -
+            /*
+             * #if B2_DEBUG_SOLVER == 1 // Postconditions dv1 = vB + Cross(wB, cp1.rB) - vA -
              * Cross(wA, cp1.rA);
              * 
              * // Compute normal velocity vn1 = Dot(dv1, normal);
              * 
-             * assert(Abs(vn1 - cp1.velocityBias) < k_errorTol); #endif */
+             * assert(Abs(vn1 - cp1.velocityBias) < k_errorTol); #endif
+             */
             if (DEBUG_SOLVER) {
               // Postconditions
-              Vec2 dv1 = vB.add(Vec2.cross(wB, cp1.rB).subLocal(vA)
-                  .subLocal(Vec2.cross(wA, cp1.rA)));
+              Vec2 dv1 =
+                  vB.add(Vec2.cross(wB, cp1.rB).subLocal(vA).subLocal(Vec2.cross(wA, cp1.rA)));
               // Compute normal velocity
               vn1 = Vec2.dot(dv1, normal);
 
@@ -648,10 +656,12 @@ public class ContactSolver {
             d.set(x).subLocal(a);
 
             // Apply incremental impulse
-            /* Vec2 P1 = d.x * normal; Vec2 P2 = d.y * normal; vA -= invMassA * (P1 + P2); wA -=
+            /*
+             * Vec2 P1 = d.x * normal; Vec2 P2 = d.y * normal; vA -= invMassA * (P1 + P2); wA -=
              * invIA * (Cross(cp1.rA, P1) + Cross(cp2.rA, P2));
              * 
-             * vB += invMassB * (P1 + P2); wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2)); */
+             * vB += invMassB * (P1 + P2); wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2));
+             */
 
             P1.set(normal).mulLocal(d.x);
             P2.set(normal).mulLocal(d.y);
@@ -669,16 +679,18 @@ public class ContactSolver {
             cp1.normalImpulse = x.x;
             cp2.normalImpulse = x.y;
 
-            /* #if B2_DEBUG_SOLVER == 1 // Postconditions dv2 = vB + Cross(wB, cp2.rB) - vA -
+            /*
+             * #if B2_DEBUG_SOLVER == 1 // Postconditions dv2 = vB + Cross(wB, cp2.rB) - vA -
              * Cross(wA, cp2.rA);
              * 
              * // Compute normal velocity vn2 = Dot(dv2, normal);
              * 
-             * assert(Abs(vn2 - cp2.velocityBias) < k_errorTol); #endif */
+             * assert(Abs(vn2 - cp2.velocityBias) < k_errorTol); #endif
+             */
             if (DEBUG_SOLVER) {
               // Postconditions
-              Vec2 dv2 = vB.add(Vec2.cross(wB, cp2.rB).subLocal(vA)
-                  .subLocal(Vec2.cross(wA, cp2.rA)));
+              Vec2 dv2 =
+                  vB.add(Vec2.cross(wB, cp2.rB).subLocal(vA).subLocal(Vec2.cross(wA, cp2.rA)));
               // Compute normal velocity
               vn2 = Vec2.dot(dv2, normal);
 
@@ -703,10 +715,12 @@ public class ContactSolver {
             d.set(x).subLocal(a);
 
             // Apply incremental impulse
-            /* Vec2 P1 = d.x * normal; Vec2 P2 = d.y * normal; vA -= invMassA * (P1 + P2); wA -=
+            /*
+             * Vec2 P1 = d.x * normal; Vec2 P2 = d.y * normal; vA -= invMassA * (P1 + P2); wA -=
              * invIA * (Cross(cp1.rA, P1) + Cross(cp2.rA, P2));
              * 
-             * vB += invMassB * (P1 + P2); wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2)); */
+             * vB += invMassB * (P1 + P2); wB += invIB * (Cross(cp1.rB, P1) + Cross(cp2.rB, P2));
+             */
 
             P1.set(normal).mulLocal(d.x);
             P2.set(normal).mulLocal(d.y);
@@ -751,7 +765,8 @@ public class ContactSolver {
     }
   }
 
-  /* #if 0 // Sequential solver. bool ContactSolver::SolvePositionConstraints(float baumgarte) {
+  /*
+   * #if 0 // Sequential solver. bool ContactSolver::SolvePositionConstraints(float baumgarte) {
    * float minSeparation = 0.0f;
    * 
    * for (int i = 0; i < m_constraintCount; ++i) { ContactConstraint* c = m_constraints + i; Body*
@@ -787,7 +802,8 @@ public class ContactSolver {
    * bodyB.SynchronizeTransform(); } }
    * 
    * // We can't expect minSpeparation >= -_linearSlop because we don't // push the separation above
-   * -_linearSlop. return minSeparation >= -1.5f * _linearSlop; } */
+   * -_linearSlop. return minSeparation >= -1.5f * _linearSlop; }
+   */
 
   // djm pooling, and from above
   private final PositionSolverManifold psolver = new PositionSolverManifold();
@@ -842,8 +858,9 @@ public class ContactSolver {
         minSeparation = MathUtils.min(minSeparation, separation);
 
         // Prevent large corrections and allow slop.
-        final float C = MathUtils.clamp(Settings.baumgarte * (separation + Settings.linearSlop),
-            -Settings.maxLinearCorrection, 0.0f);
+        final float C =
+            MathUtils.clamp(Settings.baumgarte * (separation + Settings.linearSlop),
+                -Settings.maxLinearCorrection, 0.0f);
 
         // Compute the effective mass.
         final float rnA = Vec2.cross(rA, normal);
@@ -862,10 +879,10 @@ public class ContactSolver {
         aB += iB * Vec2.cross(rB, P);
       }
 
-//      m_positions[indexA].c.set(cA);
+      // m_positions[indexA].c.set(cA);
       m_positions[indexA].a = aA;
 
-//      m_positions[indexB].c.set(cB);
+      // m_positions[indexB].c.set(cB);
       m_positions[indexB].a = aB;
     }
 
@@ -930,8 +947,9 @@ public class ContactSolver {
         minSeparation = MathUtils.min(minSeparation, separation);
 
         // Prevent large corrections and allow slop.
-        float C = MathUtils.clamp(Settings.toiBaugarte * (separation + Settings.linearSlop),
-            -Settings.maxLinearCorrection, 0.0f);
+        float C =
+            MathUtils.clamp(Settings.toiBaugarte * (separation + Settings.linearSlop),
+                -Settings.maxLinearCorrection, 0.0f);
 
         // Compute the effective mass.
         float rnA = Vec2.cross(rA, normal);
@@ -971,57 +989,99 @@ public class ContactSolver {
   }
 }
 
+
 class PositionSolverManifold {
 
   public final Vec2 normal = new Vec2();
   public final Vec2 point = new Vec2();
   public float separation;
 
-  // djm pooling
-  private final Vec2 pointA = new Vec2();
-  private final Vec2 pointB = new Vec2();
-  private final Vec2 temp = new Vec2();
-  private final Vec2 planePoint = new Vec2();
-  private final Vec2 clipPoint = new Vec2();
-
   public void initialize(ContactPositionConstraint pc, Transform xfA, Transform xfB, int index) {
     assert (pc.pointCount > 0);
 
+    final Rot xfAq = xfA.q;
+    final Rot xfBq = xfB.q;
+    final Vec2 pcLocalPointsI = pc.localPoints[index];
     switch (pc.type) {
       case CIRCLES: {
-        Transform.mulToOutUnsafe(xfA, pc.localPoint, pointA);
-        Transform.mulToOutUnsafe(xfB, pc.localPoints[0], pointB);
-        normal.set(pointB).subLocal(pointA);
+        // Transform.mulToOutUnsafe(xfA, pc.localPoint, pointA);
+        // Transform.mulToOutUnsafe(xfB, pc.localPoints[0], pointB);
+        // normal.set(pointB).subLocal(pointA);
+        // normal.normalize();
+        //
+        // point.set(pointA).addLocal(pointB).mulLocal(.5f);
+        // temp.set(pointB).subLocal(pointA);
+        // separation = Vec2.dot(temp, normal) - pc.radiusA - pc.radiusB;
+        final Vec2 plocalPoint = pc.localPoint;
+        final Vec2 pLocalPoints0 = pc.localPoints[0];
+        final float pointAx = (xfAq.c * plocalPoint.x - xfAq.s * plocalPoint.y) + xfA.p.x;
+        final float pointAy = (xfAq.s * plocalPoint.x + xfAq.c * plocalPoint.y) + xfA.p.y;
+        final float pointBx = (xfBq.c * pLocalPoints0.x - xfBq.s * pLocalPoints0.y) + xfB.p.x;
+        final float pointBy = (xfBq.s * pLocalPoints0.x + xfBq.c * pLocalPoints0.y) + xfB.p.y;
+        normal.x = pointBx - pointAx;
+        normal.y = pointBy - pointAy;
         normal.normalize();
 
-        point.set(pointA).addLocal(pointB).mulLocal(.5f);
-        temp.set(pointB).subLocal(pointA);
-        separation = Vec2.dot(temp, normal) - pc.radiusA - pc.radiusB;
+        point.x = (pointAx + pointBx) * .5f;
+        point.y = (pointAy + pointBy) * .5f;
+        final float tempx = pointBx - pointAx;
+        final float tempy = pointBy - pointAy;
+        separation = tempx * normal.x + tempy * normal.y - pc.radiusA - pc.radiusB;
         break;
       }
 
       case FACE_A: {
-        Rot.mulToOutUnsafe(xfA.q, pc.localNormal, normal);
-        Transform.mulToOutUnsafe(xfA, pc.localPoint, planePoint);
+        // Rot.mulToOutUnsafe(xfAq, pc.localNormal, normal);
+        // Transform.mulToOutUnsafe(xfA, pc.localPoint, planePoint);
+        //
+        // Transform.mulToOutUnsafe(xfB, pc.localPoints[index], clipPoint);
+        // temp.set(clipPoint).subLocal(planePoint);
+        // separation = Vec2.dot(temp, normal) - pc.radiusA - pc.radiusB;
+        // point.set(clipPoint);
+        final Vec2 pcLocalNormal = pc.localNormal;
+        final Vec2 pcLocalPoint = pc.localPoint;
+        normal.x = xfAq.c * pcLocalNormal.x - xfAq.s * pcLocalNormal.y;
+        normal.y = xfAq.s * pcLocalNormal.x + xfAq.c * pcLocalNormal.y;
+        final float planePointx = (xfAq.c * pcLocalPoint.x - xfAq.s * pcLocalPoint.y) + xfA.p.x;
+        final float planePointy = (xfAq.s * pcLocalPoint.x + xfAq.c * pcLocalPoint.y) + xfA.p.y;
 
-        Transform.mulToOutUnsafe(xfB, pc.localPoints[index], clipPoint);
-        temp.set(clipPoint).subLocal(planePoint);
-        separation = Vec2.dot(temp, normal) - pc.radiusA - pc.radiusB;
-        point.set(clipPoint);
+        final float clipPointx = (xfBq.c * pcLocalPointsI.x - xfBq.s * pcLocalPointsI.y) + xfB.p.x;
+        final float clipPointy = (xfBq.s * pcLocalPointsI.x + xfBq.c * pcLocalPointsI.y) + xfB.p.y;
+        final float tempx = clipPointx - planePointx;
+        final float tempy = clipPointy - planePointy;
+        separation = tempx * normal.x + tempy * normal.y - pc.radiusA - pc.radiusB;
+        point.x = clipPointx;
+        point.y = clipPointy;
         break;
       }
 
       case FACE_B: {
-        Rot.mulToOutUnsafe(xfB.q, pc.localNormal, normal);
-        Transform.mulToOutUnsafe(xfB, pc.localPoint, planePoint);
+        // Rot.mulToOutUnsafe(xfBq, pc.localNormal, normal);
+        // Transform.mulToOutUnsafe(xfB, pc.localPoint, planePoint);
+        //
+        // Transform.mulToOutUnsafe(xfA, pcLocalPointsI, clipPoint);
+        // temp.set(clipPoint).subLocal(planePoint);
+        // separation = Vec2.dot(temp, normal) - pc.radiusA - pc.radiusB;
+        // point.set(clipPoint);
+        //
+        // // Ensure normal points from A to B
+        // normal.negateLocal();
+        final Vec2 pcLocalNormal = pc.localNormal;
+        final Vec2 pcLocalPoint = pc.localPoint;
+        normal.x = xfBq.c * pcLocalNormal.x - xfBq.s * pcLocalNormal.y;
+        normal.y = xfBq.s * pcLocalNormal.x + xfBq.c * pcLocalNormal.y;
+        final float planePointx = (xfBq.c * pcLocalPoint.x - xfBq.s * pcLocalPoint.y) + xfB.p.x;
+        final float planePointy = (xfBq.s * pcLocalPoint.x + xfBq.c * pcLocalPoint.y) + xfB.p.y;
 
-        Transform.mulToOutUnsafe(xfA, pc.localPoints[index], clipPoint);
-        temp.set(clipPoint).subLocal(planePoint);
-        separation = Vec2.dot(temp, normal) - pc.radiusA - pc.radiusB;
-        point.set(clipPoint);
-
-        // Ensure normal points from A to B
-        normal.negateLocal();
+        final float clipPointx = (xfAq.c * pcLocalPointsI.x - xfAq.s * pcLocalPointsI.y) + xfA.p.x;
+        final float clipPointy = (xfAq.s * pcLocalPointsI.x + xfAq.c * pcLocalPointsI.y) + xfA.p.y;
+        final float tempx = clipPointx - planePointx;
+        final float tempy = clipPointy - planePointy;
+        separation = tempx * normal.x + tempy * normal.y - pc.radiusA - pc.radiusB;
+        point.x = clipPointx;
+        point.y = clipPointy;
+        normal.x *= -1;
+        normal.y *= -1;
       }
         break;
     }
