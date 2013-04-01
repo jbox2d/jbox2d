@@ -68,7 +68,6 @@ public class DefaultWorldPool implements IWorldPool {
   private final HashMap<Integer, int[]> aints = new HashMap<Integer, int[]>();
   private final HashMap<Integer, Vec2[]> avecs = new HashMap<Integer, Vec2[]>();
 
-  private final Class<?>[] classes = new Class<?>[] {IWorldPool.class};
   private final IWorldPool world = this;
 
   private final MutableStack<Contact> pcstack =

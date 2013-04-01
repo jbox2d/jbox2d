@@ -46,11 +46,13 @@ public abstract class OrderedStack<E> {
     container = new Object[argContainerSize];
   }
 
+  @SuppressWarnings("unchecked")
   public final E pop() {
     assert (index < size) : "End of stack reached, there is probably a leak somewhere";
     return (E) pool[index++];
   }
 
+  @SuppressWarnings("unchecked")
   public final E[] pop(int argNum) {
     assert (index + argNum < size) : "End of stack reached, there is probably a leak somewhere";
     assert (argNum <= container.length) : "Container array is too small";
