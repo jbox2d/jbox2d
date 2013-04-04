@@ -30,6 +30,7 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.IWorldPool;
 import org.jbox2d.pooling.normal.DefaultWorldPool;
+import org.jbox2d.profile.BasicPerformanceTest;
 
 
 //Test Name               Milliseconds Avg
@@ -45,7 +46,7 @@ import org.jbox2d.pooling.normal.DefaultWorldPool;
 /**
  * @author Daniel Murphy
  */
-public class StackTest extends PerfTest {
+public class StackTest extends BasicPerformanceTest {
 	
 	public static final int INNER_ITERS = 50000;
 	public static final int OUTER_ITERS = 200;
@@ -72,7 +73,7 @@ public class StackTest extends PerfTest {
 
 	
 	/**
-	 * @see org.jbox2d.testbed.perf.PerfTest#runTest(int)
+	 * @see org.jbox2d.testbed.perf.BasicPerformanceTest#runTest(int)
 	 */
 	@Override
 	public void runTest(int argNum) {
@@ -168,7 +169,7 @@ public class StackTest extends PerfTest {
 	}
 	
 	/**
-	 * @see org.jbox2d.testbed.perf.PerfTest#getTestName(int)
+	 * @see org.jbox2d.testbed.perf.BasicPerformanceTest#getTestName(int)
 	 */
 	@Override
 	public String getTestName(int argNum) {

@@ -21,7 +21,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-package org.jbox2d.testbed.perf;
+package org.jbox2d.profile;
 
 import org.jbox2d.collision.broadphase.BroadPhaseStrategy;
 import org.jbox2d.collision.broadphase.DynamicTree;
@@ -46,17 +46,11 @@ import org.jbox2d.pooling.normal.DefaultWorldPool;
  * 
  * NOTE: some iterations cause objects to fall through the piston
  * 
- * Test Name               Milliseconds Avg      FPS (optional)
- * Pistons (bullets)              2071.3008            386.2307
- * Pistons (no bullets)           1528.2571            523.4721
- * 
- * @author eric, Daniel
- * 
  */
-public class PistonBenchmark extends PerfTest {
-  public static int iters = 10;
+public class PistonBenchmark extends SettingsPerformanceTest {
+  public static int iters = 5;
   public static int frames = 800;
-  public static float timeStep = 1f/60;
+  public static float timeStep = 1f / 60;
   public static int velIters = 8;
   public static int posIters = 3;
 
@@ -65,18 +59,18 @@ public class PistonBenchmark extends PerfTest {
   public World world;
 
   public PistonBenchmark() {
-    super(1, iters);
+    super(iters);
   }
 
   public static void main(String[] args) {
     PistonBenchmark benchmark = new PistonBenchmark();
     benchmark.go();
   }
-  
+
   @Override
-  public void runTest(int argNum) {
+  public void runBenchmarkWorld() {
     BroadPhaseStrategy strategy = new DynamicTree();
-    
+
     world = new World(new Vec2(0.0f, -10.0f), new DefaultWorldPool(100, 10), strategy);
     Body ground = null;
     {
@@ -134,7 +128,6 @@ public class PistonBenchmark extends PerfTest {
       rjd.enableMotor = true;
       world.createJoint(rjd);
     }
-
 
     {
       Body prevBody = ground;
@@ -272,11 +265,6 @@ public class PistonBenchmark extends PerfTest {
     }
   }
 
-  @Override
-  public String getTestName(int argNum) {
-    return "Pistons " + (argNum == 0 ? "(reg)" : "(2)");
-  }
-  
   @Override
   public int getFrames(int testNum) {
     return frames;

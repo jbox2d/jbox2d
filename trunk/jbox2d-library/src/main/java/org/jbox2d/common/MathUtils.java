@@ -70,12 +70,10 @@ public class MathUtils extends PlatformMathUtils {
   public static final float RAD2DEG = 180 / PI;
 
   public static final float[] sinLUT = new float[Settings.SINCOS_LUT_LENGTH];
-  public static final float[] cosLUT = new float[Settings.SINCOS_LUT_LENGTH];
 
   static {
     for (int i = 0; i < Settings.SINCOS_LUT_LENGTH; i++) {
       sinLUT[i] = (float) Math.sin(i * Settings.SINCOS_LUT_PRECISION);
-      cosLUT[i] = (float) Math.cos(i * Settings.SINCOS_LUT_PRECISION);
     }
   }
 
@@ -118,41 +116,14 @@ public class MathUtils extends PlatformMathUtils {
 
   public static final float cos(float x) {
     if (Settings.SINCOS_LUT_ENABLED) {
-      x %= TWOPI;
-
-      while (x < 0) {
-        x += TWOPI;
-      }
-
-      if (Settings.SINCOS_LUT_LERP) {
-
-        x /= Settings.SINCOS_LUT_PRECISION;
-
-        final int index = (int) x;
-
-        if (index != 0) {
-          x %= index;
-        }
-
-        // the next index is 0
-        if (index == Settings.SINCOS_LUT_LENGTH - 1) {
-          return ((1 - x) * cosLUT[index] + x * cosLUT[0]);
-        } else {
-          return ((1 - x) * cosLUT[index] + x * cosLUT[index + 1]);
-        }
-
-      } else {
-        return cosLUT[MathUtils.round(x / Settings.SINCOS_LUT_PRECISION)
-            % Settings.SINCOS_LUT_LENGTH];
-      }
-
+      return sinLUT(HALF_PI - x);
     } else {
       return (float) StrictMath.cos(x);
     }
   }
 
   public static final float abs(final float x) {
-    if (Settings.FAST_MATH) {
+    if (Settings.FAST_ABS) {
       return x > 0 ? x : -x;
     } else {
       return Math.abs(x);
@@ -165,7 +136,7 @@ public class MathUtils extends PlatformMathUtils {
   }
 
   public static final int floor(final float x) {
-    if (Settings.FAST_MATH) {
+    if (Settings.FAST_FLOOR) {
       int y = (int) x;
       if (x < 0 && x != y) {
         return y - 1;
@@ -177,7 +148,7 @@ public class MathUtils extends PlatformMathUtils {
   }
 
   public static final int ceil(final float x) {
-    if (Settings.FAST_MATH) {
+    if (Settings.FAST_CEIL) {
       int y = (int) x;
       if (x > 0 && x != y) {
         return y + 1;
@@ -189,7 +160,7 @@ public class MathUtils extends PlatformMathUtils {
   }
 
   public static final int round(final float x) {
-    if (Settings.FAST_MATH) {
+    if (Settings.FAST_ROUND) {
       return floor(x + .5f);
     } else {
       return StrictMath.round(x);
@@ -274,7 +245,7 @@ public class MathUtils extends PlatformMathUtils {
   }
 
   public static final float atan2(final float y, final float x) {
-    if (Settings.FAST_MATH) {
+    if (Settings.FAST_ATAN2) {
       return fastAtan2(y, x);
     } else {
       return (float) StrictMath.atan2(y, x);
