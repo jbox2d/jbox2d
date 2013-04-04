@@ -23,37 +23,38 @@
  ******************************************************************************/
 package org.jbox2d.collision.broadphase;
 
-import org.jbox2d.callbacks.QueryCallback;
-import org.jbox2d.callbacks.RayCastCallback;
-import org.jbox2d.collision.AABB;
-import org.jbox2d.collision.RayCastInput;
+public class TreeNodeStack {
 
-public interface IBroadphase {
-  
-  int createProxy(AABB aabb, Object userData);
-  
-  void destroyProxy(int proxyId);
-  
-  void moveProxy(int proxyIdA, int proxyIdB);
-  
-  void touchProxy(int proxyId);
-  
-  AABB getFatAABB(int proxyId);
-  
-  Object getUserData(int proxyId);
-  
-  boolean testOverlap(int proxyIdA, int proxyIdB);
-  
-  int getProxyCount();
-  
-  void query(QueryCallback callback, AABB aabb);
-  
-  void raycast(RayCastCallback callback, RayCastInput input);
-  
-  int getTreeHeight();
-  
-  int getTreeBalance();
-  
-  float getTreeQuality();
-  
+  private TreeNode[] stack;
+  private int size;
+  private int position;
+
+  public TreeNodeStack(int initialSize) {
+    stack = new TreeNode[initialSize];
+    position = 0;
+    size = initialSize;
+  }
+
+  public void reset() {
+    position = 0;
+  }
+
+  public TreeNode pop() {
+    assert (position > 0);
+    return stack[--position];
+  }
+
+  public void push(TreeNode i) {
+    if (position == size) {
+      TreeNode[] old = stack;
+      stack = new TreeNode[size * 2];
+      size = stack.length;
+      System.arraycopy(old, 0, stack, 0, old.length);
+    }
+    stack[position++] = i;
+  }
+
+  public int getCount() {
+    return position;
+  }
 }

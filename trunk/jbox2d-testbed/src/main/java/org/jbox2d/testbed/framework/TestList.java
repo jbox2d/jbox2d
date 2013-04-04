@@ -121,11 +121,11 @@ public class TestList {
     model.addTest(new RevoluteTest());
     model.addTest(new FixedPendulumTest(true));
     model.addTest(new FreePendulumTest(true));
+    model.addTest(new Chain());
     model.addTest(new RopeTest());
     model.addTest(new Pulleys());
     model.addTest(new Gears());
     model.addTest(new Web());
-    model.addTest(new Chain());
     model.addTest(new Cantilever());
     model.addTest(new SliderCrankTest());
 

@@ -38,6 +38,8 @@ import org.jbox2d.collision.TimeOfImpact.TOIInput;
 import org.jbox2d.collision.TimeOfImpact.TOIOutput;
 import org.jbox2d.collision.TimeOfImpact.TOIOutputState;
 import org.jbox2d.collision.broadphase.BroadPhase;
+import org.jbox2d.collision.broadphase.BroadPhaseStrategy;
+import org.jbox2d.collision.broadphase.DynamicTree;
 import org.jbox2d.collision.shapes.ChainShape;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.EdgeShape;
@@ -119,6 +121,11 @@ public class World {
   private ContactRegister[][] contactStacks =
       new ContactRegister[ShapeType.values().length][ShapeType.values().length];
 
+  /**
+   * Construct a world object.
+   * 
+   * @param gravity the world gravity vector.
+   */
   public World(Vec2 gravity) {
     this(gravity, new DefaultWorldPool(WORLD_POOL_SIZE, WORLD_POOL_CONTAINER_SIZE));
   }
@@ -127,9 +134,12 @@ public class World {
    * Construct a world object.
    * 
    * @param gravity the world gravity vector.
-   * @param doSleep improve performance by not simulating inactive bodies.
    */
-  public World(Vec2 gravity, IWorldPool argPool) {
+  public World(Vec2 gravity, IWorldPool pool) {
+    this(gravity, pool, new DynamicTree());
+  }
+  
+  public World(Vec2 gravity, IWorldPool argPool, BroadPhaseStrategy broadPhaseStrategy) {
     pool = argPool;
     m_destructionListener = null;
     m_debugDraw = null;
@@ -152,7 +162,7 @@ public class World {
 
     m_inv_dt0 = 0f;
 
-    m_contactManager = new ContactManager(this);
+    m_contactManager = new ContactManager(this, broadPhaseStrategy);
     m_profile = new Profile();
 
     initializeRegisters();

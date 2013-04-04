@@ -26,7 +26,6 @@ package org.jbox2d.collision.broadphase;
 import org.jbox2d.collision.AABB;
 
 public class TreeNode {
-  public static final int NULL_NODE = -1;
   /**
    * Enlarged AABB
    */
@@ -34,14 +33,16 @@ public class TreeNode {
 
   public Object userData;
 
-  protected int parent;
+  protected TreeNode parent;
 
-  protected int child1;
-  protected int child2;
+  protected TreeNode child1;
+  protected TreeNode child2;
+  protected final int id;
+  protected boolean leaf;
   protected int height;
 
   public final boolean isLeaf() {
-    return child1 == NULL_NODE;
+    return child1 == null;
   }
 
   public Object getUserData() {
@@ -55,5 +56,5 @@ public class TreeNode {
   /**
    * Should never be constructed outside the engine
    */
-  protected TreeNode() {}
+  protected TreeNode(int id) { this.id = id;}
 }

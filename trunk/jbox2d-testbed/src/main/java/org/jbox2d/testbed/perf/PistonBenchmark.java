@@ -23,6 +23,8 @@
  ******************************************************************************/
 package org.jbox2d.testbed.perf;
 
+import org.jbox2d.collision.broadphase.BroadPhaseStrategy;
+import org.jbox2d.collision.broadphase.DynamicTree;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.MathUtils;
@@ -36,6 +38,7 @@ import org.jbox2d.dynamics.joints.PrismaticJoint;
 import org.jbox2d.dynamics.joints.PrismaticJointDef;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
+import org.jbox2d.pooling.normal.DefaultWorldPool;
 
 /**
  * Benchmark - piston example (constantly bumping a bunch of circles and boxes). Should be a decent
@@ -62,19 +65,19 @@ public class PistonBenchmark extends PerfTest {
   public World world;
 
   public PistonBenchmark() {
-    super(2, iters);
+    super(1, iters);
   }
 
   public static void main(String[] args) {
     PistonBenchmark benchmark = new PistonBenchmark();
     benchmark.go();
   }
-
+  
   @Override
   public void runTest(int argNum) {
-    boolean bullet = argNum == 0;
+    BroadPhaseStrategy strategy = new DynamicTree();
     
-    world = new World(new Vec2(0.0f, -10.0f));
+    world = new World(new Vec2(0.0f, -10.0f), new DefaultWorldPool(100, 10), strategy);
     Body ground = null;
     {
       BodyDef bd = new BodyDef();
@@ -123,8 +126,6 @@ public class PistonBenchmark extends PerfTest {
 
         body.createFixture(fd);
       }
-
-      body.setBullet(bullet);
 
       RevoluteJointDef rjd = new RevoluteJointDef();
       rjd.initialize(body, ground, body.getPosition());
@@ -239,6 +240,30 @@ public class PistonBenchmark extends PerfTest {
           body = world.createBody(bd);
           body.createFixture(fixture);
         }
+
+        float angle = 0.0f;
+        float delta = MathUtils.PI / 3.0f;
+        Vec2 vertices[] = new Vec2[6];
+        for (int i = 0; i < 6; ++i) {
+          vertices[i] = new Vec2(0.3f * MathUtils.cos(angle), 0.3f * MathUtils.sin(angle));
+          angle += delta;
+        }
+
+        PolygonShape shape = new PolygonShape();
+        shape.set(vertices, 6);
+
+        for (int i = 0; i < 100; ++i) {
+          bd.position.set(0f, 23.0f + i);
+          bd.type = BodyType.DYNAMIC;
+          bd.fixedRotation = true;
+          bd.bullet = false;
+          fixture.shape = shape;
+          fixture.density = 1f;
+          fixture.filter.categoryBits = 2;
+          fixture.filter.maskBits = 1 | 4 | 2;
+          body = world.createBody(bd);
+          body.createFixture(fixture);
+        }
       }
     }
 
@@ -249,7 +274,7 @@ public class PistonBenchmark extends PerfTest {
 
   @Override
   public String getTestName(int argNum) {
-    return "Pistons " + (argNum == 0 ? "(bullets)" : "(no bullets)");
+    return "Pistons " + (argNum == 0 ? "(reg)" : "(2)");
   }
   
   @Override
