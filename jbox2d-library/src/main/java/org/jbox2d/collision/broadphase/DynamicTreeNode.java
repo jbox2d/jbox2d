@@ -25,7 +25,7 @@ package org.jbox2d.collision.broadphase;
 
 import org.jbox2d.collision.AABB;
 
-public class TreeNode {
+public class DynamicTreeNode {
   /**
    * Enlarged AABB
    */
@@ -33,10 +33,10 @@ public class TreeNode {
 
   public Object userData;
 
-  protected TreeNode parent;
+  protected DynamicTreeNode parent;
 
-  protected TreeNode child1;
-  protected TreeNode child2;
+  protected DynamicTreeNode child1;
+  protected DynamicTreeNode child2;
   protected final int id;
   protected boolean leaf;
   protected int height;
@@ -56,5 +56,5 @@ public class TreeNode {
   /**
    * Should never be constructed outside the engine
    */
-  protected TreeNode(int id) { this.id = id;}
+  protected DynamicTreeNode(int id) { this.id = id;}
 }

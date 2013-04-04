@@ -24,20 +24,19 @@
 /**
  * Created at 8:12:11 AM Jan 18, 2011
  */
-package org.jbox2d.testbed.perf;
-
+package org.jbox2d.profile;
 
 /**
  * @author Daniel Murphy
  */
-public abstract class PerfTest {
+public abstract class BasicPerformanceTest {
 
   private final int numTests, iters;
-  private final long[] times;
+  protected final long[] times;
 
-  public PerfTest(int argNumTests, int argIters) {
-    numTests = argNumTests;
-    iters = argIters;
+  public BasicPerformanceTest(int numTests, int iters) {
+    this.numTests = numTests;
+    this.iters = iters;
     times = new long[numTests];
     for (int i = 0; i < numTests; i++) {
       times[i] = 0;
@@ -51,7 +50,7 @@ public abstract class PerfTest {
   public void go() {
     long prev, after;
     for (int i = 0; i < iters; i++) {
-      System.out.println(i * 100.0 / iters + "%");
+      println(i * 100.0 / iters + "%");
       for (int test = 0; test < numTests; test++) {
         prev = System.nanoTime();
         runTest(test);
@@ -66,24 +65,33 @@ public abstract class PerfTest {
   }
 
   public void printResults() {
-    System.out.printf("%-20s%20s%20s\n", "Test Name", "Milliseconds Avg", "FPS (optional)");
+    printf("%-20s%20s%20s\n", "Test Name", "Milliseconds Avg", "FPS (optional)");
 
     for (int i = 0; i < numTests; i++) {
       double milliseconds = times[i] * 1.0 / 1000000;
       if (getFrames(i) != 0) {
         double fps = getFrames(i) * 1000d / milliseconds;
-        System.out.printf("%-20s%20.4f%20.4f\n", getTestName(i), milliseconds, fps);
+        printf("%-20s%20.4f%20.4f\n", getTestName(i), milliseconds, fps);
       } else {
-        System.out.printf("%-20s%20.4f\n", getTestName(i), milliseconds);
+        printf("%-20s%20.4f\n", getTestName(i), milliseconds);
       }
     }
   }
 
-  public abstract void runTest(int argNum);
+  public abstract void runTest(int testNum);
 
-  public abstract String getTestName(int argNum);
+  public abstract String getTestName(int testNum);
 
   public int getFrames(int testNum) {
     return 0;
+  }
+  
+  // override to change output
+  public void println(String s) {
+    System.out.println(s);
+  }
+  
+  public void printf(String s, Object... args) {
+    System.out.printf(s, args);
   }
 }
