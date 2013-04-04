@@ -33,6 +33,7 @@ import org.jbox2d.callbacks.TreeRayCastCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.collision.RayCastOutput;
+import org.jbox2d.collision.broadphase.BroadPhaseStrategy;
 import org.jbox2d.collision.broadphase.DynamicTree;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
@@ -52,7 +53,7 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 	float worldExtent;
 	float m_proxyExtent;
 
-	DynamicTree m_tree;
+	BroadPhaseStrategy m_tree;
 	AABB m_queryAABB;
 	RayCastInput m_rayCastInput;
 	RayCastOutput m_rayCastOutput;

@@ -44,7 +44,7 @@ public class BroadPhase implements TreeCallback {
 
   public static final int NULL_PROXY = -1;
 
-  private final DynamicTree m_tree;
+  private final BroadPhaseStrategy m_tree;
 
   private int m_proxyCount;
 
@@ -58,7 +58,7 @@ public class BroadPhase implements TreeCallback {
 
   private int m_queryProxyId;
 
-  public BroadPhase() {
+  public BroadPhase(BroadPhaseStrategy strategy) {
     m_proxyCount = 0;
 
     m_pairCapacity = 16;
@@ -72,7 +72,7 @@ public class BroadPhase implements TreeCallback {
     m_moveCount = 0;
     m_moveBuffer = new int[m_moveCapacity];
 
-    m_tree = new DynamicTree();
+    m_tree = strategy;
     m_queryProxyId = NULL_PROXY;
   }
 

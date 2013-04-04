@@ -27,6 +27,7 @@ import org.jbox2d.callbacks.ContactFilter;
 import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.callbacks.PairCallback;
 import org.jbox2d.collision.broadphase.BroadPhase;
+import org.jbox2d.collision.broadphase.BroadPhaseStrategy;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.contacts.ContactEdge;
 
@@ -45,12 +46,12 @@ public class ContactManager implements PairCallback {
 
   private final World pool;
 
-  public ContactManager(World argPool) {
+  public ContactManager(World argPool, BroadPhaseStrategy strategy) {
     m_contactList = null;
     m_contactCount = 0;
     m_contactFilter = new ContactFilter();
     m_contactListener = null;
-    m_broadPhase = new BroadPhase();
+    m_broadPhase = new BroadPhase(strategy);
     pool = argPool;
   }
 

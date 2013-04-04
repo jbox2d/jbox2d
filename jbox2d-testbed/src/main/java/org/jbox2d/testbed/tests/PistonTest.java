@@ -105,8 +105,6 @@ public class PistonTest extends TestbedTest {
         body.createFixture(fd);
       }
 
-      body.setBullet(false);
-
       RevoluteJointDef rjd = new RevoluteJointDef();
       rjd.initialize(body, getGroundBody(), body.getPosition());
       rjd.motorSpeed = MathUtils.PI;
@@ -174,7 +172,8 @@ public class PistonTest extends TestbedTest {
         piston.filter.categoryBits = 1;
         piston.filter.maskBits = 2;
         body.createFixture(piston);
-
+        body.setBullet(false);
+        
         RevoluteJointDef rjd = new RevoluteJointDef();
         rjd.initialize(prevBody, body, new Vec2(0.0f, 17.0f));
         getWorld().createJoint(rjd);
@@ -215,6 +214,30 @@ public class PistonTest extends TestbedTest {
           bd.bullet = bullet;
           fixture.shape = cd;
           fixture.density = 2f;
+          fixture.filter.categoryBits = 2;
+          fixture.filter.maskBits = 1 | 4 | 2;
+          body = world.createBody(bd);
+          body.createFixture(fixture);
+        }
+        
+        float angle = 0.0f;
+        float delta = MathUtils.PI / 3.0f;
+        Vec2 vertices[] = new Vec2[6];
+        for (int i = 0; i < 6; ++i) {
+          vertices[i] = new Vec2(0.3f * MathUtils.cos(angle), 0.3f * MathUtils.sin(angle));
+          angle += delta;
+        }
+
+        PolygonShape shape = new PolygonShape();
+        shape.set(vertices, 6);
+
+        for (int i = 0; i < 100; ++i) {
+          bd.position.set(0f, 23.0f + i);
+          bd.type = BodyType.DYNAMIC;
+          bd.fixedRotation = true;
+          bd.bullet = bullet;
+          fixture.shape = shape;
+          fixture.density = 1f;
           fixture.filter.categoryBits = 2;
           fixture.filter.maskBits = 1 | 4 | 2;
           body = world.createBody(bd);

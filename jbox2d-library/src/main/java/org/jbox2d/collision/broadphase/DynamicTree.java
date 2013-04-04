@@ -4,11 +4,11 @@
  * 
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
- * 	* Redistributions of source code must retain the above copyright notice,
- * 	  this list of conditions and the following disclaimer.
- * 	* Redistributions in binary form must reproduce the above copyright notice,
- * 	  this list of conditions and the following disclaimer in the documentation
- * 	  and/or other materials provided with the distribution.
+ *  * Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -27,15 +27,12 @@ import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
 import org.jbox2d.collision.AABB;
-import static org.jbox2d.collision.broadphase.TreeNode.NULL_NODE;
 import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.pooling.stacks.DynamicIntStack;
 
-// updated to rev 100
 /**
  * A dynamic tree arranges data in a binary tree to accelerate queries such as volume queries and
  * ray casts. Leafs are proxies with an AABB. In the tree we expand the proxy AABB by _fatAABBFactor
@@ -44,10 +41,11 @@ import org.jbox2d.pooling.stacks.DynamicIntStack;
  * 
  * @author daniel
  */
-public class DynamicTree {
+public class DynamicTree implements BroadPhaseStrategy {
   public static final int MAX_STACK_SIZE = 64;
+  public static final int NULL_NODE = -1;
 
-  private int m_root;
+  private TreeNode m_root;
   private TreeNode[] m_nodes;
   private int m_nodeCount;
   private int m_nodeCapacity;
@@ -57,21 +55,20 @@ public class DynamicTree {
   private int m_insertionCount;
 
   private final Vec2[] drawVecs = new Vec2[4];
-  private final DynamicIntStack intStack = new DynamicIntStack(10);
+  private final TreeNodeStack nodeStack = new TreeNodeStack(10);
 
   public DynamicTree() {
-    m_root = TreeNode.NULL_NODE;
+    m_root = null;
     m_nodeCount = 0;
     m_nodeCapacity = 16;
     m_nodes = new TreeNode[16];
 
     // Build a linked list for the free list.
-    for (int i = 0; i < m_nodeCapacity; i++) {
-      m_nodes[i] = new TreeNode();
-      m_nodes[i].parent = i + 1;
+    for (int i = m_nodeCapacity - 1; i >= 0; i--) {
+      m_nodes[i] = new TreeNode(i);
+      m_nodes[i].parent = (i == m_nodeCapacity - 1) ? null : m_nodes[i + 1];
       m_nodes[i].height = -1;
     }
-    m_nodes[m_nodeCapacity - 1].parent = TreeNode.NULL_NODE;
     m_freeList = 0;
 
     m_insertionCount = 0;
@@ -81,18 +78,11 @@ public class DynamicTree {
     }
   }
 
-  /**
-   * Create a proxy. Provide a tight fitting AABB and a userData pointer.
-   * 
-   * @param aabb
-   * @param userData
-   * @return
-   */
+  @Override
   public final int createProxy(final AABB aabb, Object userData) {
-    int proxyId = allocateNode();
-
+    final TreeNode node = allocateNode();
+    int proxyId = node.id;
     // Fatten the aabb
-    final TreeNode node = m_nodes[proxyId];
     final AABB nodeAABB = node.aabb;
     nodeAABB.lowerBound.x = aabb.lowerBound.x - Settings.aabbExtension;
     nodeAABB.lowerBound.y = aabb.lowerBound.y - Settings.aabbExtension;
@@ -105,26 +95,17 @@ public class DynamicTree {
     return proxyId;
   }
 
-  /**
-   * Destroy a proxy
-   * 
-   * @param proxyId
-   */
+  @Override
   public final void destroyProxy(int proxyId) {
     assert (0 <= proxyId && proxyId < m_nodeCapacity);
-    assert (m_nodes[proxyId].isLeaf());
+    TreeNode node = m_nodes[proxyId];
+    assert (node.isLeaf());
 
-    removeLeaf(proxyId);
-    freeNode(proxyId);
+    removeLeaf(node);
+    freeNode(node);
   }
 
-  // djm pooling
-  /**
-   * Move a proxy with a swepted AABB. If the proxy has moved outside of its fattened AABB, then the
-   * proxy is removed from the tree and re-inserted. Otherwise the function returns immediately.
-   * 
-   * @return true if the proxy was re-inserted.
-   */
+  @Override
   public final boolean moveProxy(int proxyId, final AABB aabb, Vec2 displacement) {
     assert (0 <= proxyId && proxyId < m_nodeCapacity);
     final TreeNode node = m_nodes[proxyId];
@@ -137,7 +118,7 @@ public class DynamicTree {
       return false;
     }
 
-    removeLeaf(proxyId);
+    removeLeaf(node);
 
     // Extend AABB
     final Vec2 lowerBound = aabb.lowerBound;
@@ -146,7 +127,6 @@ public class DynamicTree {
     lowerBound.y -= Settings.aabbExtension;
     upperBound.x += Settings.aabbExtension;
     upperBound.y += Settings.aabbExtension;
-
 
     // Predict AABB displacement.
     final float dx = displacement.x * Settings.aabbMultiplier;
@@ -171,44 +151,38 @@ public class DynamicTree {
     return true;
   }
 
+  @Override
   public final Object getUserData(int proxyId) {
     assert (0 <= proxyId && proxyId < m_nodeCapacity);
     return m_nodes[proxyId].userData;
   }
 
+  @Override
   public final AABB getFatAABB(int proxyId) {
     assert (0 <= proxyId && proxyId < m_nodeCapacity);
     return m_nodes[proxyId].aabb;
   }
 
-  /**
-   * Query an AABB for overlapping proxies. The callback class is called for each proxy that
-   * overlaps the supplied AABB.
-   * 
-   * @param callback
-   * @param araabbgAABB
-   */
+  @Override
   public final void query(TreeCallback callback, AABB aabb) {
-    intStack.reset();
-    intStack.push(m_root);
+    nodeStack.reset();
+    nodeStack.push(m_root);
 
-    while (intStack.getCount() > 0) {
-      int nodeId = intStack.pop();
-      if (nodeId == TreeNode.NULL_NODE) {
+    while (nodeStack.getCount() > 0) {
+      TreeNode node = nodeStack.pop();
+      if (node == null) {
         continue;
       }
 
-      final TreeNode node = m_nodes[nodeId];
-
       if (AABB.testOverlap(node.aabb, aabb)) {
-        if (node.child1 == TreeNode.NULL_NODE) {
-          boolean proceed = callback.treeCallback(nodeId);
+        if (node.child1 == null) {
+          boolean proceed = callback.treeCallback(node.id);
           if (!proceed) {
             return;
           }
         } else {
-          intStack.push(node.child1);
-          intStack.push(node.child2);
+          nodeStack.push(node.child1);
+          nodeStack.push(node.child2);
         }
       }
     }
@@ -218,15 +192,7 @@ public class DynamicTree {
   private final AABB aabb = new AABB();
   private final RayCastInput subInput = new RayCastInput();
 
-  /**
-   * Ray-cast against the proxies in the tree. This relies on the callback to perform a exact
-   * ray-cast in the case were the proxy contains a shape. The callback also performs the any
-   * collision filtering. This has performance roughly equal to k * log(n), where k is the number of
-   * collisions and n is the number of proxies in the tree.
-   * 
-   * @param input the ray-cast input data. The ray extends from p1 to p1 + maxFraction * (p2 - p1).
-   * @param callback a callback class that is called for each proxy that is hit by the ray.
-   */
+  @Override
   public void raycast(TreeRayCastCallback callback, RayCastInput input) {
     final Vec2 p1 = input.p1;
     final Vec2 p2 = input.p2;
@@ -270,15 +236,14 @@ public class DynamicTree {
     segAABB.upperBound.y = p1y > tempy ? p1y : tempy;
     // end inline
 
-    intStack.reset();
-    intStack.push(m_root);
-    while (intStack.getCount() > 0) {
-      int nodeId = intStack.pop();
-      if (nodeId == TreeNode.NULL_NODE) {
+    nodeStack.reset();
+    nodeStack.push(m_root);
+    while (nodeStack.getCount() > 0) {
+      final TreeNode node = nodeStack.pop();
+      if (node == null) {
         continue;
       }
 
-      final TreeNode node = m_nodes[nodeId];
       final AABB nodeAABB = node.aabb;
       if (!AABB.testOverlap(nodeAABB, segAABB)) {
         continue;
@@ -306,7 +271,7 @@ public class DynamicTree {
         subInput.p2.y = p2y;
         subInput.maxFraction = maxFraction;
 
-        float value = callback.raycastCallback(subInput, nodeId);
+        float value = callback.raycastCallback(subInput, node.id);
 
         if (value == 0.0f) {
           // The client has terminated the ray cast.
@@ -327,23 +292,19 @@ public class DynamicTree {
           segAABB.upperBound.y = p1y > tempy ? p1y : tempy;
         }
       } else {
-        intStack.push(node.child1);
-        intStack.push(node.child2);
+        nodeStack.push(node.child1);
+        nodeStack.push(node.child2);
       }
     }
   }
 
-  /**
-   * Compute the height of the tree.
-   */
+  @Override
   public final int computeHeight() {
     return computeHeight(m_root);
   }
 
-  private final int computeHeight(int nodeId) {
-    assert (0 <= nodeId && nodeId < m_nodeCapacity);
-
-    final TreeNode node = m_nodes[nodeId];
+  private final int computeHeight(TreeNode node) {
+    assert (0 <= node.id && node.id < m_nodeCapacity);
 
     if (node.isLeaf()) {
       return 0;
@@ -361,10 +322,11 @@ public class DynamicTree {
     validateMetrics(m_root);
 
     int freeCount = 0;
-    int freeIndex = m_freeList;
-    while (freeIndex != NULL_NODE) {
-      assert (0 <= freeIndex && freeIndex < m_nodeCapacity);
-      freeIndex = m_nodes[freeIndex].parent;
+    TreeNode freeNode = m_freeList != NULL_NODE ? m_nodes[m_freeList] : null;
+    while (freeNode != null) {
+      assert (0 <= freeNode.id && freeNode.id < m_nodeCapacity);
+      assert (freeNode == m_nodes[freeNode.id]);
+      freeNode = freeNode.parent;
       ++freeCount;
     }
 
@@ -373,24 +335,15 @@ public class DynamicTree {
     assert (m_nodeCount + freeCount == m_nodeCapacity);
   }
 
-  /**
-   * Compute the height of the binary tree in O(N) time. Should not be called often.
-   * 
-   * @return
-   */
+  @Override
   public int getHeight() {
-    if (m_root == NULL_NODE) {
+    if (m_root == null) {
       return 0;
     }
-    return m_nodes[m_root].height;
+    return m_root.height;
   }
 
-  /**
-   * Get the maximum balance of an node in the tree. The balance is the difference in height of the
-   * two children of a node.
-   * 
-   * @return
-   */
+  @Override
   public int getMaxBalance() {
     int maxBalance = 0;
     for (int i = 0; i < m_nodeCapacity; ++i) {
@@ -401,26 +354,22 @@ public class DynamicTree {
 
       assert (node.isLeaf() == false);
 
-      int child1 = node.child1;
-      int child2 = node.child2;
-      int balance = MathUtils.abs(m_nodes[child2].height - m_nodes[child1].height);
+      TreeNode child1 = node.child1;
+      TreeNode child2 = node.child2;
+      int balance = MathUtils.abs(child2.height - child1.height);
       maxBalance = MathUtils.max(maxBalance, balance);
     }
 
     return maxBalance;
   }
 
-  /**
-   * Get the ratio of the sum of the node areas to the root area.
-   * 
-   * @return
-   */
+  @Override
   public float getAreaRatio() {
-    if (m_root == NULL_NODE) {
+    if (m_root == null) {
       return 0.0f;
     }
 
-    final TreeNode root = m_nodes[m_root];
+    final TreeNode root = m_root;
     float rootArea = root.aabb.getPerimeter();
 
     float totalArea = 0.0f;
@@ -451,12 +400,13 @@ public class DynamicTree {
         continue;
       }
 
-      if (m_nodes[i].isLeaf()) {
-        m_nodes[i].parent = NULL_NODE;
+      TreeNode node = m_nodes[i];
+      if (node.isLeaf()) {
+        node.parent = null;
         nodes[count] = i;
         ++count;
       } else {
-        freeNode(i);
+        freeNode(node);
       }
     }
 
@@ -484,28 +434,27 @@ public class DynamicTree {
       TreeNode child1 = m_nodes[index1];
       TreeNode child2 = m_nodes[index2];
 
-      int parentIndex = allocateNode();
-      TreeNode parent = m_nodes[parentIndex];
-      parent.child1 = index1;
-      parent.child2 = index2;
+      TreeNode parent = allocateNode();
+      parent.child1 = child1;
+      parent.child2 = child2;
       parent.height = 1 + MathUtils.max(child1.height, child2.height);
       parent.aabb.combine(child1.aabb, child2.aabb);
-      parent.parent = NULL_NODE;
+      parent.parent = null;
 
-      child1.parent = parentIndex;
-      child2.parent = parentIndex;
+      child1.parent = parent;
+      child2.parent = parent;
 
       nodes[jMin] = nodes[count - 1];
-      nodes[iMin] = parentIndex;
+      nodes[iMin] = parent.id;
       --count;
     }
 
-    m_root = nodes[0];
+    m_root = m_nodes[nodes[0]];
 
     validate();
   }
 
-  private final int allocateNode() {
+  private final TreeNode allocateNode() {
     if (m_freeList == NULL_NODE) {
       assert (m_nodeCount == m_nodeCapacity);
 
@@ -515,64 +464,62 @@ public class DynamicTree {
       System.arraycopy(old, 0, m_nodes, 0, old.length);
 
       // Build a linked list for the free list.
-      for (int i = m_nodeCount; i < m_nodeCapacity; i++) {
-        m_nodes[i] = new TreeNode();
-        m_nodes[i].parent = i + 1;
+      for (int i = m_nodeCapacity - 1; i >= m_nodeCount; i--) {
+        m_nodes[i] = new TreeNode(i);
+        m_nodes[i].parent = (i == m_nodeCapacity - 1) ? null : m_nodes[i + 1];
         m_nodes[i].height = -1;
       }
-      m_nodes[m_nodeCapacity - 1].parent = TreeNode.NULL_NODE;
       m_freeList = m_nodeCount;
     }
     int nodeId = m_freeList;
     final TreeNode treeNode = m_nodes[nodeId];
-    m_freeList = treeNode.parent;
+    m_freeList = treeNode.parent != null ? treeNode.parent.id : NULL_NODE;
 
-    treeNode.parent = NULL_NODE;
-    treeNode.child1 = NULL_NODE;
-    treeNode.child2 = NULL_NODE;
+    treeNode.parent = null;
+    treeNode.child1 = null;
+    treeNode.child2 = null;
     treeNode.height = 0;
     treeNode.userData = null;
     ++m_nodeCount;
-    return nodeId;
+    return treeNode;
   }
 
   /**
    * returns a node to the pool
-   * 
-   * @param argNode
    */
-  private final void freeNode(int nodeId) {
-    assert (nodeId != NULL_NODE);
+  private final void freeNode(TreeNode node) {
+    assert (node != null);
     assert (0 < m_nodeCount);
-    m_nodes[nodeId].parent = m_freeList;
-    m_nodes[nodeId].height = -1;
-    m_freeList = nodeId;
+    node.parent = m_freeList != NULL_NODE ? m_nodes[m_freeList] : null;
+    node.height = -1;
+    m_freeList = node.id;
     m_nodeCount--;
   }
 
-
+  @Override
   public int getInsertionCount() {
     return m_insertionCount;
   }
 
   private final AABB combinedAABB = new AABB();
 
-  private final void insertLeaf(int leaf) {
+  private final void insertLeaf(int leaf_index) {
     m_insertionCount++;
 
-    if (m_root == NULL_NODE) {
+    TreeNode leaf = m_nodes[leaf_index];
+    if (m_root == null) {
       m_root = leaf;
-      m_nodes[m_root].parent = NULL_NODE;
+      m_root.parent = null;
       return;
     }
 
     // find the best sibling
-    AABB leafAABB = m_nodes[leaf].aabb;
-    int index = m_root;
-    while (m_nodes[index].child1 != TreeNode.NULL_NODE) {
-      final TreeNode node = m_nodes[index];
-      int child1 = node.child1;
-      int child2 = node.child2;
+    AABB leafAABB = leaf.aabb;
+    TreeNode index = m_root;
+    while (index.child1 != null) {
+      final TreeNode node = index;
+      TreeNode child1 = node.child1;
+      TreeNode child2 = node.child2;
 
       float area = node.aabb.getPerimeter();
 
@@ -587,24 +534,24 @@ public class DynamicTree {
 
       // Cost of descending into child1
       float cost1;
-      if (m_nodes[child1].isLeaf()) {
-        combinedAABB.combine(leafAABB, m_nodes[child1].aabb);
+      if (child1.isLeaf()) {
+        combinedAABB.combine(leafAABB, child1.aabb);
         cost1 = combinedAABB.getPerimeter() + inheritanceCost;
       } else {
-        combinedAABB.combine(leafAABB, m_nodes[child1].aabb);
-        float oldArea = m_nodes[child1].aabb.getPerimeter();
+        combinedAABB.combine(leafAABB, child1.aabb);
+        float oldArea = child1.aabb.getPerimeter();
         float newArea = combinedAABB.getPerimeter();
         cost1 = (newArea - oldArea) + inheritanceCost;
       }
 
       // Cost of descending into child2
       float cost2;
-      if (m_nodes[child2].isLeaf()) {
-        combinedAABB.combine(leafAABB, m_nodes[child2].aabb);
+      if (child2.isLeaf()) {
+        combinedAABB.combine(leafAABB, child2.aabb);
         cost2 = combinedAABB.getPerimeter() + inheritanceCost;
       } else {
-        combinedAABB.combine(leafAABB, m_nodes[child2].aabb);
-        float oldArea = m_nodes[child2].aabb.getPerimeter();
+        combinedAABB.combine(leafAABB, child2.aabb);
+        float oldArea = child2.aabb.getPerimeter();
         float newArea = combinedAABB.getPerimeter();
         cost2 = newArea - oldArea + inheritanceCost;
       }
@@ -622,97 +569,96 @@ public class DynamicTree {
       }
     }
 
-    int sibling = index;
-    int oldParent = m_nodes[sibling].parent;
-    int newParentId = allocateNode();
-    final TreeNode newParent = m_nodes[newParentId];
+    TreeNode sibling = index;
+    TreeNode oldParent = m_nodes[sibling.id].parent;
+    final TreeNode newParent = allocateNode();
     newParent.parent = oldParent;
     newParent.userData = null;
-    newParent.aabb.combine(leafAABB, m_nodes[sibling].aabb);
-    newParent.height = m_nodes[sibling].height + 1;
+    newParent.aabb.combine(leafAABB, sibling.aabb);
+    newParent.height = sibling.height + 1;
 
-    if (oldParent != NULL_NODE) {
+    if (oldParent != null) {
       // The sibling was not the root.
-      if (m_nodes[oldParent].child1 == sibling) {
-        m_nodes[oldParent].child1 = newParentId;
+      if (oldParent.child1 == sibling) {
+        oldParent.child1 = newParent;
       } else {
-        m_nodes[oldParent].child2 = newParentId;
+        oldParent.child2 = newParent;
       }
 
-      m_nodes[newParentId].child1 = sibling;
-      m_nodes[newParentId].child2 = leaf;
-      m_nodes[sibling].parent = newParentId;
-      m_nodes[leaf].parent = newParentId;
+      newParent.child1 = sibling;
+      newParent.child2 = leaf;
+      sibling.parent = newParent;
+      leaf.parent = newParent;
     } else {
       // The sibling was the root.
-      m_nodes[newParentId].child1 = sibling;
-      m_nodes[newParentId].child2 = leaf;
-      m_nodes[sibling].parent = newParentId;
-      m_nodes[leaf].parent = newParentId;
-      m_root = newParentId;
+      newParent.child1 = sibling;
+      newParent.child2 = leaf;
+      sibling.parent = newParent;
+      leaf.parent = newParent;
+      m_root = newParent;
     }
 
     // Walk back up the tree fixing heights and AABBs
-    index = m_nodes[leaf].parent;
-    while (index != NULL_NODE) {
+    index = leaf.parent;
+    while (index != null) {
       index = balance(index);
 
-      int child1 = m_nodes[index].child1;
-      int child2 = m_nodes[index].child2;
+      TreeNode child1 = index.child1;
+      TreeNode child2 = index.child2;
 
-      assert (child1 != NULL_NODE);
-      assert (child2 != NULL_NODE);
+      assert (child1 != null);
+      assert (child2 != null);
 
-      m_nodes[index].height = 1 + MathUtils.max(m_nodes[child1].height, m_nodes[child2].height);
-      m_nodes[index].aabb.combine(m_nodes[child1].aabb, m_nodes[child2].aabb);
+      index.height = 1 + MathUtils.max(child1.height, child2.height);
+      index.aabb.combine(child1.aabb, child2.aabb);
 
-      index = m_nodes[index].parent;
+      index = index.parent;
     }
 
     // validate();
   }
 
-  private final void removeLeaf(int leaf) {
+  private final void removeLeaf(TreeNode leaf) {
     if (leaf == m_root) {
-      m_root = NULL_NODE;
+      m_root = null;
       return;
     }
 
-    int parent = m_nodes[leaf].parent;
-    int grandParent = m_nodes[parent].parent;
-    int sibling;
-    if (m_nodes[parent].child1 == leaf) {
-      sibling = m_nodes[parent].child2;
+    TreeNode parent = leaf.parent;
+    TreeNode grandParent = parent.parent;
+    TreeNode sibling;
+    if (parent.child1 == leaf) {
+      sibling = parent.child2;
     } else {
-      sibling = m_nodes[parent].child1;
+      sibling = parent.child1;
     }
 
-    if (grandParent != NULL_NODE) {
+    if (grandParent != null) {
       // Destroy parent and connect sibling to grandParent.
-      if (m_nodes[grandParent].child1 == parent) {
-        m_nodes[grandParent].child1 = sibling;
+      if (grandParent.child1 == parent) {
+        grandParent.child1 = sibling;
       } else {
-        m_nodes[grandParent].child2 = sibling;
+        grandParent.child2 = sibling;
       }
-      m_nodes[sibling].parent = grandParent;
+      sibling.parent = grandParent;
       freeNode(parent);
 
       // Adjust ancestor bounds.
-      int index = grandParent;
-      while (index != NULL_NODE) {
+      TreeNode index = grandParent;
+      while (index != null) {
         index = balance(index);
 
-        int child1 = m_nodes[index].child1;
-        int child2 = m_nodes[index].child2;
+        TreeNode child1 = index.child1;
+        TreeNode child2 = index.child2;
 
-        m_nodes[index].aabb.combine(m_nodes[child1].aabb, m_nodes[child2].aabb);
-        m_nodes[index].height = 1 + MathUtils.max(m_nodes[child1].height, m_nodes[child2].height);
+        index.aabb.combine(child1.aabb, child2.aabb);
+        index.height = 1 + MathUtils.max(child1.height, child2.height);
 
-        index = m_nodes[index].parent;
+        index = index.parent;
       }
     } else {
       m_root = sibling;
-      m_nodes[sibling].parent = NULL_NODE;
+      sibling.parent = null;
       freeNode(parent);
     }
 
@@ -721,32 +667,34 @@ public class DynamicTree {
 
   // Perform a left or right rotation if node A is imbalanced.
   // Returns the new root index.
-  private int balance(int iA) {
-    assert (iA != NULL_NODE);
+  private TreeNode balance(TreeNode iA) {
+    assert (iA != null);
 
-    TreeNode A = m_nodes[iA];
+    TreeNode A = iA;
     if (A.isLeaf() || A.height < 2) {
       return iA;
     }
 
-    int iB = A.child1;
-    int iC = A.child2;
-    assert (0 <= iB && iB < m_nodeCapacity);
-    assert (0 <= iC && iC < m_nodeCapacity);
+    TreeNode iB = A.child1;
+    TreeNode iC = A.child2;
+    assert (0 <= iB.id && iB.id < m_nodeCapacity);
+    assert (0 <= iC.id && iC.id < m_nodeCapacity);
 
-    TreeNode B = m_nodes[iB];
-    TreeNode C = m_nodes[iC];
+    TreeNode B = iB;
+    TreeNode C = iC;
 
     int balance = C.height - B.height;
 
     // Rotate C up
     if (balance > 1) {
-      int iF = C.child1;
-      int iG = C.child2;
-      TreeNode F = m_nodes[iF];
-      TreeNode G = m_nodes[iG];
-      assert (0 <= iF && iF < m_nodeCapacity);
-      assert (0 <= iG && iG < m_nodeCapacity);
+      TreeNode iF = C.child1;
+      TreeNode iG = C.child2;
+      TreeNode F = iF;
+      TreeNode G = iG;
+      assert (F != null);
+      assert (G != null);
+      assert (0 <= iF.id && iF.id < m_nodeCapacity);
+      assert (0 <= iG.id && iG.id < m_nodeCapacity);
 
       // Swap A and C
       C.child1 = iA;
@@ -754,12 +702,12 @@ public class DynamicTree {
       A.parent = iC;
 
       // A's old parent should point to C
-      if (C.parent != NULL_NODE) {
-        if (m_nodes[C.parent].child1 == iA) {
-          m_nodes[C.parent].child1 = iC;
+      if (C.parent != null) {
+        if (C.parent.child1 == iA) {
+          C.parent.child1 = iC;
         } else {
-          assert (m_nodes[C.parent].child2 == iA);
-          m_nodes[C.parent].child2 = iC;
+          assert (C.parent.child2 == iA);
+          C.parent.child2 = iC;
         }
       } else {
         m_root = iC;
@@ -791,12 +739,12 @@ public class DynamicTree {
 
     // Rotate B up
     if (balance < -1) {
-      int iD = B.child1;
-      int iE = B.child2;
-      TreeNode D = m_nodes[iD];
-      TreeNode E = m_nodes[iE];
-      assert (0 <= iD && iD < m_nodeCapacity);
-      assert (0 <= iE && iE < m_nodeCapacity);
+      TreeNode iD = B.child1;
+      TreeNode iE = B.child2;
+      TreeNode D = iD;
+      TreeNode E = iE;
+      assert (0 <= iD.id && iD.id < m_nodeCapacity);
+      assert (0 <= iE.id && iE.id < m_nodeCapacity);
 
       // Swap A and B
       B.child1 = iA;
@@ -804,12 +752,12 @@ public class DynamicTree {
       A.parent = iB;
 
       // A's old parent should point to B
-      if (B.parent != NULL_NODE) {
-        if (m_nodes[B.parent].child1 == iA) {
-          m_nodes[B.parent].child1 = iB;
+      if (B.parent != null) {
+        if (B.parent.child1 == iA) {
+          B.parent.child1 = iB;
         } else {
-          assert (m_nodes[B.parent].child2 == iA);
-          m_nodes[B.parent].child2 = iB;
+          assert (B.parent.child2 == iA);
+          B.parent.child2 = iB;
         }
       } else {
         m_root = iB;
@@ -842,65 +790,62 @@ public class DynamicTree {
     return iA;
   }
 
-  private void validateStructure(int index) {
-    if (index == NULL_NODE) {
+  private void validateStructure(TreeNode node) {
+    if (node == null) {
       return;
     }
+    assert (node == m_nodes[node.id]);
 
-    if (index == m_root) {
-      assert (m_nodes[index].parent == NULL_NODE);
+    if (node == m_root) {
+      assert (node.parent == null);
     }
 
-    final TreeNode node = m_nodes[index];
-
-    int child1 = node.child1;
-    int child2 = node.child2;
+    TreeNode child1 = node.child1;
+    TreeNode child2 = node.child2;
 
     if (node.isLeaf()) {
-      assert (child1 == NULL_NODE);
-      assert (child2 == NULL_NODE);
+      assert (child1 == null);
+      assert (child2 == null);
       assert (node.height == 0);
       return;
     }
 
-    assert (0 <= child1 && child1 < m_nodeCapacity);
-    assert (0 <= child2 && child2 < m_nodeCapacity);
+    assert (child1 != null && 0 <= child1.id && child1.id < m_nodeCapacity);
+    assert (child2 != null && 0 <= child2.id && child2.id < m_nodeCapacity);
 
-    assert (m_nodes[child1].parent == index);
-    assert (m_nodes[child2].parent == index);
+    assert (child1.parent == node);
+    assert (child2.parent == node);
 
     validateStructure(child1);
     validateStructure(child2);
   }
 
-  private void validateMetrics(int index) {
-    if (index == NULL_NODE) {
+  private void validateMetrics(TreeNode node) {
+    if (node == null) {
       return;
     }
 
-    final TreeNode node = m_nodes[index];
-
-    int child1 = node.child1;
-    int child2 = node.child2;
+    TreeNode child1 = node.child1;
+    TreeNode child2 = node.child2;
 
     if (node.isLeaf()) {
-      assert (child1 == NULL_NODE);
-      assert (child2 == NULL_NODE);
+      assert (child1 == null);
+      assert (child2 == null);
       assert (node.height == 0);
       return;
     }
 
-    assert (0 <= child1 && child1 < m_nodeCapacity);
-    assert (0 <= child2 && child2 < m_nodeCapacity);
+    assert (child1 != null && 0 <= child1.id && child1.id < m_nodeCapacity);
+    assert (child2 != null && 0 <= child2.id && child2.id < m_nodeCapacity);
 
-    int height1 = m_nodes[child1].height;
-    int height2 = m_nodes[child2].height;
+    int height1 = child1.height;
+    int height2 = child2.height;
     int height;
     height = 1 + MathUtils.max(height1, height2);
     assert (node.height == height);
 
     AABB aabb = new AABB();
-    aabb.combine(m_nodes[child1].aabb, m_nodes[child2].aabb);
+    aabb.combine(child1.aabb, child2.aabb);
 
     assert (aabb.lowerBound.equals(node.aabb.lowerBound));
     assert (aabb.upperBound.equals(node.aabb.upperBound));
@@ -909,8 +854,9 @@ public class DynamicTree {
     validateMetrics(child2);
   }
 
+  @Override
   public void drawTree(DebugDraw argDraw) {
-    if (m_root == NULL_NODE) {
+    if (m_root == null) {
       return;
     }
     int height = computeHeight();
@@ -920,20 +866,19 @@ public class DynamicTree {
   private final Color3f color = new Color3f();
   private final Vec2 textVec = new Vec2();
 
-  public void drawTree(DebugDraw argDraw, int nodeId, int spot, int height) {
-    final TreeNode node = m_nodes[nodeId];
+  public void drawTree(DebugDraw argDraw, TreeNode node, int spot, int height) {
     node.aabb.getVertices(drawVecs);
 
     color.set(1, (height - spot) * 1f / height, (height - spot) * 1f / height);
     argDraw.drawPolygon(drawVecs, 4, color);
 
     argDraw.getViewportTranform().getWorldToScreen(node.aabb.upperBound, textVec);
-    argDraw.drawString(textVec.x, textVec.y, nodeId + "-" + (spot + 1) + "/" + height, color);
+    argDraw.drawString(textVec.x, textVec.y, node.id + "-" + (spot + 1) + "/" + height, color);
 
-    if (node.child1 != NULL_NODE) {
+    if (node.child1 != null) {
       drawTree(argDraw, node.child1, spot + 1, height);
     }
-    if (node.child2 != NULL_NODE) {
+    if (node.child2 != null) {
       drawTree(argDraw, node.child2, spot + 1, height);
     }
   }
