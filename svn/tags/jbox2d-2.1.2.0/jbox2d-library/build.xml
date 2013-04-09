@@ -1,0 +1,26 @@
+<project name="jbox2d-library" default="build-dotnet">
+
+    <import file="build-properties.xml" />
+    <import file="sharpen-common.xml" />
+    
+    <target name="build-dotnet" depends="sharpen">
+        <exec executable="${nant.exe}">
+        </exec>
+    </target>
+        
+    <target name="sharpen" depends="init">
+        
+        <prepare-sharpen-workspace project="jbox2d-library" dir="${sharpen.workspace.dir}" />
+        
+        <sharpen workspace="${sharpen.workspace.dir}" resource="jbox2d-library/src">
+        </sharpen>
+        
+    </target>
+    
+    <target name="init">
+        
+        <reset-dir dir="${sharpen.workspace.dir}" />
+        
+    </target>
+    
+</project>

@@ -1,0 +1,67 @@
+#summary Basic guide for importing and building JBox2D
+#labels Featured
+<wiki:toc max_depth="2" />
+
+= Introduction =
+
+JBox2D is a Java rigid body physics engine library.  It does not include any graphics support, you are expected to hook it up to your rendering library yourself (though the testbed includes a sample implementation using Java2D graphics, it is not intended to be a production-ready implementation).
+
+This page will show you how to generally use/build jbox2d in any environment.
+
+= Importing JBox2D =
+== Jar Releases ==
+The jar releases have all dependencies included, so you just need to include them as an external library in your project.  This is a common option with most IDE's, and usually consists of:
+  # Placing the jar in your project
+  # Right clicking and choosing to include the jar in the build path.
+
+If you need more help with this, please see help sources for your IDE.  If you're not using an IDE, then you shouldn't need help with this.
+
+== Maven ==
+JBox2D is released in Maven (or will be soon), so you should see it listed as an available dependency.
+
+= Building JBox2D =
+== Maven ==
+The most recent versions of JBox2D lean on Maven to help handle dependency management, and if your IDE supports Maven, then this should be pretty easy.  To quickly get a project running you:
+
+
+  # Check out the project through Subversion:
+    # For 2.1.2 branch:  `svn checkout http://jbox2d.googlecode.com/svn/branch/jbox2d-2.1.2.1/ jbox2d-read-only`
+    # For trunk `svn checkout http://jbox2d.googlecode.com/svn/trunk jbox2d-read-only`
+  # Import to your IDE as a Maven project (using the pom.xml descriptor in the root folder)
+  # Run the `org.jbox2d.testbed.framework.TestbedMain` class
+
+Note: the trunk is pretty stable at this time.
+
+If you're planning on doing some more in-depth customization, we would suggest adding each module project independently (jbox2d-library, jbox2d-serialization, jbox2d-testbed) and putting all of those projects in your workspace.
+
+*Note:*
+  * You might receive errors about the jbox2d parent POM is not found.  In this case you'll have to run 'mvn install" on the root project (checked out like above).
+  * If you're changing the protobuffer definition for serialization, you'll need the protobuffer library installed on your machine.  Download it [http://code.google.com/apis/protocolbuffers/docs/overview.html here].
+
+== Non Maven ==
+You'll have to include the dependencies yourself if you don't want to use Maven.  Fortunately, there are only a couple:
+
+  # Standard Logging Facade for Java ([http://www.slf4j.org/ SLF4J])
+  # [http://code.google.com/p/protobuf/downloads/list Protobuffers] for serialization (you might have to build it)
+
+Include those and you should be good!
+
+== Quick IDE Setups ==
+=== Eclipse (tested with [http://www.eclipse.org/downloads/packages/release/helios/sr2 Eclipse Helios]) ===
+
+  # Check out the project through Subversion (you can also do this within Eclipse using the [http://subclipse.tigris.org/ Subclipse] plugin if you don't like the command line):
+    `svn checkout http://jbox2d.googlecode.com/svn/trunk/ jbox2d-read-only`
+  # Make sure you have the [http://maven.apache.org/eclipse-plugin.html Maven Integration for Eclipse] plugin installed
+  # In Eclipse, go to _File_->_Import_ and select _Maven_->_Existing Maven Projects_
+  # Navigate to the directory that you checked out from Subversion (jbox2d-read-only if you cut and pasted the example above) and hit _Next_
+  # Select both of the projects, and add them to your working sets if desired
+  # Finish the import
+  # In Package Explorer, find the jbox2d-testbed project, navigate to _src/main/java_ and find the _org.jbox2d.testbed.framework_ package - right click on TestbedMain.java and run it as a Java application.
+  # If the JBox2D testbed runs, congratulations, you've successfully set up the project!  You can add the jbox2d-library project as a reference to other projects to use it, or you can browse through the jbox2d-testbed project to see how things are done (navigate to the org.jbox2d.testbed.tests directory to see code examples)
+
+*NOTE* make sure the src/generated folder is included if you're using the serialization library
+=== !NetBeans ===
+R.A. Nagy made a blog post [http://www.soft9000.com/blog9000/index.php?entry=Angry-Buddha-Springs? here] about importing/building with !NetBeans. Thanks R.A. Nagy!
+
+=Using JBox2D =
+*Please* see the [Testbed Testbed] wiki article.

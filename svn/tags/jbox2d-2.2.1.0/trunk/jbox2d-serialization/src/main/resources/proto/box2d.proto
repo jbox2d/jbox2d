@@ -1,0 +1,173 @@
+
+package box2d;
+
+option java_package = "org.box2d.proto";
+option java_outer_classname = "Box2D";
+
+// Math classes
+
+message PbVec2 {
+  required float x = 1;
+  required float y = 2;
+}
+
+// enums
+
+enum PbBodyType {
+  STATIC = 0;
+  DYNAMIC = 1;
+  KINEMATIC = 2;
+}
+
+enum PbShapeType { 
+  CIRCLE = 1;
+  POLYGON = 2;
+  EDGE = 3;
+  CHAIN = 4;
+}
+
+enum PbJointType {
+  DISTANCE = 1;
+  REVOLUTE = 2;
+  PRISMATIC = 3;
+  PULLEY = 4;
+  MOUSE = 5;
+  GEAR = 6;
+  WHEEL = 7;
+  WELD = 8;
+  FRICTION = 9;
+  ROPE = 10;
+  CONSTANT_VOLUME = 11;
+  LINE = 12;
+}
+
+
+// objects
+
+message PbFilter {
+  optional int32 category_bits = 1;
+  optional int32 mask_bits = 2;
+  optional int32 group_index = 3;
+}
+
+// just include all fields we might use
+message PbShape {
+  optional int64 tag = 1;
+  required PbShapeType type = 2;
+  optional PbVec2 center = 10; // circle
+  optional float radius = 11; // circle
+  
+  repeated PbVec2 points = 20; // polygon, chain
+  repeated PbVec2 normals = 21; // polygon
+  optional PbVec2 centroid = 22; // polygon
+  
+  optional PbVec2 v0 = 30; // edge
+  optional PbVec2 v1 = 31; // edge
+  optional PbVec2 v2 = 32; // edge
+  optional PbVec2 v3 = 33; // edge
+  optional bool has0 = 34; // edge, chain
+  optional bool has3 = 35; // edge, chain
+  
+  optional PbVec2 prev = 40; // chain
+  optional PbVec2 next = 41; // chain
+}
+
+message PbFixture {
+  optional int64 tag = 1;
+  optional float restitution = 2;
+  optional float friction = 3;
+  optional float density = 4;
+  optional bool sensor = 5;
+  
+  optional PbFilter filter = 10;
+  optional PbShape shape = 11;
+}
+
+message PbJoint {
+  optional int64 tag = 1;
+  required PbJointType type = 2;
+  
+  optional int32 body_a = 3;
+  optional int32 body_b = 4;
+  
+  optional bool collideConnected = 5;
+  
+  optional PbVec2 local_anchor_a = 6;
+  optional PbVec2 local_anchor_b = 7;
+  
+  optional float ref_angle = 10; // revolute, prismatic, joint
+  optional bool enable_limit = 12; // revolute, prismatic
+  optional float lower_limit = 13; // revolute, prismatic
+  optional float upper_limit = 14; // revolute, prismatic
+  optional bool enable_motor = 15; // revolute, prismatic, wheel
+  optional float motor_speed = 16; // revolute, prismatic, wheel
+  optional float max_motor_torque = 17; // revolute, wheel
+  
+  optional PbVec2 local_axis_a = 20; // prismatic, wheel
+  optional float max_motor_force = 21; // prismatic
+  
+  optional float length = 30; // distance
+  optional float frequency = 31; // distance, mouse, wheel, weld, con vol
+  optional float damping_ratio = 32; // distance, mouse, wheel, weld, col vol
+  
+  optional PbVec2 ground_anchor_a = 40; // pulley
+  optional PbVec2 ground_anchor_b = 41; // pulley
+  optional float length_a = 42; // pulley
+  optional float length_b = 43; // pulley
+  optional float ratio = 44; // pulley, gear
+  
+  optional PbVec2 target = 50; // mouse
+  optional float max_force = 51; // mouse, friction, rope
+  
+  optional int32 joint1 = 61; // gear
+  optional int32 joint2 = 62; // gear
+  
+  // wheel joint 70
+  
+  // weld joint 80
+  
+  optional float max_torque = 90; // friction
+  
+  optional float max_length = 100; // rope
+  
+  repeated int32 bodies = 110; // con vol
+  repeated int32 joints = 111; // con vol
+  
+  // line joint 120
+}
+
+message PbBody {
+  optional int64 tag = 1;
+  required PbBodyType type = 2;
+  
+  // physical attributes
+  optional PbVec2 position = 10;
+  optional float angle = 11;
+  optional PbVec2 linear_velocity = 12;
+  optional float angular_velocity = 13;
+  
+  // configuration
+  optional float linear_damping = 50;
+  optional float angular_damping = 51;
+  optional float gravity_scale = 52;
+  optional bool bullet = 53;
+  optional bool allow_sleep = 54;
+  optional bool awake = 55;
+  optional bool active = 56;
+  optional bool fixed_rotation = 57;
+  
+  repeated PbFixture fixtures = 100;
+}
+
+message PbWorld {
+  optional int64 tag = 1;
+  optional PbVec2 gravity = 2;
+  optional bool allow_sleep = 3;
+  optional bool auto_clear_forces = 4;
+  optional bool warm_starting = 5;
+  optional bool continuous_physics = 6;
+  optional bool sub_stepping = 7;
+  
+  repeated PbBody bodies = 20;
+  repeated PbJoint joints = 21;
+}

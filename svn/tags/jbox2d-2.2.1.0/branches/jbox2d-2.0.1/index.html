@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<title>JBox2d 2.0 Testbed: Built with Processing</title>
+
+<style type="text/css">
+body {
+  margin: 0px 0px 0px 0px;
+  font-family: verdana, geneva, arial, helvetica, sans-serif; 
+  font-size: 11px; 
+  background-color: #DDDDCC; 
+  text-decoration: none; 
+  font-weight: normal; 
+  line-height: normal; 
+}
+ 
+A          { color: #3399CC; }
+A:link     { color: #3399CC; text-decoration: underline; }
+A:visited  { color: #3399CC; text-decoration: underline; }
+A:active   { color: #3399CC; text-decoration: underline; }
+A:hover    { color: #3399CC; text-decoration: underline; }
+
+#sketch {
+  margin-left: 50px;
+  margin-top: 50px;
+}
+
+#comments {
+  margin-top: 15px;
+  margin-left: 50px;
+  width:600px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="content">
+
+
+<div id="sketch">
+<p><strong><a href="http://www.jbox2d.org/">JBox2d</a> 2.0 Testbed Demo</strong></p>
+<applet
+ name="TestbedMain"
+ code="org.jbox2d.testbed.TestbedMain" 
+ archive="core.jar,jbox2d.jar"
+ width="640" height="480"
+ mayscript="true">
+<param name="image" value="loading.gif">
+<param name="boxmessage" value="Loading Processing software...">
+<param name="boxbgcolor" value="#FFFFFF">
+<param name="progressbar" value="true">
+<param name="subapplet.classname" VALUE="org.jbox2d.testbed.TestbedMain"> 
+<param name="subapplet.displayname" VALUE="Testbed"> 
+
+
+<!-- This is the message that shows up when people don't have
+     Java installed in their browser. Any HTML can go here
+     (i.e. if you wanted to include an image other links, 
+     or an anti-Microsoft diatribe. -->
+To view this content, you need to install Java from <A HREF="http://java.com">java.com</A>
+</applet>
+</div>
+
+<div id="comments">
+<UL>
+<LI>Left/Right to cycle through demos
+<LI>Space to shoot bomb
+<LI>Shift + Drag to slingshot bomb
+<LI>Left click to grab objects
+<LI>Right click to grab canvas
+<LI>Scroll wheel to zoom
+<LI>'o' to toggle options panel
+<LI>'r' to restart simulation
+</UL>
+<UL>
+<LI><a href="http://www.jbox2d.org/v2demos/JBox2d 03-31-2008.zip">Download entire project (.zip)</a>
+</UL>
+</div>
+
+</div>
+
+</body>
+</html>

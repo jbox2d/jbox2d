@@ -1,0 +1,23 @@
+package collision;
+
+import common.Settings;
+import common.Vec2;
+
+public class Manifold {
+	public ContactPoint points[]; // [b2_maxManifoldPoints]
+	public Vec2 normal;
+	public int pointCount;
+
+	public Manifold() {
+		points = new ContactPoint[Settings.maxManifoldPoints];
+		normal = new Vec2();
+		pointCount = 0;
+	}
+
+	public Manifold(Manifold other) {
+		points = new ContactPoint[other.points.length];
+		System.arraycopy(other.points, 0, points, 0, other.points.length);
+
+		normal = other.normal.clone();
+	}
+}

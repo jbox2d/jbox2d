@@ -1,0 +1,9 @@
+<BODY>
+The JBox2d 2.0 testbed, implemented using <a href="http://www.processing.org">Processing</a>.  Start here to figure out how to use JBox2d in your own project.
+<BR><BR>
+TestbedMain is the holder for the tests, each of which extends AbstractExample.  Drawing is routed through ProcessingDebugDraw, which is an implementation of org.jbox2d.dynamics.DebugDraw.  The AbstractExample class handles most of the interaction with JBox2d itself, so you will likely want to start looking there to see what you need to do to hook JBox2d up in your own project.  World/object creation happens in the org.jbox2d.testbed.tests package.
+<BR><BR>
+TestbedOptions is specific to this testbed, merely providing a stripped down UI to access TestSettings with Java's reflection API.  In most game contexts you will not need anything this complicated, as your settings will be fixed throughout.
+<BR><BR>
+TimingTest is used for profiling purposes and is probably of little interest to you.
+</BODY>

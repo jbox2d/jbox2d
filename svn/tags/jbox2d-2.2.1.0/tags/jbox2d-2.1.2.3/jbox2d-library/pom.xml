@@ -1,0 +1,22 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>jbox2d</artifactId>
+    <groupId>org.jbox2d</groupId>
+    <version>2.1.2.3</version>
+  </parent>
+  <artifactId>jbox2d-library</artifactId>
+  <name>jbox2d-library</name>
+  <description>A 2D java physics engine, a port of the C++ Box2d engine.  This is the core physics engine.</description>
+  <url>http://code.google.com/p/jbox2d/</url>
+  <packaging>jar</packaging>
+  <dependencies>
+  	<dependency>
+  		<groupId>junit</groupId>
+  		<artifactId>junit</artifactId>
+  		<version>4.8.2</version>
+  		<type>jar</type>
+  		<scope>test</scope>
+  	</dependency>
+  </dependencies>
+</project>

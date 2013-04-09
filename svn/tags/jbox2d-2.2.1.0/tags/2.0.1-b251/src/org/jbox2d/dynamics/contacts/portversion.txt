@@ -1,0 +1,16 @@
+Java file -> corresponding C++ file & revision number updated to
+package: org.jbox2d.dynamics.contacts
+Updated thru rev 144 (May 8, 2008)
+----------------------------------------------------------------
+
+CircleContact.java			-> b2CircleContact.h/cpp 142
+Contact.java				-> b2Contact.h/cpp 142
+ContactConstraint.java		-> b2ContactSolver.h 139
+ContactConstraintPoint.java	-> b2ContactSolver.h 139
+ContactEdge.java			-> b2Contact.h/cpp 142
+ContactPoint.java			-> b2Contact.h/cpp 142
+ContactResult.java			-> b2Contact.h/cpp 142
+ContactSolver.java			-> b2ContactSolver.h/cpp 149
+NullContact.java			-> b2NullContact.h 89
+PolyAndCircleContact.java	-> b2PolyAndCircleContact.h/cpp 144
+PolyContact.java			-> b2PolyContact.h/cpp 142
