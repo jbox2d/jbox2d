@@ -41,80 +41,65 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class ShapeEditing extends TestbedTest {
-	
-	Body m_body;
-	Fixture m_fixture1;
-	Fixture m_fixture2;
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-	 */
-	@Override
-	public void initTest(boolean argDeserialized) {
-		{
-			BodyDef bd = new BodyDef();
-			Body ground = getWorld().createBody(bd);
 
-			EdgeShape shape = new EdgeShape();
-			shape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
-			ground.createFixture(shape, 0.0f);
-		}
+  Body m_body;
+  Fixture m_fixture1;
+  Fixture m_fixture2;
 
-		BodyDef bd = new BodyDef();
-		bd.type = BodyType.DYNAMIC;
-		bd.position.set(0.0f, 10.0f);
-		m_body = getWorld().createBody(bd);
+  @Override
+  public void initTest(boolean argDeserialized) {
+    {
+      BodyDef bd = new BodyDef();
+      Body ground = getWorld().createBody(bd);
 
-		PolygonShape shape = new PolygonShape();
-		shape.setAsBox(4.0f, 4.0f, new Vec2(0.0f, 0.0f), 0.0f);
-		m_fixture1 = m_body.createFixture(shape, 10.0f);
+      EdgeShape shape = new EdgeShape();
+      shape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
+      ground.createFixture(shape, 0.0f);
+    }
 
-		m_fixture2 = null;
-	}
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
-	 */
-	@Override
-	public void keyPressed(char key, int argKeyCode) {
-		switch (key)
-		{
-		case 'c':
-			if (m_fixture2 == null)
-			{
-				CircleShape shape = new CircleShape();
-				shape.m_radius = 3.0f;
-				shape.m_p.set(0.5f, -4.0f);
-				m_fixture2 = m_body.createFixture(shape, 10.0f);
-				m_body.setAwake(true);
-			}
-			break;
+    BodyDef bd = new BodyDef();
+    bd.type = BodyType.DYNAMIC;
+    bd.position.set(0.0f, 10.0f);
+    m_body = getWorld().createBody(bd);
 
-		case 'd':
-			if (m_fixture2 != null)
-			{
-				m_body.destroyFixture(m_fixture2);
-				m_fixture2 = null;
-				m_body.setAwake(true);
-			}
-			break;
-		}
-	}
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
-	 */
-	@Override
-	public void step(TestbedSettings settings) {
-		super.step(settings);
-		addTextLine( "Press: (c) create a shape, (d) destroy a shape.");
-	}
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-	 */
-	@Override
-	public String getTestName() {
-		return "Shape Editing";
-	}
-	
+    PolygonShape shape = new PolygonShape();
+    shape.setAsBox(4.0f, 4.0f, new Vec2(0.0f, 0.0f), 0.0f);
+    m_fixture1 = m_body.createFixture(shape, 10.0f);
+
+    m_fixture2 = null;
+  }
+
+  @Override
+  public void keyPressed(char key, int argKeyCode) {
+    switch (key) {
+      case 'c':
+        if (m_fixture2 == null) {
+          CircleShape shape = new CircleShape();
+          shape.m_radius = 3.0f;
+          shape.m_p.set(0.5f, -4.0f);
+          m_fixture2 = m_body.createFixture(shape, 10.0f);
+          m_body.setAwake(true);
+        }
+        break;
+
+      case 'd':
+        if (m_fixture2 != null) {
+          m_body.destroyFixture(m_fixture2);
+          m_fixture2 = null;
+          m_body.setAwake(true);
+        }
+        break;
+    }
+  }
+
+  @Override
+  public void step(TestbedSettings settings) {
+    super.step(settings);
+    addTextLine("Press: (c) create a shape, (d) destroy a shape.");
+  }
+
+  @Override
+  public String getTestName() {
+    return "Shape Editing";
+  }
 }

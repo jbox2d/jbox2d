@@ -200,34 +200,21 @@ public class PrismaticJoint extends Joint {
   }
 
   /**
-   * Get the current joint translation, usually in meters. public float getJointTranslation() { Vec2
-   * pA = pool.popVec2(); Vec2 pB = pool.popVec2(); Vec2 axis = pool.popVec2();
-   * 
-   * m_bodyA.getWorldPointToOut(m_localAnchorA, pA); m_bodyB.getWorldPointToOut(m_localAnchorB, pB);
-   * pB.subLocal(pA); m_bodyA.getWorldVectorToOut(m_localXAxisA, axis);
-   * 
-   * float translation = Vec2.dot(pB, axis);
-   * 
-   * pool.pushVec2(3); return translation; }
-   * 
-   * /** Get the current joint translation speed, usually in meters per second.
-   * 
-   * @return
+   * Get the current joint translation, usually in meters.
    */
   public float getJointSpeed() {
     Body bA = m_bodyA;
     Body bB = m_bodyB;
 
-    Vec2[] pc = pool.popVec2(9);
-    Vec2 temp = pc[0];
-    Vec2 rA = pc[1];
-    Vec2 rB = pc[2];
-    Vec2 p1 = pc[3];
-    Vec2 p2 = pc[4];
-    Vec2 d = pc[5];
-    Vec2 axis = pc[6];
-    Vec2 temp2 = pc[7];
-    Vec2 temp3 = pc[8];
+    Vec2 temp = pool.popVec2();
+    Vec2 rA = pool.popVec2();
+    Vec2 rB = pool.popVec2();
+    Vec2 p1 = pool.popVec2();
+    Vec2 p2 = pool.popVec2();
+    Vec2 d = pool.popVec2();
+    Vec2 axis = pool.popVec2();
+    Vec2 temp2 = pool.popVec2();
+    Vec2 temp3 = pool.popVec2();
 
     temp.set(m_localAnchorA).subLocal(bA.m_sweep.localCenter);
     Rot.mulToOutUnsafe(bA.m_xf.q, temp, rA);

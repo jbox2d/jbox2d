@@ -53,9 +53,6 @@ public class SensorTest extends TestbedTest {
   Body m_bodies[] = new Body[e_count];
   BoolWrapper m_touching[] = new BoolWrapper[e_count];
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-   */
   @Override
   public void initTest(boolean argDeserialized) {
 
@@ -143,9 +140,6 @@ public class SensorTest extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
-   */
   @Override
   public void step(TestbedSettings settings) {
     // TODO Auto-generated method stub
@@ -177,12 +171,8 @@ public class SensorTest extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-   */
   @Override
   public String getTestName() {
     return "Sensor Test";
   }
-
 }

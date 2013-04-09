@@ -37,6 +37,8 @@ import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.testbed.framework.TestbedTest;
 
 public class OneSidedTest extends TestbedTest {
+  private static final long PLATFORM_TAG = 10;
+  private static final long CHARACTER_TAG = 11;
 
   enum State {
     e_unknown, e_above, e_below,
@@ -48,12 +50,41 @@ public class OneSidedTest extends TestbedTest {
   Fixture m_character;
 
   @Override
+  public Long getTag(Fixture fixture) {
+    if (fixture == m_platform)
+      return PLATFORM_TAG;
+    if (fixture == m_character)
+      return CHARACTER_TAG;
+    return super.getTag(fixture);
+  }
+
+  @Override
+  public void processFixture(Fixture fixture, Long tag) {
+    if (tag == PLATFORM_TAG) {
+      m_platform = fixture;
+    } else if (tag == CHARACTER_TAG) {
+      m_character = fixture;
+    } else {
+      super.processFixture(fixture, tag);
+    }
+  }
+  
+  @Override
+  public boolean isSaveLoadEnabled() {
+    return true;
+  }
+
+  @Override
   public String getTestName() {
     return "One Sided";
   }
 
   @Override
-  public void initTest(boolean argDeserialized) {
+  public void initTest(boolean deserialized) {
+    m_state = State.e_unknown;
+    if (deserialized) {
+      return;
+    }
     // Ground
     {
       BodyDef bd = new BodyDef();
@@ -117,5 +148,4 @@ public class OneSidedTest extends TestbedTest {
       contact.setEnabled(false);
     }
   }
-
 }

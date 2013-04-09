@@ -63,9 +63,6 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 	boolean m_automated;
 	Random rand = new Random();
 
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-	 */
 	@Override
 	public void initTest(boolean argDeserialized) {
 		worldExtent = 15.0f;
@@ -98,9 +95,6 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 		m_automated = false;
 	}
 
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
-	 */
 	@Override
 	public void keyPressed(char argKeyChar, int argKeyCode) {
 		switch (argKeyChar) {
@@ -124,9 +118,6 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 
 	private Vec2Array vecPool = new Vec2Array();
 
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
-	 */
 	@Override
 	public void step(TestbedSettings settings) {
 		m_rayActor = null;
@@ -363,9 +354,6 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 		}
 	}
 
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-	 */
 	@Override
 	public String getTestName() {
 		return "Dynamic Tree";

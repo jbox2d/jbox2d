@@ -16,7 +16,6 @@ public class Tumbler extends TestbedTest {
   RevoluteJoint m_joint;
   int m_count;
 
-
   @Override
   public void initTest(boolean deserialized) {
     {

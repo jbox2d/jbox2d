@@ -57,9 +57,6 @@ public class PolyShapes extends TestbedTest {
   PolygonShape m_polygons[] = new PolygonShape[4];
   CircleShape m_circle;
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-   */
   @Override
   public void initTest(boolean argDeserialized) {
     // Ground body
@@ -164,9 +161,6 @@ public class PolyShapes extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
-   */
   @Override
   public void keyPressed(char key, int argKeyCode) {
     switch (key) {

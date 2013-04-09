@@ -53,9 +53,6 @@ public class ContinuousTest extends TestbedTest {
   boolean polygon = false;
   float m_angularVelocity;
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-   */
   @Override
   public String getTestName() {
     return "Continuous";
@@ -70,9 +67,6 @@ public class ContinuousTest extends TestbedTest {
     polygon = !polygon;
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-   */
   @Override
   public void initTest(boolean argDeserialized) {
     {
@@ -121,9 +115,6 @@ public class ContinuousTest extends TestbedTest {
     m_body.setAngularVelocity(m_angularVelocity);
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
-   */
   @Override
   public void step(TestbedSettings settings) {
     if (nextShape != null) {
@@ -153,9 +144,6 @@ public class ContinuousTest extends TestbedTest {
 
       addTextLine(String.format("ave toi root iters = %3.1f, max toi root iters = %d", toiRootIters
           * 1. / toiCalls, toiMaxRootIters));
-
-      // m_debugDraw.DrawString(5, m_textLine, "max toi opt iters = %d", b2_toiMaxOptIters);
-      // m_textLine += 15;
     }
 
     addTextLine("Press 'c' to change launch shape");
@@ -165,9 +153,6 @@ public class ContinuousTest extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
-   */
   @Override
   public void keyPressed(char argKeyChar, int argKeyCode) {
     switch (argKeyChar) {

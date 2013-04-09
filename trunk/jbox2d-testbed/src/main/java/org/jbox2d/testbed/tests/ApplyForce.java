@@ -49,12 +49,9 @@ public class ApplyForce extends TestbedTest {
 
   Body m_body;
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-   */
   @Override
-  public void initTest(boolean argDeserialized) {
-    if (argDeserialized) {
+  public void initTest(boolean deserialized) {
+    if (deserialized) {
       return;
     }
 
@@ -176,9 +173,12 @@ public class ApplyForce extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
-   */
+  @Override
+  public void keyPressed(char keyCar, int keyCode) {
+    // TODO Auto-generated method stub
+    super.keyPressed(keyCar, keyCode);
+  }
+  
   @Override
   public void step(TestbedSettings settings) {
     super.step(settings);
@@ -217,26 +217,23 @@ public class ApplyForce extends TestbedTest {
   }
 
   @Override
-  public Long getTag(Body argBody) {
-    if (argBody == m_body) {
+  public Long getTag(Body body) {
+    if (body == m_body) {
       return BODY_TAG;
     }
-    return null;
+    return super.getTag(body);
   }
 
   @Override
-  public void processBody(Body argBody, Long argTag) {
-    if (argTag == BODY_TAG) {
-      m_body = argBody;
+  public void processBody(Body body, Long tag) {
+    if (tag == BODY_TAG) {
+      m_body = body;
     }
+    super.processBody(body, tag);
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-   */
   @Override
   public String getTestName() {
     return "Apply Force";
   }
-
 }

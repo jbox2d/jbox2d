@@ -124,7 +124,7 @@ public class VaryingFrictionTest extends TestbedTest {
       fd.shape = shape;
       fd.density = 25.0f;
 
-      float friction[] = {0.75f, 0.5f, 0.35f, 0.1f, 0.0f};
+      float friction[] = { 0.75f, 0.5f, 0.35f, 0.1f, 0.0f };
 
       for (int i = 0; i < 5; ++i) {
         BodyDef bd = new BodyDef();

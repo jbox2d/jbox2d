@@ -42,49 +42,46 @@ import org.jbox2d.testbed.framework.TestbedTest;
  */
 public class VerticalStack extends TestbedTest {
   private static final long BULLET_TAG = 1;
-  
-  
+
   public static final int e_columnCount = 5;
-  public static final int e_rowCount = 10;
+  public static final int e_rowCount = 15;
 
   Body m_bullet;
-  
+
   @Override
   public Long getTag(Body argBody) {
-    if(argBody == m_bullet){
+    if (argBody == m_bullet) {
       return BULLET_TAG;
     }
     return super.getTag(argBody);
   }
-  
+
   @Override
   public void processBody(Body argBody, Long argTag) {
-    if(argTag == BULLET_TAG){
+    if (argTag == BULLET_TAG) {
       m_bullet = argBody;
       return;
     }
     super.processBody(argBody, argTag);
   }
-  
+
   @Override
   public boolean isSaveLoadEnabled() {
     return true;
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-   */
   @Override
   public void initTest(boolean argDeserialized) {
-    if(argDeserialized){
+    if (argDeserialized) {
       return;
     }
+
     {
       BodyDef bd = new BodyDef();
       Body ground = getWorld().createBody(bd);
 
       EdgeShape shape = new EdgeShape();
-      //shape.setAsBox(40, 10, new Vec2(0,-10), 0);
+      // shape.setAsBox(40, 10, new Vec2(0,-10), 0);
       shape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
       ground.createFixture(shape, 0.0f);
 
@@ -123,9 +120,6 @@ public class VerticalStack extends TestbedTest {
     m_bullet = null;
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
-   */
   @Override
   public void keyPressed(char argKeyChar, int argKeyCode) {
     switch (argKeyChar) {
@@ -158,18 +152,12 @@ public class VerticalStack extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
-   */
   @Override
   public void step(TestbedSettings settings) {
     super.step(settings);
     addTextLine("Press ',' to launch bullet.");
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-   */
   @Override
   public String getTestName() {
     return "Vertical Stack";
