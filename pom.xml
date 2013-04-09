@@ -21,8 +21,8 @@
 
 	<scm>
 		<url>scm:svn:https://jbox2d.googlecode.com/svn</url>
-		<connection>scm:svn:http://jbox2d.googlecode.com/svn</connection>
-		<developerConnection>scm:svn:https://jbox2d.googlecode.com/svn</developerConnection>
+		<connection>scm:svn:http://jbox2d.googlecode.com/svn/trunk</connection>
+		<developerConnection>scm:svn:https://jbox2d.googlecode.com/svn/trunk</developerConnection>
 	</scm>
 
 	<developers>
