@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jbox2d</groupId>
 	<artifactId>jbox2d</artifactId>
-	<version>2.2.1.1-SNAPSHOT</version>
+	<version>2.2.1.1</version>
 	<packaging>pom</packaging>
 	<name>jbox2d</name>
 	<description>JBox2D is a 2d Java physics engine, a port of the C++ Box2d engine.  This is the parent pom for the library and testbed modules.</description>
@@ -19,9 +19,9 @@
 	</issueManagement>
 
 	<scm>
-		<url>scm:svn:https://jbox2d.googlecode.com/svn</url>
-		<connection>scm:svn:http://jbox2d.googlecode.com/svn/trunk</connection>
-		<developerConnection>scm:svn:https://jbox2d.googlecode.com/svn/trunk</developerConnection>
+		<url>scm:svn:https://jbox2d.googlecode.com/svn/tags/jbox2d-2.2.1.1</url>
+		<connection>scm:svn:http://jbox2d.googlecode.com/svn/tags/jbox2d-2.2.1.1</connection>
+		<developerConnection>scm:svn:https://jbox2d.googlecode.com/svn/tags/jbox2d-2.2.1.1</developerConnection>
 	</scm>
 
 	<developers>
