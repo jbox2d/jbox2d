@@ -33,6 +33,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.PulleyJoint;
 import org.jbox2d.dynamics.joints.PulleyJointDef;
 import org.jbox2d.testbed.framework.TestbedSettings;
@@ -42,15 +43,36 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class Pulleys extends TestbedTest {
+  private static final long JOINT_TAG = 2;
 
-  PulleyJoint m_joint1;
+  PulleyJoint m_joint1;  
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-   */
   @Override
-  public void initTest(boolean argDeserialized) {
+  public Long getTag(Joint joint) {
+    if (joint == m_joint1)
+      return JOINT_TAG;
+    return super.getTag(joint);
+  }
 
+  @Override
+  public void processJoint(Joint joint, Long tag) {
+    if (tag == JOINT_TAG) {
+      m_joint1 = (PulleyJoint) joint;
+    } else {
+      super.processJoint(joint, tag);
+    }
+  }
+
+  @Override
+  public boolean isSaveLoadEnabled() {
+    return true;
+  }
+
+  @Override
+  public void initTest(boolean deserialized) {
+    if (deserialized) {
+      return;
+    }
     float y = 16.0f;
     float L = 12.0f;
     float a = 1.0f;
@@ -101,9 +123,6 @@ public class Pulleys extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
-   */
   @Override
   public void step(TestbedSettings settings) {
     super.step(settings);
@@ -115,9 +134,6 @@ public class Pulleys extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-   */
   @Override
   public String getTestName() {
     return "Pulleys";

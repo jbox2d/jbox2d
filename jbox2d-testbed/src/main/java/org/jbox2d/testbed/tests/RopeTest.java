@@ -120,5 +120,4 @@ public class RopeTest extends TestbedTest {
   public String getTestName() {
     return "Rope Joint";
   }
-
 }

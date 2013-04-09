@@ -48,12 +48,9 @@ public class CompoundShapes extends TestbedTest {
     return true;
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-   */
   @Override
-  public void initTest(boolean argDeserialized) {
-    if (argDeserialized) {
+  public void initTest(boolean deserialized) {
+    if (deserialized) {
       return;
     }
 
@@ -163,12 +160,8 @@ public class CompoundShapes extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-   */
   @Override
   public String getTestName() {
     return "Compound Shapes";
   }
-
 }

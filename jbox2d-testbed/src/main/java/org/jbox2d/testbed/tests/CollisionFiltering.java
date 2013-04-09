@@ -64,12 +64,10 @@ public class CollisionFiltering extends TestbedTest {
 	public boolean isSaveLoadEnabled() {
 	  return true;
 	}
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-	 */
+
 	@Override
-	public void initTest(boolean argDeserialized) {
-	  if(argDeserialized){
+	public void initTest(boolean deserialized) {
+	  if(deserialized){
 	    return;
 	  }
 		// Ground body
@@ -197,10 +195,7 @@ public class CollisionFiltering extends TestbedTest {
 		Body body6 = getWorld().createBody(circleBodyDef);
 		body6.createFixture(circleShapeDef);
 	}
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-	 */
+
 	@Override
 	public String getTestName() {
 		return "Collision Filtering";

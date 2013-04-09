@@ -71,10 +71,7 @@ public class DominoTower extends TestbedTest {
   public boolean isSaveLoadEnabled() {
     return true;
   }
-  
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-   */
+
   @Override
   public void initTest(boolean argDeserialized) {
     if(argDeserialized){
@@ -155,9 +152,6 @@ public class DominoTower extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-   */
   @Override
   public String getTestName() {
     return "Domino Tower";

@@ -35,6 +35,7 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
+import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jbox2d.testbed.framework.TestbedSettings;
@@ -44,13 +45,36 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class RevoluteTest extends TestbedTest {
-
+  private static final long JOINT_TAG = 1;
   private RevoluteJoint m_joint;
-  private Body m_ball;
   private boolean isLeft = false;
 
   @Override
-  public void initTest(boolean argDeserialized) {
+  public Long getTag(Joint joint) {
+    if (joint == m_joint)
+      return JOINT_TAG;
+    return super.getTag(joint);
+  }
+
+  @Override
+  public void processJoint(Joint joint, Long tag) {
+    if (tag == JOINT_TAG) {
+      m_joint = (RevoluteJoint) joint;
+      isLeft = m_joint.getMotorSpeed() > 0;
+    } else {
+      super.processJoint(joint, tag);
+    }
+  }
+
+  @Override
+  public boolean isSaveLoadEnabled() {
+    return true;
+  }
+  @Override
+  public void initTest(boolean deserialized) {
+    if (deserialized) {
+      return;
+    }
     Body ground = null;
     {
       BodyDef bd = new BodyDef();
@@ -103,8 +127,8 @@ public class RevoluteTest extends TestbedTest {
       fd.filter.maskBits = 1;
       fd.shape = circle_shape;
 
-      m_ball = m_world.createBody(circle_bd);
-      m_ball.createFixture(fd);
+      Body ball = m_world.createBody(circle_bd);
+      ball.createFixture(fd);
 
       PolygonShape polygon_shape = new PolygonShape();
       polygon_shape.setAsBox(10.0f, 0.2f, new Vec2 (-10.0f, 0.0f), 0.0f);
@@ -160,20 +184,16 @@ public class RevoluteTest extends TestbedTest {
     switch (argKeyChar) {
       case 'l':
         m_joint.enableLimit(!m_joint.isLimitEnabled());
-        getModel().getKeys()['l'] = false;
         break;
       case 'm':
         m_joint.enableMotor(!m_joint.isMotorEnabled());
-        getModel().getKeys()['m'] = false;
         break;
       case 'a':
         m_joint.setMotorSpeed(1.0f * MathUtils.PI);
-        getModel().getKeys()['a'] = false;
         isLeft = true;
         break;
       case 'd':
         m_joint.setMotorSpeed(-1.0f * MathUtils.PI);
-        getModel().getKeys()['d'] = false;
         isLeft = false;
         break;
     }

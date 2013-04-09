@@ -40,68 +40,60 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class Chain extends TestbedTest {
-	
-  
+
   @Override
   public boolean isSaveLoadEnabled() {
     return true;
   }
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-	 */
-	@Override
-	public void initTest(boolean argDeserialized) {
-	  if(argDeserialized){
-	    return;
-	  }
-	  
-		Body ground = null;
-		{
-			BodyDef bd = new BodyDef();
-			ground = getWorld().createBody(bd);
 
-			EdgeShape shape = new EdgeShape();
-			shape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
-			ground.createFixture(shape, 0.0f);
-		}
+  @Override
+  public void initTest(boolean deserialized) {
+    if (deserialized) {
+      return;
+    }
 
-		{
-			PolygonShape shape = new PolygonShape();
-			shape.setAsBox(0.6f, 0.125f);
+    Body ground = null;
+    {
+      BodyDef bd = new BodyDef();
+      ground = getWorld().createBody(bd);
 
-			FixtureDef fd = new FixtureDef();
-			fd.shape = shape;
-			fd.density = 20.0f;
-			fd.friction = 0.2f;
+      EdgeShape shape = new EdgeShape();
+      shape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
+      ground.createFixture(shape, 0.0f);
+    }
 
-			RevoluteJointDef jd = new RevoluteJointDef();
-			jd.collideConnected = false;
+    {
+      PolygonShape shape = new PolygonShape();
+      shape.setAsBox(0.6f, 0.125f);
 
-			final float y = 25.0f;
-			Body prevBody = ground;
-			for (int i = 0; i < 30; ++i)
-			{
-				BodyDef bd = new BodyDef();
-				bd.type = BodyType.DYNAMIC;
-				bd.position.set(0.5f + i, y);
-				Body body = getWorld().createBody(bd);
-				body.createFixture(fd);
+      FixtureDef fd = new FixtureDef();
+      fd.shape = shape;
+      fd.density = 20.0f;
+      fd.friction = 0.2f;
 
-				Vec2 anchor = new Vec2(i, y);
-				jd.initialize(prevBody, body, anchor);
-				getWorld().createJoint(jd);
+      RevoluteJointDef jd = new RevoluteJointDef();
+      jd.collideConnected = false;
 
-				prevBody = body;
-			}
-		}
-	}
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-	 */
-	@Override
-	public String getTestName() {
-		return "Chain";
-	}
-	
+      final float y = 25.0f;
+      Body prevBody = ground;
+      for (int i = 0; i < 30; ++i) {
+        BodyDef bd = new BodyDef();
+        bd.type = BodyType.DYNAMIC;
+        bd.position.set(0.5f + i, y);
+        Body body = getWorld().createBody(bd);
+        body.createFixture(fd);
+
+        Vec2 anchor = new Vec2(i, y);
+        jd.initialize(prevBody, body, anchor);
+        getWorld().createJoint(jd);
+
+        prevBody = body;
+      }
+    }
+  }
+
+  @Override
+  public String getTestName() {
+    return "Chain";
+  }
 }

@@ -43,19 +43,43 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class BodyTypes extends TestbedTest {
+  private final static long ATTACHMENT_TAG = 19;
+  private final static long PLATFORM_TAG = 20;
 
   Body m_attachment;
   Body m_platform;
   float m_speed;
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-   */
   @Override
-  public void initTest(boolean argDeserialized) {
+  public Long getTag(Body body) {
+    if (body == m_attachment)
+      return ATTACHMENT_TAG;
+    if (body == m_platform)
+      return PLATFORM_TAG;
+    return super.getTag(body);
+  }
+
+  @Override
+  public void processBody(Body body, Long tag) {
+    if (tag == ATTACHMENT_TAG) {
+      m_attachment = body;
+    } else if (tag == PLATFORM_TAG) {
+      m_platform = body;
+    } else {
+      super.processBody(body, tag);
+    }
+  }
+  
+  @Override
+  public boolean isSaveLoadEnabled() {
+    return true;
+  }
+
+  @Override
+  public void initTest(boolean deserialized) {
     m_speed = 3.0f;
 
-    if (argDeserialized) {
+    if (deserialized) {
       return;
     }
 
@@ -139,9 +163,6 @@ public class BodyTypes extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
-   */
   @Override
   public void step(TestbedSettings settings) {
     super.step(settings);
@@ -159,9 +180,6 @@ public class BodyTypes extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
-   */
   @Override
   public void keyPressed(char argKeyChar, int argKeyCode) {
     switch (argKeyChar) {
@@ -181,9 +199,6 @@ public class BodyTypes extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-   */
   @Override
   public String getTestName() {
     return "Body Types";

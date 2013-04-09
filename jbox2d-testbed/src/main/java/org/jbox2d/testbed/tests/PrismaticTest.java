@@ -33,6 +33,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.PrismaticJoint;
 import org.jbox2d.dynamics.joints.PrismaticJointDef;
 import org.jbox2d.testbed.framework.TestbedSettings;
@@ -42,14 +43,35 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class PrismaticTest extends TestbedTest {
-
+  private static final long JOINT_TAG = 1;
   PrismaticJoint m_joint;
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-   */
   @Override
-  public void initTest(boolean argDeserialized) {
+  public Long getTag(Joint joint) {
+    if (joint == m_joint)
+      return JOINT_TAG;
+    return super.getTag(joint);
+  }
+
+  @Override
+  public void processJoint(Joint joint, Long tag) {
+    if (tag == JOINT_TAG) {
+      m_joint = (PrismaticJoint) joint;
+    } else {
+      super.processJoint(joint, tag);
+    }
+  }
+
+  @Override
+  public boolean isSaveLoadEnabled() {
+    return true;
+  }
+
+  @Override
+  public void initTest(boolean deserialized) {
+    if (deserialized) {
+      return;
+    }
     Body ground = null;
     {
       BodyDef bd = new BodyDef();
@@ -120,12 +142,8 @@ public class PrismaticTest extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-   */
   @Override
   public String getTestName() {
     return "Prismatic";
   }
-
 }

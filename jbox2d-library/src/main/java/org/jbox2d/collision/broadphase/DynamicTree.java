@@ -121,12 +121,12 @@ public class DynamicTree implements BroadPhaseStrategy {
     removeLeaf(node);
 
     // Extend AABB
-    final Vec2 lowerBound = aabb.lowerBound;
-    final Vec2 upperBound = aabb.upperBound;
-    lowerBound.x -= Settings.aabbExtension;
-    lowerBound.y -= Settings.aabbExtension;
-    upperBound.x += Settings.aabbExtension;
-    upperBound.y += Settings.aabbExtension;
+    final Vec2 lowerBound = nodeAABB.lowerBound;
+    final Vec2 upperBound = nodeAABB.upperBound;
+    lowerBound.x = aabb.lowerBound.x - Settings.aabbExtension;
+    lowerBound.y = aabb.lowerBound.y - Settings.aabbExtension;
+    upperBound.x = aabb.upperBound.x + Settings.aabbExtension;
+    upperBound.y = aabb.upperBound.y + Settings.aabbExtension;
 
     // Predict AABB displacement.
     final float dx = displacement.x * Settings.aabbMultiplier;
@@ -142,10 +142,6 @@ public class DynamicTree implements BroadPhaseStrategy {
     } else {
       upperBound.y += dy;
     }
-    nodeAABB.lowerBound.x = lowerBound.x;
-    nodeAABB.lowerBound.y = lowerBound.y;
-    nodeAABB.upperBound.x = upperBound.x;
-    nodeAABB.upperBound.y = upperBound.y;
 
     insertLeaf(proxyId);
     return true;

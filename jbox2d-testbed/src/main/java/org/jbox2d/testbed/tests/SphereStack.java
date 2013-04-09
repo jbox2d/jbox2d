@@ -38,49 +38,50 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class SphereStack extends TestbedTest {
-	
-	int e_count = 10;
-	Body m_bodies[] = new Body[e_count];
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-	 */
-	@Override
-	public void initTest(boolean argDeserialized) {
-		{
-			BodyDef bd = new BodyDef();
-			Body ground = getWorld().createBody(bd);
 
-			EdgeShape shape = new EdgeShape();
-			shape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
-			ground.createFixture(shape, 0.0f);
-		}
+  int e_count = 10;
 
-		{
-			CircleShape shape = new CircleShape();
-			shape.m_radius = 1.0f;
+  @Override
+  public boolean isSaveLoadEnabled() {
+    return true;
+  }
 
-			for (int i = 0; i < e_count; ++i)
-			{
-				BodyDef bd = new BodyDef();
-				bd.type = BodyType.DYNAMIC;
-				bd.position.set(0.0f, 4.0f + 3.0f * i);
+  @Override
+  public void initTest(boolean deserialized) {
+    if (deserialized) {
+      return;
+    }
+    Body bodies[] = new Body[e_count];
+    {
+      BodyDef bd = new BodyDef();
+      Body ground = getWorld().createBody(bd);
 
-				m_bodies[i] = getWorld().createBody(bd);
+      EdgeShape shape = new EdgeShape();
+      shape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
+      ground.createFixture(shape, 0.0f);
+    }
 
-				m_bodies[i].createFixture(shape, 1.0f);
+    {
+      CircleShape shape = new CircleShape();
+      shape.m_radius = 1.0f;
 
-				//m_bodies[i].setLinearVelocity(new Vec2(0.0f, -100.0f));
-			}
-		}
-	}
-	
-	/**
-	 * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-	 */
-	@Override
-	public String getTestName() {
-		return "Sphere Stack";
-	}
-	
+      for (int i = 0; i < e_count; ++i) {
+        BodyDef bd = new BodyDef();
+        bd.type = BodyType.DYNAMIC;
+        bd.position.set(0.0f, 4.0f + 3.0f * i);
+
+        bodies[i] = getWorld().createBody(bd);
+
+        bodies[i].createFixture(shape, 1.0f);
+
+        // m_bodies[i].setLinearVelocity(new Vec2(0.0f, -100.0f));
+      }
+    }
+  }
+
+  @Override
+  public String getTestName() {
+    return "Sphere Stack";
+  }
+
 }

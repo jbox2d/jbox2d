@@ -40,6 +40,9 @@ public class ConvexHull extends TestbedTest {
 
   @Override
   public void initTest(boolean deserialized) {
+    if (deserialized) {
+      return;
+    }
     generate();
   }
 

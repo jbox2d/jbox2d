@@ -46,12 +46,9 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class TheoJansen extends TestbedTest {
-
   private static final long CHASSIS_TAG = 1;
   private static final long WHEEL_TAG = 2;
-
   private static final long MOTOR_TAG = 8;
-
 
   Vec2 m_offset = new Vec2();
   Body m_chassis;
@@ -100,9 +97,6 @@ public class TheoJansen extends TestbedTest {
     return true;
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-   */
   @Override
   public void initTest(boolean argDeserialized) {
     if (argDeserialized) {
@@ -289,9 +283,6 @@ public class TheoJansen extends TestbedTest {
     getWorld().createJoint(rjd);
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
-   */
   @Override
   public void keyPressed(char key, int argKeyCode) {
     switch (key) {
@@ -313,21 +304,14 @@ public class TheoJansen extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
-   */
   @Override
   public void step(TestbedSettings settings) {
     super.step(settings);
     addTextLine("Keys: left = a, brake = s, right = d, toggle motor = m");
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-   */
   @Override
   public String getTestName() {
     return "TheoJansen Walker";
   }
-
 }

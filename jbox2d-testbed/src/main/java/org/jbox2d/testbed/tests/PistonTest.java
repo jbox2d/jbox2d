@@ -32,17 +32,12 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
-import org.jbox2d.dynamics.joints.PrismaticJoint;
 import org.jbox2d.dynamics.joints.PrismaticJointDef;
-import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jbox2d.testbed.framework.TestbedTest;
 
 public class PistonTest extends TestbedTest {
-
-  public RevoluteJoint m_joint1;
-  public PrismaticJoint m_joint2;
-
+  
   private boolean bullet = false;
 
   @Override
@@ -51,8 +46,8 @@ public class PistonTest extends TestbedTest {
   }
 
   @Override
-  public void initTest(boolean argDeserialized) {
-    if (argDeserialized) {
+  public void initTest(boolean deserialized) {
+    if (deserialized) {
       return;
     }
     World world = getWorld();
@@ -133,7 +128,7 @@ public class PistonTest extends TestbedTest {
         rjd.motorSpeed = 1.0f * MathUtils.PI;
         rjd.maxMotorTorque = 20000;
         rjd.enableMotor = true;
-        m_joint1 = (RevoluteJoint) getWorld().createJoint(rjd);
+        getWorld().createJoint(rjd);
 
         prevBody = body;
       }
@@ -184,7 +179,7 @@ public class PistonTest extends TestbedTest {
         pjd.maxMotorForce = 1000.0f;
         pjd.enableMotor = true;
 
-        m_joint2 = (PrismaticJoint) getWorld().createJoint(pjd);
+        getWorld().createJoint(pjd);
       }
 
       // Create a payload

@@ -199,12 +199,12 @@ public class FrictionJoint extends Joint {
       m_linearImpulse.setZero();
       m_angularImpulse = 0.0f;
     }
-    data.velocities[m_indexA].v.set(vA);
+//    data.velocities[m_indexA].v.set(vA);
     if( data.velocities[m_indexA].w != wA) {
       assert(data.velocities[m_indexA].w != wA);
     }
     data.velocities[m_indexA].w = wA;
-    data.velocities[m_indexB].v.set(vB);
+//    data.velocities[m_indexB].v.set(vB);
     data.velocities[m_indexB].w = wB;
 
     pool.pushRot(2);
@@ -275,13 +275,13 @@ public class FrictionJoint extends Joint {
       
     }
 
-    data.velocities[m_indexA].v.set(vA);
+//    data.velocities[m_indexA].v.set(vA);
     if( data.velocities[m_indexA].w != wA) {
       assert(data.velocities[m_indexA].w != wA);
     }
     data.velocities[m_indexA].w = wA;
    
-    data.velocities[m_indexB].v.set(vB);
+//    data.velocities[m_indexB].v.set(vB);
     data.velocities[m_indexB].w = wB;
 
     pool.pushVec2(4);

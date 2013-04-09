@@ -42,7 +42,6 @@ import org.jbox2d.testbed.framework.TestbedTest;
  */
 public class Cantilever extends TestbedTest {
 
-
   int e_count = 8;
 
   @Override
@@ -50,9 +49,6 @@ public class Cantilever extends TestbedTest {
     return true;
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-   */
   @Override
   public void initTest(boolean argDeserialized) {
     if (argDeserialized) {

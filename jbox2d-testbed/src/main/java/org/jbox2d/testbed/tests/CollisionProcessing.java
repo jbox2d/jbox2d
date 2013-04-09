@@ -52,8 +52,8 @@ public class CollisionProcessing extends TestbedTest {
   }
 
   @Override
-  public void initTest(boolean argDeserialized) {
-    if (argDeserialized) {
+  public void initTest(boolean deserialized) {
+    if (deserialized) {
       return;
     }
     // Ground body
@@ -191,5 +191,4 @@ public class CollisionProcessing extends TestbedTest {
   public String getTestName() {
     return "Collision Processing";
   }
-
 }

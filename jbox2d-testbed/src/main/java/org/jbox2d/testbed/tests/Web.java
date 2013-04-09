@@ -45,9 +45,6 @@ public class Web extends TestbedTest {
   Body m_bodies[] = new Body[4];
   Joint m_joints[] = new Joint[8];
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#initTest(boolean)
-   */
   @Override
   public void initTest(boolean argDeserialized) {
     Body ground = null;
@@ -173,9 +170,6 @@ public class Web extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#keyPressed(char, int)
-   */
   @Override
   public void keyPressed(char key, int argKeyCode) {
     switch (key) {
@@ -201,9 +195,6 @@ public class Web extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#step(org.jbox2d.testbed.framework.TestbedSettings)
-   */
   @Override
   public void step(TestbedSettings settings) {
     super.step(settings);
@@ -220,12 +211,8 @@ public class Web extends TestbedTest {
     }
   }
 
-  /**
-   * @see org.jbox2d.testbed.framework.TestbedTest#getTestName()
-   */
   @Override
   public String getTestName() {
     return "Web";
   }
-
 }
