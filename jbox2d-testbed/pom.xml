@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>jbox2d</artifactId>
 		<groupId>org.jbox2d</groupId>
-		<version>2.2.1.1</version>
+		<version>2.2.1.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>jbox2d-testbed</artifactId>
 	<name>jbox2d-testbed</name>
@@ -14,7 +14,7 @@
 		<dependency>
 			<groupId>org.jbox2d</groupId>
 			<artifactId>jbox2d-library</artifactId>
-			<version>2.2.1.1</version>
+			<version>2.2.1.2-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
@@ -42,7 +42,7 @@
 		<dependency>
 			<groupId>org.jbox2d</groupId>
 			<artifactId>jbox2d-serialization</artifactId>
-			<version>1.1.0</version>
+			<version>1.1.1-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
