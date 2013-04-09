@@ -86,8 +86,8 @@ public class TestbedSettings {
     addSetting(new TestbedSetting(DrawContactImpulses, SettingType.DRAWING, false));
     addSetting(new TestbedSetting(DrawFrictionImpulses, SettingType.DRAWING, false));
     addSetting(new TestbedSetting(DrawCOMs, SettingType.DRAWING, false));
-    addSetting(new TestbedSetting(DrawStats, SettingType.DRAWING, true));
-    addSetting(new TestbedSetting(DrawHelp, SettingType.DRAWING, false));
+    addSetting(new TestbedSetting(DrawStats, SettingType.DRAWING, false));
+    addSetting(new TestbedSetting(DrawHelp, SettingType.DRAWING, true));
     addSetting(new TestbedSetting(DrawTree, SettingType.DRAWING, false));
   }
 

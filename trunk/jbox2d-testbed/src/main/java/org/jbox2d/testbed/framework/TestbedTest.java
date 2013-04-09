@@ -513,7 +513,7 @@ public abstract class TestbedTest
       loadPending = false;
     }
 
-    m_textLine = 30;
+    m_textLine = 20;
 
     if (title != null) {
       model.getDebugDraw().drawString(model.getPanelWidth() / 2, 15, title, Color3f.WHITE);

@@ -46,7 +46,6 @@ public class Tumbler extends TestbedTest {
       jd.enableMotor = true;
       m_joint = (RevoluteJoint) m_world.createJoint(jd);
     }
-
     m_count = 0;
   }
 
@@ -72,5 +71,4 @@ public class Tumbler extends TestbedTest {
   public String getTestName() {
     return "Tumbler";
   }
-
 }

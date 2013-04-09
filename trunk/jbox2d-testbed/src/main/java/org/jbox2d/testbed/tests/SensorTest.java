@@ -54,7 +54,7 @@ public class SensorTest extends TestbedTest {
   BoolWrapper m_touching[] = new BoolWrapper[e_count];
 
   @Override
-  public void initTest(boolean argDeserialized) {
+  public void initTest(boolean deserialized) {
 
     for (int i = 0; i < m_touching.length; i++) {
       m_touching[i] = new BoolWrapper();

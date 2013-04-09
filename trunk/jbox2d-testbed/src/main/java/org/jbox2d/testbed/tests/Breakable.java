@@ -155,7 +155,6 @@ public class Breakable extends TestbedTest {
       m_velocity.set(m_body1.getLinearVelocity());
       m_angularVelocity = m_body1.getAngularVelocity();
     }
-
   }
 
   @Override
