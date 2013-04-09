@@ -70,6 +70,7 @@ public class RevoluteTest extends TestbedTest {
   public boolean isSaveLoadEnabled() {
     return true;
   }
+
   @Override
   public void initTest(boolean deserialized) {
     if (deserialized) {
@@ -113,7 +114,7 @@ public class RevoluteTest extends TestbedTest {
 
       m_joint = (RevoluteJoint) getWorld().createJoint(rjd);
     }
-    
+
     {
       CircleShape circle_shape = new CircleShape();
       circle_shape.m_radius = 3.0f;
@@ -131,7 +132,7 @@ public class RevoluteTest extends TestbedTest {
       ball.createFixture(fd);
 
       PolygonShape polygon_shape = new PolygonShape();
-      polygon_shape.setAsBox(10.0f, 0.2f, new Vec2 (-10.0f, 0.0f), 0.0f);
+      polygon_shape.setAsBox(10.0f, 0.2f, new Vec2(-10.0f, 0.0f), 0.0f);
 
       BodyDef polygon_bd = new BodyDef();
       polygon_bd.position.set(20.0f, 10.0f);
@@ -146,27 +147,27 @@ public class RevoluteTest extends TestbedTest {
       rjd.upperAngle = 0.0f * MathUtils.PI;
       rjd.enableLimit = true;
       m_world.createJoint(rjd);
-  }
+    }
 
-  // Tests mass computation of a small object far from the origin
-  {
+    // Tests mass computation of a small object far from the origin
+    {
       BodyDef bodyDef = new BodyDef();
       bodyDef.type = BodyType.DYNAMIC;
       Body body = m_world.createBody(bodyDef);
-  
-      PolygonShape polyShape = new PolygonShape();       
+
+      PolygonShape polyShape = new PolygonShape();
       Vec2 verts[] = new Vec2[3];
-      verts[0] = new Vec2( 17.63f, 36.31f );
-      verts[1] = new Vec2( 17.52f, 36.69f );
-      verts[2] = new Vec2( 17.19f, 36.36f );
+      verts[0] = new Vec2(17.63f, 36.31f);
+      verts[1] = new Vec2(17.52f, 36.69f);
+      verts[2] = new Vec2(17.19f, 36.36f);
       polyShape.set(verts, 3);
-  
+
       FixtureDef polyFixtureDef = new FixtureDef();
       polyFixtureDef.shape = polyShape;
       polyFixtureDef.density = 1;
 
-      body.createFixture(polyFixtureDef);   //assertion hits inside here
-  }
+      body.createFixture(polyFixtureDef); // assertion hits inside here
+    }
   }
 
   @Override
@@ -180,7 +181,6 @@ public class RevoluteTest extends TestbedTest {
 
   @Override
   public void keyPressed(char argKeyChar, int argKeyCode) {
-
     switch (argKeyChar) {
       case 'l':
         m_joint.enableLimit(!m_joint.isLimitEnabled());
@@ -203,5 +203,4 @@ public class RevoluteTest extends TestbedTest {
   public String getTestName() {
     return "Revolute";
   }
-
 }

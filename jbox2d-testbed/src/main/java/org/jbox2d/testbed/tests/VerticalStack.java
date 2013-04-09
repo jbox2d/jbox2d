@@ -71,8 +71,8 @@ public class VerticalStack extends TestbedTest {
   }
 
   @Override
-  public void initTest(boolean argDeserialized) {
-    if (argDeserialized) {
+  public void initTest(boolean deserialized) {
+    if (deserialized) {
       return;
     }
 

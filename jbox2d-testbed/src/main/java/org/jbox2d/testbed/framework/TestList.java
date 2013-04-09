@@ -89,7 +89,6 @@ public class TestList {
     model.addCategory("Collision Watching");
     model.addTest(new VaryingRestitution());
     model.addTest(new VaryingFrictionTest());
-    model.addTest(new VerticalStack());
     model.addTest(new ConveyorBelt());
     model.addTest(new SphereStack());
     model.addTest(new Tumbler());

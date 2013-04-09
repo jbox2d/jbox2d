@@ -46,8 +46,8 @@ public class VaryingRestitution extends TestbedTest {
   }
 
   @Override
-  public void initTest(boolean argDeserialized) {
-    if (argDeserialized) {
+  public void initTest(boolean deserialized) {
+    if (deserialized) {
       return;
     }
     {
@@ -86,5 +86,4 @@ public class VaryingRestitution extends TestbedTest {
   public String getTestName() {
     return "Varying Restitution";
   }
-
 }

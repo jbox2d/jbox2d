@@ -44,8 +44,7 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 public class ApplyForce extends TestbedTest {
-
-  private static final long BODY_TAG = 1;
+  private static final long BODY_TAG = 12;
 
   Body m_body;
 

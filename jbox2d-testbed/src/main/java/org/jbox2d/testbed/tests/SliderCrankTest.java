@@ -176,5 +176,4 @@ public class SliderCrankTest extends TestbedTest {
   public String getTestName() {
     return "Slider Crank";
   }
-
 }
