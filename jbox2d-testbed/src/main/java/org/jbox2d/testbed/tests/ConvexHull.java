@@ -51,8 +51,8 @@ public class ConvexHull extends TestbedTest {
     Vec2 upperBound = new Vec2(8f, 8f);
 
     for (int i = 0; i < count; i++) {
-      float x = MathUtils.randomFloat(0, 10);
-      float y = MathUtils.randomFloat(0, 10);
+      float x = MathUtils.randomFloat(-8, 8);
+      float y = MathUtils.randomFloat(-8, 8);
 
       Vec2 v = new Vec2(x, y);
       MathUtils.clampToOut(v, lowerBound, upperBound, v);
