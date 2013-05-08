@@ -49,7 +49,6 @@ public class PyramidTest extends TestbedTest {
     if (deserialized) {
       return;
     }
-    setTitle("Pyramid");
     int count = 20;
     {
       BodyDef bd = new BodyDef();

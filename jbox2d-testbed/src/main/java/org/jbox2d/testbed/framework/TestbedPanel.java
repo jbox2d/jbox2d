@@ -26,12 +26,6 @@
  */
 package org.jbox2d.testbed.framework;
 
-import java.awt.event.KeyListener;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-
-import org.jbox2d.callbacks.DebugDraw;
-
 /**
  * A TestbedPanel encapsulates the graphical panel displayed to the user. Also it is responsible for
  * populating panel-specific data in the model (like panel width).
@@ -40,34 +34,7 @@ import org.jbox2d.callbacks.DebugDraw;
  */
 public interface TestbedPanel {
 
-  /**
-   * Adds a key listener
-   * 
-   * @param argListener
-   */
-  public void addKeyListener(KeyListener argListener);
-
-  /**
-   * Adds a mouse listener
-   * 
-   * @param argListener
-   */
-  public void addMouseListener(MouseListener argListener);
-
-  /**
-   * Adds a mouse motion listener
-   * 
-   * @param argListener
-   */
-  public void addMouseMotionListener(MouseMotionListener argListener);
-
   public void grabFocus();
-
-  /**
-   * Gets the display-specific debug draw
-   * @return
-   */
-  public DebugDraw getDebugDraw();
 
   /**
    * Renders the world

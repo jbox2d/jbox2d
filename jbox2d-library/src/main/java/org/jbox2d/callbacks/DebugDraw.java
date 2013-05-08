@@ -49,12 +49,20 @@ public abstract class DebugDraw {
 	public static final int e_dynamicTreeBit		= 0x0020; ///< draw dynamic tree.
 	
 	protected int m_drawFlags;
-	protected final IViewportTransform viewportTransform;
-
+	protected IViewportTransform viewportTransform;
+	
+	public DebugDraw() {
+	  this(null);
+	}
+	
 	public DebugDraw(IViewportTransform viewport) {
 		m_drawFlags = 0;
 		viewportTransform = viewport;
 	}
+	
+	public void setViewportTransform(IViewportTransform viewportTransform) {
+      this.viewportTransform = viewportTransform;
+    }
 
 	public void setFlags(int flags) {
 		m_drawFlags = flags;
@@ -157,7 +165,7 @@ public abstract class DebugDraw {
 	 * @param x
 	 * @param y
 	 * @param scale
-	 * @see IViewportTransform#setCamera(float, float, float)
+	 * @deprecated use the viewport transform in {@link #getViewportTranform()}
 	 */
 	public void setCamera(float x, float y, float scale){
 		viewportTransform.setCamera(x,y,scale);
@@ -167,7 +175,6 @@ public abstract class DebugDraw {
 	/**
 	 * @param argScreen
 	 * @param argWorld
-	 * @see org.jbox2d.common.IViewportTransform#getScreenToWorld(org.jbox2d.common.Vec2, org.jbox2d.common.Vec2)
 	 */
 	public void getScreenToWorldToOut(Vec2 argScreen, Vec2 argWorld) {
 		viewportTransform.getScreenToWorld(argScreen, argWorld);
@@ -176,7 +183,6 @@ public abstract class DebugDraw {
 	/**
 	 * @param argWorld
 	 * @param argScreen
-	 * @see org.jbox2d.common.IViewportTransform#getWorldToScreen(org.jbox2d.common.Vec2, org.jbox2d.common.Vec2)
 	 */
 	public void getWorldToScreenToOut(Vec2 argWorld, Vec2 argScreen) {
 		viewportTransform.getWorldToScreen(argWorld, argScreen);

@@ -16,7 +16,10 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-package org.jbox2d.testbed.framework.jogl;
+/**
+ * Created at 4:23:48 PM Jul 17, 2010
+ */
+package org.jbox2d.testbed.framework.j2d;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -33,20 +36,27 @@ import org.jbox2d.testbed.framework.TestbedController.MouseBehavior;
 import org.jbox2d.testbed.framework.TestbedController.UpdateBehavior;
 import org.jbox2d.testbed.framework.TestbedErrorHandler;
 import org.jbox2d.testbed.framework.TestbedModel;
-import org.jbox2d.testbed.framework.j2d.TestbedSidePanel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class JoglTestbedMain {
+/**
+ * The entry point for the testbed application
+ * 
+ * @author Daniel Murphy
+ */
+public class TestbedMain {
+  private static final Logger log = LoggerFactory.getLogger(TestbedMain.class);
 
   public static void main(String[] args) {
     try {
       UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
     } catch (Exception e) {
-      // log.warn("Could not set the look and feel to nimbus.  "
-      // + "Hopefully you're on a mac so the window isn't ugly as crap.");
+      log.warn("Could not set the look and feel to nimbus.  "
+          + "Hopefully you're on a mac so the window isn't ugly as crap.");
     }
     TestbedModel model = new TestbedModel();
     final TestbedController controller =
-        new TestbedController(model, UpdateBehavior.UPDATE_IGNORED, MouseBehavior.FORCE_Y_FLIP,
+        new TestbedController(model, UpdateBehavior.UPDATE_CALLED, MouseBehavior.NORMAL,
             new TestbedErrorHandler() {
               @Override
               public void serializationError(Exception e, String message) {
@@ -54,9 +64,9 @@ public class JoglTestbedMain {
                     JOptionPane.ERROR_MESSAGE);
               }
             });
-    JoglPanel panel = new JoglPanel(model, controller);
-    model.setDebugDraw(new JoglDebugDraw(panel));
+    TestPanelJ2D panel = new TestPanelJ2D(model, controller);
     model.setPanel(panel);
+    model.setDebugDraw(new DebugDrawJ2D(panel, true));
     TestList.populateModel(model);
 
     JFrame testbed = new JFrame();
@@ -77,5 +87,4 @@ public class JoglTestbedMain {
       }
     });
   }
-
 }

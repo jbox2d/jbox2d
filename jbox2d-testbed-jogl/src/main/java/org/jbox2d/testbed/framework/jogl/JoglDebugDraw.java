@@ -29,8 +29,8 @@ import javax.media.opengl.GL2;
 
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.common.Color3f;
+import org.jbox2d.common.IViewportTransform;
 import org.jbox2d.common.MathUtils;
-import org.jbox2d.common.OBBViewportTransform;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.arrays.Vec2Array;
@@ -43,11 +43,15 @@ public class JoglDebugDraw extends DebugDraw {
   private final TextRenderer text;
 
   public JoglDebugDraw(JoglPanel argPanel) {
-    super(new OBBViewportTransform());
-    
+    super();
     panel = argPanel;
     text = new TextRenderer(new Font("Courier New", Font.PLAIN, 12));
+  }
+  
+  @Override
+  public void setViewportTransform(IViewportTransform viewportTransform) {
     viewportTransform.setYFlip(false);
+    super.setViewportTransform(viewportTransform);
   }
 
   @Override
@@ -109,10 +113,33 @@ public class JoglDebugDraw extends DebugDraw {
     gl.glEnd();
   }
 
+  
+  private final Vec2 temp = new Vec2();
+  private final Vec2 temp2 = new Vec2();
+  
   @Override
   public void drawTransform(Transform xf) {
-    // TODO Auto-generated method stub
+    GL2 gl = panel.getGL().getGL2();
+    getWorldToScreenToOut(xf.p, temp);
+    temp2.setZero();
+    float k_axisScale = 0.4f;
 
+    gl.glBegin(GL2.GL_LINES);
+    gl.glColor3f(1, 0, 0);
+
+    temp2.x = xf.p.x + k_axisScale * xf.q.c;
+    temp2.y = xf.p.y + k_axisScale * xf.q.s;
+    getWorldToScreenToOut(temp2, temp2);
+    gl.glVertex2f(temp.x, temp.y);
+    gl.glVertex2f(temp2.x, temp2.y);
+    
+    gl.glColor3f(0, 1, 0);
+    temp2.x = xf.p.x + - k_axisScale * xf.q.s;
+    temp2.y = xf.p.y + k_axisScale * xf.q.c;
+    getWorldToScreenToOut(temp2, temp2);
+    gl.glVertex2f(temp.x, temp.y);
+    gl.glVertex2f(temp2.x, temp2.y);
+    gl.glEnd();
   }
 
   @Override

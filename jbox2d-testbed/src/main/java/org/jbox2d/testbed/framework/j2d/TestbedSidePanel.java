@@ -205,6 +205,7 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
           model.getSettings().pause = true;
           pauseButton.setText("Resume");
         }
+        model.getPanel().grabFocus();
       }
     });
 
@@ -215,13 +216,14 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
           model.getSettings().pause = true;
           pauseButton.setText("Resume");
         }
+        model.getPanel().grabFocus();
       }
     });
 
     resetButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        controller.resetTest();
+        controller.reset();
       }
     });
 
@@ -235,14 +237,14 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
     saveButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        controller.saveTest();
+        controller.save();
       }
     });
 
     loadButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        controller.loadTest();
+        controller.load();
       }
     });
   }
@@ -291,6 +293,7 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
         label.setText(setting.name + ": " + setting.value);
         break;
     }
+    model.getPanel().grabFocus();
   }
 
   public void actionPerformed(ActionEvent e) {

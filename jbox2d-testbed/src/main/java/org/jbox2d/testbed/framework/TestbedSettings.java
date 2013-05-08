@@ -26,12 +26,14 @@
  */
 package org.jbox2d.testbed.framework;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jbox2d.testbed.framework.TestbedSetting.SettingType;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Stores all the testbed settings.  Automatically populates default settings.
@@ -61,12 +63,12 @@ public class TestbedSettings {
   public boolean pause = false;
   public boolean singleStep = false;
 
-  private ArrayList<TestbedSetting> settings;
-  private final HashMap<String, TestbedSetting> settingsMap;
+  private List<TestbedSetting> settings;
+  private final Map<String, TestbedSetting> settingsMap;
 
   public TestbedSettings() {
-    settings = new ArrayList<TestbedSetting>();
-    settingsMap = new HashMap<String, TestbedSetting>();
+    settings = Lists.newArrayList();
+    settingsMap = Maps.newHashMap();
     populateDefaultSettings();
   }
 
@@ -86,8 +88,8 @@ public class TestbedSettings {
     addSetting(new TestbedSetting(DrawContactImpulses, SettingType.DRAWING, false));
     addSetting(new TestbedSetting(DrawFrictionImpulses, SettingType.DRAWING, false));
     addSetting(new TestbedSetting(DrawCOMs, SettingType.DRAWING, false));
-    addSetting(new TestbedSetting(DrawStats, SettingType.DRAWING, false));
-    addSetting(new TestbedSetting(DrawHelp, SettingType.DRAWING, true));
+    addSetting(new TestbedSetting(DrawStats, SettingType.DRAWING, true));
+    addSetting(new TestbedSetting(DrawHelp, SettingType.DRAWING, false));
     addSetting(new TestbedSetting(DrawTree, SettingType.DRAWING, false));
   }
 

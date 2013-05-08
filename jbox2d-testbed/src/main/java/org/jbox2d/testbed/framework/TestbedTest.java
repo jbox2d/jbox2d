@@ -1,40 +1,29 @@
 /*******************************************************************************
- * Copyright (c) 2013, Daniel Murphy
- * All rights reserved.
+ * Copyright (c) 2013, Daniel Murphy All rights reserved.
  * 
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- * 	* Redistributions of source code must retain the above copyright notice,
- * 	  this list of conditions and the following disclaimer.
- * 	* Redistributions in binary form must reproduce the above copyright notice,
- * 	  this list of conditions and the following disclaimer in the documentation
- * 	  and/or other materials provided with the distribution.
+ * Redistribution and use in source and binary forms, with or without modification, are permitted
+ * provided that the following conditions are met: * Redistributions of source code must retain the
+ * above copyright notice, this list of conditions and the following disclaimer. * Redistributions
+ * in binary form must reproduce the above copyright notice, this list of conditions and the
+ * following disclaimer in the documentation and/or other materials provided with the distribution.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+ * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 /**
  * Created at 2:21:03 PM Jul 17, 2010
  */
 package org.jbox2d.testbed.framework;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.swing.JOptionPane;
 
 import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.callbacks.ContactListener;
@@ -66,13 +55,10 @@ import org.jbox2d.serialization.JbDeserializer;
 import org.jbox2d.serialization.JbDeserializer.ObjectListener;
 import org.jbox2d.serialization.JbSerializer;
 import org.jbox2d.serialization.JbSerializer.ObjectSigner;
-import org.jbox2d.serialization.SerializationResult;
 import org.jbox2d.serialization.UnsupportedListener;
 import org.jbox2d.serialization.UnsupportedObjectException;
 import org.jbox2d.serialization.pb.PbDeserializer;
 import org.jbox2d.serialization.pb.PbSerializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Daniel Murphy
@@ -84,20 +70,17 @@ public abstract class TestbedTest
       ObjectSigner,
       UnsupportedListener {
   public static final int MAX_CONTACT_POINTS = 4048;
+  public static final float ZOOM_SCALE_DIFF = .05f;
+  public static final int TEXT_LINE_SPACE = 13;
+  public static final int TEXT_SECTION_SPACE = 3;
+  public static final int MOUSE_JOINT_BUTTON = 1;
+  public static final int BOMB_SPAWN_BUTTON = 10;
 
   protected static final long GROUND_BODY_TAG = 1897450239847L;
   protected static final long BOMB_TAG = 98989788987L;
   protected static final long MOUSE_JOINT_TAG = 4567893364789L;
 
-  private static final Logger log = LoggerFactory.getLogger(TestbedTest.class);
-
-  // keep these static so we don't have to recreate them every time
-  public final static ContactPoint[] points = new ContactPoint[MAX_CONTACT_POINTS];
-  static {
-    for (int i = 0; i < MAX_CONTACT_POINTS; i++) {
-      points[i] = new ContactPoint();
-    }
-  }
+  public final ContactPoint[] points = new ContactPoint[MAX_CONTACT_POINTS];
 
   /**
    * Only visible for compatibility. Should use {@link #getWorld()} instead.
@@ -107,6 +90,7 @@ public abstract class TestbedTest
   private MouseJoint mouseJoint;
 
   private Body bomb;
+  private final Vec2 bombMousePoint = new Vec2();
   private final Vec2 bombSpawnPoint = new Vec2();
   private boolean bombSpawning = false;
 
@@ -117,25 +101,20 @@ public abstract class TestbedTest
   private TestbedModel model;
   protected DestructionListener destructionListener;
 
-  private final LinkedList<QueueItem> inputQueue;
 
   private String title = null;
   protected int m_textLine;
   private final LinkedList<String> textList = new LinkedList<String>();
 
-  private float cachedCameraScale;
-  private final Vec2 cachedCameraPos = new Vec2();
-  private boolean hasCachedCamera = false;
+  private TestbedCamera camera;
 
   private JbSerializer serializer;
   private JbDeserializer deserializer;
 
-  private boolean dialogOnSaveLoadErrors = true;
-
-  private boolean savePending, loadPending, resetPending = false;
-
   public TestbedTest() {
-    inputQueue = new LinkedList<QueueItem>();
+    for (int i = 0; i < MAX_CONTACT_POINTS; i++) {
+      points[i] = new ContactPoint();
+    }
     serializer = new PbSerializer(this, new SignerAdapter(this) {
       @Override
       public Long getTag(Body argBody) {
@@ -185,12 +164,7 @@ public abstract class TestbedTest
         super.processJoint(argJoint, argTag);
       }
     });
-  }
-
-  public void init(TestbedModel argModel) {
-    model = argModel;
     destructionListener = new DestructionListener() {
-
       public void sayGoodbye(Fixture fixture) {}
 
       public void sayGoodbye(Joint joint) {
@@ -201,6 +175,11 @@ public abstract class TestbedTest
         }
       }
     };
+    camera = new TestbedCamera(getDefaultCameraPos(), getDefaultCameraScale(), ZOOM_SCALE_DIFF);
+  }
+
+  public void init(TestbedModel argModel) {
+    model = argModel;
 
     Vec2 gravity = new Vec2(0, -10f);
     m_world = new World(gravity);
@@ -213,29 +192,30 @@ public abstract class TestbedTest
     init(m_world, false);
   }
 
-  public void init(World argWorld, boolean argDeserialized) {
+  public void init(World world, boolean deserialized) {
+    m_world = world;
     pointCount = 0;
     stepCount = 0;
     bombSpawning = false;
+    model.getDebugDraw().setViewportTransform(camera.getTransform());
 
-    argWorld.setDestructionListener(destructionListener);
-    argWorld.setContactListener(this);
-    argWorld.setDebugDraw(model.getDebugDraw());
+    world.setDestructionListener(destructionListener);
+    world.setContactListener(this);
+    world.setDebugDraw(model.getDebugDraw());
+    title = getTestName();
+    initTest(deserialized);
+  }
 
-    if (hasCachedCamera) {
-      setCamera(cachedCameraPos, cachedCameraScale);
-    } else {
-      setCamera(getDefaultCameraPos(), getDefaultCameraScale());
-    }
-    setTitle(getTestName());
+  protected JbSerializer getSerializer() {
+    return serializer;
+  }
 
-    initTest(argDeserialized);
+  protected JbDeserializer getDeserializer() {
+    return deserializer;
   }
 
   /**
    * Gets the current world
-   * 
-   * @return
    */
   public World getWorld() {
     return m_world;
@@ -243,8 +223,6 @@ public abstract class TestbedTest
 
   /**
    * Gets the testbed model
-   * 
-   * @return
    */
   public TestbedModel getModel() {
     return model;
@@ -252,17 +230,13 @@ public abstract class TestbedTest
 
   /**
    * Gets the contact points for the current test
-   * 
-   * @return
    */
-  public static ContactPoint[] getContactPoints() {
+  public ContactPoint[] getContactPoints() {
     return points;
   }
 
   /**
    * Gets the ground body of the world, used for some joints
-   * 
-   * @return
    */
   public Body getGroundBody() {
     return groundBody;
@@ -270,8 +244,6 @@ public abstract class TestbedTest
 
   /**
    * Gets the debug draw for the testbed
-   * 
-   * @return
    */
   public DebugDraw getDebugDraw() {
     return model.getDebugDraw();
@@ -279,8 +251,6 @@ public abstract class TestbedTest
 
   /**
    * Gets the world position of the mouse
-   * 
-   * @return
    */
   public Vec2 getWorldMouse() {
     return mouseWorld;
@@ -292,58 +262,24 @@ public abstract class TestbedTest
 
   /**
    * The number of contact points we're storing
-   * 
-   * @return
    */
   public int getPointCount() {
     return pointCount;
   }
 
+  public TestbedCamera getCamera() {
+    return camera;
+  }
+
   /**
    * Gets the 'bomb' body if it's present
-   * 
-   * @return
    */
   public Body getBomb() {
     return bomb;
   }
 
-  public float getCachedCameraScale() {
-    return cachedCameraScale;
-  }
-
-  public void setCachedCameraScale(float cachedCameraScale) {
-    this.cachedCameraScale = cachedCameraScale;
-  }
-
-  public Vec2 getCachedCameraPos() {
-    return cachedCameraPos;
-  }
-
-  public void setCachedCameraPos(Vec2 argPos) {
-    cachedCameraPos.set(argPos);
-  }
-
-  public boolean isHasCachedCamera() {
-    return hasCachedCamera;
-  }
-
-  public void setHasCachedCamera(boolean hasCachedCamera) {
-    this.hasCachedCamera = hasCachedCamera;
-  }
-
-  public boolean isDialogOnSaveLoadErrors() {
-    return dialogOnSaveLoadErrors;
-  }
-
-  public void setDialogOnSaveLoadErrors(boolean dialogOnSaveLoadErrors) {
-    this.dialogOnSaveLoadErrors = dialogOnSaveLoadErrors;
-  }
-
   /**
-   * Override for a different default camera pos
-   * 
-   * @return
+   * Override for a different default camera position
    */
   public Vec2 getDefaultCameraPos() {
     return new Vec2(0, 10);
@@ -351,8 +287,6 @@ public abstract class TestbedTest
 
   /**
    * Override for a different default camera scale
-   * 
-   * @return
    */
   public float getDefaultCameraScale() {
     return 10;
@@ -361,196 +295,45 @@ public abstract class TestbedTest
   /**
    * Gets the filename of the current test. Default implementation uses the test name with no
    * spaces".
-   * 
-   * @return
    */
   public String getFilename() {
     return getTestName().toLowerCase().replaceAll(" ", "_") + ".box2d";
   }
 
-  /**
-   * Resets the test
-   */
-  public void reset() {
-    resetPending = true;
-  }
-
-  /**
-   * Saves the test
-   */
-  public void save() {
-    savePending = true;
-  }
-
-  /**
-   * Loads the test from file
-   */
-  public void load() {
-    loadPending = true;
-  }
-
-  protected void _reset() {
-    init(model);
-  }
-
-  protected void _save() {
-
-    SerializationResult result;
-    try {
-      result = serializer.serialize(m_world);
-    } catch (UnsupportedObjectException e1) {
-      log.error("Error serializing world", e1);
-      if (dialogOnSaveLoadErrors) {
-        JOptionPane.showConfirmDialog(null, "Error serializing the object: " + e1.toString(),
-            "Serialization Error", JOptionPane.ERROR_MESSAGE);
-      }
-      return;
-    }
-
-    try {
-      FileOutputStream fos = new FileOutputStream(getFilename());
-      result.writeTo(fos);
-    } catch (FileNotFoundException e) {
-      log.error("File not found exception while saving", e);
-      if (dialogOnSaveLoadErrors) {
-        JOptionPane.showConfirmDialog(null, "File not found exception while saving: "
-            + getFilename(), "Serialization Error", JOptionPane.ERROR_MESSAGE);
-      }
-      return;
-    } catch (IOException e) {
-      log.error("Exception while writing world", e);
-      if (dialogOnSaveLoadErrors) {
-        JOptionPane.showConfirmDialog(null, "Error while writing world: " + e.toString(),
-            "Serialization Error", JOptionPane.ERROR_MESSAGE);
-      }
-      return;
-    }
-    return;
-  }
-
-  protected void _load() {
-
-    World w;
-    try {
-      FileInputStream fis = new FileInputStream(getFilename());
-      w = deserializer.deserializeWorld(fis);
-    } catch (FileNotFoundException e) {
-      log.error("File not found error while loading", e);
-      if (dialogOnSaveLoadErrors) {
-        JOptionPane.showMessageDialog(null, "File not found exception while loading: "
-            + getFilename(), "Serialization Error", JOptionPane.ERROR_MESSAGE);
-      }
-      return;
-    } catch (UnsupportedObjectException e) {
-      log.error("Error deserializing world", e);
-      if (dialogOnSaveLoadErrors) {
-        JOptionPane.showMessageDialog(null, "Error serializing the object: " + e.toString(),
-            "Serialization Error", JOptionPane.ERROR_MESSAGE);
-      }
-      return;
-    } catch (IOException e) {
-      log.error("Exception while writing world", e);
-      if (dialogOnSaveLoadErrors) {
-        JOptionPane.showMessageDialog(null, "Error while reading world: " + e.toString(),
-            "Serialization Error", JOptionPane.ERROR_MESSAGE);
-      }
-      return;
-    }
-    m_world = w;
-
-    init(m_world, true);
-    return;
-  }
-
+  /** @deprecated use {@link #getCamera()} */
   public void setCamera(Vec2 argPos) {
-    model.getDebugDraw().getViewportTranform().setCenter(argPos);
+    camera.setCamera(argPos);
   }
 
-  /**
-   * Sets the current testbed camera
-   * 
-   * @param argPos
-   * @param scale
-   */
+  /** @deprecated use {@link #getCamera()} */
   public void setCamera(Vec2 argPos, float scale) {
-    model.getDebugDraw().setCamera(argPos.x, argPos.y, scale);
-    hasCachedCamera = true;
-    cachedCameraScale = scale;
-    cachedCameraPos.set(argPos);
+    camera.setCamera(argPos, scale);
   }
 
   /**
-   * Initializes the current test
+   * Initializes the current test.
    * 
-   * @param argDeserialized if the test was deserialized from a file. If so, all physics objects
-   *        were already added.
+   * @param deserialized if the test was deserialized from a file. If so, all physics objects are
+   *        already added.
    */
   public abstract void initTest(boolean deserialized);
 
   /**
    * The name of the test
-   * 
-   * @return
    */
   public abstract String getTestName();
+
+  /**
+   * Adds a text line to the reporting area
+   */
+  public void addTextLine(String line) {
+    textList.add(line);
+  }
 
   /**
    * called when the tests exits
    */
   public void exit() {}
-
-  public void update() {
-    if (resetPending) {
-      _reset();
-      resetPending = false;
-    }
-    if (savePending) {
-      _save();
-      savePending = false;
-    }
-    if (loadPending) {
-      _load();
-      loadPending = false;
-    }
-
-    m_textLine = 20;
-
-    if (title != null) {
-      model.getDebugDraw().drawString(model.getPanelWidth() / 2, 15, title, Color3f.WHITE);
-      m_textLine += 15;
-    }
-
-    // process our input
-    if (!inputQueue.isEmpty()) {
-      synchronized (inputQueue) {
-        while (!inputQueue.isEmpty()) {
-          QueueItem i = inputQueue.pop();
-          switch (i.type) {
-            case KeyPressed:
-              keyPressed(i.c, i.code);
-              break;
-            case KeyReleased:
-              keyReleased(i.c, i.code);
-              break;
-            case MouseDown:
-              mouseDown(i.p);
-              break;
-            case MouseMove:
-              mouseMove(i.p);
-              break;
-            case MouseUp:
-              mouseUp(i.p);
-              break;
-            case ShiftMouseDown:
-              shiftMouseDown(i.p);
-              break;
-          }
-        }
-      }
-    }
-
-    step(model.getSettings());
-  }
 
   private final Color3f color1 = new Color3f(.3f, .95f, .3f);
   private final Color3f color2 = new Color3f(.3f, .3f, .95f);
@@ -563,7 +346,7 @@ public abstract class TestbedTest
   private final Vec2 tangent = new Vec2();
   private final List<String> statsList = new ArrayList<String>();
 
-  public synchronized void step(TestbedSettings settings) {
+  public void step(TestbedSettings settings) {
     float hz = settings.getSetting(TestbedSettings.Hz).value;
     float timeStep = hz > 0f ? 1f / hz : 0;
     if (settings.singleStep && !settings.pause) {
@@ -571,6 +354,13 @@ public abstract class TestbedTest
     }
 
     final DebugDraw debugDraw = model.getDebugDraw();
+    m_textLine = 20;
+
+    if (title != null) {
+      debugDraw.drawString(camera.getTransform().getExtents().x, 15, title, Color3f.WHITE);
+      m_textLine += TEXT_LINE_SPACE;
+    }
+
     if (settings.pause) {
       if (settings.singleStep) {
         settings.singleStep = false;
@@ -579,7 +369,7 @@ public abstract class TestbedTest
       }
 
       debugDraw.drawString(5, m_textLine, "****PAUSED****", Color3f.WHITE);
-      m_textLine += 15;
+      m_textLine += TEXT_LINE_SPACE;
     }
 
     int flags = 0;
@@ -610,19 +400,19 @@ public abstract class TestbedTest
     if (settings.getSetting(TestbedSettings.DrawStats).enabled) {
       // Vec2.watchCreations = true;
       debugDraw.drawString(5, m_textLine, "Engine Info", color4);
-      m_textLine += 15;
+      m_textLine += TEXT_LINE_SPACE;
       debugDraw.drawString(5, m_textLine, "Framerate: " + model.getCalculatedFps(), Color3f.WHITE);
-      m_textLine += 15;
+      m_textLine += TEXT_LINE_SPACE;
       debugDraw.drawString(
           5,
           m_textLine,
           "bodies/contacts/joints/proxies = " + m_world.getBodyCount() + "/"
               + m_world.getContactCount() + "/" + m_world.getJointCount() + "/"
               + m_world.getProxyCount(), Color3f.WHITE);
-      m_textLine += 15;
+      m_textLine += TEXT_LINE_SPACE;
       debugDraw.drawString(5, m_textLine, "World mouse position: " + mouseWorld.toString(),
           Color3f.WHITE);
-      m_textLine += 15;
+      m_textLine += TEXT_LINE_SPACE;
 
 
       statsList.clear();
@@ -631,36 +421,28 @@ public abstract class TestbedTest
 
       for (String s : statsList) {
         debugDraw.drawString(5, m_textLine, s, Color3f.WHITE);
-        m_textLine += 15;
+        m_textLine += TEXT_LINE_SPACE;
       }
-      m_textLine += 5;
+      m_textLine += TEXT_SECTION_SPACE;
     }
 
     if (settings.getSetting(TestbedSettings.DrawHelp).enabled) {
       debugDraw.drawString(5, m_textLine, "Help", color4);
-      m_textLine += 15;
-      debugDraw.drawString(5, m_textLine, "Click and drag the left mouse button to move objects.",
-          Color3f.WHITE);
-      m_textLine += 15;
-      debugDraw.drawString(5, m_textLine, "Shift-Click to aim a bullet, or press space.",
-          Color3f.WHITE);
-      m_textLine += 15;
-      debugDraw.drawString(5, m_textLine,
-          "Click and drag the right mouse button to move the view.", Color3f.WHITE);
-      m_textLine += 15;
-      debugDraw.drawString(5, m_textLine, "Scroll to zoom in/out.", Color3f.WHITE);
-      m_textLine += 15;
-      debugDraw.drawString(5, m_textLine, "Press '[' or ']' to change tests, and 'r' to restart.",
-          Color3f.WHITE);
-      m_textLine += 20;
+      m_textLine += TEXT_LINE_SPACE;
+      List<String> help = model.getImplSpecificHelp();
+      for (String string : help) {
+        debugDraw.drawString(5, m_textLine, string, Color3f.WHITE);
+        m_textLine += TEXT_LINE_SPACE;
+      }
+      m_textLine += TEXT_SECTION_SPACE;
     }
 
     if (!textList.isEmpty()) {
       debugDraw.drawString(5, m_textLine, "Test Info", color4);
-      m_textLine += 15;
+      m_textLine += TEXT_LINE_SPACE;
       for (String s : textList) {
         debugDraw.drawString(5, m_textLine, s, Color3f.WHITE);
-        m_textLine += 15;
+        m_textLine += TEXT_LINE_SPACE;
       }
       textList.clear();
     }
@@ -673,7 +455,7 @@ public abstract class TestbedTest
     }
 
     if (bombSpawning) {
-      debugDraw.drawSegment(bombSpawnPoint, mouseWorld, Color3f.WHITE);
+      debugDraw.drawSegment(bombSpawnPoint, bombMousePoint, Color3f.WHITE);
     }
 
     if (settings.getSetting(TestbedSettings.DrawContactPoints).enabled) {
@@ -711,88 +493,56 @@ public abstract class TestbedTest
     }
   }
 
-  public void queueShiftMouseDown(Vec2 p) {
-    synchronized (inputQueue) {
-      inputQueue.addLast(new QueueItem(QueueItemType.ShiftMouseDown, p));
-    }
-  }
-
-  public void queueMouseUp(Vec2 p) {
-    synchronized (inputQueue) {
-      inputQueue.addLast(new QueueItem(QueueItemType.MouseUp, p));
-    }
-  }
-
-  public void queueMouseDown(Vec2 p) {
-    synchronized (inputQueue) {
-      inputQueue.addLast(new QueueItem(QueueItemType.MouseDown, p));
-    }
-  }
-
-  public void queueMouseMove(Vec2 p) {
-    synchronized (inputQueue) {
-      inputQueue.addLast(new QueueItem(QueueItemType.MouseMove, p));
-    }
-  }
-
-  public void queueKeyPressed(char c, int code) {
-    synchronized (inputQueue) {
-      inputQueue.addLast(new QueueItem(QueueItemType.KeyPressed, c, code));
-    }
-  }
-
-  public void queueKeyReleased(char c, int code) {
-    synchronized (inputQueue) {
-      inputQueue.addLast(new QueueItem(QueueItemType.KeyReleased, c, code));
-    }
-  }
-
-  /**
-   * Called when shift-mouse down occurs
-   * 
-   * @param p
-   */
-  public void shiftMouseDown(Vec2 p) {
-    mouseWorld.set(p);
-
-    if (mouseJoint != null) {
-      return;
-    }
-
-    spawnBomb(p);
-  }
+  /************ INPUT ************/
 
   /**
    * Called for mouse-up
-   * 
-   * @param p
    */
-  public void mouseUp(Vec2 p) {
-    if (mouseJoint != null) {
-      m_world.destroyJoint(mouseJoint);
-      mouseJoint = null;
+  public void mouseUp(Vec2 p, int button) {
+    if (button == MOUSE_JOINT_BUTTON) {
+      destroyMouseJoint();
+    }
+    completeBombSpawn(p);
+  }
+
+  public void keyPressed(char keyCar, int keyCode) {}
+
+  public void keyReleased(char keyChar, int keyCode) {}
+
+  public void mouseDown(Vec2 p, int button) {
+    mouseWorld.set(p);
+
+    if (button == BOMB_SPAWN_BUTTON) {
+      beginBombSpawn(p);
     }
 
-    if (bombSpawning) {
-      completeBombSpawn(p);
+    if (button == MOUSE_JOINT_BUTTON) {
+      spawnMouseJoint(p);
     }
   }
+
+  public void mouseMove(Vec2 p) {
+    mouseWorld.set(p);
+  }
+
+  public void mouseDrag(Vec2 p, int button) {
+    if (button == MOUSE_JOINT_BUTTON) {
+      updateMouseJoint(p);
+    }
+    if (button == BOMB_SPAWN_BUTTON) {
+      bombMousePoint.set(p);
+    }
+  }
+
+  /************ MOUSE JOINT ************/
 
   private final AABB queryAABB = new AABB();
   private final TestQueryCallback callback = new TestQueryCallback();
 
-  /**
-   * Called for mouse-down
-   * 
-   * @param p
-   */
-  public void mouseDown(Vec2 p) {
-    mouseWorld.set(p);
-
+  private void spawnMouseJoint(Vec2 p) {
     if (mouseJoint != null) {
       return;
     }
-
     queryAABB.lowerBound.set(p.x - .001f, p.y - .001f);
     queryAABB.upperBound.set(p.x + .001f, p.y + .001f);
     callback.point.set(p);
@@ -811,36 +561,20 @@ public abstract class TestbedTest
     }
   }
 
-  /**
-   * Called when mouse is moved
-   * 
-   * @param p
-   */
-  public void mouseMove(Vec2 p) {
-    mouseWorld.set(p);
-
+  private void updateMouseJoint(Vec2 target) {
     if (mouseJoint != null) {
-      mouseJoint.setTarget(p);
+      mouseJoint.setTarget(target);
     }
   }
 
-  /**
-   * Sets the title of the test
-   * 
-   * @param argTitle
-   */
-  public void setTitle(String argTitle) {
-    title = argTitle;
+  private void destroyMouseJoint() {
+    if (mouseJoint != null) {
+      m_world.destroyJoint(mouseJoint);
+      mouseJoint = null;
+    }
   }
 
-  /**
-   * Adds a text line to the reporting area
-   * 
-   * @param argTextLine
-   */
-  public void addTextLine(String argTextLine) {
-    textList.add(argTextLine);
-  }
+  /********** BOMB ************/
 
   private final Vec2 p = new Vec2();
   private final Vec2 v = new Vec2();
@@ -853,7 +587,7 @@ public abstract class TestbedTest
 
   private final AABB aabb = new AABB();
 
-  public synchronized void launchBomb(Vec2 position, Vec2 velocity) {
+  private void launchBomb(Vec2 position, Vec2 velocity) {
     if (bomb != null) {
       m_world.destroyBody(bomb);
       bomb = null;
@@ -886,14 +620,15 @@ public abstract class TestbedTest
     bomb.createFixture(fd);
   }
 
-  public synchronized void spawnBomb(Vec2 worldPt) {
+  private void beginBombSpawn(Vec2 worldPt) {
     bombSpawnPoint.set(worldPt);
+    bombMousePoint.set(worldPt);
     bombSpawning = true;
   }
 
   private final Vec2 vel = new Vec2();
 
-  public synchronized void completeBombSpawn(Vec2 p) {
+  private void completeBombSpawn(Vec2 p) {
     if (bombSpawning == false) {
       return;
     }
@@ -904,6 +639,8 @@ public abstract class TestbedTest
     launchBomb(bombSpawnPoint, vel);
     bombSpawning = false;
   }
+
+  /************ SERIALIZATION *************/
 
   /**
    * Override to enable saving and loading. Remember to also override the {@link ObjectListener} and
@@ -998,10 +735,6 @@ public abstract class TestbedTest
       ++pointCount;
     }
   }
-
-  public void keyPressed(char keyCar, int keyCode) {}
-
-  public void keyReleased(char keyChar, int keyCode) {}
 }
 
 
@@ -1027,30 +760,6 @@ class TestQueryCallback implements QueryCallback {
     }
 
     return true;
-  }
-}
-
-
-enum QueueItemType {
-  MouseDown, MouseMove, MouseUp, ShiftMouseDown, KeyPressed, KeyReleased
-}
-
-
-class QueueItem {
-  public QueueItemType type;
-  public Vec2 p;
-  public char c;
-  public int code;
-
-  public QueueItem(QueueItemType t, Vec2 pt) {
-    type = t;
-    p = pt;
-  }
-
-  public QueueItem(QueueItemType t, char cr, int cd) {
-    type = t;
-    c = cr;
-    code = cd;
   }
 }
 

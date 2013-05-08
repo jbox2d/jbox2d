@@ -1,34 +1,30 @@
 /*******************************************************************************
- * Copyright (c) 2013, Daniel Murphy
- * All rights reserved.
+ * Copyright (c) 2013, Daniel Murphy All rights reserved.
  * 
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- * 	* Redistributions of source code must retain the above copyright notice,
- * 	  this list of conditions and the following disclaimer.
- * 	* Redistributions in binary form must reproduce the above copyright notice,
- * 	  this list of conditions and the following disclaimer in the documentation
- * 	  and/or other materials provided with the distribution.
+ * Redistribution and use in source and binary forms, with or without modification, are permitted
+ * provided that the following conditions are met: * Redistributions of source code must retain the
+ * above copyright notice, this list of conditions and the following disclaimer. * Redistributions
+ * in binary form must reproduce the above copyright notice, this list of conditions and the
+ * following disclaimer in the documentation and/or other materials provided with the distribution.
  * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+ * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 package org.jbox2d.testbed.framework;
 
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.DefaultComboBoxModel;
 
 import org.jbox2d.callbacks.DebugDraw;
-import org.jbox2d.common.Vec2;
+import org.jbox2d.common.IViewportTransform;
 
 /**
  * Model for the testbed
@@ -41,16 +37,31 @@ public class TestbedModel {
   private final TestbedSettings settings = new TestbedSettings();
   private DebugDraw draw;
   private TestbedTest test;
-  private final Vec2 mouse = new Vec2();
   private final Vector<TestChangedListener> listeners = new Vector<TestChangedListener>();
   private final boolean[] keys = new boolean[512];
   private final boolean[] codedKeys = new boolean[512];
   private float calculatedFps;
-  private float panelWidth;
   private int currTestIndex = -1;
   private TestbedTest runningTest;
+  private List<String> implSpecificHelp;
+  private TestbedPanel panel;
+
+  public TestbedModel() {}
   
-  public TestbedModel() {
+  public void setPanel(TestbedPanel panel) {
+    this.panel = panel;
+  }
+  
+  public TestbedPanel getPanel() {
+    return panel;
+  }
+
+  public void setImplSpecificHelp(List<String> implSpecificHelp) {
+    this.implSpecificHelp = implSpecificHelp;
+  }
+  
+  public List<String> getImplSpecificHelp() {
+    return implSpecificHelp;
   }
 
   public void setCalculatedFps(float calculatedFps) {
@@ -61,12 +72,8 @@ public class TestbedModel {
     return calculatedFps;
   }
 
-  public void setPanelWidth(float panelWidth) {
-    this.panelWidth = panelWidth;
-  }
-
-  public float getPanelWidth() {
-    return panelWidth;
+  public void setViewportTransform(IViewportTransform transform) {
+    draw.setViewportTransform(transform);
   }
 
   public void setDebugDraw(DebugDraw argDraw) {
@@ -81,20 +88,12 @@ public class TestbedModel {
     return test;
   }
 
-  public Vec2 getMouse() {
-    return mouse;
-  }
-
-  public void setMouse(Vec2 argMouse) {
-    mouse.set(argMouse);
-  }
-
   /**
    * Gets the array of keys, index corresponding to the char value.
    * 
    * @return
    */
-  public boolean[] getKeys(){
+  public boolean[] getKeys() {
     return keys;
   }
 
@@ -103,19 +102,19 @@ public class TestbedModel {
    * 
    * @return
    */
-  public boolean[] getCodedKeys(){
+  public boolean[] getCodedKeys() {
     return codedKeys;
   }
-  
+
   public void setCurrTestIndex(int argCurrTestIndex) {
-    if(argCurrTestIndex < 0 || argCurrTestIndex >= tests.getSize()){
+    if (argCurrTestIndex < 0 || argCurrTestIndex >= tests.getSize()) {
       throw new IllegalArgumentException("Invalid test index");
     }
-    if(currTestIndex == argCurrTestIndex){
+    if (currTestIndex == argCurrTestIndex) {
       return;
     }
-    
-    if(!isTestAt(argCurrTestIndex)){
+
+    if (!isTestAt(argCurrTestIndex)) {
       throw new IllegalArgumentException("No test at " + argCurrTestIndex);
     }
     currTestIndex = argCurrTestIndex;
@@ -206,6 +205,6 @@ public class TestbedModel {
   }
 
   public static interface TestChangedListener {
-    public void testChanged(TestbedTest argTest, int argIndex);
+    public void testChanged(TestbedTest test, int index);
   }
 }
