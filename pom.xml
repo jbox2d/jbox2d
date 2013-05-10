@@ -56,16 +56,11 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2</version><!--$NO-MVN-MAN-VER$ -->
+				<version>2.4</version>
 				<configuration>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
-					<archive>
-						<manifest>
-							<mainClass>org.jbox2d.testbed.framework.TestbedMain</mainClass>
-						</manifest>
-					</archive>
 				</configuration>
 			</plugin>
 			<plugin>

@@ -21,9 +21,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-/**
- * Created at 5:34:33 PM Jul 17, 2010
- */
 package org.jbox2d.testbed.framework;
 
 import org.jbox2d.testbed.tests.ApplyForce;

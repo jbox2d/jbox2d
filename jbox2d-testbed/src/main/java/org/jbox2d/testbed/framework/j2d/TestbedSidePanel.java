@@ -115,8 +115,8 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
       JLabel testLabel = null;
 
       @Override
-      public Component getListCellRendererComponent(JList list, Object ovalue,
-          int index, boolean isSelected, boolean cellHasFocus) {
+      public Component getListCellRendererComponent(JList list, Object ovalue, int index,
+          boolean isSelected, boolean cellHasFocus) {
         ListItem value = (ListItem) ovalue;
         if (value.isCategory()) {
           if (categoryLabel == null) {

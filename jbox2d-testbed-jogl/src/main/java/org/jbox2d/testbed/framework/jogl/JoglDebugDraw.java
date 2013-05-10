@@ -47,7 +47,7 @@ public class JoglDebugDraw extends DebugDraw {
     panel = argPanel;
     text = new TextRenderer(new Font("Courier New", Font.PLAIN, 12));
   }
-  
+
   @Override
   public void setViewportTransform(IViewportTransform viewportTransform) {
     viewportTransform.setYFlip(false);
@@ -65,20 +65,21 @@ public class JoglDebugDraw extends DebugDraw {
   }
 
   private final Vec2 trans = new Vec2();
+
   @Override
   public void drawSolidPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
     GL2 gl = panel.getGL().getGL2();
     gl.glBegin(GL2.GL_TRIANGLE_FAN);
     gl.glColor4f(color.x, color.y, color.z, .4f);
-    for(int i=0; i<vertexCount; i++){
+    for (int i = 0; i < vertexCount; i++) {
       getWorldToScreenToOut(vertices[i], trans);
       gl.glVertex2f(trans.x, trans.y);
     }
     gl.glEnd();
-    
+
     gl.glBegin(GL2.GL_LINE_LOOP);
     gl.glColor4f(color.x, color.y, color.z, 1f);
-    for(int i=0; i<vertexCount; i++){
+    for (int i = 0; i < vertexCount; i++) {
       getWorldToScreenToOut(vertices[i], trans);
       gl.glVertex2f(trans.x, trans.y);
     }
@@ -86,6 +87,7 @@ public class JoglDebugDraw extends DebugDraw {
   }
 
   private final Vec2Array vec2Array = new Vec2Array();
+
   @Override
   public void drawCircle(Vec2 center, float radius, Color3f color) {
     Vec2[] vecs = vec2Array.get(20);
@@ -113,10 +115,10 @@ public class JoglDebugDraw extends DebugDraw {
     gl.glEnd();
   }
 
-  
+
   private final Vec2 temp = new Vec2();
   private final Vec2 temp2 = new Vec2();
-  
+
   @Override
   public void drawTransform(Transform xf) {
     GL2 gl = panel.getGL().getGL2();
@@ -132,9 +134,9 @@ public class JoglDebugDraw extends DebugDraw {
     getWorldToScreenToOut(temp2, temp2);
     gl.glVertex2f(temp.x, temp.y);
     gl.glVertex2f(temp2.x, temp2.y);
-    
+
     gl.glColor3f(0, 1, 0);
-    temp2.x = xf.p.x + - k_axisScale * xf.q.s;
+    temp2.x = xf.p.x + -k_axisScale * xf.q.s;
     temp2.y = xf.p.y + k_axisScale * xf.q.c;
     getWorldToScreenToOut(temp2, temp2);
     gl.glVertex2f(temp.x, temp.y);
@@ -146,7 +148,7 @@ public class JoglDebugDraw extends DebugDraw {
   public void drawString(float x, float y, String s, Color3f color) {
     text.beginRendering(panel.getWidth(), panel.getHeight());
     text.setColor(color.x, color.y, color.z, 1);
-    text.draw(s, (int)x,panel.getHeight() -  (int)y);
+    text.draw(s, (int) x, panel.getHeight() - (int) y);
     text.endRendering();
   }
 
