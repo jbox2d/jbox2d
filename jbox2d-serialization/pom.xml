@@ -17,7 +17,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.6</version><!--$NO-MVN-MAN-VER$-->
+        <version>1.7</version>
         <executions>
           <execution>
             <phase>generate-sources</phase>
@@ -101,7 +101,7 @@
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
-      <version>2.4.1</version>
+      <version>2.5.0</version>
     </dependency>
   </dependencies>
 </project>

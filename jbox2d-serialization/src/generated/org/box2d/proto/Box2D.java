@@ -8,20 +8,41 @@ public final class Box2D {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
+  /**
+   * Protobuf enum {@code box2d.PbBodyType}
+   */
   public enum PbBodyType
       implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <code>STATIC = 0;</code>
+     */
     STATIC(0, 0),
+    /**
+     * <code>DYNAMIC = 1;</code>
+     */
     DYNAMIC(1, 1),
+    /**
+     * <code>KINEMATIC = 2;</code>
+     */
     KINEMATIC(2, 2),
     ;
-    
+
+    /**
+     * <code>STATIC = 0;</code>
+     */
     public static final int STATIC_VALUE = 0;
+    /**
+     * <code>DYNAMIC = 1;</code>
+     */
     public static final int DYNAMIC_VALUE = 1;
+    /**
+     * <code>KINEMATIC = 2;</code>
+     */
     public static final int KINEMATIC_VALUE = 2;
-    
-    
+
+
     public final int getNumber() { return value; }
-    
+
     public static PbBodyType valueOf(int value) {
       switch (value) {
         case 0: return STATIC;
@@ -30,7 +51,7 @@ public final class Box2D {
         default: return null;
       }
     }
-    
+
     public static com.google.protobuf.Internal.EnumLiteMap<PbBodyType>
         internalGetValueMap() {
       return internalValueMap;
@@ -42,7 +63,7 @@ public final class Box2D {
               return PbBodyType.valueOf(number);
             }
           };
-    
+
     public final com.google.protobuf.Descriptors.EnumValueDescriptor
         getValueDescriptor() {
       return getDescriptor().getValues().get(index);
@@ -55,11 +76,9 @@ public final class Box2D {
         getDescriptor() {
       return org.box2d.proto.Box2D.getDescriptor().getEnumTypes().get(0);
     }
-    
-    private static final PbBodyType[] VALUES = {
-      STATIC, DYNAMIC, KINEMATIC, 
-    };
-    
+
+    private static final PbBodyType[] VALUES = values();
+
     public static PbBodyType valueOf(
         com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
       if (desc.getType() != getDescriptor()) {
@@ -68,34 +87,61 @@ public final class Box2D {
       }
       return VALUES[desc.getIndex()];
     }
-    
+
     private final int index;
     private final int value;
-    
+
     private PbBodyType(int index, int value) {
       this.index = index;
       this.value = value;
     }
-    
+
     // @@protoc_insertion_point(enum_scope:box2d.PbBodyType)
   }
-  
+
+  /**
+   * Protobuf enum {@code box2d.PbShapeType}
+   */
   public enum PbShapeType
       implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <code>CIRCLE = 1;</code>
+     */
     CIRCLE(0, 1),
+    /**
+     * <code>POLYGON = 2;</code>
+     */
     POLYGON(1, 2),
+    /**
+     * <code>EDGE = 3;</code>
+     */
     EDGE(2, 3),
+    /**
+     * <code>CHAIN = 4;</code>
+     */
     CHAIN(3, 4),
     ;
-    
+
+    /**
+     * <code>CIRCLE = 1;</code>
+     */
     public static final int CIRCLE_VALUE = 1;
+    /**
+     * <code>POLYGON = 2;</code>
+     */
     public static final int POLYGON_VALUE = 2;
+    /**
+     * <code>EDGE = 3;</code>
+     */
     public static final int EDGE_VALUE = 3;
+    /**
+     * <code>CHAIN = 4;</code>
+     */
     public static final int CHAIN_VALUE = 4;
-    
-    
+
+
     public final int getNumber() { return value; }
-    
+
     public static PbShapeType valueOf(int value) {
       switch (value) {
         case 1: return CIRCLE;
@@ -105,7 +151,7 @@ public final class Box2D {
         default: return null;
       }
     }
-    
+
     public static com.google.protobuf.Internal.EnumLiteMap<PbShapeType>
         internalGetValueMap() {
       return internalValueMap;
@@ -117,7 +163,7 @@ public final class Box2D {
               return PbShapeType.valueOf(number);
             }
           };
-    
+
     public final com.google.protobuf.Descriptors.EnumValueDescriptor
         getValueDescriptor() {
       return getDescriptor().getValues().get(index);
@@ -130,11 +176,9 @@ public final class Box2D {
         getDescriptor() {
       return org.box2d.proto.Box2D.getDescriptor().getEnumTypes().get(1);
     }
-    
-    private static final PbShapeType[] VALUES = {
-      CIRCLE, POLYGON, EDGE, CHAIN, 
-    };
-    
+
+    private static final PbShapeType[] VALUES = values();
+
     public static PbShapeType valueOf(
         com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
       if (desc.getType() != getDescriptor()) {
@@ -143,50 +187,125 @@ public final class Box2D {
       }
       return VALUES[desc.getIndex()];
     }
-    
+
     private final int index;
     private final int value;
-    
+
     private PbShapeType(int index, int value) {
       this.index = index;
       this.value = value;
     }
-    
+
     // @@protoc_insertion_point(enum_scope:box2d.PbShapeType)
   }
-  
+
+  /**
+   * Protobuf enum {@code box2d.PbJointType}
+   */
   public enum PbJointType
       implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <code>DISTANCE = 1;</code>
+     */
     DISTANCE(0, 1),
+    /**
+     * <code>REVOLUTE = 2;</code>
+     */
     REVOLUTE(1, 2),
+    /**
+     * <code>PRISMATIC = 3;</code>
+     */
     PRISMATIC(2, 3),
+    /**
+     * <code>PULLEY = 4;</code>
+     */
     PULLEY(3, 4),
+    /**
+     * <code>MOUSE = 5;</code>
+     */
     MOUSE(4, 5),
+    /**
+     * <code>GEAR = 6;</code>
+     */
     GEAR(5, 6),
+    /**
+     * <code>WHEEL = 7;</code>
+     */
     WHEEL(6, 7),
+    /**
+     * <code>WELD = 8;</code>
+     */
     WELD(7, 8),
+    /**
+     * <code>FRICTION = 9;</code>
+     */
     FRICTION(8, 9),
+    /**
+     * <code>ROPE = 10;</code>
+     */
     ROPE(9, 10),
+    /**
+     * <code>CONSTANT_VOLUME = 11;</code>
+     */
     CONSTANT_VOLUME(10, 11),
+    /**
+     * <code>LINE = 12;</code>
+     */
     LINE(11, 12),
     ;
-    
+
+    /**
+     * <code>DISTANCE = 1;</code>
+     */
     public static final int DISTANCE_VALUE = 1;
+    /**
+     * <code>REVOLUTE = 2;</code>
+     */
     public static final int REVOLUTE_VALUE = 2;
+    /**
+     * <code>PRISMATIC = 3;</code>
+     */
     public static final int PRISMATIC_VALUE = 3;
+    /**
+     * <code>PULLEY = 4;</code>
+     */
     public static final int PULLEY_VALUE = 4;
+    /**
+     * <code>MOUSE = 5;</code>
+     */
     public static final int MOUSE_VALUE = 5;
+    /**
+     * <code>GEAR = 6;</code>
+     */
     public static final int GEAR_VALUE = 6;
+    /**
+     * <code>WHEEL = 7;</code>
+     */
     public static final int WHEEL_VALUE = 7;
+    /**
+     * <code>WELD = 8;</code>
+     */
     public static final int WELD_VALUE = 8;
+    /**
+     * <code>FRICTION = 9;</code>
+     */
     public static final int FRICTION_VALUE = 9;
+    /**
+     * <code>ROPE = 10;</code>
+     */
     public static final int ROPE_VALUE = 10;
+    /**
+     * <code>CONSTANT_VOLUME = 11;</code>
+     */
     public static final int CONSTANT_VOLUME_VALUE = 11;
+    /**
+     * <code>LINE = 12;</code>
+     */
     public static final int LINE_VALUE = 12;
-    
-    
+
+
     public final int getNumber() { return value; }
-    
+
     public static PbJointType valueOf(int value) {
       switch (value) {
         case 1: return DISTANCE;
@@ -204,7 +323,7 @@ public final class Box2D {
         default: return null;
       }
     }
-    
+
     public static com.google.protobuf.Internal.EnumLiteMap<PbJointType>
         internalGetValueMap() {
       return internalValueMap;
@@ -216,7 +335,7 @@ public final class Box2D {
               return PbJointType.valueOf(number);
             }
           };
-    
+
     public final com.google.protobuf.Descriptors.EnumValueDescriptor
         getValueDescriptor() {
       return getDescriptor().getValues().get(index);
@@ -229,11 +348,9 @@ public final class Box2D {
         getDescriptor() {
       return org.box2d.proto.Box2D.getDescriptor().getEnumTypes().get(2);
     }
-    
-    private static final PbJointType[] VALUES = {
-      DISTANCE, REVOLUTE, PRISMATIC, PULLEY, MOUSE, GEAR, WHEEL, WELD, FRICTION, ROPE, CONSTANT_VOLUME, LINE, 
-    };
-    
+
+    private static final PbJointType[] VALUES = values();
+
     public static PbJointType valueOf(
         com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
       if (desc.getType() != getDescriptor()) {
@@ -242,78 +359,174 @@ public final class Box2D {
       }
       return VALUES[desc.getIndex()];
     }
-    
+
     private final int index;
     private final int value;
-    
+
     private PbJointType(int index, int value) {
       this.index = index;
       this.value = value;
     }
-    
+
     // @@protoc_insertion_point(enum_scope:box2d.PbJointType)
   }
-  
+
   public interface PbVec2OrBuilder
       extends com.google.protobuf.MessageOrBuilder {
-    
+
     // required float x = 1;
+    /**
+     * <code>required float x = 1;</code>
+     */
     boolean hasX();
+    /**
+     * <code>required float x = 1;</code>
+     */
     float getX();
-    
+
     // required float y = 2;
+    /**
+     * <code>required float y = 2;</code>
+     */
     boolean hasY();
+    /**
+     * <code>required float y = 2;</code>
+     */
     float getY();
   }
+  /**
+   * Protobuf type {@code box2d.PbVec2}
+   */
   public static final class PbVec2 extends
       com.google.protobuf.GeneratedMessage
       implements PbVec2OrBuilder {
     // Use PbVec2.newBuilder() to construct.
-    private PbVec2(Builder builder) {
+    private PbVec2(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private PbVec2(boolean noInit) {}
-    
+    private PbVec2(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
     private static final PbVec2 defaultInstance;
     public static PbVec2 getDefaultInstance() {
       return defaultInstance;
     }
-    
+
     public PbVec2 getDefaultInstanceForType() {
       return defaultInstance;
     }
-    
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private PbVec2(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 13: {
+              bitField0_ |= 0x00000001;
+              x_ = input.readFloat();
+              break;
+            }
+            case 21: {
+              bitField0_ |= 0x00000002;
+              y_ = input.readFloat();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return org.box2d.proto.Box2D.internal_static_box2d_PbVec2_descriptor;
     }
-    
+
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return org.box2d.proto.Box2D.internal_static_box2d_PbVec2_fieldAccessorTable;
+      return org.box2d.proto.Box2D.internal_static_box2d_PbVec2_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.box2d.proto.Box2D.PbVec2.class, org.box2d.proto.Box2D.PbVec2.Builder.class);
     }
-    
+
+    public static com.google.protobuf.Parser<PbVec2> PARSER =
+        new com.google.protobuf.AbstractParser<PbVec2>() {
+      public PbVec2 parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new PbVec2(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PbVec2> getParserForType() {
+      return PARSER;
+    }
+
     private int bitField0_;
     // required float x = 1;
     public static final int X_FIELD_NUMBER = 1;
     private float x_;
+    /**
+     * <code>required float x = 1;</code>
+     */
     public boolean hasX() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
+    /**
+     * <code>required float x = 1;</code>
+     */
     public float getX() {
       return x_;
     }
-    
+
     // required float y = 2;
     public static final int Y_FIELD_NUMBER = 2;
     private float y_;
+    /**
+     * <code>required float y = 2;</code>
+     */
     public boolean hasY() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
+    /**
+     * <code>required float y = 2;</code>
+     */
     public float getY() {
       return y_;
     }
-    
+
     private void initFields() {
       x_ = 0F;
       y_ = 0F;
@@ -322,7 +535,7 @@ public final class Box2D {
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
-      
+
       if (!hasX()) {
         memoizedIsInitialized = 0;
         return false;
@@ -334,7 +547,7 @@ public final class Box2D {
       memoizedIsInitialized = 1;
       return true;
     }
-    
+
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
@@ -346,12 +559,12 @@ public final class Box2D {
       }
       getUnknownFields().writeTo(output);
     }
-    
+
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
-    
+
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
@@ -365,94 +578,83 @@ public final class Box2D {
       memoizedSerializedSize = size;
       return size;
     }
-    
+
     private static final long serialVersionUID = 0L;
     @java.lang.Override
     protected java.lang.Object writeReplace()
         throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
-    
+
     public static org.box2d.proto.Box2D.PbVec2 parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static org.box2d.proto.Box2D.PbVec2 parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbVec2 parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static org.box2d.proto.Box2D.PbVec2 parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbVec2 parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static org.box2d.proto.Box2D.PbVec2 parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbVec2 parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input);
     }
     public static org.box2d.proto.Box2D.PbVec2 parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbVec2 parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static org.box2d.proto.Box2D.PbVec2 parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
-    
+
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder(org.box2d.proto.Box2D.PbVec2 prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
-    
+
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
+    /**
+     * Protobuf type {@code box2d.PbVec2}
+     */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
        implements org.box2d.proto.Box2D.PbVec2OrBuilder {
@@ -460,18 +662,21 @@ public final class Box2D {
           getDescriptor() {
         return org.box2d.proto.Box2D.internal_static_box2d_PbVec2_descriptor;
       }
-      
+
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return org.box2d.proto.Box2D.internal_static_box2d_PbVec2_fieldAccessorTable;
+        return org.box2d.proto.Box2D.internal_static_box2d_PbVec2_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.box2d.proto.Box2D.PbVec2.class, org.box2d.proto.Box2D.PbVec2.Builder.class);
       }
-      
+
       // Construct using org.box2d.proto.Box2D.PbVec2.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
-      
-      private Builder(BuilderParent parent) {
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
@@ -482,7 +687,7 @@ public final class Box2D {
       private static Builder create() {
         return new Builder();
       }
-      
+
       public Builder clear() {
         super.clear();
         x_ = 0F;
@@ -491,20 +696,20 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
-      
+
       public Builder clone() {
         return create().mergeFrom(buildPartial());
       }
-      
+
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return org.box2d.proto.Box2D.PbVec2.getDescriptor();
+        return org.box2d.proto.Box2D.internal_static_box2d_PbVec2_descriptor;
       }
-      
+
       public org.box2d.proto.Box2D.PbVec2 getDefaultInstanceForType() {
         return org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
       }
-      
+
       public org.box2d.proto.Box2D.PbVec2 build() {
         org.box2d.proto.Box2D.PbVec2 result = buildPartial();
         if (!result.isInitialized()) {
@@ -512,17 +717,7 @@ public final class Box2D {
         }
         return result;
       }
-      
-      private org.box2d.proto.Box2D.PbVec2 buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        org.box2d.proto.Box2D.PbVec2 result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
+
       public org.box2d.proto.Box2D.PbVec2 buildPartial() {
         org.box2d.proto.Box2D.PbVec2 result = new org.box2d.proto.Box2D.PbVec2(this);
         int from_bitField0_ = bitField0_;
@@ -539,7 +734,7 @@ public final class Box2D {
         onBuilt();
         return result;
       }
-      
+
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.box2d.proto.Box2D.PbVec2) {
           return mergeFrom((org.box2d.proto.Box2D.PbVec2)other);
@@ -548,7 +743,7 @@ public final class Box2D {
           return this;
         }
       }
-      
+
       public Builder mergeFrom(org.box2d.proto.Box2D.PbVec2 other) {
         if (other == org.box2d.proto.Box2D.PbVec2.getDefaultInstance()) return this;
         if (other.hasX()) {
@@ -560,7 +755,7 @@ public final class Box2D {
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
-      
+
       public final boolean isInitialized() {
         if (!hasX()) {
           
@@ -572,453 +767,184 @@ public final class Box2D {
         }
         return true;
       }
-      
+
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
-              }
-              break;
-            }
-            case 13: {
-              bitField0_ |= 0x00000001;
-              x_ = input.readFloat();
-              break;
-            }
-            case 21: {
-              bitField0_ |= 0x00000002;
-              y_ = input.readFloat();
-              break;
-            }
+        org.box2d.proto.Box2D.PbVec2 parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.box2d.proto.Box2D.PbVec2) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
           }
         }
+        return this;
       }
-      
       private int bitField0_;
-      
+
       // required float x = 1;
       private float x_ ;
+      /**
+       * <code>required float x = 1;</code>
+       */
       public boolean hasX() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+      /**
+       * <code>required float x = 1;</code>
+       */
       public float getX() {
         return x_;
       }
+      /**
+       * <code>required float x = 1;</code>
+       */
       public Builder setX(float value) {
         bitField0_ |= 0x00000001;
         x_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>required float x = 1;</code>
+       */
       public Builder clearX() {
         bitField0_ = (bitField0_ & ~0x00000001);
         x_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // required float y = 2;
       private float y_ ;
+      /**
+       * <code>required float y = 2;</code>
+       */
       public boolean hasY() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
+      /**
+       * <code>required float y = 2;</code>
+       */
       public float getY() {
         return y_;
       }
+      /**
+       * <code>required float y = 2;</code>
+       */
       public Builder setY(float value) {
         bitField0_ |= 0x00000002;
         y_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>required float y = 2;</code>
+       */
       public Builder clearY() {
         bitField0_ = (bitField0_ & ~0x00000002);
         y_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // @@protoc_insertion_point(builder_scope:box2d.PbVec2)
     }
-    
+
     static {
       defaultInstance = new PbVec2(true);
       defaultInstance.initFields();
     }
-    
+
     // @@protoc_insertion_point(class_scope:box2d.PbVec2)
   }
-  
+
   public interface PbFilterOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
-    
+
     // optional int32 category_bits = 1;
+    /**
+     * <code>optional int32 category_bits = 1;</code>
+     */
     boolean hasCategoryBits();
+    /**
+     * <code>optional int32 category_bits = 1;</code>
+     */
     int getCategoryBits();
-    
+
     // optional int32 mask_bits = 2;
+    /**
+     * <code>optional int32 mask_bits = 2;</code>
+     */
     boolean hasMaskBits();
+    /**
+     * <code>optional int32 mask_bits = 2;</code>
+     */
     int getMaskBits();
-    
+
     // optional int32 group_index = 3;
+    /**
+     * <code>optional int32 group_index = 3;</code>
+     */
     boolean hasGroupIndex();
+    /**
+     * <code>optional int32 group_index = 3;</code>
+     */
     int getGroupIndex();
   }
+  /**
+   * Protobuf type {@code box2d.PbFilter}
+   */
   public static final class PbFilter extends
       com.google.protobuf.GeneratedMessage
       implements PbFilterOrBuilder {
     // Use PbFilter.newBuilder() to construct.
-    private PbFilter(Builder builder) {
+    private PbFilter(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private PbFilter(boolean noInit) {}
-    
+    private PbFilter(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
     private static final PbFilter defaultInstance;
     public static PbFilter getDefaultInstance() {
       return defaultInstance;
     }
-    
+
     public PbFilter getDefaultInstanceForType() {
       return defaultInstance;
     }
-    
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return org.box2d.proto.Box2D.internal_static_box2d_PbFilter_descriptor;
-    }
-    
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return org.box2d.proto.Box2D.internal_static_box2d_PbFilter_fieldAccessorTable;
-    }
-    
-    private int bitField0_;
-    // optional int32 category_bits = 1;
-    public static final int CATEGORY_BITS_FIELD_NUMBER = 1;
-    private int categoryBits_;
-    public boolean hasCategoryBits() {
-      return ((bitField0_ & 0x00000001) == 0x00000001);
-    }
-    public int getCategoryBits() {
-      return categoryBits_;
-    }
-    
-    // optional int32 mask_bits = 2;
-    public static final int MASK_BITS_FIELD_NUMBER = 2;
-    private int maskBits_;
-    public boolean hasMaskBits() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    public int getMaskBits() {
-      return maskBits_;
-    }
-    
-    // optional int32 group_index = 3;
-    public static final int GROUP_INDEX_FIELD_NUMBER = 3;
-    private int groupIndex_;
-    public boolean hasGroupIndex() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
-    }
-    public int getGroupIndex() {
-      return groupIndex_;
-    }
-    
-    private void initFields() {
-      categoryBits_ = 0;
-      maskBits_ = 0;
-      groupIndex_ = 0;
-    }
-    private byte memoizedIsInitialized = -1;
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
-      
-      memoizedIsInitialized = 1;
-      return true;
-    }
-    
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      getSerializedSize();
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt32(1, categoryBits_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeInt32(2, maskBits_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeInt32(3, groupIndex_);
-      }
-      getUnknownFields().writeTo(output);
-    }
-    
-    private int memoizedSerializedSize = -1;
-    public int getSerializedSize() {
-      int size = memoizedSerializedSize;
-      if (size != -1) return size;
-    
-      size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, categoryBits_);
-      }
-      if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, maskBits_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(3, groupIndex_);
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSerializedSize = size;
-      return size;
-    }
-    
-    private static final long serialVersionUID = 0L;
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
     }
-    
-    public static org.box2d.proto.Box2D.PbFilter parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static org.box2d.proto.Box2D.PbFilter parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static org.box2d.proto.Box2D.PbFilter parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
-    }
-    public static org.box2d.proto.Box2D.PbFilter parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
-    }
-    public static org.box2d.proto.Box2D.PbFilter parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static org.box2d.proto.Box2D.PbFilter parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    public static org.box2d.proto.Box2D.PbFilter parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static org.box2d.proto.Box2D.PbFilter parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
-    }
-    public static org.box2d.proto.Box2D.PbFilter parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
-    }
-    public static org.box2d.proto.Box2D.PbFilter parseFrom(
+    private PbFilter(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
-    }
-    
-    public static Builder newBuilder() { return Builder.create(); }
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.box2d.proto.Box2D.PbFilter prototype) {
-      return newBuilder().mergeFrom(prototype);
-    }
-    public Builder toBuilder() { return newBuilder(this); }
-    
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.box2d.proto.Box2D.PbFilterOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return org.box2d.proto.Box2D.internal_static_box2d_PbFilter_descriptor;
-      }
-      
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return org.box2d.proto.Box2D.internal_static_box2d_PbFilter_fieldAccessorTable;
-      }
-      
-      // Construct using org.box2d.proto.Box2D.PbFilter.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-      
-      private Builder(BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-        }
-      }
-      private static Builder create() {
-        return new Builder();
-      }
-      
-      public Builder clear() {
-        super.clear();
-        categoryBits_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000001);
-        maskBits_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000002);
-        groupIndex_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000004);
-        return this;
-      }
-      
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
-      }
-      
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return org.box2d.proto.Box2D.PbFilter.getDescriptor();
-      }
-      
-      public org.box2d.proto.Box2D.PbFilter getDefaultInstanceForType() {
-        return org.box2d.proto.Box2D.PbFilter.getDefaultInstance();
-      }
-      
-      public org.box2d.proto.Box2D.PbFilter build() {
-        org.box2d.proto.Box2D.PbFilter result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-      
-      private org.box2d.proto.Box2D.PbFilter buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        org.box2d.proto.Box2D.PbFilter result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
-      public org.box2d.proto.Box2D.PbFilter buildPartial() {
-        org.box2d.proto.Box2D.PbFilter result = new org.box2d.proto.Box2D.PbFilter(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
-          to_bitField0_ |= 0x00000001;
-        }
-        result.categoryBits_ = categoryBits_;
-        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
-          to_bitField0_ |= 0x00000002;
-        }
-        result.maskBits_ = maskBits_;
-        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
-          to_bitField0_ |= 0x00000004;
-        }
-        result.groupIndex_ = groupIndex_;
-        result.bitField0_ = to_bitField0_;
-        onBuilt();
-        return result;
-      }
-      
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof org.box2d.proto.Box2D.PbFilter) {
-          return mergeFrom((org.box2d.proto.Box2D.PbFilter)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-      
-      public Builder mergeFrom(org.box2d.proto.Box2D.PbFilter other) {
-        if (other == org.box2d.proto.Box2D.PbFilter.getDefaultInstance()) return this;
-        if (other.hasCategoryBits()) {
-          setCategoryBits(other.getCategoryBits());
-        }
-        if (other.hasMaskBits()) {
-          setMaskBits(other.getMaskBits());
-        }
-        if (other.hasGroupIndex()) {
-          setGroupIndex(other.getGroupIndex());
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        return this;
-      }
-      
-      public final boolean isInitialized() {
-        return true;
-      }
-      
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
           int tag = input.readTag();
           switch (tag) {
             case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
+              done = true;
+              break;
             default: {
               if (!parseUnknownField(input, unknownFields,
                                      extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
+                done = true;
               }
               break;
             }
@@ -1039,392 +965,1578 @@ public final class Box2D {
             }
           }
         }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
       }
-      
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.box2d.proto.Box2D.internal_static_box2d_PbFilter_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.box2d.proto.Box2D.internal_static_box2d_PbFilter_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.box2d.proto.Box2D.PbFilter.class, org.box2d.proto.Box2D.PbFilter.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<PbFilter> PARSER =
+        new com.google.protobuf.AbstractParser<PbFilter>() {
+      public PbFilter parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new PbFilter(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PbFilter> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    // optional int32 category_bits = 1;
+    public static final int CATEGORY_BITS_FIELD_NUMBER = 1;
+    private int categoryBits_;
+    /**
+     * <code>optional int32 category_bits = 1;</code>
+     */
+    public boolean hasCategoryBits() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>optional int32 category_bits = 1;</code>
+     */
+    public int getCategoryBits() {
+      return categoryBits_;
+    }
+
+    // optional int32 mask_bits = 2;
+    public static final int MASK_BITS_FIELD_NUMBER = 2;
+    private int maskBits_;
+    /**
+     * <code>optional int32 mask_bits = 2;</code>
+     */
+    public boolean hasMaskBits() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>optional int32 mask_bits = 2;</code>
+     */
+    public int getMaskBits() {
+      return maskBits_;
+    }
+
+    // optional int32 group_index = 3;
+    public static final int GROUP_INDEX_FIELD_NUMBER = 3;
+    private int groupIndex_;
+    /**
+     * <code>optional int32 group_index = 3;</code>
+     */
+    public boolean hasGroupIndex() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional int32 group_index = 3;</code>
+     */
+    public int getGroupIndex() {
+      return groupIndex_;
+    }
+
+    private void initFields() {
+      categoryBits_ = 0;
+      maskBits_ = 0;
+      groupIndex_ = 0;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeInt32(1, categoryBits_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeInt32(2, maskBits_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeInt32(3, groupIndex_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(1, categoryBits_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, maskBits_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, groupIndex_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static org.box2d.proto.Box2D.PbFilter parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.box2d.proto.Box2D.PbFilter parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.box2d.proto.Box2D.PbFilter parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.box2d.proto.Box2D.PbFilter parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.box2d.proto.Box2D.PbFilter parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.box2d.proto.Box2D.PbFilter parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static org.box2d.proto.Box2D.PbFilter parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static org.box2d.proto.Box2D.PbFilter parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static org.box2d.proto.Box2D.PbFilter parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.box2d.proto.Box2D.PbFilter parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(org.box2d.proto.Box2D.PbFilter prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code box2d.PbFilter}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements org.box2d.proto.Box2D.PbFilterOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.box2d.proto.Box2D.internal_static_box2d_PbFilter_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.box2d.proto.Box2D.internal_static_box2d_PbFilter_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.box2d.proto.Box2D.PbFilter.class, org.box2d.proto.Box2D.PbFilter.Builder.class);
+      }
+
+      // Construct using org.box2d.proto.Box2D.PbFilter.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        categoryBits_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        maskBits_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        groupIndex_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.box2d.proto.Box2D.internal_static_box2d_PbFilter_descriptor;
+      }
+
+      public org.box2d.proto.Box2D.PbFilter getDefaultInstanceForType() {
+        return org.box2d.proto.Box2D.PbFilter.getDefaultInstance();
+      }
+
+      public org.box2d.proto.Box2D.PbFilter build() {
+        org.box2d.proto.Box2D.PbFilter result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public org.box2d.proto.Box2D.PbFilter buildPartial() {
+        org.box2d.proto.Box2D.PbFilter result = new org.box2d.proto.Box2D.PbFilter(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.categoryBits_ = categoryBits_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.maskBits_ = maskBits_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.groupIndex_ = groupIndex_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.box2d.proto.Box2D.PbFilter) {
+          return mergeFrom((org.box2d.proto.Box2D.PbFilter)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.box2d.proto.Box2D.PbFilter other) {
+        if (other == org.box2d.proto.Box2D.PbFilter.getDefaultInstance()) return this;
+        if (other.hasCategoryBits()) {
+          setCategoryBits(other.getCategoryBits());
+        }
+        if (other.hasMaskBits()) {
+          setMaskBits(other.getMaskBits());
+        }
+        if (other.hasGroupIndex()) {
+          setGroupIndex(other.getGroupIndex());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.box2d.proto.Box2D.PbFilter parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.box2d.proto.Box2D.PbFilter) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
       private int bitField0_;
-      
+
       // optional int32 category_bits = 1;
       private int categoryBits_ ;
+      /**
+       * <code>optional int32 category_bits = 1;</code>
+       */
       public boolean hasCategoryBits() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+      /**
+       * <code>optional int32 category_bits = 1;</code>
+       */
       public int getCategoryBits() {
         return categoryBits_;
       }
+      /**
+       * <code>optional int32 category_bits = 1;</code>
+       */
       public Builder setCategoryBits(int value) {
         bitField0_ |= 0x00000001;
         categoryBits_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional int32 category_bits = 1;</code>
+       */
       public Builder clearCategoryBits() {
         bitField0_ = (bitField0_ & ~0x00000001);
         categoryBits_ = 0;
         onChanged();
         return this;
       }
-      
+
       // optional int32 mask_bits = 2;
       private int maskBits_ ;
+      /**
+       * <code>optional int32 mask_bits = 2;</code>
+       */
       public boolean hasMaskBits() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
+      /**
+       * <code>optional int32 mask_bits = 2;</code>
+       */
       public int getMaskBits() {
         return maskBits_;
       }
+      /**
+       * <code>optional int32 mask_bits = 2;</code>
+       */
       public Builder setMaskBits(int value) {
         bitField0_ |= 0x00000002;
         maskBits_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional int32 mask_bits = 2;</code>
+       */
       public Builder clearMaskBits() {
         bitField0_ = (bitField0_ & ~0x00000002);
         maskBits_ = 0;
         onChanged();
         return this;
       }
-      
+
       // optional int32 group_index = 3;
       private int groupIndex_ ;
+      /**
+       * <code>optional int32 group_index = 3;</code>
+       */
       public boolean hasGroupIndex() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
+      /**
+       * <code>optional int32 group_index = 3;</code>
+       */
       public int getGroupIndex() {
         return groupIndex_;
       }
+      /**
+       * <code>optional int32 group_index = 3;</code>
+       */
       public Builder setGroupIndex(int value) {
         bitField0_ |= 0x00000004;
         groupIndex_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional int32 group_index = 3;</code>
+       */
       public Builder clearGroupIndex() {
         bitField0_ = (bitField0_ & ~0x00000004);
         groupIndex_ = 0;
         onChanged();
         return this;
       }
-      
+
       // @@protoc_insertion_point(builder_scope:box2d.PbFilter)
     }
-    
+
     static {
       defaultInstance = new PbFilter(true);
       defaultInstance.initFields();
     }
-    
+
     // @@protoc_insertion_point(class_scope:box2d.PbFilter)
   }
-  
+
   public interface PbShapeOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
-    
+
     // optional int64 tag = 1;
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     boolean hasTag();
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     long getTag();
-    
+
     // required .box2d.PbShapeType type = 2;
+    /**
+     * <code>required .box2d.PbShapeType type = 2;</code>
+     */
     boolean hasType();
+    /**
+     * <code>required .box2d.PbShapeType type = 2;</code>
+     */
     org.box2d.proto.Box2D.PbShapeType getType();
-    
+
     // optional .box2d.PbVec2 center = 10;
+    /**
+     * <code>optional .box2d.PbVec2 center = 10;</code>
+     *
+     * <pre>
+     * circle
+     * </pre>
+     */
     boolean hasCenter();
+    /**
+     * <code>optional .box2d.PbVec2 center = 10;</code>
+     *
+     * <pre>
+     * circle
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2 getCenter();
+    /**
+     * <code>optional .box2d.PbVec2 center = 10;</code>
+     *
+     * <pre>
+     * circle
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2OrBuilder getCenterOrBuilder();
-    
+
     // optional float radius = 11;
+    /**
+     * <code>optional float radius = 11;</code>
+     *
+     * <pre>
+     * circle
+     * </pre>
+     */
     boolean hasRadius();
+    /**
+     * <code>optional float radius = 11;</code>
+     *
+     * <pre>
+     * circle
+     * </pre>
+     */
     float getRadius();
-    
+
     // repeated .box2d.PbVec2 points = 20;
+    /**
+     * <code>repeated .box2d.PbVec2 points = 20;</code>
+     *
+     * <pre>
+     * polygon, chain
+     * </pre>
+     */
     java.util.List<org.box2d.proto.Box2D.PbVec2> 
         getPointsList();
+    /**
+     * <code>repeated .box2d.PbVec2 points = 20;</code>
+     *
+     * <pre>
+     * polygon, chain
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2 getPoints(int index);
+    /**
+     * <code>repeated .box2d.PbVec2 points = 20;</code>
+     *
+     * <pre>
+     * polygon, chain
+     * </pre>
+     */
     int getPointsCount();
+    /**
+     * <code>repeated .box2d.PbVec2 points = 20;</code>
+     *
+     * <pre>
+     * polygon, chain
+     * </pre>
+     */
     java.util.List<? extends org.box2d.proto.Box2D.PbVec2OrBuilder> 
         getPointsOrBuilderList();
+    /**
+     * <code>repeated .box2d.PbVec2 points = 20;</code>
+     *
+     * <pre>
+     * polygon, chain
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2OrBuilder getPointsOrBuilder(
         int index);
-    
+
     // repeated .box2d.PbVec2 normals = 21;
+    /**
+     * <code>repeated .box2d.PbVec2 normals = 21;</code>
+     *
+     * <pre>
+     * polygon
+     * </pre>
+     */
     java.util.List<org.box2d.proto.Box2D.PbVec2> 
         getNormalsList();
+    /**
+     * <code>repeated .box2d.PbVec2 normals = 21;</code>
+     *
+     * <pre>
+     * polygon
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2 getNormals(int index);
+    /**
+     * <code>repeated .box2d.PbVec2 normals = 21;</code>
+     *
+     * <pre>
+     * polygon
+     * </pre>
+     */
     int getNormalsCount();
+    /**
+     * <code>repeated .box2d.PbVec2 normals = 21;</code>
+     *
+     * <pre>
+     * polygon
+     * </pre>
+     */
     java.util.List<? extends org.box2d.proto.Box2D.PbVec2OrBuilder> 
         getNormalsOrBuilderList();
+    /**
+     * <code>repeated .box2d.PbVec2 normals = 21;</code>
+     *
+     * <pre>
+     * polygon
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2OrBuilder getNormalsOrBuilder(
         int index);
-    
+
     // optional .box2d.PbVec2 centroid = 22;
+    /**
+     * <code>optional .box2d.PbVec2 centroid = 22;</code>
+     *
+     * <pre>
+     * polygon
+     * </pre>
+     */
     boolean hasCentroid();
+    /**
+     * <code>optional .box2d.PbVec2 centroid = 22;</code>
+     *
+     * <pre>
+     * polygon
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2 getCentroid();
+    /**
+     * <code>optional .box2d.PbVec2 centroid = 22;</code>
+     *
+     * <pre>
+     * polygon
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2OrBuilder getCentroidOrBuilder();
-    
+
     // optional .box2d.PbVec2 v0 = 30;
+    /**
+     * <code>optional .box2d.PbVec2 v0 = 30;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     boolean hasV0();
+    /**
+     * <code>optional .box2d.PbVec2 v0 = 30;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2 getV0();
+    /**
+     * <code>optional .box2d.PbVec2 v0 = 30;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2OrBuilder getV0OrBuilder();
-    
+
     // optional .box2d.PbVec2 v1 = 31;
+    /**
+     * <code>optional .box2d.PbVec2 v1 = 31;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     boolean hasV1();
+    /**
+     * <code>optional .box2d.PbVec2 v1 = 31;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2 getV1();
+    /**
+     * <code>optional .box2d.PbVec2 v1 = 31;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2OrBuilder getV1OrBuilder();
-    
+
     // optional .box2d.PbVec2 v2 = 32;
+    /**
+     * <code>optional .box2d.PbVec2 v2 = 32;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     boolean hasV2();
+    /**
+     * <code>optional .box2d.PbVec2 v2 = 32;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2 getV2();
+    /**
+     * <code>optional .box2d.PbVec2 v2 = 32;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2OrBuilder getV2OrBuilder();
-    
+
     // optional .box2d.PbVec2 v3 = 33;
+    /**
+     * <code>optional .box2d.PbVec2 v3 = 33;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     boolean hasV3();
+    /**
+     * <code>optional .box2d.PbVec2 v3 = 33;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2 getV3();
+    /**
+     * <code>optional .box2d.PbVec2 v3 = 33;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2OrBuilder getV3OrBuilder();
-    
+
     // optional bool has0 = 34;
+    /**
+     * <code>optional bool has0 = 34;</code>
+     *
+     * <pre>
+     * edge, chain
+     * </pre>
+     */
     boolean hasHas0();
+    /**
+     * <code>optional bool has0 = 34;</code>
+     *
+     * <pre>
+     * edge, chain
+     * </pre>
+     */
     boolean getHas0();
-    
+
     // optional bool has3 = 35;
+    /**
+     * <code>optional bool has3 = 35;</code>
+     *
+     * <pre>
+     * edge, chain
+     * </pre>
+     */
     boolean hasHas3();
+    /**
+     * <code>optional bool has3 = 35;</code>
+     *
+     * <pre>
+     * edge, chain
+     * </pre>
+     */
     boolean getHas3();
-    
+
     // optional .box2d.PbVec2 prev = 40;
+    /**
+     * <code>optional .box2d.PbVec2 prev = 40;</code>
+     *
+     * <pre>
+     * chain
+     * </pre>
+     */
     boolean hasPrev();
+    /**
+     * <code>optional .box2d.PbVec2 prev = 40;</code>
+     *
+     * <pre>
+     * chain
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2 getPrev();
+    /**
+     * <code>optional .box2d.PbVec2 prev = 40;</code>
+     *
+     * <pre>
+     * chain
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2OrBuilder getPrevOrBuilder();
-    
+
     // optional .box2d.PbVec2 next = 41;
+    /**
+     * <code>optional .box2d.PbVec2 next = 41;</code>
+     *
+     * <pre>
+     * chain
+     * </pre>
+     */
     boolean hasNext();
+    /**
+     * <code>optional .box2d.PbVec2 next = 41;</code>
+     *
+     * <pre>
+     * chain
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2 getNext();
+    /**
+     * <code>optional .box2d.PbVec2 next = 41;</code>
+     *
+     * <pre>
+     * chain
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2OrBuilder getNextOrBuilder();
   }
+  /**
+   * Protobuf type {@code box2d.PbShape}
+   *
+   * <pre>
+   * just include all fields we might use
+   * </pre>
+   */
   public static final class PbShape extends
       com.google.protobuf.GeneratedMessage
       implements PbShapeOrBuilder {
     // Use PbShape.newBuilder() to construct.
-    private PbShape(Builder builder) {
+    private PbShape(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private PbShape(boolean noInit) {}
-    
+    private PbShape(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
     private static final PbShape defaultInstance;
     public static PbShape getDefaultInstance() {
       return defaultInstance;
     }
-    
+
     public PbShape getDefaultInstanceForType() {
       return defaultInstance;
     }
-    
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private PbShape(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+              bitField0_ |= 0x00000001;
+              tag_ = input.readInt64();
+              break;
+            }
+            case 16: {
+              int rawValue = input.readEnum();
+              org.box2d.proto.Box2D.PbShapeType value = org.box2d.proto.Box2D.PbShapeType.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(2, rawValue);
+              } else {
+                bitField0_ |= 0x00000002;
+                type_ = value;
+              }
+              break;
+            }
+            case 82: {
+              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000004) == 0x00000004)) {
+                subBuilder = center_.toBuilder();
+              }
+              center_ = input.readMessage(org.box2d.proto.Box2D.PbVec2.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(center_);
+                center_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000004;
+              break;
+            }
+            case 93: {
+              bitField0_ |= 0x00000008;
+              radius_ = input.readFloat();
+              break;
+            }
+            case 162: {
+              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+                points_ = new java.util.ArrayList<org.box2d.proto.Box2D.PbVec2>();
+                mutable_bitField0_ |= 0x00000010;
+              }
+              points_.add(input.readMessage(org.box2d.proto.Box2D.PbVec2.PARSER, extensionRegistry));
+              break;
+            }
+            case 170: {
+              if (!((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+                normals_ = new java.util.ArrayList<org.box2d.proto.Box2D.PbVec2>();
+                mutable_bitField0_ |= 0x00000020;
+              }
+              normals_.add(input.readMessage(org.box2d.proto.Box2D.PbVec2.PARSER, extensionRegistry));
+              break;
+            }
+            case 178: {
+              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000010) == 0x00000010)) {
+                subBuilder = centroid_.toBuilder();
+              }
+              centroid_ = input.readMessage(org.box2d.proto.Box2D.PbVec2.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(centroid_);
+                centroid_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000010;
+              break;
+            }
+            case 242: {
+              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000020) == 0x00000020)) {
+                subBuilder = v0_.toBuilder();
+              }
+              v0_ = input.readMessage(org.box2d.proto.Box2D.PbVec2.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(v0_);
+                v0_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000020;
+              break;
+            }
+            case 250: {
+              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000040) == 0x00000040)) {
+                subBuilder = v1_.toBuilder();
+              }
+              v1_ = input.readMessage(org.box2d.proto.Box2D.PbVec2.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(v1_);
+                v1_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000040;
+              break;
+            }
+            case 258: {
+              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000080) == 0x00000080)) {
+                subBuilder = v2_.toBuilder();
+              }
+              v2_ = input.readMessage(org.box2d.proto.Box2D.PbVec2.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(v2_);
+                v2_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000080;
+              break;
+            }
+            case 266: {
+              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000100) == 0x00000100)) {
+                subBuilder = v3_.toBuilder();
+              }
+              v3_ = input.readMessage(org.box2d.proto.Box2D.PbVec2.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(v3_);
+                v3_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000100;
+              break;
+            }
+            case 272: {
+              bitField0_ |= 0x00000200;
+              has0_ = input.readBool();
+              break;
+            }
+            case 280: {
+              bitField0_ |= 0x00000400;
+              has3_ = input.readBool();
+              break;
+            }
+            case 322: {
+              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000800) == 0x00000800)) {
+                subBuilder = prev_.toBuilder();
+              }
+              prev_ = input.readMessage(org.box2d.proto.Box2D.PbVec2.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(prev_);
+                prev_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000800;
+              break;
+            }
+            case 330: {
+              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = null;
+              if (((bitField0_ & 0x00001000) == 0x00001000)) {
+                subBuilder = next_.toBuilder();
+              }
+              next_ = input.readMessage(org.box2d.proto.Box2D.PbVec2.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(next_);
+                next_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00001000;
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+          points_ = java.util.Collections.unmodifiableList(points_);
+        }
+        if (((mutable_bitField0_ & 0x00000020) == 0x00000020)) {
+          normals_ = java.util.Collections.unmodifiableList(normals_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return org.box2d.proto.Box2D.internal_static_box2d_PbShape_descriptor;
     }
-    
+
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return org.box2d.proto.Box2D.internal_static_box2d_PbShape_fieldAccessorTable;
+      return org.box2d.proto.Box2D.internal_static_box2d_PbShape_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.box2d.proto.Box2D.PbShape.class, org.box2d.proto.Box2D.PbShape.Builder.class);
     }
-    
+
+    public static com.google.protobuf.Parser<PbShape> PARSER =
+        new com.google.protobuf.AbstractParser<PbShape>() {
+      public PbShape parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new PbShape(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PbShape> getParserForType() {
+      return PARSER;
+    }
+
     private int bitField0_;
     // optional int64 tag = 1;
     public static final int TAG_FIELD_NUMBER = 1;
     private long tag_;
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     public boolean hasTag() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     public long getTag() {
       return tag_;
     }
-    
+
     // required .box2d.PbShapeType type = 2;
     public static final int TYPE_FIELD_NUMBER = 2;
     private org.box2d.proto.Box2D.PbShapeType type_;
+    /**
+     * <code>required .box2d.PbShapeType type = 2;</code>
+     */
     public boolean hasType() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
+    /**
+     * <code>required .box2d.PbShapeType type = 2;</code>
+     */
     public org.box2d.proto.Box2D.PbShapeType getType() {
       return type_;
     }
-    
+
     // optional .box2d.PbVec2 center = 10;
     public static final int CENTER_FIELD_NUMBER = 10;
     private org.box2d.proto.Box2D.PbVec2 center_;
+    /**
+     * <code>optional .box2d.PbVec2 center = 10;</code>
+     *
+     * <pre>
+     * circle
+     * </pre>
+     */
     public boolean hasCenter() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
+    /**
+     * <code>optional .box2d.PbVec2 center = 10;</code>
+     *
+     * <pre>
+     * circle
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2 getCenter() {
       return center_;
     }
+    /**
+     * <code>optional .box2d.PbVec2 center = 10;</code>
+     *
+     * <pre>
+     * circle
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2OrBuilder getCenterOrBuilder() {
       return center_;
     }
-    
+
     // optional float radius = 11;
     public static final int RADIUS_FIELD_NUMBER = 11;
     private float radius_;
+    /**
+     * <code>optional float radius = 11;</code>
+     *
+     * <pre>
+     * circle
+     * </pre>
+     */
     public boolean hasRadius() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
+    /**
+     * <code>optional float radius = 11;</code>
+     *
+     * <pre>
+     * circle
+     * </pre>
+     */
     public float getRadius() {
       return radius_;
     }
-    
+
     // repeated .box2d.PbVec2 points = 20;
     public static final int POINTS_FIELD_NUMBER = 20;
     private java.util.List<org.box2d.proto.Box2D.PbVec2> points_;
+    /**
+     * <code>repeated .box2d.PbVec2 points = 20;</code>
+     *
+     * <pre>
+     * polygon, chain
+     * </pre>
+     */
     public java.util.List<org.box2d.proto.Box2D.PbVec2> getPointsList() {
       return points_;
     }
+    /**
+     * <code>repeated .box2d.PbVec2 points = 20;</code>
+     *
+     * <pre>
+     * polygon, chain
+     * </pre>
+     */
     public java.util.List<? extends org.box2d.proto.Box2D.PbVec2OrBuilder> 
         getPointsOrBuilderList() {
       return points_;
     }
+    /**
+     * <code>repeated .box2d.PbVec2 points = 20;</code>
+     *
+     * <pre>
+     * polygon, chain
+     * </pre>
+     */
     public int getPointsCount() {
       return points_.size();
     }
+    /**
+     * <code>repeated .box2d.PbVec2 points = 20;</code>
+     *
+     * <pre>
+     * polygon, chain
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2 getPoints(int index) {
       return points_.get(index);
     }
+    /**
+     * <code>repeated .box2d.PbVec2 points = 20;</code>
+     *
+     * <pre>
+     * polygon, chain
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2OrBuilder getPointsOrBuilder(
         int index) {
       return points_.get(index);
     }
-    
+
     // repeated .box2d.PbVec2 normals = 21;
     public static final int NORMALS_FIELD_NUMBER = 21;
     private java.util.List<org.box2d.proto.Box2D.PbVec2> normals_;
+    /**
+     * <code>repeated .box2d.PbVec2 normals = 21;</code>
+     *
+     * <pre>
+     * polygon
+     * </pre>
+     */
     public java.util.List<org.box2d.proto.Box2D.PbVec2> getNormalsList() {
       return normals_;
     }
+    /**
+     * <code>repeated .box2d.PbVec2 normals = 21;</code>
+     *
+     * <pre>
+     * polygon
+     * </pre>
+     */
     public java.util.List<? extends org.box2d.proto.Box2D.PbVec2OrBuilder> 
         getNormalsOrBuilderList() {
       return normals_;
     }
+    /**
+     * <code>repeated .box2d.PbVec2 normals = 21;</code>
+     *
+     * <pre>
+     * polygon
+     * </pre>
+     */
     public int getNormalsCount() {
       return normals_.size();
     }
+    /**
+     * <code>repeated .box2d.PbVec2 normals = 21;</code>
+     *
+     * <pre>
+     * polygon
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2 getNormals(int index) {
       return normals_.get(index);
     }
+    /**
+     * <code>repeated .box2d.PbVec2 normals = 21;</code>
+     *
+     * <pre>
+     * polygon
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2OrBuilder getNormalsOrBuilder(
         int index) {
       return normals_.get(index);
     }
-    
+
     // optional .box2d.PbVec2 centroid = 22;
     public static final int CENTROID_FIELD_NUMBER = 22;
     private org.box2d.proto.Box2D.PbVec2 centroid_;
+    /**
+     * <code>optional .box2d.PbVec2 centroid = 22;</code>
+     *
+     * <pre>
+     * polygon
+     * </pre>
+     */
     public boolean hasCentroid() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
+    /**
+     * <code>optional .box2d.PbVec2 centroid = 22;</code>
+     *
+     * <pre>
+     * polygon
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2 getCentroid() {
       return centroid_;
     }
+    /**
+     * <code>optional .box2d.PbVec2 centroid = 22;</code>
+     *
+     * <pre>
+     * polygon
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2OrBuilder getCentroidOrBuilder() {
       return centroid_;
     }
-    
+
     // optional .box2d.PbVec2 v0 = 30;
     public static final int V0_FIELD_NUMBER = 30;
     private org.box2d.proto.Box2D.PbVec2 v0_;
+    /**
+     * <code>optional .box2d.PbVec2 v0 = 30;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     public boolean hasV0() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
+    /**
+     * <code>optional .box2d.PbVec2 v0 = 30;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2 getV0() {
       return v0_;
     }
+    /**
+     * <code>optional .box2d.PbVec2 v0 = 30;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2OrBuilder getV0OrBuilder() {
       return v0_;
     }
-    
+
     // optional .box2d.PbVec2 v1 = 31;
     public static final int V1_FIELD_NUMBER = 31;
     private org.box2d.proto.Box2D.PbVec2 v1_;
+    /**
+     * <code>optional .box2d.PbVec2 v1 = 31;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     public boolean hasV1() {
       return ((bitField0_ & 0x00000040) == 0x00000040);
     }
+    /**
+     * <code>optional .box2d.PbVec2 v1 = 31;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2 getV1() {
       return v1_;
     }
+    /**
+     * <code>optional .box2d.PbVec2 v1 = 31;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2OrBuilder getV1OrBuilder() {
       return v1_;
     }
-    
+
     // optional .box2d.PbVec2 v2 = 32;
     public static final int V2_FIELD_NUMBER = 32;
     private org.box2d.proto.Box2D.PbVec2 v2_;
+    /**
+     * <code>optional .box2d.PbVec2 v2 = 32;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     public boolean hasV2() {
       return ((bitField0_ & 0x00000080) == 0x00000080);
     }
+    /**
+     * <code>optional .box2d.PbVec2 v2 = 32;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2 getV2() {
       return v2_;
     }
+    /**
+     * <code>optional .box2d.PbVec2 v2 = 32;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2OrBuilder getV2OrBuilder() {
       return v2_;
     }
-    
+
     // optional .box2d.PbVec2 v3 = 33;
     public static final int V3_FIELD_NUMBER = 33;
     private org.box2d.proto.Box2D.PbVec2 v3_;
+    /**
+     * <code>optional .box2d.PbVec2 v3 = 33;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     public boolean hasV3() {
       return ((bitField0_ & 0x00000100) == 0x00000100);
     }
+    /**
+     * <code>optional .box2d.PbVec2 v3 = 33;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2 getV3() {
       return v3_;
     }
+    /**
+     * <code>optional .box2d.PbVec2 v3 = 33;</code>
+     *
+     * <pre>
+     * edge
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2OrBuilder getV3OrBuilder() {
       return v3_;
     }
-    
+
     // optional bool has0 = 34;
     public static final int HAS0_FIELD_NUMBER = 34;
     private boolean has0_;
+    /**
+     * <code>optional bool has0 = 34;</code>
+     *
+     * <pre>
+     * edge, chain
+     * </pre>
+     */
     public boolean hasHas0() {
       return ((bitField0_ & 0x00000200) == 0x00000200);
     }
+    /**
+     * <code>optional bool has0 = 34;</code>
+     *
+     * <pre>
+     * edge, chain
+     * </pre>
+     */
     public boolean getHas0() {
       return has0_;
     }
-    
+
     // optional bool has3 = 35;
     public static final int HAS3_FIELD_NUMBER = 35;
     private boolean has3_;
+    /**
+     * <code>optional bool has3 = 35;</code>
+     *
+     * <pre>
+     * edge, chain
+     * </pre>
+     */
     public boolean hasHas3() {
       return ((bitField0_ & 0x00000400) == 0x00000400);
     }
+    /**
+     * <code>optional bool has3 = 35;</code>
+     *
+     * <pre>
+     * edge, chain
+     * </pre>
+     */
     public boolean getHas3() {
       return has3_;
     }
-    
+
     // optional .box2d.PbVec2 prev = 40;
     public static final int PREV_FIELD_NUMBER = 40;
     private org.box2d.proto.Box2D.PbVec2 prev_;
+    /**
+     * <code>optional .box2d.PbVec2 prev = 40;</code>
+     *
+     * <pre>
+     * chain
+     * </pre>
+     */
     public boolean hasPrev() {
       return ((bitField0_ & 0x00000800) == 0x00000800);
     }
+    /**
+     * <code>optional .box2d.PbVec2 prev = 40;</code>
+     *
+     * <pre>
+     * chain
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2 getPrev() {
       return prev_;
     }
+    /**
+     * <code>optional .box2d.PbVec2 prev = 40;</code>
+     *
+     * <pre>
+     * chain
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2OrBuilder getPrevOrBuilder() {
       return prev_;
     }
-    
+
     // optional .box2d.PbVec2 next = 41;
     public static final int NEXT_FIELD_NUMBER = 41;
     private org.box2d.proto.Box2D.PbVec2 next_;
+    /**
+     * <code>optional .box2d.PbVec2 next = 41;</code>
+     *
+     * <pre>
+     * chain
+     * </pre>
+     */
     public boolean hasNext() {
       return ((bitField0_ & 0x00001000) == 0x00001000);
     }
+    /**
+     * <code>optional .box2d.PbVec2 next = 41;</code>
+     *
+     * <pre>
+     * chain
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2 getNext() {
       return next_;
     }
+    /**
+     * <code>optional .box2d.PbVec2 next = 41;</code>
+     *
+     * <pre>
+     * chain
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2OrBuilder getNextOrBuilder() {
       return next_;
     }
-    
+
     private void initFields() {
       tag_ = 0L;
       type_ = org.box2d.proto.Box2D.PbShapeType.CIRCLE;
@@ -1446,7 +2558,7 @@ public final class Box2D {
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
-      
+
       if (!hasType()) {
         memoizedIsInitialized = 0;
         return false;
@@ -1514,7 +2626,7 @@ public final class Box2D {
       memoizedIsInitialized = 1;
       return true;
     }
-    
+
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
@@ -1565,12 +2677,12 @@ public final class Box2D {
       }
       getUnknownFields().writeTo(output);
     }
-    
+
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
-    
+
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
@@ -1636,94 +2748,87 @@ public final class Box2D {
       memoizedSerializedSize = size;
       return size;
     }
-    
+
     private static final long serialVersionUID = 0L;
     @java.lang.Override
     protected java.lang.Object writeReplace()
         throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
-    
+
     public static org.box2d.proto.Box2D.PbShape parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static org.box2d.proto.Box2D.PbShape parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbShape parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static org.box2d.proto.Box2D.PbShape parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbShape parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static org.box2d.proto.Box2D.PbShape parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbShape parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input);
     }
     public static org.box2d.proto.Box2D.PbShape parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbShape parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static org.box2d.proto.Box2D.PbShape parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
-    
+
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder(org.box2d.proto.Box2D.PbShape prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
-    
+
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
+    /**
+     * Protobuf type {@code box2d.PbShape}
+     *
+     * <pre>
+     * just include all fields we might use
+     * </pre>
+     */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
        implements org.box2d.proto.Box2D.PbShapeOrBuilder {
@@ -1731,18 +2836,21 @@ public final class Box2D {
           getDescriptor() {
         return org.box2d.proto.Box2D.internal_static_box2d_PbShape_descriptor;
       }
-      
+
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return org.box2d.proto.Box2D.internal_static_box2d_PbShape_fieldAccessorTable;
+        return org.box2d.proto.Box2D.internal_static_box2d_PbShape_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.box2d.proto.Box2D.PbShape.class, org.box2d.proto.Box2D.PbShape.Builder.class);
       }
-      
+
       // Construct using org.box2d.proto.Box2D.PbShape.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
-      
-      private Builder(BuilderParent parent) {
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
@@ -1763,7 +2871,7 @@ public final class Box2D {
       private static Builder create() {
         return new Builder();
       }
-      
+
       public Builder clear() {
         super.clear();
         tag_ = 0L;
@@ -1838,20 +2946,20 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00004000);
         return this;
       }
-      
+
       public Builder clone() {
         return create().mergeFrom(buildPartial());
       }
-      
+
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return org.box2d.proto.Box2D.PbShape.getDescriptor();
+        return org.box2d.proto.Box2D.internal_static_box2d_PbShape_descriptor;
       }
-      
+
       public org.box2d.proto.Box2D.PbShape getDefaultInstanceForType() {
         return org.box2d.proto.Box2D.PbShape.getDefaultInstance();
       }
-      
+
       public org.box2d.proto.Box2D.PbShape build() {
         org.box2d.proto.Box2D.PbShape result = buildPartial();
         if (!result.isInitialized()) {
@@ -1859,17 +2967,7 @@ public final class Box2D {
         }
         return result;
       }
-      
-      private org.box2d.proto.Box2D.PbShape buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        org.box2d.proto.Box2D.PbShape result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
+
       public org.box2d.proto.Box2D.PbShape buildPartial() {
         org.box2d.proto.Box2D.PbShape result = new org.box2d.proto.Box2D.PbShape(this);
         int from_bitField0_ = bitField0_;
@@ -1980,7 +3078,7 @@ public final class Box2D {
         onBuilt();
         return result;
       }
-      
+
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.box2d.proto.Box2D.PbShape) {
           return mergeFrom((org.box2d.proto.Box2D.PbShape)other);
@@ -1989,7 +3087,7 @@ public final class Box2D {
           return this;
         }
       }
-      
+
       public Builder mergeFrom(org.box2d.proto.Box2D.PbShape other) {
         if (other == org.box2d.proto.Box2D.PbShape.getDefaultInstance()) return this;
         if (other.hasTag()) {
@@ -2086,7 +3184,7 @@ public final class Box2D {
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
-      
+
       public final boolean isInitialized() {
         if (!hasType()) {
           
@@ -2154,180 +3252,76 @@ public final class Box2D {
         }
         return true;
       }
-      
+
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
-              }
-              break;
-            }
-            case 8: {
-              bitField0_ |= 0x00000001;
-              tag_ = input.readInt64();
-              break;
-            }
-            case 16: {
-              int rawValue = input.readEnum();
-              org.box2d.proto.Box2D.PbShapeType value = org.box2d.proto.Box2D.PbShapeType.valueOf(rawValue);
-              if (value == null) {
-                unknownFields.mergeVarintField(2, rawValue);
-              } else {
-                bitField0_ |= 0x00000002;
-                type_ = value;
-              }
-              break;
-            }
-            case 82: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              if (hasCenter()) {
-                subBuilder.mergeFrom(getCenter());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setCenter(subBuilder.buildPartial());
-              break;
-            }
-            case 93: {
-              bitField0_ |= 0x00000008;
-              radius_ = input.readFloat();
-              break;
-            }
-            case 162: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              input.readMessage(subBuilder, extensionRegistry);
-              addPoints(subBuilder.buildPartial());
-              break;
-            }
-            case 170: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              input.readMessage(subBuilder, extensionRegistry);
-              addNormals(subBuilder.buildPartial());
-              break;
-            }
-            case 178: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              if (hasCentroid()) {
-                subBuilder.mergeFrom(getCentroid());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setCentroid(subBuilder.buildPartial());
-              break;
-            }
-            case 242: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              if (hasV0()) {
-                subBuilder.mergeFrom(getV0());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setV0(subBuilder.buildPartial());
-              break;
-            }
-            case 250: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              if (hasV1()) {
-                subBuilder.mergeFrom(getV1());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setV1(subBuilder.buildPartial());
-              break;
-            }
-            case 258: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              if (hasV2()) {
-                subBuilder.mergeFrom(getV2());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setV2(subBuilder.buildPartial());
-              break;
-            }
-            case 266: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              if (hasV3()) {
-                subBuilder.mergeFrom(getV3());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setV3(subBuilder.buildPartial());
-              break;
-            }
-            case 272: {
-              bitField0_ |= 0x00000800;
-              has0_ = input.readBool();
-              break;
-            }
-            case 280: {
-              bitField0_ |= 0x00001000;
-              has3_ = input.readBool();
-              break;
-            }
-            case 322: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              if (hasPrev()) {
-                subBuilder.mergeFrom(getPrev());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setPrev(subBuilder.buildPartial());
-              break;
-            }
-            case 330: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              if (hasNext()) {
-                subBuilder.mergeFrom(getNext());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setNext(subBuilder.buildPartial());
-              break;
-            }
+        org.box2d.proto.Box2D.PbShape parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.box2d.proto.Box2D.PbShape) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
           }
         }
+        return this;
       }
-      
       private int bitField0_;
-      
+
       // optional int64 tag = 1;
       private long tag_ ;
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public boolean hasTag() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public long getTag() {
         return tag_;
       }
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public Builder setTag(long value) {
         bitField0_ |= 0x00000001;
         tag_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public Builder clearTag() {
         bitField0_ = (bitField0_ & ~0x00000001);
         tag_ = 0L;
         onChanged();
         return this;
       }
-      
+
       // required .box2d.PbShapeType type = 2;
       private org.box2d.proto.Box2D.PbShapeType type_ = org.box2d.proto.Box2D.PbShapeType.CIRCLE;
+      /**
+       * <code>required .box2d.PbShapeType type = 2;</code>
+       */
       public boolean hasType() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
+      /**
+       * <code>required .box2d.PbShapeType type = 2;</code>
+       */
       public org.box2d.proto.Box2D.PbShapeType getType() {
         return type_;
       }
+      /**
+       * <code>required .box2d.PbShapeType type = 2;</code>
+       */
       public Builder setType(org.box2d.proto.Box2D.PbShapeType value) {
         if (value == null) {
           throw new NullPointerException();
@@ -2337,20 +3331,37 @@ public final class Box2D {
         onChanged();
         return this;
       }
+      /**
+       * <code>required .box2d.PbShapeType type = 2;</code>
+       */
       public Builder clearType() {
         bitField0_ = (bitField0_ & ~0x00000002);
         type_ = org.box2d.proto.Box2D.PbShapeType.CIRCLE;
         onChanged();
         return this;
       }
-      
+
       // optional .box2d.PbVec2 center = 10;
       private org.box2d.proto.Box2D.PbVec2 center_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> centerBuilder_;
+      /**
+       * <code>optional .box2d.PbVec2 center = 10;</code>
+       *
+       * <pre>
+       * circle
+       * </pre>
+       */
       public boolean hasCenter() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
+      /**
+       * <code>optional .box2d.PbVec2 center = 10;</code>
+       *
+       * <pre>
+       * circle
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2 getCenter() {
         if (centerBuilder_ == null) {
           return center_;
@@ -2358,6 +3369,13 @@ public final class Box2D {
           return centerBuilder_.getMessage();
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 center = 10;</code>
+       *
+       * <pre>
+       * circle
+       * </pre>
+       */
       public Builder setCenter(org.box2d.proto.Box2D.PbVec2 value) {
         if (centerBuilder_ == null) {
           if (value == null) {
@@ -2371,6 +3389,13 @@ public final class Box2D {
         bitField0_ |= 0x00000004;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 center = 10;</code>
+       *
+       * <pre>
+       * circle
+       * </pre>
+       */
       public Builder setCenter(
           org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (centerBuilder_ == null) {
@@ -2382,6 +3407,13 @@ public final class Box2D {
         bitField0_ |= 0x00000004;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 center = 10;</code>
+       *
+       * <pre>
+       * circle
+       * </pre>
+       */
       public Builder mergeCenter(org.box2d.proto.Box2D.PbVec2 value) {
         if (centerBuilder_ == null) {
           if (((bitField0_ & 0x00000004) == 0x00000004) &&
@@ -2398,6 +3430,13 @@ public final class Box2D {
         bitField0_ |= 0x00000004;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 center = 10;</code>
+       *
+       * <pre>
+       * circle
+       * </pre>
+       */
       public Builder clearCenter() {
         if (centerBuilder_ == null) {
           center_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
@@ -2408,11 +3447,25 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 center = 10;</code>
+       *
+       * <pre>
+       * circle
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder getCenterBuilder() {
         bitField0_ |= 0x00000004;
         onChanged();
         return getCenterFieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .box2d.PbVec2 center = 10;</code>
+       *
+       * <pre>
+       * circle
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2OrBuilder getCenterOrBuilder() {
         if (centerBuilder_ != null) {
           return centerBuilder_.getMessageOrBuilder();
@@ -2420,6 +3473,13 @@ public final class Box2D {
           return center_;
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 center = 10;</code>
+       *
+       * <pre>
+       * circle
+       * </pre>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> 
           getCenterFieldBuilder() {
@@ -2433,28 +3493,56 @@ public final class Box2D {
         }
         return centerBuilder_;
       }
-      
+
       // optional float radius = 11;
       private float radius_ ;
+      /**
+       * <code>optional float radius = 11;</code>
+       *
+       * <pre>
+       * circle
+       * </pre>
+       */
       public boolean hasRadius() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
+      /**
+       * <code>optional float radius = 11;</code>
+       *
+       * <pre>
+       * circle
+       * </pre>
+       */
       public float getRadius() {
         return radius_;
       }
+      /**
+       * <code>optional float radius = 11;</code>
+       *
+       * <pre>
+       * circle
+       * </pre>
+       */
       public Builder setRadius(float value) {
         bitField0_ |= 0x00000008;
         radius_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float radius = 11;</code>
+       *
+       * <pre>
+       * circle
+       * </pre>
+       */
       public Builder clearRadius() {
         bitField0_ = (bitField0_ & ~0x00000008);
         radius_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // repeated .box2d.PbVec2 points = 20;
       private java.util.List<org.box2d.proto.Box2D.PbVec2> points_ =
         java.util.Collections.emptyList();
@@ -2464,10 +3552,17 @@ public final class Box2D {
           bitField0_ |= 0x00000010;
          }
       }
-      
+
       private com.google.protobuf.RepeatedFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> pointsBuilder_;
-      
+
+      /**
+       * <code>repeated .box2d.PbVec2 points = 20;</code>
+       *
+       * <pre>
+       * polygon, chain
+       * </pre>
+       */
       public java.util.List<org.box2d.proto.Box2D.PbVec2> getPointsList() {
         if (pointsBuilder_ == null) {
           return java.util.Collections.unmodifiableList(points_);
@@ -2475,6 +3570,13 @@ public final class Box2D {
           return pointsBuilder_.getMessageList();
         }
       }
+      /**
+       * <code>repeated .box2d.PbVec2 points = 20;</code>
+       *
+       * <pre>
+       * polygon, chain
+       * </pre>
+       */
       public int getPointsCount() {
         if (pointsBuilder_ == null) {
           return points_.size();
@@ -2482,6 +3584,13 @@ public final class Box2D {
           return pointsBuilder_.getCount();
         }
       }
+      /**
+       * <code>repeated .box2d.PbVec2 points = 20;</code>
+       *
+       * <pre>
+       * polygon, chain
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2 getPoints(int index) {
         if (pointsBuilder_ == null) {
           return points_.get(index);
@@ -2489,6 +3598,13 @@ public final class Box2D {
           return pointsBuilder_.getMessage(index);
         }
       }
+      /**
+       * <code>repeated .box2d.PbVec2 points = 20;</code>
+       *
+       * <pre>
+       * polygon, chain
+       * </pre>
+       */
       public Builder setPoints(
           int index, org.box2d.proto.Box2D.PbVec2 value) {
         if (pointsBuilder_ == null) {
@@ -2503,6 +3619,13 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbVec2 points = 20;</code>
+       *
+       * <pre>
+       * polygon, chain
+       * </pre>
+       */
       public Builder setPoints(
           int index, org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (pointsBuilder_ == null) {
@@ -2514,6 +3637,13 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbVec2 points = 20;</code>
+       *
+       * <pre>
+       * polygon, chain
+       * </pre>
+       */
       public Builder addPoints(org.box2d.proto.Box2D.PbVec2 value) {
         if (pointsBuilder_ == null) {
           if (value == null) {
@@ -2527,6 +3657,13 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbVec2 points = 20;</code>
+       *
+       * <pre>
+       * polygon, chain
+       * </pre>
+       */
       public Builder addPoints(
           int index, org.box2d.proto.Box2D.PbVec2 value) {
         if (pointsBuilder_ == null) {
@@ -2541,6 +3678,13 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbVec2 points = 20;</code>
+       *
+       * <pre>
+       * polygon, chain
+       * </pre>
+       */
       public Builder addPoints(
           org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (pointsBuilder_ == null) {
@@ -2552,6 +3696,13 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbVec2 points = 20;</code>
+       *
+       * <pre>
+       * polygon, chain
+       * </pre>
+       */
       public Builder addPoints(
           int index, org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (pointsBuilder_ == null) {
@@ -2563,6 +3714,13 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbVec2 points = 20;</code>
+       *
+       * <pre>
+       * polygon, chain
+       * </pre>
+       */
       public Builder addAllPoints(
           java.lang.Iterable<? extends org.box2d.proto.Box2D.PbVec2> values) {
         if (pointsBuilder_ == null) {
@@ -2574,6 +3732,13 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbVec2 points = 20;</code>
+       *
+       * <pre>
+       * polygon, chain
+       * </pre>
+       */
       public Builder clearPoints() {
         if (pointsBuilder_ == null) {
           points_ = java.util.Collections.emptyList();
@@ -2584,6 +3749,13 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbVec2 points = 20;</code>
+       *
+       * <pre>
+       * polygon, chain
+       * </pre>
+       */
       public Builder removePoints(int index) {
         if (pointsBuilder_ == null) {
           ensurePointsIsMutable();
@@ -2594,10 +3766,24 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbVec2 points = 20;</code>
+       *
+       * <pre>
+       * polygon, chain
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder getPointsBuilder(
           int index) {
         return getPointsFieldBuilder().getBuilder(index);
       }
+      /**
+       * <code>repeated .box2d.PbVec2 points = 20;</code>
+       *
+       * <pre>
+       * polygon, chain
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2OrBuilder getPointsOrBuilder(
           int index) {
         if (pointsBuilder_ == null) {
@@ -2605,6 +3791,13 @@ public final class Box2D {
           return pointsBuilder_.getMessageOrBuilder(index);
         }
       }
+      /**
+       * <code>repeated .box2d.PbVec2 points = 20;</code>
+       *
+       * <pre>
+       * polygon, chain
+       * </pre>
+       */
       public java.util.List<? extends org.box2d.proto.Box2D.PbVec2OrBuilder> 
            getPointsOrBuilderList() {
         if (pointsBuilder_ != null) {
@@ -2613,15 +3806,36 @@ public final class Box2D {
           return java.util.Collections.unmodifiableList(points_);
         }
       }
+      /**
+       * <code>repeated .box2d.PbVec2 points = 20;</code>
+       *
+       * <pre>
+       * polygon, chain
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder addPointsBuilder() {
         return getPointsFieldBuilder().addBuilder(
             org.box2d.proto.Box2D.PbVec2.getDefaultInstance());
       }
+      /**
+       * <code>repeated .box2d.PbVec2 points = 20;</code>
+       *
+       * <pre>
+       * polygon, chain
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder addPointsBuilder(
           int index) {
         return getPointsFieldBuilder().addBuilder(
             index, org.box2d.proto.Box2D.PbVec2.getDefaultInstance());
       }
+      /**
+       * <code>repeated .box2d.PbVec2 points = 20;</code>
+       *
+       * <pre>
+       * polygon, chain
+       * </pre>
+       */
       public java.util.List<org.box2d.proto.Box2D.PbVec2.Builder> 
            getPointsBuilderList() {
         return getPointsFieldBuilder().getBuilderList();
@@ -2640,7 +3854,7 @@ public final class Box2D {
         }
         return pointsBuilder_;
       }
-      
+
       // repeated .box2d.PbVec2 normals = 21;
       private java.util.List<org.box2d.proto.Box2D.PbVec2> normals_ =
         java.util.Collections.emptyList();
@@ -2650,10 +3864,17 @@ public final class Box2D {
           bitField0_ |= 0x00000020;
          }
       }
-      
+
       private com.google.protobuf.RepeatedFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> normalsBuilder_;
-      
+
+      /**
+       * <code>repeated .box2d.PbVec2 normals = 21;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public java.util.List<org.box2d.proto.Box2D.PbVec2> getNormalsList() {
         if (normalsBuilder_ == null) {
           return java.util.Collections.unmodifiableList(normals_);
@@ -2661,6 +3882,13 @@ public final class Box2D {
           return normalsBuilder_.getMessageList();
         }
       }
+      /**
+       * <code>repeated .box2d.PbVec2 normals = 21;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public int getNormalsCount() {
         if (normalsBuilder_ == null) {
           return normals_.size();
@@ -2668,6 +3896,13 @@ public final class Box2D {
           return normalsBuilder_.getCount();
         }
       }
+      /**
+       * <code>repeated .box2d.PbVec2 normals = 21;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2 getNormals(int index) {
         if (normalsBuilder_ == null) {
           return normals_.get(index);
@@ -2675,6 +3910,13 @@ public final class Box2D {
           return normalsBuilder_.getMessage(index);
         }
       }
+      /**
+       * <code>repeated .box2d.PbVec2 normals = 21;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public Builder setNormals(
           int index, org.box2d.proto.Box2D.PbVec2 value) {
         if (normalsBuilder_ == null) {
@@ -2689,6 +3931,13 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbVec2 normals = 21;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public Builder setNormals(
           int index, org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (normalsBuilder_ == null) {
@@ -2700,6 +3949,13 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbVec2 normals = 21;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public Builder addNormals(org.box2d.proto.Box2D.PbVec2 value) {
         if (normalsBuilder_ == null) {
           if (value == null) {
@@ -2713,6 +3969,13 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbVec2 normals = 21;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public Builder addNormals(
           int index, org.box2d.proto.Box2D.PbVec2 value) {
         if (normalsBuilder_ == null) {
@@ -2727,6 +3990,13 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbVec2 normals = 21;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public Builder addNormals(
           org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (normalsBuilder_ == null) {
@@ -2738,6 +4008,13 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbVec2 normals = 21;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public Builder addNormals(
           int index, org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (normalsBuilder_ == null) {
@@ -2749,6 +4026,13 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbVec2 normals = 21;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public Builder addAllNormals(
           java.lang.Iterable<? extends org.box2d.proto.Box2D.PbVec2> values) {
         if (normalsBuilder_ == null) {
@@ -2760,6 +4044,13 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbVec2 normals = 21;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public Builder clearNormals() {
         if (normalsBuilder_ == null) {
           normals_ = java.util.Collections.emptyList();
@@ -2770,6 +4061,13 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbVec2 normals = 21;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public Builder removeNormals(int index) {
         if (normalsBuilder_ == null) {
           ensureNormalsIsMutable();
@@ -2780,10 +4078,24 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbVec2 normals = 21;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder getNormalsBuilder(
           int index) {
         return getNormalsFieldBuilder().getBuilder(index);
       }
+      /**
+       * <code>repeated .box2d.PbVec2 normals = 21;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2OrBuilder getNormalsOrBuilder(
           int index) {
         if (normalsBuilder_ == null) {
@@ -2791,6 +4103,13 @@ public final class Box2D {
           return normalsBuilder_.getMessageOrBuilder(index);
         }
       }
+      /**
+       * <code>repeated .box2d.PbVec2 normals = 21;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public java.util.List<? extends org.box2d.proto.Box2D.PbVec2OrBuilder> 
            getNormalsOrBuilderList() {
         if (normalsBuilder_ != null) {
@@ -2799,15 +4118,36 @@ public final class Box2D {
           return java.util.Collections.unmodifiableList(normals_);
         }
       }
+      /**
+       * <code>repeated .box2d.PbVec2 normals = 21;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder addNormalsBuilder() {
         return getNormalsFieldBuilder().addBuilder(
             org.box2d.proto.Box2D.PbVec2.getDefaultInstance());
       }
+      /**
+       * <code>repeated .box2d.PbVec2 normals = 21;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder addNormalsBuilder(
           int index) {
         return getNormalsFieldBuilder().addBuilder(
             index, org.box2d.proto.Box2D.PbVec2.getDefaultInstance());
       }
+      /**
+       * <code>repeated .box2d.PbVec2 normals = 21;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public java.util.List<org.box2d.proto.Box2D.PbVec2.Builder> 
            getNormalsBuilderList() {
         return getNormalsFieldBuilder().getBuilderList();
@@ -2826,14 +4166,28 @@ public final class Box2D {
         }
         return normalsBuilder_;
       }
-      
+
       // optional .box2d.PbVec2 centroid = 22;
       private org.box2d.proto.Box2D.PbVec2 centroid_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> centroidBuilder_;
+      /**
+       * <code>optional .box2d.PbVec2 centroid = 22;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public boolean hasCentroid() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
+      /**
+       * <code>optional .box2d.PbVec2 centroid = 22;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2 getCentroid() {
         if (centroidBuilder_ == null) {
           return centroid_;
@@ -2841,6 +4195,13 @@ public final class Box2D {
           return centroidBuilder_.getMessage();
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 centroid = 22;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public Builder setCentroid(org.box2d.proto.Box2D.PbVec2 value) {
         if (centroidBuilder_ == null) {
           if (value == null) {
@@ -2854,6 +4215,13 @@ public final class Box2D {
         bitField0_ |= 0x00000040;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 centroid = 22;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public Builder setCentroid(
           org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (centroidBuilder_ == null) {
@@ -2865,6 +4233,13 @@ public final class Box2D {
         bitField0_ |= 0x00000040;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 centroid = 22;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public Builder mergeCentroid(org.box2d.proto.Box2D.PbVec2 value) {
         if (centroidBuilder_ == null) {
           if (((bitField0_ & 0x00000040) == 0x00000040) &&
@@ -2881,6 +4256,13 @@ public final class Box2D {
         bitField0_ |= 0x00000040;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 centroid = 22;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public Builder clearCentroid() {
         if (centroidBuilder_ == null) {
           centroid_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
@@ -2891,11 +4273,25 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 centroid = 22;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder getCentroidBuilder() {
         bitField0_ |= 0x00000040;
         onChanged();
         return getCentroidFieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .box2d.PbVec2 centroid = 22;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2OrBuilder getCentroidOrBuilder() {
         if (centroidBuilder_ != null) {
           return centroidBuilder_.getMessageOrBuilder();
@@ -2903,6 +4299,13 @@ public final class Box2D {
           return centroid_;
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 centroid = 22;</code>
+       *
+       * <pre>
+       * polygon
+       * </pre>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> 
           getCentroidFieldBuilder() {
@@ -2916,14 +4319,28 @@ public final class Box2D {
         }
         return centroidBuilder_;
       }
-      
+
       // optional .box2d.PbVec2 v0 = 30;
       private org.box2d.proto.Box2D.PbVec2 v0_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> v0Builder_;
+      /**
+       * <code>optional .box2d.PbVec2 v0 = 30;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public boolean hasV0() {
         return ((bitField0_ & 0x00000080) == 0x00000080);
       }
+      /**
+       * <code>optional .box2d.PbVec2 v0 = 30;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2 getV0() {
         if (v0Builder_ == null) {
           return v0_;
@@ -2931,6 +4348,13 @@ public final class Box2D {
           return v0Builder_.getMessage();
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 v0 = 30;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public Builder setV0(org.box2d.proto.Box2D.PbVec2 value) {
         if (v0Builder_ == null) {
           if (value == null) {
@@ -2944,6 +4368,13 @@ public final class Box2D {
         bitField0_ |= 0x00000080;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 v0 = 30;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public Builder setV0(
           org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (v0Builder_ == null) {
@@ -2955,6 +4386,13 @@ public final class Box2D {
         bitField0_ |= 0x00000080;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 v0 = 30;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public Builder mergeV0(org.box2d.proto.Box2D.PbVec2 value) {
         if (v0Builder_ == null) {
           if (((bitField0_ & 0x00000080) == 0x00000080) &&
@@ -2971,6 +4409,13 @@ public final class Box2D {
         bitField0_ |= 0x00000080;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 v0 = 30;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public Builder clearV0() {
         if (v0Builder_ == null) {
           v0_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
@@ -2981,11 +4426,25 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 v0 = 30;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder getV0Builder() {
         bitField0_ |= 0x00000080;
         onChanged();
         return getV0FieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .box2d.PbVec2 v0 = 30;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2OrBuilder getV0OrBuilder() {
         if (v0Builder_ != null) {
           return v0Builder_.getMessageOrBuilder();
@@ -2993,6 +4452,13 @@ public final class Box2D {
           return v0_;
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 v0 = 30;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> 
           getV0FieldBuilder() {
@@ -3006,14 +4472,28 @@ public final class Box2D {
         }
         return v0Builder_;
       }
-      
+
       // optional .box2d.PbVec2 v1 = 31;
       private org.box2d.proto.Box2D.PbVec2 v1_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> v1Builder_;
+      /**
+       * <code>optional .box2d.PbVec2 v1 = 31;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public boolean hasV1() {
         return ((bitField0_ & 0x00000100) == 0x00000100);
       }
+      /**
+       * <code>optional .box2d.PbVec2 v1 = 31;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2 getV1() {
         if (v1Builder_ == null) {
           return v1_;
@@ -3021,6 +4501,13 @@ public final class Box2D {
           return v1Builder_.getMessage();
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 v1 = 31;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public Builder setV1(org.box2d.proto.Box2D.PbVec2 value) {
         if (v1Builder_ == null) {
           if (value == null) {
@@ -3034,6 +4521,13 @@ public final class Box2D {
         bitField0_ |= 0x00000100;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 v1 = 31;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public Builder setV1(
           org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (v1Builder_ == null) {
@@ -3045,6 +4539,13 @@ public final class Box2D {
         bitField0_ |= 0x00000100;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 v1 = 31;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public Builder mergeV1(org.box2d.proto.Box2D.PbVec2 value) {
         if (v1Builder_ == null) {
           if (((bitField0_ & 0x00000100) == 0x00000100) &&
@@ -3061,6 +4562,13 @@ public final class Box2D {
         bitField0_ |= 0x00000100;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 v1 = 31;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public Builder clearV1() {
         if (v1Builder_ == null) {
           v1_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
@@ -3071,11 +4579,25 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00000100);
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 v1 = 31;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder getV1Builder() {
         bitField0_ |= 0x00000100;
         onChanged();
         return getV1FieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .box2d.PbVec2 v1 = 31;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2OrBuilder getV1OrBuilder() {
         if (v1Builder_ != null) {
           return v1Builder_.getMessageOrBuilder();
@@ -3083,6 +4605,13 @@ public final class Box2D {
           return v1_;
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 v1 = 31;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> 
           getV1FieldBuilder() {
@@ -3096,14 +4625,28 @@ public final class Box2D {
         }
         return v1Builder_;
       }
-      
+
       // optional .box2d.PbVec2 v2 = 32;
       private org.box2d.proto.Box2D.PbVec2 v2_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> v2Builder_;
+      /**
+       * <code>optional .box2d.PbVec2 v2 = 32;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public boolean hasV2() {
         return ((bitField0_ & 0x00000200) == 0x00000200);
       }
+      /**
+       * <code>optional .box2d.PbVec2 v2 = 32;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2 getV2() {
         if (v2Builder_ == null) {
           return v2_;
@@ -3111,6 +4654,13 @@ public final class Box2D {
           return v2Builder_.getMessage();
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 v2 = 32;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public Builder setV2(org.box2d.proto.Box2D.PbVec2 value) {
         if (v2Builder_ == null) {
           if (value == null) {
@@ -3124,6 +4674,13 @@ public final class Box2D {
         bitField0_ |= 0x00000200;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 v2 = 32;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public Builder setV2(
           org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (v2Builder_ == null) {
@@ -3135,6 +4692,13 @@ public final class Box2D {
         bitField0_ |= 0x00000200;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 v2 = 32;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public Builder mergeV2(org.box2d.proto.Box2D.PbVec2 value) {
         if (v2Builder_ == null) {
           if (((bitField0_ & 0x00000200) == 0x00000200) &&
@@ -3151,6 +4715,13 @@ public final class Box2D {
         bitField0_ |= 0x00000200;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 v2 = 32;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public Builder clearV2() {
         if (v2Builder_ == null) {
           v2_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
@@ -3161,11 +4732,25 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00000200);
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 v2 = 32;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder getV2Builder() {
         bitField0_ |= 0x00000200;
         onChanged();
         return getV2FieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .box2d.PbVec2 v2 = 32;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2OrBuilder getV2OrBuilder() {
         if (v2Builder_ != null) {
           return v2Builder_.getMessageOrBuilder();
@@ -3173,6 +4758,13 @@ public final class Box2D {
           return v2_;
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 v2 = 32;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> 
           getV2FieldBuilder() {
@@ -3186,14 +4778,28 @@ public final class Box2D {
         }
         return v2Builder_;
       }
-      
+
       // optional .box2d.PbVec2 v3 = 33;
       private org.box2d.proto.Box2D.PbVec2 v3_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> v3Builder_;
+      /**
+       * <code>optional .box2d.PbVec2 v3 = 33;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public boolean hasV3() {
         return ((bitField0_ & 0x00000400) == 0x00000400);
       }
+      /**
+       * <code>optional .box2d.PbVec2 v3 = 33;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2 getV3() {
         if (v3Builder_ == null) {
           return v3_;
@@ -3201,6 +4807,13 @@ public final class Box2D {
           return v3Builder_.getMessage();
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 v3 = 33;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public Builder setV3(org.box2d.proto.Box2D.PbVec2 value) {
         if (v3Builder_ == null) {
           if (value == null) {
@@ -3214,6 +4827,13 @@ public final class Box2D {
         bitField0_ |= 0x00000400;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 v3 = 33;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public Builder setV3(
           org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (v3Builder_ == null) {
@@ -3225,6 +4845,13 @@ public final class Box2D {
         bitField0_ |= 0x00000400;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 v3 = 33;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public Builder mergeV3(org.box2d.proto.Box2D.PbVec2 value) {
         if (v3Builder_ == null) {
           if (((bitField0_ & 0x00000400) == 0x00000400) &&
@@ -3241,6 +4868,13 @@ public final class Box2D {
         bitField0_ |= 0x00000400;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 v3 = 33;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public Builder clearV3() {
         if (v3Builder_ == null) {
           v3_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
@@ -3251,11 +4885,25 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00000400);
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 v3 = 33;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder getV3Builder() {
         bitField0_ |= 0x00000400;
         onChanged();
         return getV3FieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .box2d.PbVec2 v3 = 33;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2OrBuilder getV3OrBuilder() {
         if (v3Builder_ != null) {
           return v3Builder_.getMessageOrBuilder();
@@ -3263,6 +4911,13 @@ public final class Box2D {
           return v3_;
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 v3 = 33;</code>
+       *
+       * <pre>
+       * edge
+       * </pre>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> 
           getV3FieldBuilder() {
@@ -3276,56 +4931,126 @@ public final class Box2D {
         }
         return v3Builder_;
       }
-      
+
       // optional bool has0 = 34;
       private boolean has0_ ;
+      /**
+       * <code>optional bool has0 = 34;</code>
+       *
+       * <pre>
+       * edge, chain
+       * </pre>
+       */
       public boolean hasHas0() {
         return ((bitField0_ & 0x00000800) == 0x00000800);
       }
+      /**
+       * <code>optional bool has0 = 34;</code>
+       *
+       * <pre>
+       * edge, chain
+       * </pre>
+       */
       public boolean getHas0() {
         return has0_;
       }
+      /**
+       * <code>optional bool has0 = 34;</code>
+       *
+       * <pre>
+       * edge, chain
+       * </pre>
+       */
       public Builder setHas0(boolean value) {
         bitField0_ |= 0x00000800;
         has0_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional bool has0 = 34;</code>
+       *
+       * <pre>
+       * edge, chain
+       * </pre>
+       */
       public Builder clearHas0() {
         bitField0_ = (bitField0_ & ~0x00000800);
         has0_ = false;
         onChanged();
         return this;
       }
-      
+
       // optional bool has3 = 35;
       private boolean has3_ ;
+      /**
+       * <code>optional bool has3 = 35;</code>
+       *
+       * <pre>
+       * edge, chain
+       * </pre>
+       */
       public boolean hasHas3() {
         return ((bitField0_ & 0x00001000) == 0x00001000);
       }
+      /**
+       * <code>optional bool has3 = 35;</code>
+       *
+       * <pre>
+       * edge, chain
+       * </pre>
+       */
       public boolean getHas3() {
         return has3_;
       }
+      /**
+       * <code>optional bool has3 = 35;</code>
+       *
+       * <pre>
+       * edge, chain
+       * </pre>
+       */
       public Builder setHas3(boolean value) {
         bitField0_ |= 0x00001000;
         has3_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional bool has3 = 35;</code>
+       *
+       * <pre>
+       * edge, chain
+       * </pre>
+       */
       public Builder clearHas3() {
         bitField0_ = (bitField0_ & ~0x00001000);
         has3_ = false;
         onChanged();
         return this;
       }
-      
+
       // optional .box2d.PbVec2 prev = 40;
       private org.box2d.proto.Box2D.PbVec2 prev_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> prevBuilder_;
+      /**
+       * <code>optional .box2d.PbVec2 prev = 40;</code>
+       *
+       * <pre>
+       * chain
+       * </pre>
+       */
       public boolean hasPrev() {
         return ((bitField0_ & 0x00002000) == 0x00002000);
       }
+      /**
+       * <code>optional .box2d.PbVec2 prev = 40;</code>
+       *
+       * <pre>
+       * chain
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2 getPrev() {
         if (prevBuilder_ == null) {
           return prev_;
@@ -3333,6 +5058,13 @@ public final class Box2D {
           return prevBuilder_.getMessage();
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 prev = 40;</code>
+       *
+       * <pre>
+       * chain
+       * </pre>
+       */
       public Builder setPrev(org.box2d.proto.Box2D.PbVec2 value) {
         if (prevBuilder_ == null) {
           if (value == null) {
@@ -3346,6 +5078,13 @@ public final class Box2D {
         bitField0_ |= 0x00002000;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 prev = 40;</code>
+       *
+       * <pre>
+       * chain
+       * </pre>
+       */
       public Builder setPrev(
           org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (prevBuilder_ == null) {
@@ -3357,6 +5096,13 @@ public final class Box2D {
         bitField0_ |= 0x00002000;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 prev = 40;</code>
+       *
+       * <pre>
+       * chain
+       * </pre>
+       */
       public Builder mergePrev(org.box2d.proto.Box2D.PbVec2 value) {
         if (prevBuilder_ == null) {
           if (((bitField0_ & 0x00002000) == 0x00002000) &&
@@ -3373,6 +5119,13 @@ public final class Box2D {
         bitField0_ |= 0x00002000;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 prev = 40;</code>
+       *
+       * <pre>
+       * chain
+       * </pre>
+       */
       public Builder clearPrev() {
         if (prevBuilder_ == null) {
           prev_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
@@ -3383,11 +5136,25 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00002000);
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 prev = 40;</code>
+       *
+       * <pre>
+       * chain
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder getPrevBuilder() {
         bitField0_ |= 0x00002000;
         onChanged();
         return getPrevFieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .box2d.PbVec2 prev = 40;</code>
+       *
+       * <pre>
+       * chain
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2OrBuilder getPrevOrBuilder() {
         if (prevBuilder_ != null) {
           return prevBuilder_.getMessageOrBuilder();
@@ -3395,6 +5162,13 @@ public final class Box2D {
           return prev_;
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 prev = 40;</code>
+       *
+       * <pre>
+       * chain
+       * </pre>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> 
           getPrevFieldBuilder() {
@@ -3408,14 +5182,28 @@ public final class Box2D {
         }
         return prevBuilder_;
       }
-      
+
       // optional .box2d.PbVec2 next = 41;
       private org.box2d.proto.Box2D.PbVec2 next_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> nextBuilder_;
+      /**
+       * <code>optional .box2d.PbVec2 next = 41;</code>
+       *
+       * <pre>
+       * chain
+       * </pre>
+       */
       public boolean hasNext() {
         return ((bitField0_ & 0x00004000) == 0x00004000);
       }
+      /**
+       * <code>optional .box2d.PbVec2 next = 41;</code>
+       *
+       * <pre>
+       * chain
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2 getNext() {
         if (nextBuilder_ == null) {
           return next_;
@@ -3423,6 +5211,13 @@ public final class Box2D {
           return nextBuilder_.getMessage();
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 next = 41;</code>
+       *
+       * <pre>
+       * chain
+       * </pre>
+       */
       public Builder setNext(org.box2d.proto.Box2D.PbVec2 value) {
         if (nextBuilder_ == null) {
           if (value == null) {
@@ -3436,6 +5231,13 @@ public final class Box2D {
         bitField0_ |= 0x00004000;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 next = 41;</code>
+       *
+       * <pre>
+       * chain
+       * </pre>
+       */
       public Builder setNext(
           org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (nextBuilder_ == null) {
@@ -3447,6 +5249,13 @@ public final class Box2D {
         bitField0_ |= 0x00004000;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 next = 41;</code>
+       *
+       * <pre>
+       * chain
+       * </pre>
+       */
       public Builder mergeNext(org.box2d.proto.Box2D.PbVec2 value) {
         if (nextBuilder_ == null) {
           if (((bitField0_ & 0x00004000) == 0x00004000) &&
@@ -3463,6 +5272,13 @@ public final class Box2D {
         bitField0_ |= 0x00004000;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 next = 41;</code>
+       *
+       * <pre>
+       * chain
+       * </pre>
+       */
       public Builder clearNext() {
         if (nextBuilder_ == null) {
           next_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
@@ -3473,11 +5289,25 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00004000);
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 next = 41;</code>
+       *
+       * <pre>
+       * chain
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder getNextBuilder() {
         bitField0_ |= 0x00004000;
         onChanged();
         return getNextFieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .box2d.PbVec2 next = 41;</code>
+       *
+       * <pre>
+       * chain
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2OrBuilder getNextOrBuilder() {
         if (nextBuilder_ != null) {
           return nextBuilder_.getMessageOrBuilder();
@@ -3485,6 +5315,13 @@ public final class Box2D {
           return next_;
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 next = 41;</code>
+       *
+       * <pre>
+       * chain
+       * </pre>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> 
           getNextFieldBuilder() {
@@ -3498,156 +5335,365 @@ public final class Box2D {
         }
         return nextBuilder_;
       }
-      
+
       // @@protoc_insertion_point(builder_scope:box2d.PbShape)
     }
-    
+
     static {
       defaultInstance = new PbShape(true);
       defaultInstance.initFields();
     }
-    
+
     // @@protoc_insertion_point(class_scope:box2d.PbShape)
   }
-  
+
   public interface PbFixtureOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
-    
+
     // optional int64 tag = 1;
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     boolean hasTag();
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     long getTag();
-    
+
     // optional float restitution = 2;
+    /**
+     * <code>optional float restitution = 2;</code>
+     */
     boolean hasRestitution();
+    /**
+     * <code>optional float restitution = 2;</code>
+     */
     float getRestitution();
-    
+
     // optional float friction = 3;
+    /**
+     * <code>optional float friction = 3;</code>
+     */
     boolean hasFriction();
+    /**
+     * <code>optional float friction = 3;</code>
+     */
     float getFriction();
-    
+
     // optional float density = 4;
+    /**
+     * <code>optional float density = 4;</code>
+     */
     boolean hasDensity();
+    /**
+     * <code>optional float density = 4;</code>
+     */
     float getDensity();
-    
+
     // optional bool sensor = 5;
+    /**
+     * <code>optional bool sensor = 5;</code>
+     */
     boolean hasSensor();
+    /**
+     * <code>optional bool sensor = 5;</code>
+     */
     boolean getSensor();
-    
+
     // optional .box2d.PbFilter filter = 10;
+    /**
+     * <code>optional .box2d.PbFilter filter = 10;</code>
+     */
     boolean hasFilter();
+    /**
+     * <code>optional .box2d.PbFilter filter = 10;</code>
+     */
     org.box2d.proto.Box2D.PbFilter getFilter();
+    /**
+     * <code>optional .box2d.PbFilter filter = 10;</code>
+     */
     org.box2d.proto.Box2D.PbFilterOrBuilder getFilterOrBuilder();
-    
+
     // optional .box2d.PbShape shape = 11;
+    /**
+     * <code>optional .box2d.PbShape shape = 11;</code>
+     */
     boolean hasShape();
+    /**
+     * <code>optional .box2d.PbShape shape = 11;</code>
+     */
     org.box2d.proto.Box2D.PbShape getShape();
+    /**
+     * <code>optional .box2d.PbShape shape = 11;</code>
+     */
     org.box2d.proto.Box2D.PbShapeOrBuilder getShapeOrBuilder();
   }
+  /**
+   * Protobuf type {@code box2d.PbFixture}
+   */
   public static final class PbFixture extends
       com.google.protobuf.GeneratedMessage
       implements PbFixtureOrBuilder {
     // Use PbFixture.newBuilder() to construct.
-    private PbFixture(Builder builder) {
+    private PbFixture(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private PbFixture(boolean noInit) {}
-    
+    private PbFixture(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
     private static final PbFixture defaultInstance;
     public static PbFixture getDefaultInstance() {
       return defaultInstance;
     }
-    
+
     public PbFixture getDefaultInstanceForType() {
       return defaultInstance;
     }
-    
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private PbFixture(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+              bitField0_ |= 0x00000001;
+              tag_ = input.readInt64();
+              break;
+            }
+            case 21: {
+              bitField0_ |= 0x00000002;
+              restitution_ = input.readFloat();
+              break;
+            }
+            case 29: {
+              bitField0_ |= 0x00000004;
+              friction_ = input.readFloat();
+              break;
+            }
+            case 37: {
+              bitField0_ |= 0x00000008;
+              density_ = input.readFloat();
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000010;
+              sensor_ = input.readBool();
+              break;
+            }
+            case 82: {
+              org.box2d.proto.Box2D.PbFilter.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000020) == 0x00000020)) {
+                subBuilder = filter_.toBuilder();
+              }
+              filter_ = input.readMessage(org.box2d.proto.Box2D.PbFilter.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(filter_);
+                filter_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000020;
+              break;
+            }
+            case 90: {
+              org.box2d.proto.Box2D.PbShape.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000040) == 0x00000040)) {
+                subBuilder = shape_.toBuilder();
+              }
+              shape_ = input.readMessage(org.box2d.proto.Box2D.PbShape.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(shape_);
+                shape_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000040;
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return org.box2d.proto.Box2D.internal_static_box2d_PbFixture_descriptor;
     }
-    
+
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return org.box2d.proto.Box2D.internal_static_box2d_PbFixture_fieldAccessorTable;
+      return org.box2d.proto.Box2D.internal_static_box2d_PbFixture_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.box2d.proto.Box2D.PbFixture.class, org.box2d.proto.Box2D.PbFixture.Builder.class);
     }
-    
+
+    public static com.google.protobuf.Parser<PbFixture> PARSER =
+        new com.google.protobuf.AbstractParser<PbFixture>() {
+      public PbFixture parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new PbFixture(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PbFixture> getParserForType() {
+      return PARSER;
+    }
+
     private int bitField0_;
     // optional int64 tag = 1;
     public static final int TAG_FIELD_NUMBER = 1;
     private long tag_;
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     public boolean hasTag() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     public long getTag() {
       return tag_;
     }
-    
+
     // optional float restitution = 2;
     public static final int RESTITUTION_FIELD_NUMBER = 2;
     private float restitution_;
+    /**
+     * <code>optional float restitution = 2;</code>
+     */
     public boolean hasRestitution() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
+    /**
+     * <code>optional float restitution = 2;</code>
+     */
     public float getRestitution() {
       return restitution_;
     }
-    
+
     // optional float friction = 3;
     public static final int FRICTION_FIELD_NUMBER = 3;
     private float friction_;
+    /**
+     * <code>optional float friction = 3;</code>
+     */
     public boolean hasFriction() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
+    /**
+     * <code>optional float friction = 3;</code>
+     */
     public float getFriction() {
       return friction_;
     }
-    
+
     // optional float density = 4;
     public static final int DENSITY_FIELD_NUMBER = 4;
     private float density_;
+    /**
+     * <code>optional float density = 4;</code>
+     */
     public boolean hasDensity() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
+    /**
+     * <code>optional float density = 4;</code>
+     */
     public float getDensity() {
       return density_;
     }
-    
+
     // optional bool sensor = 5;
     public static final int SENSOR_FIELD_NUMBER = 5;
     private boolean sensor_;
+    /**
+     * <code>optional bool sensor = 5;</code>
+     */
     public boolean hasSensor() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
+    /**
+     * <code>optional bool sensor = 5;</code>
+     */
     public boolean getSensor() {
       return sensor_;
     }
-    
+
     // optional .box2d.PbFilter filter = 10;
     public static final int FILTER_FIELD_NUMBER = 10;
     private org.box2d.proto.Box2D.PbFilter filter_;
+    /**
+     * <code>optional .box2d.PbFilter filter = 10;</code>
+     */
     public boolean hasFilter() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
+    /**
+     * <code>optional .box2d.PbFilter filter = 10;</code>
+     */
     public org.box2d.proto.Box2D.PbFilter getFilter() {
       return filter_;
     }
+    /**
+     * <code>optional .box2d.PbFilter filter = 10;</code>
+     */
     public org.box2d.proto.Box2D.PbFilterOrBuilder getFilterOrBuilder() {
       return filter_;
     }
-    
+
     // optional .box2d.PbShape shape = 11;
     public static final int SHAPE_FIELD_NUMBER = 11;
     private org.box2d.proto.Box2D.PbShape shape_;
+    /**
+     * <code>optional .box2d.PbShape shape = 11;</code>
+     */
     public boolean hasShape() {
       return ((bitField0_ & 0x00000040) == 0x00000040);
     }
+    /**
+     * <code>optional .box2d.PbShape shape = 11;</code>
+     */
     public org.box2d.proto.Box2D.PbShape getShape() {
       return shape_;
     }
+    /**
+     * <code>optional .box2d.PbShape shape = 11;</code>
+     */
     public org.box2d.proto.Box2D.PbShapeOrBuilder getShapeOrBuilder() {
       return shape_;
     }
-    
+
     private void initFields() {
       tag_ = 0L;
       restitution_ = 0F;
@@ -3661,7 +5707,7 @@ public final class Box2D {
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
-      
+
       if (hasShape()) {
         if (!getShape().isInitialized()) {
           memoizedIsInitialized = 0;
@@ -3671,7 +5717,7 @@ public final class Box2D {
       memoizedIsInitialized = 1;
       return true;
     }
-    
+
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
@@ -3698,12 +5744,12 @@ public final class Box2D {
       }
       getUnknownFields().writeTo(output);
     }
-    
+
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
-    
+
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
@@ -3737,94 +5783,83 @@ public final class Box2D {
       memoizedSerializedSize = size;
       return size;
     }
-    
+
     private static final long serialVersionUID = 0L;
     @java.lang.Override
     protected java.lang.Object writeReplace()
         throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
-    
+
     public static org.box2d.proto.Box2D.PbFixture parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static org.box2d.proto.Box2D.PbFixture parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbFixture parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static org.box2d.proto.Box2D.PbFixture parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbFixture parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static org.box2d.proto.Box2D.PbFixture parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbFixture parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input);
     }
     public static org.box2d.proto.Box2D.PbFixture parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbFixture parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static org.box2d.proto.Box2D.PbFixture parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
-    
+
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder(org.box2d.proto.Box2D.PbFixture prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
-    
+
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
+    /**
+     * Protobuf type {@code box2d.PbFixture}
+     */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
        implements org.box2d.proto.Box2D.PbFixtureOrBuilder {
@@ -3832,18 +5867,21 @@ public final class Box2D {
           getDescriptor() {
         return org.box2d.proto.Box2D.internal_static_box2d_PbFixture_descriptor;
       }
-      
+
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return org.box2d.proto.Box2D.internal_static_box2d_PbFixture_fieldAccessorTable;
+        return org.box2d.proto.Box2D.internal_static_box2d_PbFixture_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.box2d.proto.Box2D.PbFixture.class, org.box2d.proto.Box2D.PbFixture.Builder.class);
       }
-      
+
       // Construct using org.box2d.proto.Box2D.PbFixture.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
-      
-      private Builder(BuilderParent parent) {
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
@@ -3856,7 +5894,7 @@ public final class Box2D {
       private static Builder create() {
         return new Builder();
       }
-      
+
       public Builder clear() {
         super.clear();
         tag_ = 0L;
@@ -3883,20 +5921,20 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
-      
+
       public Builder clone() {
         return create().mergeFrom(buildPartial());
       }
-      
+
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return org.box2d.proto.Box2D.PbFixture.getDescriptor();
+        return org.box2d.proto.Box2D.internal_static_box2d_PbFixture_descriptor;
       }
-      
+
       public org.box2d.proto.Box2D.PbFixture getDefaultInstanceForType() {
         return org.box2d.proto.Box2D.PbFixture.getDefaultInstance();
       }
-      
+
       public org.box2d.proto.Box2D.PbFixture build() {
         org.box2d.proto.Box2D.PbFixture result = buildPartial();
         if (!result.isInitialized()) {
@@ -3904,17 +5942,7 @@ public final class Box2D {
         }
         return result;
       }
-      
-      private org.box2d.proto.Box2D.PbFixture buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        org.box2d.proto.Box2D.PbFixture result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
+
       public org.box2d.proto.Box2D.PbFixture buildPartial() {
         org.box2d.proto.Box2D.PbFixture result = new org.box2d.proto.Box2D.PbFixture(this);
         int from_bitField0_ = bitField0_;
@@ -3959,7 +5987,7 @@ public final class Box2D {
         onBuilt();
         return result;
       }
-      
+
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.box2d.proto.Box2D.PbFixture) {
           return mergeFrom((org.box2d.proto.Box2D.PbFixture)other);
@@ -3968,7 +5996,7 @@ public final class Box2D {
           return this;
         }
       }
-      
+
       public Builder mergeFrom(org.box2d.proto.Box2D.PbFixture other) {
         if (other == org.box2d.proto.Box2D.PbFixture.getDefaultInstance()) return this;
         if (other.hasTag()) {
@@ -3995,7 +6023,7 @@ public final class Box2D {
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
-      
+
       public final boolean isInitialized() {
         if (hasShape()) {
           if (!getShape().isInitialized()) {
@@ -4005,191 +6033,204 @@ public final class Box2D {
         }
         return true;
       }
-      
+
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
-              }
-              break;
-            }
-            case 8: {
-              bitField0_ |= 0x00000001;
-              tag_ = input.readInt64();
-              break;
-            }
-            case 21: {
-              bitField0_ |= 0x00000002;
-              restitution_ = input.readFloat();
-              break;
-            }
-            case 29: {
-              bitField0_ |= 0x00000004;
-              friction_ = input.readFloat();
-              break;
-            }
-            case 37: {
-              bitField0_ |= 0x00000008;
-              density_ = input.readFloat();
-              break;
-            }
-            case 40: {
-              bitField0_ |= 0x00000010;
-              sensor_ = input.readBool();
-              break;
-            }
-            case 82: {
-              org.box2d.proto.Box2D.PbFilter.Builder subBuilder = org.box2d.proto.Box2D.PbFilter.newBuilder();
-              if (hasFilter()) {
-                subBuilder.mergeFrom(getFilter());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setFilter(subBuilder.buildPartial());
-              break;
-            }
-            case 90: {
-              org.box2d.proto.Box2D.PbShape.Builder subBuilder = org.box2d.proto.Box2D.PbShape.newBuilder();
-              if (hasShape()) {
-                subBuilder.mergeFrom(getShape());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setShape(subBuilder.buildPartial());
-              break;
-            }
+        org.box2d.proto.Box2D.PbFixture parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.box2d.proto.Box2D.PbFixture) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
           }
         }
+        return this;
       }
-      
       private int bitField0_;
-      
+
       // optional int64 tag = 1;
       private long tag_ ;
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public boolean hasTag() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public long getTag() {
         return tag_;
       }
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public Builder setTag(long value) {
         bitField0_ |= 0x00000001;
         tag_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public Builder clearTag() {
         bitField0_ = (bitField0_ & ~0x00000001);
         tag_ = 0L;
         onChanged();
         return this;
       }
-      
+
       // optional float restitution = 2;
       private float restitution_ ;
+      /**
+       * <code>optional float restitution = 2;</code>
+       */
       public boolean hasRestitution() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
+      /**
+       * <code>optional float restitution = 2;</code>
+       */
       public float getRestitution() {
         return restitution_;
       }
+      /**
+       * <code>optional float restitution = 2;</code>
+       */
       public Builder setRestitution(float value) {
         bitField0_ |= 0x00000002;
         restitution_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float restitution = 2;</code>
+       */
       public Builder clearRestitution() {
         bitField0_ = (bitField0_ & ~0x00000002);
         restitution_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional float friction = 3;
       private float friction_ ;
+      /**
+       * <code>optional float friction = 3;</code>
+       */
       public boolean hasFriction() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
+      /**
+       * <code>optional float friction = 3;</code>
+       */
       public float getFriction() {
         return friction_;
       }
+      /**
+       * <code>optional float friction = 3;</code>
+       */
       public Builder setFriction(float value) {
         bitField0_ |= 0x00000004;
         friction_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float friction = 3;</code>
+       */
       public Builder clearFriction() {
         bitField0_ = (bitField0_ & ~0x00000004);
         friction_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional float density = 4;
       private float density_ ;
+      /**
+       * <code>optional float density = 4;</code>
+       */
       public boolean hasDensity() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
+      /**
+       * <code>optional float density = 4;</code>
+       */
       public float getDensity() {
         return density_;
       }
+      /**
+       * <code>optional float density = 4;</code>
+       */
       public Builder setDensity(float value) {
         bitField0_ |= 0x00000008;
         density_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float density = 4;</code>
+       */
       public Builder clearDensity() {
         bitField0_ = (bitField0_ & ~0x00000008);
         density_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional bool sensor = 5;
       private boolean sensor_ ;
+      /**
+       * <code>optional bool sensor = 5;</code>
+       */
       public boolean hasSensor() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
+      /**
+       * <code>optional bool sensor = 5;</code>
+       */
       public boolean getSensor() {
         return sensor_;
       }
+      /**
+       * <code>optional bool sensor = 5;</code>
+       */
       public Builder setSensor(boolean value) {
         bitField0_ |= 0x00000010;
         sensor_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional bool sensor = 5;</code>
+       */
       public Builder clearSensor() {
         bitField0_ = (bitField0_ & ~0x00000010);
         sensor_ = false;
         onChanged();
         return this;
       }
-      
+
       // optional .box2d.PbFilter filter = 10;
       private org.box2d.proto.Box2D.PbFilter filter_ = org.box2d.proto.Box2D.PbFilter.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbFilter, org.box2d.proto.Box2D.PbFilter.Builder, org.box2d.proto.Box2D.PbFilterOrBuilder> filterBuilder_;
+      /**
+       * <code>optional .box2d.PbFilter filter = 10;</code>
+       */
       public boolean hasFilter() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
+      /**
+       * <code>optional .box2d.PbFilter filter = 10;</code>
+       */
       public org.box2d.proto.Box2D.PbFilter getFilter() {
         if (filterBuilder_ == null) {
           return filter_;
@@ -4197,6 +6238,9 @@ public final class Box2D {
           return filterBuilder_.getMessage();
         }
       }
+      /**
+       * <code>optional .box2d.PbFilter filter = 10;</code>
+       */
       public Builder setFilter(org.box2d.proto.Box2D.PbFilter value) {
         if (filterBuilder_ == null) {
           if (value == null) {
@@ -4210,6 +6254,9 @@ public final class Box2D {
         bitField0_ |= 0x00000020;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbFilter filter = 10;</code>
+       */
       public Builder setFilter(
           org.box2d.proto.Box2D.PbFilter.Builder builderForValue) {
         if (filterBuilder_ == null) {
@@ -4221,6 +6268,9 @@ public final class Box2D {
         bitField0_ |= 0x00000020;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbFilter filter = 10;</code>
+       */
       public Builder mergeFilter(org.box2d.proto.Box2D.PbFilter value) {
         if (filterBuilder_ == null) {
           if (((bitField0_ & 0x00000020) == 0x00000020) &&
@@ -4237,6 +6287,9 @@ public final class Box2D {
         bitField0_ |= 0x00000020;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbFilter filter = 10;</code>
+       */
       public Builder clearFilter() {
         if (filterBuilder_ == null) {
           filter_ = org.box2d.proto.Box2D.PbFilter.getDefaultInstance();
@@ -4247,11 +6300,17 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
+      /**
+       * <code>optional .box2d.PbFilter filter = 10;</code>
+       */
       public org.box2d.proto.Box2D.PbFilter.Builder getFilterBuilder() {
         bitField0_ |= 0x00000020;
         onChanged();
         return getFilterFieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .box2d.PbFilter filter = 10;</code>
+       */
       public org.box2d.proto.Box2D.PbFilterOrBuilder getFilterOrBuilder() {
         if (filterBuilder_ != null) {
           return filterBuilder_.getMessageOrBuilder();
@@ -4259,6 +6318,9 @@ public final class Box2D {
           return filter_;
         }
       }
+      /**
+       * <code>optional .box2d.PbFilter filter = 10;</code>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbFilter, org.box2d.proto.Box2D.PbFilter.Builder, org.box2d.proto.Box2D.PbFilterOrBuilder> 
           getFilterFieldBuilder() {
@@ -4272,14 +6334,20 @@ public final class Box2D {
         }
         return filterBuilder_;
       }
-      
+
       // optional .box2d.PbShape shape = 11;
       private org.box2d.proto.Box2D.PbShape shape_ = org.box2d.proto.Box2D.PbShape.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbShape, org.box2d.proto.Box2D.PbShape.Builder, org.box2d.proto.Box2D.PbShapeOrBuilder> shapeBuilder_;
+      /**
+       * <code>optional .box2d.PbShape shape = 11;</code>
+       */
       public boolean hasShape() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
+      /**
+       * <code>optional .box2d.PbShape shape = 11;</code>
+       */
       public org.box2d.proto.Box2D.PbShape getShape() {
         if (shapeBuilder_ == null) {
           return shape_;
@@ -4287,6 +6355,9 @@ public final class Box2D {
           return shapeBuilder_.getMessage();
         }
       }
+      /**
+       * <code>optional .box2d.PbShape shape = 11;</code>
+       */
       public Builder setShape(org.box2d.proto.Box2D.PbShape value) {
         if (shapeBuilder_ == null) {
           if (value == null) {
@@ -4300,6 +6371,9 @@ public final class Box2D {
         bitField0_ |= 0x00000040;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbShape shape = 11;</code>
+       */
       public Builder setShape(
           org.box2d.proto.Box2D.PbShape.Builder builderForValue) {
         if (shapeBuilder_ == null) {
@@ -4311,6 +6385,9 @@ public final class Box2D {
         bitField0_ |= 0x00000040;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbShape shape = 11;</code>
+       */
       public Builder mergeShape(org.box2d.proto.Box2D.PbShape value) {
         if (shapeBuilder_ == null) {
           if (((bitField0_ & 0x00000040) == 0x00000040) &&
@@ -4327,6 +6404,9 @@ public final class Box2D {
         bitField0_ |= 0x00000040;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbShape shape = 11;</code>
+       */
       public Builder clearShape() {
         if (shapeBuilder_ == null) {
           shape_ = org.box2d.proto.Box2D.PbShape.getDefaultInstance();
@@ -4337,11 +6417,17 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
+      /**
+       * <code>optional .box2d.PbShape shape = 11;</code>
+       */
       public org.box2d.proto.Box2D.PbShape.Builder getShapeBuilder() {
         bitField0_ |= 0x00000040;
         onChanged();
         return getShapeFieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .box2d.PbShape shape = 11;</code>
+       */
       public org.box2d.proto.Box2D.PbShapeOrBuilder getShapeOrBuilder() {
         if (shapeBuilder_ != null) {
           return shapeBuilder_.getMessageOrBuilder();
@@ -4349,6 +6435,9 @@ public final class Box2D {
           return shape_;
         }
       }
+      /**
+       * <code>optional .box2d.PbShape shape = 11;</code>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbShape, org.box2d.proto.Box2D.PbShape.Builder, org.box2d.proto.Box2D.PbShapeOrBuilder> 
           getShapeFieldBuilder() {
@@ -4362,532 +6451,1726 @@ public final class Box2D {
         }
         return shapeBuilder_;
       }
-      
+
       // @@protoc_insertion_point(builder_scope:box2d.PbFixture)
     }
-    
+
     static {
       defaultInstance = new PbFixture(true);
       defaultInstance.initFields();
     }
-    
+
     // @@protoc_insertion_point(class_scope:box2d.PbFixture)
   }
-  
+
   public interface PbJointOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
-    
+
     // optional int64 tag = 1;
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     boolean hasTag();
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     long getTag();
-    
+
     // required .box2d.PbJointType type = 2;
+    /**
+     * <code>required .box2d.PbJointType type = 2;</code>
+     */
     boolean hasType();
+    /**
+     * <code>required .box2d.PbJointType type = 2;</code>
+     */
     org.box2d.proto.Box2D.PbJointType getType();
-    
+
     // optional int32 body_a = 3;
+    /**
+     * <code>optional int32 body_a = 3;</code>
+     */
     boolean hasBodyA();
+    /**
+     * <code>optional int32 body_a = 3;</code>
+     */
     int getBodyA();
-    
+
     // optional int32 body_b = 4;
+    /**
+     * <code>optional int32 body_b = 4;</code>
+     */
     boolean hasBodyB();
+    /**
+     * <code>optional int32 body_b = 4;</code>
+     */
     int getBodyB();
-    
+
     // optional bool collideConnected = 5;
+    /**
+     * <code>optional bool collideConnected = 5;</code>
+     */
     boolean hasCollideConnected();
+    /**
+     * <code>optional bool collideConnected = 5;</code>
+     */
     boolean getCollideConnected();
-    
+
     // optional .box2d.PbVec2 local_anchor_a = 6;
+    /**
+     * <code>optional .box2d.PbVec2 local_anchor_a = 6;</code>
+     */
     boolean hasLocalAnchorA();
+    /**
+     * <code>optional .box2d.PbVec2 local_anchor_a = 6;</code>
+     */
     org.box2d.proto.Box2D.PbVec2 getLocalAnchorA();
+    /**
+     * <code>optional .box2d.PbVec2 local_anchor_a = 6;</code>
+     */
     org.box2d.proto.Box2D.PbVec2OrBuilder getLocalAnchorAOrBuilder();
-    
+
     // optional .box2d.PbVec2 local_anchor_b = 7;
+    /**
+     * <code>optional .box2d.PbVec2 local_anchor_b = 7;</code>
+     */
     boolean hasLocalAnchorB();
+    /**
+     * <code>optional .box2d.PbVec2 local_anchor_b = 7;</code>
+     */
     org.box2d.proto.Box2D.PbVec2 getLocalAnchorB();
+    /**
+     * <code>optional .box2d.PbVec2 local_anchor_b = 7;</code>
+     */
     org.box2d.proto.Box2D.PbVec2OrBuilder getLocalAnchorBOrBuilder();
-    
+
     // optional float ref_angle = 10;
+    /**
+     * <code>optional float ref_angle = 10;</code>
+     *
+     * <pre>
+     * revolute, prismatic, joint
+     * </pre>
+     */
     boolean hasRefAngle();
+    /**
+     * <code>optional float ref_angle = 10;</code>
+     *
+     * <pre>
+     * revolute, prismatic, joint
+     * </pre>
+     */
     float getRefAngle();
-    
+
     // optional bool enable_limit = 12;
+    /**
+     * <code>optional bool enable_limit = 12;</code>
+     *
+     * <pre>
+     * revolute, prismatic
+     * </pre>
+     */
     boolean hasEnableLimit();
+    /**
+     * <code>optional bool enable_limit = 12;</code>
+     *
+     * <pre>
+     * revolute, prismatic
+     * </pre>
+     */
     boolean getEnableLimit();
-    
+
     // optional float lower_limit = 13;
+    /**
+     * <code>optional float lower_limit = 13;</code>
+     *
+     * <pre>
+     * revolute, prismatic
+     * </pre>
+     */
     boolean hasLowerLimit();
+    /**
+     * <code>optional float lower_limit = 13;</code>
+     *
+     * <pre>
+     * revolute, prismatic
+     * </pre>
+     */
     float getLowerLimit();
-    
+
     // optional float upper_limit = 14;
+    /**
+     * <code>optional float upper_limit = 14;</code>
+     *
+     * <pre>
+     * revolute, prismatic
+     * </pre>
+     */
     boolean hasUpperLimit();
+    /**
+     * <code>optional float upper_limit = 14;</code>
+     *
+     * <pre>
+     * revolute, prismatic
+     * </pre>
+     */
     float getUpperLimit();
-    
+
     // optional bool enable_motor = 15;
+    /**
+     * <code>optional bool enable_motor = 15;</code>
+     *
+     * <pre>
+     * revolute, prismatic, wheel
+     * </pre>
+     */
     boolean hasEnableMotor();
+    /**
+     * <code>optional bool enable_motor = 15;</code>
+     *
+     * <pre>
+     * revolute, prismatic, wheel
+     * </pre>
+     */
     boolean getEnableMotor();
-    
+
     // optional float motor_speed = 16;
+    /**
+     * <code>optional float motor_speed = 16;</code>
+     *
+     * <pre>
+     * revolute, prismatic, wheel
+     * </pre>
+     */
     boolean hasMotorSpeed();
+    /**
+     * <code>optional float motor_speed = 16;</code>
+     *
+     * <pre>
+     * revolute, prismatic, wheel
+     * </pre>
+     */
     float getMotorSpeed();
-    
+
     // optional float max_motor_torque = 17;
+    /**
+     * <code>optional float max_motor_torque = 17;</code>
+     *
+     * <pre>
+     * revolute, wheel
+     * </pre>
+     */
     boolean hasMaxMotorTorque();
+    /**
+     * <code>optional float max_motor_torque = 17;</code>
+     *
+     * <pre>
+     * revolute, wheel
+     * </pre>
+     */
     float getMaxMotorTorque();
-    
+
     // optional .box2d.PbVec2 local_axis_a = 20;
+    /**
+     * <code>optional .box2d.PbVec2 local_axis_a = 20;</code>
+     *
+     * <pre>
+     * prismatic, wheel
+     * </pre>
+     */
     boolean hasLocalAxisA();
+    /**
+     * <code>optional .box2d.PbVec2 local_axis_a = 20;</code>
+     *
+     * <pre>
+     * prismatic, wheel
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2 getLocalAxisA();
+    /**
+     * <code>optional .box2d.PbVec2 local_axis_a = 20;</code>
+     *
+     * <pre>
+     * prismatic, wheel
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2OrBuilder getLocalAxisAOrBuilder();
-    
+
     // optional float max_motor_force = 21;
+    /**
+     * <code>optional float max_motor_force = 21;</code>
+     *
+     * <pre>
+     * prismatic
+     * </pre>
+     */
     boolean hasMaxMotorForce();
+    /**
+     * <code>optional float max_motor_force = 21;</code>
+     *
+     * <pre>
+     * prismatic
+     * </pre>
+     */
     float getMaxMotorForce();
-    
+
     // optional float length = 30;
+    /**
+     * <code>optional float length = 30;</code>
+     *
+     * <pre>
+     * distance
+     * </pre>
+     */
     boolean hasLength();
+    /**
+     * <code>optional float length = 30;</code>
+     *
+     * <pre>
+     * distance
+     * </pre>
+     */
     float getLength();
-    
+
     // optional float frequency = 31;
+    /**
+     * <code>optional float frequency = 31;</code>
+     *
+     * <pre>
+     * distance, mouse, wheel, weld, con vol
+     * </pre>
+     */
     boolean hasFrequency();
+    /**
+     * <code>optional float frequency = 31;</code>
+     *
+     * <pre>
+     * distance, mouse, wheel, weld, con vol
+     * </pre>
+     */
     float getFrequency();
-    
+
     // optional float damping_ratio = 32;
+    /**
+     * <code>optional float damping_ratio = 32;</code>
+     *
+     * <pre>
+     * distance, mouse, wheel, weld, col vol
+     * </pre>
+     */
     boolean hasDampingRatio();
+    /**
+     * <code>optional float damping_ratio = 32;</code>
+     *
+     * <pre>
+     * distance, mouse, wheel, weld, col vol
+     * </pre>
+     */
     float getDampingRatio();
-    
+
     // optional .box2d.PbVec2 ground_anchor_a = 40;
+    /**
+     * <code>optional .box2d.PbVec2 ground_anchor_a = 40;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     boolean hasGroundAnchorA();
+    /**
+     * <code>optional .box2d.PbVec2 ground_anchor_a = 40;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2 getGroundAnchorA();
+    /**
+     * <code>optional .box2d.PbVec2 ground_anchor_a = 40;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2OrBuilder getGroundAnchorAOrBuilder();
-    
+
     // optional .box2d.PbVec2 ground_anchor_b = 41;
+    /**
+     * <code>optional .box2d.PbVec2 ground_anchor_b = 41;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     boolean hasGroundAnchorB();
+    /**
+     * <code>optional .box2d.PbVec2 ground_anchor_b = 41;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2 getGroundAnchorB();
+    /**
+     * <code>optional .box2d.PbVec2 ground_anchor_b = 41;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2OrBuilder getGroundAnchorBOrBuilder();
-    
+
     // optional float length_a = 42;
+    /**
+     * <code>optional float length_a = 42;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     boolean hasLengthA();
+    /**
+     * <code>optional float length_a = 42;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     float getLengthA();
-    
+
     // optional float length_b = 43;
+    /**
+     * <code>optional float length_b = 43;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     boolean hasLengthB();
+    /**
+     * <code>optional float length_b = 43;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     float getLengthB();
-    
+
     // optional float ratio = 44;
+    /**
+     * <code>optional float ratio = 44;</code>
+     *
+     * <pre>
+     * pulley, gear
+     * </pre>
+     */
     boolean hasRatio();
+    /**
+     * <code>optional float ratio = 44;</code>
+     *
+     * <pre>
+     * pulley, gear
+     * </pre>
+     */
     float getRatio();
-    
+
     // optional .box2d.PbVec2 target = 50;
+    /**
+     * <code>optional .box2d.PbVec2 target = 50;</code>
+     *
+     * <pre>
+     * mouse
+     * </pre>
+     */
     boolean hasTarget();
+    /**
+     * <code>optional .box2d.PbVec2 target = 50;</code>
+     *
+     * <pre>
+     * mouse
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2 getTarget();
+    /**
+     * <code>optional .box2d.PbVec2 target = 50;</code>
+     *
+     * <pre>
+     * mouse
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2OrBuilder getTargetOrBuilder();
-    
+
     // optional float max_force = 51;
+    /**
+     * <code>optional float max_force = 51;</code>
+     *
+     * <pre>
+     * mouse, friction, rope
+     * </pre>
+     */
     boolean hasMaxForce();
+    /**
+     * <code>optional float max_force = 51;</code>
+     *
+     * <pre>
+     * mouse, friction, rope
+     * </pre>
+     */
     float getMaxForce();
-    
+
     // optional int32 joint1 = 61;
+    /**
+     * <code>optional int32 joint1 = 61;</code>
+     *
+     * <pre>
+     * gear
+     * </pre>
+     */
     boolean hasJoint1();
+    /**
+     * <code>optional int32 joint1 = 61;</code>
+     *
+     * <pre>
+     * gear
+     * </pre>
+     */
     int getJoint1();
-    
+
     // optional int32 joint2 = 62;
+    /**
+     * <code>optional int32 joint2 = 62;</code>
+     *
+     * <pre>
+     * gear
+     * </pre>
+     */
     boolean hasJoint2();
+    /**
+     * <code>optional int32 joint2 = 62;</code>
+     *
+     * <pre>
+     * gear
+     * </pre>
+     */
     int getJoint2();
-    
+
     // optional float max_torque = 90;
+    /**
+     * <code>optional float max_torque = 90;</code>
+     *
+     * <pre>
+     * friction
+     * </pre>
+     */
     boolean hasMaxTorque();
+    /**
+     * <code>optional float max_torque = 90;</code>
+     *
+     * <pre>
+     * friction
+     * </pre>
+     */
     float getMaxTorque();
-    
+
     // optional float max_length = 100;
+    /**
+     * <code>optional float max_length = 100;</code>
+     *
+     * <pre>
+     * rope
+     * </pre>
+     */
     boolean hasMaxLength();
+    /**
+     * <code>optional float max_length = 100;</code>
+     *
+     * <pre>
+     * rope
+     * </pre>
+     */
     float getMaxLength();
-    
+
     // repeated int32 bodies = 110;
+    /**
+     * <code>repeated int32 bodies = 110;</code>
+     *
+     * <pre>
+     * con vol
+     * </pre>
+     */
     java.util.List<java.lang.Integer> getBodiesList();
+    /**
+     * <code>repeated int32 bodies = 110;</code>
+     *
+     * <pre>
+     * con vol
+     * </pre>
+     */
     int getBodiesCount();
+    /**
+     * <code>repeated int32 bodies = 110;</code>
+     *
+     * <pre>
+     * con vol
+     * </pre>
+     */
     int getBodies(int index);
-    
+
     // repeated int32 joints = 111;
+    /**
+     * <code>repeated int32 joints = 111;</code>
+     *
+     * <pre>
+     * con vol
+     * </pre>
+     */
     java.util.List<java.lang.Integer> getJointsList();
+    /**
+     * <code>repeated int32 joints = 111;</code>
+     *
+     * <pre>
+     * con vol
+     * </pre>
+     */
     int getJointsCount();
+    /**
+     * <code>repeated int32 joints = 111;</code>
+     *
+     * <pre>
+     * con vol
+     * </pre>
+     */
     int getJoints(int index);
   }
+  /**
+   * Protobuf type {@code box2d.PbJoint}
+   */
   public static final class PbJoint extends
       com.google.protobuf.GeneratedMessage
       implements PbJointOrBuilder {
     // Use PbJoint.newBuilder() to construct.
-    private PbJoint(Builder builder) {
+    private PbJoint(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private PbJoint(boolean noInit) {}
-    
+    private PbJoint(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
     private static final PbJoint defaultInstance;
     public static PbJoint getDefaultInstance() {
       return defaultInstance;
     }
-    
+
     public PbJoint getDefaultInstanceForType() {
       return defaultInstance;
     }
-    
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private PbJoint(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+              bitField0_ |= 0x00000001;
+              tag_ = input.readInt64();
+              break;
+            }
+            case 16: {
+              int rawValue = input.readEnum();
+              org.box2d.proto.Box2D.PbJointType value = org.box2d.proto.Box2D.PbJointType.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(2, rawValue);
+              } else {
+                bitField0_ |= 0x00000002;
+                type_ = value;
+              }
+              break;
+            }
+            case 24: {
+              bitField0_ |= 0x00000004;
+              bodyA_ = input.readInt32();
+              break;
+            }
+            case 32: {
+              bitField0_ |= 0x00000008;
+              bodyB_ = input.readInt32();
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000010;
+              collideConnected_ = input.readBool();
+              break;
+            }
+            case 50: {
+              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000020) == 0x00000020)) {
+                subBuilder = localAnchorA_.toBuilder();
+              }
+              localAnchorA_ = input.readMessage(org.box2d.proto.Box2D.PbVec2.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(localAnchorA_);
+                localAnchorA_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000020;
+              break;
+            }
+            case 58: {
+              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000040) == 0x00000040)) {
+                subBuilder = localAnchorB_.toBuilder();
+              }
+              localAnchorB_ = input.readMessage(org.box2d.proto.Box2D.PbVec2.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(localAnchorB_);
+                localAnchorB_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000040;
+              break;
+            }
+            case 85: {
+              bitField0_ |= 0x00000080;
+              refAngle_ = input.readFloat();
+              break;
+            }
+            case 96: {
+              bitField0_ |= 0x00000100;
+              enableLimit_ = input.readBool();
+              break;
+            }
+            case 109: {
+              bitField0_ |= 0x00000200;
+              lowerLimit_ = input.readFloat();
+              break;
+            }
+            case 117: {
+              bitField0_ |= 0x00000400;
+              upperLimit_ = input.readFloat();
+              break;
+            }
+            case 120: {
+              bitField0_ |= 0x00000800;
+              enableMotor_ = input.readBool();
+              break;
+            }
+            case 133: {
+              bitField0_ |= 0x00001000;
+              motorSpeed_ = input.readFloat();
+              break;
+            }
+            case 141: {
+              bitField0_ |= 0x00002000;
+              maxMotorTorque_ = input.readFloat();
+              break;
+            }
+            case 162: {
+              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = null;
+              if (((bitField0_ & 0x00004000) == 0x00004000)) {
+                subBuilder = localAxisA_.toBuilder();
+              }
+              localAxisA_ = input.readMessage(org.box2d.proto.Box2D.PbVec2.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(localAxisA_);
+                localAxisA_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00004000;
+              break;
+            }
+            case 173: {
+              bitField0_ |= 0x00008000;
+              maxMotorForce_ = input.readFloat();
+              break;
+            }
+            case 245: {
+              bitField0_ |= 0x00010000;
+              length_ = input.readFloat();
+              break;
+            }
+            case 253: {
+              bitField0_ |= 0x00020000;
+              frequency_ = input.readFloat();
+              break;
+            }
+            case 261: {
+              bitField0_ |= 0x00040000;
+              dampingRatio_ = input.readFloat();
+              break;
+            }
+            case 322: {
+              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = null;
+              if (((bitField0_ & 0x00080000) == 0x00080000)) {
+                subBuilder = groundAnchorA_.toBuilder();
+              }
+              groundAnchorA_ = input.readMessage(org.box2d.proto.Box2D.PbVec2.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(groundAnchorA_);
+                groundAnchorA_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00080000;
+              break;
+            }
+            case 330: {
+              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = null;
+              if (((bitField0_ & 0x00100000) == 0x00100000)) {
+                subBuilder = groundAnchorB_.toBuilder();
+              }
+              groundAnchorB_ = input.readMessage(org.box2d.proto.Box2D.PbVec2.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(groundAnchorB_);
+                groundAnchorB_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00100000;
+              break;
+            }
+            case 341: {
+              bitField0_ |= 0x00200000;
+              lengthA_ = input.readFloat();
+              break;
+            }
+            case 349: {
+              bitField0_ |= 0x00400000;
+              lengthB_ = input.readFloat();
+              break;
+            }
+            case 357: {
+              bitField0_ |= 0x00800000;
+              ratio_ = input.readFloat();
+              break;
+            }
+            case 402: {
+              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = null;
+              if (((bitField0_ & 0x01000000) == 0x01000000)) {
+                subBuilder = target_.toBuilder();
+              }
+              target_ = input.readMessage(org.box2d.proto.Box2D.PbVec2.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(target_);
+                target_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x01000000;
+              break;
+            }
+            case 413: {
+              bitField0_ |= 0x02000000;
+              maxForce_ = input.readFloat();
+              break;
+            }
+            case 488: {
+              bitField0_ |= 0x04000000;
+              joint1_ = input.readInt32();
+              break;
+            }
+            case 496: {
+              bitField0_ |= 0x08000000;
+              joint2_ = input.readInt32();
+              break;
+            }
+            case 725: {
+              bitField0_ |= 0x10000000;
+              maxTorque_ = input.readFloat();
+              break;
+            }
+            case 805: {
+              bitField0_ |= 0x20000000;
+              maxLength_ = input.readFloat();
+              break;
+            }
+            case 880: {
+              if (!((mutable_bitField0_ & 0x40000000) == 0x40000000)) {
+                bodies_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x40000000;
+              }
+              bodies_.add(input.readInt32());
+              break;
+            }
+            case 882: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              if (!((mutable_bitField0_ & 0x40000000) == 0x40000000) && input.getBytesUntilLimit() > 0) {
+                bodies_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x40000000;
+              }
+              while (input.getBytesUntilLimit() > 0) {
+                bodies_.add(input.readInt32());
+              }
+              input.popLimit(limit);
+              break;
+            }
+            case 888: {
+              if (!((mutable_bitField0_ & 0x80000000) == 0x80000000)) {
+                joints_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x80000000;
+              }
+              joints_.add(input.readInt32());
+              break;
+            }
+            case 890: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              if (!((mutable_bitField0_ & 0x80000000) == 0x80000000) && input.getBytesUntilLimit() > 0) {
+                joints_ = new java.util.ArrayList<java.lang.Integer>();
+                mutable_bitField0_ |= 0x80000000;
+              }
+              while (input.getBytesUntilLimit() > 0) {
+                joints_.add(input.readInt32());
+              }
+              input.popLimit(limit);
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x40000000) == 0x40000000)) {
+          bodies_ = java.util.Collections.unmodifiableList(bodies_);
+        }
+        if (((mutable_bitField0_ & 0x80000000) == 0x80000000)) {
+          joints_ = java.util.Collections.unmodifiableList(joints_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return org.box2d.proto.Box2D.internal_static_box2d_PbJoint_descriptor;
     }
-    
+
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return org.box2d.proto.Box2D.internal_static_box2d_PbJoint_fieldAccessorTable;
+      return org.box2d.proto.Box2D.internal_static_box2d_PbJoint_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.box2d.proto.Box2D.PbJoint.class, org.box2d.proto.Box2D.PbJoint.Builder.class);
     }
-    
+
+    public static com.google.protobuf.Parser<PbJoint> PARSER =
+        new com.google.protobuf.AbstractParser<PbJoint>() {
+      public PbJoint parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new PbJoint(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PbJoint> getParserForType() {
+      return PARSER;
+    }
+
     private int bitField0_;
     // optional int64 tag = 1;
     public static final int TAG_FIELD_NUMBER = 1;
     private long tag_;
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     public boolean hasTag() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     public long getTag() {
       return tag_;
     }
-    
+
     // required .box2d.PbJointType type = 2;
     public static final int TYPE_FIELD_NUMBER = 2;
     private org.box2d.proto.Box2D.PbJointType type_;
+    /**
+     * <code>required .box2d.PbJointType type = 2;</code>
+     */
     public boolean hasType() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
+    /**
+     * <code>required .box2d.PbJointType type = 2;</code>
+     */
     public org.box2d.proto.Box2D.PbJointType getType() {
       return type_;
     }
-    
+
     // optional int32 body_a = 3;
     public static final int BODY_A_FIELD_NUMBER = 3;
     private int bodyA_;
+    /**
+     * <code>optional int32 body_a = 3;</code>
+     */
     public boolean hasBodyA() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
+    /**
+     * <code>optional int32 body_a = 3;</code>
+     */
     public int getBodyA() {
       return bodyA_;
     }
-    
+
     // optional int32 body_b = 4;
     public static final int BODY_B_FIELD_NUMBER = 4;
     private int bodyB_;
+    /**
+     * <code>optional int32 body_b = 4;</code>
+     */
     public boolean hasBodyB() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
+    /**
+     * <code>optional int32 body_b = 4;</code>
+     */
     public int getBodyB() {
       return bodyB_;
     }
-    
+
     // optional bool collideConnected = 5;
     public static final int COLLIDECONNECTED_FIELD_NUMBER = 5;
     private boolean collideConnected_;
+    /**
+     * <code>optional bool collideConnected = 5;</code>
+     */
     public boolean hasCollideConnected() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
+    /**
+     * <code>optional bool collideConnected = 5;</code>
+     */
     public boolean getCollideConnected() {
       return collideConnected_;
     }
-    
+
     // optional .box2d.PbVec2 local_anchor_a = 6;
     public static final int LOCAL_ANCHOR_A_FIELD_NUMBER = 6;
     private org.box2d.proto.Box2D.PbVec2 localAnchorA_;
+    /**
+     * <code>optional .box2d.PbVec2 local_anchor_a = 6;</code>
+     */
     public boolean hasLocalAnchorA() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
+    /**
+     * <code>optional .box2d.PbVec2 local_anchor_a = 6;</code>
+     */
     public org.box2d.proto.Box2D.PbVec2 getLocalAnchorA() {
       return localAnchorA_;
     }
+    /**
+     * <code>optional .box2d.PbVec2 local_anchor_a = 6;</code>
+     */
     public org.box2d.proto.Box2D.PbVec2OrBuilder getLocalAnchorAOrBuilder() {
       return localAnchorA_;
     }
-    
+
     // optional .box2d.PbVec2 local_anchor_b = 7;
     public static final int LOCAL_ANCHOR_B_FIELD_NUMBER = 7;
     private org.box2d.proto.Box2D.PbVec2 localAnchorB_;
+    /**
+     * <code>optional .box2d.PbVec2 local_anchor_b = 7;</code>
+     */
     public boolean hasLocalAnchorB() {
       return ((bitField0_ & 0x00000040) == 0x00000040);
     }
+    /**
+     * <code>optional .box2d.PbVec2 local_anchor_b = 7;</code>
+     */
     public org.box2d.proto.Box2D.PbVec2 getLocalAnchorB() {
       return localAnchorB_;
     }
+    /**
+     * <code>optional .box2d.PbVec2 local_anchor_b = 7;</code>
+     */
     public org.box2d.proto.Box2D.PbVec2OrBuilder getLocalAnchorBOrBuilder() {
       return localAnchorB_;
     }
-    
+
     // optional float ref_angle = 10;
     public static final int REF_ANGLE_FIELD_NUMBER = 10;
     private float refAngle_;
+    /**
+     * <code>optional float ref_angle = 10;</code>
+     *
+     * <pre>
+     * revolute, prismatic, joint
+     * </pre>
+     */
     public boolean hasRefAngle() {
       return ((bitField0_ & 0x00000080) == 0x00000080);
     }
+    /**
+     * <code>optional float ref_angle = 10;</code>
+     *
+     * <pre>
+     * revolute, prismatic, joint
+     * </pre>
+     */
     public float getRefAngle() {
       return refAngle_;
     }
-    
+
     // optional bool enable_limit = 12;
     public static final int ENABLE_LIMIT_FIELD_NUMBER = 12;
     private boolean enableLimit_;
+    /**
+     * <code>optional bool enable_limit = 12;</code>
+     *
+     * <pre>
+     * revolute, prismatic
+     * </pre>
+     */
     public boolean hasEnableLimit() {
       return ((bitField0_ & 0x00000100) == 0x00000100);
     }
+    /**
+     * <code>optional bool enable_limit = 12;</code>
+     *
+     * <pre>
+     * revolute, prismatic
+     * </pre>
+     */
     public boolean getEnableLimit() {
       return enableLimit_;
     }
-    
+
     // optional float lower_limit = 13;
     public static final int LOWER_LIMIT_FIELD_NUMBER = 13;
     private float lowerLimit_;
+    /**
+     * <code>optional float lower_limit = 13;</code>
+     *
+     * <pre>
+     * revolute, prismatic
+     * </pre>
+     */
     public boolean hasLowerLimit() {
       return ((bitField0_ & 0x00000200) == 0x00000200);
     }
+    /**
+     * <code>optional float lower_limit = 13;</code>
+     *
+     * <pre>
+     * revolute, prismatic
+     * </pre>
+     */
     public float getLowerLimit() {
       return lowerLimit_;
     }
-    
+
     // optional float upper_limit = 14;
     public static final int UPPER_LIMIT_FIELD_NUMBER = 14;
     private float upperLimit_;
+    /**
+     * <code>optional float upper_limit = 14;</code>
+     *
+     * <pre>
+     * revolute, prismatic
+     * </pre>
+     */
     public boolean hasUpperLimit() {
       return ((bitField0_ & 0x00000400) == 0x00000400);
     }
+    /**
+     * <code>optional float upper_limit = 14;</code>
+     *
+     * <pre>
+     * revolute, prismatic
+     * </pre>
+     */
     public float getUpperLimit() {
       return upperLimit_;
     }
-    
+
     // optional bool enable_motor = 15;
     public static final int ENABLE_MOTOR_FIELD_NUMBER = 15;
     private boolean enableMotor_;
+    /**
+     * <code>optional bool enable_motor = 15;</code>
+     *
+     * <pre>
+     * revolute, prismatic, wheel
+     * </pre>
+     */
     public boolean hasEnableMotor() {
       return ((bitField0_ & 0x00000800) == 0x00000800);
     }
+    /**
+     * <code>optional bool enable_motor = 15;</code>
+     *
+     * <pre>
+     * revolute, prismatic, wheel
+     * </pre>
+     */
     public boolean getEnableMotor() {
       return enableMotor_;
     }
-    
+
     // optional float motor_speed = 16;
     public static final int MOTOR_SPEED_FIELD_NUMBER = 16;
     private float motorSpeed_;
+    /**
+     * <code>optional float motor_speed = 16;</code>
+     *
+     * <pre>
+     * revolute, prismatic, wheel
+     * </pre>
+     */
     public boolean hasMotorSpeed() {
       return ((bitField0_ & 0x00001000) == 0x00001000);
     }
+    /**
+     * <code>optional float motor_speed = 16;</code>
+     *
+     * <pre>
+     * revolute, prismatic, wheel
+     * </pre>
+     */
     public float getMotorSpeed() {
       return motorSpeed_;
     }
-    
+
     // optional float max_motor_torque = 17;
     public static final int MAX_MOTOR_TORQUE_FIELD_NUMBER = 17;
     private float maxMotorTorque_;
+    /**
+     * <code>optional float max_motor_torque = 17;</code>
+     *
+     * <pre>
+     * revolute, wheel
+     * </pre>
+     */
     public boolean hasMaxMotorTorque() {
       return ((bitField0_ & 0x00002000) == 0x00002000);
     }
+    /**
+     * <code>optional float max_motor_torque = 17;</code>
+     *
+     * <pre>
+     * revolute, wheel
+     * </pre>
+     */
     public float getMaxMotorTorque() {
       return maxMotorTorque_;
     }
-    
+
     // optional .box2d.PbVec2 local_axis_a = 20;
     public static final int LOCAL_AXIS_A_FIELD_NUMBER = 20;
     private org.box2d.proto.Box2D.PbVec2 localAxisA_;
+    /**
+     * <code>optional .box2d.PbVec2 local_axis_a = 20;</code>
+     *
+     * <pre>
+     * prismatic, wheel
+     * </pre>
+     */
     public boolean hasLocalAxisA() {
       return ((bitField0_ & 0x00004000) == 0x00004000);
     }
+    /**
+     * <code>optional .box2d.PbVec2 local_axis_a = 20;</code>
+     *
+     * <pre>
+     * prismatic, wheel
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2 getLocalAxisA() {
       return localAxisA_;
     }
+    /**
+     * <code>optional .box2d.PbVec2 local_axis_a = 20;</code>
+     *
+     * <pre>
+     * prismatic, wheel
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2OrBuilder getLocalAxisAOrBuilder() {
       return localAxisA_;
     }
-    
+
     // optional float max_motor_force = 21;
     public static final int MAX_MOTOR_FORCE_FIELD_NUMBER = 21;
     private float maxMotorForce_;
+    /**
+     * <code>optional float max_motor_force = 21;</code>
+     *
+     * <pre>
+     * prismatic
+     * </pre>
+     */
     public boolean hasMaxMotorForce() {
       return ((bitField0_ & 0x00008000) == 0x00008000);
     }
+    /**
+     * <code>optional float max_motor_force = 21;</code>
+     *
+     * <pre>
+     * prismatic
+     * </pre>
+     */
     public float getMaxMotorForce() {
       return maxMotorForce_;
     }
-    
+
     // optional float length = 30;
     public static final int LENGTH_FIELD_NUMBER = 30;
     private float length_;
+    /**
+     * <code>optional float length = 30;</code>
+     *
+     * <pre>
+     * distance
+     * </pre>
+     */
     public boolean hasLength() {
       return ((bitField0_ & 0x00010000) == 0x00010000);
     }
+    /**
+     * <code>optional float length = 30;</code>
+     *
+     * <pre>
+     * distance
+     * </pre>
+     */
     public float getLength() {
       return length_;
     }
-    
+
     // optional float frequency = 31;
     public static final int FREQUENCY_FIELD_NUMBER = 31;
     private float frequency_;
+    /**
+     * <code>optional float frequency = 31;</code>
+     *
+     * <pre>
+     * distance, mouse, wheel, weld, con vol
+     * </pre>
+     */
     public boolean hasFrequency() {
       return ((bitField0_ & 0x00020000) == 0x00020000);
     }
+    /**
+     * <code>optional float frequency = 31;</code>
+     *
+     * <pre>
+     * distance, mouse, wheel, weld, con vol
+     * </pre>
+     */
     public float getFrequency() {
       return frequency_;
     }
-    
+
     // optional float damping_ratio = 32;
     public static final int DAMPING_RATIO_FIELD_NUMBER = 32;
     private float dampingRatio_;
+    /**
+     * <code>optional float damping_ratio = 32;</code>
+     *
+     * <pre>
+     * distance, mouse, wheel, weld, col vol
+     * </pre>
+     */
     public boolean hasDampingRatio() {
       return ((bitField0_ & 0x00040000) == 0x00040000);
     }
+    /**
+     * <code>optional float damping_ratio = 32;</code>
+     *
+     * <pre>
+     * distance, mouse, wheel, weld, col vol
+     * </pre>
+     */
     public float getDampingRatio() {
       return dampingRatio_;
     }
-    
+
     // optional .box2d.PbVec2 ground_anchor_a = 40;
     public static final int GROUND_ANCHOR_A_FIELD_NUMBER = 40;
     private org.box2d.proto.Box2D.PbVec2 groundAnchorA_;
+    /**
+     * <code>optional .box2d.PbVec2 ground_anchor_a = 40;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     public boolean hasGroundAnchorA() {
       return ((bitField0_ & 0x00080000) == 0x00080000);
     }
+    /**
+     * <code>optional .box2d.PbVec2 ground_anchor_a = 40;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2 getGroundAnchorA() {
       return groundAnchorA_;
     }
+    /**
+     * <code>optional .box2d.PbVec2 ground_anchor_a = 40;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2OrBuilder getGroundAnchorAOrBuilder() {
       return groundAnchorA_;
     }
-    
+
     // optional .box2d.PbVec2 ground_anchor_b = 41;
     public static final int GROUND_ANCHOR_B_FIELD_NUMBER = 41;
     private org.box2d.proto.Box2D.PbVec2 groundAnchorB_;
+    /**
+     * <code>optional .box2d.PbVec2 ground_anchor_b = 41;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     public boolean hasGroundAnchorB() {
       return ((bitField0_ & 0x00100000) == 0x00100000);
     }
+    /**
+     * <code>optional .box2d.PbVec2 ground_anchor_b = 41;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2 getGroundAnchorB() {
       return groundAnchorB_;
     }
+    /**
+     * <code>optional .box2d.PbVec2 ground_anchor_b = 41;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2OrBuilder getGroundAnchorBOrBuilder() {
       return groundAnchorB_;
     }
-    
+
     // optional float length_a = 42;
     public static final int LENGTH_A_FIELD_NUMBER = 42;
     private float lengthA_;
+    /**
+     * <code>optional float length_a = 42;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     public boolean hasLengthA() {
       return ((bitField0_ & 0x00200000) == 0x00200000);
     }
+    /**
+     * <code>optional float length_a = 42;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     public float getLengthA() {
       return lengthA_;
     }
-    
+
     // optional float length_b = 43;
     public static final int LENGTH_B_FIELD_NUMBER = 43;
     private float lengthB_;
+    /**
+     * <code>optional float length_b = 43;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     public boolean hasLengthB() {
       return ((bitField0_ & 0x00400000) == 0x00400000);
     }
+    /**
+     * <code>optional float length_b = 43;</code>
+     *
+     * <pre>
+     * pulley
+     * </pre>
+     */
     public float getLengthB() {
       return lengthB_;
     }
-    
+
     // optional float ratio = 44;
     public static final int RATIO_FIELD_NUMBER = 44;
     private float ratio_;
+    /**
+     * <code>optional float ratio = 44;</code>
+     *
+     * <pre>
+     * pulley, gear
+     * </pre>
+     */
     public boolean hasRatio() {
       return ((bitField0_ & 0x00800000) == 0x00800000);
     }
+    /**
+     * <code>optional float ratio = 44;</code>
+     *
+     * <pre>
+     * pulley, gear
+     * </pre>
+     */
     public float getRatio() {
       return ratio_;
     }
-    
+
     // optional .box2d.PbVec2 target = 50;
     public static final int TARGET_FIELD_NUMBER = 50;
     private org.box2d.proto.Box2D.PbVec2 target_;
+    /**
+     * <code>optional .box2d.PbVec2 target = 50;</code>
+     *
+     * <pre>
+     * mouse
+     * </pre>
+     */
     public boolean hasTarget() {
       return ((bitField0_ & 0x01000000) == 0x01000000);
     }
+    /**
+     * <code>optional .box2d.PbVec2 target = 50;</code>
+     *
+     * <pre>
+     * mouse
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2 getTarget() {
       return target_;
     }
+    /**
+     * <code>optional .box2d.PbVec2 target = 50;</code>
+     *
+     * <pre>
+     * mouse
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2OrBuilder getTargetOrBuilder() {
       return target_;
     }
-    
+
     // optional float max_force = 51;
     public static final int MAX_FORCE_FIELD_NUMBER = 51;
     private float maxForce_;
+    /**
+     * <code>optional float max_force = 51;</code>
+     *
+     * <pre>
+     * mouse, friction, rope
+     * </pre>
+     */
     public boolean hasMaxForce() {
       return ((bitField0_ & 0x02000000) == 0x02000000);
     }
+    /**
+     * <code>optional float max_force = 51;</code>
+     *
+     * <pre>
+     * mouse, friction, rope
+     * </pre>
+     */
     public float getMaxForce() {
       return maxForce_;
     }
-    
+
     // optional int32 joint1 = 61;
     public static final int JOINT1_FIELD_NUMBER = 61;
     private int joint1_;
+    /**
+     * <code>optional int32 joint1 = 61;</code>
+     *
+     * <pre>
+     * gear
+     * </pre>
+     */
     public boolean hasJoint1() {
       return ((bitField0_ & 0x04000000) == 0x04000000);
     }
+    /**
+     * <code>optional int32 joint1 = 61;</code>
+     *
+     * <pre>
+     * gear
+     * </pre>
+     */
     public int getJoint1() {
       return joint1_;
     }
-    
+
     // optional int32 joint2 = 62;
     public static final int JOINT2_FIELD_NUMBER = 62;
     private int joint2_;
+    /**
+     * <code>optional int32 joint2 = 62;</code>
+     *
+     * <pre>
+     * gear
+     * </pre>
+     */
     public boolean hasJoint2() {
       return ((bitField0_ & 0x08000000) == 0x08000000);
     }
+    /**
+     * <code>optional int32 joint2 = 62;</code>
+     *
+     * <pre>
+     * gear
+     * </pre>
+     */
     public int getJoint2() {
       return joint2_;
     }
-    
+
     // optional float max_torque = 90;
     public static final int MAX_TORQUE_FIELD_NUMBER = 90;
     private float maxTorque_;
+    /**
+     * <code>optional float max_torque = 90;</code>
+     *
+     * <pre>
+     * friction
+     * </pre>
+     */
     public boolean hasMaxTorque() {
       return ((bitField0_ & 0x10000000) == 0x10000000);
     }
+    /**
+     * <code>optional float max_torque = 90;</code>
+     *
+     * <pre>
+     * friction
+     * </pre>
+     */
     public float getMaxTorque() {
       return maxTorque_;
     }
-    
+
     // optional float max_length = 100;
     public static final int MAX_LENGTH_FIELD_NUMBER = 100;
     private float maxLength_;
+    /**
+     * <code>optional float max_length = 100;</code>
+     *
+     * <pre>
+     * rope
+     * </pre>
+     */
     public boolean hasMaxLength() {
       return ((bitField0_ & 0x20000000) == 0x20000000);
     }
+    /**
+     * <code>optional float max_length = 100;</code>
+     *
+     * <pre>
+     * rope
+     * </pre>
+     */
     public float getMaxLength() {
       return maxLength_;
     }
-    
+
     // repeated int32 bodies = 110;
     public static final int BODIES_FIELD_NUMBER = 110;
     private java.util.List<java.lang.Integer> bodies_;
+    /**
+     * <code>repeated int32 bodies = 110;</code>
+     *
+     * <pre>
+     * con vol
+     * </pre>
+     */
     public java.util.List<java.lang.Integer>
         getBodiesList() {
       return bodies_;
     }
+    /**
+     * <code>repeated int32 bodies = 110;</code>
+     *
+     * <pre>
+     * con vol
+     * </pre>
+     */
     public int getBodiesCount() {
       return bodies_.size();
     }
+    /**
+     * <code>repeated int32 bodies = 110;</code>
+     *
+     * <pre>
+     * con vol
+     * </pre>
+     */
     public int getBodies(int index) {
       return bodies_.get(index);
     }
-    
+
     // repeated int32 joints = 111;
     public static final int JOINTS_FIELD_NUMBER = 111;
     private java.util.List<java.lang.Integer> joints_;
+    /**
+     * <code>repeated int32 joints = 111;</code>
+     *
+     * <pre>
+     * con vol
+     * </pre>
+     */
     public java.util.List<java.lang.Integer>
         getJointsList() {
       return joints_;
     }
+    /**
+     * <code>repeated int32 joints = 111;</code>
+     *
+     * <pre>
+     * con vol
+     * </pre>
+     */
     public int getJointsCount() {
       return joints_.size();
     }
+    /**
+     * <code>repeated int32 joints = 111;</code>
+     *
+     * <pre>
+     * con vol
+     * </pre>
+     */
     public int getJoints(int index) {
       return joints_.get(index);
     }
-    
+
     private void initFields() {
       tag_ = 0L;
       type_ = org.box2d.proto.Box2D.PbJointType.DISTANCE;
@@ -4919,14 +8202,14 @@ public final class Box2D {
       joint2_ = 0;
       maxTorque_ = 0F;
       maxLength_ = 0F;
-      bodies_ = java.util.Collections.emptyList();;
-      joints_ = java.util.Collections.emptyList();;
+      bodies_ = java.util.Collections.emptyList();
+      joints_ = java.util.Collections.emptyList();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
-      
+
       if (!hasType()) {
         memoizedIsInitialized = 0;
         return false;
@@ -4970,7 +8253,7 @@ public final class Box2D {
       memoizedIsInitialized = 1;
       return true;
     }
-    
+
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
@@ -5072,12 +8355,12 @@ public final class Box2D {
       }
       getUnknownFields().writeTo(output);
     }
-    
+
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
-    
+
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
@@ -5221,94 +8504,83 @@ public final class Box2D {
       memoizedSerializedSize = size;
       return size;
     }
-    
+
     private static final long serialVersionUID = 0L;
     @java.lang.Override
     protected java.lang.Object writeReplace()
         throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
-    
+
     public static org.box2d.proto.Box2D.PbJoint parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static org.box2d.proto.Box2D.PbJoint parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbJoint parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static org.box2d.proto.Box2D.PbJoint parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbJoint parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static org.box2d.proto.Box2D.PbJoint parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbJoint parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input);
     }
     public static org.box2d.proto.Box2D.PbJoint parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbJoint parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static org.box2d.proto.Box2D.PbJoint parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
-    
+
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder(org.box2d.proto.Box2D.PbJoint prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
-    
+
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
+    /**
+     * Protobuf type {@code box2d.PbJoint}
+     */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
        implements org.box2d.proto.Box2D.PbJointOrBuilder {
@@ -5316,18 +8588,21 @@ public final class Box2D {
           getDescriptor() {
         return org.box2d.proto.Box2D.internal_static_box2d_PbJoint_descriptor;
       }
-      
+
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return org.box2d.proto.Box2D.internal_static_box2d_PbJoint_fieldAccessorTable;
+        return org.box2d.proto.Box2D.internal_static_box2d_PbJoint_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.box2d.proto.Box2D.PbJoint.class, org.box2d.proto.Box2D.PbJoint.Builder.class);
       }
-      
+
       // Construct using org.box2d.proto.Box2D.PbJoint.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
-      
-      private Builder(BuilderParent parent) {
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
@@ -5344,7 +8619,7 @@ public final class Box2D {
       private static Builder create() {
         return new Builder();
       }
-      
+
       public Builder clear() {
         super.clear();
         tag_ = 0L;
@@ -5431,26 +8706,26 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x10000000);
         maxLength_ = 0F;
         bitField0_ = (bitField0_ & ~0x20000000);
-        bodies_ = java.util.Collections.emptyList();;
+        bodies_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x40000000);
-        joints_ = java.util.Collections.emptyList();;
+        joints_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x80000000);
         return this;
       }
-      
+
       public Builder clone() {
         return create().mergeFrom(buildPartial());
       }
-      
+
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return org.box2d.proto.Box2D.PbJoint.getDescriptor();
+        return org.box2d.proto.Box2D.internal_static_box2d_PbJoint_descriptor;
       }
-      
+
       public org.box2d.proto.Box2D.PbJoint getDefaultInstanceForType() {
         return org.box2d.proto.Box2D.PbJoint.getDefaultInstance();
       }
-      
+
       public org.box2d.proto.Box2D.PbJoint build() {
         org.box2d.proto.Box2D.PbJoint result = buildPartial();
         if (!result.isInitialized()) {
@@ -5458,17 +8733,7 @@ public final class Box2D {
         }
         return result;
       }
-      
-      private org.box2d.proto.Box2D.PbJoint buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        org.box2d.proto.Box2D.PbJoint result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
+
       public org.box2d.proto.Box2D.PbJoint buildPartial() {
         org.box2d.proto.Box2D.PbJoint result = new org.box2d.proto.Box2D.PbJoint(this);
         int from_bitField0_ = bitField0_;
@@ -5631,7 +8896,7 @@ public final class Box2D {
         onBuilt();
         return result;
       }
-      
+
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.box2d.proto.Box2D.PbJoint) {
           return mergeFrom((org.box2d.proto.Box2D.PbJoint)other);
@@ -5640,7 +8905,7 @@ public final class Box2D {
           return this;
         }
       }
-      
+
       public Builder mergeFrom(org.box2d.proto.Box2D.PbJoint other) {
         if (other == org.box2d.proto.Box2D.PbJoint.getDefaultInstance()) return this;
         if (other.hasTag()) {
@@ -5756,7 +9021,7 @@ public final class Box2D {
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
-      
+
       public final boolean isInitialized() {
         if (!hasType()) {
           
@@ -5800,273 +9065,76 @@ public final class Box2D {
         }
         return true;
       }
-      
+
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
-              }
-              break;
-            }
-            case 8: {
-              bitField0_ |= 0x00000001;
-              tag_ = input.readInt64();
-              break;
-            }
-            case 16: {
-              int rawValue = input.readEnum();
-              org.box2d.proto.Box2D.PbJointType value = org.box2d.proto.Box2D.PbJointType.valueOf(rawValue);
-              if (value == null) {
-                unknownFields.mergeVarintField(2, rawValue);
-              } else {
-                bitField0_ |= 0x00000002;
-                type_ = value;
-              }
-              break;
-            }
-            case 24: {
-              bitField0_ |= 0x00000004;
-              bodyA_ = input.readInt32();
-              break;
-            }
-            case 32: {
-              bitField0_ |= 0x00000008;
-              bodyB_ = input.readInt32();
-              break;
-            }
-            case 40: {
-              bitField0_ |= 0x00000010;
-              collideConnected_ = input.readBool();
-              break;
-            }
-            case 50: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              if (hasLocalAnchorA()) {
-                subBuilder.mergeFrom(getLocalAnchorA());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setLocalAnchorA(subBuilder.buildPartial());
-              break;
-            }
-            case 58: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              if (hasLocalAnchorB()) {
-                subBuilder.mergeFrom(getLocalAnchorB());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setLocalAnchorB(subBuilder.buildPartial());
-              break;
-            }
-            case 85: {
-              bitField0_ |= 0x00000080;
-              refAngle_ = input.readFloat();
-              break;
-            }
-            case 96: {
-              bitField0_ |= 0x00000100;
-              enableLimit_ = input.readBool();
-              break;
-            }
-            case 109: {
-              bitField0_ |= 0x00000200;
-              lowerLimit_ = input.readFloat();
-              break;
-            }
-            case 117: {
-              bitField0_ |= 0x00000400;
-              upperLimit_ = input.readFloat();
-              break;
-            }
-            case 120: {
-              bitField0_ |= 0x00000800;
-              enableMotor_ = input.readBool();
-              break;
-            }
-            case 133: {
-              bitField0_ |= 0x00001000;
-              motorSpeed_ = input.readFloat();
-              break;
-            }
-            case 141: {
-              bitField0_ |= 0x00002000;
-              maxMotorTorque_ = input.readFloat();
-              break;
-            }
-            case 162: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              if (hasLocalAxisA()) {
-                subBuilder.mergeFrom(getLocalAxisA());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setLocalAxisA(subBuilder.buildPartial());
-              break;
-            }
-            case 173: {
-              bitField0_ |= 0x00008000;
-              maxMotorForce_ = input.readFloat();
-              break;
-            }
-            case 245: {
-              bitField0_ |= 0x00010000;
-              length_ = input.readFloat();
-              break;
-            }
-            case 253: {
-              bitField0_ |= 0x00020000;
-              frequency_ = input.readFloat();
-              break;
-            }
-            case 261: {
-              bitField0_ |= 0x00040000;
-              dampingRatio_ = input.readFloat();
-              break;
-            }
-            case 322: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              if (hasGroundAnchorA()) {
-                subBuilder.mergeFrom(getGroundAnchorA());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setGroundAnchorA(subBuilder.buildPartial());
-              break;
-            }
-            case 330: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              if (hasGroundAnchorB()) {
-                subBuilder.mergeFrom(getGroundAnchorB());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setGroundAnchorB(subBuilder.buildPartial());
-              break;
-            }
-            case 341: {
-              bitField0_ |= 0x00200000;
-              lengthA_ = input.readFloat();
-              break;
-            }
-            case 349: {
-              bitField0_ |= 0x00400000;
-              lengthB_ = input.readFloat();
-              break;
-            }
-            case 357: {
-              bitField0_ |= 0x00800000;
-              ratio_ = input.readFloat();
-              break;
-            }
-            case 402: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              if (hasTarget()) {
-                subBuilder.mergeFrom(getTarget());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setTarget(subBuilder.buildPartial());
-              break;
-            }
-            case 413: {
-              bitField0_ |= 0x02000000;
-              maxForce_ = input.readFloat();
-              break;
-            }
-            case 488: {
-              bitField0_ |= 0x04000000;
-              joint1_ = input.readInt32();
-              break;
-            }
-            case 496: {
-              bitField0_ |= 0x08000000;
-              joint2_ = input.readInt32();
-              break;
-            }
-            case 725: {
-              bitField0_ |= 0x10000000;
-              maxTorque_ = input.readFloat();
-              break;
-            }
-            case 805: {
-              bitField0_ |= 0x20000000;
-              maxLength_ = input.readFloat();
-              break;
-            }
-            case 880: {
-              ensureBodiesIsMutable();
-              bodies_.add(input.readInt32());
-              break;
-            }
-            case 882: {
-              int length = input.readRawVarint32();
-              int limit = input.pushLimit(length);
-              while (input.getBytesUntilLimit() > 0) {
-                addBodies(input.readInt32());
-              }
-              input.popLimit(limit);
-              break;
-            }
-            case 888: {
-              ensureJointsIsMutable();
-              joints_.add(input.readInt32());
-              break;
-            }
-            case 890: {
-              int length = input.readRawVarint32();
-              int limit = input.pushLimit(length);
-              while (input.getBytesUntilLimit() > 0) {
-                addJoints(input.readInt32());
-              }
-              input.popLimit(limit);
-              break;
-            }
+        org.box2d.proto.Box2D.PbJoint parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.box2d.proto.Box2D.PbJoint) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
           }
         }
+        return this;
       }
-      
       private int bitField0_;
-      
+
       // optional int64 tag = 1;
       private long tag_ ;
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public boolean hasTag() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public long getTag() {
         return tag_;
       }
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public Builder setTag(long value) {
         bitField0_ |= 0x00000001;
         tag_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public Builder clearTag() {
         bitField0_ = (bitField0_ & ~0x00000001);
         tag_ = 0L;
         onChanged();
         return this;
       }
-      
+
       // required .box2d.PbJointType type = 2;
       private org.box2d.proto.Box2D.PbJointType type_ = org.box2d.proto.Box2D.PbJointType.DISTANCE;
+      /**
+       * <code>required .box2d.PbJointType type = 2;</code>
+       */
       public boolean hasType() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
+      /**
+       * <code>required .box2d.PbJointType type = 2;</code>
+       */
       public org.box2d.proto.Box2D.PbJointType getType() {
         return type_;
       }
+      /**
+       * <code>required .box2d.PbJointType type = 2;</code>
+       */
       public Builder setType(org.box2d.proto.Box2D.PbJointType value) {
         if (value == null) {
           throw new NullPointerException();
@@ -6076,83 +9144,128 @@ public final class Box2D {
         onChanged();
         return this;
       }
+      /**
+       * <code>required .box2d.PbJointType type = 2;</code>
+       */
       public Builder clearType() {
         bitField0_ = (bitField0_ & ~0x00000002);
         type_ = org.box2d.proto.Box2D.PbJointType.DISTANCE;
         onChanged();
         return this;
       }
-      
+
       // optional int32 body_a = 3;
       private int bodyA_ ;
+      /**
+       * <code>optional int32 body_a = 3;</code>
+       */
       public boolean hasBodyA() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
+      /**
+       * <code>optional int32 body_a = 3;</code>
+       */
       public int getBodyA() {
         return bodyA_;
       }
+      /**
+       * <code>optional int32 body_a = 3;</code>
+       */
       public Builder setBodyA(int value) {
         bitField0_ |= 0x00000004;
         bodyA_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional int32 body_a = 3;</code>
+       */
       public Builder clearBodyA() {
         bitField0_ = (bitField0_ & ~0x00000004);
         bodyA_ = 0;
         onChanged();
         return this;
       }
-      
+
       // optional int32 body_b = 4;
       private int bodyB_ ;
+      /**
+       * <code>optional int32 body_b = 4;</code>
+       */
       public boolean hasBodyB() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
+      /**
+       * <code>optional int32 body_b = 4;</code>
+       */
       public int getBodyB() {
         return bodyB_;
       }
+      /**
+       * <code>optional int32 body_b = 4;</code>
+       */
       public Builder setBodyB(int value) {
         bitField0_ |= 0x00000008;
         bodyB_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional int32 body_b = 4;</code>
+       */
       public Builder clearBodyB() {
         bitField0_ = (bitField0_ & ~0x00000008);
         bodyB_ = 0;
         onChanged();
         return this;
       }
-      
+
       // optional bool collideConnected = 5;
       private boolean collideConnected_ ;
+      /**
+       * <code>optional bool collideConnected = 5;</code>
+       */
       public boolean hasCollideConnected() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
+      /**
+       * <code>optional bool collideConnected = 5;</code>
+       */
       public boolean getCollideConnected() {
         return collideConnected_;
       }
+      /**
+       * <code>optional bool collideConnected = 5;</code>
+       */
       public Builder setCollideConnected(boolean value) {
         bitField0_ |= 0x00000010;
         collideConnected_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional bool collideConnected = 5;</code>
+       */
       public Builder clearCollideConnected() {
         bitField0_ = (bitField0_ & ~0x00000010);
         collideConnected_ = false;
         onChanged();
         return this;
       }
-      
+
       // optional .box2d.PbVec2 local_anchor_a = 6;
       private org.box2d.proto.Box2D.PbVec2 localAnchorA_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> localAnchorABuilder_;
+      /**
+       * <code>optional .box2d.PbVec2 local_anchor_a = 6;</code>
+       */
       public boolean hasLocalAnchorA() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_anchor_a = 6;</code>
+       */
       public org.box2d.proto.Box2D.PbVec2 getLocalAnchorA() {
         if (localAnchorABuilder_ == null) {
           return localAnchorA_;
@@ -6160,6 +9273,9 @@ public final class Box2D {
           return localAnchorABuilder_.getMessage();
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_anchor_a = 6;</code>
+       */
       public Builder setLocalAnchorA(org.box2d.proto.Box2D.PbVec2 value) {
         if (localAnchorABuilder_ == null) {
           if (value == null) {
@@ -6173,6 +9289,9 @@ public final class Box2D {
         bitField0_ |= 0x00000020;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_anchor_a = 6;</code>
+       */
       public Builder setLocalAnchorA(
           org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (localAnchorABuilder_ == null) {
@@ -6184,6 +9303,9 @@ public final class Box2D {
         bitField0_ |= 0x00000020;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_anchor_a = 6;</code>
+       */
       public Builder mergeLocalAnchorA(org.box2d.proto.Box2D.PbVec2 value) {
         if (localAnchorABuilder_ == null) {
           if (((bitField0_ & 0x00000020) == 0x00000020) &&
@@ -6200,6 +9322,9 @@ public final class Box2D {
         bitField0_ |= 0x00000020;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_anchor_a = 6;</code>
+       */
       public Builder clearLocalAnchorA() {
         if (localAnchorABuilder_ == null) {
           localAnchorA_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
@@ -6210,11 +9335,17 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_anchor_a = 6;</code>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder getLocalAnchorABuilder() {
         bitField0_ |= 0x00000020;
         onChanged();
         return getLocalAnchorAFieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_anchor_a = 6;</code>
+       */
       public org.box2d.proto.Box2D.PbVec2OrBuilder getLocalAnchorAOrBuilder() {
         if (localAnchorABuilder_ != null) {
           return localAnchorABuilder_.getMessageOrBuilder();
@@ -6222,6 +9353,9 @@ public final class Box2D {
           return localAnchorA_;
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_anchor_a = 6;</code>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> 
           getLocalAnchorAFieldBuilder() {
@@ -6235,14 +9369,20 @@ public final class Box2D {
         }
         return localAnchorABuilder_;
       }
-      
+
       // optional .box2d.PbVec2 local_anchor_b = 7;
       private org.box2d.proto.Box2D.PbVec2 localAnchorB_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> localAnchorBBuilder_;
+      /**
+       * <code>optional .box2d.PbVec2 local_anchor_b = 7;</code>
+       */
       public boolean hasLocalAnchorB() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_anchor_b = 7;</code>
+       */
       public org.box2d.proto.Box2D.PbVec2 getLocalAnchorB() {
         if (localAnchorBBuilder_ == null) {
           return localAnchorB_;
@@ -6250,6 +9390,9 @@ public final class Box2D {
           return localAnchorBBuilder_.getMessage();
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_anchor_b = 7;</code>
+       */
       public Builder setLocalAnchorB(org.box2d.proto.Box2D.PbVec2 value) {
         if (localAnchorBBuilder_ == null) {
           if (value == null) {
@@ -6263,6 +9406,9 @@ public final class Box2D {
         bitField0_ |= 0x00000040;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_anchor_b = 7;</code>
+       */
       public Builder setLocalAnchorB(
           org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (localAnchorBBuilder_ == null) {
@@ -6274,6 +9420,9 @@ public final class Box2D {
         bitField0_ |= 0x00000040;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_anchor_b = 7;</code>
+       */
       public Builder mergeLocalAnchorB(org.box2d.proto.Box2D.PbVec2 value) {
         if (localAnchorBBuilder_ == null) {
           if (((bitField0_ & 0x00000040) == 0x00000040) &&
@@ -6290,6 +9439,9 @@ public final class Box2D {
         bitField0_ |= 0x00000040;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_anchor_b = 7;</code>
+       */
       public Builder clearLocalAnchorB() {
         if (localAnchorBBuilder_ == null) {
           localAnchorB_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
@@ -6300,11 +9452,17 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_anchor_b = 7;</code>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder getLocalAnchorBBuilder() {
         bitField0_ |= 0x00000040;
         onChanged();
         return getLocalAnchorBFieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_anchor_b = 7;</code>
+       */
       public org.box2d.proto.Box2D.PbVec2OrBuilder getLocalAnchorBOrBuilder() {
         if (localAnchorBBuilder_ != null) {
           return localAnchorBBuilder_.getMessageOrBuilder();
@@ -6312,6 +9470,9 @@ public final class Box2D {
           return localAnchorB_;
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_anchor_b = 7;</code>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> 
           getLocalAnchorBFieldBuilder() {
@@ -6325,161 +9486,371 @@ public final class Box2D {
         }
         return localAnchorBBuilder_;
       }
-      
+
       // optional float ref_angle = 10;
       private float refAngle_ ;
+      /**
+       * <code>optional float ref_angle = 10;</code>
+       *
+       * <pre>
+       * revolute, prismatic, joint
+       * </pre>
+       */
       public boolean hasRefAngle() {
         return ((bitField0_ & 0x00000080) == 0x00000080);
       }
+      /**
+       * <code>optional float ref_angle = 10;</code>
+       *
+       * <pre>
+       * revolute, prismatic, joint
+       * </pre>
+       */
       public float getRefAngle() {
         return refAngle_;
       }
+      /**
+       * <code>optional float ref_angle = 10;</code>
+       *
+       * <pre>
+       * revolute, prismatic, joint
+       * </pre>
+       */
       public Builder setRefAngle(float value) {
         bitField0_ |= 0x00000080;
         refAngle_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float ref_angle = 10;</code>
+       *
+       * <pre>
+       * revolute, prismatic, joint
+       * </pre>
+       */
       public Builder clearRefAngle() {
         bitField0_ = (bitField0_ & ~0x00000080);
         refAngle_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional bool enable_limit = 12;
       private boolean enableLimit_ ;
+      /**
+       * <code>optional bool enable_limit = 12;</code>
+       *
+       * <pre>
+       * revolute, prismatic
+       * </pre>
+       */
       public boolean hasEnableLimit() {
         return ((bitField0_ & 0x00000100) == 0x00000100);
       }
+      /**
+       * <code>optional bool enable_limit = 12;</code>
+       *
+       * <pre>
+       * revolute, prismatic
+       * </pre>
+       */
       public boolean getEnableLimit() {
         return enableLimit_;
       }
+      /**
+       * <code>optional bool enable_limit = 12;</code>
+       *
+       * <pre>
+       * revolute, prismatic
+       * </pre>
+       */
       public Builder setEnableLimit(boolean value) {
         bitField0_ |= 0x00000100;
         enableLimit_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional bool enable_limit = 12;</code>
+       *
+       * <pre>
+       * revolute, prismatic
+       * </pre>
+       */
       public Builder clearEnableLimit() {
         bitField0_ = (bitField0_ & ~0x00000100);
         enableLimit_ = false;
         onChanged();
         return this;
       }
-      
+
       // optional float lower_limit = 13;
       private float lowerLimit_ ;
+      /**
+       * <code>optional float lower_limit = 13;</code>
+       *
+       * <pre>
+       * revolute, prismatic
+       * </pre>
+       */
       public boolean hasLowerLimit() {
         return ((bitField0_ & 0x00000200) == 0x00000200);
       }
+      /**
+       * <code>optional float lower_limit = 13;</code>
+       *
+       * <pre>
+       * revolute, prismatic
+       * </pre>
+       */
       public float getLowerLimit() {
         return lowerLimit_;
       }
+      /**
+       * <code>optional float lower_limit = 13;</code>
+       *
+       * <pre>
+       * revolute, prismatic
+       * </pre>
+       */
       public Builder setLowerLimit(float value) {
         bitField0_ |= 0x00000200;
         lowerLimit_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float lower_limit = 13;</code>
+       *
+       * <pre>
+       * revolute, prismatic
+       * </pre>
+       */
       public Builder clearLowerLimit() {
         bitField0_ = (bitField0_ & ~0x00000200);
         lowerLimit_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional float upper_limit = 14;
       private float upperLimit_ ;
+      /**
+       * <code>optional float upper_limit = 14;</code>
+       *
+       * <pre>
+       * revolute, prismatic
+       * </pre>
+       */
       public boolean hasUpperLimit() {
         return ((bitField0_ & 0x00000400) == 0x00000400);
       }
+      /**
+       * <code>optional float upper_limit = 14;</code>
+       *
+       * <pre>
+       * revolute, prismatic
+       * </pre>
+       */
       public float getUpperLimit() {
         return upperLimit_;
       }
+      /**
+       * <code>optional float upper_limit = 14;</code>
+       *
+       * <pre>
+       * revolute, prismatic
+       * </pre>
+       */
       public Builder setUpperLimit(float value) {
         bitField0_ |= 0x00000400;
         upperLimit_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float upper_limit = 14;</code>
+       *
+       * <pre>
+       * revolute, prismatic
+       * </pre>
+       */
       public Builder clearUpperLimit() {
         bitField0_ = (bitField0_ & ~0x00000400);
         upperLimit_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional bool enable_motor = 15;
       private boolean enableMotor_ ;
+      /**
+       * <code>optional bool enable_motor = 15;</code>
+       *
+       * <pre>
+       * revolute, prismatic, wheel
+       * </pre>
+       */
       public boolean hasEnableMotor() {
         return ((bitField0_ & 0x00000800) == 0x00000800);
       }
+      /**
+       * <code>optional bool enable_motor = 15;</code>
+       *
+       * <pre>
+       * revolute, prismatic, wheel
+       * </pre>
+       */
       public boolean getEnableMotor() {
         return enableMotor_;
       }
+      /**
+       * <code>optional bool enable_motor = 15;</code>
+       *
+       * <pre>
+       * revolute, prismatic, wheel
+       * </pre>
+       */
       public Builder setEnableMotor(boolean value) {
         bitField0_ |= 0x00000800;
         enableMotor_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional bool enable_motor = 15;</code>
+       *
+       * <pre>
+       * revolute, prismatic, wheel
+       * </pre>
+       */
       public Builder clearEnableMotor() {
         bitField0_ = (bitField0_ & ~0x00000800);
         enableMotor_ = false;
         onChanged();
         return this;
       }
-      
+
       // optional float motor_speed = 16;
       private float motorSpeed_ ;
+      /**
+       * <code>optional float motor_speed = 16;</code>
+       *
+       * <pre>
+       * revolute, prismatic, wheel
+       * </pre>
+       */
       public boolean hasMotorSpeed() {
         return ((bitField0_ & 0x00001000) == 0x00001000);
       }
+      /**
+       * <code>optional float motor_speed = 16;</code>
+       *
+       * <pre>
+       * revolute, prismatic, wheel
+       * </pre>
+       */
       public float getMotorSpeed() {
         return motorSpeed_;
       }
+      /**
+       * <code>optional float motor_speed = 16;</code>
+       *
+       * <pre>
+       * revolute, prismatic, wheel
+       * </pre>
+       */
       public Builder setMotorSpeed(float value) {
         bitField0_ |= 0x00001000;
         motorSpeed_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float motor_speed = 16;</code>
+       *
+       * <pre>
+       * revolute, prismatic, wheel
+       * </pre>
+       */
       public Builder clearMotorSpeed() {
         bitField0_ = (bitField0_ & ~0x00001000);
         motorSpeed_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional float max_motor_torque = 17;
       private float maxMotorTorque_ ;
+      /**
+       * <code>optional float max_motor_torque = 17;</code>
+       *
+       * <pre>
+       * revolute, wheel
+       * </pre>
+       */
       public boolean hasMaxMotorTorque() {
         return ((bitField0_ & 0x00002000) == 0x00002000);
       }
+      /**
+       * <code>optional float max_motor_torque = 17;</code>
+       *
+       * <pre>
+       * revolute, wheel
+       * </pre>
+       */
       public float getMaxMotorTorque() {
         return maxMotorTorque_;
       }
+      /**
+       * <code>optional float max_motor_torque = 17;</code>
+       *
+       * <pre>
+       * revolute, wheel
+       * </pre>
+       */
       public Builder setMaxMotorTorque(float value) {
         bitField0_ |= 0x00002000;
         maxMotorTorque_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float max_motor_torque = 17;</code>
+       *
+       * <pre>
+       * revolute, wheel
+       * </pre>
+       */
       public Builder clearMaxMotorTorque() {
         bitField0_ = (bitField0_ & ~0x00002000);
         maxMotorTorque_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional .box2d.PbVec2 local_axis_a = 20;
       private org.box2d.proto.Box2D.PbVec2 localAxisA_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> localAxisABuilder_;
+      /**
+       * <code>optional .box2d.PbVec2 local_axis_a = 20;</code>
+       *
+       * <pre>
+       * prismatic, wheel
+       * </pre>
+       */
       public boolean hasLocalAxisA() {
         return ((bitField0_ & 0x00004000) == 0x00004000);
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_axis_a = 20;</code>
+       *
+       * <pre>
+       * prismatic, wheel
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2 getLocalAxisA() {
         if (localAxisABuilder_ == null) {
           return localAxisA_;
@@ -6487,6 +9858,13 @@ public final class Box2D {
           return localAxisABuilder_.getMessage();
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_axis_a = 20;</code>
+       *
+       * <pre>
+       * prismatic, wheel
+       * </pre>
+       */
       public Builder setLocalAxisA(org.box2d.proto.Box2D.PbVec2 value) {
         if (localAxisABuilder_ == null) {
           if (value == null) {
@@ -6500,6 +9878,13 @@ public final class Box2D {
         bitField0_ |= 0x00004000;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_axis_a = 20;</code>
+       *
+       * <pre>
+       * prismatic, wheel
+       * </pre>
+       */
       public Builder setLocalAxisA(
           org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (localAxisABuilder_ == null) {
@@ -6511,6 +9896,13 @@ public final class Box2D {
         bitField0_ |= 0x00004000;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_axis_a = 20;</code>
+       *
+       * <pre>
+       * prismatic, wheel
+       * </pre>
+       */
       public Builder mergeLocalAxisA(org.box2d.proto.Box2D.PbVec2 value) {
         if (localAxisABuilder_ == null) {
           if (((bitField0_ & 0x00004000) == 0x00004000) &&
@@ -6527,6 +9919,13 @@ public final class Box2D {
         bitField0_ |= 0x00004000;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_axis_a = 20;</code>
+       *
+       * <pre>
+       * prismatic, wheel
+       * </pre>
+       */
       public Builder clearLocalAxisA() {
         if (localAxisABuilder_ == null) {
           localAxisA_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
@@ -6537,11 +9936,25 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00004000);
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_axis_a = 20;</code>
+       *
+       * <pre>
+       * prismatic, wheel
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder getLocalAxisABuilder() {
         bitField0_ |= 0x00004000;
         onChanged();
         return getLocalAxisAFieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_axis_a = 20;</code>
+       *
+       * <pre>
+       * prismatic, wheel
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2OrBuilder getLocalAxisAOrBuilder() {
         if (localAxisABuilder_ != null) {
           return localAxisABuilder_.getMessageOrBuilder();
@@ -6549,6 +9962,13 @@ public final class Box2D {
           return localAxisA_;
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 local_axis_a = 20;</code>
+       *
+       * <pre>
+       * prismatic, wheel
+       * </pre>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> 
           getLocalAxisAFieldBuilder() {
@@ -6562,98 +9982,224 @@ public final class Box2D {
         }
         return localAxisABuilder_;
       }
-      
+
       // optional float max_motor_force = 21;
       private float maxMotorForce_ ;
+      /**
+       * <code>optional float max_motor_force = 21;</code>
+       *
+       * <pre>
+       * prismatic
+       * </pre>
+       */
       public boolean hasMaxMotorForce() {
         return ((bitField0_ & 0x00008000) == 0x00008000);
       }
+      /**
+       * <code>optional float max_motor_force = 21;</code>
+       *
+       * <pre>
+       * prismatic
+       * </pre>
+       */
       public float getMaxMotorForce() {
         return maxMotorForce_;
       }
+      /**
+       * <code>optional float max_motor_force = 21;</code>
+       *
+       * <pre>
+       * prismatic
+       * </pre>
+       */
       public Builder setMaxMotorForce(float value) {
         bitField0_ |= 0x00008000;
         maxMotorForce_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float max_motor_force = 21;</code>
+       *
+       * <pre>
+       * prismatic
+       * </pre>
+       */
       public Builder clearMaxMotorForce() {
         bitField0_ = (bitField0_ & ~0x00008000);
         maxMotorForce_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional float length = 30;
       private float length_ ;
+      /**
+       * <code>optional float length = 30;</code>
+       *
+       * <pre>
+       * distance
+       * </pre>
+       */
       public boolean hasLength() {
         return ((bitField0_ & 0x00010000) == 0x00010000);
       }
+      /**
+       * <code>optional float length = 30;</code>
+       *
+       * <pre>
+       * distance
+       * </pre>
+       */
       public float getLength() {
         return length_;
       }
+      /**
+       * <code>optional float length = 30;</code>
+       *
+       * <pre>
+       * distance
+       * </pre>
+       */
       public Builder setLength(float value) {
         bitField0_ |= 0x00010000;
         length_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float length = 30;</code>
+       *
+       * <pre>
+       * distance
+       * </pre>
+       */
       public Builder clearLength() {
         bitField0_ = (bitField0_ & ~0x00010000);
         length_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional float frequency = 31;
       private float frequency_ ;
+      /**
+       * <code>optional float frequency = 31;</code>
+       *
+       * <pre>
+       * distance, mouse, wheel, weld, con vol
+       * </pre>
+       */
       public boolean hasFrequency() {
         return ((bitField0_ & 0x00020000) == 0x00020000);
       }
+      /**
+       * <code>optional float frequency = 31;</code>
+       *
+       * <pre>
+       * distance, mouse, wheel, weld, con vol
+       * </pre>
+       */
       public float getFrequency() {
         return frequency_;
       }
+      /**
+       * <code>optional float frequency = 31;</code>
+       *
+       * <pre>
+       * distance, mouse, wheel, weld, con vol
+       * </pre>
+       */
       public Builder setFrequency(float value) {
         bitField0_ |= 0x00020000;
         frequency_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float frequency = 31;</code>
+       *
+       * <pre>
+       * distance, mouse, wheel, weld, con vol
+       * </pre>
+       */
       public Builder clearFrequency() {
         bitField0_ = (bitField0_ & ~0x00020000);
         frequency_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional float damping_ratio = 32;
       private float dampingRatio_ ;
+      /**
+       * <code>optional float damping_ratio = 32;</code>
+       *
+       * <pre>
+       * distance, mouse, wheel, weld, col vol
+       * </pre>
+       */
       public boolean hasDampingRatio() {
         return ((bitField0_ & 0x00040000) == 0x00040000);
       }
+      /**
+       * <code>optional float damping_ratio = 32;</code>
+       *
+       * <pre>
+       * distance, mouse, wheel, weld, col vol
+       * </pre>
+       */
       public float getDampingRatio() {
         return dampingRatio_;
       }
+      /**
+       * <code>optional float damping_ratio = 32;</code>
+       *
+       * <pre>
+       * distance, mouse, wheel, weld, col vol
+       * </pre>
+       */
       public Builder setDampingRatio(float value) {
         bitField0_ |= 0x00040000;
         dampingRatio_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float damping_ratio = 32;</code>
+       *
+       * <pre>
+       * distance, mouse, wheel, weld, col vol
+       * </pre>
+       */
       public Builder clearDampingRatio() {
         bitField0_ = (bitField0_ & ~0x00040000);
         dampingRatio_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional .box2d.PbVec2 ground_anchor_a = 40;
       private org.box2d.proto.Box2D.PbVec2 groundAnchorA_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> groundAnchorABuilder_;
+      /**
+       * <code>optional .box2d.PbVec2 ground_anchor_a = 40;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public boolean hasGroundAnchorA() {
         return ((bitField0_ & 0x00080000) == 0x00080000);
       }
+      /**
+       * <code>optional .box2d.PbVec2 ground_anchor_a = 40;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2 getGroundAnchorA() {
         if (groundAnchorABuilder_ == null) {
           return groundAnchorA_;
@@ -6661,6 +10207,13 @@ public final class Box2D {
           return groundAnchorABuilder_.getMessage();
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 ground_anchor_a = 40;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public Builder setGroundAnchorA(org.box2d.proto.Box2D.PbVec2 value) {
         if (groundAnchorABuilder_ == null) {
           if (value == null) {
@@ -6674,6 +10227,13 @@ public final class Box2D {
         bitField0_ |= 0x00080000;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 ground_anchor_a = 40;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public Builder setGroundAnchorA(
           org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (groundAnchorABuilder_ == null) {
@@ -6685,6 +10245,13 @@ public final class Box2D {
         bitField0_ |= 0x00080000;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 ground_anchor_a = 40;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public Builder mergeGroundAnchorA(org.box2d.proto.Box2D.PbVec2 value) {
         if (groundAnchorABuilder_ == null) {
           if (((bitField0_ & 0x00080000) == 0x00080000) &&
@@ -6701,6 +10268,13 @@ public final class Box2D {
         bitField0_ |= 0x00080000;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 ground_anchor_a = 40;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public Builder clearGroundAnchorA() {
         if (groundAnchorABuilder_ == null) {
           groundAnchorA_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
@@ -6711,11 +10285,25 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00080000);
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 ground_anchor_a = 40;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder getGroundAnchorABuilder() {
         bitField0_ |= 0x00080000;
         onChanged();
         return getGroundAnchorAFieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .box2d.PbVec2 ground_anchor_a = 40;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2OrBuilder getGroundAnchorAOrBuilder() {
         if (groundAnchorABuilder_ != null) {
           return groundAnchorABuilder_.getMessageOrBuilder();
@@ -6723,6 +10311,13 @@ public final class Box2D {
           return groundAnchorA_;
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 ground_anchor_a = 40;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> 
           getGroundAnchorAFieldBuilder() {
@@ -6736,14 +10331,28 @@ public final class Box2D {
         }
         return groundAnchorABuilder_;
       }
-      
+
       // optional .box2d.PbVec2 ground_anchor_b = 41;
       private org.box2d.proto.Box2D.PbVec2 groundAnchorB_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> groundAnchorBBuilder_;
+      /**
+       * <code>optional .box2d.PbVec2 ground_anchor_b = 41;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public boolean hasGroundAnchorB() {
         return ((bitField0_ & 0x00100000) == 0x00100000);
       }
+      /**
+       * <code>optional .box2d.PbVec2 ground_anchor_b = 41;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2 getGroundAnchorB() {
         if (groundAnchorBBuilder_ == null) {
           return groundAnchorB_;
@@ -6751,6 +10360,13 @@ public final class Box2D {
           return groundAnchorBBuilder_.getMessage();
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 ground_anchor_b = 41;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public Builder setGroundAnchorB(org.box2d.proto.Box2D.PbVec2 value) {
         if (groundAnchorBBuilder_ == null) {
           if (value == null) {
@@ -6764,6 +10380,13 @@ public final class Box2D {
         bitField0_ |= 0x00100000;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 ground_anchor_b = 41;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public Builder setGroundAnchorB(
           org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (groundAnchorBBuilder_ == null) {
@@ -6775,6 +10398,13 @@ public final class Box2D {
         bitField0_ |= 0x00100000;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 ground_anchor_b = 41;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public Builder mergeGroundAnchorB(org.box2d.proto.Box2D.PbVec2 value) {
         if (groundAnchorBBuilder_ == null) {
           if (((bitField0_ & 0x00100000) == 0x00100000) &&
@@ -6791,6 +10421,13 @@ public final class Box2D {
         bitField0_ |= 0x00100000;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 ground_anchor_b = 41;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public Builder clearGroundAnchorB() {
         if (groundAnchorBBuilder_ == null) {
           groundAnchorB_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
@@ -6801,11 +10438,25 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00100000);
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 ground_anchor_b = 41;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder getGroundAnchorBBuilder() {
         bitField0_ |= 0x00100000;
         onChanged();
         return getGroundAnchorBFieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .box2d.PbVec2 ground_anchor_b = 41;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2OrBuilder getGroundAnchorBOrBuilder() {
         if (groundAnchorBBuilder_ != null) {
           return groundAnchorBBuilder_.getMessageOrBuilder();
@@ -6813,6 +10464,13 @@ public final class Box2D {
           return groundAnchorB_;
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 ground_anchor_b = 41;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> 
           getGroundAnchorBFieldBuilder() {
@@ -6826,77 +10484,175 @@ public final class Box2D {
         }
         return groundAnchorBBuilder_;
       }
-      
+
       // optional float length_a = 42;
       private float lengthA_ ;
+      /**
+       * <code>optional float length_a = 42;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public boolean hasLengthA() {
         return ((bitField0_ & 0x00200000) == 0x00200000);
       }
+      /**
+       * <code>optional float length_a = 42;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public float getLengthA() {
         return lengthA_;
       }
+      /**
+       * <code>optional float length_a = 42;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public Builder setLengthA(float value) {
         bitField0_ |= 0x00200000;
         lengthA_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float length_a = 42;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public Builder clearLengthA() {
         bitField0_ = (bitField0_ & ~0x00200000);
         lengthA_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional float length_b = 43;
       private float lengthB_ ;
+      /**
+       * <code>optional float length_b = 43;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public boolean hasLengthB() {
         return ((bitField0_ & 0x00400000) == 0x00400000);
       }
+      /**
+       * <code>optional float length_b = 43;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public float getLengthB() {
         return lengthB_;
       }
+      /**
+       * <code>optional float length_b = 43;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public Builder setLengthB(float value) {
         bitField0_ |= 0x00400000;
         lengthB_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float length_b = 43;</code>
+       *
+       * <pre>
+       * pulley
+       * </pre>
+       */
       public Builder clearLengthB() {
         bitField0_ = (bitField0_ & ~0x00400000);
         lengthB_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional float ratio = 44;
       private float ratio_ ;
+      /**
+       * <code>optional float ratio = 44;</code>
+       *
+       * <pre>
+       * pulley, gear
+       * </pre>
+       */
       public boolean hasRatio() {
         return ((bitField0_ & 0x00800000) == 0x00800000);
       }
+      /**
+       * <code>optional float ratio = 44;</code>
+       *
+       * <pre>
+       * pulley, gear
+       * </pre>
+       */
       public float getRatio() {
         return ratio_;
       }
+      /**
+       * <code>optional float ratio = 44;</code>
+       *
+       * <pre>
+       * pulley, gear
+       * </pre>
+       */
       public Builder setRatio(float value) {
         bitField0_ |= 0x00800000;
         ratio_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float ratio = 44;</code>
+       *
+       * <pre>
+       * pulley, gear
+       * </pre>
+       */
       public Builder clearRatio() {
         bitField0_ = (bitField0_ & ~0x00800000);
         ratio_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional .box2d.PbVec2 target = 50;
       private org.box2d.proto.Box2D.PbVec2 target_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> targetBuilder_;
+      /**
+       * <code>optional .box2d.PbVec2 target = 50;</code>
+       *
+       * <pre>
+       * mouse
+       * </pre>
+       */
       public boolean hasTarget() {
         return ((bitField0_ & 0x01000000) == 0x01000000);
       }
+      /**
+       * <code>optional .box2d.PbVec2 target = 50;</code>
+       *
+       * <pre>
+       * mouse
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2 getTarget() {
         if (targetBuilder_ == null) {
           return target_;
@@ -6904,6 +10660,13 @@ public final class Box2D {
           return targetBuilder_.getMessage();
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 target = 50;</code>
+       *
+       * <pre>
+       * mouse
+       * </pre>
+       */
       public Builder setTarget(org.box2d.proto.Box2D.PbVec2 value) {
         if (targetBuilder_ == null) {
           if (value == null) {
@@ -6917,6 +10680,13 @@ public final class Box2D {
         bitField0_ |= 0x01000000;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 target = 50;</code>
+       *
+       * <pre>
+       * mouse
+       * </pre>
+       */
       public Builder setTarget(
           org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (targetBuilder_ == null) {
@@ -6928,6 +10698,13 @@ public final class Box2D {
         bitField0_ |= 0x01000000;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 target = 50;</code>
+       *
+       * <pre>
+       * mouse
+       * </pre>
+       */
       public Builder mergeTarget(org.box2d.proto.Box2D.PbVec2 value) {
         if (targetBuilder_ == null) {
           if (((bitField0_ & 0x01000000) == 0x01000000) &&
@@ -6944,6 +10721,13 @@ public final class Box2D {
         bitField0_ |= 0x01000000;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 target = 50;</code>
+       *
+       * <pre>
+       * mouse
+       * </pre>
+       */
       public Builder clearTarget() {
         if (targetBuilder_ == null) {
           target_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
@@ -6954,11 +10738,25 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x01000000);
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 target = 50;</code>
+       *
+       * <pre>
+       * mouse
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder getTargetBuilder() {
         bitField0_ |= 0x01000000;
         onChanged();
         return getTargetFieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .box2d.PbVec2 target = 50;</code>
+       *
+       * <pre>
+       * mouse
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2OrBuilder getTargetOrBuilder() {
         if (targetBuilder_ != null) {
           return targetBuilder_.getMessageOrBuilder();
@@ -6966,6 +10764,13 @@ public final class Box2D {
           return target_;
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 target = 50;</code>
+       *
+       * <pre>
+       * mouse
+       * </pre>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> 
           getTargetFieldBuilder() {
@@ -6979,130 +10784,298 @@ public final class Box2D {
         }
         return targetBuilder_;
       }
-      
+
       // optional float max_force = 51;
       private float maxForce_ ;
+      /**
+       * <code>optional float max_force = 51;</code>
+       *
+       * <pre>
+       * mouse, friction, rope
+       * </pre>
+       */
       public boolean hasMaxForce() {
         return ((bitField0_ & 0x02000000) == 0x02000000);
       }
+      /**
+       * <code>optional float max_force = 51;</code>
+       *
+       * <pre>
+       * mouse, friction, rope
+       * </pre>
+       */
       public float getMaxForce() {
         return maxForce_;
       }
+      /**
+       * <code>optional float max_force = 51;</code>
+       *
+       * <pre>
+       * mouse, friction, rope
+       * </pre>
+       */
       public Builder setMaxForce(float value) {
         bitField0_ |= 0x02000000;
         maxForce_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float max_force = 51;</code>
+       *
+       * <pre>
+       * mouse, friction, rope
+       * </pre>
+       */
       public Builder clearMaxForce() {
         bitField0_ = (bitField0_ & ~0x02000000);
         maxForce_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional int32 joint1 = 61;
       private int joint1_ ;
+      /**
+       * <code>optional int32 joint1 = 61;</code>
+       *
+       * <pre>
+       * gear
+       * </pre>
+       */
       public boolean hasJoint1() {
         return ((bitField0_ & 0x04000000) == 0x04000000);
       }
+      /**
+       * <code>optional int32 joint1 = 61;</code>
+       *
+       * <pre>
+       * gear
+       * </pre>
+       */
       public int getJoint1() {
         return joint1_;
       }
+      /**
+       * <code>optional int32 joint1 = 61;</code>
+       *
+       * <pre>
+       * gear
+       * </pre>
+       */
       public Builder setJoint1(int value) {
         bitField0_ |= 0x04000000;
         joint1_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional int32 joint1 = 61;</code>
+       *
+       * <pre>
+       * gear
+       * </pre>
+       */
       public Builder clearJoint1() {
         bitField0_ = (bitField0_ & ~0x04000000);
         joint1_ = 0;
         onChanged();
         return this;
       }
-      
+
       // optional int32 joint2 = 62;
       private int joint2_ ;
+      /**
+       * <code>optional int32 joint2 = 62;</code>
+       *
+       * <pre>
+       * gear
+       * </pre>
+       */
       public boolean hasJoint2() {
         return ((bitField0_ & 0x08000000) == 0x08000000);
       }
+      /**
+       * <code>optional int32 joint2 = 62;</code>
+       *
+       * <pre>
+       * gear
+       * </pre>
+       */
       public int getJoint2() {
         return joint2_;
       }
+      /**
+       * <code>optional int32 joint2 = 62;</code>
+       *
+       * <pre>
+       * gear
+       * </pre>
+       */
       public Builder setJoint2(int value) {
         bitField0_ |= 0x08000000;
         joint2_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional int32 joint2 = 62;</code>
+       *
+       * <pre>
+       * gear
+       * </pre>
+       */
       public Builder clearJoint2() {
         bitField0_ = (bitField0_ & ~0x08000000);
         joint2_ = 0;
         onChanged();
         return this;
       }
-      
+
       // optional float max_torque = 90;
       private float maxTorque_ ;
+      /**
+       * <code>optional float max_torque = 90;</code>
+       *
+       * <pre>
+       * friction
+       * </pre>
+       */
       public boolean hasMaxTorque() {
         return ((bitField0_ & 0x10000000) == 0x10000000);
       }
+      /**
+       * <code>optional float max_torque = 90;</code>
+       *
+       * <pre>
+       * friction
+       * </pre>
+       */
       public float getMaxTorque() {
         return maxTorque_;
       }
+      /**
+       * <code>optional float max_torque = 90;</code>
+       *
+       * <pre>
+       * friction
+       * </pre>
+       */
       public Builder setMaxTorque(float value) {
         bitField0_ |= 0x10000000;
         maxTorque_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float max_torque = 90;</code>
+       *
+       * <pre>
+       * friction
+       * </pre>
+       */
       public Builder clearMaxTorque() {
         bitField0_ = (bitField0_ & ~0x10000000);
         maxTorque_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional float max_length = 100;
       private float maxLength_ ;
+      /**
+       * <code>optional float max_length = 100;</code>
+       *
+       * <pre>
+       * rope
+       * </pre>
+       */
       public boolean hasMaxLength() {
         return ((bitField0_ & 0x20000000) == 0x20000000);
       }
+      /**
+       * <code>optional float max_length = 100;</code>
+       *
+       * <pre>
+       * rope
+       * </pre>
+       */
       public float getMaxLength() {
         return maxLength_;
       }
+      /**
+       * <code>optional float max_length = 100;</code>
+       *
+       * <pre>
+       * rope
+       * </pre>
+       */
       public Builder setMaxLength(float value) {
         bitField0_ |= 0x20000000;
         maxLength_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float max_length = 100;</code>
+       *
+       * <pre>
+       * rope
+       * </pre>
+       */
       public Builder clearMaxLength() {
         bitField0_ = (bitField0_ & ~0x20000000);
         maxLength_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // repeated int32 bodies = 110;
-      private java.util.List<java.lang.Integer> bodies_ = java.util.Collections.emptyList();;
+      private java.util.List<java.lang.Integer> bodies_ = java.util.Collections.emptyList();
       private void ensureBodiesIsMutable() {
         if (!((bitField0_ & 0x40000000) == 0x40000000)) {
           bodies_ = new java.util.ArrayList<java.lang.Integer>(bodies_);
           bitField0_ |= 0x40000000;
          }
       }
+      /**
+       * <code>repeated int32 bodies = 110;</code>
+       *
+       * <pre>
+       * con vol
+       * </pre>
+       */
       public java.util.List<java.lang.Integer>
           getBodiesList() {
         return java.util.Collections.unmodifiableList(bodies_);
       }
+      /**
+       * <code>repeated int32 bodies = 110;</code>
+       *
+       * <pre>
+       * con vol
+       * </pre>
+       */
       public int getBodiesCount() {
         return bodies_.size();
       }
+      /**
+       * <code>repeated int32 bodies = 110;</code>
+       *
+       * <pre>
+       * con vol
+       * </pre>
+       */
       public int getBodies(int index) {
         return bodies_.get(index);
       }
+      /**
+       * <code>repeated int32 bodies = 110;</code>
+       *
+       * <pre>
+       * con vol
+       * </pre>
+       */
       public Builder setBodies(
           int index, int value) {
         ensureBodiesIsMutable();
@@ -7110,12 +11083,26 @@ public final class Box2D {
         onChanged();
         return this;
       }
+      /**
+       * <code>repeated int32 bodies = 110;</code>
+       *
+       * <pre>
+       * con vol
+       * </pre>
+       */
       public Builder addBodies(int value) {
         ensureBodiesIsMutable();
         bodies_.add(value);
         onChanged();
         return this;
       }
+      /**
+       * <code>repeated int32 bodies = 110;</code>
+       *
+       * <pre>
+       * con vol
+       * </pre>
+       */
       public Builder addAllBodies(
           java.lang.Iterable<? extends java.lang.Integer> values) {
         ensureBodiesIsMutable();
@@ -7123,31 +11110,66 @@ public final class Box2D {
         onChanged();
         return this;
       }
+      /**
+       * <code>repeated int32 bodies = 110;</code>
+       *
+       * <pre>
+       * con vol
+       * </pre>
+       */
       public Builder clearBodies() {
-        bodies_ = java.util.Collections.emptyList();;
+        bodies_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x40000000);
         onChanged();
         return this;
       }
-      
+
       // repeated int32 joints = 111;
-      private java.util.List<java.lang.Integer> joints_ = java.util.Collections.emptyList();;
+      private java.util.List<java.lang.Integer> joints_ = java.util.Collections.emptyList();
       private void ensureJointsIsMutable() {
         if (!((bitField0_ & 0x80000000) == 0x80000000)) {
           joints_ = new java.util.ArrayList<java.lang.Integer>(joints_);
           bitField0_ |= 0x80000000;
          }
       }
+      /**
+       * <code>repeated int32 joints = 111;</code>
+       *
+       * <pre>
+       * con vol
+       * </pre>
+       */
       public java.util.List<java.lang.Integer>
           getJointsList() {
         return java.util.Collections.unmodifiableList(joints_);
       }
+      /**
+       * <code>repeated int32 joints = 111;</code>
+       *
+       * <pre>
+       * con vol
+       * </pre>
+       */
       public int getJointsCount() {
         return joints_.size();
       }
+      /**
+       * <code>repeated int32 joints = 111;</code>
+       *
+       * <pre>
+       * con vol
+       * </pre>
+       */
       public int getJoints(int index) {
         return joints_.get(index);
       }
+      /**
+       * <code>repeated int32 joints = 111;</code>
+       *
+       * <pre>
+       * con vol
+       * </pre>
+       */
       public Builder setJoints(
           int index, int value) {
         ensureJointsIsMutable();
@@ -7155,12 +11177,26 @@ public final class Box2D {
         onChanged();
         return this;
       }
+      /**
+       * <code>repeated int32 joints = 111;</code>
+       *
+       * <pre>
+       * con vol
+       * </pre>
+       */
       public Builder addJoints(int value) {
         ensureJointsIsMutable();
         joints_.add(value);
         onChanged();
         return this;
       }
+      /**
+       * <code>repeated int32 joints = 111;</code>
+       *
+       * <pre>
+       * con vol
+       * </pre>
+       */
       public Builder addAllJoints(
           java.lang.Iterable<? extends java.lang.Integer> values) {
         ensureJointsIsMutable();
@@ -7168,291 +11204,713 @@ public final class Box2D {
         onChanged();
         return this;
       }
+      /**
+       * <code>repeated int32 joints = 111;</code>
+       *
+       * <pre>
+       * con vol
+       * </pre>
+       */
       public Builder clearJoints() {
-        joints_ = java.util.Collections.emptyList();;
+        joints_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x80000000);
         onChanged();
         return this;
       }
-      
+
       // @@protoc_insertion_point(builder_scope:box2d.PbJoint)
     }
-    
+
     static {
       defaultInstance = new PbJoint(true);
       defaultInstance.initFields();
     }
-    
+
     // @@protoc_insertion_point(class_scope:box2d.PbJoint)
   }
-  
+
   public interface PbBodyOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
-    
+
     // optional int64 tag = 1;
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     boolean hasTag();
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     long getTag();
-    
+
     // required .box2d.PbBodyType type = 2;
+    /**
+     * <code>required .box2d.PbBodyType type = 2;</code>
+     */
     boolean hasType();
+    /**
+     * <code>required .box2d.PbBodyType type = 2;</code>
+     */
     org.box2d.proto.Box2D.PbBodyType getType();
-    
+
     // optional .box2d.PbVec2 position = 10;
+    /**
+     * <code>optional .box2d.PbVec2 position = 10;</code>
+     *
+     * <pre>
+     * physical attributes
+     * </pre>
+     */
     boolean hasPosition();
+    /**
+     * <code>optional .box2d.PbVec2 position = 10;</code>
+     *
+     * <pre>
+     * physical attributes
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2 getPosition();
+    /**
+     * <code>optional .box2d.PbVec2 position = 10;</code>
+     *
+     * <pre>
+     * physical attributes
+     * </pre>
+     */
     org.box2d.proto.Box2D.PbVec2OrBuilder getPositionOrBuilder();
-    
+
     // optional float angle = 11;
+    /**
+     * <code>optional float angle = 11;</code>
+     */
     boolean hasAngle();
+    /**
+     * <code>optional float angle = 11;</code>
+     */
     float getAngle();
-    
+
     // optional .box2d.PbVec2 linear_velocity = 12;
+    /**
+     * <code>optional .box2d.PbVec2 linear_velocity = 12;</code>
+     */
     boolean hasLinearVelocity();
+    /**
+     * <code>optional .box2d.PbVec2 linear_velocity = 12;</code>
+     */
     org.box2d.proto.Box2D.PbVec2 getLinearVelocity();
+    /**
+     * <code>optional .box2d.PbVec2 linear_velocity = 12;</code>
+     */
     org.box2d.proto.Box2D.PbVec2OrBuilder getLinearVelocityOrBuilder();
-    
+
     // optional float angular_velocity = 13;
+    /**
+     * <code>optional float angular_velocity = 13;</code>
+     */
     boolean hasAngularVelocity();
+    /**
+     * <code>optional float angular_velocity = 13;</code>
+     */
     float getAngularVelocity();
-    
+
     // optional float linear_damping = 50;
+    /**
+     * <code>optional float linear_damping = 50;</code>
+     *
+     * <pre>
+     * configuration
+     * </pre>
+     */
     boolean hasLinearDamping();
+    /**
+     * <code>optional float linear_damping = 50;</code>
+     *
+     * <pre>
+     * configuration
+     * </pre>
+     */
     float getLinearDamping();
-    
+
     // optional float angular_damping = 51;
+    /**
+     * <code>optional float angular_damping = 51;</code>
+     */
     boolean hasAngularDamping();
+    /**
+     * <code>optional float angular_damping = 51;</code>
+     */
     float getAngularDamping();
-    
+
     // optional float gravity_scale = 52;
+    /**
+     * <code>optional float gravity_scale = 52;</code>
+     */
     boolean hasGravityScale();
+    /**
+     * <code>optional float gravity_scale = 52;</code>
+     */
     float getGravityScale();
-    
+
     // optional bool bullet = 53;
+    /**
+     * <code>optional bool bullet = 53;</code>
+     */
     boolean hasBullet();
+    /**
+     * <code>optional bool bullet = 53;</code>
+     */
     boolean getBullet();
-    
+
     // optional bool allow_sleep = 54;
+    /**
+     * <code>optional bool allow_sleep = 54;</code>
+     */
     boolean hasAllowSleep();
+    /**
+     * <code>optional bool allow_sleep = 54;</code>
+     */
     boolean getAllowSleep();
-    
+
     // optional bool awake = 55;
+    /**
+     * <code>optional bool awake = 55;</code>
+     */
     boolean hasAwake();
+    /**
+     * <code>optional bool awake = 55;</code>
+     */
     boolean getAwake();
-    
+
     // optional bool active = 56;
+    /**
+     * <code>optional bool active = 56;</code>
+     */
     boolean hasActive();
+    /**
+     * <code>optional bool active = 56;</code>
+     */
     boolean getActive();
-    
+
     // optional bool fixed_rotation = 57;
+    /**
+     * <code>optional bool fixed_rotation = 57;</code>
+     */
     boolean hasFixedRotation();
+    /**
+     * <code>optional bool fixed_rotation = 57;</code>
+     */
     boolean getFixedRotation();
-    
+
     // repeated .box2d.PbFixture fixtures = 100;
+    /**
+     * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+     */
     java.util.List<org.box2d.proto.Box2D.PbFixture> 
         getFixturesList();
+    /**
+     * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+     */
     org.box2d.proto.Box2D.PbFixture getFixtures(int index);
+    /**
+     * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+     */
     int getFixturesCount();
+    /**
+     * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+     */
     java.util.List<? extends org.box2d.proto.Box2D.PbFixtureOrBuilder> 
         getFixturesOrBuilderList();
+    /**
+     * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+     */
     org.box2d.proto.Box2D.PbFixtureOrBuilder getFixturesOrBuilder(
         int index);
   }
+  /**
+   * Protobuf type {@code box2d.PbBody}
+   */
   public static final class PbBody extends
       com.google.protobuf.GeneratedMessage
       implements PbBodyOrBuilder {
     // Use PbBody.newBuilder() to construct.
-    private PbBody(Builder builder) {
+    private PbBody(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private PbBody(boolean noInit) {}
-    
+    private PbBody(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
     private static final PbBody defaultInstance;
     public static PbBody getDefaultInstance() {
       return defaultInstance;
     }
-    
+
     public PbBody getDefaultInstanceForType() {
       return defaultInstance;
     }
-    
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private PbBody(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+              bitField0_ |= 0x00000001;
+              tag_ = input.readInt64();
+              break;
+            }
+            case 16: {
+              int rawValue = input.readEnum();
+              org.box2d.proto.Box2D.PbBodyType value = org.box2d.proto.Box2D.PbBodyType.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(2, rawValue);
+              } else {
+                bitField0_ |= 0x00000002;
+                type_ = value;
+              }
+              break;
+            }
+            case 82: {
+              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000004) == 0x00000004)) {
+                subBuilder = position_.toBuilder();
+              }
+              position_ = input.readMessage(org.box2d.proto.Box2D.PbVec2.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(position_);
+                position_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000004;
+              break;
+            }
+            case 93: {
+              bitField0_ |= 0x00000008;
+              angle_ = input.readFloat();
+              break;
+            }
+            case 98: {
+              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000010) == 0x00000010)) {
+                subBuilder = linearVelocity_.toBuilder();
+              }
+              linearVelocity_ = input.readMessage(org.box2d.proto.Box2D.PbVec2.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(linearVelocity_);
+                linearVelocity_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000010;
+              break;
+            }
+            case 109: {
+              bitField0_ |= 0x00000020;
+              angularVelocity_ = input.readFloat();
+              break;
+            }
+            case 405: {
+              bitField0_ |= 0x00000040;
+              linearDamping_ = input.readFloat();
+              break;
+            }
+            case 413: {
+              bitField0_ |= 0x00000080;
+              angularDamping_ = input.readFloat();
+              break;
+            }
+            case 421: {
+              bitField0_ |= 0x00000100;
+              gravityScale_ = input.readFloat();
+              break;
+            }
+            case 424: {
+              bitField0_ |= 0x00000200;
+              bullet_ = input.readBool();
+              break;
+            }
+            case 432: {
+              bitField0_ |= 0x00000400;
+              allowSleep_ = input.readBool();
+              break;
+            }
+            case 440: {
+              bitField0_ |= 0x00000800;
+              awake_ = input.readBool();
+              break;
+            }
+            case 448: {
+              bitField0_ |= 0x00001000;
+              active_ = input.readBool();
+              break;
+            }
+            case 456: {
+              bitField0_ |= 0x00002000;
+              fixedRotation_ = input.readBool();
+              break;
+            }
+            case 802: {
+              if (!((mutable_bitField0_ & 0x00004000) == 0x00004000)) {
+                fixtures_ = new java.util.ArrayList<org.box2d.proto.Box2D.PbFixture>();
+                mutable_bitField0_ |= 0x00004000;
+              }
+              fixtures_.add(input.readMessage(org.box2d.proto.Box2D.PbFixture.PARSER, extensionRegistry));
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00004000) == 0x00004000)) {
+          fixtures_ = java.util.Collections.unmodifiableList(fixtures_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return org.box2d.proto.Box2D.internal_static_box2d_PbBody_descriptor;
     }
-    
+
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return org.box2d.proto.Box2D.internal_static_box2d_PbBody_fieldAccessorTable;
+      return org.box2d.proto.Box2D.internal_static_box2d_PbBody_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.box2d.proto.Box2D.PbBody.class, org.box2d.proto.Box2D.PbBody.Builder.class);
     }
-    
+
+    public static com.google.protobuf.Parser<PbBody> PARSER =
+        new com.google.protobuf.AbstractParser<PbBody>() {
+      public PbBody parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new PbBody(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PbBody> getParserForType() {
+      return PARSER;
+    }
+
     private int bitField0_;
     // optional int64 tag = 1;
     public static final int TAG_FIELD_NUMBER = 1;
     private long tag_;
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     public boolean hasTag() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     public long getTag() {
       return tag_;
     }
-    
+
     // required .box2d.PbBodyType type = 2;
     public static final int TYPE_FIELD_NUMBER = 2;
     private org.box2d.proto.Box2D.PbBodyType type_;
+    /**
+     * <code>required .box2d.PbBodyType type = 2;</code>
+     */
     public boolean hasType() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
+    /**
+     * <code>required .box2d.PbBodyType type = 2;</code>
+     */
     public org.box2d.proto.Box2D.PbBodyType getType() {
       return type_;
     }
-    
+
     // optional .box2d.PbVec2 position = 10;
     public static final int POSITION_FIELD_NUMBER = 10;
     private org.box2d.proto.Box2D.PbVec2 position_;
+    /**
+     * <code>optional .box2d.PbVec2 position = 10;</code>
+     *
+     * <pre>
+     * physical attributes
+     * </pre>
+     */
     public boolean hasPosition() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
+    /**
+     * <code>optional .box2d.PbVec2 position = 10;</code>
+     *
+     * <pre>
+     * physical attributes
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2 getPosition() {
       return position_;
     }
+    /**
+     * <code>optional .box2d.PbVec2 position = 10;</code>
+     *
+     * <pre>
+     * physical attributes
+     * </pre>
+     */
     public org.box2d.proto.Box2D.PbVec2OrBuilder getPositionOrBuilder() {
       return position_;
     }
-    
+
     // optional float angle = 11;
     public static final int ANGLE_FIELD_NUMBER = 11;
     private float angle_;
+    /**
+     * <code>optional float angle = 11;</code>
+     */
     public boolean hasAngle() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
+    /**
+     * <code>optional float angle = 11;</code>
+     */
     public float getAngle() {
       return angle_;
     }
-    
+
     // optional .box2d.PbVec2 linear_velocity = 12;
     public static final int LINEAR_VELOCITY_FIELD_NUMBER = 12;
     private org.box2d.proto.Box2D.PbVec2 linearVelocity_;
+    /**
+     * <code>optional .box2d.PbVec2 linear_velocity = 12;</code>
+     */
     public boolean hasLinearVelocity() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
+    /**
+     * <code>optional .box2d.PbVec2 linear_velocity = 12;</code>
+     */
     public org.box2d.proto.Box2D.PbVec2 getLinearVelocity() {
       return linearVelocity_;
     }
+    /**
+     * <code>optional .box2d.PbVec2 linear_velocity = 12;</code>
+     */
     public org.box2d.proto.Box2D.PbVec2OrBuilder getLinearVelocityOrBuilder() {
       return linearVelocity_;
     }
-    
+
     // optional float angular_velocity = 13;
     public static final int ANGULAR_VELOCITY_FIELD_NUMBER = 13;
     private float angularVelocity_;
+    /**
+     * <code>optional float angular_velocity = 13;</code>
+     */
     public boolean hasAngularVelocity() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
+    /**
+     * <code>optional float angular_velocity = 13;</code>
+     */
     public float getAngularVelocity() {
       return angularVelocity_;
     }
-    
+
     // optional float linear_damping = 50;
     public static final int LINEAR_DAMPING_FIELD_NUMBER = 50;
     private float linearDamping_;
+    /**
+     * <code>optional float linear_damping = 50;</code>
+     *
+     * <pre>
+     * configuration
+     * </pre>
+     */
     public boolean hasLinearDamping() {
       return ((bitField0_ & 0x00000040) == 0x00000040);
     }
+    /**
+     * <code>optional float linear_damping = 50;</code>
+     *
+     * <pre>
+     * configuration
+     * </pre>
+     */
     public float getLinearDamping() {
       return linearDamping_;
     }
-    
+
     // optional float angular_damping = 51;
     public static final int ANGULAR_DAMPING_FIELD_NUMBER = 51;
     private float angularDamping_;
+    /**
+     * <code>optional float angular_damping = 51;</code>
+     */
     public boolean hasAngularDamping() {
       return ((bitField0_ & 0x00000080) == 0x00000080);
     }
+    /**
+     * <code>optional float angular_damping = 51;</code>
+     */
     public float getAngularDamping() {
       return angularDamping_;
     }
-    
+
     // optional float gravity_scale = 52;
     public static final int GRAVITY_SCALE_FIELD_NUMBER = 52;
     private float gravityScale_;
+    /**
+     * <code>optional float gravity_scale = 52;</code>
+     */
     public boolean hasGravityScale() {
       return ((bitField0_ & 0x00000100) == 0x00000100);
     }
+    /**
+     * <code>optional float gravity_scale = 52;</code>
+     */
     public float getGravityScale() {
       return gravityScale_;
     }
-    
+
     // optional bool bullet = 53;
     public static final int BULLET_FIELD_NUMBER = 53;
     private boolean bullet_;
+    /**
+     * <code>optional bool bullet = 53;</code>
+     */
     public boolean hasBullet() {
       return ((bitField0_ & 0x00000200) == 0x00000200);
     }
+    /**
+     * <code>optional bool bullet = 53;</code>
+     */
     public boolean getBullet() {
       return bullet_;
     }
-    
+
     // optional bool allow_sleep = 54;
     public static final int ALLOW_SLEEP_FIELD_NUMBER = 54;
     private boolean allowSleep_;
+    /**
+     * <code>optional bool allow_sleep = 54;</code>
+     */
     public boolean hasAllowSleep() {
       return ((bitField0_ & 0x00000400) == 0x00000400);
     }
+    /**
+     * <code>optional bool allow_sleep = 54;</code>
+     */
     public boolean getAllowSleep() {
       return allowSleep_;
     }
-    
+
     // optional bool awake = 55;
     public static final int AWAKE_FIELD_NUMBER = 55;
     private boolean awake_;
+    /**
+     * <code>optional bool awake = 55;</code>
+     */
     public boolean hasAwake() {
       return ((bitField0_ & 0x00000800) == 0x00000800);
     }
+    /**
+     * <code>optional bool awake = 55;</code>
+     */
     public boolean getAwake() {
       return awake_;
     }
-    
+
     // optional bool active = 56;
     public static final int ACTIVE_FIELD_NUMBER = 56;
     private boolean active_;
+    /**
+     * <code>optional bool active = 56;</code>
+     */
     public boolean hasActive() {
       return ((bitField0_ & 0x00001000) == 0x00001000);
     }
+    /**
+     * <code>optional bool active = 56;</code>
+     */
     public boolean getActive() {
       return active_;
     }
-    
+
     // optional bool fixed_rotation = 57;
     public static final int FIXED_ROTATION_FIELD_NUMBER = 57;
     private boolean fixedRotation_;
+    /**
+     * <code>optional bool fixed_rotation = 57;</code>
+     */
     public boolean hasFixedRotation() {
       return ((bitField0_ & 0x00002000) == 0x00002000);
     }
+    /**
+     * <code>optional bool fixed_rotation = 57;</code>
+     */
     public boolean getFixedRotation() {
       return fixedRotation_;
     }
-    
+
     // repeated .box2d.PbFixture fixtures = 100;
     public static final int FIXTURES_FIELD_NUMBER = 100;
     private java.util.List<org.box2d.proto.Box2D.PbFixture> fixtures_;
+    /**
+     * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+     */
     public java.util.List<org.box2d.proto.Box2D.PbFixture> getFixturesList() {
       return fixtures_;
     }
+    /**
+     * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+     */
     public java.util.List<? extends org.box2d.proto.Box2D.PbFixtureOrBuilder> 
         getFixturesOrBuilderList() {
       return fixtures_;
     }
+    /**
+     * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+     */
     public int getFixturesCount() {
       return fixtures_.size();
     }
+    /**
+     * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+     */
     public org.box2d.proto.Box2D.PbFixture getFixtures(int index) {
       return fixtures_.get(index);
     }
+    /**
+     * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+     */
     public org.box2d.proto.Box2D.PbFixtureOrBuilder getFixturesOrBuilder(
         int index) {
       return fixtures_.get(index);
     }
-    
+
     private void initFields() {
       tag_ = 0L;
       type_ = org.box2d.proto.Box2D.PbBodyType.STATIC;
@@ -7474,7 +11932,7 @@ public final class Box2D {
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
-      
+
       if (!hasType()) {
         memoizedIsInitialized = 0;
         return false;
@@ -7500,7 +11958,7 @@ public final class Box2D {
       memoizedIsInitialized = 1;
       return true;
     }
-    
+
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
@@ -7551,12 +12009,12 @@ public final class Box2D {
       }
       getUnknownFields().writeTo(output);
     }
-    
+
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
-    
+
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
@@ -7622,94 +12080,83 @@ public final class Box2D {
       memoizedSerializedSize = size;
       return size;
     }
-    
+
     private static final long serialVersionUID = 0L;
     @java.lang.Override
     protected java.lang.Object writeReplace()
         throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
-    
+
     public static org.box2d.proto.Box2D.PbBody parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static org.box2d.proto.Box2D.PbBody parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbBody parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static org.box2d.proto.Box2D.PbBody parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbBody parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static org.box2d.proto.Box2D.PbBody parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbBody parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input);
     }
     public static org.box2d.proto.Box2D.PbBody parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbBody parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static org.box2d.proto.Box2D.PbBody parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
-    
+
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder(org.box2d.proto.Box2D.PbBody prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
-    
+
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
+    /**
+     * Protobuf type {@code box2d.PbBody}
+     */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
        implements org.box2d.proto.Box2D.PbBodyOrBuilder {
@@ -7717,18 +12164,21 @@ public final class Box2D {
           getDescriptor() {
         return org.box2d.proto.Box2D.internal_static_box2d_PbBody_descriptor;
       }
-      
+
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return org.box2d.proto.Box2D.internal_static_box2d_PbBody_fieldAccessorTable;
+        return org.box2d.proto.Box2D.internal_static_box2d_PbBody_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.box2d.proto.Box2D.PbBody.class, org.box2d.proto.Box2D.PbBody.Builder.class);
       }
-      
+
       // Construct using org.box2d.proto.Box2D.PbBody.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
-      
-      private Builder(BuilderParent parent) {
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
@@ -7742,7 +12192,7 @@ public final class Box2D {
       private static Builder create() {
         return new Builder();
       }
-      
+
       public Builder clear() {
         super.clear();
         tag_ = 0L;
@@ -7789,20 +12239,20 @@ public final class Box2D {
         }
         return this;
       }
-      
+
       public Builder clone() {
         return create().mergeFrom(buildPartial());
       }
-      
+
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return org.box2d.proto.Box2D.PbBody.getDescriptor();
+        return org.box2d.proto.Box2D.internal_static_box2d_PbBody_descriptor;
       }
-      
+
       public org.box2d.proto.Box2D.PbBody getDefaultInstanceForType() {
         return org.box2d.proto.Box2D.PbBody.getDefaultInstance();
       }
-      
+
       public org.box2d.proto.Box2D.PbBody build() {
         org.box2d.proto.Box2D.PbBody result = buildPartial();
         if (!result.isInitialized()) {
@@ -7810,17 +12260,7 @@ public final class Box2D {
         }
         return result;
       }
-      
-      private org.box2d.proto.Box2D.PbBody buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        org.box2d.proto.Box2D.PbBody result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
+
       public org.box2d.proto.Box2D.PbBody buildPartial() {
         org.box2d.proto.Box2D.PbBody result = new org.box2d.proto.Box2D.PbBody(this);
         int from_bitField0_ = bitField0_;
@@ -7902,7 +12342,7 @@ public final class Box2D {
         onBuilt();
         return result;
       }
-      
+
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.box2d.proto.Box2D.PbBody) {
           return mergeFrom((org.box2d.proto.Box2D.PbBody)other);
@@ -7911,7 +12351,7 @@ public final class Box2D {
           return this;
         }
       }
-      
+
       public Builder mergeFrom(org.box2d.proto.Box2D.PbBody other) {
         if (other == org.box2d.proto.Box2D.PbBody.getDefaultInstance()) return this;
         if (other.hasTag()) {
@@ -7985,7 +12425,7 @@ public final class Box2D {
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
-      
+
       public final boolean isInitialized() {
         if (!hasType()) {
           
@@ -8011,155 +12451,76 @@ public final class Box2D {
         }
         return true;
       }
-      
+
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
-              }
-              break;
-            }
-            case 8: {
-              bitField0_ |= 0x00000001;
-              tag_ = input.readInt64();
-              break;
-            }
-            case 16: {
-              int rawValue = input.readEnum();
-              org.box2d.proto.Box2D.PbBodyType value = org.box2d.proto.Box2D.PbBodyType.valueOf(rawValue);
-              if (value == null) {
-                unknownFields.mergeVarintField(2, rawValue);
-              } else {
-                bitField0_ |= 0x00000002;
-                type_ = value;
-              }
-              break;
-            }
-            case 82: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              if (hasPosition()) {
-                subBuilder.mergeFrom(getPosition());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setPosition(subBuilder.buildPartial());
-              break;
-            }
-            case 93: {
-              bitField0_ |= 0x00000008;
-              angle_ = input.readFloat();
-              break;
-            }
-            case 98: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              if (hasLinearVelocity()) {
-                subBuilder.mergeFrom(getLinearVelocity());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setLinearVelocity(subBuilder.buildPartial());
-              break;
-            }
-            case 109: {
-              bitField0_ |= 0x00000020;
-              angularVelocity_ = input.readFloat();
-              break;
-            }
-            case 405: {
-              bitField0_ |= 0x00000040;
-              linearDamping_ = input.readFloat();
-              break;
-            }
-            case 413: {
-              bitField0_ |= 0x00000080;
-              angularDamping_ = input.readFloat();
-              break;
-            }
-            case 421: {
-              bitField0_ |= 0x00000100;
-              gravityScale_ = input.readFloat();
-              break;
-            }
-            case 424: {
-              bitField0_ |= 0x00000200;
-              bullet_ = input.readBool();
-              break;
-            }
-            case 432: {
-              bitField0_ |= 0x00000400;
-              allowSleep_ = input.readBool();
-              break;
-            }
-            case 440: {
-              bitField0_ |= 0x00000800;
-              awake_ = input.readBool();
-              break;
-            }
-            case 448: {
-              bitField0_ |= 0x00001000;
-              active_ = input.readBool();
-              break;
-            }
-            case 456: {
-              bitField0_ |= 0x00002000;
-              fixedRotation_ = input.readBool();
-              break;
-            }
-            case 802: {
-              org.box2d.proto.Box2D.PbFixture.Builder subBuilder = org.box2d.proto.Box2D.PbFixture.newBuilder();
-              input.readMessage(subBuilder, extensionRegistry);
-              addFixtures(subBuilder.buildPartial());
-              break;
-            }
+        org.box2d.proto.Box2D.PbBody parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.box2d.proto.Box2D.PbBody) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
           }
         }
+        return this;
       }
-      
       private int bitField0_;
-      
+
       // optional int64 tag = 1;
       private long tag_ ;
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public boolean hasTag() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public long getTag() {
         return tag_;
       }
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public Builder setTag(long value) {
         bitField0_ |= 0x00000001;
         tag_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public Builder clearTag() {
         bitField0_ = (bitField0_ & ~0x00000001);
         tag_ = 0L;
         onChanged();
         return this;
       }
-      
+
       // required .box2d.PbBodyType type = 2;
       private org.box2d.proto.Box2D.PbBodyType type_ = org.box2d.proto.Box2D.PbBodyType.STATIC;
+      /**
+       * <code>required .box2d.PbBodyType type = 2;</code>
+       */
       public boolean hasType() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
+      /**
+       * <code>required .box2d.PbBodyType type = 2;</code>
+       */
       public org.box2d.proto.Box2D.PbBodyType getType() {
         return type_;
       }
+      /**
+       * <code>required .box2d.PbBodyType type = 2;</code>
+       */
       public Builder setType(org.box2d.proto.Box2D.PbBodyType value) {
         if (value == null) {
           throw new NullPointerException();
@@ -8169,20 +12530,37 @@ public final class Box2D {
         onChanged();
         return this;
       }
+      /**
+       * <code>required .box2d.PbBodyType type = 2;</code>
+       */
       public Builder clearType() {
         bitField0_ = (bitField0_ & ~0x00000002);
         type_ = org.box2d.proto.Box2D.PbBodyType.STATIC;
         onChanged();
         return this;
       }
-      
+
       // optional .box2d.PbVec2 position = 10;
       private org.box2d.proto.Box2D.PbVec2 position_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> positionBuilder_;
+      /**
+       * <code>optional .box2d.PbVec2 position = 10;</code>
+       *
+       * <pre>
+       * physical attributes
+       * </pre>
+       */
       public boolean hasPosition() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
+      /**
+       * <code>optional .box2d.PbVec2 position = 10;</code>
+       *
+       * <pre>
+       * physical attributes
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2 getPosition() {
         if (positionBuilder_ == null) {
           return position_;
@@ -8190,6 +12568,13 @@ public final class Box2D {
           return positionBuilder_.getMessage();
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 position = 10;</code>
+       *
+       * <pre>
+       * physical attributes
+       * </pre>
+       */
       public Builder setPosition(org.box2d.proto.Box2D.PbVec2 value) {
         if (positionBuilder_ == null) {
           if (value == null) {
@@ -8203,6 +12588,13 @@ public final class Box2D {
         bitField0_ |= 0x00000004;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 position = 10;</code>
+       *
+       * <pre>
+       * physical attributes
+       * </pre>
+       */
       public Builder setPosition(
           org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (positionBuilder_ == null) {
@@ -8214,6 +12606,13 @@ public final class Box2D {
         bitField0_ |= 0x00000004;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 position = 10;</code>
+       *
+       * <pre>
+       * physical attributes
+       * </pre>
+       */
       public Builder mergePosition(org.box2d.proto.Box2D.PbVec2 value) {
         if (positionBuilder_ == null) {
           if (((bitField0_ & 0x00000004) == 0x00000004) &&
@@ -8230,6 +12629,13 @@ public final class Box2D {
         bitField0_ |= 0x00000004;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 position = 10;</code>
+       *
+       * <pre>
+       * physical attributes
+       * </pre>
+       */
       public Builder clearPosition() {
         if (positionBuilder_ == null) {
           position_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
@@ -8240,11 +12646,25 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00000004);
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 position = 10;</code>
+       *
+       * <pre>
+       * physical attributes
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder getPositionBuilder() {
         bitField0_ |= 0x00000004;
         onChanged();
         return getPositionFieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .box2d.PbVec2 position = 10;</code>
+       *
+       * <pre>
+       * physical attributes
+       * </pre>
+       */
       public org.box2d.proto.Box2D.PbVec2OrBuilder getPositionOrBuilder() {
         if (positionBuilder_ != null) {
           return positionBuilder_.getMessageOrBuilder();
@@ -8252,6 +12672,13 @@ public final class Box2D {
           return position_;
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 position = 10;</code>
+       *
+       * <pre>
+       * physical attributes
+       * </pre>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> 
           getPositionFieldBuilder() {
@@ -8265,35 +12692,53 @@ public final class Box2D {
         }
         return positionBuilder_;
       }
-      
+
       // optional float angle = 11;
       private float angle_ ;
+      /**
+       * <code>optional float angle = 11;</code>
+       */
       public boolean hasAngle() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
+      /**
+       * <code>optional float angle = 11;</code>
+       */
       public float getAngle() {
         return angle_;
       }
+      /**
+       * <code>optional float angle = 11;</code>
+       */
       public Builder setAngle(float value) {
         bitField0_ |= 0x00000008;
         angle_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float angle = 11;</code>
+       */
       public Builder clearAngle() {
         bitField0_ = (bitField0_ & ~0x00000008);
         angle_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional .box2d.PbVec2 linear_velocity = 12;
       private org.box2d.proto.Box2D.PbVec2 linearVelocity_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> linearVelocityBuilder_;
+      /**
+       * <code>optional .box2d.PbVec2 linear_velocity = 12;</code>
+       */
       public boolean hasLinearVelocity() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
+      /**
+       * <code>optional .box2d.PbVec2 linear_velocity = 12;</code>
+       */
       public org.box2d.proto.Box2D.PbVec2 getLinearVelocity() {
         if (linearVelocityBuilder_ == null) {
           return linearVelocity_;
@@ -8301,6 +12746,9 @@ public final class Box2D {
           return linearVelocityBuilder_.getMessage();
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 linear_velocity = 12;</code>
+       */
       public Builder setLinearVelocity(org.box2d.proto.Box2D.PbVec2 value) {
         if (linearVelocityBuilder_ == null) {
           if (value == null) {
@@ -8314,6 +12762,9 @@ public final class Box2D {
         bitField0_ |= 0x00000010;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 linear_velocity = 12;</code>
+       */
       public Builder setLinearVelocity(
           org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (linearVelocityBuilder_ == null) {
@@ -8325,6 +12776,9 @@ public final class Box2D {
         bitField0_ |= 0x00000010;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 linear_velocity = 12;</code>
+       */
       public Builder mergeLinearVelocity(org.box2d.proto.Box2D.PbVec2 value) {
         if (linearVelocityBuilder_ == null) {
           if (((bitField0_ & 0x00000010) == 0x00000010) &&
@@ -8341,6 +12795,9 @@ public final class Box2D {
         bitField0_ |= 0x00000010;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 linear_velocity = 12;</code>
+       */
       public Builder clearLinearVelocity() {
         if (linearVelocityBuilder_ == null) {
           linearVelocity_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
@@ -8351,11 +12808,17 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 linear_velocity = 12;</code>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder getLinearVelocityBuilder() {
         bitField0_ |= 0x00000010;
         onChanged();
         return getLinearVelocityFieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .box2d.PbVec2 linear_velocity = 12;</code>
+       */
       public org.box2d.proto.Box2D.PbVec2OrBuilder getLinearVelocityOrBuilder() {
         if (linearVelocityBuilder_ != null) {
           return linearVelocityBuilder_.getMessageOrBuilder();
@@ -8363,6 +12826,9 @@ public final class Box2D {
           return linearVelocity_;
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 linear_velocity = 12;</code>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> 
           getLinearVelocityFieldBuilder() {
@@ -8376,196 +12842,320 @@ public final class Box2D {
         }
         return linearVelocityBuilder_;
       }
-      
+
       // optional float angular_velocity = 13;
       private float angularVelocity_ ;
+      /**
+       * <code>optional float angular_velocity = 13;</code>
+       */
       public boolean hasAngularVelocity() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
+      /**
+       * <code>optional float angular_velocity = 13;</code>
+       */
       public float getAngularVelocity() {
         return angularVelocity_;
       }
+      /**
+       * <code>optional float angular_velocity = 13;</code>
+       */
       public Builder setAngularVelocity(float value) {
         bitField0_ |= 0x00000020;
         angularVelocity_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float angular_velocity = 13;</code>
+       */
       public Builder clearAngularVelocity() {
         bitField0_ = (bitField0_ & ~0x00000020);
         angularVelocity_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional float linear_damping = 50;
       private float linearDamping_ ;
+      /**
+       * <code>optional float linear_damping = 50;</code>
+       *
+       * <pre>
+       * configuration
+       * </pre>
+       */
       public boolean hasLinearDamping() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
+      /**
+       * <code>optional float linear_damping = 50;</code>
+       *
+       * <pre>
+       * configuration
+       * </pre>
+       */
       public float getLinearDamping() {
         return linearDamping_;
       }
+      /**
+       * <code>optional float linear_damping = 50;</code>
+       *
+       * <pre>
+       * configuration
+       * </pre>
+       */
       public Builder setLinearDamping(float value) {
         bitField0_ |= 0x00000040;
         linearDamping_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float linear_damping = 50;</code>
+       *
+       * <pre>
+       * configuration
+       * </pre>
+       */
       public Builder clearLinearDamping() {
         bitField0_ = (bitField0_ & ~0x00000040);
         linearDamping_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional float angular_damping = 51;
       private float angularDamping_ ;
+      /**
+       * <code>optional float angular_damping = 51;</code>
+       */
       public boolean hasAngularDamping() {
         return ((bitField0_ & 0x00000080) == 0x00000080);
       }
+      /**
+       * <code>optional float angular_damping = 51;</code>
+       */
       public float getAngularDamping() {
         return angularDamping_;
       }
+      /**
+       * <code>optional float angular_damping = 51;</code>
+       */
       public Builder setAngularDamping(float value) {
         bitField0_ |= 0x00000080;
         angularDamping_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float angular_damping = 51;</code>
+       */
       public Builder clearAngularDamping() {
         bitField0_ = (bitField0_ & ~0x00000080);
         angularDamping_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional float gravity_scale = 52;
       private float gravityScale_ ;
+      /**
+       * <code>optional float gravity_scale = 52;</code>
+       */
       public boolean hasGravityScale() {
         return ((bitField0_ & 0x00000100) == 0x00000100);
       }
+      /**
+       * <code>optional float gravity_scale = 52;</code>
+       */
       public float getGravityScale() {
         return gravityScale_;
       }
+      /**
+       * <code>optional float gravity_scale = 52;</code>
+       */
       public Builder setGravityScale(float value) {
         bitField0_ |= 0x00000100;
         gravityScale_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional float gravity_scale = 52;</code>
+       */
       public Builder clearGravityScale() {
         bitField0_ = (bitField0_ & ~0x00000100);
         gravityScale_ = 0F;
         onChanged();
         return this;
       }
-      
+
       // optional bool bullet = 53;
       private boolean bullet_ ;
+      /**
+       * <code>optional bool bullet = 53;</code>
+       */
       public boolean hasBullet() {
         return ((bitField0_ & 0x00000200) == 0x00000200);
       }
+      /**
+       * <code>optional bool bullet = 53;</code>
+       */
       public boolean getBullet() {
         return bullet_;
       }
+      /**
+       * <code>optional bool bullet = 53;</code>
+       */
       public Builder setBullet(boolean value) {
         bitField0_ |= 0x00000200;
         bullet_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional bool bullet = 53;</code>
+       */
       public Builder clearBullet() {
         bitField0_ = (bitField0_ & ~0x00000200);
         bullet_ = false;
         onChanged();
         return this;
       }
-      
+
       // optional bool allow_sleep = 54;
       private boolean allowSleep_ ;
+      /**
+       * <code>optional bool allow_sleep = 54;</code>
+       */
       public boolean hasAllowSleep() {
         return ((bitField0_ & 0x00000400) == 0x00000400);
       }
+      /**
+       * <code>optional bool allow_sleep = 54;</code>
+       */
       public boolean getAllowSleep() {
         return allowSleep_;
       }
+      /**
+       * <code>optional bool allow_sleep = 54;</code>
+       */
       public Builder setAllowSleep(boolean value) {
         bitField0_ |= 0x00000400;
         allowSleep_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional bool allow_sleep = 54;</code>
+       */
       public Builder clearAllowSleep() {
         bitField0_ = (bitField0_ & ~0x00000400);
         allowSleep_ = false;
         onChanged();
         return this;
       }
-      
+
       // optional bool awake = 55;
       private boolean awake_ ;
+      /**
+       * <code>optional bool awake = 55;</code>
+       */
       public boolean hasAwake() {
         return ((bitField0_ & 0x00000800) == 0x00000800);
       }
+      /**
+       * <code>optional bool awake = 55;</code>
+       */
       public boolean getAwake() {
         return awake_;
       }
+      /**
+       * <code>optional bool awake = 55;</code>
+       */
       public Builder setAwake(boolean value) {
         bitField0_ |= 0x00000800;
         awake_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional bool awake = 55;</code>
+       */
       public Builder clearAwake() {
         bitField0_ = (bitField0_ & ~0x00000800);
         awake_ = false;
         onChanged();
         return this;
       }
-      
+
       // optional bool active = 56;
       private boolean active_ ;
+      /**
+       * <code>optional bool active = 56;</code>
+       */
       public boolean hasActive() {
         return ((bitField0_ & 0x00001000) == 0x00001000);
       }
+      /**
+       * <code>optional bool active = 56;</code>
+       */
       public boolean getActive() {
         return active_;
       }
+      /**
+       * <code>optional bool active = 56;</code>
+       */
       public Builder setActive(boolean value) {
         bitField0_ |= 0x00001000;
         active_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional bool active = 56;</code>
+       */
       public Builder clearActive() {
         bitField0_ = (bitField0_ & ~0x00001000);
         active_ = false;
         onChanged();
         return this;
       }
-      
+
       // optional bool fixed_rotation = 57;
       private boolean fixedRotation_ ;
+      /**
+       * <code>optional bool fixed_rotation = 57;</code>
+       */
       public boolean hasFixedRotation() {
         return ((bitField0_ & 0x00002000) == 0x00002000);
       }
+      /**
+       * <code>optional bool fixed_rotation = 57;</code>
+       */
       public boolean getFixedRotation() {
         return fixedRotation_;
       }
+      /**
+       * <code>optional bool fixed_rotation = 57;</code>
+       */
       public Builder setFixedRotation(boolean value) {
         bitField0_ |= 0x00002000;
         fixedRotation_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional bool fixed_rotation = 57;</code>
+       */
       public Builder clearFixedRotation() {
         bitField0_ = (bitField0_ & ~0x00002000);
         fixedRotation_ = false;
         onChanged();
         return this;
       }
-      
+
       // repeated .box2d.PbFixture fixtures = 100;
       private java.util.List<org.box2d.proto.Box2D.PbFixture> fixtures_ =
         java.util.Collections.emptyList();
@@ -8575,10 +13165,13 @@ public final class Box2D {
           bitField0_ |= 0x00004000;
          }
       }
-      
+
       private com.google.protobuf.RepeatedFieldBuilder<
           org.box2d.proto.Box2D.PbFixture, org.box2d.proto.Box2D.PbFixture.Builder, org.box2d.proto.Box2D.PbFixtureOrBuilder> fixturesBuilder_;
-      
+
+      /**
+       * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+       */
       public java.util.List<org.box2d.proto.Box2D.PbFixture> getFixturesList() {
         if (fixturesBuilder_ == null) {
           return java.util.Collections.unmodifiableList(fixtures_);
@@ -8586,6 +13179,9 @@ public final class Box2D {
           return fixturesBuilder_.getMessageList();
         }
       }
+      /**
+       * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+       */
       public int getFixturesCount() {
         if (fixturesBuilder_ == null) {
           return fixtures_.size();
@@ -8593,6 +13189,9 @@ public final class Box2D {
           return fixturesBuilder_.getCount();
         }
       }
+      /**
+       * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+       */
       public org.box2d.proto.Box2D.PbFixture getFixtures(int index) {
         if (fixturesBuilder_ == null) {
           return fixtures_.get(index);
@@ -8600,6 +13199,9 @@ public final class Box2D {
           return fixturesBuilder_.getMessage(index);
         }
       }
+      /**
+       * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+       */
       public Builder setFixtures(
           int index, org.box2d.proto.Box2D.PbFixture value) {
         if (fixturesBuilder_ == null) {
@@ -8614,6 +13216,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+       */
       public Builder setFixtures(
           int index, org.box2d.proto.Box2D.PbFixture.Builder builderForValue) {
         if (fixturesBuilder_ == null) {
@@ -8625,6 +13230,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+       */
       public Builder addFixtures(org.box2d.proto.Box2D.PbFixture value) {
         if (fixturesBuilder_ == null) {
           if (value == null) {
@@ -8638,6 +13246,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+       */
       public Builder addFixtures(
           int index, org.box2d.proto.Box2D.PbFixture value) {
         if (fixturesBuilder_ == null) {
@@ -8652,6 +13263,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+       */
       public Builder addFixtures(
           org.box2d.proto.Box2D.PbFixture.Builder builderForValue) {
         if (fixturesBuilder_ == null) {
@@ -8663,6 +13277,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+       */
       public Builder addFixtures(
           int index, org.box2d.proto.Box2D.PbFixture.Builder builderForValue) {
         if (fixturesBuilder_ == null) {
@@ -8674,6 +13291,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+       */
       public Builder addAllFixtures(
           java.lang.Iterable<? extends org.box2d.proto.Box2D.PbFixture> values) {
         if (fixturesBuilder_ == null) {
@@ -8685,6 +13305,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+       */
       public Builder clearFixtures() {
         if (fixturesBuilder_ == null) {
           fixtures_ = java.util.Collections.emptyList();
@@ -8695,6 +13318,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+       */
       public Builder removeFixtures(int index) {
         if (fixturesBuilder_ == null) {
           ensureFixturesIsMutable();
@@ -8705,10 +13331,16 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+       */
       public org.box2d.proto.Box2D.PbFixture.Builder getFixturesBuilder(
           int index) {
         return getFixturesFieldBuilder().getBuilder(index);
       }
+      /**
+       * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+       */
       public org.box2d.proto.Box2D.PbFixtureOrBuilder getFixturesOrBuilder(
           int index) {
         if (fixturesBuilder_ == null) {
@@ -8716,6 +13348,9 @@ public final class Box2D {
           return fixturesBuilder_.getMessageOrBuilder(index);
         }
       }
+      /**
+       * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+       */
       public java.util.List<? extends org.box2d.proto.Box2D.PbFixtureOrBuilder> 
            getFixturesOrBuilderList() {
         if (fixturesBuilder_ != null) {
@@ -8724,15 +13359,24 @@ public final class Box2D {
           return java.util.Collections.unmodifiableList(fixtures_);
         }
       }
+      /**
+       * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+       */
       public org.box2d.proto.Box2D.PbFixture.Builder addFixturesBuilder() {
         return getFixturesFieldBuilder().addBuilder(
             org.box2d.proto.Box2D.PbFixture.getDefaultInstance());
       }
+      /**
+       * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+       */
       public org.box2d.proto.Box2D.PbFixture.Builder addFixturesBuilder(
           int index) {
         return getFixturesFieldBuilder().addBuilder(
             index, org.box2d.proto.Box2D.PbFixture.getDefaultInstance());
       }
+      /**
+       * <code>repeated .box2d.PbFixture fixtures = 100;</code>
+       */
       public java.util.List<org.box2d.proto.Box2D.PbFixture.Builder> 
            getFixturesBuilderList() {
         return getFixturesFieldBuilder().getBuilderList();
@@ -8751,214 +13395,491 @@ public final class Box2D {
         }
         return fixturesBuilder_;
       }
-      
+
       // @@protoc_insertion_point(builder_scope:box2d.PbBody)
     }
-    
+
     static {
       defaultInstance = new PbBody(true);
       defaultInstance.initFields();
     }
-    
+
     // @@protoc_insertion_point(class_scope:box2d.PbBody)
   }
-  
+
   public interface PbWorldOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
-    
+
     // optional int64 tag = 1;
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     boolean hasTag();
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     long getTag();
-    
+
     // optional .box2d.PbVec2 gravity = 2;
+    /**
+     * <code>optional .box2d.PbVec2 gravity = 2;</code>
+     */
     boolean hasGravity();
+    /**
+     * <code>optional .box2d.PbVec2 gravity = 2;</code>
+     */
     org.box2d.proto.Box2D.PbVec2 getGravity();
+    /**
+     * <code>optional .box2d.PbVec2 gravity = 2;</code>
+     */
     org.box2d.proto.Box2D.PbVec2OrBuilder getGravityOrBuilder();
-    
+
     // optional bool allow_sleep = 3;
+    /**
+     * <code>optional bool allow_sleep = 3;</code>
+     */
     boolean hasAllowSleep();
+    /**
+     * <code>optional bool allow_sleep = 3;</code>
+     */
     boolean getAllowSleep();
-    
+
     // optional bool auto_clear_forces = 4;
+    /**
+     * <code>optional bool auto_clear_forces = 4;</code>
+     */
     boolean hasAutoClearForces();
+    /**
+     * <code>optional bool auto_clear_forces = 4;</code>
+     */
     boolean getAutoClearForces();
-    
+
     // optional bool warm_starting = 5;
+    /**
+     * <code>optional bool warm_starting = 5;</code>
+     */
     boolean hasWarmStarting();
+    /**
+     * <code>optional bool warm_starting = 5;</code>
+     */
     boolean getWarmStarting();
-    
+
     // optional bool continuous_physics = 6;
+    /**
+     * <code>optional bool continuous_physics = 6;</code>
+     */
     boolean hasContinuousPhysics();
+    /**
+     * <code>optional bool continuous_physics = 6;</code>
+     */
     boolean getContinuousPhysics();
-    
+
     // optional bool sub_stepping = 7;
+    /**
+     * <code>optional bool sub_stepping = 7;</code>
+     */
     boolean hasSubStepping();
+    /**
+     * <code>optional bool sub_stepping = 7;</code>
+     */
     boolean getSubStepping();
-    
+
     // repeated .box2d.PbBody bodies = 20;
+    /**
+     * <code>repeated .box2d.PbBody bodies = 20;</code>
+     */
     java.util.List<org.box2d.proto.Box2D.PbBody> 
         getBodiesList();
+    /**
+     * <code>repeated .box2d.PbBody bodies = 20;</code>
+     */
     org.box2d.proto.Box2D.PbBody getBodies(int index);
+    /**
+     * <code>repeated .box2d.PbBody bodies = 20;</code>
+     */
     int getBodiesCount();
+    /**
+     * <code>repeated .box2d.PbBody bodies = 20;</code>
+     */
     java.util.List<? extends org.box2d.proto.Box2D.PbBodyOrBuilder> 
         getBodiesOrBuilderList();
+    /**
+     * <code>repeated .box2d.PbBody bodies = 20;</code>
+     */
     org.box2d.proto.Box2D.PbBodyOrBuilder getBodiesOrBuilder(
         int index);
-    
+
     // repeated .box2d.PbJoint joints = 21;
+    /**
+     * <code>repeated .box2d.PbJoint joints = 21;</code>
+     */
     java.util.List<org.box2d.proto.Box2D.PbJoint> 
         getJointsList();
+    /**
+     * <code>repeated .box2d.PbJoint joints = 21;</code>
+     */
     org.box2d.proto.Box2D.PbJoint getJoints(int index);
+    /**
+     * <code>repeated .box2d.PbJoint joints = 21;</code>
+     */
     int getJointsCount();
+    /**
+     * <code>repeated .box2d.PbJoint joints = 21;</code>
+     */
     java.util.List<? extends org.box2d.proto.Box2D.PbJointOrBuilder> 
         getJointsOrBuilderList();
+    /**
+     * <code>repeated .box2d.PbJoint joints = 21;</code>
+     */
     org.box2d.proto.Box2D.PbJointOrBuilder getJointsOrBuilder(
         int index);
   }
+  /**
+   * Protobuf type {@code box2d.PbWorld}
+   */
   public static final class PbWorld extends
       com.google.protobuf.GeneratedMessage
       implements PbWorldOrBuilder {
     // Use PbWorld.newBuilder() to construct.
-    private PbWorld(Builder builder) {
+    private PbWorld(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
+      this.unknownFields = builder.getUnknownFields();
     }
-    private PbWorld(boolean noInit) {}
-    
+    private PbWorld(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
     private static final PbWorld defaultInstance;
     public static PbWorld getDefaultInstance() {
       return defaultInstance;
     }
-    
+
     public PbWorld getDefaultInstanceForType() {
       return defaultInstance;
     }
-    
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private PbWorld(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+              bitField0_ |= 0x00000001;
+              tag_ = input.readInt64();
+              break;
+            }
+            case 18: {
+              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = null;
+              if (((bitField0_ & 0x00000002) == 0x00000002)) {
+                subBuilder = gravity_.toBuilder();
+              }
+              gravity_ = input.readMessage(org.box2d.proto.Box2D.PbVec2.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(gravity_);
+                gravity_ = subBuilder.buildPartial();
+              }
+              bitField0_ |= 0x00000002;
+              break;
+            }
+            case 24: {
+              bitField0_ |= 0x00000004;
+              allowSleep_ = input.readBool();
+              break;
+            }
+            case 32: {
+              bitField0_ |= 0x00000008;
+              autoClearForces_ = input.readBool();
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000010;
+              warmStarting_ = input.readBool();
+              break;
+            }
+            case 48: {
+              bitField0_ |= 0x00000020;
+              continuousPhysics_ = input.readBool();
+              break;
+            }
+            case 56: {
+              bitField0_ |= 0x00000040;
+              subStepping_ = input.readBool();
+              break;
+            }
+            case 162: {
+              if (!((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
+                bodies_ = new java.util.ArrayList<org.box2d.proto.Box2D.PbBody>();
+                mutable_bitField0_ |= 0x00000080;
+              }
+              bodies_.add(input.readMessage(org.box2d.proto.Box2D.PbBody.PARSER, extensionRegistry));
+              break;
+            }
+            case 170: {
+              if (!((mutable_bitField0_ & 0x00000100) == 0x00000100)) {
+                joints_ = new java.util.ArrayList<org.box2d.proto.Box2D.PbJoint>();
+                mutable_bitField0_ |= 0x00000100;
+              }
+              joints_.add(input.readMessage(org.box2d.proto.Box2D.PbJoint.PARSER, extensionRegistry));
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000080) == 0x00000080)) {
+          bodies_ = java.util.Collections.unmodifiableList(bodies_);
+        }
+        if (((mutable_bitField0_ & 0x00000100) == 0x00000100)) {
+          joints_ = java.util.Collections.unmodifiableList(joints_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return org.box2d.proto.Box2D.internal_static_box2d_PbWorld_descriptor;
     }
-    
+
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return org.box2d.proto.Box2D.internal_static_box2d_PbWorld_fieldAccessorTable;
+      return org.box2d.proto.Box2D.internal_static_box2d_PbWorld_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.box2d.proto.Box2D.PbWorld.class, org.box2d.proto.Box2D.PbWorld.Builder.class);
     }
-    
+
+    public static com.google.protobuf.Parser<PbWorld> PARSER =
+        new com.google.protobuf.AbstractParser<PbWorld>() {
+      public PbWorld parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new PbWorld(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PbWorld> getParserForType() {
+      return PARSER;
+    }
+
     private int bitField0_;
     // optional int64 tag = 1;
     public static final int TAG_FIELD_NUMBER = 1;
     private long tag_;
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     public boolean hasTag() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
+    /**
+     * <code>optional int64 tag = 1;</code>
+     */
     public long getTag() {
       return tag_;
     }
-    
+
     // optional .box2d.PbVec2 gravity = 2;
     public static final int GRAVITY_FIELD_NUMBER = 2;
     private org.box2d.proto.Box2D.PbVec2 gravity_;
+    /**
+     * <code>optional .box2d.PbVec2 gravity = 2;</code>
+     */
     public boolean hasGravity() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
+    /**
+     * <code>optional .box2d.PbVec2 gravity = 2;</code>
+     */
     public org.box2d.proto.Box2D.PbVec2 getGravity() {
       return gravity_;
     }
+    /**
+     * <code>optional .box2d.PbVec2 gravity = 2;</code>
+     */
     public org.box2d.proto.Box2D.PbVec2OrBuilder getGravityOrBuilder() {
       return gravity_;
     }
-    
+
     // optional bool allow_sleep = 3;
     public static final int ALLOW_SLEEP_FIELD_NUMBER = 3;
     private boolean allowSleep_;
+    /**
+     * <code>optional bool allow_sleep = 3;</code>
+     */
     public boolean hasAllowSleep() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
+    /**
+     * <code>optional bool allow_sleep = 3;</code>
+     */
     public boolean getAllowSleep() {
       return allowSleep_;
     }
-    
+
     // optional bool auto_clear_forces = 4;
     public static final int AUTO_CLEAR_FORCES_FIELD_NUMBER = 4;
     private boolean autoClearForces_;
+    /**
+     * <code>optional bool auto_clear_forces = 4;</code>
+     */
     public boolean hasAutoClearForces() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
+    /**
+     * <code>optional bool auto_clear_forces = 4;</code>
+     */
     public boolean getAutoClearForces() {
       return autoClearForces_;
     }
-    
+
     // optional bool warm_starting = 5;
     public static final int WARM_STARTING_FIELD_NUMBER = 5;
     private boolean warmStarting_;
+    /**
+     * <code>optional bool warm_starting = 5;</code>
+     */
     public boolean hasWarmStarting() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
+    /**
+     * <code>optional bool warm_starting = 5;</code>
+     */
     public boolean getWarmStarting() {
       return warmStarting_;
     }
-    
+
     // optional bool continuous_physics = 6;
     public static final int CONTINUOUS_PHYSICS_FIELD_NUMBER = 6;
     private boolean continuousPhysics_;
+    /**
+     * <code>optional bool continuous_physics = 6;</code>
+     */
     public boolean hasContinuousPhysics() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
+    /**
+     * <code>optional bool continuous_physics = 6;</code>
+     */
     public boolean getContinuousPhysics() {
       return continuousPhysics_;
     }
-    
+
     // optional bool sub_stepping = 7;
     public static final int SUB_STEPPING_FIELD_NUMBER = 7;
     private boolean subStepping_;
+    /**
+     * <code>optional bool sub_stepping = 7;</code>
+     */
     public boolean hasSubStepping() {
       return ((bitField0_ & 0x00000040) == 0x00000040);
     }
+    /**
+     * <code>optional bool sub_stepping = 7;</code>
+     */
     public boolean getSubStepping() {
       return subStepping_;
     }
-    
+
     // repeated .box2d.PbBody bodies = 20;
     public static final int BODIES_FIELD_NUMBER = 20;
     private java.util.List<org.box2d.proto.Box2D.PbBody> bodies_;
+    /**
+     * <code>repeated .box2d.PbBody bodies = 20;</code>
+     */
     public java.util.List<org.box2d.proto.Box2D.PbBody> getBodiesList() {
       return bodies_;
     }
+    /**
+     * <code>repeated .box2d.PbBody bodies = 20;</code>
+     */
     public java.util.List<? extends org.box2d.proto.Box2D.PbBodyOrBuilder> 
         getBodiesOrBuilderList() {
       return bodies_;
     }
+    /**
+     * <code>repeated .box2d.PbBody bodies = 20;</code>
+     */
     public int getBodiesCount() {
       return bodies_.size();
     }
+    /**
+     * <code>repeated .box2d.PbBody bodies = 20;</code>
+     */
     public org.box2d.proto.Box2D.PbBody getBodies(int index) {
       return bodies_.get(index);
     }
+    /**
+     * <code>repeated .box2d.PbBody bodies = 20;</code>
+     */
     public org.box2d.proto.Box2D.PbBodyOrBuilder getBodiesOrBuilder(
         int index) {
       return bodies_.get(index);
     }
-    
+
     // repeated .box2d.PbJoint joints = 21;
     public static final int JOINTS_FIELD_NUMBER = 21;
     private java.util.List<org.box2d.proto.Box2D.PbJoint> joints_;
+    /**
+     * <code>repeated .box2d.PbJoint joints = 21;</code>
+     */
     public java.util.List<org.box2d.proto.Box2D.PbJoint> getJointsList() {
       return joints_;
     }
+    /**
+     * <code>repeated .box2d.PbJoint joints = 21;</code>
+     */
     public java.util.List<? extends org.box2d.proto.Box2D.PbJointOrBuilder> 
         getJointsOrBuilderList() {
       return joints_;
     }
+    /**
+     * <code>repeated .box2d.PbJoint joints = 21;</code>
+     */
     public int getJointsCount() {
       return joints_.size();
     }
+    /**
+     * <code>repeated .box2d.PbJoint joints = 21;</code>
+     */
     public org.box2d.proto.Box2D.PbJoint getJoints(int index) {
       return joints_.get(index);
     }
+    /**
+     * <code>repeated .box2d.PbJoint joints = 21;</code>
+     */
     public org.box2d.proto.Box2D.PbJointOrBuilder getJointsOrBuilder(
         int index) {
       return joints_.get(index);
     }
-    
+
     private void initFields() {
       tag_ = 0L;
       gravity_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
@@ -8974,7 +13895,7 @@ public final class Box2D {
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
-      
+
       if (hasGravity()) {
         if (!getGravity().isInitialized()) {
           memoizedIsInitialized = 0;
@@ -8996,7 +13917,7 @@ public final class Box2D {
       memoizedIsInitialized = 1;
       return true;
     }
-    
+
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
@@ -9029,12 +13950,12 @@ public final class Box2D {
       }
       getUnknownFields().writeTo(output);
     }
-    
+
     private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
-    
+
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
@@ -9076,94 +13997,83 @@ public final class Box2D {
       memoizedSerializedSize = size;
       return size;
     }
-    
+
     private static final long serialVersionUID = 0L;
     @java.lang.Override
     protected java.lang.Object writeReplace()
         throws java.io.ObjectStreamException {
       return super.writeReplace();
     }
-    
+
     public static org.box2d.proto.Box2D.PbWorld parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static org.box2d.proto.Box2D.PbWorld parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbWorld parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data).buildParsed();
+      return PARSER.parseFrom(data);
     }
     public static org.box2d.proto.Box2D.PbWorld parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
-      return newBuilder().mergeFrom(data, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(data, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbWorld parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static org.box2d.proto.Box2D.PbWorld parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbWorld parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input);
     }
     public static org.box2d.proto.Box2D.PbWorld parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      Builder builder = newBuilder();
-      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
-        return builder.buildParsed();
-      } else {
-        return null;
-      }
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
     public static org.box2d.proto.Box2D.PbWorld parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input).buildParsed();
+      return PARSER.parseFrom(input);
     }
     public static org.box2d.proto.Box2D.PbWorld parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return newBuilder().mergeFrom(input, extensionRegistry)
-               .buildParsed();
+      return PARSER.parseFrom(input, extensionRegistry);
     }
-    
+
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder(org.box2d.proto.Box2D.PbWorld prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
-    
+
     @java.lang.Override
     protected Builder newBuilderForType(
         com.google.protobuf.GeneratedMessage.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
+    /**
+     * Protobuf type {@code box2d.PbWorld}
+     */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder>
        implements org.box2d.proto.Box2D.PbWorldOrBuilder {
@@ -9171,18 +14081,21 @@ public final class Box2D {
           getDescriptor() {
         return org.box2d.proto.Box2D.internal_static_box2d_PbWorld_descriptor;
       }
-      
+
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return org.box2d.proto.Box2D.internal_static_box2d_PbWorld_fieldAccessorTable;
+        return org.box2d.proto.Box2D.internal_static_box2d_PbWorld_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.box2d.proto.Box2D.PbWorld.class, org.box2d.proto.Box2D.PbWorld.Builder.class);
       }
-      
+
       // Construct using org.box2d.proto.Box2D.PbWorld.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
-      
-      private Builder(BuilderParent parent) {
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
@@ -9196,7 +14109,7 @@ public final class Box2D {
       private static Builder create() {
         return new Builder();
       }
-      
+
       public Builder clear() {
         super.clear();
         tag_ = 0L;
@@ -9231,20 +14144,20 @@ public final class Box2D {
         }
         return this;
       }
-      
+
       public Builder clone() {
         return create().mergeFrom(buildPartial());
       }
-      
+
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return org.box2d.proto.Box2D.PbWorld.getDescriptor();
+        return org.box2d.proto.Box2D.internal_static_box2d_PbWorld_descriptor;
       }
-      
+
       public org.box2d.proto.Box2D.PbWorld getDefaultInstanceForType() {
         return org.box2d.proto.Box2D.PbWorld.getDefaultInstance();
       }
-      
+
       public org.box2d.proto.Box2D.PbWorld build() {
         org.box2d.proto.Box2D.PbWorld result = buildPartial();
         if (!result.isInitialized()) {
@@ -9252,17 +14165,7 @@ public final class Box2D {
         }
         return result;
       }
-      
-      private org.box2d.proto.Box2D.PbWorld buildParsed()
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        org.box2d.proto.Box2D.PbWorld result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(
-            result).asInvalidProtocolBufferException();
-        }
-        return result;
-      }
-      
+
       public org.box2d.proto.Box2D.PbWorld buildPartial() {
         org.box2d.proto.Box2D.PbWorld result = new org.box2d.proto.Box2D.PbWorld(this);
         int from_bitField0_ = bitField0_;
@@ -9321,7 +14224,7 @@ public final class Box2D {
         onBuilt();
         return result;
       }
-      
+
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.box2d.proto.Box2D.PbWorld) {
           return mergeFrom((org.box2d.proto.Box2D.PbWorld)other);
@@ -9330,7 +14233,7 @@ public final class Box2D {
           return this;
         }
       }
-      
+
       public Builder mergeFrom(org.box2d.proto.Box2D.PbWorld other) {
         if (other == org.box2d.proto.Box2D.PbWorld.getDefaultInstance()) return this;
         if (other.hasTag()) {
@@ -9409,7 +14312,7 @@ public final class Box2D {
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
-      
+
       public final boolean isInitialized() {
         if (hasGravity()) {
           if (!getGravity().isInitialized()) {
@@ -9431,115 +14334,72 @@ public final class Box2D {
         }
         return true;
       }
-      
+
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder(
-            this.getUnknownFields());
-        while (true) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              this.setUnknownFields(unknownFields.build());
-              onChanged();
-              return this;
-            default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
-                this.setUnknownFields(unknownFields.build());
-                onChanged();
-                return this;
-              }
-              break;
-            }
-            case 8: {
-              bitField0_ |= 0x00000001;
-              tag_ = input.readInt64();
-              break;
-            }
-            case 18: {
-              org.box2d.proto.Box2D.PbVec2.Builder subBuilder = org.box2d.proto.Box2D.PbVec2.newBuilder();
-              if (hasGravity()) {
-                subBuilder.mergeFrom(getGravity());
-              }
-              input.readMessage(subBuilder, extensionRegistry);
-              setGravity(subBuilder.buildPartial());
-              break;
-            }
-            case 24: {
-              bitField0_ |= 0x00000004;
-              allowSleep_ = input.readBool();
-              break;
-            }
-            case 32: {
-              bitField0_ |= 0x00000008;
-              autoClearForces_ = input.readBool();
-              break;
-            }
-            case 40: {
-              bitField0_ |= 0x00000010;
-              warmStarting_ = input.readBool();
-              break;
-            }
-            case 48: {
-              bitField0_ |= 0x00000020;
-              continuousPhysics_ = input.readBool();
-              break;
-            }
-            case 56: {
-              bitField0_ |= 0x00000040;
-              subStepping_ = input.readBool();
-              break;
-            }
-            case 162: {
-              org.box2d.proto.Box2D.PbBody.Builder subBuilder = org.box2d.proto.Box2D.PbBody.newBuilder();
-              input.readMessage(subBuilder, extensionRegistry);
-              addBodies(subBuilder.buildPartial());
-              break;
-            }
-            case 170: {
-              org.box2d.proto.Box2D.PbJoint.Builder subBuilder = org.box2d.proto.Box2D.PbJoint.newBuilder();
-              input.readMessage(subBuilder, extensionRegistry);
-              addJoints(subBuilder.buildPartial());
-              break;
-            }
+        org.box2d.proto.Box2D.PbWorld parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.box2d.proto.Box2D.PbWorld) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
           }
         }
+        return this;
       }
-      
       private int bitField0_;
-      
+
       // optional int64 tag = 1;
       private long tag_ ;
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public boolean hasTag() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public long getTag() {
         return tag_;
       }
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public Builder setTag(long value) {
         bitField0_ |= 0x00000001;
         tag_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional int64 tag = 1;</code>
+       */
       public Builder clearTag() {
         bitField0_ = (bitField0_ & ~0x00000001);
         tag_ = 0L;
         onChanged();
         return this;
       }
-      
+
       // optional .box2d.PbVec2 gravity = 2;
       private org.box2d.proto.Box2D.PbVec2 gravity_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> gravityBuilder_;
+      /**
+       * <code>optional .box2d.PbVec2 gravity = 2;</code>
+       */
       public boolean hasGravity() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
+      /**
+       * <code>optional .box2d.PbVec2 gravity = 2;</code>
+       */
       public org.box2d.proto.Box2D.PbVec2 getGravity() {
         if (gravityBuilder_ == null) {
           return gravity_;
@@ -9547,6 +14407,9 @@ public final class Box2D {
           return gravityBuilder_.getMessage();
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 gravity = 2;</code>
+       */
       public Builder setGravity(org.box2d.proto.Box2D.PbVec2 value) {
         if (gravityBuilder_ == null) {
           if (value == null) {
@@ -9560,6 +14423,9 @@ public final class Box2D {
         bitField0_ |= 0x00000002;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 gravity = 2;</code>
+       */
       public Builder setGravity(
           org.box2d.proto.Box2D.PbVec2.Builder builderForValue) {
         if (gravityBuilder_ == null) {
@@ -9571,6 +14437,9 @@ public final class Box2D {
         bitField0_ |= 0x00000002;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 gravity = 2;</code>
+       */
       public Builder mergeGravity(org.box2d.proto.Box2D.PbVec2 value) {
         if (gravityBuilder_ == null) {
           if (((bitField0_ & 0x00000002) == 0x00000002) &&
@@ -9587,6 +14456,9 @@ public final class Box2D {
         bitField0_ |= 0x00000002;
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 gravity = 2;</code>
+       */
       public Builder clearGravity() {
         if (gravityBuilder_ == null) {
           gravity_ = org.box2d.proto.Box2D.PbVec2.getDefaultInstance();
@@ -9597,11 +14469,17 @@ public final class Box2D {
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
+      /**
+       * <code>optional .box2d.PbVec2 gravity = 2;</code>
+       */
       public org.box2d.proto.Box2D.PbVec2.Builder getGravityBuilder() {
         bitField0_ |= 0x00000002;
         onChanged();
         return getGravityFieldBuilder().getBuilder();
       }
+      /**
+       * <code>optional .box2d.PbVec2 gravity = 2;</code>
+       */
       public org.box2d.proto.Box2D.PbVec2OrBuilder getGravityOrBuilder() {
         if (gravityBuilder_ != null) {
           return gravityBuilder_.getMessageOrBuilder();
@@ -9609,6 +14487,9 @@ public final class Box2D {
           return gravity_;
         }
       }
+      /**
+       * <code>optional .box2d.PbVec2 gravity = 2;</code>
+       */
       private com.google.protobuf.SingleFieldBuilder<
           org.box2d.proto.Box2D.PbVec2, org.box2d.proto.Box2D.PbVec2.Builder, org.box2d.proto.Box2D.PbVec2OrBuilder> 
           getGravityFieldBuilder() {
@@ -9622,112 +14503,172 @@ public final class Box2D {
         }
         return gravityBuilder_;
       }
-      
+
       // optional bool allow_sleep = 3;
       private boolean allowSleep_ ;
+      /**
+       * <code>optional bool allow_sleep = 3;</code>
+       */
       public boolean hasAllowSleep() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
+      /**
+       * <code>optional bool allow_sleep = 3;</code>
+       */
       public boolean getAllowSleep() {
         return allowSleep_;
       }
+      /**
+       * <code>optional bool allow_sleep = 3;</code>
+       */
       public Builder setAllowSleep(boolean value) {
         bitField0_ |= 0x00000004;
         allowSleep_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional bool allow_sleep = 3;</code>
+       */
       public Builder clearAllowSleep() {
         bitField0_ = (bitField0_ & ~0x00000004);
         allowSleep_ = false;
         onChanged();
         return this;
       }
-      
+
       // optional bool auto_clear_forces = 4;
       private boolean autoClearForces_ ;
+      /**
+       * <code>optional bool auto_clear_forces = 4;</code>
+       */
       public boolean hasAutoClearForces() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
+      /**
+       * <code>optional bool auto_clear_forces = 4;</code>
+       */
       public boolean getAutoClearForces() {
         return autoClearForces_;
       }
+      /**
+       * <code>optional bool auto_clear_forces = 4;</code>
+       */
       public Builder setAutoClearForces(boolean value) {
         bitField0_ |= 0x00000008;
         autoClearForces_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional bool auto_clear_forces = 4;</code>
+       */
       public Builder clearAutoClearForces() {
         bitField0_ = (bitField0_ & ~0x00000008);
         autoClearForces_ = false;
         onChanged();
         return this;
       }
-      
+
       // optional bool warm_starting = 5;
       private boolean warmStarting_ ;
+      /**
+       * <code>optional bool warm_starting = 5;</code>
+       */
       public boolean hasWarmStarting() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
+      /**
+       * <code>optional bool warm_starting = 5;</code>
+       */
       public boolean getWarmStarting() {
         return warmStarting_;
       }
+      /**
+       * <code>optional bool warm_starting = 5;</code>
+       */
       public Builder setWarmStarting(boolean value) {
         bitField0_ |= 0x00000010;
         warmStarting_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional bool warm_starting = 5;</code>
+       */
       public Builder clearWarmStarting() {
         bitField0_ = (bitField0_ & ~0x00000010);
         warmStarting_ = false;
         onChanged();
         return this;
       }
-      
+
       // optional bool continuous_physics = 6;
       private boolean continuousPhysics_ ;
+      /**
+       * <code>optional bool continuous_physics = 6;</code>
+       */
       public boolean hasContinuousPhysics() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
+      /**
+       * <code>optional bool continuous_physics = 6;</code>
+       */
       public boolean getContinuousPhysics() {
         return continuousPhysics_;
       }
+      /**
+       * <code>optional bool continuous_physics = 6;</code>
+       */
       public Builder setContinuousPhysics(boolean value) {
         bitField0_ |= 0x00000020;
         continuousPhysics_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional bool continuous_physics = 6;</code>
+       */
       public Builder clearContinuousPhysics() {
         bitField0_ = (bitField0_ & ~0x00000020);
         continuousPhysics_ = false;
         onChanged();
         return this;
       }
-      
+
       // optional bool sub_stepping = 7;
       private boolean subStepping_ ;
+      /**
+       * <code>optional bool sub_stepping = 7;</code>
+       */
       public boolean hasSubStepping() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
+      /**
+       * <code>optional bool sub_stepping = 7;</code>
+       */
       public boolean getSubStepping() {
         return subStepping_;
       }
+      /**
+       * <code>optional bool sub_stepping = 7;</code>
+       */
       public Builder setSubStepping(boolean value) {
         bitField0_ |= 0x00000040;
         subStepping_ = value;
         onChanged();
         return this;
       }
+      /**
+       * <code>optional bool sub_stepping = 7;</code>
+       */
       public Builder clearSubStepping() {
         bitField0_ = (bitField0_ & ~0x00000040);
         subStepping_ = false;
         onChanged();
         return this;
       }
-      
+
       // repeated .box2d.PbBody bodies = 20;
       private java.util.List<org.box2d.proto.Box2D.PbBody> bodies_ =
         java.util.Collections.emptyList();
@@ -9737,10 +14678,13 @@ public final class Box2D {
           bitField0_ |= 0x00000080;
          }
       }
-      
+
       private com.google.protobuf.RepeatedFieldBuilder<
           org.box2d.proto.Box2D.PbBody, org.box2d.proto.Box2D.PbBody.Builder, org.box2d.proto.Box2D.PbBodyOrBuilder> bodiesBuilder_;
-      
+
+      /**
+       * <code>repeated .box2d.PbBody bodies = 20;</code>
+       */
       public java.util.List<org.box2d.proto.Box2D.PbBody> getBodiesList() {
         if (bodiesBuilder_ == null) {
           return java.util.Collections.unmodifiableList(bodies_);
@@ -9748,6 +14692,9 @@ public final class Box2D {
           return bodiesBuilder_.getMessageList();
         }
       }
+      /**
+       * <code>repeated .box2d.PbBody bodies = 20;</code>
+       */
       public int getBodiesCount() {
         if (bodiesBuilder_ == null) {
           return bodies_.size();
@@ -9755,6 +14702,9 @@ public final class Box2D {
           return bodiesBuilder_.getCount();
         }
       }
+      /**
+       * <code>repeated .box2d.PbBody bodies = 20;</code>
+       */
       public org.box2d.proto.Box2D.PbBody getBodies(int index) {
         if (bodiesBuilder_ == null) {
           return bodies_.get(index);
@@ -9762,6 +14712,9 @@ public final class Box2D {
           return bodiesBuilder_.getMessage(index);
         }
       }
+      /**
+       * <code>repeated .box2d.PbBody bodies = 20;</code>
+       */
       public Builder setBodies(
           int index, org.box2d.proto.Box2D.PbBody value) {
         if (bodiesBuilder_ == null) {
@@ -9776,6 +14729,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbBody bodies = 20;</code>
+       */
       public Builder setBodies(
           int index, org.box2d.proto.Box2D.PbBody.Builder builderForValue) {
         if (bodiesBuilder_ == null) {
@@ -9787,6 +14743,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbBody bodies = 20;</code>
+       */
       public Builder addBodies(org.box2d.proto.Box2D.PbBody value) {
         if (bodiesBuilder_ == null) {
           if (value == null) {
@@ -9800,6 +14759,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbBody bodies = 20;</code>
+       */
       public Builder addBodies(
           int index, org.box2d.proto.Box2D.PbBody value) {
         if (bodiesBuilder_ == null) {
@@ -9814,6 +14776,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbBody bodies = 20;</code>
+       */
       public Builder addBodies(
           org.box2d.proto.Box2D.PbBody.Builder builderForValue) {
         if (bodiesBuilder_ == null) {
@@ -9825,6 +14790,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbBody bodies = 20;</code>
+       */
       public Builder addBodies(
           int index, org.box2d.proto.Box2D.PbBody.Builder builderForValue) {
         if (bodiesBuilder_ == null) {
@@ -9836,6 +14804,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbBody bodies = 20;</code>
+       */
       public Builder addAllBodies(
           java.lang.Iterable<? extends org.box2d.proto.Box2D.PbBody> values) {
         if (bodiesBuilder_ == null) {
@@ -9847,6 +14818,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbBody bodies = 20;</code>
+       */
       public Builder clearBodies() {
         if (bodiesBuilder_ == null) {
           bodies_ = java.util.Collections.emptyList();
@@ -9857,6 +14831,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbBody bodies = 20;</code>
+       */
       public Builder removeBodies(int index) {
         if (bodiesBuilder_ == null) {
           ensureBodiesIsMutable();
@@ -9867,10 +14844,16 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbBody bodies = 20;</code>
+       */
       public org.box2d.proto.Box2D.PbBody.Builder getBodiesBuilder(
           int index) {
         return getBodiesFieldBuilder().getBuilder(index);
       }
+      /**
+       * <code>repeated .box2d.PbBody bodies = 20;</code>
+       */
       public org.box2d.proto.Box2D.PbBodyOrBuilder getBodiesOrBuilder(
           int index) {
         if (bodiesBuilder_ == null) {
@@ -9878,6 +14861,9 @@ public final class Box2D {
           return bodiesBuilder_.getMessageOrBuilder(index);
         }
       }
+      /**
+       * <code>repeated .box2d.PbBody bodies = 20;</code>
+       */
       public java.util.List<? extends org.box2d.proto.Box2D.PbBodyOrBuilder> 
            getBodiesOrBuilderList() {
         if (bodiesBuilder_ != null) {
@@ -9886,15 +14872,24 @@ public final class Box2D {
           return java.util.Collections.unmodifiableList(bodies_);
         }
       }
+      /**
+       * <code>repeated .box2d.PbBody bodies = 20;</code>
+       */
       public org.box2d.proto.Box2D.PbBody.Builder addBodiesBuilder() {
         return getBodiesFieldBuilder().addBuilder(
             org.box2d.proto.Box2D.PbBody.getDefaultInstance());
       }
+      /**
+       * <code>repeated .box2d.PbBody bodies = 20;</code>
+       */
       public org.box2d.proto.Box2D.PbBody.Builder addBodiesBuilder(
           int index) {
         return getBodiesFieldBuilder().addBuilder(
             index, org.box2d.proto.Box2D.PbBody.getDefaultInstance());
       }
+      /**
+       * <code>repeated .box2d.PbBody bodies = 20;</code>
+       */
       public java.util.List<org.box2d.proto.Box2D.PbBody.Builder> 
            getBodiesBuilderList() {
         return getBodiesFieldBuilder().getBuilderList();
@@ -9913,7 +14908,7 @@ public final class Box2D {
         }
         return bodiesBuilder_;
       }
-      
+
       // repeated .box2d.PbJoint joints = 21;
       private java.util.List<org.box2d.proto.Box2D.PbJoint> joints_ =
         java.util.Collections.emptyList();
@@ -9923,10 +14918,13 @@ public final class Box2D {
           bitField0_ |= 0x00000100;
          }
       }
-      
+
       private com.google.protobuf.RepeatedFieldBuilder<
           org.box2d.proto.Box2D.PbJoint, org.box2d.proto.Box2D.PbJoint.Builder, org.box2d.proto.Box2D.PbJointOrBuilder> jointsBuilder_;
-      
+
+      /**
+       * <code>repeated .box2d.PbJoint joints = 21;</code>
+       */
       public java.util.List<org.box2d.proto.Box2D.PbJoint> getJointsList() {
         if (jointsBuilder_ == null) {
           return java.util.Collections.unmodifiableList(joints_);
@@ -9934,6 +14932,9 @@ public final class Box2D {
           return jointsBuilder_.getMessageList();
         }
       }
+      /**
+       * <code>repeated .box2d.PbJoint joints = 21;</code>
+       */
       public int getJointsCount() {
         if (jointsBuilder_ == null) {
           return joints_.size();
@@ -9941,6 +14942,9 @@ public final class Box2D {
           return jointsBuilder_.getCount();
         }
       }
+      /**
+       * <code>repeated .box2d.PbJoint joints = 21;</code>
+       */
       public org.box2d.proto.Box2D.PbJoint getJoints(int index) {
         if (jointsBuilder_ == null) {
           return joints_.get(index);
@@ -9948,6 +14952,9 @@ public final class Box2D {
           return jointsBuilder_.getMessage(index);
         }
       }
+      /**
+       * <code>repeated .box2d.PbJoint joints = 21;</code>
+       */
       public Builder setJoints(
           int index, org.box2d.proto.Box2D.PbJoint value) {
         if (jointsBuilder_ == null) {
@@ -9962,6 +14969,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbJoint joints = 21;</code>
+       */
       public Builder setJoints(
           int index, org.box2d.proto.Box2D.PbJoint.Builder builderForValue) {
         if (jointsBuilder_ == null) {
@@ -9973,6 +14983,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbJoint joints = 21;</code>
+       */
       public Builder addJoints(org.box2d.proto.Box2D.PbJoint value) {
         if (jointsBuilder_ == null) {
           if (value == null) {
@@ -9986,6 +14999,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbJoint joints = 21;</code>
+       */
       public Builder addJoints(
           int index, org.box2d.proto.Box2D.PbJoint value) {
         if (jointsBuilder_ == null) {
@@ -10000,6 +15016,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbJoint joints = 21;</code>
+       */
       public Builder addJoints(
           org.box2d.proto.Box2D.PbJoint.Builder builderForValue) {
         if (jointsBuilder_ == null) {
@@ -10011,6 +15030,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbJoint joints = 21;</code>
+       */
       public Builder addJoints(
           int index, org.box2d.proto.Box2D.PbJoint.Builder builderForValue) {
         if (jointsBuilder_ == null) {
@@ -10022,6 +15044,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbJoint joints = 21;</code>
+       */
       public Builder addAllJoints(
           java.lang.Iterable<? extends org.box2d.proto.Box2D.PbJoint> values) {
         if (jointsBuilder_ == null) {
@@ -10033,6 +15058,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbJoint joints = 21;</code>
+       */
       public Builder clearJoints() {
         if (jointsBuilder_ == null) {
           joints_ = java.util.Collections.emptyList();
@@ -10043,6 +15071,9 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbJoint joints = 21;</code>
+       */
       public Builder removeJoints(int index) {
         if (jointsBuilder_ == null) {
           ensureJointsIsMutable();
@@ -10053,10 +15084,16 @@ public final class Box2D {
         }
         return this;
       }
+      /**
+       * <code>repeated .box2d.PbJoint joints = 21;</code>
+       */
       public org.box2d.proto.Box2D.PbJoint.Builder getJointsBuilder(
           int index) {
         return getJointsFieldBuilder().getBuilder(index);
       }
+      /**
+       * <code>repeated .box2d.PbJoint joints = 21;</code>
+       */
       public org.box2d.proto.Box2D.PbJointOrBuilder getJointsOrBuilder(
           int index) {
         if (jointsBuilder_ == null) {
@@ -10064,6 +15101,9 @@ public final class Box2D {
           return jointsBuilder_.getMessageOrBuilder(index);
         }
       }
+      /**
+       * <code>repeated .box2d.PbJoint joints = 21;</code>
+       */
       public java.util.List<? extends org.box2d.proto.Box2D.PbJointOrBuilder> 
            getJointsOrBuilderList() {
         if (jointsBuilder_ != null) {
@@ -10072,15 +15112,24 @@ public final class Box2D {
           return java.util.Collections.unmodifiableList(joints_);
         }
       }
+      /**
+       * <code>repeated .box2d.PbJoint joints = 21;</code>
+       */
       public org.box2d.proto.Box2D.PbJoint.Builder addJointsBuilder() {
         return getJointsFieldBuilder().addBuilder(
             org.box2d.proto.Box2D.PbJoint.getDefaultInstance());
       }
+      /**
+       * <code>repeated .box2d.PbJoint joints = 21;</code>
+       */
       public org.box2d.proto.Box2D.PbJoint.Builder addJointsBuilder(
           int index) {
         return getJointsFieldBuilder().addBuilder(
             index, org.box2d.proto.Box2D.PbJoint.getDefaultInstance());
       }
+      /**
+       * <code>repeated .box2d.PbJoint joints = 21;</code>
+       */
       public java.util.List<org.box2d.proto.Box2D.PbJoint.Builder> 
            getJointsBuilderList() {
         return getJointsFieldBuilder().getBuilderList();
@@ -10099,18 +15148,18 @@ public final class Box2D {
         }
         return jointsBuilder_;
       }
-      
+
       // @@protoc_insertion_point(builder_scope:box2d.PbWorld)
     }
-    
+
     static {
       defaultInstance = new PbWorld(true);
       defaultInstance.initFields();
     }
-    
+
     // @@protoc_insertion_point(class_scope:box2d.PbWorld)
   }
-  
+
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_box2d_PbVec2_descriptor;
   private static
@@ -10146,7 +15195,7 @@ public final class Box2D {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_box2d_PbWorld_fieldAccessorTable;
-  
+
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
     return descriptor;
@@ -10226,57 +15275,43 @@ public final class Box2D {
           internal_static_box2d_PbVec2_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_box2d_PbVec2_descriptor,
-              new java.lang.String[] { "X", "Y", },
-              org.box2d.proto.Box2D.PbVec2.class,
-              org.box2d.proto.Box2D.PbVec2.Builder.class);
+              new java.lang.String[] { "X", "Y", });
           internal_static_box2d_PbFilter_descriptor =
             getDescriptor().getMessageTypes().get(1);
           internal_static_box2d_PbFilter_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_box2d_PbFilter_descriptor,
-              new java.lang.String[] { "CategoryBits", "MaskBits", "GroupIndex", },
-              org.box2d.proto.Box2D.PbFilter.class,
-              org.box2d.proto.Box2D.PbFilter.Builder.class);
+              new java.lang.String[] { "CategoryBits", "MaskBits", "GroupIndex", });
           internal_static_box2d_PbShape_descriptor =
             getDescriptor().getMessageTypes().get(2);
           internal_static_box2d_PbShape_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_box2d_PbShape_descriptor,
-              new java.lang.String[] { "Tag", "Type", "Center", "Radius", "Points", "Normals", "Centroid", "V0", "V1", "V2", "V3", "Has0", "Has3", "Prev", "Next", },
-              org.box2d.proto.Box2D.PbShape.class,
-              org.box2d.proto.Box2D.PbShape.Builder.class);
+              new java.lang.String[] { "Tag", "Type", "Center", "Radius", "Points", "Normals", "Centroid", "V0", "V1", "V2", "V3", "Has0", "Has3", "Prev", "Next", });
           internal_static_box2d_PbFixture_descriptor =
             getDescriptor().getMessageTypes().get(3);
           internal_static_box2d_PbFixture_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_box2d_PbFixture_descriptor,
-              new java.lang.String[] { "Tag", "Restitution", "Friction", "Density", "Sensor", "Filter", "Shape", },
-              org.box2d.proto.Box2D.PbFixture.class,
-              org.box2d.proto.Box2D.PbFixture.Builder.class);
+              new java.lang.String[] { "Tag", "Restitution", "Friction", "Density", "Sensor", "Filter", "Shape", });
           internal_static_box2d_PbJoint_descriptor =
             getDescriptor().getMessageTypes().get(4);
           internal_static_box2d_PbJoint_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_box2d_PbJoint_descriptor,
-              new java.lang.String[] { "Tag", "Type", "BodyA", "BodyB", "CollideConnected", "LocalAnchorA", "LocalAnchorB", "RefAngle", "EnableLimit", "LowerLimit", "UpperLimit", "EnableMotor", "MotorSpeed", "MaxMotorTorque", "LocalAxisA", "MaxMotorForce", "Length", "Frequency", "DampingRatio", "GroundAnchorA", "GroundAnchorB", "LengthA", "LengthB", "Ratio", "Target", "MaxForce", "Joint1", "Joint2", "MaxTorque", "MaxLength", "Bodies", "Joints", },
-              org.box2d.proto.Box2D.PbJoint.class,
-              org.box2d.proto.Box2D.PbJoint.Builder.class);
+              new java.lang.String[] { "Tag", "Type", "BodyA", "BodyB", "CollideConnected", "LocalAnchorA", "LocalAnchorB", "RefAngle", "EnableLimit", "LowerLimit", "UpperLimit", "EnableMotor", "MotorSpeed", "MaxMotorTorque", "LocalAxisA", "MaxMotorForce", "Length", "Frequency", "DampingRatio", "GroundAnchorA", "GroundAnchorB", "LengthA", "LengthB", "Ratio", "Target", "MaxForce", "Joint1", "Joint2", "MaxTorque", "MaxLength", "Bodies", "Joints", });
           internal_static_box2d_PbBody_descriptor =
             getDescriptor().getMessageTypes().get(5);
           internal_static_box2d_PbBody_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_box2d_PbBody_descriptor,
-              new java.lang.String[] { "Tag", "Type", "Position", "Angle", "LinearVelocity", "AngularVelocity", "LinearDamping", "AngularDamping", "GravityScale", "Bullet", "AllowSleep", "Awake", "Active", "FixedRotation", "Fixtures", },
-              org.box2d.proto.Box2D.PbBody.class,
-              org.box2d.proto.Box2D.PbBody.Builder.class);
+              new java.lang.String[] { "Tag", "Type", "Position", "Angle", "LinearVelocity", "AngularVelocity", "LinearDamping", "AngularDamping", "GravityScale", "Bullet", "AllowSleep", "Awake", "Active", "FixedRotation", "Fixtures", });
           internal_static_box2d_PbWorld_descriptor =
             getDescriptor().getMessageTypes().get(6);
           internal_static_box2d_PbWorld_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_box2d_PbWorld_descriptor,
-              new java.lang.String[] { "Tag", "Gravity", "AllowSleep", "AutoClearForces", "WarmStarting", "ContinuousPhysics", "SubStepping", "Bodies", "Joints", },
-              org.box2d.proto.Box2D.PbWorld.class,
-              org.box2d.proto.Box2D.PbWorld.Builder.class);
+              new java.lang.String[] { "Tag", "Gravity", "AllowSleep", "AutoClearForces", "WarmStarting", "ContinuousPhysics", "SubStepping", "Bodies", "Joints", });
           return null;
         }
       };
@@ -10285,6 +15320,6 @@ public final class Box2D {
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
   }
-  
+
   // @@protoc_insertion_point(outer_class_scope)
 }
