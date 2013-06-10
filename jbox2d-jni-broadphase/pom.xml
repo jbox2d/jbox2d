@@ -8,6 +8,9 @@
 	<packaging>nar</packaging>
 	<version>1.0.0-SNAPSHOT</version>
 
+	<properties>
+		<skipTests>true</skipTests>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -15,6 +18,12 @@
 			<artifactId>jbox2d-library</artifactId>
 			<version>2.2.1.2-SNAPSHOT</version>
 			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -24,36 +33,31 @@
 			<plugins>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-nar-plugin</artifactId>
-					<version>2.1-SNAPSHOT</version>
+					<artifactId>nar-maven-plugin</artifactId>
+					<version>3.0.0-SNAPSHOT</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-nar-plugin</artifactId>
+				<artifactId>nar-maven-plugin</artifactId>
 				<extensions>true</extensions>
 				<configuration>
-					<linker>
-						<name>link</name>
-					</linker>
 					<cpp>
 						<debug>true</debug>
+						<exceptions>false</exceptions>
 					</cpp>
 					<libraries>
 						<library>
 							<type>jni</type>
+
 							<!--This is where the NarSystem.jar class will be generated and is 
 								also the namespace used for the generated jni header -->
 							<narSystemPackage>org.jbox2d.collision.broadphase</narSystemPackage>
 							<linkCPP>false</linkCPP>
 						</library>
 					</libraries>
-					<linker>
-						<sysLibs>
-						</sysLibs>
-					</linker>
 				</configuration>
 			</plugin>
 		</plugins>
