@@ -39,6 +39,7 @@ import org.jbox2d.collision.TimeOfImpact.TOIOutput;
 import org.jbox2d.collision.TimeOfImpact.TOIOutputState;
 import org.jbox2d.collision.broadphase.BroadPhase;
 import org.jbox2d.collision.broadphase.BroadPhaseStrategy;
+import org.jbox2d.collision.broadphase.DefaultBroadPhaseBuffer;
 import org.jbox2d.collision.broadphase.DynamicTree;
 import org.jbox2d.collision.shapes.ChainShape;
 import org.jbox2d.collision.shapes.CircleShape;
@@ -139,8 +140,12 @@ public class World {
     this(gravity, pool, new DynamicTree());
   }
   
-  public World(Vec2 gravity, IWorldPool argPool, BroadPhaseStrategy broadPhaseStrategy) {
-    pool = argPool;
+  public World(Vec2 gravity, IWorldPool pool, BroadPhaseStrategy strategy) {
+    this(gravity, pool, new DefaultBroadPhaseBuffer(strategy));
+  }
+
+  public World(Vec2 gravity, IWorldPool pool, BroadPhase broadPhase) {
+    this.pool = pool;
     m_destructionListener = null;
     m_debugDraw = null;
 
@@ -162,7 +167,7 @@ public class World {
 
     m_inv_dt0 = 0f;
 
-    m_contactManager = new ContactManager(this, broadPhaseStrategy);
+    m_contactManager = new ContactManager(this, broadPhase);
     m_profile = new Profile();
 
     initializeRegisters();
@@ -180,7 +185,7 @@ public class World {
       }
     }
   }
-  
+
   public void setSubStepping(boolean subStepping) {
     this.m_subStepping = subStepping;
   }
@@ -188,7 +193,7 @@ public class World {
   public boolean isSubStepping() {
     return m_subStepping;
   }
-  
+
   public boolean isAllowSleep() {
     return m_allowSleep;
   }
@@ -241,7 +246,7 @@ public class World {
   public void pushContact(Contact contact) {
     Fixture fixtureA = contact.getFixtureA();
     Fixture fixtureB = contact.getFixtureB();
-    
+
     if (contact.m_manifold.pointCount > 0 && !fixtureA.isSensor() && !fixtureB.isSensor()) {
       fixtureA.getBody().setAwake(true);
       fixtureB.getBody().setAwake(true);
@@ -703,12 +708,14 @@ public class World {
           for (int i = 0; i < f.m_proxyCount; ++i) {
             FixtureProxy proxy = f.m_proxies[i];
             AABB aabb = m_contactManager.m_broadPhase.getFatAABB(proxy.proxyId);
-            Vec2[] vs = avs.get(4);
-            vs[0].set(aabb.lowerBound.x, aabb.lowerBound.y);
-            vs[1].set(aabb.upperBound.x, aabb.lowerBound.y);
-            vs[2].set(aabb.upperBound.x, aabb.upperBound.y);
-            vs[3].set(aabb.lowerBound.x, aabb.upperBound.y);
-            m_debugDraw.drawPolygon(vs, 4, color);
+            if (aabb != null) {
+              Vec2[] vs = avs.get(4);
+              vs[0].set(aabb.lowerBound.x, aabb.lowerBound.y);
+              vs[1].set(aabb.upperBound.x, aabb.lowerBound.y);
+              vs[2].set(aabb.upperBound.x, aabb.upperBound.y);
+              vs[3].set(aabb.lowerBound.x, aabb.upperBound.y);
+              m_debugDraw.drawPolygon(vs, 4, color);
+            }
           }
         }
       }

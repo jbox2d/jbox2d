@@ -492,11 +492,6 @@ public class DynamicTree implements BroadPhaseStrategy {
     m_nodeCount--;
   }
 
-  @Override
-  public int getInsertionCount() {
-    return m_insertionCount;
-  }
-
   private final AABB combinedAABB = new AABB();
 
   private final void insertLeaf(int leaf_index) {
@@ -878,7 +873,7 @@ public class DynamicTree implements BroadPhaseStrategy {
       drawTree(argDraw, node.child2, spot + 1, height);
     }
   }
-  
+
   public class TreeNodeStack {
     private DynamicTreeNode[] stack;
     private int size;

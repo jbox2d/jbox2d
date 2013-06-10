@@ -180,11 +180,11 @@ public abstract class TestbedTest
     camera = new TestbedCamera(getDefaultCameraPos(), getDefaultCameraScale(), ZOOM_SCALE_DIFF);
   }
 
-  public void init(TestbedModel argModel) {
-    model = argModel;
+  public void init(TestbedModel model) {
+    this.model = model;
 
     Vec2 gravity = new Vec2(0, -10f);
-    m_world = new World(gravity);
+    m_world = model.getWorldCreator().createWorld(gravity);
     bomb = null;
     mouseJoint = null;
 

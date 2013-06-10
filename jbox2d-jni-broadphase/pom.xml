@@ -45,7 +45,7 @@
 						</descriptorRefs>
 						<archive>
 							<manifest>
-								<mainClass>org.jbox2d.collision.broadphase.JniTest</mainClass>
+								<mainClass>org.jbox2d.collision.broadphase.TestbedMain</mainClass>
 							</manifest>
 						</archive>
 					</configuration>

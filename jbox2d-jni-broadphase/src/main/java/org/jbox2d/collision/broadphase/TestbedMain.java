@@ -21,12 +21,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-package org.jbox2d.jnitest;
+package org.jbox2d.collision.broadphase;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -34,7 +32,6 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import org.jbox2d.collision.broadphase.BroadPhaseJNI;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.pooling.normal.DefaultWorldPool;
@@ -60,10 +57,8 @@ import org.slf4j.LoggerFactory;
 public class TestbedMain {
   private static final Logger log = LoggerFactory.getLogger(TestbedMain.class);
 
-  private final Object lock = new Object();
 
-  @Test
-  public void testTestbed() {
+  public static void main(String[] args) {
     try {
       UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
     } catch (Exception e) {
@@ -108,24 +103,6 @@ public class TestbedMain {
         controller.start();
       }
     });
-    
-    testbed.addWindowListener(new WindowAdapter() {
-      @Override
-      public void windowClosed(WindowEvent e) {
-        synchronized (lock) {
-          lock.notifyAll();      
-        }
-      }
-    });
-    
-    synchronized (lock) {
-      try {
-        lock.wait();
-      } catch (InterruptedException e1) {
-        // TODO Auto-generated catch block
-        e1.printStackTrace();
-      }      
-    }
     
   }
 }

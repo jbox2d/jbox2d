@@ -1,14 +1,17 @@
 package org.jbox2d.collision.broadphase;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
 import org.jbox2d.collision.AABB;
-import org.jbox2d.collision.broadphase.DynamicTreeJNI;
 
 
 public class JniTest {
 
   public static void main(String[] args) {
-    DynamicTreeJNI tree = new DynamicTreeJNI();
+    BroadPhaseJNI tree = new BroadPhaseJNI();
     
     Integer a = new Integer(193);
     Integer b = new Integer(1);
@@ -24,9 +27,7 @@ public class JniTest {
     
     assertNotNull(tree.getUserData(proxy1));
     assertSame(a, tree.getUserData(proxy1));
-    
-    assertEquals(1, tree.getHeight());
-    
+        
     
     aabb.upperBound.x = -2;
     aabb.upperBound.y = -2;
@@ -38,8 +39,5 @@ public class JniTest {
     assertNotNull(tree.getUserData(proxy2));
     assertSame(b, tree.getUserData(proxy2));
     
-    assertEquals(2, tree.getHeight());
-  }
-  
-  
+  }  
 }
