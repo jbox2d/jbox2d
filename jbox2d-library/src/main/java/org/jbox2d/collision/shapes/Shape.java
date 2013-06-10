@@ -117,21 +117,5 @@ public abstract class Shape {
    */
   public abstract void computeMass(final MassData massData, final float density);
 
-  /*
-   * Compute the volume and centroid of this shape intersected with a half plane
-   * 
-   * @param normal the surface normal
-   * 
-   * @param offset the surface offset along normal
-   * 
-   * @param xf the shape transform
-   * 
-   * @param c returns the centroid
-   * 
-   * @return the total volume less than offset along normal
-   * 
-   * public abstract float computeSubmergedArea(Vec2 normal, float offset, Transform xf, Vec2 c);
-   */
-
   public abstract Shape clone();
 }
