@@ -1,43 +1,45 @@
-package org.jbox2d.jnitest;
+package org.jbox2d.collision.broadphase;
 
 import static org.junit.Assert.*;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.broadphase.DynamicTreeJNI;
-import org.junit.Test;
 
 
 public class JniTest {
 
-  @Test
-  public void testClass() {
+  public static void main(String[] args) {
     DynamicTreeJNI tree = new DynamicTreeJNI();
-
+    
     Integer a = new Integer(193);
     Integer b = new Integer(1);
     AABB aabb = new AABB();
     aabb.lowerBound.x = -10;
     aabb.lowerBound.y = -10;
-
+    
     int proxy1 = tree.createProxy(aabb, a);
     System.out.println("proxy1: " + proxy1);
-    assertNotNull(tree.getFatAABB(proxy1));
-    System.out.println("fat aabb: " + tree.getFatAABB(proxy1));
-    assertTrue(tree.getFatAABB(proxy1).contains(aabb));
-
-    System.out.println("getting user data");
+//    assertNotNull(tree.getFatAABB(proxy1));
+//    System.out.println("fat aabb: " + tree.getFatAABB(proxy1));
+//    assertTrue(tree.getFatAABB(proxy1).contains(aabb));
+    
     assertNotNull(tree.getUserData(proxy1));
-    System.out.println("verifying same user data");
     assertSame(a, tree.getUserData(proxy1));
-
-
+    
+    assertEquals(1, tree.getHeight());
+    
+    
     aabb.upperBound.x = -2;
     aabb.upperBound.y = -2;
-
+    
 
     int proxy2 = tree.createProxy(aabb, b);
     assertNotNull(tree.getFatAABB(proxy2));
     assertTrue(tree.getFatAABB(proxy2).contains(aabb));
     assertNotNull(tree.getUserData(proxy2));
     assertSame(b, tree.getUserData(proxy2));
+    
+    assertEquals(2, tree.getHeight());
   }
+  
+  
 }

@@ -46,9 +46,7 @@ public class DynamicTreeJNI implements BroadPhaseStrategy {
   public native Object getUserData(int proxyId);
 
   @Override
-  public AABB getFatAABB(int proxyId) {
-    return null;
-  }
+  public native boolean overlap(int proxyA, int proxyB);
 
   @Override
   public void query(TreeCallback callback, AABB aabb) {
@@ -59,7 +57,18 @@ public class DynamicTreeJNI implements BroadPhaseStrategy {
       float upperY);
 
   @Override
-  public native void raycast(TreeRayCastCallback callback, RayCastInput input);
+  public native void query(TreeCallback callback, int proxyToHit);
+
+  private final RaycastWrapper wrapper = new RaycastWrapper();
+
+  @Override
+  public void raycast(TreeRayCastCallback callback, RayCastInput input) {
+    wrapper.setCallback(callback);
+    raycast(wrapper, input.p1.x, input.p1.y, input.p2.x, input.p2.y, input.maxFraction);
+  }
+
+  private native void raycast(RaycastWrapper callback, float p1x, float p1y, float p2x, float p2y,
+      float maxFraction);
 
   @Override
   public native int computeHeight();
@@ -73,8 +82,19 @@ public class DynamicTreeJNI implements BroadPhaseStrategy {
   @Override
   public native float getAreaRatio();
 
+  private final AABB fat = new AABB();
+
   @Override
-  public native int getInsertionCount();
+  public AABB getFatAABB(int proxyId) {
+    AABB2 f2 = getFat(proxyId);
+    fat.lowerBound.x = f2.lx;
+    fat.lowerBound.y = f2.ly;
+    fat.upperBound.x = f2.ux;
+    fat.upperBound.y = f2.uy;
+    return fat;
+  }
+
+  private native AABB2 getFat(int proxy);
 
   @Override
   public void drawTree(DebugDraw draw) {}

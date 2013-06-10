@@ -20,10 +20,15 @@
 			<type>jar</type>
 		</dependency>
 		<dependency>
+			<groupId>org.jbox2d</groupId>
+			<artifactId>jbox2d-testbed</artifactId>
+			<version>2.2.1.2-SNAPSHOT</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.11</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -31,6 +36,20 @@
 		<defaultGoal>install</defaultGoal>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>2.4</version>
+					<configuration>
+						<descriptorRefs>
+							<descriptorRef>jar-with-dependencies</descriptorRef>
+						</descriptorRefs>
+						<archive>
+							<manifest>
+								<mainClass>org.jbox2d.collision.broadphase.JniTest</mainClass>
+							</manifest>
+						</archive>
+					</configuration>
+				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>nar-maven-plugin</artifactId>

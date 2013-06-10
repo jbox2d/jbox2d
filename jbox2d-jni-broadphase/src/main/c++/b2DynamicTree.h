@@ -123,6 +123,16 @@ public:
 	/// @param newOrigin the new origin with respect to the old origin
 	void ShiftOrigin(const b2Vec2& newOrigin);
 
+	template <typename T>
+	void Iterate(T* callback) const {
+		for (int i = 0; i < m_nodeCount; i++) {
+			const b2TreeNode& node = m_nodes[i];
+			if (node.height != -1 && node.userData != NULL) {
+				callback->process(node.userData);
+			}
+		}
+	}
+
 private:
 
 	int32 AllocateNode();
