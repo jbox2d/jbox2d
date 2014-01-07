@@ -48,6 +48,7 @@ import org.jbox2d.testbed.tests.FixedPendulumTest;
 import org.jbox2d.testbed.tests.FreePendulumTest;
 import org.jbox2d.testbed.tests.Gears;
 import org.jbox2d.testbed.tests.LiquidTest;
+import org.jbox2d.testbed.tests.MotorTest;
 import org.jbox2d.testbed.tests.OneSidedTest;
 import org.jbox2d.testbed.tests.PistonTest;
 import org.jbox2d.testbed.tests.PolyShapes;
@@ -117,6 +118,7 @@ public class TestList {
     model.addTest(new RevoluteTest());
     model.addTest(new FixedPendulumTest(true));
     model.addTest(new FreePendulumTest(true));
+    model.addTest(new MotorTest());
     model.addTest(new Chain());
     model.addTest(new RopeTest());
     model.addTest(new Pulleys());
