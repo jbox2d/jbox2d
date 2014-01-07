@@ -244,9 +244,9 @@ public class MotorJoint extends Joint {
 
   @Override
   public void solveVelocityConstraints(SolverData data) {
-    Vec2 vA = data.velocities[m_indexA].v;
+    final Vec2 vA = data.velocities[m_indexA].v;
     float wA = data.velocities[m_indexA].w;
-    Vec2 vB = data.velocities[m_indexB].v;
+    final Vec2 vB = data.velocities[m_indexB].v;
     float wB = data.velocities[m_indexB].w;
 
     float mA = m_invMassA, mB = m_invMassB;
