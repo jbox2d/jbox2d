@@ -223,6 +223,9 @@ public class ChainShape extends Shape {
     }
     m_hasPrevVertex = false;
     m_hasNextVertex = false;
+
+    m_prevVertex.setZero();
+    m_nextVertex.setZero();
   }
 
   /**
