@@ -42,4 +42,5 @@ public class ContactPoint {
 	public PointState state;
 	public float normalImpulse;
 	public float tangentImpulse;
+	public float separation;
 }
