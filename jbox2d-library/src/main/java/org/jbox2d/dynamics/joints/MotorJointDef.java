@@ -39,14 +39,14 @@ public class MotorJointDef extends JointDef {
     angularOffset = 0;
     maxForce = 1;
     maxTorque = 1;
-    correctionFactor = 0;
+    correctionFactor = 0.3f;
   }
 
   public void initialize(Body bA, Body bB) {
     bodyA = bA;
     bodyB = bB;
     Vec2 xB = bodyB.getPosition();
-    linearOffset.set(bodyA.getLocalPoint(xB));
+    bodyA.getLocalPointToOut(xB, linearOffset);
 
     float angleA = bodyA.getAngle();
     float angleB = bodyB.getAngle();
