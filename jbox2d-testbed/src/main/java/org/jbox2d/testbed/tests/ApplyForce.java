@@ -122,8 +122,8 @@ public class ApplyForce extends TestbedTest {
 
       BodyDef bd = new BodyDef();
       bd.type = BodyType.DYNAMIC;
-      bd.angularDamping = 5.0f;
-      bd.linearDamping = 0.1f;
+      bd.angularDamping = 2.0f;
+      bd.linearDamping = 0.5f;
 
       bd.position.set(0.0f, 2.0f);
       bd.angle = MathUtils.PI;

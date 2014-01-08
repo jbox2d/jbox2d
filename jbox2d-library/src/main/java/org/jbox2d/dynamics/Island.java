@@ -267,12 +267,11 @@ public class Island {
         // Time step: v(t + dt) = v0 * exp(-c * (t + dt)) = v0 * exp(-c * t) * exp(-c * dt) = v *
         // exp(-c * dt)
         // v2 = exp(-c * dt) * v1
-        // Taylor expansion:
-        // v2 = (1.0f - c * dt) * v1
-        float a1 = MathUtils.clamp(1.0f - h * b.m_linearDamping, 0.0f, 1.0f);
-        v.x *= a1;
-        v.y *= a1;
-        w *= MathUtils.clamp(1.0f - h * b.m_angularDamping, 0.0f, 1.0f);
+        // Pade approximation:
+        // v2 = v1 * 1 / (1 + c * dt)
+        v.x *= 1.0f / (1.0f + h * b.m_linearDamping);
+        v.y *= 1.0f / (1.0f + h * b.m_linearDamping);
+        w *= 1.0f / (1.0f + h * b.m_angularDamping);
       }
 
       m_positions[i].c.x = c.x;
@@ -523,8 +522,9 @@ public class Island {
       float translationx = v.x * h;
       float translationy = v.y * h;
       if (translationx * translationx + translationy * translationy > Settings.maxTranslationSquared) {
-        float ratio = Settings.maxTranslation
-            / MathUtils.sqrt(translationx * translationx + translationy * translationy);
+        float ratio =
+            Settings.maxTranslation
+                / MathUtils.sqrt(translationx * translationx + translationy * translationy);
         v.mulLocal(ratio);
       }
 

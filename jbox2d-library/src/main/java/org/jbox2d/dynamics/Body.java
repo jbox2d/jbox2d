@@ -304,7 +304,8 @@ public class Body {
 
   /**
    * Set the position of the body's origin and rotation. This breaks any contacts and wakes the
-   * other bodies. Manipulating a body's transform may cause non-physical behavior.
+   * other bodies. Manipulating a body's transform may cause non-physical behavior. Note: contacts
+   * are updated on the next call to World.step().
    * 
    * @param position the world position of the body's local origin.
    * @param angle the world rotation in radians.
@@ -329,8 +330,6 @@ public class Body {
     for (Fixture f = m_fixtureList; f != null; f = f.m_next) {
       f.synchronize(broadPhase, m_xf, m_xf);
     }
-
-    m_world.m_contactManager.findNewContacts();
   }
 
   /**
