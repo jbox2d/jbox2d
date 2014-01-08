@@ -50,6 +50,7 @@ public class RayCastTest extends TestbedTest {
   Integer[] m_userData;
   PolygonShape[] m_polygons;
   CircleShape m_circle;
+  EdgeShape m_edge;
 
   float m_angle;
 
@@ -120,6 +121,11 @@ public class RayCastTest extends TestbedTest {
       m_circle = new CircleShape();
       m_circle.m_radius = 0.5f;
     }
+    
+    {
+      m_edge = new EdgeShape();
+      m_edge.set(new Vec2(-1.0f, 0.0f), new Vec2(1.0f, 0.0f));
+    }
 
     m_bodyIndex = 0;
 
@@ -144,7 +150,7 @@ public class RayCastTest extends TestbedTest {
 
     super.step(settings);
 
-    addTextLine("Press 1-5 to drop stuff, m to change the mode");
+    addTextLine("Press 1-6 to drop stuff, m to change the mode");
     addTextLine("Polygon 1 is filtered");
     addTextLine("Mode = " + m_mode);
 
@@ -228,9 +234,15 @@ public class RayCastTest extends TestbedTest {
       fd.shape = m_polygons[index];
       fd.friction = 0.3f;
       m_bodies[m_bodyIndex].createFixture(fd);
-    } else {
+    } else if (index < 5) {
       FixtureDef fd = new FixtureDef();
       fd.shape = m_circle;
+      fd.friction = 0.3f;
+
+      m_bodies[m_bodyIndex].createFixture(fd);
+    } else {
+      FixtureDef fd = new FixtureDef();
+      fd.shape = m_edge;
       fd.friction = 0.3f;
 
       m_bodies[m_bodyIndex].createFixture(fd);
@@ -258,6 +270,7 @@ public class RayCastTest extends TestbedTest {
       case '3':
       case '4':
       case '5':
+      case '6':
         Create(argKeyChar - '1');
         break;
 

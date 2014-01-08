@@ -33,10 +33,11 @@ import org.jbox2d.testbed.framework.TestbedTest;
 
 public class ConvexHull extends TestbedTest {
 
-  private final int count = Settings.maxPolygonVertices;
+  private final int e_count = Settings.maxPolygonVertices;
 
   private boolean m_auto = false;
-  private Vec2[] m_points = new Vec2[count];
+  private Vec2[] m_points = new Vec2[Settings.maxPolygonVertices];
+  private int m_count;
 
   @Override
   public void initTest(boolean deserialized) {
@@ -50,7 +51,7 @@ public class ConvexHull extends TestbedTest {
     Vec2 lowerBound = new Vec2(-8f, -8f);
     Vec2 upperBound = new Vec2(8f, 8f);
 
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < e_count; i++) {
       float x = MathUtils.randomFloat(-8, 8);
       float y = MathUtils.randomFloat(-8, 8);
 
@@ -58,6 +59,7 @@ public class ConvexHull extends TestbedTest {
       MathUtils.clampToOut(v, lowerBound, upperBound, v);
       m_points[i] = v;
     }
+    m_count = e_count;
   }
 
   public void keyPressed(char argKeyChar, int argKeyCode) {
@@ -76,13 +78,13 @@ public class ConvexHull extends TestbedTest {
   public synchronized void step(TestbedSettings settings) {
     super.step(settings);
 
-    shape.set(m_points, count);
+    shape.set(m_points, m_count);
 
     addTextLine("Press g to generate a new random convex hull");
 
     getDebugDraw().drawPolygon(shape.m_vertices, shape.m_count, color);
 
-    for (int i = 0; i < count; ++i) {
+    for (int i = 0; i < m_count; ++i) {
       getDebugDraw().drawPoint(m_points[i], 2.0f, color2);
       getDebugDraw().drawString(m_points[i].add(new Vec2(0.05f, 0.05f)), i + "", Color3f.WHITE);
     }

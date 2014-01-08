@@ -82,7 +82,7 @@ public class EdgeShape extends Shape {
 
   // for pooling
   private final Vec2 normal = new Vec2();
-  
+
   @Override
   public boolean raycast(RayCastOutput output, RayCastInput input, Transform xf, int childIndex) {
 
@@ -93,8 +93,8 @@ public class EdgeShape extends Shape {
     final Vec2 xfp = xf.p;
 
     // Put the ray into the edge's frame of reference.
-    //b2Vec2 p1 = b2MulT(xf.q, input.p1 - xf.p);
-    //b2Vec2 p2 = b2MulT(xf.q, input.p2 - xf.p);
+    // b2Vec2 p1 = b2MulT(xf.q, input.p1 - xf.p);
+    // b2Vec2 p2 = b2MulT(xf.q, input.p2 - xf.p);
     tempx = input.p1.x - xfp.x;
     tempy = input.p1.y - xfp.y;
     final float p1x = xfq.c * tempx + xfq.s * tempy;
@@ -156,13 +156,13 @@ public class EdgeShape extends Shape {
 
     output.fraction = t;
     if (numerator > 0.0f) {
-      // argOutput.normal = -normal;
-      output.normal.x = -normalx;
-      output.normal.y = -normaly;
+      // output.normal = -b2Mul(xf.q, normal);
+      output.normal.x = -xfq.c * normal.x + xfq.s * normal.y;
+      output.normal.y = -xfq.s * normal.x - xfq.c * normal.y;
     } else {
-      // output.normal = normal;
-      output.normal.x = normalx;
-      output.normal.y = normaly;
+      // output->normal = b2Mul(xf.q, normal);
+      output.normal.x = xfq.c * normal.x - xfq.s * normal.y;
+      output.normal.y = xfq.s * normal.x + xfq.c * normal.y;
     }
     return true;
   }
