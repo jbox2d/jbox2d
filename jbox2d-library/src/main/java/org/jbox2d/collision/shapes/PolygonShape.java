@@ -103,9 +103,8 @@ public class PolygonShape extends Shape {
    * Create a convex hull from the given array of points. The count must be in the range [3,
    * Settings.maxPolygonVertices].
    * 
-   * @warning the points may be re-ordered, even if they form a convex polygon
-   * @warning collinear points are handled but not removed. Collinear points may lead to poor
-   *          stacking behavior.
+   * @warning the points may be re-ordered, even if they form a convex polygon.
+   * @warning collinear points are removed.
    */
   public final void set(final Vec2[] vertices, final int count) {
     set(vertices, count, null, null);
@@ -113,11 +112,10 @@ public class PolygonShape extends Shape {
 
   /**
    * Create a convex hull from the given array of points. The count must be in the range [3,
-   * Settings.maxPolygonVertices]. This method takes an arraypool for pooling
+   * Settings.maxPolygonVertices]. This method takes an arraypool for pooling.
    * 
-   * @warning the points may be re-ordered, even if they form a convex polygon
-   * @warning collinear points are handled but not removed. Collinear points may lead to poor
-   *          stacking behavior.
+   * @warning the points may be re-ordered, even if they form a convex polygon.
+   * @warning collinear points are removed.
    */
   public final void set(final Vec2[] verts, final int num, final Vec2Array vecPool,
       final IntArray intPool) {
@@ -129,10 +127,33 @@ public class PolygonShape extends Shape {
 
     int n = MathUtils.min(num, Settings.maxPolygonVertices);
 
-    // Copy the vertices into a local buffer
-    Vec2[] ps = (vecPool != null) ? vecPool.get(n) : new Vec2[n];
+    // Perform welding and copy vertices into local buffer.
+    Vec2[] ps =
+        (vecPool != null)
+            ? vecPool.get(Settings.maxPolygonVertices)
+            : new Vec2[Settings.maxPolygonVertices];
+    int tempCount = 0;
     for (int i = 0; i < n; ++i) {
-      ps[i] = verts[i];
+      Vec2 v = verts[i];
+      boolean unique = true;
+      for (int j = 0; j < tempCount; ++j) {
+        if (MathUtils.distanceSquared(v, ps[j]) < Settings.linearSlop) {
+          unique = false;
+          break;
+        }
+      }
+
+      if (unique) {
+        ps[tempCount++] = v;
+      }
+    }
+
+    n = tempCount;
+    if (n < 3) {
+      // Polygon is degenerate.
+      assert (false);
+      setAsBox(1.0f, 1.0f);
+      return;
     }
 
     // Create the convex hull using the Gift wrapping algorithm
@@ -141,7 +162,7 @@ public class PolygonShape extends Shape {
     // Find the right most point on the hull
     int i0 = 0;
     float x0 = ps[0].x;
-    for (int i = 1; i < num; ++i) {
+    for (int i = 1; i < n; ++i) {
       float x = ps[i].x;
       if (x > x0 || (x == x0 && ps[i].y < ps[i0].y)) {
         i0 = i;

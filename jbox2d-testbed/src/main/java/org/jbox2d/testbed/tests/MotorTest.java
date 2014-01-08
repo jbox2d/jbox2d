@@ -73,14 +73,13 @@ public class MotorTest extends TestbedTest {
   @Override
   public void step(TestbedSettings settings) {
     float hz = settings.getSetting(TestbedSettings.Hz).value;
-    if (m_go && hz > 0.0f)
-    {
-            m_time += 1.0f / hz;
+    if (m_go && hz > 0.0f) {
+      m_time += 1.0f / hz;
     }
 
     linearOffset.x = 6.0f * MathUtils.sin(2.0f * m_time);
     linearOffset.y = 8.0f + 4.0f * MathUtils.sin(1.0f * m_time);
-    
+
     float angularOffset = 4.0f * m_time;
 
     m_joint.setLinearOffset(linearOffset);
