@@ -26,6 +26,7 @@ package org.jbox2d.collision.shapes;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.collision.RayCastOutput;
+import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Rot;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Transform;
@@ -83,6 +84,48 @@ public class EdgeShape extends Shape {
   // for pooling
   private final Vec2 normal = new Vec2();
 
+  @Override
+  public float computeDistanceToOut(Transform xf, Vec2 p, int childIndex, Vec2 normalOut) {
+    float xfqc = xf.q.c;
+    float xfqs = xf.q.s;
+    float xfpx = xf.p.x;
+    float xfpy = xf.p.y;
+    float v1x = (xfqc * m_vertex1.x - xfqs * m_vertex1.y) + xfpx;
+    float v1y = (xfqs * m_vertex1.x + xfqc * m_vertex1.y) + xfpy;
+    float v2x = (xfqc * m_vertex2.x - xfqs * m_vertex2.y) + xfpx;
+    float v2y = (xfqs * m_vertex2.x + xfqc * m_vertex2.y) + xfpy;
+
+    float dx = p.x - v1x;
+    float dy = p.y - v1y;
+    float sx = v2x - v1x;
+    float sy = v2y - v1y;
+    float ds = dx * sx + dy * sy;
+    if (ds > 0) {
+      float s2 = sx * sx + sy * sy;
+      if (ds > s2) {
+        dx = p.x - v2x;
+        dy = p.y - v2y;
+      } else {
+        dx -= ds / s2 * sx;
+        dy -= ds / s2 * sy;
+      }
+    }
+
+    float d1 = MathUtils.sqrt(dx * dx + dy * dy);
+    if (d1 > 0) {
+      normalOut.x = 1 / d1 * dx;
+      normalOut.y = 1 / d1 * dy;
+    } else {
+      normalOut.x = 0;
+      normalOut.y = 0;
+    }
+    return d1;
+  }
+
+  // p = p1 + t * d
+  // v = v1 + s * e
+  // p1 + t * d = v1 + s * e
+  // s * e - t * d = p1 - v1
   @Override
   public boolean raycast(RayCastOutput output, RayCastInput input, Transform xf, int childIndex) {
 

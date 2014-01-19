@@ -59,6 +59,10 @@ public class Body {
    * The body origin transform.
    */
   public final Transform m_xf = new Transform();
+  /**
+   * The previous transform for particle simulation
+   */
+  public final Transform m_xf0 = new Transform();
 
   /**
    * The swept motion for CCD
