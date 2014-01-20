@@ -5,8 +5,8 @@ import org.jbox2d.common.Vec2;
 public class ParticleDef {
   /**
    * Specifies the type of particle. A particle may be more than one type. Multiple types are
-   * chained by logical sums, for example: pd.flags = ParticleType.ELASTIC.flag |
-   * ParticleType.VISCOUS.flag.
+   * chained by logical sums, for example: pd.flags = ParticleType.b2_elasticParticle |
+   * ParticleType.b2_viscousParticle.
    */
   int flags;
 
