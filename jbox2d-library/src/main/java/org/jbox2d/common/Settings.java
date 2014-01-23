@@ -193,7 +193,7 @@ public class Settings {
   /**
    * A symbolic constant that stands for particle allocation error.
    */
-  public static final float invalidParticleIndex = (-1);
+  public static final int invalidParticleIndex = (-1);
 
   /**
    * The standard distance between particles, divided by the particle radius.
@@ -213,13 +213,13 @@ public class Settings {
   /**
    * The maximum distance between particles in a triad, divided by the particle radius.
    */
-  public static final float maxTriadDistance = 2;
-  public static final float maxTriadDistanceSquared = (maxTriadDistance * maxTriadDistance);
+  public static final int maxTriadDistance = 2;
+  public static final int maxTriadDistanceSquared = (maxTriadDistance * maxTriadDistance);
 
   /**
    * The initial size of particle data buffers.
    */
-  public static final float minParticleBufferCapacity = 256;
+  public static final int minParticleBufferCapacity = 256;
 
 
   /**
