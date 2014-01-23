@@ -26,6 +26,10 @@ public class ParticleColor {
     b = (byte) (255 * color.z);
     a = (byte) 255;
   }
+  
+  public boolean isZero() {
+    return r == 0 && g == 0 && b == 0 && a == 0;
+  }
 
   public void set(byte r, byte g, byte b, byte a) {
     this.r = r;
