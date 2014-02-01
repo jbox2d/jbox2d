@@ -6,25 +6,26 @@ import org.jbox2d.common.Vec2;
 public class ParticleGroup {
 
   ParticleSystem m_system;
-  private int m_firstIndex, m_lastIndex;
-  private int m_groupFlags;
-  private float m_strength;
-  private ParticleGroup m_prev;
-  private ParticleGroup m_next;
+  int m_firstIndex;
+  int m_lastIndex;
+  int m_groupFlags;
+  float m_strength;
+  ParticleGroup m_prev;
+  ParticleGroup m_next;
 
-  private int m_timestamp;
-  private float m_mass;
-  private float m_inertia;
-  private final Vec2 m_center = new Vec2();
-  private final Vec2 m_linearVelocity = new Vec2();
-  private float m_angularVelocity;
-  private final Transform m_transform = new Transform();
+  int m_timestamp;
+  float m_mass;
+  float m_inertia;
+  final Vec2 m_center = new Vec2();
+  final Vec2 m_linearVelocity = new Vec2();
+  float m_angularVelocity;
+  final Transform m_transform = new Transform();
 
-  private boolean m_destroyAutomatically;
-  private boolean m_toBeDestroyed;
-  private boolean m_toBeSplit;
+  boolean m_destroyAutomatically;
+  boolean m_toBeDestroyed;
+  boolean m_toBeSplit;
 
-  private Object m_userData;
+  Object m_userData;
 
   public ParticleGroup() {
     // m_system = null;
@@ -111,7 +112,7 @@ public class ParticleGroup {
 
   public void updateStatistics() {
     if (m_timestamp != m_system.m_timestamp) {
-      float m = 0;//m_system.getParticleMass();
+      float m = m_system.getParticleMass();
       m_mass = 0;
       m_center.setZero();
       m_linearVelocity.setZero();

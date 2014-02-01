@@ -221,6 +221,10 @@ public class World {
     addType(pool.getChainCircleContactStack(), ShapeType.CHAIN, ShapeType.CIRCLE);
     addType(pool.getChainPolyContactStack(), ShapeType.CHAIN, ShapeType.POLYGON);
   }
+  
+  public DestructionListener getDestructionListener() {
+    return m_destructionListener;
+  }
 
   public Contact popContact(Fixture fixtureA, int indexA, Fixture fixtureB, int indexB) {
     final ShapeType type1 = fixtureA.getType();
