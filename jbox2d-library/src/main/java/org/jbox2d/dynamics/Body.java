@@ -514,26 +514,25 @@ public class Body {
   /**
    * Apply an impulse at a point. This immediately modifies the velocity. It also modifies the
    * angular velocity if the point of application is not at the center of mass. This wakes up the
-   * body.
+   * body if 'wake' is set to true. If the body is sleeping and 'wake' is false, then there is no
+   * effect.
    * 
    * @param impulse the world impulse vector, usually in N-seconds or kg-m/s.
    * @param point the world position of the point of application.
+   * @param wake also wake up the body
    */
-  public final void applyLinearImpulse(Vec2 impulse, Vec2 point) {
+  public final void applyLinearImpulse(Vec2 impulse, Vec2 point, boolean wake) {
     if (m_type != BodyType.DYNAMIC) {
       return;
     }
 
-    if (isAwake() == false) {
-      setAwake(true);
+    if (!isAwake()) {
+      if (wake) {
+        setAwake(true);
+      } else {
+        return;
+      }
     }
-
-    // Vec2 temp = tltemp.get();
-    // temp.set(impulse).mulLocal(m_invMass);
-    // m_linearVelocity.addLocal(temp);
-    //
-    // temp.set(point).subLocal(m_sweep.c);
-    // m_angularVelocity += m_invI * Vec2.cross(temp, impulse);
 
     m_linearVelocity.x += impulse.x * m_invMass;
     m_linearVelocity.y += impulse.y * m_invMass;
