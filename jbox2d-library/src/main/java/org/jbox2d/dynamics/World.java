@@ -28,6 +28,8 @@ import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.DestructionListener;
 import org.jbox2d.callbacks.ParticleDestructionListener;
+import org.jbox2d.callbacks.ParticleQueryCallback;
+import org.jbox2d.callbacks.ParticleRaycastCallback;
 import org.jbox2d.callbacks.QueryCallback;
 import org.jbox2d.callbacks.RayCastCallback;
 import org.jbox2d.callbacks.TreeCallback;
@@ -46,6 +48,7 @@ import org.jbox2d.collision.shapes.ChainShape;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.collision.shapes.ShapeType;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
@@ -61,6 +64,13 @@ import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.JointDef;
 import org.jbox2d.dynamics.joints.JointEdge;
 import org.jbox2d.dynamics.joints.PulleyJoint;
+import org.jbox2d.particle.ParticleBodyContact;
+import org.jbox2d.particle.ParticleColor;
+import org.jbox2d.particle.ParticleContact;
+import org.jbox2d.particle.ParticleDef;
+import org.jbox2d.particle.ParticleGroup;
+import org.jbox2d.particle.ParticleGroupDef;
+import org.jbox2d.particle.ParticleSystem;
 import org.jbox2d.pooling.IDynamicStack;
 import org.jbox2d.pooling.IWorldPool;
 import org.jbox2d.pooling.arrays.Vec2Array;
@@ -120,6 +130,8 @@ public class World {
 
   private Profile m_profile;
 
+  private ParticleSystem m_particleSystem;
+
 
   private ContactRegister[][] contactStacks =
       new ContactRegister[ShapeType.values().length][ShapeType.values().length];
@@ -141,7 +153,7 @@ public class World {
   public World(Vec2 gravity, IWorldPool pool) {
     this(gravity, pool, new DynamicTree());
   }
-  
+
   public World(Vec2 gravity, IWorldPool pool, BroadPhaseStrategy strategy) {
     this(gravity, pool, new DefaultBroadPhaseBuffer(strategy));
   }
@@ -171,6 +183,8 @@ public class World {
 
     m_contactManager = new ContactManager(this, broadPhase);
     m_profile = new Profile();
+
+    m_particleSystem = new ParticleSystem(this);
 
     initializeRegisters();
   }
@@ -223,11 +237,11 @@ public class World {
     addType(pool.getChainCircleContactStack(), ShapeType.CHAIN, ShapeType.CIRCLE);
     addType(pool.getChainPolyContactStack(), ShapeType.CHAIN, ShapeType.POLYGON);
   }
-  
+
   public DestructionListener getDestructionListener() {
     return m_destructionListener;
   }
-  
+
   public ParticleDestructionListener getParticleDestructionListener() {
     return m_particleDestructionListener;
   }
@@ -614,6 +628,7 @@ public class World {
     // Integrate velocities, solve velocity constraints, and integrate positions.
     if (m_stepComplete && step.dt > 0.0f) {
       tempTimer.reset();
+      m_particleSystem.solve(step); // Particle Simulation
       solve(step);
       m_profile.solve = tempTimer.getMilliseconds();
     }
@@ -669,7 +684,7 @@ public class World {
 
     int flags = m_debugDraw.getFlags();
 
-    if ((flags & DebugDraw.e_shapeBit) == DebugDraw.e_shapeBit) {
+    if ((flags & DebugDraw.e_shapeBit) != 0) {
       for (Body b = m_bodyList; b != null; b = b.getNext()) {
         xf.set(b.getTransform());
         for (Fixture f = b.getFixtureList(); f != null; f = f.getNext()) {
@@ -691,15 +706,16 @@ public class World {
           }
         }
       }
+      drawParticleSystem(m_particleSystem);
     }
 
-    if ((flags & DebugDraw.e_jointBit) == DebugDraw.e_jointBit) {
+    if ((flags & DebugDraw.e_jointBit) != 0) {
       for (Joint j = m_jointList; j != null; j = j.getNext()) {
         drawJoint(j);
       }
     }
 
-    if ((flags & DebugDraw.e_pairBit) == DebugDraw.e_pairBit) {
+    if ((flags & DebugDraw.e_pairBit) != 0) {
       color.set(0.3f, 0.9f, 0.9f);
       for (Contact c = m_contactManager.m_contactList; c != null; c = c.getNext()) {
         Fixture fixtureA = c.getFixtureA();
@@ -710,7 +726,7 @@ public class World {
       }
     }
 
-    if ((flags & DebugDraw.e_aabbBit) == DebugDraw.e_aabbBit) {
+    if ((flags & DebugDraw.e_aabbBit) != 0) {
       color.set(0.9f, 0.3f, 0.9f);
 
       for (Body b = m_bodyList; b != null; b = b.getNext()) {
@@ -735,7 +751,7 @@ public class World {
       }
     }
 
-    if ((flags & DebugDraw.e_centerOfMassBit) == DebugDraw.e_centerOfMassBit) {
+    if ((flags & DebugDraw.e_centerOfMassBit) != 0) {
       for (Body b = m_bodyList; b != null; b = b.getNext()) {
         xf.set(b.getTransform());
         xf.p.set(b.getWorldCenter());
@@ -743,7 +759,7 @@ public class World {
       }
     }
 
-    if ((flags & DebugDraw.e_dynamicTreeBit) == DebugDraw.e_dynamicTreeBit) {
+    if ((flags & DebugDraw.e_dynamicTreeBit) != 0) {
       m_contactManager.m_broadPhase.drawTree(m_debugDraw);
     }
   }
@@ -760,6 +776,30 @@ public class World {
     wqwrapper.broadPhase = m_contactManager.m_broadPhase;
     wqwrapper.callback = callback;
     m_contactManager.m_broadPhase.query(wqwrapper, aabb);
+  }
+
+  /**
+   * Query the world for all fixtures and particles that potentially overlap the provided AABB.
+   * 
+   * @param callback a user implemented callback class.
+   * @param particleCallback callback for particles.
+   * @param aabb the query box.
+   */
+  public void queryAABB(QueryCallback callback, ParticleQueryCallback particleCallback, AABB aabb) {
+    wqwrapper.broadPhase = m_contactManager.m_broadPhase;
+    wqwrapper.callback = callback;
+    m_contactManager.m_broadPhase.query(wqwrapper, aabb);
+    m_particleSystem.queryAABB(particleCallback, aabb);
+  }
+
+  /**
+   * Query the world for all particles that potentially overlap the provided AABB.
+   * 
+   * @param particleCallback callback for particles.
+   * @param aabb the query box.
+   */
+  public void queryAABB(ParticleQueryCallback particleCallback, AABB aabb) {
+    m_particleSystem.queryAABB(particleCallback, aabb);
   }
 
   private final WorldRayCastWrapper wrcwrapper = new WorldRayCastWrapper();
@@ -781,6 +821,39 @@ public class World {
     input.p1.set(point1);
     input.p2.set(point2);
     m_contactManager.m_broadPhase.raycast(wrcwrapper, input);
+  }
+
+  /**
+   * Ray-cast the world for all fixtures and particles in the path of the ray. Your callback
+   * controls whether you get the closest point, any point, or n-points. The ray-cast ignores shapes
+   * that contain the starting point.
+   * 
+   * @param callback a user implemented callback class.
+   * @param particleCallback the particle callback class.
+   * @param point1 the ray starting point
+   * @param point2 the ray ending point
+   */
+  public void raycast(RayCastCallback callback, ParticleRaycastCallback particleCallback,
+      Vec2 point1, Vec2 point2) {
+    wrcwrapper.broadPhase = m_contactManager.m_broadPhase;
+    wrcwrapper.callback = callback;
+    input.maxFraction = 1.0f;
+    input.p1.set(point1);
+    input.p2.set(point2);
+    m_contactManager.m_broadPhase.raycast(wrcwrapper, input);
+    m_particleSystem.raycast(particleCallback, point1, point2);
+  }
+
+  /**
+   * Ray-cast the world for all particles in the path of the ray. Your callback controls whether you
+   * get the closest point, any point, or n-points.
+   * 
+   * @param particleCallback the particle callback class.
+   * @param point1 the ray starting point
+   * @param point2 the ray ending point
+   */
+  public void raycast(ParticleRaycastCallback particleCallback, Vec2 point1, Vec2 point2) {
+    m_particleSystem.raycast(particleCallback, point1, point2);
   }
 
   /**
@@ -982,6 +1055,11 @@ public class World {
   private final Timer broadphaseTimer = new Timer();
 
   private void solve(TimeStep step) {
+
+    // update previous transforms
+    for (Body b = m_bodyList; b != null; b = b.m_next) {
+      b.m_xf0.set(b.m_xf);
+    }
     m_profile.solveInit = 0;
     m_profile.solveVelocity = 0;
     m_profile.solvePosition = 0;
@@ -1553,6 +1631,362 @@ public class World {
       default:
         break;
     }
+  }
+
+  private void drawParticleSystem(ParticleSystem system) {
+    int particleCount = system.getParticleCount();
+    if (particleCount != 0) {
+      float particleRadius = system.getParticleRadius();
+      Vec2[] positionBuffer = system.getParticlePositionBuffer();
+      if (system.m_colorBuffer.data != null) {
+        ParticleColor[] colorBuffer = system.getParticleColorBuffer();
+        m_debugDraw.drawParticles(positionBuffer, particleRadius, colorBuffer, particleCount);
+      } else {
+        m_debugDraw.drawParticles(positionBuffer, particleRadius, null, particleCount);
+      }
+    }
+  }
+
+  /**
+   * Create a particle whose properties have been defined. No reference to the definition is
+   * retained. A simulation step must occur before it's possible to interact with a newly created
+   * particle. For example, DestroyParticleInShape() will not destroy a particle until Step() has
+   * been called.
+   * 
+   * @warning This function is locked during callbacks.
+   * @return the index of the particle.
+   */
+  public int createParticle(ParticleDef def) {
+    assert (isLocked() == false);
+    if (isLocked()) {
+      return 0;
+    }
+    int p = m_particleSystem.createParticle(def);
+    return p;
+  }
+
+  /**
+   * Destroy a particle. The particle is removed after the next step.
+   * 
+   * @param index
+   */
+  public void destroyParticle(int index) {
+    destroyParticle(index, false);
+  }
+
+  /**
+   * Destroy a particle. The particle is removed after the next step.
+   * 
+   * @param Index of the particle to destroy.
+   * @param Whether to call the destruction listener just before the particle is destroyed.
+   */
+  public void destroyParticle(int index, boolean callDestructionListener) {
+    m_particleSystem.destroyParticle(index, callDestructionListener);
+  }
+
+  /**
+   * Destroy particles inside a shape without enabling the destruction callback for destroyed
+   * particles. This function is locked during callbacks. For more information see
+   * DestroyParticleInShape(Shape&, Transform&,bool).
+   * 
+   * @param Shape which encloses particles that should be destroyed.
+   * @param Transform applied to the shape.
+   * @warning This function is locked during callbacks.
+   * @return Number of particles destroyed.
+   */
+  public int destroyParticlesInShape(Shape shape, Transform xf) {
+    return destroyParticlesInShape(shape, xf, false);
+  }
+
+  /**
+   * Destroy particles inside a shape. This function is locked during callbacks. In addition, this
+   * function immediately destroys particles in the shape in contrast to DestroyParticle() which
+   * defers the destruction until the next simulation step.
+   * 
+   * @param Shape which encloses particles that should be destroyed.
+   * @param Transform applied to the shape.
+   * @param Whether to call the world b2DestructionListener for each particle destroyed.
+   * @warning This function is locked during callbacks.
+   * @return Number of particles destroyed.
+   */
+  public int destroyParticlesInShape(Shape shape, Transform xf, boolean callDestructionListener) {
+    assert (isLocked() == false);
+    if (isLocked()) {
+      return 0;
+    }
+    return m_particleSystem.destroyParticlesInShape(shape, xf, callDestructionListener);
+  }
+
+  /**
+   * Create a particle group whose properties have been defined. No reference to the definition is
+   * retained.
+   * 
+   * @warning This function is locked during callbacks.
+   */
+  public ParticleGroup createParticleGroup(ParticleGroupDef def) {
+    assert (isLocked() == false);
+    if (isLocked()) {
+      return null;
+    }
+    ParticleGroup g = m_particleSystem.createParticleGroup(def);
+    return g;
+  }
+
+  /**
+   * Join two particle groups.
+   * 
+   * @param the first group. Expands to encompass the second group.
+   * @param the second group. It is destroyed.
+   * @warning This function is locked during callbacks.
+   */
+  public void joinParticleGroups(ParticleGroup groupA, ParticleGroup groupB) {
+    assert (isLocked() == false);
+    if (isLocked()) {
+      return;
+    }
+    m_particleSystem.joinParticleGroups(groupA, groupB);
+  }
+
+  /**
+   * Destroy particles in a group. This function is locked during callbacks.
+   * 
+   * @param The particle group to destroy.
+   * @param Whether to call the world b2DestructionListener for each particle is destroyed.
+   * @warning This function is locked during callbacks.
+   */
+  public void destroyParticlesInGroup(ParticleGroup group, boolean callDestructionListener) {
+    assert (isLocked() == false);
+    if (isLocked()) {
+      return;
+    }
+    m_particleSystem.destroyParticlesInGroup(group, callDestructionListener);
+  }
+
+  /**
+   * Destroy particles in a group without enabling the destruction callback for destroyed particles.
+   * This function is locked during callbacks.
+   * 
+   * @param The particle group to destroy.
+   * @warning This function is locked during callbacks.
+   */
+  public void destroyParticlesInGroup(ParticleGroup group) {
+    destroyParticlesInGroup(group, false);
+  }
+
+  /**
+   * Get the world particle group list. With the returned group, use ParticleGroup::GetNext to get
+   * the next group in the world list. A NULL group indicates the end of the list.
+   * 
+   * @return the head of the world particle group list.
+   */
+  public ParticleGroup[] getParticleGroupList() {
+    return m_particleSystem.getParticleGroupList();
+  }
+
+  /**
+   * Get the number of particle groups.
+   * 
+   * @return
+   */
+  public int getParticleGroupCount() {
+    return m_particleSystem.getParticleGroupCount();
+  }
+
+  /**
+   * Get the number of particles.
+   * 
+   * @return
+   */
+  public int getParticleCount() {
+    return m_particleSystem.getParticleCount();
+  }
+
+  /**
+   * Get the maximum number of particles.
+   * 
+   * @return
+   */
+  public int getParticleMaxCount() {
+    return m_particleSystem.getParticleMaxCount();
+  }
+
+  /**
+   * Set the maximum number of particles.
+   * 
+   * @param count
+   */
+  public void setParticleMaxCount(int count) {
+    m_particleSystem.setParticleMaxCount(count);
+  }
+
+  /**
+   * Change the particle density.
+   * 
+   * @param density
+   */
+  public void setParticleDensity(float density) {
+    m_particleSystem.setParticleDensity(density);
+  }
+
+  /**
+   * Get the particle density.
+   * 
+   * @return
+   */
+  public float getParticleDensity() {
+    return m_particleSystem.getParticleDensity();
+  }
+
+  /**
+   * Change the particle gravity scale. Adjusts the effect of the global gravity vector on
+   * particles. Default value is 1.0f.
+   * 
+   * @param gravityScale
+   */
+  public void setParticleGravityScale(float gravityScale) {
+    m_particleSystem.setParticleGravityScale(gravityScale);
+
+  }
+
+  /**
+   * Get the particle gravity scale.
+   * 
+   * @return
+   */
+  public float getParticleGravityScale() {
+    return m_particleSystem.getParticleGravityScale();
+  }
+
+  /**
+   * Damping is used to reduce the velocity of particles. The damping parameter can be larger than
+   * 1.0f but the damping effect becomes sensitive to the time step when the damping parameter is
+   * large.
+   * 
+   * @param damping
+   */
+  public void setParticleDamping(float damping) {
+    m_particleSystem.setParticleDamping(damping);
+  }
+
+  /**
+   * Get damping for particles
+   * 
+   * @return
+   */
+  public float getParticleDamping() {
+    return m_particleSystem.getParticleDamping();
+  }
+
+  /**
+   * Change the particle radius. You should set this only once, on world start. If you change the
+   * radius during execution, existing particles may explode, shrink, or behave unexpectedly.
+   * 
+   * @param radius
+   */
+  public void setParticleRadius(float radius) {
+    m_particleSystem.setParticleRadius(radius);
+  }
+
+  /**
+   * Get the particle radius.
+   * 
+   * @return
+   */
+  public float getParticleRadius() {
+    return m_particleSystem.getParticleRadius();
+  }
+
+  /**
+   * Get the particle data. @return the pointer to the head of the particle data.
+   * 
+   * @return
+   */
+  public int[] getParticleFlagsBuffer() {
+    return m_particleSystem.getParticleFlagsBuffer();
+  }
+
+  public Vec2[] getParticlePositionBuffer() {
+    return m_particleSystem.getParticlePositionBuffer();
+  }
+
+  public Vec2[] getParticleVelocityBuffer() {
+    return m_particleSystem.getParticleVelocityBuffer();
+  }
+
+  public ParticleColor[] getParticleColorBuffer() {
+    return m_particleSystem.getParticleColorBuffer();
+  }
+
+  public ParticleGroup[] getParticleGroupBuffer() {
+    return m_particleSystem.getParticleGroupBuffer();
+  }
+
+  public Object[] getParticleUserDataBuffer() {
+    return m_particleSystem.getParticleUserDataBuffer();
+  }
+
+  /**
+   * Set a buffer for particle data.
+   * 
+   * @param buffer is a pointer to a block of memory.
+   * @param size is the number of values in the block.
+   */
+  public void setParticleFlagsBuffer(int[] buffer, int capacity) {
+    m_particleSystem.setParticleFlagsBuffer(buffer, capacity);
+  }
+
+  public void setParticlePositionBuffer(Vec2[] buffer, int capacity) {
+    m_particleSystem.setParticlePositionBuffer(buffer, capacity);
+
+  }
+
+  public void setParticleVelocityBuffer(Vec2[] buffer, int capacity) {
+    m_particleSystem.setParticleVelocityBuffer(buffer, capacity);
+
+  }
+
+  public void setParticleColorBuffer(ParticleColor[] buffer, int capacity) {
+    m_particleSystem.setParticleColorBuffer(buffer, capacity);
+
+  }
+
+  public void setParticleUserDataBuffer(Object[] buffer, int capacity) {
+    m_particleSystem.setParticleUserDataBuffer(buffer, capacity);
+  }
+
+  /**
+   * Get contacts between particles
+   * 
+   * @return
+   */
+  public ParticleContact[] getParticleContacts() {
+    return m_particleSystem.m_contactBuffer;
+  }
+
+  public int getParticleContactCount() {
+    return m_particleSystem.m_contactCount;
+  }
+
+  /**
+   * Get contacts between particles and bodies
+   * 
+   * @return
+   */
+  public ParticleBodyContact[] getParticleBodyContacts() {
+    return m_particleSystem.m_bodyContactBuffer;
+  }
+
+  public int getParticleBodyContactCount() {
+    return m_particleSystem.m_bodyContactCount;
+  }
+
+  /**
+   * Compute the kinetic energy that can be lost by damping force
+   * 
+   * @return
+   */
+  public float computeParticleCollisionEnergy() {
+    return m_particleSystem.computeParticleCollisionEnergy();
   }
 }
 
