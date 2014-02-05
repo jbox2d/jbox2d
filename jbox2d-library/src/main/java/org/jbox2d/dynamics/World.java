@@ -27,6 +27,7 @@ import org.jbox2d.callbacks.ContactFilter;
 import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.DestructionListener;
+import org.jbox2d.callbacks.ParticleDestructionListener;
 import org.jbox2d.callbacks.QueryCallback;
 import org.jbox2d.callbacks.RayCastCallback;
 import org.jbox2d.callbacks.TreeCallback;
@@ -100,6 +101,7 @@ public class World {
   // private Body m_groundBody;
 
   private DestructionListener m_destructionListener;
+  private ParticleDestructionListener m_particleDestructionListener;
   private DebugDraw m_debugDraw;
 
   private final IWorldPool pool;
@@ -224,6 +226,14 @@ public class World {
   
   public DestructionListener getDestructionListener() {
     return m_destructionListener;
+  }
+  
+  public ParticleDestructionListener getParticleDestructionListener() {
+    return m_particleDestructionListener;
+  }
+
+  public void setParticleDestructionListener(ParticleDestructionListener listener) {
+    m_particleDestructionListener = listener;
   }
 
   public Contact popContact(Fixture fixtureA, int indexA, Fixture fixtureB, int indexB) {
