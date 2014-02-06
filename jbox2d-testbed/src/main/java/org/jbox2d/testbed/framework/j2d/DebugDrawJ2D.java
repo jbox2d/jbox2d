@@ -26,8 +26,10 @@ package org.jbox2d.testbed.framework.j2d;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.collision.AABB;
@@ -56,11 +58,13 @@ public class DebugDrawJ2D extends DebugDraw {
   private final ColorPool cpool = new ColorPool();
   private final boolean yFlip;
   private final BasicStroke stroke;
+  private final Shape circle;
 
   public DebugDrawJ2D(TestPanelJ2D argTestPanel, boolean yFlip) {
     panel = argTestPanel;
     this.yFlip = yFlip;
     stroke = new BasicStroke(0);
+    circle = new Ellipse2D.Float(-1, -1, 2, 2);
   }
 
   @Override
@@ -155,9 +159,9 @@ public class DebugDrawJ2D extends DebugDraw {
     Color s = cpool.getColor(color.x, color.y, color.z, 1f);
     g.setColor(f);
     g.scale(radius, radius);
-    g.fillOval(-1, -1, 2, 2);
+    g.fill(circle);
     g.setColor(s);
-    g.drawOval(-1, -1, 2, 2);
+    g.draw(circle);
     g.rotate(MathUtils.atan2(axis.y, axis.x));
     if (axis != null) {
       g.drawLine(0, 0, 1, 0);
@@ -166,6 +170,9 @@ public class DebugDrawJ2D extends DebugDraw {
   }
 
   private final Vec2 zero = new Vec2();
+  private final Color pcolor = new Color(1f, 1f, 1f, 1f);
+  private final Color pcolora = new Color(1f, 1f, 1f, .4f);
+
   @Override
   public void drawParticles(Vec2[] centers, float radius, ParticleColor[] colors, int count) {
     Graphics2D g = getGraphics();
@@ -174,17 +181,22 @@ public class DebugDrawJ2D extends DebugDraw {
     g.setStroke(stroke);
     for (int i = 0; i < count; i++) {
       Vec2 center = centers[i];
-      ParticleColor color = colors[i];
-      Color s = cpool.getColor(color.r, color.g, color.b, color.a);
-      Color f = cpool.getColor(color.r, color.g, color.b, color.a / 2);
+      Color color;
+      Color acolor;
+      if (colors == null) {
+        color = pcolor;
+        acolor = pcolora;
+      } else {
+        ParticleColor c = colors[i];
+        color = new Color(c.r, c.g, c.b, c.a);
+        acolor = new Color(c.r, c.g, c.b, c.a / 5);
+      }
+      AffineTransform old = g.getTransform();
       g.translate(center.x, center.y);
       g.scale(radius, radius);
-      g.setColor(f);
-      g.fillOval(-1, -1, 2, 2);
-      g.setColor(s);
-      g.drawOval(-1, -1, 2, 2);
-      g.scale(-radius, -radius);
-      g.translate(-center.x, -center.y);
+      g.setColor(color);
+      g.draw(circle);
+      g.setTransform(old);
     }
     restoreState(g);
   }
@@ -213,7 +225,7 @@ public class DebugDrawJ2D extends DebugDraw {
     g.drawPolygon(xInts, yInts, vertexCount);
     restoreState(g);
   }
-  
+
   @Override
   public void drawPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
     Color s = cpool.getColor(color.x, color.y, color.z, 1f);

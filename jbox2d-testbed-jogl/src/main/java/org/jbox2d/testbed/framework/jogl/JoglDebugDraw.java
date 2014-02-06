@@ -33,6 +33,7 @@ import org.jbox2d.common.IViewportTransform;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.particle.ParticleColor;
 import org.jbox2d.pooling.arrays.Vec2Array;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
@@ -113,6 +114,12 @@ public class JoglDebugDraw extends DebugDraw {
     getWorldToScreenToOut(p2, trans);
     gl.glVertex2f(trans.x, trans.y);
     gl.glEnd();
+  }
+  
+  @Override
+  public void drawParticles(Vec2[] centers, float radius, ParticleColor[] colors, int count) {
+    // TODO Auto-generated method stub
+    
   }
 
 
