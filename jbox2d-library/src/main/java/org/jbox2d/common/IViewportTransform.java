@@ -89,6 +89,8 @@ public interface IViewportTransform {
    * Transforms the given directional screen vector back to the world direction.
    */
   void getScreenVectorToWorld(Vec2 screen, Vec2 world);
+  
+  Mat22 getMat22Representation();
 
 
   /**

@@ -23,16 +23,21 @@
  ******************************************************************************/
 package org.jbox2d.testbed.framework.j2d;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
 
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.IViewportTransform;
+import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.particle.ParticleColor;
 import org.jbox2d.pooling.arrays.IntArray;
 import org.jbox2d.pooling.arrays.Vec2Array;
 import org.jbox2d.testbed.pooling.ColorPool;
@@ -45,14 +50,17 @@ import org.jbox2d.testbed.pooling.ColorPool;
  */
 public class DebugDrawJ2D extends DebugDraw {
   public static int circlePoints = 13;
+  public static final float edgeWidth = 0.02f;
 
   private final TestPanelJ2D panel;
   private final ColorPool cpool = new ColorPool();
   private final boolean yFlip;
+  private final BasicStroke stroke;
 
   public DebugDrawJ2D(TestPanelJ2D argTestPanel, boolean yFlip) {
     panel = argTestPanel;
     this.yFlip = yFlip;
+    stroke = new BasicStroke(0);
   }
 
   @Override
@@ -62,13 +70,6 @@ public class DebugDrawJ2D extends DebugDraw {
   }
 
   private final Vec2Array vec2Array = new Vec2Array();
-
-  @Override
-  public void drawCircle(Vec2 center, float radius, Color3f color) {
-    Vec2[] vecs = vec2Array.get(circlePoints);
-    generateCirle(center, radius, vecs, circlePoints);
-    drawPolygon(vecs, circlePoints, color);
-  }
 
   @Override
   public void drawPoint(Vec2 argPoint, float argRadiusOnScreen, Color3f argColor) {
@@ -90,11 +91,13 @@ public class DebugDrawJ2D extends DebugDraw {
     getWorldToScreenToOut(p1, sp1);
     getWorldToScreenToOut(p2, sp2);
 
-    Graphics2D g = getGraphics();
     Color c = cpool.getColor(color.x, color.y, color.z);
+    Graphics2D g = getGraphics();
+    saveState(g);
     g.setColor(c);
-
+    g.setStroke(stroke);
     g.drawLine((int) sp1.x, (int) sp1.y, (int) sp2.x, (int) sp2.y);
+    restoreState(g);
   }
 
   public void drawAABB(AABB argAABB, Color3f color) {
@@ -103,44 +106,130 @@ public class DebugDrawJ2D extends DebugDraw {
     drawPolygon(vecs, 4, color);
   }
 
-  private final Vec2 saxis = new Vec2();
+  private final AffineTransform tr = new AffineTransform();
+  private AffineTransform oldTrans = new AffineTransform();
+  private Stroke oldStroke;
+
+  private void saveState(Graphics2D g) {
+    oldTrans = g.getTransform();
+    oldStroke = g.getStroke();
+  }
+
+  private void restoreState(Graphics2D g) {
+    g.setTransform(oldTrans);
+    g.setStroke(oldStroke);
+  }
+
+  private void transformGraphics(Graphics2D g, Vec2 center) {
+    Vec2 e = viewportTransform.getExtents();
+    Vec2 vc = viewportTransform.getCenter();
+    Mat22 vt = viewportTransform.getMat22Representation();
+
+    int flip = yFlip ? -1 : 1;
+    tr.setTransform(vt.ex.x, flip * vt.ex.y, vt.ey.x, flip * vt.ey.y, e.x, e.y);
+    tr.translate(-vc.x, -vc.y);
+    tr.translate(center.x, center.y);
+    g.transform(tr);
+  }
+
+  @Override
+  public void drawCircle(Vec2 center, float radius, Color3f color) {
+    Graphics2D g = getGraphics();
+    Color s = cpool.getColor(color.x, color.y, color.z, 1f);
+    saveState(g);
+    transformGraphics(g, center);
+    g.setStroke(stroke);
+    g.scale(radius, radius);
+    g.setColor(s);
+    g.drawOval(-1, -1, 2, 2);
+    restoreState(g);
+  }
 
   @Override
   public void drawSolidCircle(Vec2 center, float radius, Vec2 axis, Color3f color) {
-    Vec2[] vecs = vec2Array.get(circlePoints);
-    generateCirle(center, radius, vecs, circlePoints);
-    drawSolidPolygon(vecs, circlePoints, color);
+    Graphics2D g = getGraphics();
+    saveState(g);
+    transformGraphics(g, center);
+    g.setStroke(stroke);
+    Color f = cpool.getColor(color.x, color.y, color.z, .4f);
+    Color s = cpool.getColor(color.x, color.y, color.z, 1f);
+    g.setColor(f);
+    g.scale(radius, radius);
+    g.fillOval(-1, -1, 2, 2);
+    g.setColor(s);
+    g.drawOval(-1, -1, 2, 2);
+    g.rotate(MathUtils.atan2(axis.y, axis.x));
     if (axis != null) {
-      saxis.set(axis).mulLocal(radius).addLocal(center);
-      drawSegment(center, saxis, color);
+      g.drawLine(0, 0, 1, 0);
     }
+    restoreState(g);
   }
 
-  // TODO change IntegerArray to a specific class for int[] arrays
+  private final Vec2 zero = new Vec2();
+  @Override
+  public void drawParticles(Vec2[] centers, float radius, ParticleColor[] colors, int count) {
+    Graphics2D g = getGraphics();
+    saveState(g);
+    transformGraphics(g, zero);
+    g.setStroke(stroke);
+    for (int i = 0; i < count; i++) {
+      Vec2 center = centers[i];
+      ParticleColor color = colors[i];
+      Color s = cpool.getColor(color.r, color.g, color.b, color.a);
+      Color f = cpool.getColor(color.r, color.g, color.b, color.a / 2);
+      g.translate(center.x, center.y);
+      g.scale(radius, radius);
+      g.setColor(f);
+      g.fillOval(-1, -1, 2, 2);
+      g.setColor(s);
+      g.drawOval(-1, -1, 2, 2);
+      g.scale(-radius, -radius);
+      g.translate(-center.x, -center.y);
+    }
+    restoreState(g);
+  }
+
   private final Vec2 temp = new Vec2();
   private final static IntArray xIntsPool = new IntArray();
   private final static IntArray yIntsPool = new IntArray();
 
   @Override
   public void drawSolidPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
-
-    // inside
+    Color f = cpool.getColor(color.x, color.y, color.z, .4f);
+    Color s = cpool.getColor(color.x, color.y, color.z, 1f);
     Graphics2D g = getGraphics();
+    saveState(g);
     int[] xInts = xIntsPool.get(vertexCount);
     int[] yInts = yIntsPool.get(vertexCount);
-
     for (int i = 0; i < vertexCount; i++) {
       getWorldToScreenToOut(vertices[i], temp);
       xInts[i] = (int) temp.x;
       yInts[i] = (int) temp.y;
     }
-
-    Color c = cpool.getColor(color.x, color.y, color.z, .4f);
-    g.setColor(c);
+    g.setColor(f);
     g.fillPolygon(xInts, yInts, vertexCount);
-
-    // outside
-    drawPolygon(vertices, vertexCount, color);
+    g.setStroke(stroke);
+    g.setColor(s);
+    g.drawPolygon(xInts, yInts, vertexCount);
+    restoreState(g);
+  }
+  
+  @Override
+  public void drawPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
+    Color s = cpool.getColor(color.x, color.y, color.z, 1f);
+    Graphics2D g = getGraphics();
+    saveState(g);
+    int[] xInts = xIntsPool.get(vertexCount);
+    int[] yInts = yIntsPool.get(vertexCount);
+    for (int i = 0; i < vertexCount; i++) {
+      getWorldToScreenToOut(vertices[i], temp);
+      xInts[i] = (int) temp.x;
+      yInts[i] = (int) temp.y;
+    }
+    g.setStroke(stroke);
+    g.setColor(s);
+    g.drawPolygon(xInts, yInts, vertexCount);
+    restoreState(g);
   }
 
   @Override
@@ -181,16 +270,5 @@ public class DebugDrawJ2D extends DebugDraw {
     temp2.y = xf.p.y + k_axisScale * xf.q.c;
     getWorldToScreenToOut(temp2, temp2);
     g.drawLine((int) temp.x, (int) temp.y, (int) temp2.x, (int) temp2.y);
-  }
-
-  // CIRCLE GENERATOR
-
-  private void generateCirle(Vec2 argCenter, float argRadius, Vec2[] argPoints, int argNumPoints) {
-    float inc = MathUtils.TWOPI / argNumPoints;
-
-    for (int i = 0; i < argNumPoints; i++) {
-      argPoints[i].x = (argCenter.x + MathUtils.cos(i * inc) * argRadius);
-      argPoints[i].y = (argCenter.y + MathUtils.sin(i * inc) * argRadius);
-    }
   }
 }
