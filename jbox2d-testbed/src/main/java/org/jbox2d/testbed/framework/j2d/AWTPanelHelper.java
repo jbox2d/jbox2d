@@ -120,6 +120,9 @@ public class AWTPanelHelper {
           case ' ':
             controller.queueLaunchBomb();
             break;
+          case 'p':
+            controller.queuePause();
+            break;
         }
       }
     });

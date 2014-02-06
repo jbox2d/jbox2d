@@ -52,8 +52,6 @@ public class DynamicTree implements BroadPhaseStrategy {
 
   private int m_freeList;
 
-  private int m_insertionCount;
-
   private final Vec2[] drawVecs = new Vec2[4];
   private final TreeNodeStack nodeStack = new TreeNodeStack(10);
 
@@ -70,8 +68,6 @@ public class DynamicTree implements BroadPhaseStrategy {
       m_nodes[i].height = -1;
     }
     m_freeList = 0;
-
-    m_insertionCount = 0;
 
     for (int i = 0; i < drawVecs.length; i++) {
       drawVecs[i] = new Vec2();
@@ -495,8 +491,6 @@ public class DynamicTree implements BroadPhaseStrategy {
   private final AABB combinedAABB = new AABB();
 
   private final void insertLeaf(int leaf_index) {
-    m_insertionCount++;
-
     DynamicTreeNode leaf = m_nodes[leaf_index];
     if (m_root == null) {
       m_root = leaf;
@@ -605,8 +599,7 @@ public class DynamicTree implements BroadPhaseStrategy {
 
       index = index.parent;
     }
-
-    // validate();
+    validate();
   }
 
   private final void removeLeaf(DynamicTreeNode leaf) {

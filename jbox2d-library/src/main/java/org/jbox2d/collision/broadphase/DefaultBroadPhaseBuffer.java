@@ -74,9 +74,6 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
     m_queryProxyId = NULL_PROXY;
   }
 
-  /* (non-Javadoc)
-   * @see org.jbox2d.collision.broadphase.BroadPhase#createProxy(org.jbox2d.collision.AABB, java.lang.Object)
-   */
   @Override
   public final int createProxy(final AABB aabb, Object userData) {
     int proxyId = m_tree.createProxy(aabb, userData);
@@ -85,9 +82,6 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
     return proxyId;
   }
 
-  /* (non-Javadoc)
-   * @see org.jbox2d.collision.broadphase.BroadPhase#destroyProxy(int)
-   */
   @Override
   public final void destroyProxy(int proxyId) {
     unbufferMove(proxyId);
@@ -95,9 +89,6 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
     m_tree.destroyProxy(proxyId);
   }
 
-  /* (non-Javadoc)
-   * @see org.jbox2d.collision.broadphase.BroadPhase#moveProxy(int, org.jbox2d.collision.AABB, org.jbox2d.common.Vec2)
-   */
   @Override
   public final void moveProxy(int proxyId, final AABB aabb, final Vec2 displacement) {
     boolean buffer = m_tree.moveProxy(proxyId, aabb, displacement);
@@ -106,37 +97,25 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
     }
   }
 
-  /* (non-Javadoc)
-   * @see org.jbox2d.collision.broadphase.BroadPhase#touchProxy(int)
-   */
   @Override
   public void touchProxy(int proxyId) {
     bufferMove(proxyId);
   }
 
-  /* (non-Javadoc)
-   * @see org.jbox2d.collision.broadphase.BroadPhase#getUserData(int)
-   */
   @Override
   public Object getUserData(int proxyId) {
     return m_tree.getUserData(proxyId);
   }
 
-  /* (non-Javadoc)
-   * @see org.jbox2d.collision.broadphase.BroadPhase#getFatAABB(int)
-   */
   @Override
   public AABB getFatAABB(int proxyId) {
     return m_tree.getFatAABB(proxyId);
   }
 
-  /* (non-Javadoc)
-   * @see org.jbox2d.collision.broadphase.BroadPhase#testOverlap(int, int)
-   */
   @Override
   public boolean testOverlap(int proxyIdA, int proxyIdB) {
     // return AABB.testOverlap(proxyA.aabb, proxyB.aabb);
-    //return m_tree.overlap(proxyIdA, proxyIdB);
+    // return m_tree.overlap(proxyIdA, proxyIdB);
     final AABB a = m_tree.getFatAABB(proxyIdA);
     final AABB b = m_tree.getFatAABB(proxyIdB);
     if (b.lowerBound.x - a.upperBound.x > 0.0f || b.lowerBound.y - a.upperBound.y > 0.0f) {
@@ -150,28 +129,18 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
     return true;
   }
 
-  /* (non-Javadoc)
-   * @see org.jbox2d.collision.broadphase.BroadPhase#getProxyCount()
-   */
   @Override
   public final int getProxyCount() {
     return m_proxyCount;
   }
 
-  /* (non-Javadoc)
-   * @see org.jbox2d.collision.broadphase.BroadPhase#drawTree(org.jbox2d.callbacks.DebugDraw)
-   */
   @Override
   public void drawTree(DebugDraw argDraw) {
     m_tree.drawTree(argDraw);
   }
 
-  /* (non-Javadoc)
-   * @see org.jbox2d.collision.broadphase.BroadPhase#updatePairs(org.jbox2d.callbacks.PairCallback)
-   */
   @Override
   public final void updatePairs(PairCallback callback) {
-    // log.debug("beginning to update pairs");
     // Reset pair buffer
     m_pairCount = 0;
 
@@ -215,50 +184,31 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
         if (pair.proxyIdA != primaryPair.proxyIdA || pair.proxyIdB != primaryPair.proxyIdB) {
           break;
         }
-        // log.debug("skipping duplicate");
         ++i;
       }
     }
-
-    // Try to keep the tree balanced.
-    // m_tree.rebalance(Settings.TREE_REBALANCE_STEPS);
   }
 
-  /* (non-Javadoc)
-   * @see org.jbox2d.collision.broadphase.BroadPhase#query(org.jbox2d.callbacks.TreeCallback, org.jbox2d.collision.AABB)
-   */
   @Override
   public final void query(final TreeCallback callback, final AABB aabb) {
     m_tree.query(callback, aabb);
   }
 
-  /* (non-Javadoc)
-   * @see org.jbox2d.collision.broadphase.BroadPhase#raycast(org.jbox2d.callbacks.TreeRayCastCallback, org.jbox2d.collision.RayCastInput)
-   */
   @Override
   public final void raycast(final TreeRayCastCallback callback, final RayCastInput input) {
     m_tree.raycast(callback, input);
   }
 
-  /* (non-Javadoc)
-   * @see org.jbox2d.collision.broadphase.BroadPhase#getTreeHeight()
-   */
   @Override
   public final int getTreeHeight() {
     return m_tree.getHeight();
   }
 
-  /* (non-Javadoc)
-   * @see org.jbox2d.collision.broadphase.BroadPhase#getTreeBalance()
-   */
   @Override
   public int getTreeBalance() {
     return m_tree.getMaxBalance();
   }
 
-  /* (non-Javadoc)
-   * @see org.jbox2d.collision.broadphase.BroadPhase#getTreeQuality()
-   */
   @Override
   public float getTreeQuality() {
     return m_tree.getAreaRatio();
@@ -284,14 +234,12 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
     }
   }
 
-  // private final PairStack pairStack = new PairStack();
   /**
    * This is called from DynamicTree::query when we are gathering pairs.
    */
   public final boolean treeCallback(int proxyId) {
     // A proxy cannot form a pair with itself.
     if (proxyId == m_queryProxyId) {
-      // log.debug("It was us...");
       return true;
     }
 
@@ -307,11 +255,9 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
     }
 
     if (proxyId < m_queryProxyId) {
-      // log.debug("new proxy is first");
       m_pairBuffer[m_pairCount].proxyIdA = proxyId;
       m_pairBuffer[m_pairCount].proxyIdB = m_queryProxyId;
     } else {
-      // log.debug("new proxy is second");
       m_pairBuffer[m_pairCount].proxyIdA = m_queryProxyId;
       m_pairBuffer[m_pairCount].proxyIdB = proxyId;
     }
