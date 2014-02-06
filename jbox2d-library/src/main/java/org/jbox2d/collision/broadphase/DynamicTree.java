@@ -113,8 +113,8 @@ public class DynamicTree implements BroadPhaseStrategy {
 
     final AABB nodeAABB = node.aabb;
     // if (nodeAABB.contains(aabb)) {
-    if (nodeAABB.lowerBound.x > aabb.lowerBound.x && nodeAABB.lowerBound.y > aabb.lowerBound.y
-        && aabb.upperBound.x > nodeAABB.upperBound.x && aabb.upperBound.y > nodeAABB.upperBound.y) {
+    if (nodeAABB.lowerBound.x <= aabb.lowerBound.x && nodeAABB.lowerBound.y <= aabb.lowerBound.y
+        && aabb.upperBound.x <= nodeAABB.upperBound.x && aabb.upperBound.y <= nodeAABB.upperBound.y) {
       return false;
     }
 
