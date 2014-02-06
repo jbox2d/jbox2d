@@ -50,6 +50,7 @@ import org.jbox2d.testbed.tests.Gears;
 import org.jbox2d.testbed.tests.LiquidTest;
 import org.jbox2d.testbed.tests.MotorTest;
 import org.jbox2d.testbed.tests.OneSidedTest;
+import org.jbox2d.testbed.tests.Particles;
 import org.jbox2d.testbed.tests.PistonTest;
 import org.jbox2d.testbed.tests.PolyShapes;
 import org.jbox2d.testbed.tests.PrismaticTest;
@@ -77,6 +78,7 @@ public class TestList {
   public static void populateModel(TestbedModel model) {
 
     model.addCategory("Featured");
+    model.addTest(new Particles());
     model.addTest(new Car());
     model.addTest(new DominoTest());
     model.addTest(new CompoundShapes());

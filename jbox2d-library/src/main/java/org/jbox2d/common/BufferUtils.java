@@ -9,7 +9,16 @@ public class BufferUtils {
     assert (newCapacity > oldCapacity);
     @SuppressWarnings("unchecked")
     T[] newBuffer = (T[]) Array.newInstance(klass, newCapacity);
-    System.arraycopy(oldBuffer, 0, newBuffer, 0, oldCapacity);
+    if (oldBuffer != null) {
+      System.arraycopy(oldBuffer, 0, newBuffer, 0, oldCapacity);
+    }
+    for (int i = oldCapacity; i < newCapacity; i++) {
+      try {
+        newBuffer[i] = klass.newInstance();
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
     return newBuffer;
   }
 
@@ -17,7 +26,9 @@ public class BufferUtils {
   public static int[] reallocateBuffer(int[] oldBuffer, int oldCapacity, int newCapacity) {
     assert (newCapacity > oldCapacity);
     int[] newBuffer = new int[newCapacity];
-    System.arraycopy(oldBuffer, 0, newBuffer, 0, oldCapacity);
+    if (oldBuffer != null) {
+      System.arraycopy(oldBuffer, 0, newBuffer, 0, oldCapacity);
+    }
     return newBuffer;
   }
 
@@ -25,7 +36,9 @@ public class BufferUtils {
   public static float[] reallocateBuffer(float[] oldBuffer, int oldCapacity, int newCapacity) {
     assert (newCapacity > oldCapacity);
     float[] newBuffer = new float[newCapacity];
-    System.arraycopy(oldBuffer, 0, newBuffer, 0, oldCapacity);
+    if (oldBuffer != null) {
+      System.arraycopy(oldBuffer, 0, newBuffer, 0, oldCapacity);
+    }
     return newBuffer;
   }
 
@@ -87,7 +100,7 @@ public class BufferUtils {
       }
     }
   }
-  
+
   /** Rotate an array, see std::rotate */
   public static void rotate(int[] ray, int first, int new_first, int last) {
     int next = new_first;
@@ -104,7 +117,7 @@ public class BufferUtils {
       }
     }
   }
-  
+
   /** Rotate an array, see std::rotate */
   public static void rotate(float[] ray, int first, int new_first, int last) {
     int next = new_first;
@@ -121,4 +134,4 @@ public class BufferUtils {
       }
     }
   }
-  }
+}

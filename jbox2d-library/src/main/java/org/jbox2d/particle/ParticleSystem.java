@@ -33,7 +33,7 @@ public class ParticleSystem {
 
   static final int xTruncBits = 12;
   static final int yTruncBits = 12;
-  static final int tagBits = 8 * 4 /* sizeof(int) */;
+  static final int tagBits = 8 * 4 - 1 /* sizeof(int) */;
   static final int yOffset = 1 << (yTruncBits - 1);
   static final int yShift = tagBits - yTruncBits;
   static final int xShift = tagBits - yTruncBits - xTruncBits;
@@ -158,6 +158,7 @@ public class ParticleSystem {
     m_ejectionStrength = 0.5f;
     m_colorMixingStrength = 0.5f;
 
+    m_flagsBuffer = new ParticleBufferInt();
     m_positionBuffer = new ParticleBuffer<Vec2>(Vec2.class);
     m_velocityBuffer = new ParticleBuffer<Vec2>(Vec2.class);
     m_colorBuffer = new ParticleBuffer<ParticleColor>(ParticleColor.class);
@@ -204,15 +205,15 @@ public class ParticleSystem {
     }
     int index = m_count++;
     m_flagsBuffer.data[index] = def.flags;
-    m_positionBuffer.data[index] = def.position;
-    m_velocityBuffer.data[index] = def.velocity;
+    m_positionBuffer.data[index].set(def.position);
+    m_velocityBuffer.data[index].set(def.velocity);
     m_groupBuffer[index] = null;
     if (m_depthBuffer != null) {
       m_depthBuffer[index] = 0;
     }
     if (m_colorBuffer.data != null || !def.color.isZero()) {
       m_colorBuffer.data = requestParticleBuffer(m_colorBuffer.dataClass, m_colorBuffer.data);
-      m_colorBuffer.data[index] = def.color;
+      m_colorBuffer.data[index].set(def.color);
     }
     if (m_userDataBuffer.data != null || def.userData != null) {
       m_userDataBuffer.data =
@@ -563,19 +564,19 @@ public class ParticleSystem {
   }
 
   public void updateContacts(boolean exceptZombie) {
-    for (Proxy proxy : m_proxyBuffer) {
+    for (int p = 0; p < m_proxyCount; p++) {
+      Proxy proxy = m_proxyBuffer[p];
       int i = proxy.index;
-      Vec2 p = m_positionBuffer.data[i];
-      proxy.tag = computeTag(m_inverseDiameter * p.x, m_inverseDiameter * p.y);
+      Vec2 pos = m_positionBuffer.data[i];
+      proxy.tag = computeTag(m_inverseDiameter * pos.x, m_inverseDiameter * pos.y);
     }
-    Arrays.sort(m_proxyBuffer);
+    Arrays.sort(m_proxyBuffer, 0, m_proxyCount);
     m_contactCount = 0;
     int c_index = 0;
-    final int length = m_proxyBuffer.length;
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < m_proxyCount; i++) {
       Proxy a = m_proxyBuffer[i];
       int rightTag = computeRelativeTag(a.tag, 1, 0);
-      for (int j = i + 1; j < length; j++) {
+      for (int j = i + 1; j < m_proxyCount; j++) {
         Proxy b = m_proxyBuffer[j];
         if (rightTag < b.tag) {
           break;
@@ -583,7 +584,7 @@ public class ParticleSystem {
         addContact(a.index, b.index);
       }
       int bottomLeftTag = computeRelativeTag(a.tag, -1, 1);
-      for (; c_index < length; c_index++) {
+      for (; c_index < m_proxyCount; c_index++) {
         Proxy c = m_proxyBuffer[c_index];
         if (bottomLeftTag <= c.tag) {
           break;
@@ -591,7 +592,7 @@ public class ParticleSystem {
       }
       int bottomRightTag = computeRelativeTag(a.tag, 1, 1);
 
-      for (int b_index = c_index; b_index < length; b_index++) {
+      for (int b_index = c_index; b_index < m_proxyCount; b_index++) {
         Proxy b = m_proxyBuffer[b_index];
         if (bottomRightTag < b.tag) {
           break;
@@ -633,6 +634,7 @@ public class ParticleSystem {
     aabb.upperBound.y += m_particleDiameter;
     m_bodyContactCount = 0;
 
+    ubccallback.system = this;
     m_world.queryAABB(ubccallback, aabb);
   }
 
@@ -662,6 +664,8 @@ public class ParticleSystem {
       upperBound.x = upperBound.x > b1x ? upperBound.x : b1x;
       upperBound.y = upperBound.y > b1y ? upperBound.y : b1y;
     }
+    sccallback.step = step;
+    sccallback.system = this;
     m_world.queryAABB(sccallback, aabb);
   }
 
@@ -1185,14 +1189,16 @@ public class ParticleSystem {
         newIndices[i] = newCount;
         if (i != newCount) {
           m_flagsBuffer.data[newCount] = m_flagsBuffer.data[i];
-          m_positionBuffer.data[newCount] = m_positionBuffer.data[i];
-          m_velocityBuffer.data[newCount] = m_velocityBuffer.data[i];
+          m_positionBuffer.data[newCount].set(m_positionBuffer.data[i]);
+          m_velocityBuffer.data[newCount].set(m_velocityBuffer.data[i]);
+          ParticleGroup group = m_groupBuffer[newCount];
           m_groupBuffer[newCount] = m_groupBuffer[i];
+          m_groupBuffer[i] = group;
           if (m_depthBuffer != null) {
             m_depthBuffer[newCount] = m_depthBuffer[i];
           }
           if (m_colorBuffer.data != null) {
-            m_colorBuffer.data[newCount] = m_colorBuffer.data[i];
+            m_colorBuffer.data[newCount].set(m_colorBuffer.data[i]);
           }
           if (m_userDataBuffer.data != null) {
             m_userDataBuffer.data[newCount] = m_userDataBuffer.data[i];
@@ -1580,7 +1586,7 @@ public class ParticleSystem {
   }
 
   public int getParticleCount() {
-    return m_pairCount;
+    return m_count;
   }
 
   public void setParticleUserDataBuffer(Object[] buffer, int capacity) {
@@ -1675,7 +1681,7 @@ public class ParticleSystem {
     float v2 = vx * vx + vy * vy;
     for (int proxy = firstProxy; proxy < lastProxy; ++proxy) {
       int i = m_proxyBuffer[proxy].index;
-      Vec2 posI = m_positionBuffer.data[i];
+      final Vec2 posI = m_positionBuffer.data[i];
       final float px = point1.x - posI.x;
       final float py = point1.y - posI.y;
       float pv = px * vx + py * vy;
@@ -1774,7 +1780,7 @@ public class ParticleSystem {
   }
 
   /** Used for detecting particle contacts */
-  static class Proxy implements Comparable<Proxy> {
+  public static class Proxy implements Comparable<Proxy> {
     int index;
     int tag;
 
@@ -1785,7 +1791,7 @@ public class ParticleSystem {
   }
 
   /** Connection between two particles */
-  static class Pair {
+  public static class Pair {
     int indexA, indexB;
     int flags;
     float strength;
@@ -1793,7 +1799,7 @@ public class ParticleSystem {
   }
 
   /** Connection between three particles */
-  static class Triad {
+  public static class Triad {
     int indexA, indexB, indexC;
     int flags;
     float strength;

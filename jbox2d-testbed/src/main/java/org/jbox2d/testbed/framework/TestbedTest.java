@@ -31,6 +31,8 @@ import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.DestructionListener;
+import org.jbox2d.callbacks.ParticleDestructionListener;
+import org.jbox2d.callbacks.ParticleQueryCallback;
 import org.jbox2d.callbacks.QueryCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.Collision;
@@ -41,6 +43,7 @@ import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.Settings;
+import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
@@ -53,6 +56,7 @@ import org.jbox2d.dynamics.contacts.Contact;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.MouseJoint;
 import org.jbox2d.dynamics.joints.MouseJointDef;
+import org.jbox2d.particle.ParticleGroup;
 import org.jbox2d.serialization.JbDeserializer;
 import org.jbox2d.serialization.JbDeserializer.ObjectListener;
 import org.jbox2d.serialization.JbSerializer;
@@ -96,12 +100,17 @@ public abstract class TestbedTest
   private final Vec2 bombSpawnPoint = new Vec2();
   private boolean bombSpawning = false;
 
+  private boolean mouseTracing;
+  private Vec2 mouseTracerPosition = new Vec2();
+  private Vec2 mouseTracerVelocity = new Vec2();
+
   private final Vec2 mouseWorld = new Vec2();
   private int pointCount;
   private int stepCount;
 
   private TestbedModel model;
   protected DestructionListener destructionListener;
+  protected ParticleDestructionListener particleDestructionListener;
 
 
   private String title = null;
@@ -113,7 +122,10 @@ public abstract class TestbedTest
   private JbSerializer serializer;
   private JbDeserializer deserializer;
 
+  private final Transform identity = new Transform();
+
   public TestbedTest() {
+    identity.setIdentity();
     for (int i = 0; i < MAX_CONTACT_POINTS; i++) {
       points[i] = new ContactPoint();
     }
@@ -167,7 +179,9 @@ public abstract class TestbedTest
       }
     });
     destructionListener = new DestructionListener() {
-      public void sayGoodbye(Fixture fixture) {}
+      public void sayGoodbye(Fixture fixture) {
+        fixtureDestroyed(fixture);
+      }
 
       public void sayGoodbye(Joint joint) {
         if (mouseJoint == joint) {
@@ -175,6 +189,18 @@ public abstract class TestbedTest
         } else {
           jointDestroyed(joint);
         }
+      }
+    };
+
+    particleDestructionListener = new ParticleDestructionListener() {
+      @Override
+      public void sayGoodbye(int index) {
+        particleDestroyed(index);
+      }
+
+      @Override
+      public void sayGoodbye(ParticleGroup group) {
+        particleGroupDestroyed(group);
       }
     };
     camera = new TestbedCamera(getDefaultCameraPos(), getDefaultCameraScale(), ZOOM_SCALE_DIFF);
@@ -185,8 +211,14 @@ public abstract class TestbedTest
 
     Vec2 gravity = new Vec2(0, -10f);
     m_world = model.getWorldCreator().createWorld(gravity);
+    m_world.setParticleGravityScale(0.4f);
+    m_world.setParticleDensity(1.2f);
     bomb = null;
     mouseJoint = null;
+
+    mouseTracing = false;
+    mouseTracerPosition.setZero();
+    mouseTracerVelocity.setZero();
 
     BodyDef bodyDef = new BodyDef();
     groundBody = m_world.createBody(bodyDef);
@@ -294,6 +326,18 @@ public abstract class TestbedTest
     return 10;
   }
 
+  public boolean isMouseTracing() {
+    return mouseTracing;
+  }
+
+  public Vec2 getMouseTracerPosition() {
+    return mouseTracerPosition;
+  }
+
+  public Vec2 getMouseTracerVelocity() {
+    return mouseTracerVelocity;
+  }
+
   /**
    * Gets the filename of the current test. Default implementation uses the test name with no
    * spaces".
@@ -347,6 +391,12 @@ public abstract class TestbedTest
   private final Vec2 p2 = new Vec2();
   private final Vec2 tangent = new Vec2();
   private final List<String> statsList = new ArrayList<String>();
+
+  private final Vec2 acceleration = new Vec2();
+  private final Vec2 temp = new Vec2();
+  private final CircleShape pshape = new CircleShape();
+  private final ParticleVelocityQueryCallback pcallback = new ParticleVelocityQueryCallback();
+  private final AABB paabb = new AABB();
 
   public void step(TestbedSettings settings) {
     float hz = settings.getSetting(TestbedSettings.Hz).value;
@@ -405,13 +455,17 @@ public abstract class TestbedTest
       m_textLine += TEXT_LINE_SPACE;
       debugDraw.drawString(5, m_textLine, "Framerate: " + model.getCalculatedFps(), Color3f.WHITE);
       m_textLine += TEXT_LINE_SPACE;
+
+      int particleCount = m_world.getParticleCount();
+      int groupCount = m_world.getParticleGroupCount();
       debugDraw.drawString(
           5,
           m_textLine,
-          "bodies/contacts/joints/proxies = " + m_world.getBodyCount() + "/"
+          "bodies/contacts/joints/proxies/particles/groups = " + m_world.getBodyCount() + "/"
               + m_world.getContactCount() + "/" + m_world.getJointCount() + "/"
-              + m_world.getProxyCount(), Color3f.WHITE);
+              + m_world.getProxyCount() + "/" + particleCount + "/" + groupCount, Color3f.WHITE);
       m_textLine += TEXT_LINE_SPACE;
+
       debugDraw.drawString(5, m_textLine, "World mouse position: " + mouseWorld.toString(),
           Color3f.WHITE);
       m_textLine += TEXT_LINE_SPACE;
@@ -447,6 +501,23 @@ public abstract class TestbedTest
         m_textLine += TEXT_LINE_SPACE;
       }
       textList.clear();
+    }
+
+    if (mouseTracing && mouseJoint == null) {
+      float delay = 0.1f;
+      acceleration.x =
+          2 / delay * (1 / delay * (mouseWorld.x - mouseTracerPosition.x) - mouseTracerVelocity.x);
+      acceleration.y =
+          2 / delay * (1 / delay * (mouseWorld.y - mouseTracerPosition.y) - mouseTracerVelocity.y);
+      mouseTracerVelocity.x += timeStep * acceleration.x;
+      mouseTracerVelocity.y += timeStep * acceleration.y;
+      mouseTracerPosition.x += timeStep * mouseTracerVelocity.x;
+      mouseTracerPosition.y += timeStep * mouseTracerVelocity.y;
+      pshape.m_p.set(mouseTracerPosition);
+      pshape.m_radius = 2;
+      pcallback.init(m_world, pshape, mouseTracerVelocity);
+      pshape.computeAABB(paabb, identity, 0);
+      m_world.queryAABB(pcallback, paabb);
     }
 
     if (mouseJoint != null) {
@@ -501,6 +572,7 @@ public abstract class TestbedTest
    * Called for mouse-up
    */
   public void mouseUp(Vec2 p, int button) {
+    mouseTracing = false;
     if (button == MOUSE_JOINT_BUTTON) {
       destroyMouseJoint();
     }
@@ -513,6 +585,9 @@ public abstract class TestbedTest
 
   public void mouseDown(Vec2 p, int button) {
     mouseWorld.set(p);
+    mouseTracing = true;
+    mouseTracerVelocity.setZero();
+    mouseTracerPosition.set(p);
 
     if (button == BOMB_SPAWN_BUTTON) {
       beginBombSpawn(p);
@@ -699,11 +774,17 @@ public abstract class TestbedTest
     return true;
   }
 
+  public void fixtureDestroyed(Fixture fixture) {}
+
   public void jointDestroyed(Joint joint) {}
 
   public void beginContact(Contact contact) {}
 
   public void endContact(Contact contact) {}
+
+  public void particleDestroyed(int particle) {}
+
+  public void particleGroupDestroyed(ParticleGroup group) {}
 
   public void postSolve(Contact contact, ContactImpulse impulse) {}
 
@@ -762,6 +843,35 @@ class TestQueryCallback implements QueryCallback {
       }
     }
 
+    return true;
+  }
+}
+
+
+class ParticleVelocityQueryCallback implements ParticleQueryCallback {
+  World world;
+  Shape shape;
+  Vec2 velocity;
+  final Transform xf = new Transform();
+
+  public ParticleVelocityQueryCallback() {
+    xf.setIdentity();
+  }
+
+  public void init(World world, Shape shape, Vec2 velocity) {
+    this.world = world;
+    this.shape = shape;
+    this.velocity = velocity;
+  }
+
+  @Override
+  public boolean reportParticle(int index) {
+    xf.setIdentity();
+    Vec2 p = world.getParticlePositionBuffer()[index];
+    if (shape.testPoint(xf, p)) {
+      Vec2 v = world.getParticleVelocityBuffer()[index];
+      v.set(velocity);
+    }
     return true;
   }
 }
