@@ -59,6 +59,11 @@ public class OBBViewportTransform implements IViewportTransform {
   public Vec2 getExtents() {
     return box.extents;
   }
+  
+  @Override
+  public Mat22 getMat22Representation() {
+    return box.R;
+  }
 
   public void setExtents(Vec2 argExtents) {
     box.extents.set(argExtents);
