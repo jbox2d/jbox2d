@@ -556,6 +556,7 @@ public abstract class TestbedTest
       MouseJointDef def = new MouseJointDef();
       def.bodyA = groundBody;
       def.bodyB = body;
+      def.collideConnected = true;
       def.target.set(p);
       def.maxForce = 1000f * body.getMass();
       mouseJoint = (MouseJoint) m_world.createJoint(def);
