@@ -38,7 +38,6 @@ public class DynamicTreeNode {
   protected DynamicTreeNode child1;
   protected DynamicTreeNode child2;
   protected final int id;
-  protected boolean leaf;
   protected int height;
 
   public final boolean isLeaf() {

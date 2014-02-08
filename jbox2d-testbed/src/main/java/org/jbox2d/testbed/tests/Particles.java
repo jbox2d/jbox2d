@@ -19,7 +19,6 @@ public class Particles extends TestbedTest {
   @Override
   public void initTest(boolean deserialized) {
     {
-
       {
         PolygonShape shape = new PolygonShape();
         Vec2[] vertices =
@@ -50,11 +49,11 @@ public class Particles extends TestbedTest {
     {
       CircleShape shape = new CircleShape();
       shape.m_p.set(0, 30);
-      shape.m_radius = 10;
+      shape.m_radius = 20;
       ParticleGroupDef pd = new ParticleGroupDef();
       pd.flags = ParticleType.b2_waterParticle;
       pd.shape = shape;
-     // m_world.createParticleGroup(pd);
+      m_world.createParticleGroup(pd);
     }
 
     {

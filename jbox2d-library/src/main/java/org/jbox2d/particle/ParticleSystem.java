@@ -551,7 +551,7 @@ public class ParticleSystem {
                 newCapacity);
         m_contactCapacity = newCapacity;
       }
-      float invD = 1 / MathUtils.sqrt(d2);
+      float invD = MathUtils.sqrt(1 / d2);
       ParticleContact contact = m_contactBuffer[m_contactCount];
       contact.indexA = a;
       contact.indexB = b;
@@ -789,12 +789,13 @@ public class ParticleSystem {
       Vec2 p = m_positionBuffer.data[a];
       float h = m_accumulationBuffer[a] + pressurePerWeight * w;
       final Vec2 f = tempVec;
-      f.x = velocityPerPressure * w * m * h * n.x;
-      f.y = velocityPerPressure * w * m * h * n.y;
+      final float coef = velocityPerPressure * w * m * h;
+      f.x = coef * n.x;
+      f.y = coef * n.y;
       final Vec2 velData = m_velocityBuffer.data[a];
       final float particleInvMass = getParticleInvMass();
       velData.x -= particleInvMass * f.x;
-      velData.x -= particleInvMass * f.x;
+      velData.y -= particleInvMass * f.y;
       b.applyLinearImpulse(f, p, true);
     }
     for (int k = 0; k < m_contactCount; k++) {
@@ -928,7 +929,7 @@ public class ParticleSystem {
         float rs = Vec2.cross(oa, pa) + Vec2.cross(ob, pb) + Vec2.cross(oc, pc);
         float rc = Vec2.dot(oa, pa) + Vec2.dot(ob, pb) + Vec2.dot(oc, pc);
         float r2 = rs * rs + rc * rc;
-        float invR = 1f / MathUtils.sqrt(r2);
+        float invR = MathUtils.sqrt(1f / r2);
         rs *= invR;
         rc *= invR;
         final float strength = elasticStrength * triad.strength;
@@ -1978,28 +1979,28 @@ public class ParticleSystem {
       int childCount = shape.getChildCount();
       for (int childIndex = 0; childIndex < childCount; childIndex++) {
         AABB aabb = fixture.getAABB(childIndex);
-        aabb.lowerBound.x -= system.m_particleDiameter;
-        aabb.lowerBound.y -= system.m_particleDiameter;
-        aabb.upperBound.x += system.m_particleDiameter;
-        aabb.upperBound.y += system.m_particleDiameter;
+        final float aabblowerBoundx = aabb.lowerBound.x - system.m_particleDiameter;
+        final float aabblowerBoundy = aabb.lowerBound.y - system.m_particleDiameter;
+        final float aabbupperBoundx = aabb.upperBound.x + system.m_particleDiameter;
+        final float aabbupperBoundy = aabb.upperBound.y + system.m_particleDiameter;
         int firstProxy =
             lowerBound(
                 system.m_proxyBuffer,
                 system.m_proxyCount,
-                computeTag(system.m_inverseDiameter * aabb.lowerBound.x, system.m_inverseDiameter
-                    * aabb.lowerBound.y));
+                computeTag(system.m_inverseDiameter * aabblowerBoundx, system.m_inverseDiameter
+                    * aabblowerBoundy));
         int lastProxy =
             upperBound(
                 system.m_proxyBuffer,
                 system.m_proxyCount,
-                computeTag(system.m_inverseDiameter * aabb.upperBound.x, system.m_inverseDiameter
-                    * aabb.upperBound.y));
+                computeTag(system.m_inverseDiameter * aabbupperBoundx, system.m_inverseDiameter
+                    * aabbupperBoundy));
 
         for (int proxy = firstProxy; proxy != lastProxy; ++proxy) {
           int a = system.m_proxyBuffer[proxy].index;
           Vec2 ap = system.m_positionBuffer.data[a];
-          if (aabb.lowerBound.x <= ap.x && ap.x <= aabb.upperBound.x && aabb.lowerBound.y <= ap.y
-              && ap.y <= aabb.upperBound.y) {
+          if (aabblowerBoundx <= ap.x && ap.x <= aabbupperBoundx && aabblowerBoundy <= ap.y
+              && ap.y <= aabbupperBoundy) {
             float d;
             final Vec2 n = tempVec;
             d = fixture.computeDistance(ap, childIndex, n);
@@ -2007,8 +2008,8 @@ public class ParticleSystem {
               float invAm =
                   (system.m_flagsBuffer.data[a] & ParticleType.b2_wallParticle) != 0 ? 0 : system
                       .getParticleInvMass();
-              final float rpx = ap.x - bp.y;
-              final float rpy = ap.x - bp.y;
+              final float rpx = ap.x - bp.x;
+              final float rpy = ap.y - bp.y;
               float rpn = rpx * n.y - rpy * n.x;
               if (system.m_bodyContactCount >= system.m_bodyContactCapacity) {
                 int oldCapacity = system.m_bodyContactCapacity;
@@ -2056,28 +2057,28 @@ public class ParticleSystem {
       int childCount = shape.getChildCount();
       for (int childIndex = 0; childIndex < childCount; childIndex++) {
         AABB aabb = fixture.getAABB(childIndex);
-        aabb.lowerBound.x -= system.m_particleDiameter;
-        aabb.lowerBound.y -= system.m_particleDiameter;
-        aabb.upperBound.x += system.m_particleDiameter;
-        aabb.upperBound.y += system.m_particleDiameter;
+        final float aabblowerBoundx = aabb.lowerBound.x - system.m_particleDiameter;
+        final float aabblowerBoundy = aabb.lowerBound.y - system.m_particleDiameter;
+        final float aabbupperBoundx = aabb.upperBound.x + system.m_particleDiameter;
+        final float aabbupperBoundy = aabb.upperBound.y + system.m_particleDiameter;
         int firstProxy =
             lowerBound(
                 system.m_proxyBuffer,
                 system.m_proxyCount,
-                computeTag(system.m_inverseDiameter * aabb.lowerBound.x, system.m_inverseDiameter
-                    * aabb.lowerBound.y));
+                computeTag(system.m_inverseDiameter * aabblowerBoundx, system.m_inverseDiameter
+                    * aabblowerBoundy));
         int lastProxy =
             upperBound(
                 system.m_proxyBuffer,
                 system.m_proxyCount,
-                computeTag(system.m_inverseDiameter * aabb.upperBound.x, system.m_inverseDiameter
-                    * aabb.upperBound.y));
+                computeTag(system.m_inverseDiameter * aabbupperBoundx, system.m_inverseDiameter
+                    * aabbupperBoundy));
 
         for (int proxy = firstProxy; proxy != lastProxy; ++proxy) {
           int a = system.m_proxyBuffer[proxy].index;
           Vec2 ap = system.m_positionBuffer.data[a];
-          if (aabb.lowerBound.x <= ap.x && ap.x <= aabb.upperBound.x && aabb.lowerBound.y <= ap.y
-              && ap.y <= aabb.upperBound.y) {
+          if (aabblowerBoundx <= ap.x && ap.x <= aabbupperBoundx && aabblowerBoundy <= ap.y
+              && ap.y <= aabbupperBoundy) {
             Vec2 av = system.m_velocityBuffer.data[a];
             final Vec2 temp = tempVec;
             Transform.mulTransToOutUnsafe(body.m_xf0, ap, temp);
