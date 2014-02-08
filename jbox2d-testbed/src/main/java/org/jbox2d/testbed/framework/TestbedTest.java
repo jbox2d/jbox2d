@@ -393,7 +393,6 @@ public abstract class TestbedTest
   private final List<String> statsList = new ArrayList<String>();
 
   private final Vec2 acceleration = new Vec2();
-  private final Vec2 temp = new Vec2();
   private final CircleShape pshape = new CircleShape();
   private final ParticleVelocityQueryCallback pcallback = new ParticleVelocityQueryCallback();
   private final AABB paabb = new AABB();
