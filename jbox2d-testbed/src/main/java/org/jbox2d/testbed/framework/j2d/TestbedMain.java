@@ -80,6 +80,7 @@ public class TestbedMain {
     testbed.pack();
     testbed.setVisible(true);
     testbed.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    System.out.println(System.getProperty("java.home"));
 
     SwingUtilities.invokeLater(new Runnable() {
       @Override

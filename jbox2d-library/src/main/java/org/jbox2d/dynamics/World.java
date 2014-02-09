@@ -255,14 +255,13 @@ public class World {
     final ShapeType type2 = fixtureB.getType();
 
     final ContactRegister reg = contactStacks[type1.ordinal()][type2.ordinal()];
-    final IDynamicStack<Contact> creator = reg.creator;
-    if (creator != null) {
+    if (reg != null) {
       if (reg.primary) {
-        Contact c = creator.pop();
+        Contact c = reg.creator.pop();
         c.init(fixtureA, indexA, fixtureB, indexB);
         return c;
       } else {
-        Contact c = creator.pop();
+        Contact c = reg.creator.pop();
         c.init(fixtureB, indexB, fixtureA, indexA);
         return c;
       }

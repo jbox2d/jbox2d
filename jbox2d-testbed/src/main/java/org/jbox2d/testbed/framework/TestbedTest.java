@@ -578,7 +578,7 @@ public abstract class TestbedTest
     completeBombSpawn(p);
   }
 
-  public void keyPressed(char keyCar, int keyCode) {}
+  public void keyPressed(char keyChar, int keyCode) {}
 
   public void keyReleased(char keyChar, int keyCode) {}
 
@@ -602,6 +602,7 @@ public abstract class TestbedTest
   }
 
   public void mouseDrag(Vec2 p, int button) {
+    mouseWorld.set(p);
     if (button == MOUSE_JOINT_BUTTON) {
       updateMouseJoint(p);
     }

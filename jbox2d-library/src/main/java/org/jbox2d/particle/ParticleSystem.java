@@ -42,11 +42,11 @@ public class ParticleSystem {
   static final int xMask = (1 << xTruncBits) - 1;
   static final int yMask = (1 << yTruncBits) - 1;
 
-  static int computeTag(float x, float y) {
-    return ((int) (y + yOffset) << yShift) + (int) (xScale * x + xOffset);
+  static long computeTag(float x, float y) {
+    return (((long) (y + yOffset)) << yShift) + (int) (((long) (xScale * x)) + xOffset);
   }
 
-  static int computeRelativeTag(int tag, int x, int y) {
+  static long computeRelativeTag(long tag, int x, int y) {
     return tag + (y << yShift) + (x << xShift);
   }
 
@@ -575,7 +575,7 @@ public class ParticleSystem {
     int c_index = 0;
     for (int i = 0; i < m_proxyCount; i++) {
       Proxy a = m_proxyBuffer[i];
-      int rightTag = computeRelativeTag(a.tag, 1, 0);
+      long rightTag = computeRelativeTag(a.tag, 1, 0);
       for (int j = i + 1; j < m_proxyCount; j++) {
         Proxy b = m_proxyBuffer[j];
         if (rightTag < b.tag) {
@@ -583,14 +583,14 @@ public class ParticleSystem {
         }
         addContact(a.index, b.index);
       }
-      int bottomLeftTag = computeRelativeTag(a.tag, -1, 1);
+      long bottomLeftTag = computeRelativeTag(a.tag, -1, 1);
       for (; c_index < m_proxyCount; c_index++) {
         Proxy c = m_proxyBuffer[c_index];
         if (bottomLeftTag <= c.tag) {
           break;
         }
       }
-      int bottomRightTag = computeRelativeTag(a.tag, 1, 1);
+      long bottomRightTag = computeRelativeTag(a.tag, 1, 1);
 
       for (int b_index = c_index; b_index < m_proxyCount; b_index++) {
         Proxy b = m_proxyBuffer[b_index];
@@ -653,8 +653,8 @@ public class ParticleSystem {
       final Vec2 p1 = m_positionBuffer.data[i];
       final float p1x = p1.x;
       final float p1y = p1.y;
-      final float p2x = p1.x + step.dt * v.x;
-      final float p2y = p1.y + step.dt * v.y;
+      final float p2x = p1x + step.dt * v.x;
+      final float p2y = p1y + step.dt * v.y;
       final float bx = p1x < p2x ? p1x : p2x;
       final float by = p1y < p2y ? p1y : p2y;
       lowerBound.x = lowerBound.x < bx ? lowerBound.x : bx;
@@ -1594,7 +1594,7 @@ public class ParticleSystem {
     setParticleBuffer(m_userDataBuffer, buffer, capacity);
   }
 
-  private static final int lowerBound(Proxy[] ray, int length, int tag) {
+  private static final int lowerBound(Proxy[] ray, int length, long tag) {
     int left = 0;
     int step, curr;
     while (length > 0) {
@@ -1610,7 +1610,7 @@ public class ParticleSystem {
     return left;
   }
 
-  private static final int upperBound(Proxy[] ray, int length, int tag) {
+  private static final int upperBound(Proxy[] ray, int length, long tag) {
     int left = 0;
     int step, curr;
     while (length > 0) {
@@ -1755,6 +1755,13 @@ public class ParticleSystem {
   <T> T[] requestParticleBuffer(Class<T> klass, T[] buffer) {
     if (buffer == null) {
       buffer = (T[]) Array.newInstance(klass, m_internalAllocatedCapacity);
+      for (int i = 0; i < m_internalAllocatedCapacity; i++) {
+        try {
+          buffer[i] = klass.newInstance();
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+      }
     }
     return buffer;
   }
@@ -1783,11 +1790,21 @@ public class ParticleSystem {
   /** Used for detecting particle contacts */
   public static class Proxy implements Comparable<Proxy> {
     int index;
-    int tag;
+    long tag;
 
     @Override
     public int compareTo(Proxy o) {
-      return tag - o.tag;
+      return (int) (tag - o.tag);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) return true;
+      if (obj == null) return false;
+      if (getClass() != obj.getClass()) return false;
+      Proxy other = (Proxy) obj;
+      if (tag != other.tag) return false;
+      return true;
     }
   }
 

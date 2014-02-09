@@ -30,6 +30,7 @@ import javax.media.opengl.GL2;
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.IViewportTransform;
+import org.jbox2d.common.Mat22;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
@@ -42,10 +43,16 @@ public class JoglDebugDraw extends DebugDraw {
 
   private final JoglPanel panel;
   private final TextRenderer text;
+  private static final int NUM_CIRCLE_POINTS = 20;
+  private final Vec2[] circle = new Vec2[NUM_CIRCLE_POINTS];
 
   public JoglDebugDraw(JoglPanel argPanel) {
     super();
     panel = argPanel;
+    for (int i = 0; i < NUM_CIRCLE_POINTS; i++) {
+      circle[i] = new Vec2();
+    }
+    generateCirle(new Vec2(), 1, circle, NUM_CIRCLE_POINTS);
     text = new TextRenderer(new Font("Courier New", Font.PLAIN, 12));
   }
 
@@ -53,6 +60,23 @@ public class JoglDebugDraw extends DebugDraw {
   public void setViewportTransform(IViewportTransform viewportTransform) {
     viewportTransform.setYFlip(false);
     super.setViewportTransform(viewportTransform);
+  }
+
+  private final float[] mat = new float[16];
+
+  public void transformViewport(GL2 gl, Vec2 center) {
+    Vec2 e = viewportTransform.getExtents();
+    Vec2 vc = viewportTransform.getCenter();
+    Mat22 vt = viewportTransform.getMat22Representation();
+
+    int f = viewportTransform.isYFlip() ? -1 : 1;
+    mat[0] = vt.ex.x;     mat[4] = vt.ey.x;     mat[8] = 0;  mat[12] = e.x;
+    mat[1] = f * vt.ex.y; mat[5] = f * vt.ey.y; mat[9] = 0;  mat[13] = e.y;
+    mat[2] = 0;           mat[6] = 0;           mat[10] = 1; mat[14] = 0;
+    mat[3] = 0;           mat[7] = 0;           mat[11] = 0; mat[15] = 1;
+
+    gl.glMultMatrixf(mat, 0);
+    gl.glTranslatef(center.x - vc.x, center.y - vc.y, 0);
   }
 
   @Override
@@ -64,44 +88,90 @@ public class JoglDebugDraw extends DebugDraw {
     gl.glVertex2f(vec.x, vec.y);
     gl.glEnd();
   }
+  
+  private final Vec2 zero = new Vec2();
+
+  @Override
+  public void drawPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
+    GL2 gl = panel.getGL().getGL2();
+    gl.glPushMatrix();
+    transformViewport(gl, zero);
+    gl.glBegin(GL2.GL_LINE_LOOP);
+    gl.glColor4f(color.x, color.y, color.z, 1f);
+    for (int i = 0; i < vertexCount; i++) {
+      Vec2 v = vertices[i];
+      gl.glVertex2f(v.x, v.y);
+    }
+    gl.glEnd();
+    gl.glPopMatrix();
+  }
 
   private final Vec2 trans = new Vec2();
 
   @Override
   public void drawSolidPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
     GL2 gl = panel.getGL().getGL2();
+    gl.glPushMatrix();
+    transformViewport(gl, zero);
     gl.glBegin(GL2.GL_TRIANGLE_FAN);
     gl.glColor4f(color.x, color.y, color.z, .4f);
     for (int i = 0; i < vertexCount; i++) {
-      getWorldToScreenToOut(vertices[i], trans);
-      gl.glVertex2f(trans.x, trans.y);
+      Vec2 v = vertices[i];
+      gl.glVertex2f(v.x, v.y);
     }
     gl.glEnd();
-
+    
     gl.glBegin(GL2.GL_LINE_LOOP);
     gl.glColor4f(color.x, color.y, color.z, 1f);
     for (int i = 0; i < vertexCount; i++) {
-      getWorldToScreenToOut(vertices[i], trans);
-      gl.glVertex2f(trans.x, trans.y);
+      Vec2 v = vertices[i];
+      gl.glVertex2f(v.x, v.y);
     }
     gl.glEnd();
+    gl.glPopMatrix();
   }
 
   private final Vec2Array vec2Array = new Vec2Array();
 
   @Override
   public void drawCircle(Vec2 center, float radius, Color3f color) {
-    Vec2[] vecs = vec2Array.get(20);
-    generateCirle(center, radius, vecs, 20);
-    drawPolygon(vecs, 20, color);
+    GL2 gl = panel.getGL().getGL2();
+    gl.glPushMatrix();
+    transformViewport(gl, center);
+    gl.glScalef(radius, radius, radius);
+    gl.glBegin(GL2.GL_LINE_LOOP);
+    gl.glColor4f(color.x, color.y, color.z, 1f);
+    for (int i = 0; i < NUM_CIRCLE_POINTS; i++) {
+      Vec2 v = circle[i];
+      gl.glVertex2f(v.x, v.y);
+    }
+    gl.glEnd();
+    gl.glPopMatrix();
   }
 
   @Override
   public void drawSolidCircle(Vec2 center, float radius, Vec2 axis, Color3f color) {
-    Vec2[] vecs = vec2Array.get(20);
-    generateCirle(center, radius, vecs, 20);
-    drawSolidPolygon(vecs, 20, color);
-    drawSegment(center, vecs[0], color);
+    GL2 gl = panel.getGL().getGL2();
+    gl.glPushMatrix();
+    transformViewport(gl, center);
+    gl.glScalef(radius, radius, radius);
+    gl.glBegin(GL2.GL_TRIANGLE_FAN);
+    gl.glColor4f(color.x, color.y, color.z, .4f);
+    for (int i = 0; i < NUM_CIRCLE_POINTS; i++) {
+      Vec2 v = circle[i];
+      gl.glVertex2f(v.x, v.y);
+    }
+    gl.glEnd();
+
+    gl.glBegin(GL2.GL_LINE_LOOP);
+    gl.glColor4f(color.x, color.y, color.z, 1f);
+    for (int i = 0; i < NUM_CIRCLE_POINTS; i++) {
+      Vec2 v = circle[i];
+      gl.glVertex2f(v.x, v.y);
+    }
+    gl.glEnd();
+    gl.glPopMatrix();
+    //drawSegment(center, vecs[0], color);
   }
 
   @Override
@@ -115,13 +185,21 @@ public class JoglDebugDraw extends DebugDraw {
     gl.glVertex2f(trans.x, trans.y);
     gl.glEnd();
   }
-  
+
   @Override
   public void drawParticles(Vec2[] centers, float radius, ParticleColor[] colors, int count) {
-    // TODO Auto-generated method stub
-    
+    for (int i = 0; i < count; i++) {
+      Vec2 center = centers[i];
+      Color3f color3f;
+      if (colors != null) {
+        ParticleColor color = colors[i];
+        color3f = new Color3f(color.r * 1.0f / 255, color.g * 1.0f / 255, color.b * 1.0f / 255);
+      } else {
+        color3f = new Color3f(1, 1, 1);
+      }
+      drawCircle(center, radius, color3f);
+    }
   }
-
 
   private final Vec2 temp = new Vec2();
   private final Vec2 temp2 = new Vec2();

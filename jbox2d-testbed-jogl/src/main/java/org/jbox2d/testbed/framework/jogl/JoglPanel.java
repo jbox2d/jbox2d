@@ -76,10 +76,7 @@ public class JoglPanel extends GLJPanel implements TestbedPanel, GLEventListener
   }
 
   @Override
-  public void dispose(GLAutoDrawable arg0) {
-    // TODO Auto-generated method stub
-
-  }
+  public void dispose(GLAutoDrawable arg0) {}
 
   @Override
   public void init(GLAutoDrawable arg0) {

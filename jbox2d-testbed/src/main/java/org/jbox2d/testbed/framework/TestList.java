@@ -39,6 +39,7 @@ import org.jbox2d.testbed.tests.ConfinedTest;
 import org.jbox2d.testbed.tests.ContinuousTest;
 import org.jbox2d.testbed.tests.ConvexHull;
 import org.jbox2d.testbed.tests.ConveyorBelt;
+import org.jbox2d.testbed.tests.DamBreak;
 import org.jbox2d.testbed.tests.DistanceTest;
 import org.jbox2d.testbed.tests.DominoTest;
 import org.jbox2d.testbed.tests.DominoTower;
@@ -50,6 +51,7 @@ import org.jbox2d.testbed.tests.Gears;
 import org.jbox2d.testbed.tests.LiquidTest;
 import org.jbox2d.testbed.tests.MotorTest;
 import org.jbox2d.testbed.tests.OneSidedTest;
+import org.jbox2d.testbed.tests.ParticleTypes;
 import org.jbox2d.testbed.tests.Particles;
 import org.jbox2d.testbed.tests.PistonTest;
 import org.jbox2d.testbed.tests.PolyShapes;
@@ -68,6 +70,7 @@ import org.jbox2d.testbed.tests.Tumbler;
 import org.jbox2d.testbed.tests.VaryingFrictionTest;
 import org.jbox2d.testbed.tests.VaryingRestitution;
 import org.jbox2d.testbed.tests.VerticalStack;
+import org.jbox2d.testbed.tests.WaveMachine;
 import org.jbox2d.testbed.tests.Web;
 
 /**
@@ -78,12 +81,18 @@ public class TestList {
   public static void populateModel(TestbedModel model) {
 
     model.addCategory("Featured");
-    model.addTest(new Particles());
-    model.addTest(new Car());
+    model.addTest(new ParticleTypes());
     model.addTest(new DominoTest());
+    model.addTest(new Car());
     model.addTest(new CompoundShapes());
     model.addTest(new BlobTest4());
     model.addTest(new TheoJansen());
+    
+    // particles
+    model.addCategory("Particles");
+    model.addTest(new Particles());
+    model.addTest(new DamBreak());
+    model.addTest(new WaveMachine());
 
     // watching...
     model.addCategory("Collision Watching");
