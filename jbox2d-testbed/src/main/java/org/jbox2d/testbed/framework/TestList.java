@@ -43,15 +43,16 @@ import org.jbox2d.testbed.tests.DamBreak;
 import org.jbox2d.testbed.tests.DistanceTest;
 import org.jbox2d.testbed.tests.DominoTest;
 import org.jbox2d.testbed.tests.DominoTower;
+import org.jbox2d.testbed.tests.DrawingParticles;
 import org.jbox2d.testbed.tests.DynamicTreeTest;
 import org.jbox2d.testbed.tests.EdgeShapes;
 import org.jbox2d.testbed.tests.FixedPendulumTest;
 import org.jbox2d.testbed.tests.FreePendulumTest;
 import org.jbox2d.testbed.tests.Gears;
 import org.jbox2d.testbed.tests.LiquidTest;
+import org.jbox2d.testbed.tests.LiquidTimer;
 import org.jbox2d.testbed.tests.MotorTest;
 import org.jbox2d.testbed.tests.OneSidedTest;
-import org.jbox2d.testbed.tests.ParticleTypes;
 import org.jbox2d.testbed.tests.Particles;
 import org.jbox2d.testbed.tests.PistonTest;
 import org.jbox2d.testbed.tests.PolyShapes;
@@ -81,7 +82,8 @@ public class TestList {
   public static void populateModel(TestbedModel model) {
 
     model.addCategory("Featured");
-    model.addTest(new ParticleTypes());
+    model.addTest(new DrawingParticles());
+    model.addTest(new LiquidTimer());
     model.addTest(new DominoTest());
     model.addTest(new Car());
     model.addTest(new CompoundShapes());

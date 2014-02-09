@@ -171,7 +171,6 @@ public class DebugDrawJ2D extends DebugDraw {
 
   private final Vec2 zero = new Vec2();
   private final Color pcolor = new Color(1f, 1f, 1f, 1f);
-  private final Color pcolora = new Color(1f, 1f, 1f, .4f);
 
   @Override
   public void drawParticles(Vec2[] centers, float radius, ParticleColor[] colors, int count) {
@@ -182,15 +181,13 @@ public class DebugDrawJ2D extends DebugDraw {
     for (int i = 0; i < count; i++) {
       Vec2 center = centers[i];
       Color color;
-      Color acolor;
       if (colors == null) {
         color = pcolor;
-        acolor = pcolora;
       } else {
         ParticleColor c = colors[i];
         color = new Color(c.r, c.g, c.b, c.a);
-        acolor = new Color(c.r, c.g, c.b, c.a / 5);
       }
+      // No alpha channel, it slows everything down way too much.
       AffineTransform old = g.getTransform();
       g.translate(center.x, center.y);
       g.scale(radius, radius);

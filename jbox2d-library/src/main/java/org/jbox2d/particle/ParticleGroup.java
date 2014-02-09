@@ -109,6 +109,8 @@ public class ParticleGroup {
   public void setUserData(Object data) {
     m_userData = data;
   }
+  
+  
 
   public void updateStatistics() {
     if (m_timestamp != m_system.m_timestamp) {

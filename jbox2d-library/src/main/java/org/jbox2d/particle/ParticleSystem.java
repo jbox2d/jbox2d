@@ -240,13 +240,13 @@ public class ParticleSystem {
   }
 
   private final AABB temp = new AABB();
+  private final DestroyParticlesInShapeCallback dpcallback = new DestroyParticlesInShapeCallback();
 
   public int destroyParticlesInShape(Shape shape, Transform xf, boolean callDestructionListener) {
-    DestroyParticlesInShapeCallback callback =
-        new DestroyParticlesInShapeCallback(this, shape, xf, callDestructionListener);
+    dpcallback.init(this, shape, xf, callDestructionListener);
     shape.computeAABB(temp, xf, 0);
-    m_world.queryAABB(callback, temp);
-    return callback.destroyed;
+    m_world.queryAABB(dpcallback, temp);
+    return dpcallback.destroyed;
   }
 
   public void destroyParticlesInGroup(ParticleGroup group, boolean callDestructionListener) {
@@ -456,7 +456,7 @@ public class ParticleSystem {
     assert (m_groupCount > 0);
     assert (group != null);
 
-    if (m_world.getDestructionListener() != null) {
+    if (m_world.getParticleDestructionListener() != null) {
       m_world.getParticleDestructionListener().sayGoodbye(group);
     }
 
@@ -1192,9 +1192,7 @@ public class ParticleSystem {
           m_flagsBuffer.data[newCount] = m_flagsBuffer.data[i];
           m_positionBuffer.data[newCount].set(m_positionBuffer.data[i]);
           m_velocityBuffer.data[newCount].set(m_velocityBuffer.data[i]);
-          ParticleGroup group = m_groupBuffer[newCount];
           m_groupBuffer[newCount] = m_groupBuffer[i];
-          m_groupBuffer[i] = group;
           if (m_depthBuffer != null) {
             m_depthBuffer[newCount] = m_depthBuffer[i];
           }
@@ -1208,8 +1206,6 @@ public class ParticleSystem {
         newCount++;
       }
     }
-
-    // predicate functions
 
     // update proxies
     for (int k = 0; k < m_proxyCount; k++) {
@@ -1947,17 +1943,22 @@ public class ParticleSystem {
   };
 
   static class DestroyParticlesInShapeCallback implements QueryCallback {
-    final ParticleSystem system;
-    final Shape shape;
-    final Transform xf;
-    final boolean callDestructionListener;
+    ParticleSystem system;
+    Shape shape;
+    Transform xf;
+    boolean callDestructionListener;
     int destroyed;
 
-    public DestroyParticlesInShapeCallback(ParticleSystem system, Shape shape, Transform xf,
+    public DestroyParticlesInShapeCallback() {
+      // TODO Auto-generated constructor stub
+    }
+
+    public void init(ParticleSystem system, Shape shape, Transform xf,
         boolean callDestructionListener) {
       this.system = system;
       this.shape = shape;
       this.xf = xf;
+      this.destroyed = 0;
       this.callDestructionListener = callDestructionListener;
     }
 

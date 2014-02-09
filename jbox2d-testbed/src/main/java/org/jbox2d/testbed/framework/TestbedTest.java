@@ -100,7 +100,7 @@ public abstract class TestbedTest
   private final Vec2 bombSpawnPoint = new Vec2();
   private boolean bombSpawning = false;
 
-  private boolean mouseTracing;
+  protected boolean mouseTracing;
   private Vec2 mouseTracerPosition = new Vec2();
   private Vec2 mouseTracerVelocity = new Vec2();
 
@@ -234,6 +234,7 @@ public abstract class TestbedTest
     model.getDebugDraw().setViewportTransform(camera.getTransform());
 
     world.setDestructionListener(destructionListener);
+    world.setParticleDestructionListener(particleDestructionListener);
     world.setContactListener(this);
     world.setDebugDraw(model.getDebugDraw());
     title = getTestName();
