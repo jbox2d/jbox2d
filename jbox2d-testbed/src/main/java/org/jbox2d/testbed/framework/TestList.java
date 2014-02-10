@@ -53,6 +53,7 @@ import org.jbox2d.testbed.tests.LiquidTest;
 import org.jbox2d.testbed.tests.LiquidTimer;
 import org.jbox2d.testbed.tests.MotorTest;
 import org.jbox2d.testbed.tests.OneSidedTest;
+import org.jbox2d.testbed.tests.ParticleTypes;
 import org.jbox2d.testbed.tests.Particles;
 import org.jbox2d.testbed.tests.PistonTest;
 import org.jbox2d.testbed.tests.PolyShapes;

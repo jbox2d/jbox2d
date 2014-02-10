@@ -122,7 +122,7 @@ public class TestbedController implements Runnable {
       inputQueue.add(new QueueItem());
     }
   }
-  
+
   public void queuePause() {
     synchronized (inputQueue) {
       inputQueue.add(new QueueItem(QueueItemType.Pause));
@@ -216,59 +216,65 @@ public class TestbedController implements Runnable {
       model.getPanel().grabFocus();
     }
 
-    // process our input
-    if (!inputQueue.isEmpty()) {
+    if (currTest == null) {
       synchronized (inputQueue) {
-        if (currTest == null) {
-          inputQueue.clear();
-        } else {
-          IViewportTransform transform = currTest.getCamera().getTransform();
-          while (!inputQueue.isEmpty()) {
-            QueueItem i = inputQueue.pop();
-            boolean oldFlip = transform.isYFlip();
-            if (mouseBehavior == MouseBehavior.FORCE_Y_FLIP) {
-              transform.setYFlip(true);
-            }
-            currTest.getCamera().getTransform().getScreenToWorld(i.p, i.p);
-            if (mouseBehavior == MouseBehavior.FORCE_Y_FLIP) {
-              transform.setYFlip(oldFlip);
-            }
-            switch (i.type) {
-              case KeyPressed:
-                if (i.c != KeyEvent.CHAR_UNDEFINED) {
-                  model.getKeys()[i.c] = true;
-                }
-                model.getCodedKeys()[i.code] = true;
-                currTest.keyPressed(i.c, i.code);
-                break;
-              case KeyReleased:
-                if (i.c != KeyEvent.CHAR_UNDEFINED) {
-                  model.getKeys()[i.c] = false;
-                }
-                model.getCodedKeys()[i.code] = false;
-                currTest.keyReleased(i.c, i.code);
-                break;
-              case MouseDown:
-                currTest.mouseDown(i.p, i.button);
-                break;
-              case MouseMove:
-                currTest.mouseMove(i.p);
-                break;
-              case MouseUp:
-                currTest.mouseUp(i.p, i.button);
-                break;
-              case MouseDrag:
-                currTest.mouseDrag(i.p, i.button);
-                break;
-              case LaunchBomb:
-                currTest.lanchBomb();
-                break;
-              case Pause:
-                model.getSettings().pause = !model.getSettings().pause;
-                break;
-            }
-          }
+        inputQueue.clear();
+        return;
+      }
+    }
+    IViewportTransform transform = currTest.getCamera().getTransform();
+    // process our input
+    while (!inputQueue.isEmpty()) {
+      QueueItem i = null;
+      synchronized (inputQueue) {
+        if (!inputQueue.isEmpty()) {
+          i = inputQueue.pop();
         }
+      }
+      if (i == null) {
+        continue;
+      }
+      boolean oldFlip = transform.isYFlip();
+      if (mouseBehavior == MouseBehavior.FORCE_Y_FLIP) {
+        transform.setYFlip(true);
+      }
+      currTest.getCamera().getTransform().getScreenToWorld(i.p, i.p);
+      if (mouseBehavior == MouseBehavior.FORCE_Y_FLIP) {
+        transform.setYFlip(oldFlip);
+      }
+      switch (i.type) {
+        case KeyPressed:
+          if (i.c != KeyEvent.CHAR_UNDEFINED) {
+            model.getKeys()[i.c] = true;
+          }
+          model.getCodedKeys()[i.code] = true;
+          currTest.keyPressed(i.c, i.code);
+          break;
+        case KeyReleased:
+          if (i.c != KeyEvent.CHAR_UNDEFINED) {
+            model.getKeys()[i.c] = false;
+          }
+          model.getCodedKeys()[i.code] = false;
+          currTest.keyReleased(i.c, i.code);
+          break;
+        case MouseDown:
+          currTest.mouseDown(i.p, i.button);
+          break;
+        case MouseMove:
+          currTest.mouseMove(i.p);
+          break;
+        case MouseUp:
+          currTest.mouseUp(i.p, i.button);
+          break;
+        case MouseDrag:
+          currTest.mouseDrag(i.p, i.button);
+          break;
+        case LaunchBomb:
+          currTest.lanchBomb();
+          break;
+        case Pause:
+          model.getSettings().pause = !model.getSettings().pause;
+          break;
       }
     }
 
@@ -484,6 +490,7 @@ class QueueItem {
   public QueueItem() {
     type = QueueItemType.LaunchBomb;
   }
+
   public QueueItem(QueueItemType t) {
     type = t;
   }

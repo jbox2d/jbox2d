@@ -681,6 +681,9 @@ public class ParticleSystem {
     if ((m_allParticleFlags & ParticleType.b2_zombieParticle) != 0) {
       solveZombie();
     }
+    if (m_count == 0) {
+      return;
+    }
     m_allGroupFlags = 0;
     for (ParticleGroup group = m_groupList; group != null; group = group.getNext()) {
       m_allGroupFlags |= group.m_groupFlags;
@@ -1942,7 +1945,7 @@ public class ParticleSystem {
     ParticleGroup groupB;
   };
 
-  static class DestroyParticlesInShapeCallback implements QueryCallback {
+  static class DestroyParticlesInShapeCallback implements ParticleQueryCallback {
     ParticleSystem system;
     Shape shape;
     Transform xf;
@@ -1963,10 +1966,6 @@ public class ParticleSystem {
     }
 
     @Override
-    public boolean reportFixture(Fixture fixture) {
-      return false;
-    }
-
     public boolean reportParticle(int index) {
       assert (index >= 0 && index < system.m_count);
       if (shape.testPoint(xf, system.m_positionBuffer.data[index])) {

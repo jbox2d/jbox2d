@@ -21,7 +21,7 @@ public class VoronoiDiagram {
       m_i = i;
       m_generator = g;
     }
-    
+
     public VoronoiDiagramTask set(int x, int y, int i, Generator g) {
       m_x = x;
       m_y = y;
@@ -43,6 +43,9 @@ public class VoronoiDiagram {
 
   public VoronoiDiagram(int generatorCapacity) {
     m_generatorBuffer = new Generator[generatorCapacity];
+    for (int i = 0; i < generatorCapacity; i++) {
+      m_generatorBuffer[i] = new Generator();
+    }
     m_generatorCount = 0;
     m_countX = 0;
     m_countY = 0;
@@ -137,6 +140,7 @@ public class VoronoiDiagram {
           queue.push(taskPool.pop().set(x, y + 1, i + m_countX, g));
         }
       }
+      taskPool.push(front);
     }
     int maxIteration = m_countX + m_countY;
     for (int iteration = 0; iteration < maxIteration; iteration++) {
@@ -195,6 +199,7 @@ public class VoronoiDiagram {
             updated = true;
           }
         }
+        taskPool.push(front);
       }
       if (!updated) {
         break;
