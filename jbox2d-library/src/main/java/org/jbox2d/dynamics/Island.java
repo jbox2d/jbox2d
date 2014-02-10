@@ -309,7 +309,7 @@ public class Island {
       m_joints[i].initVelocityConstraints(solverData);
     }
 
-    profile.solveInit = timer.getMilliseconds();
+    profile.solveInit.accum(timer.getMilliseconds());
 
     // Solve velocity constraints
     timer.reset();
@@ -324,7 +324,7 @@ public class Island {
 
     // Store impulses for warm starting
     contactSolver.storeImpulses();
-    profile.solveVelocity = timer.getMilliseconds();
+    profile.solveVelocity.accum(timer.getMilliseconds());
 
     // Integrate positions
     for (int i = 0; i < m_bodyCount; ++i) {
@@ -390,7 +390,7 @@ public class Island {
       body.synchronizeTransform();
     }
 
-    profile.solvePosition = timer.getMilliseconds();
+    profile.solvePosition.accum(timer.getMilliseconds());
 
     report(contactSolver.m_velocityConstraints);
 

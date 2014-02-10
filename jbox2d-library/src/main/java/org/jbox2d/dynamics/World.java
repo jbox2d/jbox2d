@@ -569,6 +569,7 @@ public class World {
    */
   public void step(float dt, int velocityIterations, int positionIterations) {
     stepTimer.reset();
+    tempTimer.reset();
     // log.debug("Starting step");
     // If new fixtures were added, we need to find the new contacts.
     if ((m_flags & NEW_FIXTURE) == NEW_FIXTURE) {
@@ -591,24 +592,25 @@ public class World {
     step.dtRatio = m_inv_dt0 * dt;
 
     step.warmStarting = m_warmStarting;
+    m_profile.stepInit.record(tempTimer.getMilliseconds());
 
     // Update contacts. This is where some contacts are destroyed.
     tempTimer.reset();
     m_contactManager.collide();
-    m_profile.collide = tempTimer.getMilliseconds();
+    m_profile.collide.record(tempTimer.getMilliseconds());
 
     // Integrate velocities, solve velocity constraints, and integrate positions.
     if (m_stepComplete && step.dt > 0.0f) {
       tempTimer.reset();
       solve(step);
-      m_profile.solve = tempTimer.getMilliseconds();
+      m_profile.solve.record(tempTimer.getMilliseconds());
     }
 
     // Handle TOI events.
     if (m_continuousPhysics && step.dt > 0.0f) {
       tempTimer.reset();
       solveTOI(step);
-      m_profile.solveTOI = tempTimer.getMilliseconds();
+      m_profile.solveTOI.record(tempTimer.getMilliseconds());
     }
 
     if (step.dt > 0.0f) {
@@ -622,7 +624,7 @@ public class World {
     m_flags &= ~LOCKED;
     // log.debug("ending step");
 
-    m_profile.step = stepTimer.getMilliseconds();
+    m_profile.step.record(stepTimer.getMilliseconds());
   }
 
   /**
@@ -964,13 +966,12 @@ public class World {
 
   private final Island island = new Island();
   private Body[] stack = new Body[10]; // TODO djm find a good initial stack number;
-  private final Profile islandProfile = new Profile();
   private final Timer broadphaseTimer = new Timer();
 
   private void solve(TimeStep step) {
-    m_profile.solveInit = 0;
-    m_profile.solveVelocity = 0;
-    m_profile.solvePosition = 0;
+    m_profile.solveInit.startAccum();
+    m_profile.solveVelocity.startAccum();
+    m_profile.solvePosition.startAccum();
 
     // Size the island for the worst case.
     island.init(m_bodyCount, m_contactManager.m_contactCount, m_jointCount,
@@ -1089,10 +1090,7 @@ public class World {
           other.m_flags |= Body.e_islandFlag;
         }
       }
-      island.solve(islandProfile, step, m_gravity, m_allowSleep);
-      m_profile.solveInit += islandProfile.solveInit;
-      m_profile.solveVelocity += islandProfile.solveVelocity;
-      m_profile.solvePosition += islandProfile.solvePosition;
+      island.solve(m_profile, step, m_gravity, m_allowSleep);
 
       // Post solve cleanup.
       for (int i = 0; i < island.m_bodyCount; ++i) {
@@ -1103,6 +1101,9 @@ public class World {
         }
       }
     }
+    m_profile.solveInit.endAccum();
+    m_profile.solveVelocity.endAccum();
+    m_profile.solvePosition.endAccum();
 
     broadphaseTimer.reset();
     // Synchronize fixtures, check for out of range bodies.
@@ -1122,7 +1123,7 @@ public class World {
 
     // Look for new contacts.
     m_contactManager.findNewContacts();
-    m_profile.broadphase = broadphaseTimer.getMilliseconds();
+    m_profile.broadphase.record(broadphaseTimer.getMilliseconds());
   }
 
   private final Island toiIsland = new Island();
