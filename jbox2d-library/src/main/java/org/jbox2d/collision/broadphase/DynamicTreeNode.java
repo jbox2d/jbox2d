@@ -52,8 +52,7 @@ public class DynamicTreeNode {
     userData = argData;
   }
 
-  /**
-   * Should never be constructed outside the engine
-   */
-  protected DynamicTreeNode(int id) { this.id = id;}
+  protected DynamicTreeNode(int id) {
+    this.id = id;
+  }
 }
