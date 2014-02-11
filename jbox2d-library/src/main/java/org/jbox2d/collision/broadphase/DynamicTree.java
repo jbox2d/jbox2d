@@ -28,6 +28,7 @@ import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
+import org.jbox2d.common.BufferUtils;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
@@ -53,7 +54,8 @@ public class DynamicTree implements BroadPhaseStrategy {
   private int m_freeList;
 
   private final Vec2[] drawVecs = new Vec2[4];
-  private final TreeNodeStack nodeStack = new TreeNodeStack(10);
+  private DynamicTreeNode[] nodeStack = new DynamicTreeNode[20];
+  private int nodeStackIndex = 0;
 
   public DynamicTree() {
     m_root = null;
@@ -157,11 +159,11 @@ public class DynamicTree implements BroadPhaseStrategy {
 
   @Override
   public final void query(TreeCallback callback, AABB aabb) {
-    nodeStack.reset();
-    nodeStack.push(m_root);
+    nodeStackIndex = 0;
+    nodeStack[nodeStackIndex++] = m_root;
 
-    while (nodeStack.getCount() > 0) {
-      DynamicTreeNode node = nodeStack.pop();
+    while (nodeStackIndex > 0) {
+      DynamicTreeNode node = nodeStack[--nodeStackIndex];
       if (node == null) {
         continue;
       }
@@ -173,8 +175,13 @@ public class DynamicTree implements BroadPhaseStrategy {
             return;
           }
         } else {
-          nodeStack.push(node.child1);
-          nodeStack.push(node.child2);
+          if (nodeStack.length - nodeStackIndex - 2 <= 0) {
+            DynamicTreeNode[] newBuffer = new DynamicTreeNode[nodeStack.length * 2];
+            System.arraycopy(nodeStack, 0, newBuffer, 0, nodeStack.length);
+            nodeStack = newBuffer;
+          }
+          nodeStack[nodeStackIndex++] = node.child1;
+          nodeStack[nodeStackIndex++] = node.child2;
         }
       }
     }
@@ -228,10 +235,10 @@ public class DynamicTree implements BroadPhaseStrategy {
     segAABB.upperBound.y = p1y > tempy ? p1y : tempy;
     // end inline
 
-    nodeStack.reset();
-    nodeStack.push(m_root);
-    while (nodeStack.getCount() > 0) {
-      final DynamicTreeNode node = nodeStack.pop();
+    nodeStackIndex = 0;
+    nodeStack[nodeStackIndex++] = m_root;
+    while (nodeStackIndex > 0) {
+      final DynamicTreeNode node = nodeStack[--nodeStackIndex];
       if (node == null) {
         continue;
       }
@@ -284,8 +291,13 @@ public class DynamicTree implements BroadPhaseStrategy {
           segAABB.upperBound.y = p1y > tempy ? p1y : tempy;
         }
       } else {
-        nodeStack.push(node.child1);
-        nodeStack.push(node.child2);
+        if (nodeStack.length - nodeStackIndex - 2 <= 0) {
+          DynamicTreeNode[] newBuffer = new DynamicTreeNode[nodeStack.length * 2];
+          System.arraycopy(nodeStack, 0, newBuffer, 0, nodeStack.length);
+          nodeStack = newBuffer;
+        }
+        nodeStack[nodeStackIndex++] = node.child1;
+        nodeStack[nodeStackIndex++] = node.child2;
       }
     }
   }
@@ -599,7 +611,7 @@ public class DynamicTree implements BroadPhaseStrategy {
 
       index = index.parent;
     }
-    validate();
+    // validate();
   }
 
   private final void removeLeaf(DynamicTreeNode leaf) {

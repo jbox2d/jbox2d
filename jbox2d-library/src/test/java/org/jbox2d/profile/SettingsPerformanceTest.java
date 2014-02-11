@@ -1,17 +1,28 @@
 package org.jbox2d.profile;
 
 import org.jbox2d.common.Settings;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.World;
+import org.jbox2d.profile.worlds.PerformanceTestWorld;
+import org.jbox2d.profile.worlds.PistonWorld;
 
-public abstract class SettingsPerformanceTest extends BasicPerformanceTest {
+public class SettingsPerformanceTest extends BasicPerformanceTest {
 
   private static int NUM_TESTS = 14;
+  private PerformanceTestWorld world;
 
-  public SettingsPerformanceTest(int iters) {
-    super(NUM_TESTS, iters);
+  public SettingsPerformanceTest(int iters, PerformanceTestWorld world) {
+    super(NUM_TESTS, iters, 800);
+    this.world = world;
+  }
+
+  public static void main(String[] args) {
+    SettingsPerformanceTest benchmark = new SettingsPerformanceTest(10, new PistonWorld());
+    benchmark.go();
   }
 
   @Override
-  public void runTest(int testNum) {
+  public void setupTest(int testNum) {
     Settings.FAST_ABS = testNum == 1;
     Settings.FAST_ATAN2 = testNum == 2;
     Settings.FAST_CEIL = testNum == 3;
@@ -36,11 +47,14 @@ public abstract class SettingsPerformanceTest extends BasicPerformanceTest {
       Settings.FAST_ROUND = testNum != 12;
       Settings.SINCOS_LUT_ENABLED = testNum != 13;
     }
-
-    runBenchmarkWorld();
+    World w = new World(new Vec2(0, -10));
+    world.setupWorld(w);
   }
 
-  public abstract void runBenchmarkWorld();
+  @Override
+  public void step(int testNum) {
+    world.step();
+  }
 
   @Override
   public String getTestName(int testNum) {
