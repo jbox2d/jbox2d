@@ -40,10 +40,6 @@ public class DynamicTreeNode {
   protected final int id;
   protected int height;
 
-  public final boolean isLeaf() {
-    return child1 == null;
-  }
-
   public Object getUserData() {
     return userData;
   }
