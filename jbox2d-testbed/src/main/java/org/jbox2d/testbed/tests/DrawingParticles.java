@@ -67,7 +67,7 @@ public class DrawingParticles extends TestbedTest {
     super.step(settings);
 
     addTextLine("Keys: (L) liquid, (E) elastic, (S) spring");
-    addTextLine("(R) rigid, (W) wall, (V) viscous, (T) tensile");
+    addTextLine("(F) rigid, (W) wall, (V) viscous, (T) tensile");
     addTextLine("(Z) erase, (X) move");
   }
 
@@ -150,5 +150,4 @@ public class DrawingParticles extends TestbedTest {
   public String getTestName() {
     return "Drawing Particles";
   }
-
 }

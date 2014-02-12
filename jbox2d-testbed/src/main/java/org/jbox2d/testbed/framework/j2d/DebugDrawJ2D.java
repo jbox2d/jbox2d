@@ -51,6 +51,7 @@ import org.jbox2d.testbed.pooling.ColorPool;
  * @author Daniel Murphy
  */
 public class DebugDrawJ2D extends DebugDraw {
+  public static boolean DISABLE_FILL = true;
   public static int circlePoints = 13;
   public static final float edgeWidth = 0.02f;
 
@@ -157,9 +158,11 @@ public class DebugDrawJ2D extends DebugDraw {
     g.setStroke(stroke);
     Color f = cpool.getColor(color.x, color.y, color.z, .4f);
     Color s = cpool.getColor(color.x, color.y, color.z, 1f);
-    g.setColor(f);
     g.scale(radius, radius);
-    g.fill(circle);
+    if (!DISABLE_FILL) {
+      g.setColor(f);
+      g.fill(circle);
+    }
     g.setColor(s);
     g.draw(circle);
     g.rotate(MathUtils.atan2(axis.y, axis.x));
@@ -215,8 +218,10 @@ public class DebugDrawJ2D extends DebugDraw {
       xInts[i] = (int) temp.x;
       yInts[i] = (int) temp.y;
     }
-    g.setColor(f);
-    g.fillPolygon(xInts, yInts, vertexCount);
+    if (!DISABLE_FILL) {
+      g.setColor(f);
+      g.fillPolygon(xInts, yInts, vertexCount);
+    }
     g.setStroke(stroke);
     g.setColor(s);
     g.drawPolygon(xInts, yInts, vertexCount);
