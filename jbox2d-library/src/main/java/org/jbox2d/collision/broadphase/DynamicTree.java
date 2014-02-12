@@ -28,7 +28,6 @@ import org.jbox2d.callbacks.TreeCallback;
 import org.jbox2d.callbacks.TreeRayCastCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.RayCastInput;
-import org.jbox2d.common.BufferUtils;
 import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
@@ -97,7 +96,7 @@ public class DynamicTree implements BroadPhaseStrategy {
   public final void destroyProxy(int proxyId) {
     assert (0 <= proxyId && proxyId < m_nodeCapacity);
     DynamicTreeNode node = m_nodes[proxyId];
-    assert (node.isLeaf());
+    assert (node.child1 == null);
 
     removeLeaf(node);
     freeNode(node);
@@ -107,7 +106,7 @@ public class DynamicTree implements BroadPhaseStrategy {
   public final boolean moveProxy(int proxyId, final AABB aabb, Vec2 displacement) {
     assert (0 <= proxyId && proxyId < m_nodeCapacity);
     final DynamicTreeNode node = m_nodes[proxyId];
-    assert (node.isLeaf());
+    assert (node.child1 == null);
 
     final AABB nodeAABB = node.aabb;
     // if (nodeAABB.contains(aabb)) {
@@ -263,7 +262,7 @@ public class DynamicTree implements BroadPhaseStrategy {
         continue;
       }
 
-      if (node.isLeaf()) {
+      if (node.child1 == null) {
         subInput.p1.x = p1x;
         subInput.p1.y = p1y;
         subInput.p2.x = p2x;
@@ -310,7 +309,7 @@ public class DynamicTree implements BroadPhaseStrategy {
   private final int computeHeight(DynamicTreeNode node) {
     assert (0 <= node.id && node.id < m_nodeCapacity);
 
-    if (node.isLeaf()) {
+    if (node.child1 == null) {
       return 0;
     }
     int height1 = computeHeight(node.child1);
@@ -356,7 +355,7 @@ public class DynamicTree implements BroadPhaseStrategy {
         continue;
       }
 
-      assert (node.isLeaf() == false);
+      assert (node.child1 == null == false);
 
       DynamicTreeNode child1 = node.child1;
       DynamicTreeNode child2 = node.child2;
@@ -405,7 +404,7 @@ public class DynamicTree implements BroadPhaseStrategy {
       }
 
       DynamicTreeNode node = m_nodes[i];
-      if (node.isLeaf()) {
+      if (node.child1 == null) {
         node.parent = null;
         nodes[count] = i;
         ++count;
@@ -531,7 +530,7 @@ public class DynamicTree implements BroadPhaseStrategy {
 
       // Cost of descending into child1
       float cost1;
-      if (child1.isLeaf()) {
+      if (child1.child1 == null) {
         combinedAABB.combine(leafAABB, child1.aabb);
         cost1 = combinedAABB.getPerimeter() + inheritanceCost;
       } else {
@@ -543,7 +542,7 @@ public class DynamicTree implements BroadPhaseStrategy {
 
       // Cost of descending into child2
       float cost2;
-      if (child2.isLeaf()) {
+      if (child2.child1 == null) {
         combinedAABB.combine(leafAABB, child2.aabb);
         cost2 = combinedAABB.getPerimeter() + inheritanceCost;
       } else {
@@ -667,7 +666,7 @@ public class DynamicTree implements BroadPhaseStrategy {
     assert (iA != null);
 
     DynamicTreeNode A = iA;
-    if (A.isLeaf() || A.height < 2) {
+    if (A.child1 == null || A.height < 2) {
       return iA;
     }
 
@@ -799,7 +798,7 @@ public class DynamicTree implements BroadPhaseStrategy {
     DynamicTreeNode child1 = node.child1;
     DynamicTreeNode child2 = node.child2;
 
-    if (node.isLeaf()) {
+    if (node.child1 == null) {
       assert (child1 == null);
       assert (child2 == null);
       assert (node.height == 0);
@@ -824,7 +823,7 @@ public class DynamicTree implements BroadPhaseStrategy {
     DynamicTreeNode child1 = node.child1;
     DynamicTreeNode child2 = node.child2;
 
-    if (node.isLeaf()) {
+    if (node.child1 == null) {
       assert (child1 == null);
       assert (child2 == null);
       assert (node.height == 0);
@@ -876,41 +875,6 @@ public class DynamicTree implements BroadPhaseStrategy {
     }
     if (node.child2 != null) {
       drawTree(argDraw, node.child2, spot + 1, height);
-    }
-  }
-
-  public class TreeNodeStack {
-    private DynamicTreeNode[] stack;
-    private int size;
-    private int position;
-
-    public TreeNodeStack(int initialSize) {
-      stack = new DynamicTreeNode[initialSize];
-      position = 0;
-      size = initialSize;
-    }
-
-    public void reset() {
-      position = 0;
-    }
-
-    public DynamicTreeNode pop() {
-      assert (position > 0);
-      return stack[--position];
-    }
-
-    public void push(DynamicTreeNode i) {
-      if (position == size) {
-        DynamicTreeNode[] old = stack;
-        stack = new DynamicTreeNode[size * 2];
-        size = stack.length;
-        System.arraycopy(old, 0, stack, 0, old.length);
-      }
-      stack[position++] = i;
-    }
-
-    public int getCount() {
-      return position;
     }
   }
 }

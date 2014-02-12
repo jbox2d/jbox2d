@@ -97,7 +97,6 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
 
     insertLeaf(node);
 
-    assert (node != NULL_NODE);
     return node;
   }
 
@@ -471,9 +470,7 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
     m_freeList = m_parent[node];
     m_parent[node] = NULL_NODE;
     m_child1[node] = NULL_NODE;
-    m_child2[node] = NULL_NODE;
     m_height[node] = 0;
-    m_userData[node] = null;
     ++m_nodeCount;
     return node;
   }
@@ -871,41 +868,6 @@ public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
     }
     if (c2 != NULL_NODE) {
       drawTree(argDraw, c2, spot + 1, height);
-    }
-  }
-
-  public class TreeNodeStack {
-    private int[] stack;
-    private int size;
-    private int position;
-
-    public TreeNodeStack(int initialSize) {
-      stack = new int[initialSize];
-      position = 0;
-      size = initialSize;
-    }
-
-    public void reset() {
-      position = 0;
-    }
-
-    public int pop() {
-      assert (position > 0);
-      return stack[--position];
-    }
-
-    public void push(int i) {
-      if (position == size) {
-        int[] old = stack;
-        stack = new int[size * 2];
-        size = stack.length;
-        System.arraycopy(old, 0, stack, 0, old.length);
-      }
-      stack[position++] = i;
-    }
-
-    public int getCount() {
-      return position;
     }
   }
 }

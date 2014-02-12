@@ -12,7 +12,7 @@ public class SettingsPerformanceTest extends BasicPerformanceTest {
   private PerformanceTestWorld world;
 
   public SettingsPerformanceTest(int iters, PerformanceTestWorld world) {
-    super(NUM_TESTS, iters, 800);
+    super(NUM_TESTS, iters, 300);
     this.world = world;
   }
 
@@ -20,9 +20,15 @@ public class SettingsPerformanceTest extends BasicPerformanceTest {
     SettingsPerformanceTest benchmark = new SettingsPerformanceTest(10, new PistonWorld());
     benchmark.go();
   }
-
+  
   @Override
   public void setupTest(int testNum) {
+    World w = new World(new Vec2(0, -10));
+    world.setupWorld(w);
+  }
+
+  @Override
+  public void preStep(int testNum) {
     Settings.FAST_ABS = testNum == 1;
     Settings.FAST_ATAN2 = testNum == 2;
     Settings.FAST_CEIL = testNum == 3;
@@ -47,8 +53,6 @@ public class SettingsPerformanceTest extends BasicPerformanceTest {
       Settings.FAST_ROUND = testNum != 12;
       Settings.SINCOS_LUT_ENABLED = testNum != 13;
     }
-    World w = new World(new Vec2(0, -10));
-    world.setupWorld(w);
   }
 
   @Override
@@ -86,7 +90,7 @@ public class SettingsPerformanceTest extends BasicPerformanceTest {
       case 12:
         return "no Fast round";
       case 13:
-        return "no Sincos lookup table";
+        return "no Sincos lookup";
       default:
         return "";
     }

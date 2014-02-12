@@ -14,8 +14,9 @@ public class BroadphasePerformanceTest extends BasicPerformanceTest {
   private PerformanceTestWorld world;
 
   public BroadphasePerformanceTest(int iters, PerformanceTestWorld world) {
-    super(NUM_TESTS, iters, 800);
+    super(NUM_TESTS, iters, 1000);
     this.world = world;
+    setFormat(ResultFormat.MILLISECONDS);
   }
 
   public static void main(String[] args) {

@@ -36,7 +36,21 @@ import org.jbox2d.common.MathUtils;
  * @author Daniel Murphy
  */
 public abstract class BasicPerformanceTest {
+  public static enum ResultFormat {
+    MILLISECONDS(1000000, "Milliseconds"), MICROSECONDS(1000, "Microseconds"), NANOSECONDS(1,
+        "Nanoseconds");
 
+    private final int divisor;
+    private final String name;
+
+    private ResultFormat(int divisor, String name) {
+      assert (divisor != 0);
+      this.divisor = divisor;
+      this.name = name;
+    }
+  }
+
+  private ResultFormat format = ResultFormat.MICROSECONDS;
   private final int numTests, iters, frames;
   protected final DescriptiveStatistics[] stats;
   private ArrayList<Integer> testOrder = new ArrayList<Integer>();
@@ -47,36 +61,50 @@ public abstract class BasicPerformanceTest {
     this.frames = frames;
     stats = new DescriptiveStatistics[numTests];
     for (int i = 0; i < numTests; i++) {
-      stats[i] = new DescriptiveStatistics(iters*frames + 1);
+      stats[i] = new DescriptiveStatistics(iters * frames + 1);
       testOrder.add(i);
     }
+  }
+  
+  public void setFormat(ResultFormat format) {
+    this.format = format;
   }
 
   public void go() {
     long prev, after;
     // warmup
     println("Warmup");
-    for (int i = 0; i < MathUtils.max(1, iters / 10); i++) {
+    int warmupIters = iters / 10;
+    for (int i = 0; i < warmupIters; i++) {
+      println(i * 100.0 / warmupIters + "%");
       Collections.shuffle(testOrder);
       for (int test = 0; test < numTests; test++) {
-        int runningTest = testOrder.get(test);
-        setupTest(runningTest);
-        for (int j = 0; j < frames; j++) {
+        setupTest(test);
+      }
+      for (int j = 0; j < frames; j++) {
+        Collections.shuffle(testOrder);
+        for (int test = 0; test < numTests; test++) {
+          int runningTest = testOrder.get(test);
+          preStep(runningTest);
           step(runningTest);
         }
       }
     }
+    println("Testing");
     for (int i = 0; i < iters; i++) {
       println(i * 100.0 / iters + "%");
-      Collections.shuffle(testOrder);
       for (int test = 0; test < numTests; test++) {
-        int runningTest = testOrder.get(test);
-        setupTest(runningTest);
-        for (int j = 0; j < frames; j++) {
+        setupTest(test);
+      }
+      for (int j = 0; j < frames; j++) {
+        Collections.shuffle(testOrder);
+        for (int test = 0; test < numTests; test++) {
+          int runningTest = testOrder.get(test);
+          preStep(runningTest);
           prev = System.nanoTime();
           step(runningTest);
           after = System.nanoTime();
-          stats[runningTest].addValue((after - prev) * 1d / 1000000);
+          stats[runningTest].addValue((after - prev));
         }
       }
     }
@@ -84,11 +112,10 @@ public abstract class BasicPerformanceTest {
   }
 
   public void printResults() {
-    printf("%-20s%20s%20s%20s\n", "Test Name", "Milliseconds Avg", "StdDev", "95% Interval");
-
+    printf("%-20s%20s%20s%20s\n", "Test Name", format.name + " Avg", "StdDev", "95% Interval");
     for (int i = 0; i < numTests; i++) {
-      double mean = stats[i].getMean();
-      double stddev = stats[i].getStandardDeviation();
+      double mean = stats[i].getMean() / format.divisor;
+      double stddev = stats[i].getStandardDeviation() / format.divisor;
       double diff = 1.96 * stddev / MathUtils.sqrt(stats[i].getN());
       printf("%-20s%20.3f%20.3f  (%7.3f,%7.3f)\n", getTestName(i), mean, stddev, mean - diff, mean
           + diff);
@@ -96,6 +123,8 @@ public abstract class BasicPerformanceTest {
   }
 
   public void setupTest(int testNum) {}
+
+  public void preStep(int testNum) {}
 
   public abstract void step(int testNum);
 

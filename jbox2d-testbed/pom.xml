@@ -17,6 +17,20 @@
 			<artifactId>jbox2d-library</artifactId>
 			<version>2.2.1.2-SNAPSHOT</version>
 			<type>jar</type>
+    		<classifier>tests</classifier>
+			<scope>compile</scope>
+		</dependency>
+	  	<dependency>
+	  		<groupId>org.apache.commons</groupId>
+	  		<artifactId>commons-math3</artifactId>
+	  		<version>3.2</version>
+	  		<scope>compile</scope>
+	  	</dependency>
+		<dependency>
+			<groupId>org.jbox2d</groupId>
+			<artifactId>jbox2d-library</artifactId>
+			<version>2.2.1.2-SNAPSHOT</version>
+			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
