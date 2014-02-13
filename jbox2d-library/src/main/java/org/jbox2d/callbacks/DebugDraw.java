@@ -153,6 +153,9 @@ public abstract class DebugDraw {
 	 */
 	public abstract void drawString(float x, float y, String s, Color3f color);
 	
+	/** Called at the end of drawing a world */
+	public void flush() {}
+	
 	public void drawString(Vec2 pos, String s, Color3f color) {
 	  drawString(pos.x, pos.y, s, color);
 	}
