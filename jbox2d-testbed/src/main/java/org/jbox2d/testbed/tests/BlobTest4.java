@@ -135,8 +135,12 @@ public class BlobTest4 extends TestbedTest {
   }
 
   @Override
+  public Vec2 getDefaultCameraPos() {
+    return new Vec2(0, 10);
+  }
+
+  @Override
   public String getTestName() {
     return "Blob Joint";
   }
-
 }

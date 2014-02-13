@@ -25,7 +25,6 @@ package org.jbox2d.testbed.framework.jogl;
 
 import java.awt.Font;
 
-import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
 import org.jbox2d.callbacks.DebugDraw;

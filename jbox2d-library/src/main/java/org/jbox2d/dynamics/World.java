@@ -630,6 +630,8 @@ public class World {
     if (m_stepComplete && step.dt > 0.0f) {
       tempTimer.reset();
       m_particleSystem.solve(step); // Particle Simulation
+      m_profile.solveParticleSystem.record(tempTimer.getMilliseconds());
+      tempTimer.reset();
       solve(step);
       m_profile.solve.record(tempTimer.getMilliseconds());
     }
@@ -763,7 +765,7 @@ public class World {
     if ((flags & DebugDraw.e_dynamicTreeBit) != 0) {
       m_contactManager.m_broadPhase.drawTree(m_debugDraw);
     }
-    
+
     m_debugDraw.flush();
   }
 

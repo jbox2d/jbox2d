@@ -317,7 +317,7 @@ public abstract class TestbedTest
    * Override for a different default camera position
    */
   public Vec2 getDefaultCameraPos() {
-    return new Vec2(0, 10);
+    return new Vec2(0, 20);
   }
 
   /**
@@ -453,7 +453,7 @@ public abstract class TestbedTest
       // Vec2.watchCreations = true;
       debugDraw.drawString(5, m_textLine, "Engine Info", color4);
       m_textLine += TEXT_LINE_SPACE;
-      debugDraw.drawString(5, m_textLine, "Framerate: " + model.getCalculatedFps(), Color3f.WHITE);
+      debugDraw.drawString(5, m_textLine, String.format("Framerate: %.2f", model.getCalculatedFps()), Color3f.WHITE);
       m_textLine += TEXT_LINE_SPACE;
 
       int particleCount = m_world.getParticleCount();

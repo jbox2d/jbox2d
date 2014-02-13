@@ -73,6 +73,7 @@ public class Profile {
   public final ProfileEntry step = new ProfileEntry();
   public final ProfileEntry stepInit = new ProfileEntry();
   public final ProfileEntry collide = new ProfileEntry();
+  public final ProfileEntry solveParticleSystem = new ProfileEntry();
   public final ProfileEntry solve = new ProfileEntry();
   public final ProfileEntry solveInit = new ProfileEntry();
   public final ProfileEntry solveVelocity = new ProfileEntry();
@@ -85,6 +86,7 @@ public class Profile {
     strings.add(" step: " + step);
     strings.add("  init: " + stepInit);
     strings.add("  collide: " + collide);
+    strings.add("  particles: " + solveParticleSystem);
     strings.add("  solve: " + solve);
     strings.add("   solveInit: " + solveInit);
     strings.add("   solveVelocity: " + solveVelocity);

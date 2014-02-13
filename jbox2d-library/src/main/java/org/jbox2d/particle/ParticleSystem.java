@@ -34,11 +34,11 @@ public class ParticleSystem {
   static final int xTruncBits = 12;
   static final int yTruncBits = 12;
   static final int tagBits = 8 * 4 - 1  /* sizeof(int) */;
-  static final long yOffset = 1 << (yTruncBits - 1);
+  static final int yOffset = 1 << (yTruncBits - 1);
   static final int yShift = tagBits - yTruncBits;
   static final int xShift = tagBits - yTruncBits - xTruncBits;
-  static final long xScale = 1 << xShift;
-  static final long xOffset = xScale * (1 << (xTruncBits - 1));
+  static final int xScale = 1 << xShift;
+  static final int xOffset = xScale * (1 << (xTruncBits - 1));
   static final int xMask = (1 << xTruncBits) - 1;
   static final int yMask = (1 << yTruncBits) - 1;
 

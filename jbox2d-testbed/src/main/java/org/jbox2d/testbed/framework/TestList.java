@@ -81,25 +81,22 @@ import org.jbox2d.testbed.tests.Web;
 public class TestList {
 
   public static void populateModel(TestbedModel model) {
-
-    model.addCategory("Featured");
+    // particles
+    model.addCategory("Particles");
     model.addTest(new DamBreak());
     model.addTest(new DrawingParticles());
     model.addTest(new LiquidTimer());
     model.addTest(new WaveMachine());
     model.addTest(new Particles());
+    model.addTest(new ParticleTypes());
+    
+    model.addCategory("Featured");
     model.addTest(new DominoTest());
     model.addTest(new Car());
     model.addTest(new CompoundShapes());
     model.addTest(new BlobTest4());
     model.addTest(new TheoJansen());
     
-    // particles
-    model.addCategory("Particles");
-    model.addTest(new Particles());
-    model.addTest(new DamBreak());
-    model.addTest(new WaveMachine());
-
     // watching...
     model.addCategory("Collision Watching");
     model.addTest(new VaryingRestitution());

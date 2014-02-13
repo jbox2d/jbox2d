@@ -67,7 +67,7 @@ public class ParticleTypes extends TestbedTest {
       shape.m_p.set(0, 5);
       shape.m_radius = 1;
       body.createFixture(shape, 0.1f);
-      body.setLinearVelocity(new Vec2(-10, 0.0f));
+      body.setLinearVelocity(new Vec2(-6, 0.0f));
     }
 
     {
@@ -137,7 +137,6 @@ public class ParticleTypes extends TestbedTest {
     addTextLine("'q' Powder  " + ((flags & ParticleType.b2_powderParticle) != 0));
     addTextLine("'t' Tensile " + ((flags & ParticleType.b2_tensileParticle) != 0));
     addTextLine("'v' Viscous " + ((flags & ParticleType.b2_viscousParticle) != 0));
-    addTextLine("'w' Wall    " + ((flags & ParticleType.b2_wallParticle) != 0));
   }
 
   @Override
@@ -159,9 +158,6 @@ public class ParticleTypes extends TestbedTest {
         break;
       case 'v':
         toggle = ParticleType.b2_viscousParticle;
-        break;
-      case 'w':
-        toggle = ParticleType.b2_wallParticle;
         break;
     }
     if (toggle != 0) {

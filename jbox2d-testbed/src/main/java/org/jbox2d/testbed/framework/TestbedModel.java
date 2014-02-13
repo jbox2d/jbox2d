@@ -50,7 +50,7 @@ public class TestbedModel {
   private List<String> implSpecificHelp;
   private TestbedPanel panel;
   private WorldCreator worldCreator = new DefaultWorldCreator();
-
+  
   public TestbedModel() {}
   
   public WorldCreator getWorldCreator() {
