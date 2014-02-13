@@ -4,6 +4,7 @@ import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.particle.ParticleColor;
 import org.jbox2d.particle.ParticleGroup;
 import org.jbox2d.particle.ParticleGroupDef;
 import org.jbox2d.particle.ParticleGroupType;
@@ -17,6 +18,7 @@ public class DrawingParticles extends TestbedTest {
   boolean m_drawing;
   int m_particleFlags;
   int m_groupFlags;
+  ParticleColor color = new ParticleColor();
 
   @Override
   public void initTest(boolean deserialized) {
@@ -75,6 +77,7 @@ public class DrawingParticles extends TestbedTest {
     m_drawing = keyChar != 'x';
     m_particleFlags = 0;
     m_groupFlags = 0;
+    color.set((byte)127, (byte)127, (byte)127, (byte)50);
     switch (keyChar) {
       case 'e':
         m_particleFlags = ParticleType.b2_elasticParticle;
@@ -92,9 +95,11 @@ public class DrawingParticles extends TestbedTest {
         m_groupFlags = ParticleGroupType.b2_solidParticleGroup;
         break;
       case 't':
+        color.set((byte)0, (byte)127, (byte)0, (byte)50);
         m_particleFlags = ParticleType.b2_tensileParticle;
         break;
       case 'v':
+        color.set((byte)0, (byte)0, (byte)127, (byte)50);
         m_particleFlags = ParticleType.b2_viscousParticle;
         break;
       case 'w':
@@ -120,6 +125,7 @@ public class DrawingParticles extends TestbedTest {
       pxf.setIdentity();
       m_world.destroyParticlesInShape(pshape, pxf);
       ppd.shape = pshape;
+      ppd.color = color;
       ppd.flags = m_particleFlags;
       ppd.groupFlags = m_groupFlags;
       ParticleGroup group = m_world.createParticleGroup(ppd);

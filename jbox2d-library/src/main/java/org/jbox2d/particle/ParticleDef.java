@@ -17,7 +17,7 @@ public class ParticleDef {
   public final Vec2 velocity = new Vec2();
 
   /** The color of the particle. */
-  public final ParticleColor color = new ParticleColor();
+  public ParticleColor color;
 
   /** Use this to store application-specific body data. */
   public Object userData;

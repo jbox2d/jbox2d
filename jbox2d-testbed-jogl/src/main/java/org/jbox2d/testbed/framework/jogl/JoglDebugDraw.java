@@ -25,6 +25,7 @@ package org.jbox2d.testbed.framework.jogl;
 
 import java.awt.Font;
 
+import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
 import org.jbox2d.callbacks.DebugDraw;
@@ -43,15 +44,10 @@ public class JoglDebugDraw extends DebugDraw {
   private final JoglPanel panel;
   private final TextRenderer text;
   private static final int NUM_CIRCLE_POINTS = 13;
-  private final Vec2[] circle = new Vec2[NUM_CIRCLE_POINTS];
 
   public JoglDebugDraw(JoglPanel argPanel) {
     super();
     panel = argPanel;
-    for (int i = 0; i < NUM_CIRCLE_POINTS; i++) {
-      circle[i] = new Vec2();
-    }
-    generateCirle(new Vec2(), 1, circle, NUM_CIRCLE_POINTS);
     text = new TextRenderer(new Font("Courier New", Font.PLAIN, 12));
   }
 
@@ -94,8 +90,8 @@ public class JoglDebugDraw extends DebugDraw {
   public void drawPoint(Vec2 argPoint, float argRadiusOnScreen, Color3f argColor) {
     Vec2 vec = getWorldToScreen(argPoint);
     GL2 gl = panel.getGL().getGL2();
-    gl.glBegin(GL2.GL_POINT);
     gl.glPointSize(argRadiusOnScreen);
+    gl.glBegin(GL2.GL_POINTS);
     gl.glVertex2f(vec.x, vec.y);
     gl.glEnd();
   }
@@ -147,12 +143,22 @@ public class JoglDebugDraw extends DebugDraw {
     GL2 gl = panel.getGL().getGL2();
     gl.glPushMatrix();
     transformViewport(gl, center);
-    gl.glScalef(radius, radius, radius);
+    
+    float theta = 2 * MathUtils.PI / NUM_CIRCLE_POINTS;
+    float c = MathUtils.cos(theta);
+    float s = MathUtils.sin(theta);
+    float x = radius;
+    float y = 0;
+    float cx = center.x;
+    float cy = center.y;
     gl.glBegin(GL2.GL_LINE_LOOP);
-    gl.glColor4f(color.x, color.y, color.z, 1f);
+    gl.glColor4f(color.x, color.y, color.z, 1);
     for (int i = 0; i < NUM_CIRCLE_POINTS; i++) {
-      Vec2 v = circle[i];
-      gl.glVertex2f(v.x, v.y);
+      gl.glVertex3f(x + cx, y + cy, 0);
+      // apply the rotation matrix
+      float temp = x;
+      x = c * x - s * y;
+      y = s * temp + c * y;
     }
     gl.glEnd();
     gl.glPopMatrix();
@@ -162,22 +168,37 @@ public class JoglDebugDraw extends DebugDraw {
   public void drawSolidCircle(Vec2 center, float radius, Vec2 axis, Color3f color) {
     GL2 gl = panel.getGL().getGL2();
     gl.glPushMatrix();
-    transformViewport(gl, center);
-    gl.glScalef(radius, radius, radius);
+    transformViewport(gl, zero);
+    float theta = 2 * MathUtils.PI / NUM_CIRCLE_POINTS;
+    float c = MathUtils.cos(theta);
+    float s = MathUtils.sin(theta);
+    float x = radius;
+    float y = 0;
+    float cx = center.x;
+    float cy = center.y;
     gl.glBegin(GL2.GL_TRIANGLE_FAN);
     gl.glColor4f(color.x, color.y, color.z, .4f);
     for (int i = 0; i < NUM_CIRCLE_POINTS; i++) {
-      Vec2 v = circle[i];
-      gl.glVertex2f(v.x, v.y);
+      gl.glVertex3f(x + cx, y + cy, 0);
+      // apply the rotation matrix
+      float temp = x;
+      x = c * x - s * y;
+      y = s * temp + c * y;
     }
     gl.glEnd();
-
     gl.glBegin(GL2.GL_LINE_LOOP);
-    gl.glColor4f(color.x, color.y, color.z, 1f);
+    gl.glColor4f(color.x, color.y, color.z, 1);
     for (int i = 0; i < NUM_CIRCLE_POINTS; i++) {
-      Vec2 v = circle[i];
-      gl.glVertex2f(v.x, v.y);
+      gl.glVertex3f(x + cx, y + cy, 0);
+      // apply the rotation matrix
+      float temp = x;
+      x = c * x - s * y;
+      y = s * temp + c * y;
     }
+    gl.glEnd();
+    gl.glBegin(GL2.GL_LINES);
+    gl.glVertex3f(cx, cy, 0);
+    gl.glVertex3f(cx + axis.x * radius, cy + axis.y * radius, 0);
     gl.glEnd();
     gl.glPopMatrix();
     // drawSegment(center, vecs[0], color);
@@ -200,25 +221,34 @@ public class JoglDebugDraw extends DebugDraw {
     GL2 gl = panel.getGL().getGL2();
     gl.glPushMatrix();
     transformViewport(gl, zero);
-    
+
+    float theta = 2 * MathUtils.PI / NUM_CIRCLE_POINTS;
+    float c = MathUtils.cos(theta);
+    float s = MathUtils.sin(theta);
+
+    float x = radius;
+    float y = 0;
+
     for (int i = 0; i < count; i++) {
       Vec2 center = centers[i];
-      gl.glPushMatrix();
-      gl.glTranslatef(center.x, center.y, 0);
-      gl.glScalef(radius, radius, radius);
+      float cx = center.x;
+      float cy = center.y;
+      gl.glBegin(GL2.GL_TRIANGLE_FAN);
       if (colors == null) {
         gl.glColor4f(1, 1, 1, .4f);
       } else {
         ParticleColor color = colors[i];
-        gl.glColor4i(color.r, color.g, color.b, color.a);
+        gl.glColor4b(color.r, color.g, color.b, color.a);
       }
-      gl.glBegin(GL2.GL_TRIANGLE_FAN);
       for (int j = 0; j < NUM_CIRCLE_POINTS; j++) {
-        Vec2 v = circle[j];
-        gl.glVertex2f(v.x, v.y);
+        gl.glVertex3f(x + cx, y + cy, 0);
+
+        // apply the rotation matrix
+        float temp = x;
+        x = c * x - s * y;
+        y = s * temp + c * y;
       }
       gl.glEnd();
-      gl.glPopMatrix();
     }
     gl.glPopMatrix();
   }
@@ -257,16 +287,5 @@ public class JoglDebugDraw extends DebugDraw {
     text.setColor(color.x, color.y, color.z, 1);
     text.draw(s, (int) x, panel.getHeight() - (int) y);
     text.endRendering();
-  }
-
-  // CIRCLE GENERATOR
-
-  private void generateCirle(Vec2 argCenter, float argRadius, Vec2[] argPoints, int argNumPoints) {
-    float inc = MathUtils.TWOPI / argNumPoints;
-
-    for (int i = 0; i < argNumPoints; i++) {
-      argPoints[i].x = (argCenter.x + MathUtils.cos(i * inc) * argRadius);
-      argPoints[i].y = (argCenter.y + MathUtils.sin(i * inc) * argRadius);
-    }
   }
 }

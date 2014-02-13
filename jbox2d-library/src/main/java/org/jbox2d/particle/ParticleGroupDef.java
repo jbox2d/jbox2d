@@ -34,7 +34,7 @@ public class ParticleGroupDef {
   public float angularVelocity;
 
   /** The color of all particles in the group. */
-  public final ParticleColor color = new ParticleColor();
+  public ParticleColor color;
 
   /**
    * The strength of cohesion among the particles in a group with flag b2_elasticParticle or

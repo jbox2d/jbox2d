@@ -33,17 +33,17 @@ public class ParticleSystem {
 
   static final int xTruncBits = 12;
   static final int yTruncBits = 12;
-  static final int tagBits = 8 * 4 - 1 /* sizeof(int) */;
-  static final int yOffset = 1 << (yTruncBits - 1);
+  static final int tagBits = 8 * 4 - 1  /* sizeof(int) */;
+  static final long yOffset = 1 << (yTruncBits - 1);
   static final int yShift = tagBits - yTruncBits;
   static final int xShift = tagBits - yTruncBits - xTruncBits;
-  static final int xScale = 1 << xShift;
-  static final int xOffset = xScale * (1 << (xTruncBits - 1));
+  static final long xScale = 1 << xShift;
+  static final long xOffset = xScale * (1 << (xTruncBits - 1));
   static final int xMask = (1 << xTruncBits) - 1;
   static final int yMask = (1 << yTruncBits) - 1;
 
   static long computeTag(float x, float y) {
-    return (((long) (y + yOffset)) << yShift) + (int) (((long) (xScale * x)) + xOffset);
+    return (((long) (y + yOffset)) << yShift) + (((long) (xScale * x)) + xOffset);
   }
 
   static long computeRelativeTag(long tag, int x, int y) {
@@ -211,7 +211,7 @@ public class ParticleSystem {
     if (m_depthBuffer != null) {
       m_depthBuffer[index] = 0;
     }
-    if (m_colorBuffer.data != null || !def.color.isZero()) {
+    if (m_colorBuffer.data != null || def.color != null) {
       m_colorBuffer.data = requestParticleBuffer(m_colorBuffer.dataClass, m_colorBuffer.data);
       m_colorBuffer.data[index].set(def.color);
     }
@@ -273,7 +273,7 @@ public class ParticleSystem {
     if (groupDef.shape != null) {
       final ParticleDef particleDef = tempParticleDef;
       particleDef.flags = groupDef.flags;
-      particleDef.color.set(groupDef.color);
+      particleDef.color = groupDef.color;
       particleDef.userData = groupDef.userData;
       Shape shape = groupDef.shape;
       transform.set(groupDef.position, groupDef.angle);
@@ -1793,7 +1793,7 @@ public class ParticleSystem {
 
     @Override
     public int compareTo(Proxy o) {
-      return (int) (tag - o.tag);
+      return (tag - o.tag) < 0 ? -1 : (o.tag == tag ? 0 : 1);
     }
 
     @Override

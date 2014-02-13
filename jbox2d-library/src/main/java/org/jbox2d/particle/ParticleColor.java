@@ -10,7 +10,12 @@ import org.jbox2d.common.Color3f;
 public class ParticleColor {
   public byte r, g, b, a;
 
-  public ParticleColor() {}
+  public ParticleColor() {
+    r = (byte) 127;
+    g = (byte) 127;
+    b = (byte) 127;
+    a = (byte) 50;
+  }
 
   public ParticleColor(byte r, byte g, byte b, byte a) {
     set(r, g, b, a);
