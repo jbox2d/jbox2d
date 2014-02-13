@@ -449,13 +449,13 @@ public abstract class TestbedTest
       ++stepCount;
     }
 
+    debugDraw.drawString(5, m_textLine, "Engine Info", color4);
+    m_textLine += TEXT_LINE_SPACE;
+    debugDraw.drawString(5, m_textLine, "Framerate: " + (int) model.getCalculatedFps(),
+        Color3f.WHITE);
+    m_textLine += TEXT_LINE_SPACE;
+    
     if (settings.getSetting(TestbedSettings.DrawStats).enabled) {
-      // Vec2.watchCreations = true;
-      debugDraw.drawString(5, m_textLine, "Engine Info", color4);
-      m_textLine += TEXT_LINE_SPACE;
-      debugDraw.drawString(5, m_textLine, String.format("Framerate: %.2f", model.getCalculatedFps()), Color3f.WHITE);
-      m_textLine += TEXT_LINE_SPACE;
-
       int particleCount = m_world.getParticleCount();
       int groupCount = m_world.getParticleGroupCount();
       debugDraw.drawString(

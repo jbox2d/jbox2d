@@ -88,7 +88,6 @@ public class TestList {
     model.addTest(new LiquidTimer());
     model.addTest(new WaveMachine());
     model.addTest(new Particles());
-    model.addTest(new ParticleTypes());
     
     model.addCategory("Featured");
     model.addTest(new DominoTest());

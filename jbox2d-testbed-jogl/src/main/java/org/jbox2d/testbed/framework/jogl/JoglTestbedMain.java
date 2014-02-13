@@ -43,12 +43,12 @@ import org.jbox2d.testbed.framework.j2d.TestbedSidePanel;
 public class JoglTestbedMain {
 
   public static void main(String[] args) {
-    try {
-      UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-    } catch (Exception e) {
-      // log.warn("Could not set the look and feel to nimbus.  "
-      // + "Hopefully you're on a mac so the window isn't ugly as crap.");
-    }
+//    try {
+//      UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+//    } catch (Exception e) {
+//      // log.warn("Could not set the look and feel to nimbus.  "
+//      // + "Hopefully you're on a mac so the window isn't ugly as crap.");
+//    }
     TestbedModel model = new TestbedModel();
     final TestbedController controller =
         new TestbedController(model, UpdateBehavior.UPDATE_ASYNC, MouseBehavior.FORCE_Y_FLIP,
