@@ -763,6 +763,8 @@ public class World {
     if ((flags & DebugDraw.e_dynamicTreeBit) != 0) {
       m_contactManager.m_broadPhase.drawTree(m_debugDraw);
     }
+    
+    m_debugDraw.flush();
   }
 
   private final WorldQueryWrapper wqwrapper = new WorldQueryWrapper();

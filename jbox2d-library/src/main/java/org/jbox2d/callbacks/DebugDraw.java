@@ -32,7 +32,6 @@ import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.particle.ParticleColor;
 
-// updated to rev 100
 /**
  * Implement this abstract class to allow JBox2d to automatically draw your physics for debugging
  * purposes. Not intended to replace your own custom rendering routines!
@@ -166,6 +165,8 @@ public abstract class DebugDraw {
    */
   public abstract void drawParticles(Vec2[] centers, float radius, ParticleColor[] colors, int count);
 
+  /** Called at the end of drawing a world */
+  public void flush() {}
 
   public void drawString(Vec2 pos, String s, Color3f color) {
     drawString(pos.x, pos.y, s, color);
