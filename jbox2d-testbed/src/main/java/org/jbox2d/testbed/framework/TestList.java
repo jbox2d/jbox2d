@@ -83,8 +83,11 @@ public class TestList {
   public static void populateModel(TestbedModel model) {
 
     model.addCategory("Featured");
+    model.addTest(new DamBreak());
     model.addTest(new DrawingParticles());
     model.addTest(new LiquidTimer());
+    model.addTest(new WaveMachine());
+    model.addTest(new Particles());
     model.addTest(new DominoTest());
     model.addTest(new Car());
     model.addTest(new CompoundShapes());

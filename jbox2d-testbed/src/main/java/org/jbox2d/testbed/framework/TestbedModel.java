@@ -37,7 +37,6 @@ import org.jbox2d.common.IViewportTransform;
  * @author Daniel
  */
 public class TestbedModel {
-
   private final DefaultComboBoxModel tests = new DefaultComboBoxModel();
   private final TestbedSettings settings = new TestbedSettings();
   private DebugDraw draw;

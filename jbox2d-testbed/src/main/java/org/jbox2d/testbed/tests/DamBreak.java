@@ -26,7 +26,6 @@ public class DamBreak extends TestbedTest {
 
     m_world.setParticleRadius(0.15f);
     m_world.setParticleDamping(0.2f);
-
     {
       PolygonShape shape = new PolygonShape();
       shape.setAsBox(8, 10, new Vec2(-12, 10.1f), 0);
@@ -40,5 +39,4 @@ public class DamBreak extends TestbedTest {
   public String getTestName() {
     return "Dam Break";
   }
-
 }

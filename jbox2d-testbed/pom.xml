@@ -12,14 +12,6 @@
 	<url>http://code.google.com/p/jbox2d/</url>
 	<description>The testbed for JBox2D, a 2d java physics engine, ported from the C++ Box2d engine.</description>
 	<dependencies>
-		<dependency>
-			<groupId>org.jbox2d</groupId>
-			<artifactId>jbox2d-library</artifactId>
-			<version>2.2.1.2-SNAPSHOT</version>
-			<type>jar</type>
-    		<classifier>tests</classifier>
-			<scope>compile</scope>
-		</dependency>
 	  	<dependency>
 	  		<groupId>org.apache.commons</groupId>
 	  		<artifactId>commons-math3</artifactId>
