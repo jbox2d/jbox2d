@@ -50,7 +50,7 @@ public class JoglTestbedMain {
 //    }
     TestbedModel model = new TestbedModel();
     final TestbedController controller =
-        new TestbedController(model, UpdateBehavior.UPDATE_ASYNC, MouseBehavior.FORCE_Y_FLIP,
+        new TestbedController(model, UpdateBehavior.UPDATE_IGNORED, MouseBehavior.FORCE_Y_FLIP,
             new TestbedErrorHandler() {
               @Override
               public void serializationError(Exception e, String message) {

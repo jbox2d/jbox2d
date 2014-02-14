@@ -50,7 +50,7 @@ public class TestbedController implements Runnable {
   private static final Logger log = LoggerFactory.getLogger(TestbedController.class);
 
   public static enum UpdateBehavior {
-    UPDATE_CALLED, UPDATE_ASYNC
+    UPDATE_CALLED, UPDATE_IGNORED
   }
 
   public static enum MouseBehavior {
@@ -190,7 +190,7 @@ public class TestbedController implements Runnable {
 
   /**
    * Called by the main run loop. If the update behavior is set to
-   * {@link UpdateBehavior#UPDATE_ASYNC}, then this needs to be called manually to update the input
+   * {@link UpdateBehavior#UPDATE_IGNORED}, then this needs to be called manually to update the input
    * and test.
    */
   public void updateTest() {
