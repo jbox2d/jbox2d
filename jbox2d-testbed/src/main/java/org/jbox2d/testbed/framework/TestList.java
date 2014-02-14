@@ -49,11 +49,9 @@ import org.jbox2d.testbed.tests.EdgeShapes;
 import org.jbox2d.testbed.tests.FixedPendulumTest;
 import org.jbox2d.testbed.tests.FreePendulumTest;
 import org.jbox2d.testbed.tests.Gears;
-import org.jbox2d.testbed.tests.LiquidTest;
 import org.jbox2d.testbed.tests.LiquidTimer;
 import org.jbox2d.testbed.tests.MotorTest;
 import org.jbox2d.testbed.tests.OneSidedTest;
-import org.jbox2d.testbed.tests.ParticleTypes;
 import org.jbox2d.testbed.tests.Particles;
 import org.jbox2d.testbed.tests.PistonTest;
 import org.jbox2d.testbed.tests.PolyShapes;
@@ -155,6 +153,5 @@ public class TestList {
     model.addTest(new ConvexHull());
     model.addTest(new DynamicTreeTest());
     model.addTest(new DistanceTest());
-    model.addTest(new LiquidTest());
   }
 }

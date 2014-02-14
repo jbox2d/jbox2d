@@ -30,7 +30,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 
 import org.jbox2d.testbed.framework.TestList;
 import org.jbox2d.testbed.framework.TestbedController;

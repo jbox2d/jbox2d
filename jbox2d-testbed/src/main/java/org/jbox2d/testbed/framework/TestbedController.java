@@ -297,12 +297,15 @@ public class TestbedController implements Runnable {
 
   public void lastTest() {
     int index = model.getCurrTestIndex() - 1;
-    index = (index < 0) ? index + model.getTestsSize() : index;
 
-    while (!model.isTestAt(index) && index > 0) {
-      index--;
+    while (index >= 0 && !model.isTestAt(index)) {
+      if (index == 0) {
+        index = model.getTestsSize() - 1;
+      } else {
+        index--;
+      }
     }
-
+    
     if (model.isTestAt(index)) {
       model.setCurrTestIndex(index);
     }
