@@ -50,22 +50,23 @@ public class AWTPanelHelper {
     panel.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseReleased(MouseEvent arg0) {
-        controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), arg0.getButton());
+        controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), arg0.getButton(), arg0);
 
         if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
-          controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), 10);
+          controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), 10, arg0);
         }
       }
 
       @Override
       public void mousePressed(MouseEvent arg0) {
-        controller.queueMouseDown(new Vec2(arg0.getX(), arg0.getY()), arg0.getButton());
+
+        controller.queueMouseDown(new Vec2(arg0.getX(), arg0.getY()), arg0.getButton(), arg0);
 
         if (arg0.getButton() == screenDragButton) {
           oldDragMouse.set(arg0.getX(), arg0.getY());
         }
         if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
-          controller.queueMouseDown(new Vec2(arg0.getX(), arg0.getY()), 10);
+          controller.queueMouseDown(new Vec2(arg0.getX(), arg0.getY()), 10, arg0);
         }
       }
     });
@@ -74,13 +75,13 @@ public class AWTPanelHelper {
       @Override
       public void mouseMoved(MouseEvent arg0) {
         mouse.set(arg0.getX(), arg0.getY());
-        controller.queueMouseMove(new Vec2(mouse));
+        controller.queueMouseMove(new Vec2(mouse),arg0);
       }
 
       @Override
       public void mouseDragged(MouseEvent arg0) {
         mouse.set(arg0.getX(), arg0.getY());
-        controller.queueMouseDrag(new Vec2(mouse), arg0.getButton());
+        controller.queueMouseDrag(new Vec2(mouse), arg0.getButton(), arg0);
 
         if (arg0.getButton() == screenDragButton) {
           TestbedTest currTest = model.getCurrTest();
@@ -92,7 +93,7 @@ public class AWTPanelHelper {
           oldDragMouse.set(mouse);
         }
         if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
-          controller.queueMouseDrag(new Vec2(arg0.getX(), arg0.getY()), 10);
+          controller.queueMouseDrag(new Vec2(arg0.getX(), arg0.getY()), 10, arg0);
         }
       }
     });

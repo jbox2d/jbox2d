@@ -1,4 +1,3 @@
-// test change
 /*******************************************************************************
  * Copyright (c) 2013, Daniel Murphy
  * All rights reserved.
@@ -47,6 +46,7 @@
 
 package org.jbox2d.testbed.tests;
 
+import java.awt.event.InputEvent;
 import java.util.ArrayList;
 
 import org.jbox2d.callbacks.QueryCallback;
@@ -70,9 +70,12 @@ import org.jbox2d.dynamics.joints.JointType;
 import org.jbox2d.dynamics.joints.RopeJointDef;
 import org.jbox2d.dynamics.joints.WheelJointDef;
 import org.jbox2d.testbed.framework.TestbedTest;
+import org.jbox2d.testbed.framework.j2d.TestbedMain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VertexTest extends TestbedTest {
-	
+	private static final Logger log = LoggerFactory.getLogger(TestbedTest.class);
 	ArrayList<Body> nbd = new ArrayList<Body>();
 
   @Override
@@ -94,7 +97,8 @@ public class VertexTest extends TestbedTest {
     Body ground = null;
     {
       PolygonShape sd = new PolygonShape();
-      sd.setAsBox(50.0f, 0.01f, new Vec2(0.0f, -5.0f), 0.0f);
+      //sd.setAsBox(50.0f, 0.01f, new Vec2(0.0f, -5.0f), 0.0f);
+      sd.setAsBox(50.0f, 0.01f, new Vec2(-0.0f, -5.0f), 0.0f);
 
       BodyDef bd = new BodyDef();
       bd.position.set(0.0f, 0.0f);
@@ -199,7 +203,7 @@ public class VertexTest extends TestbedTest {
     //fallingBox.createFixture(psd, 1.0f);
   }
   
-  public void mouseDown(Vec2 p, int button) {
+  public void mouseDown(Vec2 p, int button, InputEvent rawEvent) {
 		System.out.println(p.toString());
 		super.mouseDown(p, button);
 		p.x += .3f;
@@ -210,7 +214,33 @@ public class VertexTest extends TestbedTest {
 		b.lowerBound.set(p.x - .1f, p.y - .1f);
 		b.upperBound.set(p.x + .1f, p.y + .1f);
 		System.out.println("**" +AABB.testOverlap(b, nbd.get(0).getFixtureList().getAABB(0)));
+		
+		if (rawEvent.isControlDown())
+			log.info("Control key was pressed!!!!!!");
+		
+		
+		
 	}
+  
+  public Body createNewVertex(Vec2 p, float fR) {
+	  	Body theBall;
+		CircleShape circle = new CircleShape();
+		circle.m_radius = fR;
+	
+		FixtureDef fd = new FixtureDef();
+		fd.shape = circle;
+		fd.density = 1.0f;
+		fd.friction = 0.9f;
+	
+		BodyDef ballBodyDef = new BodyDef();
+		ballBodyDef.type = BodyType.DYNAMIC;
+		ballBodyDef.position.set(p.x, p.y);
+		theBall = m_world.createBody(ballBodyDef);
+
+		theBall.createFixture(fd);
+		
+		return theBall;
+  }
 
   @Override
   public String getTestName() {

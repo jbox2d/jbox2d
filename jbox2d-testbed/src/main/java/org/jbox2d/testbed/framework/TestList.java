@@ -68,6 +68,7 @@ import org.jbox2d.testbed.tests.TheoJansen;
 import org.jbox2d.testbed.tests.Tumbler;
 import org.jbox2d.testbed.tests.VaryingFrictionTest;
 import org.jbox2d.testbed.tests.VaryingRestitution;
+import org.jbox2d.testbed.tests.VertexTest;
 import org.jbox2d.testbed.tests.VerticalStack;
 import org.jbox2d.testbed.tests.Web;
 
@@ -81,6 +82,7 @@ public class TestList {
     model.addCategory("Featured");
     model.addTest(new Graph());
     model.addTest(new Myconvex());
+    model.addTest(new VertexTest());
     model.addTest(new Car());
     model.addTest(new DominoTest());
     model.addTest(new CompoundShapes());

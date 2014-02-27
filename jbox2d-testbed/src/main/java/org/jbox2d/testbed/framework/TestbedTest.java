@@ -23,6 +23,7 @@
  ******************************************************************************/
 package org.jbox2d.testbed.framework;
 
+import java.awt.event.InputEvent;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -522,11 +523,21 @@ public abstract class TestbedTest
       spawnMouseJoint(p);
     }
   }
+  public void mouseDown(Vec2 p, int button, InputEvent rawInput) {
+	    this.mouseDown(p, button); 
+  }
 
   public void mouseMove(Vec2 p) {
     mouseWorld.set(p);
   }
 
+  public void mouseMove(Vec2 p, InputEvent rawInput) {
+	    mouseWorld.set(p);
+	}
+  
+  public void mouseDrag(Vec2 p, int button, InputEvent rawInput) {
+	    this.mouseDrag(p, button);
+  }
   public void mouseDrag(Vec2 p, int button) {
     if (button == MOUSE_JOINT_BUTTON) {
       updateMouseJoint(p);

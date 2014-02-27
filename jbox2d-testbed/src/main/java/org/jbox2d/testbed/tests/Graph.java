@@ -23,6 +23,7 @@
  ******************************************************************************/
 package org.jbox2d.testbed.tests;
 
+import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.PolygonShape;
@@ -436,6 +437,18 @@ public class Graph extends TestbedTest {
 		getCamera().setCamera(m_car.getPosition());
 	}
 	
+	public boolean isWithinVertex(Vec2 p, Body bd) {
+		
+		p.x += .3f;
+		p.y += .3f;
+		
+		//cheking mouse collision with vertex
+		AABB b = new AABB();
+		b.lowerBound.set(p.x - .1f, p.y - .1f);
+		b.upperBound.set(p.x + .1f, p.y + .1f);
+		boolean bIsInside = AABB.testOverlap(b, bd.getFixtureList().getAABB(0));
+		return bIsInside;
+	}
 	
 	
 }

@@ -23,6 +23,7 @@
  ******************************************************************************/
 package org.jbox2d.testbed.framework;
 
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -129,27 +130,27 @@ public class TestbedController implements Runnable {
     }
   }
 
-  public void queueMouseUp(Vec2 screenPos, int button) {
+  public void queueMouseUp(Vec2 screenPos, int button, InputEvent rawInput) {
     synchronized (inputQueue) {
-      inputQueue.add(new QueueItem(QueueItemType.MouseUp, screenPos, button));
+      inputQueue.add(new QueueItem(QueueItemType.MouseUp, screenPos, button, rawInput));
     }
   }
 
-  public void queueMouseDown(Vec2 screenPos, int button) {
+  public void queueMouseDown(Vec2 screenPos, int button, InputEvent rawInput) {
     synchronized (inputQueue) {
-      inputQueue.add(new QueueItem(QueueItemType.MouseDown, screenPos, button));
+      inputQueue.add(new QueueItem(QueueItemType.MouseDown, screenPos, button, rawInput));
     }
   }
 
-  public void queueMouseMove(Vec2 screenPos) {
+  public void queueMouseMove(Vec2 screenPos, InputEvent rawInput) {
     synchronized (inputQueue) {
-      inputQueue.add(new QueueItem(QueueItemType.MouseMove, screenPos, 0));
+      inputQueue.add(new QueueItem(QueueItemType.MouseMove, screenPos, 0, rawInput));
     }
   }
 
-  public void queueMouseDrag(Vec2 screenPos, int button) {
+  public void queueMouseDrag(Vec2 screenPos, int button, InputEvent rawInput) {
     synchronized (inputQueue) {
-      inputQueue.add(new QueueItem(QueueItemType.MouseDrag, screenPos, button));
+      inputQueue.add(new QueueItem(QueueItemType.MouseDrag, screenPos, button, rawInput));
     }
   }
 
@@ -249,16 +250,16 @@ public class TestbedController implements Runnable {
                 currTest.keyReleased(i.c, i.code);
                 break;
               case MouseDown:
-                currTest.mouseDown(i.p, i.button);
+                currTest.mouseDown(i.p, i.button, i._rawEvent);
                 break;
               case MouseMove:
-                currTest.mouseMove(i.p);
+                currTest.mouseMove(i.p, i._rawEvent);
                 break;
               case MouseUp:
                 currTest.mouseUp(i.p, i.button);
                 break;
               case MouseDrag:
-                currTest.mouseDrag(i.p, i.button);
+                currTest.mouseDrag(i.p, i.button, i._rawEvent);
                 break;
               case LaunchBomb:
                 currTest.lanchBomb();
@@ -480,6 +481,7 @@ class QueueItem {
   public char c;
   public int button;
   public int code;
+  public InputEvent _rawEvent;
 
   public QueueItem() {
     type = QueueItemType.LaunchBomb;
@@ -488,10 +490,11 @@ class QueueItem {
     type = t;
   }
 
-  public QueueItem(QueueItemType t, Vec2 pt, int button) {
+  public QueueItem(QueueItemType t, Vec2 pt, int button, InputEvent rawInput) {
     type = t;
     p.set(pt);
     this.button = button;
+    this._rawEvent = rawInput;
   }
 
   public QueueItem(QueueItemType t, char cr, int cd) {
