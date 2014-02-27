@@ -204,7 +204,7 @@ public class VertexTest extends TestbedTest {
   }
   
   public void mouseDown(Vec2 p, int button, InputEvent rawEvent) {
-		System.out.println(p.toString());
+		log.info(p.toString());
 		super.mouseDown(p, button);
 		p.x += .3f;
 		p.y += .3f;
@@ -213,7 +213,7 @@ public class VertexTest extends TestbedTest {
 		AABB b = new AABB();
 		b.lowerBound.set(p.x - .1f, p.y - .1f);
 		b.upperBound.set(p.x + .1f, p.y + .1f);
-		System.out.println("**" +AABB.testOverlap(b, nbd.get(0).getFixtureList().getAABB(0)));
+		log.info("**" +AABB.testOverlap(b, nbd.get(0).getFixtureList().getAABB(0)));
 		
 		if (rawEvent.isControlDown())
 			log.info("Control key was pressed!!!!!!");
