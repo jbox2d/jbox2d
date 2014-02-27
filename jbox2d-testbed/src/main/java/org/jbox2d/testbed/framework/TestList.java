@@ -28,6 +28,8 @@ import org.jbox2d.testbed.tests.BlobTest4;
 import org.jbox2d.testbed.tests.BodyTypes;
 import org.jbox2d.testbed.tests.Breakable;
 import org.jbox2d.testbed.tests.Cantilever;
+import org.jbox2d.testbed.tests.Graph;
+import org.jbox2d.testbed.tests.Myconvex;
 import org.jbox2d.testbed.tests.Car;
 import org.jbox2d.testbed.tests.Chain;
 import org.jbox2d.testbed.tests.CharacterCollision;
@@ -77,6 +79,8 @@ public class TestList {
   public static void populateModel(TestbedModel model) {
 
     model.addCategory("Featured");
+    model.addTest(new Graph());
+    model.addTest(new Myconvex());
     model.addTest(new Car());
     model.addTest(new DominoTest());
     model.addTest(new CompoundShapes());
