@@ -250,13 +250,15 @@ public class TestbedController implements Runnable {
                 currTest.keyReleased(i.c, i.code);
                 break;
               case MouseDown:
+            	//log.debug("MouseDown");
                 currTest.mouseDown(i.p, i.button, i._rawEvent);
                 break;
               case MouseMove:
                 currTest.mouseMove(i.p, i._rawEvent);
                 break;
               case MouseUp:
-                currTest.mouseUp(i.p, i.button);
+            	//log.debug("MouseUp");
+                currTest.mouseUp(i.p, i.button, i._rawEvent);
                 break;
               case MouseDrag:
                 currTest.mouseDrag(i.p, i.button, i._rawEvent);

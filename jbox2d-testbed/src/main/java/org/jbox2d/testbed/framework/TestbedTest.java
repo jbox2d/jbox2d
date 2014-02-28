@@ -507,6 +507,9 @@ public abstract class TestbedTest
     }
     completeBombSpawn(p);
   }
+  public void mouseUp(Vec2 p, int button, InputEvent rawInput) {
+	    this.mouseUp(p, button);    
+  }
 
   public void keyPressed(char keyCar, int keyCode) {}
 
@@ -535,9 +538,8 @@ public abstract class TestbedTest
 	    mouseWorld.set(p);
 	}
   
-  public void mouseDrag(Vec2 p, int button, InputEvent rawInput) {
-	    this.mouseDrag(p, button);
-  }
+  
+  
   public void mouseDrag(Vec2 p, int button) {
     if (button == MOUSE_JOINT_BUTTON) {
       updateMouseJoint(p);
@@ -546,11 +548,16 @@ public abstract class TestbedTest
       bombMousePoint.set(p);
     }
   }
+  
+  public void mouseDrag(Vec2 p, int button, InputEvent rawInput) {
+	    this.mouseDrag(p, button);
+  }
+  
 
   /************ MOUSE JOINT ************/
 
-  private final AABB queryAABB = new AABB();
-  private final TestQueryCallback callback = new TestQueryCallback();
+  protected final AABB queryAABB = new AABB();
+  protected final TestQueryCallback callback = new TestQueryCallback();
 
   private void spawnMouseJoint(Vec2 p) {
     if (mouseJoint != null) {
@@ -752,7 +759,7 @@ public abstract class TestbedTest
   }
 }
 
-
+/*
 class TestQueryCallback implements QueryCallback {
 
   public final Vec2 point;
@@ -777,7 +784,7 @@ class TestQueryCallback implements QueryCallback {
     return true;
   }
 }
-
+*/
 
 class SignerAdapter implements ObjectSigner {
   private final ObjectSigner delegate;

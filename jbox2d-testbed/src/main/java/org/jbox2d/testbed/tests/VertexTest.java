@@ -78,6 +78,10 @@ public class VertexTest extends TestbedTest {
 	private static final Logger log = LoggerFactory.getLogger(TestbedTest.class);
 	ArrayList<Body> nbd = new ArrayList<Body>();
 
+	private boolean m_isCreatingEdge = false;
+	private Vec2 mFrom;
+	private Vec2 mTo;
+	
   @Override
   public float getDefaultCameraScale() {
     return 20;
@@ -204,6 +208,7 @@ public class VertexTest extends TestbedTest {
   }
   
   public void mouseDown(Vec2 p, int button, InputEvent rawEvent) {
+	  log.info("MouseDown !!!!!");
 		log.info(p.toString());
 		super.mouseDown(p, button);
 		p.x += .3f;
@@ -221,6 +226,20 @@ public class VertexTest extends TestbedTest {
 		
 		
 	}
+  
+  public void mouseUp(Vec2 p, int button, InputEvent rawInput) {
+	  log.info("MouseUp !!!!!");
+	  super.mouseUp(p, button);    
+  }
+  
+
+  public void mouseDrag(Vec2 p, int button, InputEvent rawInput) {
+	  if (this.m_isCreatingEdge){
+		  this.mTo = p;
+	  } else {
+		  this.mouseDrag(p, button);
+	  }
+  }
   
   public Body createNewVertex(Vec2 p, float fR) {
 	  	Body theBall;
