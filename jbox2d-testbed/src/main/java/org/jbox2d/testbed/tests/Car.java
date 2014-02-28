@@ -56,6 +56,7 @@ public class Car extends TestbedTest {
   private WheelJoint m_spring1;
   private WheelJoint m_spring2;
 
+  
   @Override
   public Long getTag(Body body) {
     if (body == m_car) {
