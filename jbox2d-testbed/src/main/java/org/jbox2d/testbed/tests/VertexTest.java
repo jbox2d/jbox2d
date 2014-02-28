@@ -67,6 +67,7 @@ import org.jbox2d.dynamics.joints.DistanceJointDef;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.JointDef;
 import org.jbox2d.dynamics.joints.JointType;
+import org.jbox2d.dynamics.joints.MouseJointDef;
 import org.jbox2d.dynamics.joints.RopeJointDef;
 import org.jbox2d.dynamics.joints.WheelJointDef;
 import org.jbox2d.testbed.framework.TestbedTest;
@@ -240,6 +241,30 @@ public class VertexTest extends TestbedTest {
 		  this.mouseDrag(p, button);
 	  }
   }
+  public Body findBody(Vec2 p) {
+
+	    queryAABB.lowerBound.set(p.x - .001f, p.y - .001f);
+	    queryAABB.upperBound.set(p.x + .001f, p.y + .001f);
+	    callback.point.set(p);
+	    callback.fixture = null;
+	    m_world.queryAABB(callback, queryAABB);
+	    
+	    if (callback.fixture != null) {
+	      Body body = callback.fixture.getBody();
+	      
+	      MouseJointDef def = new MouseJointDef();
+	      def.bodyA = groundBody;
+	      def.bodyB = body;
+	      def.collideConnected = true;
+	      def.target.set(p);
+	      def.maxForce = 1000f * body.getMass();
+	      
+	      //mouseJoint = (MouseJoint) m_world.createJoint(def);
+	      body.setAwake(true);
+	      return body;
+	    }
+	    return null;
+	  }
   
   public Body createNewVertex(Vec2 p, float fR) {
 	  	Body theBall;
