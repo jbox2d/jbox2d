@@ -27,6 +27,7 @@ import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.callbacks.ContactListener;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
+import org.jbox2d.common.Sweep;
 import org.jbox2d.common.Timer;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.contacts.Contact;
@@ -245,14 +246,15 @@ public class Island {
     // Integrate velocities and apply damping. Initialize the body state.
     for (int i = 0; i < m_bodyCount; ++i) {
       final Body b = m_bodies[i];
-      final Vec2 c = b.m_sweep.c;
-      float a = b.m_sweep.a;
+      final Sweep bm_sweep = b.m_sweep;
+      final Vec2 c = bm_sweep.c;
+      float a = bm_sweep.a;
       final Vec2 v = b.m_linearVelocity;
       float w = b.m_angularVelocity;
 
       // Store positions for continuous collision.
-      b.m_sweep.c0.set(b.m_sweep.c);
-      b.m_sweep.a0 = b.m_sweep.a;
+      bm_sweep.c0.set(bm_sweep.c);
+      bm_sweep.a0 = bm_sweep.a;
 
       if (b.m_type == BodyType.DYNAMIC) {
         // Integrate velocities.
