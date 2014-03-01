@@ -174,10 +174,6 @@ public class ContactSolver {
     }
   }
 
-  // djm pooling, and from above
-  private final Vec2 P = new Vec2();
-  private final Vec2 temp = new Vec2();
-
   public void warmStart() {
     // Warm start.
     for (int i = 0; i < m_count; ++i) {
@@ -806,10 +802,7 @@ public class ContactSolver {
    * -_linearSlop. return minSeparation >= -1.5f * _linearSlop; }
    */
 
-  // djm pooling, and from above
   private final PositionSolverManifold psolver = new PositionSolverManifold();
-  private final Vec2 rA = new Vec2();
-  private final Vec2 rB = new Vec2();
 
   /**
    * Sequential solver.
@@ -826,9 +819,13 @@ public class ContactSolver {
       float mA = pc.invMassA;
       float iA = pc.invIA;
       Vec2 localCenterA = pc.localCenterA;
+      final float localCenterAx = localCenterA.x;
+      final float localCenterAy = localCenterA.y;
       float mB = pc.invMassB;
       float iB = pc.invIB;
       Vec2 localCenterB = pc.localCenterB;
+      final float localCenterBx = localCenterB.x;
+      final float localCenterBy = localCenterB.y;
       int pointCount = pc.pointCount;
 
       Vec2 cA = m_positions[indexA].c;
@@ -838,14 +835,14 @@ public class ContactSolver {
 
       // Solve normal constraints
       for (int j = 0; j < pointCount; ++j) {
-        xfA.q.set(aA);
-        xfB.q.set(aB);
         final Rot xfAq = xfA.q;
         final Rot xfBq = xfB.q;
-        xfA.p.x = cA.x - xfAq.c * localCenterA.x + xfAq.s * localCenterA.y;
-        xfA.p.y = cA.y - xfAq.s * localCenterA.x - xfAq.c * localCenterA.y;
-        xfB.p.x = cB.x - xfBq.c * localCenterB.x + xfBq.s * localCenterB.y;
-        xfB.p.y = cB.y - xfBq.s * localCenterB.x - xfBq.c * localCenterB.y;
+        xfAq.set(aA);
+        xfBq.set(aB);
+        xfA.p.x = cA.x - xfAq.c * localCenterAx + xfAq.s * localCenterAy;
+        xfA.p.y = cA.y - xfAq.s * localCenterAx - xfAq.c * localCenterAy;
+        xfB.p.x = cB.x - xfBq.c * localCenterBx + xfBq.s * localCenterBy;
+        xfB.p.y = cB.y - xfBq.s * localCenterBx - xfBq.c * localCenterBy;
 
         final PositionSolverManifold psm = psolver;
         psm.initialize(pc, xfA, xfB, j);
@@ -909,6 +906,10 @@ public class ContactSolver {
       int indexB = pc.indexB;
       Vec2 localCenterA = pc.localCenterA;
       Vec2 localCenterB = pc.localCenterB;
+      final float localCenterAx = localCenterA.x;
+      final float localCenterAy = localCenterA.y;
+      final float localCenterBx = localCenterB.x;
+      final float localCenterBy = localCenterB.y;
       int pointCount = pc.pointCount;
 
       float mA = 0.0f;
@@ -933,12 +934,14 @@ public class ContactSolver {
 
       // Solve normal constraints
       for (int j = 0; j < pointCount; ++j) {
-        xfA.q.set(aA);
-        xfB.q.set(aB);
-        Rot.mulToOutUnsafe(xfA.q, localCenterA, xfA.p);
-        xfA.p.negateLocal().addLocal(cA);
-        Rot.mulToOutUnsafe(xfB.q, localCenterB, xfB.p);
-        xfB.p.negateLocal().addLocal(cB);
+        final Rot xfAq = xfA.q;
+        final Rot xfBq = xfB.q;
+        xfAq.set(aA);
+        xfBq.set(aB);
+        xfA.p.x = cA.x - xfAq.c * localCenterAx + xfAq.s * localCenterAy;
+        xfA.p.y = cA.y - xfAq.s * localCenterAx - xfAq.c * localCenterAy;
+        xfB.p.x = cB.x - xfBq.c * localCenterBx + xfBq.s * localCenterBy;
+        xfB.p.y = cB.y - xfBq.s * localCenterBx - xfBq.c * localCenterBy;
 
         final PositionSolverManifold psm = psolver;
         psm.initialize(pc, xfA, xfB, j);
@@ -947,8 +950,10 @@ public class ContactSolver {
         Vec2 point = psm.point;
         float separation = psm.separation;
 
-        rA.set(point).subLocal(cA);
-        rB.set(point).subLocal(cB);
+        float rAx = point.x - cA.x;
+        float rAy = point.y - cA.y;
+        float rBx = point.x - cB.x;
+        float rBy = point.y - cB.y;
 
         // Track max constraint error.
         minSeparation = MathUtils.min(minSeparation, separation);
@@ -959,20 +964,23 @@ public class ContactSolver {
                 -Settings.maxLinearCorrection, 0.0f);
 
         // Compute the effective mass.
-        float rnA = Vec2.cross(rA, normal);
-        float rnB = Vec2.cross(rB, normal);
+        float rnA = rAx * normal.y - rAy * normal.x;
+        float rnB = rBx * normal.y - rBy * normal.x;
         float K = mA + mB + iA * rnA * rnA + iB * rnB * rnB;
 
         // Compute normal impulse
         float impulse = K > 0.0f ? -C / K : 0.0f;
 
-        P.set(normal).mulLocal(impulse);
+        float Px = normal.x * impulse;
+        float Py = normal.y * impulse;
+        
+        cA.x -= Px * mA;
+        cA.y -= Py * mA;
+        aA -= iA * (rAx * Py - rAy * Px);
 
-        cA.subLocal(temp.set(P).mulLocal(mA));
-        aA -= iA * Vec2.cross(rA, P);
-
-        cB.addLocal(temp.set(P).mulLocal(mB));
-        aB += iB * Vec2.cross(rB, P);
+        cB.x += Px * mB;
+        cB.y += Py * mB;
+        aB += iB * (rBx * Py - rBy * Px);
       }
 
       // m_positions[indexA].c.set(cA);
