@@ -179,8 +179,7 @@ public class DynamicTreeTest extends TestbedTest implements TreeCallback,
 			m_tree.drawTree(getDebugDraw());
 		}
 
-		m_textLine += 15;
-		getDebugDraw().drawString(5, m_textLine,
+		getDebugDraw().drawString(5, 30,
 				"(c)reate proxy, (d)estroy proxy, (a)utomate", Color3f.WHITE);
 	}
 

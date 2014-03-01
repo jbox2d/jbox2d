@@ -47,7 +47,6 @@ public class JoglPanel extends GLJPanel implements TestbedPanel, GLEventListener
   public static final int INIT_HEIGHT = 600;
 
   private final TestbedController controller;
-  private final TestbedModel model;
 
   public JoglPanel(final TestbedModel model, final TestbedController controller) {
     super(new GLCapabilities(GLProfile.getDefault()));
@@ -56,7 +55,6 @@ public class JoglPanel extends GLJPanel implements TestbedPanel, GLEventListener
     setPreferredSize(new Dimension(600, 600));
     setAutoSwapBufferMode(true);
     addGLEventListener(this);
-    this.model = model;
     AWTPanelHelper.addHelpAndPanelListeners(this, model, controller, SCREEN_DRAG_BUTTON);
   }
 

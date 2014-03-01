@@ -59,6 +59,7 @@ public class TestbedSettings {
   public static final String DrawStats = "Stats";
   public static final String DrawHelp = "Help";
   public static final String DrawTree = "Dynamic Tree";
+  public static final String DrawWireframe = "Wireframe Mode";
 
   public boolean pause = false;
   public boolean singleStep = false;
@@ -91,6 +92,7 @@ public class TestbedSettings {
     addSetting(new TestbedSetting(DrawStats, SettingType.DRAWING, true));
     addSetting(new TestbedSetting(DrawHelp, SettingType.DRAWING, false));
     addSetting(new TestbedSetting(DrawTree, SettingType.DRAWING, false));
+    addSetting(new TestbedSetting(DrawWireframe, SettingType.DRAWING, true));
   }
 
   /**

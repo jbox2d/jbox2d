@@ -44,10 +44,23 @@ public class JoglDebugDraw extends DebugDraw {
   private final TextRenderer text;
   private static final int NUM_CIRCLE_POINTS = 13;
 
-  public JoglDebugDraw(JoglPanel argPanel) {
-    super();
-    panel = argPanel;
+
+  private final float[] mat = new float[16];
+
+  public JoglDebugDraw(JoglPanel panel) {
+    this.panel = panel;
     text = new TextRenderer(new Font("Courier New", Font.PLAIN, 12));
+
+    mat[8] = 0;
+    mat[9] = 0;
+    mat[2] = 0;
+    mat[6] = 0;
+    mat[10] = 1;
+    mat[14] = 0;
+    mat[3] = 0;
+    mat[7] = 0;
+    mat[11] = 0;
+    mat[15] = 1;
   }
 
   @Override
@@ -56,7 +69,6 @@ public class JoglDebugDraw extends DebugDraw {
     super.setViewportTransform(viewportTransform);
   }
 
-  private final float[] mat = new float[16];
 
   public void transformViewport(GL2 gl, Vec2 center) {
     Vec2 e = viewportTransform.getExtents();
@@ -66,20 +78,20 @@ public class JoglDebugDraw extends DebugDraw {
     int f = viewportTransform.isYFlip() ? -1 : 1;
     mat[0] = vt.ex.x;
     mat[4] = vt.ey.x;
-    mat[8] = 0;
+    // mat[8] = 0;
     mat[12] = e.x;
     mat[1] = f * vt.ex.y;
     mat[5] = f * vt.ey.y;
-    mat[9] = 0;
+    // mat[9] = 0;
     mat[13] = e.y;
-    mat[2] = 0;
-    mat[6] = 0;
-    mat[10] = 1;
-    mat[14] = 0;
-    mat[3] = 0;
-    mat[7] = 0;
-    mat[11] = 0;
-    mat[15] = 1;
+    // mat[2] = 0;
+    // mat[6] = 0;
+    // mat[10] = 1;
+    // mat[14] = 0;
+    // mat[3] = 0;
+    // mat[7] = 0;
+    // mat[11] = 0;
+    // mat[15] = 1;
 
     gl.glMultMatrixf(mat, 0);
     gl.glTranslatef(center.x - vc.x, center.y - vc.y, 0);
@@ -112,8 +124,6 @@ public class JoglDebugDraw extends DebugDraw {
     gl.glPopMatrix();
   }
 
-  private final Vec2 trans = new Vec2();
-
   @Override
   public void drawSolidPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
     GL2 gl = panel.getGL().getGL2();
@@ -141,8 +151,7 @@ public class JoglDebugDraw extends DebugDraw {
   public void drawCircle(Vec2 center, float radius, Color3f color) {
     GL2 gl = panel.getGL().getGL2();
     gl.glPushMatrix();
-    transformViewport(gl, center);
-    
+    transformViewport(gl, zero);
     float theta = 2 * MathUtils.PI / NUM_CIRCLE_POINTS;
     float c = MathUtils.cos(theta);
     float s = MathUtils.sin(theta);
@@ -159,6 +168,35 @@ public class JoglDebugDraw extends DebugDraw {
       x = c * x - s * y;
       y = s * temp + c * y;
     }
+    gl.glEnd();
+    gl.glPopMatrix();
+  }
+
+  @Override
+  public void drawCircle(Vec2 center, float radius, Vec2 axis, Color3f color) {
+    GL2 gl = panel.getGL().getGL2();
+    gl.glPushMatrix();
+    transformViewport(gl, zero);
+    float theta = 2 * MathUtils.PI / NUM_CIRCLE_POINTS;
+    float c = MathUtils.cos(theta);
+    float s = MathUtils.sin(theta);
+    float x = radius;
+    float y = 0;
+    float cx = center.x;
+    float cy = center.y;
+    gl.glBegin(GL2.GL_LINE_LOOP);
+    gl.glColor4f(color.x, color.y, color.z, 1);
+    for (int i = 0; i < NUM_CIRCLE_POINTS; i++) {
+      gl.glVertex3f(x + cx, y + cy, 0);
+      // apply the rotation matrix
+      float temp = x;
+      x = c * x - s * y;
+      y = s * temp + c * y;
+    }
+    gl.glEnd();
+    gl.glBegin(GL2.GL_LINES);
+    gl.glVertex3f(cx, cy, 0);
+    gl.glVertex3f(cx + axis.x * radius, cy + axis.y * radius, 0);
     gl.glEnd();
     gl.glPopMatrix();
   }
@@ -200,19 +238,19 @@ public class JoglDebugDraw extends DebugDraw {
     gl.glVertex3f(cx + axis.x * radius, cy + axis.y * radius, 0);
     gl.glEnd();
     gl.glPopMatrix();
-    // drawSegment(center, vecs[0], color);
   }
 
   @Override
   public void drawSegment(Vec2 p1, Vec2 p2, Color3f color) {
     GL2 gl = panel.getGL().getGL2();
+    gl.glPushMatrix();
+    transformViewport(gl, zero);
     gl.glBegin(GL2.GL_LINES);
     gl.glColor3f(color.x, color.y, color.z);
-    getWorldToScreenToOut(p1, trans);
-    gl.glVertex2f(trans.x, trans.y);
-    getWorldToScreenToOut(p2, trans);
-    gl.glVertex2f(trans.x, trans.y);
+    gl.glVertex3f(p1.x, p1.y, 0);
+    gl.glVertex3f(p2.x, p2.y, 0);
     gl.glEnd();
+    gl.glPopMatrix();
   }
 
   @Override
@@ -241,8 +279,42 @@ public class JoglDebugDraw extends DebugDraw {
       }
       for (int j = 0; j < NUM_CIRCLE_POINTS; j++) {
         gl.glVertex3f(x + cx, y + cy, 0);
+        float temp = x;
+        x = c * x - s * y;
+        y = s * temp + c * y;
+      }
+      gl.glEnd();
+    }
+    gl.glPopMatrix();
+  }
 
-        // apply the rotation matrix
+
+  @Override
+  public void drawParticlesWireframe(Vec2[] centers, float radius, ParticleColor[] colors, int count) {
+    GL2 gl = panel.getGL().getGL2();
+    gl.glPushMatrix();
+    transformViewport(gl, zero);
+
+    float theta = 2 * MathUtils.PI / NUM_CIRCLE_POINTS;
+    float c = MathUtils.cos(theta);
+    float s = MathUtils.sin(theta);
+
+    float x = radius;
+    float y = 0;
+
+    for (int i = 0; i < count; i++) {
+      Vec2 center = centers[i];
+      float cx = center.x;
+      float cy = center.y;
+      gl.glBegin(GL2.GL_LINE_LOOP);
+      if (colors == null) {
+        gl.glColor4f(1, 1, 1, 1);
+      } else {
+        ParticleColor color = colors[i];
+        gl.glColor4b(color.r, color.g, color.b, (byte) 127);
+      }
+      for (int j = 0; j < NUM_CIRCLE_POINTS; j++) {
+        gl.glVertex3f(x + cx, y + cy, 0);
         float temp = x;
         x = c * x - s * y;
         y = s * temp + c * y;

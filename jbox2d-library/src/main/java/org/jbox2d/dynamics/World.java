@@ -685,7 +685,9 @@ public class World {
       return;
     }
 
+
     int flags = m_debugDraw.getFlags();
+    boolean wireframe = (flags & DebugDraw.e_wireframeDrawingBit) != 0;
 
     if ((flags & DebugDraw.e_shapeBit) != 0) {
       for (Body b = m_bodyList; b != null; b = b.getNext()) {
@@ -693,19 +695,19 @@ public class World {
         for (Fixture f = b.getFixtureList(); f != null; f = f.getNext()) {
           if (b.isActive() == false) {
             color.set(0.5f, 0.5f, 0.3f);
-            drawShape(f, xf, color);
+            drawShape(f, xf, color, wireframe);
           } else if (b.getType() == BodyType.STATIC) {
             color.set(0.5f, 0.9f, 0.3f);
-            drawShape(f, xf, color);
+            drawShape(f, xf, color, wireframe);
           } else if (b.getType() == BodyType.KINEMATIC) {
             color.set(0.5f, 0.5f, 0.9f);
-            drawShape(f, xf, color);
+            drawShape(f, xf, color, wireframe);
           } else if (b.isAwake() == false) {
             color.set(0.5f, 0.5f, 0.5f);
-            drawShape(f, xf, color);
+            drawShape(f, xf, color, wireframe);
           } else {
             color.set(0.9f, 0.7f, 0.7f);
-            drawShape(f, xf, color);
+            drawShape(f, xf, color, wireframe);
           }
         }
       }
@@ -1566,7 +1568,7 @@ public class World {
   private final Vec2 v2 = new Vec2();
   private final Vec2Array tlvertices = new Vec2Array();
 
-  private void drawShape(Fixture fixture, Transform xf, Color3f color) {
+  private void drawShape(Fixture fixture, Transform xf, Color3f color, boolean wireframe) {
     switch (fixture.getType()) {
       case CIRCLE: {
         CircleShape circle = (CircleShape) fixture.getShape();
@@ -1591,8 +1593,11 @@ public class World {
           m_debugDraw.drawSegment(center, circCenterMoved, liquidColor);
           return;
         }
-
-        m_debugDraw.drawSolidCircle(center, radius, axis, color);
+        if (wireframe) {
+          m_debugDraw.drawCircle(center, radius, axis, color);
+        } else {
+          m_debugDraw.drawSolidCircle(center, radius, axis, color);
+        }
       }
         break;
 
@@ -1606,8 +1611,11 @@ public class World {
           // vertices[i] = Mul(xf, poly.m_vertices[i]);
           Transform.mulToOutUnsafe(xf, poly.m_vertices[i], vertices[i]);
         }
-
-        m_debugDraw.drawSolidPolygon(vertices, vertexCount, color);
+        if (wireframe) {
+          m_debugDraw.drawPolygon(vertices, vertexCount, color);
+        } else {
+          m_debugDraw.drawSolidPolygon(vertices, vertexCount, color);
+        }
       }
         break;
       case EDGE: {
@@ -1617,7 +1625,6 @@ public class World {
         m_debugDraw.drawSegment(v1, v2, color);
       }
         break;
-
       case CHAIN: {
         ChainShape chain = (ChainShape) fixture.getShape();
         int count = chain.m_count;
@@ -1638,15 +1645,20 @@ public class World {
   }
 
   private void drawParticleSystem(ParticleSystem system) {
+    boolean wireframe = (m_debugDraw.getFlags() & DebugDraw.e_wireframeDrawingBit) != 0;
     int particleCount = system.getParticleCount();
     if (particleCount != 0) {
       float particleRadius = system.getParticleRadius();
       Vec2[] positionBuffer = system.getParticlePositionBuffer();
+      ParticleColor[] colorBuffer = null;
       if (system.m_colorBuffer.data != null) {
-        ParticleColor[] colorBuffer = system.getParticleColorBuffer();
-        m_debugDraw.drawParticles(positionBuffer, particleRadius, colorBuffer, particleCount);
+        colorBuffer = system.getParticleColorBuffer();
+      }
+      if (wireframe) {
+        m_debugDraw.drawParticlesWireframe(positionBuffer, particleRadius, colorBuffer,
+            particleCount);
       } else {
-        m_debugDraw.drawParticles(positionBuffer, particleRadius, null, particleCount);
+        m_debugDraw.drawParticles(positionBuffer, particleRadius, colorBuffer, particleCount);
       }
     }
   }

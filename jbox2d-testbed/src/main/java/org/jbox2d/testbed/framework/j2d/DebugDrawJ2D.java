@@ -51,7 +51,6 @@ import org.jbox2d.testbed.pooling.ColorPool;
  * @author Daniel Murphy
  */
 public class DebugDrawJ2D extends DebugDraw {
-  public static boolean DISABLE_FILL = true;
   public static int circlePoints = 13;
   public static final float edgeWidth = 0.02f;
 
@@ -98,11 +97,9 @@ public class DebugDrawJ2D extends DebugDraw {
 
     Color c = cpool.getColor(color.x, color.y, color.z);
     Graphics2D g = getGraphics();
-    saveState(g);
     g.setColor(c);
     g.setStroke(stroke);
     g.drawLine((int) sp1.x, (int) sp1.y, (int) sp2.x, (int) sp2.y);
-    restoreState(g);
   }
 
   public void drawAABB(AABB argAABB, Color3f color) {
@@ -149,6 +146,23 @@ public class DebugDrawJ2D extends DebugDraw {
     g.drawOval(-1, -1, 2, 2);
     restoreState(g);
   }
+  
+  @Override
+  public void drawCircle(Vec2 center, float radius, Vec2 axis, Color3f color) {
+    Graphics2D g = getGraphics();
+    saveState(g);
+    transformGraphics(g, center);
+    g.setStroke(stroke);
+    Color s = cpool.getColor(color.x, color.y, color.z, 1f);
+    g.scale(radius, radius);
+    g.setColor(s);
+    g.draw(circle);
+    g.rotate(MathUtils.atan2(axis.y, axis.x));
+    if (axis != null) {
+      g.drawLine(0, 0, 1, 0);
+    }
+    restoreState(g);
+  }
 
   @Override
   public void drawSolidCircle(Vec2 center, float radius, Vec2 axis, Color3f color) {
@@ -159,10 +173,8 @@ public class DebugDrawJ2D extends DebugDraw {
     Color f = cpool.getColor(color.x, color.y, color.z, .4f);
     Color s = cpool.getColor(color.x, color.y, color.z, 1f);
     g.scale(radius, radius);
-    if (!DISABLE_FILL) {
-      g.setColor(f);
-      g.fill(circle);
-    }
+    g.setColor(f);
+    g.fill(circle);
     g.setColor(s);
     g.draw(circle);
     g.rotate(MathUtils.atan2(axis.y, axis.x));
@@ -173,7 +185,7 @@ public class DebugDrawJ2D extends DebugDraw {
   }
 
   private final Vec2 zero = new Vec2();
-  private final Color pcolor = new Color(1f, 1f, 1f, 1f);
+  private final Color pcolorA = new Color(1f, 1f, 1f, .4f);
 
   @Override
   public void drawParticles(Vec2[] centers, float radius, ParticleColor[] colors, int count) {
@@ -185,12 +197,39 @@ public class DebugDrawJ2D extends DebugDraw {
       Vec2 center = centers[i];
       Color color;
       if (colors == null) {
+        color = pcolorA;
+      } else {
+        ParticleColor c = colors[i];
+        color = cpool.getColor(c.r * 1f / 127, c.g * 1f / 127, c.b * 1f / 127, c.a * 1f / 127);
+      }
+      AffineTransform old = g.getTransform();
+      g.translate(center.x, center.y);
+      g.scale(radius, radius);
+      g.setColor(color);
+      g.fill(circle);
+      g.setTransform(old);
+    }
+    restoreState(g);
+  }
+  
+  private final Color pcolor = new Color(1f, 1f, 1f, 1f);
+  
+  @Override
+  public void drawParticlesWireframe(Vec2[] centers, float radius, ParticleColor[] colors, int count) {
+    Graphics2D g = getGraphics();
+    saveState(g);
+    transformGraphics(g, zero);
+    g.setStroke(stroke);
+    for (int i = 0; i < count; i++) {
+      Vec2 center = centers[i];
+      Color color;
+      // No alpha channel, it slows everything down way too much.
+      if (colors == null) {
         color = pcolor;
       } else {
         ParticleColor c = colors[i];
-        color = new Color(c.r, c.g, c.b, c.a);
+        color = new Color(c.r * 1f / 127, c.g * 1f / 127, c.b * 1f / 127, 1);
       }
-      // No alpha channel, it slows everything down way too much.
       AffineTransform old = g.getTransform();
       g.translate(center.x, center.y);
       g.scale(radius, radius);
@@ -218,11 +257,9 @@ public class DebugDrawJ2D extends DebugDraw {
       xInts[i] = (int) temp.x;
       yInts[i] = (int) temp.y;
     }
-    if (!DISABLE_FILL) {
-      g.setColor(f);
-      g.fillPolygon(xInts, yInts, vertexCount);
-    }
     g.setStroke(stroke);
+    g.setColor(f);
+    g.fillPolygon(xInts, yInts, vertexCount);
     g.setColor(s);
     g.drawPolygon(xInts, yInts, vertexCount);
     restoreState(g);

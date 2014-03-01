@@ -40,12 +40,21 @@ import org.jbox2d.particle.ParticleColor;
  */
 public abstract class DebugDraw {
 
-  public static final int e_shapeBit = 0x0001; // /< draw shapes
-  public static final int e_jointBit = 0x0002; // /< draw joint connections
-  public static final int e_aabbBit = 0x0004; // /< draw core (TOI) shapes
-  public static final int e_pairBit = 0x0008; // /< draw axis aligned bounding boxes
-  public static final int e_centerOfMassBit = 0x0010; // /< draw center of mass frame
-  public static final int e_dynamicTreeBit = 0x0020; // /< draw dynamic tree.
+  /** Draw shapes */
+  public static final int e_shapeBit = 1 << 1;
+  /** Draw joint connections */
+  public static final int e_jointBit = 1 << 2;
+  /** Draw axis aligned bounding boxes */
+  public static final int e_aabbBit = 1 << 3;
+  /** Draw pairs of connected objects */
+  public static final int e_pairBit = 1 << 4;
+  /** Draw center of mass frame */
+  public static final int e_centerOfMassBit = 1 << 5;
+  /** Draw dynamic tree */
+  public static final int e_dynamicTreeBit = 1 << 6;
+  /** Draw only the wireframe for drawing performance */
+  public static final int e_wireframeDrawingBit = 1 << 7;
+
 
   protected int m_drawFlags;
   protected IViewportTransform viewportTransform;
@@ -122,6 +131,11 @@ public abstract class DebugDraw {
    */
   public abstract void drawCircle(Vec2 center, float radius, Color3f color);
 
+  /** Draws a circle with an axis */
+  public void drawCircle(Vec2 center, float radius, Vec2 axis, Color3f color) {
+    drawCircle(center, radius, color);
+  }
+
   /**
    * Draw a solid circle.
    * 
@@ -164,6 +178,14 @@ public abstract class DebugDraw {
    * @param colors can be null
    */
   public abstract void drawParticles(Vec2[] centers, float radius, ParticleColor[] colors, int count);
+
+  /**
+   * Draw a particle array
+   * 
+   * @param colors can be null
+   */
+  public abstract void drawParticlesWireframe(Vec2[] centers, float radius, ParticleColor[] colors,
+      int count);
 
   /** Called at the end of drawing a world */
   public void flush() {}

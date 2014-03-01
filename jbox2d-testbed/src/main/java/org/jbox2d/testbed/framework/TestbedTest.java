@@ -431,6 +431,10 @@ public abstract class TestbedTest
     flags +=
         settings.getSetting(TestbedSettings.DrawCOMs).enabled ? DebugDraw.e_centerOfMassBit : 0;
     flags += settings.getSetting(TestbedSettings.DrawTree).enabled ? DebugDraw.e_dynamicTreeBit : 0;
+    flags +=
+        settings.getSetting(TestbedSettings.DrawWireframe).enabled
+            ? DebugDraw.e_wireframeDrawingBit
+            : 0;
     debugDraw.setFlags(flags);
 
     m_world.setAllowSleep(settings.getSetting(TestbedSettings.AllowSleep).enabled);
@@ -454,7 +458,7 @@ public abstract class TestbedTest
     debugDraw.drawString(5, m_textLine, "Framerate: " + (int) model.getCalculatedFps(),
         Color3f.WHITE);
     m_textLine += TEXT_LINE_SPACE;
-    
+
     if (settings.getSetting(TestbedSettings.DrawStats).enabled) {
       int particleCount = m_world.getParticleCount();
       int groupCount = m_world.getParticleGroupCount();
