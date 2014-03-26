@@ -19,7 +19,8 @@ import org.jbox2d.testbed.framework.TestbedTest;
 import com.google.common.collect.Lists;
 
 public class AWTPanelHelper {
-  
+  static boolean smb_toggle = false;
+  static boolean drag_toggle = false;
   /**
    * Adds common help text and listeners for awt-based testbeds.
    */
@@ -51,6 +52,9 @@ public class AWTPanelHelper {
       @Override
       public void mouseReleased(MouseEvent arg0) {
         controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), arg0.getButton());
+        if(arg0.getButton() == screenDragButton) smb_toggle = false;
+        if(arg0.getButton() == TestbedTest.MOUSE_JOINT_BUTTON)
+        	drag_toggle = false;
 
         if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
           controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), 10);
@@ -61,11 +65,14 @@ public class AWTPanelHelper {
       public void mousePressed(MouseEvent arg0) {
         controller.queueMouseDown(new Vec2(arg0.getX(), arg0.getY()), arg0.getButton());
 
+        if(arg0.getButton() == TestbedTest.MOUSE_JOINT_BUTTON)
+        	drag_toggle = true;
         if (arg0.getButton() == screenDragButton) {
+        	smb_toggle = true;
           oldDragMouse.set(arg0.getX(), arg0.getY());
         }
         if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
-          controller.queueMouseDown(new Vec2(arg0.getX(), arg0.getY()), 10);
+          controller.queueMouseDown(new Vec2(arg0.getX(), arg0.getY()), TestbedTest.BOMB_SPAWN_BUTTON);
         }
       }
     });
@@ -80,9 +87,8 @@ public class AWTPanelHelper {
       @Override
       public void mouseDragged(MouseEvent arg0) {
         mouse.set(arg0.getX(), arg0.getY());
-        controller.queueMouseDrag(new Vec2(mouse), arg0.getButton());
 
-        if (arg0.getButton() == screenDragButton) {
+        if (smb_toggle) {
           TestbedTest currTest = model.getCurrTest();
           if (currTest == null) {
             return;
@@ -90,10 +96,11 @@ public class AWTPanelHelper {
           Vec2 diff = oldDragMouse.sub(mouse);
           currTest.getCamera().moveWorld(diff);
           oldDragMouse.set(mouse);
-        }
-        if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
+        }else if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
           controller.queueMouseDrag(new Vec2(arg0.getX(), arg0.getY()), 10);
-        }
+        }else if(drag_toggle)
+            controller.queueMouseDrag(new Vec2(mouse), TestbedTest.MOUSE_JOINT_BUTTON);
+
       }
     });
 
