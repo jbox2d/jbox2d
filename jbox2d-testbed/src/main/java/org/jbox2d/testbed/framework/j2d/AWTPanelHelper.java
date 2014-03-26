@@ -19,8 +19,8 @@ import org.jbox2d.testbed.framework.TestbedTest;
 import com.google.common.collect.Lists;
 
 public class AWTPanelHelper {
-  static boolean smb_toggle = false;
-  static boolean drag_toggle = false;
+  static boolean screenDragButtonDown = false;
+  static boolean mouseJointButtonDown = false;
   /**
    * Adds common help text and listeners for awt-based testbeds.
    */
@@ -51,28 +51,26 @@ public class AWTPanelHelper {
     panel.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseReleased(MouseEvent arg0) {
-        controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), arg0.getButton());
-        if(arg0.getButton() == screenDragButton) smb_toggle = false;
-        if(arg0.getButton() == TestbedTest.MOUSE_JOINT_BUTTON)
-        	drag_toggle = false;
-
-        if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
-          controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), 10);
+        if(arg0.getButton() == screenDragButton) {
+          screenDragButtonDown = false;
+        }else if (model.getCodedKeys()[KeyEvent.VK_SHIFT] && !mouseJointButtonDown) {
+          controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), TestbedTest.BOMB_SPAWN_BUTTON);
+        }else if(arg0.getButton() == TestbedTest.MOUSE_JOINT_BUTTON) {
+          mouseJointButtonDown = false;
+          controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), TestbedTest.MOUSE_JOINT_BUTTON);
         }
       }
 
       @Override
       public void mousePressed(MouseEvent arg0) {
-        controller.queueMouseDown(new Vec2(arg0.getX(), arg0.getY()), arg0.getButton());
-
-        if(arg0.getButton() == TestbedTest.MOUSE_JOINT_BUTTON)
-        	drag_toggle = true;
         if (arg0.getButton() == screenDragButton) {
-        	smb_toggle = true;
+          screenDragButtonDown = true;
           oldDragMouse.set(arg0.getX(), arg0.getY());
-        }
-        if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
+        }else if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
           controller.queueMouseDown(new Vec2(arg0.getX(), arg0.getY()), TestbedTest.BOMB_SPAWN_BUTTON);
+        }else if(arg0.getButton() == TestbedTest.MOUSE_JOINT_BUTTON) {
+          mouseJointButtonDown = true;
+          controller.queueMouseDown(new Vec2(arg0.getX(), arg0.getY()), TestbedTest.MOUSE_JOINT_BUTTON);
         }
       }
     });
@@ -87,8 +85,7 @@ public class AWTPanelHelper {
       @Override
       public void mouseDragged(MouseEvent arg0) {
         mouse.set(arg0.getX(), arg0.getY());
-
-        if (smb_toggle) {
+        if (screenDragButtonDown) {
           TestbedTest currTest = model.getCurrTest();
           if (currTest == null) {
             return;
@@ -96,11 +93,11 @@ public class AWTPanelHelper {
           Vec2 diff = oldDragMouse.sub(mouse);
           currTest.getCamera().moveWorld(diff);
           oldDragMouse.set(mouse);
-        }else if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
-          controller.queueMouseDrag(new Vec2(arg0.getX(), arg0.getY()), 10);
-        }else if(drag_toggle)
-            controller.queueMouseDrag(new Vec2(mouse), TestbedTest.MOUSE_JOINT_BUTTON);
-
+        }else if (model.getCodedKeys()[KeyEvent.VK_SHIFT] && !mouseJointButtonDown) {
+          controller.queueMouseDrag(new Vec2(arg0.getX(), arg0.getY()), TestbedTest.BOMB_SPAWN_BUTTON);
+        }else if(mouseJointButtonDown) {
+          controller.queueMouseDrag(new Vec2(mouse), TestbedTest.MOUSE_JOINT_BUTTON);
+        }
       }
     });
 
