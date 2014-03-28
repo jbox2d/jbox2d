@@ -51,11 +51,11 @@ public class AWTPanelHelper {
     panel.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseReleased(MouseEvent arg0) {
-        if(arg0.getButton() == screenDragButton) {
+        if (arg0.getButton() == screenDragButton) {
           screenDragButtonDown = false;
-        }else if (model.getCodedKeys()[KeyEvent.VK_SHIFT] && !mouseJointButtonDown) {
+        } else if (model.getCodedKeys()[KeyEvent.VK_SHIFT] && !mouseJointButtonDown) {
           controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), TestbedTest.BOMB_SPAWN_BUTTON);
-        }else if(arg0.getButton() == TestbedTest.MOUSE_JOINT_BUTTON) {
+        } else if (arg0.getButton() == TestbedTest.MOUSE_JOINT_BUTTON) {
           mouseJointButtonDown = false;
           controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), TestbedTest.MOUSE_JOINT_BUTTON);
         }
@@ -66,9 +66,9 @@ public class AWTPanelHelper {
         if (arg0.getButton() == screenDragButton) {
           screenDragButtonDown = true;
           oldDragMouse.set(arg0.getX(), arg0.getY());
-        }else if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
+        } else if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
           controller.queueMouseDown(new Vec2(arg0.getX(), arg0.getY()), TestbedTest.BOMB_SPAWN_BUTTON);
-        }else if(arg0.getButton() == TestbedTest.MOUSE_JOINT_BUTTON) {
+        } else if (arg0.getButton() == TestbedTest.MOUSE_JOINT_BUTTON) {
           mouseJointButtonDown = true;
           controller.queueMouseDown(new Vec2(arg0.getX(), arg0.getY()), TestbedTest.MOUSE_JOINT_BUTTON);
         }
@@ -93,10 +93,10 @@ public class AWTPanelHelper {
           Vec2 diff = oldDragMouse.sub(mouse);
           currTest.getCamera().moveWorld(diff);
           oldDragMouse.set(mouse);
-        }else if (model.getCodedKeys()[KeyEvent.VK_SHIFT] && !mouseJointButtonDown) {
+        } else if (mouseJointButtonDown) {
+            controller.queueMouseDrag(new Vec2(mouse), TestbedTest.MOUSE_JOINT_BUTTON);
+        } else if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
           controller.queueMouseDrag(new Vec2(arg0.getX(), arg0.getY()), TestbedTest.BOMB_SPAWN_BUTTON);
-        }else if(mouseJointButtonDown) {
-          controller.queueMouseDrag(new Vec2(mouse), TestbedTest.MOUSE_JOINT_BUTTON);
         }
       }
     });
