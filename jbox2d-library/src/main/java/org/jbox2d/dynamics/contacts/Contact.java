@@ -98,7 +98,7 @@ public abstract class Contact {
 
   /** initialization for pooling */
   public void init(Fixture fA, int indexA, Fixture fB, int indexB) {
-    m_flags = 0;
+    m_flags = ENABLED_FLAG;
 
     m_fixtureA = fA;
     m_fixtureB = fB;

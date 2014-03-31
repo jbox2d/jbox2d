@@ -49,7 +49,7 @@ public class BulletTest extends TestbedTest {
       box.setAsBox(0.25f, 0.25f);
 
       // m_x = RandomFloat(-1.0f, 1.0f);
-      m_x = 0.20352793f;
+      m_x = -0.06530577f;
       bd.position.set(m_x, 10.0f);
       bd.bullet = true;
 
@@ -66,7 +66,9 @@ public class BulletTest extends TestbedTest {
     m_body.setAngularVelocity(0.0f);
 
     m_x = MathUtils.randomFloat(-1.0f, 1.0f);
+    m_x = -0.06530577f;
     m_bullet.setTransform(new Vec2(m_x, 10.0f), 0.0f);
+    System.out.println(m_x);
     m_bullet.setLinearVelocity(new Vec2(0.0f, -50.0f));
     m_bullet.setAngularVelocity(0.0f);
 
