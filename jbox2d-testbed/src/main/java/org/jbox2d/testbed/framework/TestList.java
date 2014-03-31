@@ -27,6 +27,7 @@ import org.jbox2d.testbed.tests.ApplyForce;
 import org.jbox2d.testbed.tests.BlobTest4;
 import org.jbox2d.testbed.tests.BodyTypes;
 import org.jbox2d.testbed.tests.Breakable;
+import org.jbox2d.testbed.tests.BulletTest;
 import org.jbox2d.testbed.tests.Cantilever;
 import org.jbox2d.testbed.tests.Car;
 import org.jbox2d.testbed.tests.Chain;
@@ -81,6 +82,7 @@ public class TestList {
   public static void populateModel(TestbedModel model) {
     // particles
     model.addCategory("Particles");
+    model.addTest(new BulletTest());
     model.addTest(new DamBreak());
     model.addTest(new DrawingParticles());
     model.addTest(new LiquidTimer());

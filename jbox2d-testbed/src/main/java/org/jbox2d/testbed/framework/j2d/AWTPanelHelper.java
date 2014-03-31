@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 public class AWTPanelHelper {
   static boolean screenDragButtonDown = false;
   static boolean mouseJointButtonDown = false;
+
   /**
    * Adds common help text and listeners for awt-based testbeds.
    */
@@ -55,9 +56,11 @@ public class AWTPanelHelper {
           screenDragButtonDown = false;
         } else if (model.getCodedKeys()[KeyEvent.VK_SHIFT] && !mouseJointButtonDown) {
           controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), TestbedTest.BOMB_SPAWN_BUTTON);
-        } else if (arg0.getButton() == TestbedTest.MOUSE_JOINT_BUTTON) {
-          mouseJointButtonDown = false;
-          controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), TestbedTest.MOUSE_JOINT_BUTTON);
+        } else {
+          if (arg0.getButton() == TestbedTest.MOUSE_JOINT_BUTTON) {
+            mouseJointButtonDown = false;
+          }
+          controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), arg0.getButton());
         }
       }
 
@@ -66,11 +69,15 @@ public class AWTPanelHelper {
         if (arg0.getButton() == screenDragButton) {
           screenDragButtonDown = true;
           oldDragMouse.set(arg0.getX(), arg0.getY());
+          return;
         } else if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
-          controller.queueMouseDown(new Vec2(arg0.getX(), arg0.getY()), TestbedTest.BOMB_SPAWN_BUTTON);
-        } else if (arg0.getButton() == TestbedTest.MOUSE_JOINT_BUTTON) {
-          mouseJointButtonDown = true;
-          controller.queueMouseDown(new Vec2(arg0.getX(), arg0.getY()), TestbedTest.MOUSE_JOINT_BUTTON);
+          controller.queueMouseDown(new Vec2(arg0.getX(), arg0.getY()),
+              TestbedTest.BOMB_SPAWN_BUTTON);
+        } else {
+          if (arg0.getButton() == TestbedTest.MOUSE_JOINT_BUTTON) {
+            mouseJointButtonDown = true;
+          }
+          controller.queueMouseDown(new Vec2(arg0.getX(), arg0.getY()), arg0.getButton());
         }
       }
     });
@@ -94,9 +101,12 @@ public class AWTPanelHelper {
           currTest.getCamera().moveWorld(diff);
           oldDragMouse.set(mouse);
         } else if (mouseJointButtonDown) {
-            controller.queueMouseDrag(new Vec2(mouse), TestbedTest.MOUSE_JOINT_BUTTON);
+          controller.queueMouseDrag(new Vec2(mouse), TestbedTest.MOUSE_JOINT_BUTTON);
         } else if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
-          controller.queueMouseDrag(new Vec2(arg0.getX(), arg0.getY()), TestbedTest.BOMB_SPAWN_BUTTON);
+          controller.queueMouseDrag(new Vec2(arg0.getX(), arg0.getY()),
+              TestbedTest.BOMB_SPAWN_BUTTON);
+        } else {
+          controller.queueMouseDrag(new Vec2(mouse), arg0.getButton());
         }
       }
     });
