@@ -164,6 +164,16 @@ public class ParticleSystem {
     m_colorBuffer = new ParticleBuffer<ParticleColor>(ParticleColor.class);
     m_userDataBuffer = new ParticleBuffer<Object>(Object.class);
   }
+  
+//  public void assertNotSamePosition() {
+//    for (int i = 0; i < m_count; i++) {
+//      Vec2 vi = m_positionBuffer.data[i];
+//      for (int j = i + 1; j < m_count; j++) {
+//        Vec2 vj = m_positionBuffer.data[j];
+//        assert(vi.x != vj.x || vi.y != vj.y);
+//      }
+//    }
+//  }
 
   public int createParticle(ParticleDef def) {
     if (m_count >= m_internalAllocatedCapacity) {
@@ -206,6 +216,7 @@ public class ParticleSystem {
     int index = m_count++;
     m_flagsBuffer.data[index] = def.flags;
     m_positionBuffer.data[index].set(def.position);
+//    assertNotSamePosition();
     m_velocityBuffer.data[index].set(def.velocity);
     m_groupBuffer[index] = null;
     if (m_depthBuffer != null) {
@@ -536,11 +547,13 @@ public class ParticleSystem {
   }
 
   public void addContact(int a, int b) {
+    assert(a != b);
     Vec2 pa = m_positionBuffer.data[a];
     Vec2 pb = m_positionBuffer.data[b];
     float dx = pb.x - pa.x;
     float dy = pb.y - pa.y;
     float d2 = dx * dx + dy * dy;
+//    assert(d2 != 0);
     if (d2 < m_squaredDiameter) {
       if (m_contactCount >= m_contactCapacity) {
         int oldCapacity = m_contactCapacity;
@@ -551,7 +564,7 @@ public class ParticleSystem {
                 newCapacity);
         m_contactCapacity = newCapacity;
       }
-      float invD = MathUtils.sqrt(1 / d2);
+      float invD = d2 != 0 ? MathUtils.sqrt(1 / d2) : Float.MAX_VALUE;
       ParticleContact contact = m_contactBuffer[m_contactCount];
       contact.indexA = a;
       contact.indexB = b;
@@ -697,7 +710,7 @@ public class ParticleSystem {
       v.y += gravityy;
       float v2 = v.x * v.x + v.y * v.y;
       if (v2 > criticalVelocytySquared) {
-        float a = MathUtils.sqrt(criticalVelocytySquared / v2);
+        float a = v2 == 0 ? Float.MAX_VALUE : MathUtils.sqrt(criticalVelocytySquared / v2);
         v.x *= a;
         v.y *= a;
       }
@@ -932,7 +945,7 @@ public class ParticleSystem {
         float rs = Vec2.cross(oa, pa) + Vec2.cross(ob, pb) + Vec2.cross(oc, pc);
         float rc = Vec2.dot(oa, pa) + Vec2.dot(ob, pb) + Vec2.dot(oc, pc);
         float r2 = rs * rs + rc * rc;
-        float invR = MathUtils.sqrt(1f / r2);
+        float invR = r2 == 0 ? Float.MAX_VALUE : MathUtils.sqrt(1f / r2);
         rs *= invR;
         rc *= invR;
         final float strength = elasticStrength * triad.strength;
@@ -968,6 +981,7 @@ public class ParticleSystem {
         final float dy = pb.y - pa.y;
         float r0 = pair.distance;
         float r1 = MathUtils.sqrt(dx * dx + dy * dy);
+        if (r1 == 0) r1 = Float.MAX_VALUE;
         float strength = springStrength * pair.strength;
         final float fx = strength * (r0 - r1) / r1 * dx;
         final float fy = strength * (r0 - r1) / r1 * dy;
@@ -1679,6 +1693,7 @@ public class ParticleSystem {
     final float vx = point2.x - point1.x;
     final float vy = point2.y - point1.y;
     float v2 = vx * vx + vy * vy;
+    if (v2 == 0) v2 = Float.MAX_VALUE;
     for (int proxy = firstProxy; proxy < lastProxy; ++proxy) {
       int i = m_proxyBuffer[proxy].index;
       final Vec2 posI = m_positionBuffer.data[i];
