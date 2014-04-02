@@ -17,6 +17,16 @@ public class BulletTest extends TestbedTest {
   Body m_body;
   Body m_bullet;
   float m_x;
+  
+  @Override
+  public Vec2 getDefaultCameraPos() {
+    return new Vec2(0, 6);
+  }
+  
+  @Override
+  public float getDefaultCameraScale() {
+    return 40;
+  }
 
   @Override
   public void initTest(boolean deserialized) {
@@ -66,9 +76,7 @@ public class BulletTest extends TestbedTest {
     m_body.setAngularVelocity(0.0f);
 
     m_x = MathUtils.randomFloat(-1.0f, 1.0f);
-    m_x = -0.06530577f;
     m_bullet.setTransform(new Vec2(m_x, 10.0f), 0.0f);
-    System.out.println(m_x);
     m_bullet.setLinearVelocity(new Vec2(0.0f, -50.0f));
     m_bullet.setAngularVelocity(0.0f);
 
