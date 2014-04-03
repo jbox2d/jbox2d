@@ -100,7 +100,10 @@
 					<artifactId>maven-release-plugin</artifactId>
 					<version>2.4.2</version>
 					<configuration>
-						<mavenExecutorId>forked-path</mavenExecutorId>
+						<autoVersionSubmodules>true</autoVersionSubmodules>
+						<useReleaseProfile>false</useReleaseProfile>
+						<releaseProfiles>release</releaseProfiles>
+						<goals>deploy</goals>
 					</configuration>
 				</plugin>
 				<plugin>
