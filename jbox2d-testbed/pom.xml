@@ -9,7 +9,7 @@
 	<artifactId>jbox2d-testbed</artifactId>
 	<name>jbox2d-testbed</name>
 	<packaging>jar</packaging>
-	<url>http://code.google.com/p/jbox2d/</url>
+	<url>https://github.com/jbox2d/jbox2d</url>
 	<description>The testbed for JBox2D, a 2d java physics engine, ported from the C++ Box2d engine.</description>
 	<dependencies>
 	  	<dependency>
