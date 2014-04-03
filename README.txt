@@ -1,7 +1,7 @@
 See the project page online for more information:
 http://code.google.com/p/jbox2d/
 
-If you've downloaded this an archive, you should find the built java jars in the 'target' directories of each project.
+If you've downloaded this as an archive, you should find the built java jars in the 'target' directories of each project.
 
 jbox2d-library - this is the main physics library.  The only dependency is the SLF4J logging library.
 
