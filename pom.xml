@@ -15,15 +15,15 @@
 		<module>jbox2d-testbed-jogl</module>
 	</modules>
 
-	<url>http://code.google.com/p/jbox2d/</url>
+	<url>https://github.com/jbox2d/jbox2d</url>
 	<issueManagement>
-		<url>http://code.google.com/p/jbox2d/issues/list</url>
+		<url>https://github.com/jbox2d/jbox2d/issues</url>
 	</issueManagement>
 
 	<scm>
-		<url>scm:svn:https://jbox2d.googlecode.com/svn</url>
-		<connection>scm:svn:http://jbox2d.googlecode.com/svn/trunk</connection>
-		<developerConnection>scm:svn:https://jbox2d.googlecode.com/svn/trunk</developerConnection>
+		<url>scm:git:git@github.com:jbox2d/jbox2d.git</url>
+		<connection>scm:git:git@github.com:jbox2d/jbox2d.git</connection>
+		<developerConnection>scm:git:git@github.com:jbox2d/jbox2d.git</developerConnection>
 	</scm>
 
 	<developers>
