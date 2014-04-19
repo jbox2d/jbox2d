@@ -527,7 +527,7 @@ public abstract class TestbedTest
     }
   }
   public void mouseDown(Vec2 p, int button, InputEvent rawInput) {
-	    this.mouseDown(p, button); 
+	    this.mouseDown(p, button, rawInput); 
   }
 
   public void mouseMove(Vec2 p) {

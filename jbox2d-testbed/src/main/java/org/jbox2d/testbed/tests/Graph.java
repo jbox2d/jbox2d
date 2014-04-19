@@ -23,6 +23,8 @@
  ******************************************************************************/
 package org.jbox2d.testbed.tests;
 
+import java.awt.event.InputEvent;
+
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.EdgeShape;
@@ -343,11 +345,13 @@ public class Graph extends TestbedTest {
 			jd.dampingRatio = m_zeta;
 			m_spring2 = (WheelJoint) m_world.createJoint(jd);
 		}
+		/*
 		for (int j = 0; j < 100; j++)
 			createBalls();
+			*/
 	}
 
-	public void createBalls() {
+	public void createBalls(Vec2 where) {
 		Body theBall;
 		CircleShape circle = new CircleShape();
 		circle.m_radius = 2.0f;
@@ -359,7 +363,9 @@ public class Graph extends TestbedTest {
 
 		BodyDef ballBodyDef = new BodyDef();
 		ballBodyDef.type = BodyType.DYNAMIC;
-		ballBodyDef.position.set(0.0f, 1.0f);
+		
+		//ballBodyDef.position.set(0.0f, 1.0f);
+		ballBodyDef.position.set(where.x, where.y);
 		theBall = m_world.createBody(ballBodyDef);
 
 		theBall.createFixture(fd);
@@ -375,14 +381,26 @@ public class Graph extends TestbedTest {
 		log.debug("mouseDown!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		if(this.findBody(p) != null){
 			log.debug("Found one!!!!");
+			super.mouseDown(p, button);
 		} else {
 			log.debug("Found None!!!!");
+			this.createBalls(p);
 		}
-			
-		super.mouseDown(p, button);
-		
-	}
 
+	}
+	public void mouseDown(Vec2 p, int button, InputEvent rawInput) {
+		log.debug("mouseDown!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		if(this.findBody(p) != null){
+			log.debug("Found one!!!!");
+			super.mouseDown(p, button);
+		} else {
+			log.debug("Found None!!!!");
+			if (rawInput.isControlDown())
+				this.createBalls(p);
+		}
+
+	}
+	
 	@Override
 	public void keyPressed(char argKeyChar, int argKeyCode) {
 		switch (argKeyChar) {
