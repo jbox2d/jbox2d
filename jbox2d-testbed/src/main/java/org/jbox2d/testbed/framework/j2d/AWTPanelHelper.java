@@ -9,23 +9,37 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.testbed.framework.TestbedCamera.ZoomType;
 import org.jbox2d.testbed.framework.TestbedController;
 import org.jbox2d.testbed.framework.TestbedModel;
 import org.jbox2d.testbed.framework.TestbedTest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
 public class AWTPanelHelper {
-  
+	private static final Logger log = LoggerFactory.getLogger(AWTPanelHelper.class);
+	private static long mLastClick;
+	
+	//private static final Timer mTimer = new Timer();
+	private static final Timer[] mTimerList = new Timer [10];
+	private static final int nextTimerIndex = -1;
+	private static final boolean [] mIsTimerRunning = new boolean[10];
+	
   /**
    * Adds common help text and listeners for awt-based testbeds.
    */
   public static void addHelpAndPanelListeners(Component panel, final TestbedModel model,
       final TestbedController controller, final int screenDragButton) {
-    final Vec2 oldDragMouse = new Vec2();
+	
+    
+	final Vec2 oldDragMouse = new Vec2();
     final Vec2 mouse = new Vec2();
     List<String> help = Lists.newArrayList();
     help.add("Click and drag the left mouse button to move objects.");
@@ -50,6 +64,7 @@ public class AWTPanelHelper {
     panel.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseReleased(MouseEvent arg0) {
+    	log.debug("mouseReleased$$$$$$$$");
         controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), arg0.getButton(), arg0);
 
         if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
@@ -59,7 +74,7 @@ public class AWTPanelHelper {
 
       @Override
       public void mousePressed(MouseEvent arg0) {
-
+    	log.debug("mousePressed$$$$$$$$");
         controller.queueMouseDown(new Vec2(arg0.getX(), arg0.getY()), arg0.getButton(), arg0);
 
         if (arg0.getButton() == screenDragButton) {
@@ -69,6 +84,25 @@ public class AWTPanelHelper {
           controller.queueMouseDown(new Vec2(arg0.getX(), arg0.getY()), 10, arg0);
         }
       }
+      
+      @Override
+      public void mouseClicked(MouseEvent arg0) {
+    	  
+          controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), arg0.getButton(), arg0);
+
+          if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
+            controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), 10, arg0);
+          }
+          /*
+    	  if(arg0.getClickCount() == 1)
+    		  log.debug("mouseClicked(1)$$$$$$$$");
+    	  else if(arg0.getClickCount() == 2)
+    		  log.debug("mouseClicked(2)$$$$$$$$");
+    		  */
+        }
+    
+      
+      
     });
 
     panel.addMouseMotionListener(new MouseMotionAdapter() {
