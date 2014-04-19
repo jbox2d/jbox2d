@@ -24,6 +24,8 @@
 package org.jbox2d.testbed.tests;
 
 import java.awt.event.InputEvent;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.shapes.CircleShape;
@@ -35,6 +37,7 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
+import org.jbox2d.dynamics.joints.DistanceJointDef;
 import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.MouseJoint;
 import org.jbox2d.dynamics.joints.MouseJointDef;
@@ -64,6 +67,10 @@ public class Graph extends TestbedTest {
 	private float m_speed;
 	private WheelJoint m_spring1;
 	private WheelJoint m_spring2;
+	
+	/* Our Stuff
+	 */
+	private ArrayList<Body> m_Vertices;
 
 	@Override
 	public Long getTag(Body body) {
@@ -124,7 +131,9 @@ public class Graph extends TestbedTest {
 	public String getTestName() {
 		return "Graph";
 	}
-
+	public Graph () {
+		m_Vertices = new ArrayList<Body>();
+	}
 	@Override
 	public void initTest(boolean deserialized) {
 		if (deserialized) {
@@ -347,11 +356,33 @@ public class Graph extends TestbedTest {
 		}
 		/*
 		for (int j = 0; j < 100; j++)
-			createBalls();
+			createBall();
 			*/
 	}
-
-	public void createBalls(Vec2 where) {
+	public void createEdge(Body v1, Body v2) {
+		
+		DistanceJointDef j = new DistanceJointDef();
+		
+		Vec2 p = v1.getLocalCenter();
+	    
+	    
+	    //j.type = 
+	    //RopeJointDef j = new RopeJointDef();
+	    
+		//j.length = 5.0f;
+	    
+	    
+	    //j.maxLength = 8.0f;
+	    
+	    
+	    j.frequencyHz = 10.0f;
+	    j.dampingRatio = 1.0f;
+	   
+	    j.bodyA = v1;
+	    j.bodyB = v2;
+	    getWorld().createJoint(j);
+	}
+	public Body createBall(Vec2 where) {
 		Body theBall;
 		CircleShape circle = new CircleShape();
 		circle.m_radius = 2.0f;
@@ -369,6 +400,7 @@ public class Graph extends TestbedTest {
 		theBall = m_world.createBody(ballBodyDef);
 
 		theBall.createFixture(fd);
+		return theBall;
 
 	}
 
@@ -384,19 +416,37 @@ public class Graph extends TestbedTest {
 			super.mouseDown(p, button);
 		} else {
 			log.debug("Found None!!!!");
-			this.createBalls(p);
+			boolean res = m_Vertices.add(this.createBall(p));
+			if (res){
+				log.debug("there are" + m_Vertices.size() + " vertices in the list");
+				
+			} else {
+				log.debug("OH FAILED!!!!!");
+				
+			}
 		}
 
 	}
 	public void mouseDown(Vec2 p, int button, InputEvent rawInput) {
 		log.debug("mouseDown!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		if(this.findBody(p) != null){
-			log.debug("Found one!!!!");
-			super.mouseDown(p, button);
+			log.debug("Clicked on a Vertex!!!!");
+			if (rawInput.isControlDown()){
+				this.createEdge(m_Vertices.get(0), m_Vertices.get(1));
+			} else
+				super.mouseDown(p, button);
 		} else {
-			log.debug("Found None!!!!");
-			if (rawInput.isControlDown())
-				this.createBalls(p);
+			log.debug("Cllicked on Empty space!!!!");
+			if (rawInput.isControlDown()){
+				boolean res = m_Vertices.add(this.createBall(p));
+				if (res){
+					log.debug("there are" + m_Vertices.size() + " vertices in the list");
+					
+				} else {
+					log.debug("OH FAILED!!!!!");
+				
+				}
+			}
 		}
 
 	}
