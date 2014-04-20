@@ -21,7 +21,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-package org.jbox2d.testbed.framework.j2d;
+package org.jbox2d.testbed.framework.j2d.custompanels;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -54,7 +54,7 @@ import org.jbox2d.testbed.framework.TestbedSetting;
 import org.jbox2d.testbed.framework.TestbedSetting.SettingType;
 import org.jbox2d.testbed.framework.TestbedSettings;
 import org.jbox2d.testbed.framework.TestbedTest;
-
+import org.jbox2d.testbed.framework.j2d.TestbedSidePanel;
 
 /**
  * The testbed side panel. Facilitates test and setting changes.
@@ -62,7 +62,7 @@ import org.jbox2d.testbed.framework.TestbedTest;
  * @author Daniel Murphy
  */
 @SuppressWarnings("serial")
-public class TestbedSidePanel extends JPanel implements ChangeListener, ActionListener {
+public class VertexTestPanel extends TestbedSidePanel {
 
 	private static final String SETTING_TAG = "settings";
 	private static final String LABEL_TAG = "label";
@@ -80,7 +80,7 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
 	public JButton saveButton = new JButton("Save");
 	public JButton loadButton = new JButton("Load");
 
-	public TestbedSidePanel(TestbedModel argModel, TestbedController argController) {
+	public VertexTestPanel(TestbedModel argModel, TestbedController argController) {
 		model = argModel;
 		controller = argController;
 		initComponents();
@@ -160,7 +160,7 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
 		top.add(new JLabel("Choose a test:"));
 		top.add(tests);
 
-		addSettings(top, settings, SettingType.DRAWING);
+		//addSettings(top, settings, SettingType.DRAWING);
 
 		add(top, "North");
 
