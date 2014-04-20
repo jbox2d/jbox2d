@@ -358,6 +358,7 @@ public void createEdge(Body v1, Body v2) {
 		ballBodyDef.gravityScale = 0.0f;
 		ballBodyDef.type = BodyType.DYNAMIC;
 		ballBodyDef.position.set(p.x, p.y);
+		ballBodyDef.linearDamping = 5.0f;
 		theBall = m_world.createBody(ballBodyDef);
 
 		theBall.createFixture(fd);
