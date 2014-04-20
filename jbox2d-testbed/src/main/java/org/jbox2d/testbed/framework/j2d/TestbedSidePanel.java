@@ -64,239 +64,239 @@ import org.jbox2d.testbed.framework.TestbedTest;
 @SuppressWarnings("serial")
 public class TestbedSidePanel extends JPanel implements ChangeListener, ActionListener {
 
-  private static final String SETTING_TAG = "settings";
-  private static final String LABEL_TAG = "label";
+	private static final String SETTING_TAG = "settings";
+	private static final String LABEL_TAG = "label";
 
-  final TestbedModel model;
-  final TestbedController controller;
+	final TestbedModel model;
+	final TestbedController controller;
 
-  public JComboBox tests;
+	public JComboBox tests;
 
-  private JButton pauseButton = new JButton("Pause");
-  private JButton stepButton = new JButton("Step");
-  private JButton resetButton = new JButton("Reset");
-  private JButton quitButton = new JButton("Quit");
+	private JButton pauseButton = new JButton("Pause");
+	private JButton stepButton = new JButton("Step");
+	private JButton resetButton = new JButton("Reset");
+	private JButton quitButton = new JButton("Quit");
 
-  public JButton saveButton = new JButton("Save");
-  public JButton loadButton = new JButton("Load");
+	public JButton saveButton = new JButton("Save");
+	public JButton loadButton = new JButton("Load");
 
-  public TestbedSidePanel(TestbedModel argModel, TestbedController argController) {
-    model = argModel;
-    controller = argController;
-    initComponents();
-    addListeners();
+	public TestbedSidePanel(TestbedModel argModel, TestbedController argController) {
+		model = argModel;
+		controller = argController;
+		initComponents();
+		addListeners();
 
-    model.addTestChangeListener(new TestbedModel.TestChangedListener() {
-      @Override
-      public void testChanged(TestbedTest argTest, int argIndex) {
-        tests.setSelectedIndex(argIndex);
-        saveButton.setEnabled(argTest.isSaveLoadEnabled());
-        loadButton.setEnabled(argTest.isSaveLoadEnabled());
-      }
-    });
-  }
+		model.addTestChangeListener(new TestbedModel.TestChangedListener() {
+			@Override
+			public void testChanged(TestbedTest argTest, int argIndex) {
+				tests.setSelectedIndex(argIndex);
+				saveButton.setEnabled(argTest.isSaveLoadEnabled());
+				loadButton.setEnabled(argTest.isSaveLoadEnabled());
+			}
+		});
+	}
 
-  public void initComponents() {
-    setLayout(new BorderLayout());
-    setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+	public void initComponents() {
+		setLayout(new BorderLayout());
+		setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-    TestbedSettings settings = model.getSettings();
+		TestbedSettings settings = model.getSettings();
 
-    JPanel top = new JPanel();
-    top.setLayout(new GridLayout(0, 1));
-    top.setBorder(BorderFactory.createCompoundBorder(new EtchedBorder(EtchedBorder.LOWERED),
-        BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-    tests = new JComboBox(model.getComboModel());
-    tests.setMaximumRowCount(30);
-    tests.setMaximumSize(new Dimension(250, 20));
-    tests.addActionListener(this);
-    tests.setRenderer(new ListCellRenderer() {
-      JLabel categoryLabel = null;
-      JLabel testLabel = null;
+		JPanel top = new JPanel();
+		top.setLayout(new GridLayout(0, 1));
+		top.setBorder(BorderFactory.createCompoundBorder(new EtchedBorder(EtchedBorder.LOWERED),
+				BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+		tests = new JComboBox(model.getComboModel());
+		tests.setMaximumRowCount(30);
+		tests.setMaximumSize(new Dimension(250, 20));
+		tests.addActionListener(this);
+		tests.setRenderer(new ListCellRenderer() {
+			JLabel categoryLabel = null;
+			JLabel testLabel = null;
 
-      @Override
-      public Component getListCellRendererComponent(JList list, Object ovalue, int index,
-          boolean isSelected, boolean cellHasFocus) {
-        ListItem value = (ListItem) ovalue;
-        if (value.isCategory()) {
-          if (categoryLabel == null) {
-            categoryLabel = new JLabel();
-            categoryLabel.setOpaque(true);
-            categoryLabel.setBackground(new Color(.5f, .5f, .6f));
-            categoryLabel.setForeground(Color.white);
-            categoryLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            categoryLabel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
-          }
-          categoryLabel.setText(value.category);
-          return categoryLabel;
-        } else {
-          if (testLabel == null) {
-            testLabel = new JLabel();
-            testLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 1, 0));
-          }
+			@Override
+			public Component getListCellRendererComponent(JList list, Object ovalue, int index,
+					boolean isSelected, boolean cellHasFocus) {
+				ListItem value = (ListItem) ovalue;
+				if (value.isCategory()) {
+					if (categoryLabel == null) {
+						categoryLabel = new JLabel();
+						categoryLabel.setOpaque(true);
+						categoryLabel.setBackground(new Color(.5f, .5f, .6f));
+						categoryLabel.setForeground(Color.white);
+						categoryLabel.setHorizontalAlignment(SwingConstants.CENTER);
+						categoryLabel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+					}
+					categoryLabel.setText(value.category);
+					return categoryLabel;
+				} else {
+					if (testLabel == null) {
+						testLabel = new JLabel();
+						testLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 1, 0));
+					}
 
-          testLabel.setText(value.test.getTestName());
+					testLabel.setText(value.test.getTestName());
 
-          if (isSelected) {
-            testLabel.setBackground(list.getSelectionBackground());
-            testLabel.setForeground(list.getSelectionForeground());
-          } else {
-            testLabel.setBackground(list.getBackground());
-            testLabel.setForeground(list.getForeground());
-          }
-          return testLabel;
-        }
-      }
-    });
+					if (isSelected) {
+						testLabel.setBackground(list.getSelectionBackground());
+						testLabel.setForeground(list.getSelectionForeground());
+					} else {
+						testLabel.setBackground(list.getBackground());
+						testLabel.setForeground(list.getForeground());
+					}
+					return testLabel;
+				}
+			}
+		});
 
-    top.add(new JLabel("Choose a test:"));
-    top.add(tests);
+		top.add(new JLabel("Choose a test:"));
+		top.add(tests);
 
-    addSettings(top, settings, SettingType.DRAWING);
+		addSettings(top, settings, SettingType.DRAWING);
 
-    add(top, "North");
+		add(top, "North");
 
-    JPanel middle = new JPanel();
-    middle.setLayout(new GridLayout(0, 1));
-    middle.setBorder(BorderFactory.createCompoundBorder(new EtchedBorder(EtchedBorder.LOWERED),
-        BorderFactory.createEmptyBorder(5, 10, 5, 10)));
+		JPanel middle = new JPanel();
+		middle.setLayout(new GridLayout(0, 1));
+		middle.setBorder(BorderFactory.createCompoundBorder(new EtchedBorder(EtchedBorder.LOWERED),
+				BorderFactory.createEmptyBorder(5, 10, 5, 10)));
 
-    addSettings(middle, settings, SettingType.ENGINE);
+		addSettings(middle, settings, SettingType.ENGINE);
 
-    add(middle, "Center");
+		add(middle, "Center");
 
-    pauseButton.setAlignmentX(CENTER_ALIGNMENT);
-    stepButton.setAlignmentX(CENTER_ALIGNMENT);
-    resetButton.setAlignmentX(CENTER_ALIGNMENT);
-    saveButton.setAlignmentX(CENTER_ALIGNMENT);
-    loadButton.setAlignmentX(CENTER_ALIGNMENT);
-    quitButton.setAlignmentX(CENTER_ALIGNMENT);
+		pauseButton.setAlignmentX(CENTER_ALIGNMENT);
+		stepButton.setAlignmentX(CENTER_ALIGNMENT);
+		resetButton.setAlignmentX(CENTER_ALIGNMENT);
+		saveButton.setAlignmentX(CENTER_ALIGNMENT);
+		loadButton.setAlignmentX(CENTER_ALIGNMENT);
+		quitButton.setAlignmentX(CENTER_ALIGNMENT);
 
-    Box buttonGroups = Box.createHorizontalBox();
-    JPanel buttons1 = new JPanel();
-    buttons1.setLayout(new GridLayout(0, 1));
-    buttons1.add(resetButton);
+		Box buttonGroups = Box.createHorizontalBox();
+		JPanel buttons1 = new JPanel();
+		buttons1.setLayout(new GridLayout(0, 1));
+		buttons1.add(resetButton);
 
-    JPanel buttons2 = new JPanel();
-    buttons2.setLayout(new GridLayout(0, 1));
-    buttons2.add(pauseButton);
-    buttons2.add(stepButton);
+		JPanel buttons2 = new JPanel();
+		buttons2.setLayout(new GridLayout(0, 1));
+		buttons2.add(pauseButton);
+		buttons2.add(stepButton);
 
-    JPanel buttons3 = new JPanel();
-    buttons3.setLayout(new GridLayout(0, 1));
-    buttons3.add(saveButton);
-    buttons3.add(loadButton);
-    buttons3.add(quitButton);
+		JPanel buttons3 = new JPanel();
+		buttons3.setLayout(new GridLayout(0, 1));
+		buttons3.add(saveButton);
+		buttons3.add(loadButton);
+		buttons3.add(quitButton);
 
-    buttonGroups.add(buttons1);
-    buttonGroups.add(buttons2);
-    buttonGroups.add(buttons3);
+		buttonGroups.add(buttons1);
+		buttonGroups.add(buttons2);
+		buttonGroups.add(buttons3);
 
-    add(buttonGroups, "South");
-  }
+		add(buttonGroups, "South");
+	}
 
-  public void addListeners() {
-    pauseButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        if (model.getSettings().pause) {
-          model.getSettings().pause = false;
-          pauseButton.setText("Pause");
-        } else {
-          model.getSettings().pause = true;
-          pauseButton.setText("Resume");
-        }
-        model.getPanel().grabFocus();
-      }
-    });
+	public void addListeners() {
+		pauseButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (model.getSettings().pause) {
+					model.getSettings().pause = false;
+					pauseButton.setText("Pause");
+				} else {
+					model.getSettings().pause = true;
+					pauseButton.setText("Resume");
+				}
+				model.getPanel().grabFocus();
+			}
+		});
 
-    stepButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        model.getSettings().singleStep = true;
-        if (!model.getSettings().pause) {
-          model.getSettings().pause = true;
-          pauseButton.setText("Resume");
-        }
-        model.getPanel().grabFocus();
-      }
-    });
+		stepButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				model.getSettings().singleStep = true;
+				if (!model.getSettings().pause) {
+					model.getSettings().pause = true;
+					pauseButton.setText("Resume");
+				}
+				model.getPanel().grabFocus();
+			}
+		});
 
-    resetButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        controller.reset();
-      }
-    });
+		resetButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.reset();
+			}
+		});
 
-    quitButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        System.exit(0);
-      }
-    });
+		quitButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
 
-    saveButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        controller.save();
-      }
-    });
+		saveButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.save();
+			}
+		});
 
-    loadButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        controller.load();
-      }
-    });
-  }
+		loadButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.load();
+			}
+		});
+	}
 
-  private void addSettings(JPanel argPanel, TestbedSettings argSettings, SettingType argIgnore) {
-    for (TestbedSetting setting : argSettings.getSettings()) {
-      if (setting.settingsType == argIgnore) {
-        continue;
-      }
-      switch (setting.constraintType) {
-        case RANGE:
-          JLabel text = new JLabel(setting.name + ": " + setting.value);
-          JSlider slider = new JSlider(setting.min, setting.max, setting.value);
-          slider.setMaximumSize(new Dimension(200, 20));
-          slider.addChangeListener(this);
-          slider.setName(setting.name);
-          slider.putClientProperty(SETTING_TAG, setting);
-          slider.putClientProperty(LABEL_TAG, text);
-          argPanel.add(text);
-          argPanel.add(slider);
-          break;
-        case BOOLEAN:
-          JCheckBox checkbox = new JCheckBox(setting.name);
-          checkbox.setSelected(setting.enabled);
-          checkbox.addChangeListener(this);
-          checkbox.putClientProperty(SETTING_TAG, setting);
-          argPanel.add(checkbox);
-          break;
-      }
-    }
-  }
+	private void addSettings(JPanel argPanel, TestbedSettings argSettings, SettingType argIgnore) {
+		for (TestbedSetting setting : argSettings.getSettings()) {
+			if (setting.settingsType == argIgnore) {
+				continue;
+			}
+			switch (setting.constraintType) {
+			case RANGE:
+				JLabel text = new JLabel(setting.name + ": " + setting.value);
+				JSlider slider = new JSlider(setting.min, setting.max, setting.value);
+				slider.setMaximumSize(new Dimension(200, 20));
+				slider.addChangeListener(this);
+				slider.setName(setting.name);
+				slider.putClientProperty(SETTING_TAG, setting);
+				slider.putClientProperty(LABEL_TAG, text);
+				argPanel.add(text);
+				argPanel.add(slider);
+				break;
+			case BOOLEAN:
+				JCheckBox checkbox = new JCheckBox(setting.name);
+				checkbox.setSelected(setting.enabled);
+				checkbox.addChangeListener(this);
+				checkbox.putClientProperty(SETTING_TAG, setting);
+				argPanel.add(checkbox);
+				break;
+			}
+		}
+	}
 
-  public void stateChanged(ChangeEvent e) {
-    JComponent component = (JComponent) e.getSource();
-    TestbedSetting setting = (TestbedSetting) component.getClientProperty(SETTING_TAG);
+	public void stateChanged(ChangeEvent e) {
+		JComponent component = (JComponent) e.getSource();
+		TestbedSetting setting = (TestbedSetting) component.getClientProperty(SETTING_TAG);
 
-    switch (setting.constraintType) {
-      case BOOLEAN:
-        JCheckBox box = (JCheckBox) e.getSource();
-        setting.enabled = box.isSelected();
-        break;
-      case RANGE:
-        JSlider slider = (JSlider) e.getSource();
-        setting.value = slider.getValue();
-        JLabel label = (JLabel) slider.getClientProperty(LABEL_TAG);
-        label.setText(setting.name + ": " + setting.value);
-        break;
-    }
-    model.getPanel().grabFocus();
-  }
+		switch (setting.constraintType) {
+		case BOOLEAN:
+			JCheckBox box = (JCheckBox) e.getSource();
+			setting.enabled = box.isSelected();
+			break;
+		case RANGE:
+			JSlider slider = (JSlider) e.getSource();
+			setting.value = slider.getValue();
+			JLabel label = (JLabel) slider.getClientProperty(LABEL_TAG);
+			label.setText(setting.name + ": " + setting.value);
+			break;
+		}
+		model.getPanel().grabFocus();
+	}
 
-  public void actionPerformed(ActionEvent e) {
-    controller.playTest(tests.getSelectedIndex());
-  }
+	public void actionPerformed(ActionEvent e) {
+		controller.playTest(tests.getSelectedIndex());
+	}
 }
