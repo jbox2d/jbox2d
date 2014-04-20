@@ -19,7 +19,7 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * POSSIBILITY OF SUCH DAMAGE. 
  ******************************************************************************/
 /*
  * JBox2D - A Java Port of Erin Catto's Box2D
@@ -49,13 +49,16 @@ package org.jbox2d.testbed.tests;
 import java.awt.event.InputEvent;
 import java.util.ArrayList;
 
+import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.QueryCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.Distance;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
@@ -286,6 +289,7 @@ public class VertexTest extends TestbedTest {
 		{
 			
 			selectedBody = this.findBody(p); //sets selected body as the one clicked on
+
 			if(recentBody == null) //if null (clicked empty space) sets recent as selected
 			{
 				recentBody = selectedBody; 
@@ -341,6 +345,7 @@ public void createEdge(Body v1, Body v2) {
 	    j.bodyA = v1;
 	    j.bodyB = v2;
 	    getWorld().createJoint(j); 
+	    
 	}
   
   public Body createNewVertex(Vec2 p) {
@@ -348,22 +353,30 @@ public void createEdge(Body v1, Body v2) {
 	  	
 		CircleShape circle = new CircleShape();
 		circle.m_radius = 0.5f;
-	
+
 		FixtureDef fd = new FixtureDef();
 		fd.shape = circle;
 		fd.density = 1.0f;
-		fd.friction = 0.9f;
+		fd.friction = 1.0f;
 	
 		BodyDef ballBodyDef = new BodyDef();
 		ballBodyDef.gravityScale = 0.0f;
 		ballBodyDef.type = BodyType.DYNAMIC;
 		ballBodyDef.position.set(p.x, p.y);
+		ballBodyDef.linearDamping = 5.0f;
+		ballBodyDef.angularDamping = 5.0f;
 		theBall = m_world.createBody(ballBodyDef);
 
 		theBall.createFixture(fd);
 		
 		return theBall;
   }
+  
+  public void dTest()
+  {
+
+  }
+  
 
   @Override
   public String getTestName() {
