@@ -306,7 +306,7 @@ public class VertexTest extends TestbedTest {
 			recentBody = selectedBody;   //sets recent body as selected for next click
 		 }
 		else {
-			log.debug("Cllicked on Empty space!!!!");
+			log.debug("Clicked on Empty space!!!!");
 			if (rawInput.isControlDown()){
 				recentBody = this.createNewVertex(p);  // sets recent body as the one being vreated
 				boolean res = g_vertecies.add(recentBody);
