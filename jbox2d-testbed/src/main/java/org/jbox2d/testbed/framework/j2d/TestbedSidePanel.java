@@ -95,22 +95,14 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
 			}
 		});
 	}
-
-	public void initComponents() {
-		setLayout(new BorderLayout());
-		setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-		TestbedSettings settings = model.getSettings();
-
-		JPanel top = new JPanel();
-		top.setLayout(new GridLayout(0, 1));
-		top.setBorder(BorderFactory.createCompoundBorder(new EtchedBorder(EtchedBorder.LOWERED),
-				BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-		tests = new JComboBox(model.getComboModel());
-		tests.setMaximumRowCount(30);
-		tests.setMaximumSize(new Dimension(250, 20));
-		tests.addActionListener(this);
-		tests.setRenderer(new ListCellRenderer() {
+	
+	protected JComboBox createComboboxForTests() {
+		JComboBox theCombobox = new JComboBox(model.getComboModel());
+		//theCombobox = new JComboBox(model.getComboModel());
+		theCombobox.setMaximumRowCount(30);
+		theCombobox.setMaximumSize(new Dimension(250, 20));
+		theCombobox.addActionListener(this);
+		theCombobox.setRenderer(new ListCellRenderer() {
 			JLabel categoryLabel = null;
 			JLabel testLabel = null;
 
@@ -148,6 +140,21 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
 				}
 			}
 		});
+		
+		return theCombobox;
+	}
+
+	public void initComponents() {
+		setLayout(new BorderLayout());
+		setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+		TestbedSettings settings = model.getSettings();
+
+		JPanel top = new JPanel();
+		top.setLayout(new GridLayout(0, 1));
+		top.setBorder(BorderFactory.createCompoundBorder(new EtchedBorder(EtchedBorder.LOWERED),
+				BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+		tests = createComboboxForTests();
 
 		top.add(new JLabel("Choose a test:"));
 		top.add(tests);
