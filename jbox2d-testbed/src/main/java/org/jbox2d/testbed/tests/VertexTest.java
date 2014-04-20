@@ -51,6 +51,7 @@ import java.util.ArrayList;
 
 import org.jbox2d.callbacks.QueryCallback;
 import org.jbox2d.collision.AABB;
+import org.jbox2d.collision.Distance;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
@@ -68,6 +69,7 @@ import org.jbox2d.dynamics.joints.Joint;
 import org.jbox2d.dynamics.joints.JointDef;
 import org.jbox2d.dynamics.joints.JointType;
 import org.jbox2d.dynamics.joints.MouseJointDef;
+import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jbox2d.dynamics.joints.RopeJointDef;
 import org.jbox2d.dynamics.joints.WheelJointDef;
 import org.jbox2d.testbed.framework.TestbedTest;
@@ -82,6 +84,8 @@ public class VertexTest extends TestbedTest {
 	private boolean m_isCreatingEdge = false;
 	private Vec2 mFrom;
 	private Vec2 mTo;
+	private Body selectedBody; 
+	private Body recentBody; 
 	
 	
   public VertexTest()
@@ -125,7 +129,7 @@ public class VertexTest extends TestbedTest {
     }
 
     ConstantVolumeJointDef cvjd = new ConstantVolumeJointDef();
-    
+
     
 
     float cx = 0.0f;
@@ -135,6 +139,7 @@ public class VertexTest extends TestbedTest {
     //ArrayList<Body> nbd = new ArrayList<Body>();
     int nBodies = 5;
     float bodyRadius = 0.5f;
+    /*
     for (int i = 0; i < nBodies; ++i) {
       float angle = MathUtils.map(i, 0, nBodies, 0, 2 * 3.1415f);
       BodyDef bd = new BodyDef();
@@ -162,7 +167,8 @@ public class VertexTest extends TestbedTest {
       body.createFixture(fd);
       cvjd.addBody(body);
       g_vertecies.add(body); //***
-    }
+    } 
+    */
 
     DistanceJointDef j = new DistanceJointDef();
     //j.type = 
@@ -170,7 +176,7 @@ public class VertexTest extends TestbedTest {
     j.length = 5.0f;
     //j.maxLength = 8.0f;
     
-    
+    /*
     j.frequencyHz = 10.0f;
     j.dampingRatio = 1.0f;
    
@@ -197,7 +203,7 @@ public class VertexTest extends TestbedTest {
     j.bodyB = g_vertecies.get(1);
     getWorld().createJoint(j);
     
-
+   */
     
     cvjd.frequencyHz = 10.0f;
     cvjd.dampingRatio = 1.0f;
@@ -276,16 +282,34 @@ public class VertexTest extends TestbedTest {
   
   public void mouseDown(Vec2 p, int button, InputEvent rawInput) {
 		log.debug("mouseDown!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-		if(this.findBody(p) != null){
-			log.debug("Clicked on a Vertex!!!!");
-			if (rawInput.isControlDown()){
-				this.createEdge(g_vertecies.get(0), g_vertecies.get(1));
-			} else
+		if(this.findBody(p) != null)
+		{
+			
+			selectedBody = this.findBody(p); //sets selected body as the one clicked on
+			if(recentBody == null) //if null (clicked empty space) sets recent as selected
+			{
+				recentBody = selectedBody; 
+			}
+			
+			if(g_vertecies.indexOf(recentBody) != g_vertecies.indexOf(selectedBody)) //to make sure not to add an edge to itself
+			{
+				if (rawInput.isControlDown())
+				{
+					this.createEdge(g_vertecies.get(g_vertecies.indexOf(recentBody)), 
+							g_vertecies.get(g_vertecies.indexOf(selectedBody)));
+				} 
+			}
+			else
+			{
 				super.mouseDown(p, button);
-		} else {
+			}
+			recentBody = selectedBody;   //sets recent body as selected for next click
+		 }
+		else {
 			log.debug("Cllicked on Empty space!!!!");
 			if (rawInput.isControlDown()){
-				boolean res = g_vertecies.add(this.createNewVertex(p));
+				recentBody = this.createNewVertex(p);  // sets recent body as the one being vreated
+				boolean res = g_vertecies.add(recentBody);
 				if (res){
 					log.debug("there are" + g_vertecies.size() + " vertices in the list");
 					
@@ -293,6 +317,10 @@ public class VertexTest extends TestbedTest {
 					log.debug("OH FAILED!!!!!");
 				
 				}
+			}
+			else
+			{
+				recentBody = null;  //if clicking empty space, set recent body to null 
 			}
 		}
 
@@ -303,25 +331,16 @@ public class VertexTest extends TestbedTest {
 public void createEdge(Body v1, Body v2) {
 		
 		DistanceJointDef j = new DistanceJointDef();
-		
-		Vec2 p = v1.getLocalCenter();
-	    
-	    
-	    //j.type = 
-	    //RopeJointDef j = new RopeJointDef();
-	    
-		//j.length = 5.0f;
-	    
-	    
-	    //j.maxLength = 8.0f;
-	    
-	    
+		//calculate distance between the two bodies. 
+		float p1 = (float) Math.pow((v2.getPosition().x - v1.getPosition().x), 2); 
+		float p2 = (float) Math.pow((v2.getPosition().y - v1.getPosition().y), 2);
+		float distance = (float) Math.sqrt(p1 + p2); 
+		j.length = distance;    
 	    j.frequencyHz = 10.0f;
-	    j.dampingRatio = 1.0f;
-	   
+	    j.dampingRatio = 1.0f;	   
 	    j.bodyA = v1;
 	    j.bodyB = v2;
-	    getWorld().createJoint(j);
+	    getWorld().createJoint(j); 
 	}
   
   public Body createNewVertex(Vec2 p) {
