@@ -77,11 +77,17 @@ import org.slf4j.LoggerFactory;
 
 public class VertexTest extends TestbedTest {
 	private static final Logger log = LoggerFactory.getLogger(TestbedTest.class);
-	ArrayList<Body> nbd = new ArrayList<Body>();
+	ArrayList<Body> g_vertecies;
 
 	private boolean m_isCreatingEdge = false;
 	private Vec2 mFrom;
 	private Vec2 mTo;
+	
+	
+  public VertexTest()
+  {
+	  g_vertecies = new ArrayList<Body>();
+  }
 	
   @Override
   public float getDefaultCameraScale() {
@@ -155,7 +161,7 @@ public class VertexTest extends TestbedTest {
       fd.density = 1.0f;
       body.createFixture(fd);
       cvjd.addBody(body);
-      nbd.add(body); //***
+      g_vertecies.add(body); //***
     }
 
     DistanceJointDef j = new DistanceJointDef();
@@ -168,27 +174,27 @@ public class VertexTest extends TestbedTest {
     j.frequencyHz = 10.0f;
     j.dampingRatio = 1.0f;
    
-    j.bodyA = nbd.get(0);
-    j.bodyB = nbd.get(1);
+    j.bodyA = g_vertecies.get(0);
+    j.bodyB = g_vertecies.get(1);
     getWorld().createJoint(j);
     
-    j.bodyA = nbd.get(2);
-    j.bodyB = nbd.get(1);
+    j.bodyA = g_vertecies.get(2);
+    j.bodyB = g_vertecies.get(1);
     getWorld().createJoint(j);
     
-    j.bodyA = nbd.get(2);
-    j.bodyB = nbd.get(3);
+    j.bodyA = g_vertecies.get(2);
+    j.bodyB = g_vertecies.get(3);
     getWorld().createJoint(j);
     
     j.length = 15.0f;
     
-    j.bodyA = nbd.get(3);
-    j.bodyB = nbd.get(0);
+    j.bodyA = g_vertecies.get(3);
+    j.bodyB = g_vertecies.get(0);
     getWorld().createJoint(j);
     
     j.length = 5.0f;
-    j.bodyA = nbd.get(3);
-    j.bodyB = nbd.get(1);
+    j.bodyA = g_vertecies.get(3);
+    j.bodyB = g_vertecies.get(1);
     getWorld().createJoint(j);
     
 
@@ -208,6 +214,8 @@ public class VertexTest extends TestbedTest {
     //fallingBox.createFixture(psd, 1.0f);
   }
   
+  
+  /*
   public void mouseDown(Vec2 p, int button, InputEvent rawEvent) {
 	  log.info("MouseDown !!!!!");
 		log.info(p.toString());
@@ -219,14 +227,13 @@ public class VertexTest extends TestbedTest {
 		AABB b = new AABB();
 		b.lowerBound.set(p.x - .1f, p.y - .1f);
 		b.upperBound.set(p.x + .1f, p.y + .1f);
-		log.info("**" +AABB.testOverlap(b, nbd.get(0).getFixtureList().getAABB(0)));
+		log.info("**" +AABB.testOverlap(b, g_vertecies.get(0).getFixtureList().getAABB(0)));
 		
 		if (rawEvent.isControlDown())
 			log.info("Control key was pressed!!!!!!");
 		
-		
-		
 	}
+	*/
   
   public void mouseUp(Vec2 p, int button, InputEvent rawInput) {
 	  log.info("MouseUp !!!!!");
@@ -266,10 +273,62 @@ public class VertexTest extends TestbedTest {
 	    return null;
 	  }
   
-  public Body createNewVertex(Vec2 p, float fR) {
+  
+  public void mouseDown(Vec2 p, int button, InputEvent rawInput) {
+		log.debug("mouseDown!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		if(this.findBody(p) != null){
+			log.debug("Clicked on a Vertex!!!!");
+			if (rawInput.isControlDown()){
+				this.createEdge(g_vertecies.get(0), g_vertecies.get(1));
+			} else
+				super.mouseDown(p, button);
+		} else {
+			log.debug("Cllicked on Empty space!!!!");
+			if (rawInput.isControlDown()){
+				boolean res = g_vertecies.add(this.createNewVertex(p));
+				if (res){
+					log.debug("there are" + g_vertecies.size() + " vertices in the list");
+					
+				} else {
+					log.debug("OH FAILED!!!!!");
+				
+				}
+			}
+		}
+
+	}
+  
+
+	
+public void createEdge(Body v1, Body v2) {
+		
+		DistanceJointDef j = new DistanceJointDef();
+		
+		Vec2 p = v1.getLocalCenter();
+	    
+	    
+	    //j.type = 
+	    //RopeJointDef j = new RopeJointDef();
+	    
+		//j.length = 5.0f;
+	    
+	    
+	    //j.maxLength = 8.0f;
+	    
+	    
+	    j.frequencyHz = 10.0f;
+	    j.dampingRatio = 1.0f;
+	   
+	    j.bodyA = v1;
+	    j.bodyB = v2;
+	    getWorld().createJoint(j);
+	}
+  
+  public Body createNewVertex(Vec2 p) {
 	  	Body theBall;
+	  	
 		CircleShape circle = new CircleShape();
-		circle.m_radius = fR;
+		circle.m_radius = 0.5f;
 	
 		FixtureDef fd = new FixtureDef();
 		fd.shape = circle;
@@ -277,6 +336,7 @@ public class VertexTest extends TestbedTest {
 		fd.friction = 0.9f;
 	
 		BodyDef ballBodyDef = new BodyDef();
+		ballBodyDef.gravityScale = 0.0f;
 		ballBodyDef.type = BodyType.DYNAMIC;
 		ballBodyDef.position.set(p.x, p.y);
 		theBall = m_world.createBody(ballBodyDef);
