@@ -69,7 +69,7 @@ public class TestbedMain {
             });
     TestPanelJ2D panel = new TestPanelJ2D(model, controller);
     model.setPanel(panel);
-    model.setDebugDraw(new DebugDrawJ2D(panel, true));
+    model.setDebugDraw(new DebugDrawJ2D(panel, false));
     TestList.populateModel(model);
 
     JFrame testbed = new JFrame();

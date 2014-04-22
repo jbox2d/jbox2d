@@ -46,15 +46,19 @@
 
 package org.jbox2d.testbed.tests;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.event.InputEvent;
 import java.util.ArrayList;
 
+import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.QueryCallback;
 import org.jbox2d.collision.AABB;
 import org.jbox2d.collision.Distance;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
+import org.jbox2d.common.Color3f;
 import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -73,6 +77,7 @@ import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jbox2d.dynamics.joints.RopeJointDef;
 import org.jbox2d.dynamics.joints.WheelJointDef;
 import org.jbox2d.testbed.framework.TestbedTest;
+import org.jbox2d.testbed.framework.j2d.DebugDrawJ2D;
 import org.jbox2d.testbed.framework.j2d.TestbedMain;
 import org.jbox2d.testbed.framework.j2d.TestbedSidePanel;
 import org.slf4j.Logger;
@@ -325,6 +330,7 @@ public class VertexTest extends TestbedTest {
 			}
 		}
 
+		debugDraw();
 	}
   
 
@@ -375,5 +381,24 @@ public void createEdge(Body v1, Body v2) {
   public String getTestName() {
     return "VERTEX TEST";
   }
+  
+  @Override
+  public void debugDraw()
+  {
+	  DebugDraw db = super.getModel().getDebugDraw();
+      Color3f col = new Color3f(.5f, .5f, .5f);
+      db.drawString(20.0f, 20.0f, "TEST", col);
+      if(!g_vertecies.isEmpty())
+      {
+    	  for(int i = 0; i < g_vertecies.size(); i++)
+    	  {
+    		  db.drawObjectString(g_vertecies.get(i).getPosition(), "Vertex " + (i+1), col);
+    	  }
+   
+   
+      }
+      
+  }
+  
 
 }

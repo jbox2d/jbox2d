@@ -153,6 +153,21 @@ public class DebugDrawJ2D extends DebugDraw {
     g.setColor(c);
     g.drawString(s, x, y);
   }
+  
+  //private final Vec2 strVec = new Vec2();
+  
+  @Override
+  public void drawObjectString(Vec2 st, String s, Color3f color) {
+	    Graphics2D g = getGraphics();
+	    if (g == null) {
+	      return;
+	    }
+	    Vec2 tc = getWorldToScreen(st);
+	    Color c = cpool.getColor(color.x, color.y, color.z);
+	    g.setColor(c);
+	    g.drawString(s, tc.x + 8, tc.y - 5);
+	    //g.drawString(s, x, y);
+ }
 
   private Graphics2D getGraphics() {
     return panel.getDBGraphics();
