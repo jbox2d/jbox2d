@@ -74,6 +74,7 @@ import org.jbox2d.dynamics.joints.RopeJointDef;
 import org.jbox2d.dynamics.joints.WheelJointDef;
 import org.jbox2d.testbed.framework.TestbedTest;
 import org.jbox2d.testbed.framework.j2d.TestbedMain;
+import org.jbox2d.testbed.framework.j2d.TestbedSidePanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -364,6 +365,10 @@ public void createEdge(Body v1, Body v2) {
 		theBall.createFixture(fd);
 		
 		return theBall;
+  }
+
+  public String getCustomPanel(){
+	  return "org.jbox2d.testbed.framework.j2d.TestbedSidePane.VertexTestPanel";
   }
 
   @Override

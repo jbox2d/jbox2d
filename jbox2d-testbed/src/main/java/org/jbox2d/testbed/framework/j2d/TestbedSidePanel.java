@@ -23,6 +23,7 @@
  ******************************************************************************/
 package org.jbox2d.testbed.framework.j2d;
 
+import java.lang.reflect.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -54,6 +55,9 @@ import org.jbox2d.testbed.framework.TestbedSetting;
 import org.jbox2d.testbed.framework.TestbedSetting.SettingType;
 import org.jbox2d.testbed.framework.TestbedSettings;
 import org.jbox2d.testbed.framework.TestbedTest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 
 /**
@@ -63,12 +67,13 @@ import org.jbox2d.testbed.framework.TestbedTest;
  */
 @SuppressWarnings("serial")
 public class TestbedSidePanel extends JPanel implements ChangeListener, ActionListener {
-
+	private static final Logger log = LoggerFactory.getLogger(TestbedSidePanel.class);
 	private static final String SETTING_TAG = "settings";
 	private static final String LABEL_TAG = "label";
 
 	final TestbedModel model;
 	final TestbedController controller;
+	protected TestbedSettings settings;
 
 	public JComboBox tests;
 
@@ -83,15 +88,39 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
 	public TestbedSidePanel(TestbedModel argModel, TestbedController argController) {
 		model = argModel;
 		controller = argController;
+		settings = model.getSettings();
 		initComponents();
-		addListeners();
+		//addListeners();
 
 		model.addTestChangeListener(new TestbedModel.TestChangedListener() {
 			@Override
 			public void testChanged(TestbedTest argTest, int argIndex) {
+				Class c = argTest.getClass();
+				log.debug("Got Class of " + c.getName());
+				if (c.getName() == "org.jbox2d.testbed.tests.VertexTest"){
+					try {
+						Method m = c.getMethod("getCustomPanel");
+						//Method mm = c.getMethod("hahaha");
+						String hahaha = (String) m.invoke(argTest);
+						log.debug(hahaha);
+						
+					} catch(NoSuchMethodException e){
+						
+						
+					} catch(IllegalAccessException e){
+						
+					} catch(IllegalArgumentException e){
+						
+					} catch(InvocationTargetException e){
+						
+					}
+					
+				}
 				tests.setSelectedIndex(argIndex);
 				saveButton.setEnabled(argTest.isSaveLoadEnabled());
 				loadButton.setEnabled(argTest.isSaveLoadEnabled());
+				
+				
 			}
 		});
 	}
@@ -144,35 +173,7 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
 		return theCombobox;
 	}
 	
-
-	public void initComponents() {
-		setLayout(new BorderLayout());
-		setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-		TestbedSettings settings = model.getSettings();
-
-		JPanel top = new JPanel();
-		top.setLayout(new GridLayout(0, 1));
-		top.setBorder(BorderFactory.createCompoundBorder(new EtchedBorder(EtchedBorder.LOWERED),
-				BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-		tests = createComboboxForTests();
-
-		top.add(new JLabel("Choose a test:"));
-		top.add(tests);
-
-		addSettings(top, settings, SettingType.DRAWING);
-
-		add(top, "North");
-
-		JPanel middle = new JPanel();
-		middle.setLayout(new GridLayout(0, 1));
-		middle.setBorder(BorderFactory.createCompoundBorder(new EtchedBorder(EtchedBorder.LOWERED),
-				BorderFactory.createEmptyBorder(5, 10, 5, 10)));
-
-		addSettings(middle, settings, SettingType.ENGINE);
-
-		add(middle, "Center");
-
+	private Box createButtonPanel() {
 		pauseButton.setAlignmentX(CENTER_ALIGNMENT);
 		stepButton.setAlignmentX(CENTER_ALIGNMENT);
 		resetButton.setAlignmentX(CENTER_ALIGNMENT);
@@ -199,11 +200,61 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
 		buttonGroups.add(buttons1);
 		buttonGroups.add(buttons2);
 		buttonGroups.add(buttons3);
+		
+		return buttonGroups;
+	}
+	
+	private JPanel createMiddlePanel(TestbedSettings settings) {
+		JPanel middlePanel = new JPanel();
+		middlePanel.setLayout(new GridLayout(0, 1));
+		middlePanel.setBorder(BorderFactory.createCompoundBorder(new EtchedBorder(EtchedBorder.LOWERED),
+				BorderFactory.createEmptyBorder(5, 10, 5, 10)));
 
-		add(buttonGroups, "South");
+		addSettings(middlePanel, settings, SettingType.ENGINE);
+		return middlePanel;
+	}
+	
+	
+	private JPanel createTopPanel(TestbedSettings settings) {
+
+		JPanel topPanel = new JPanel();
+		topPanel.setLayout(new GridLayout(0, 1));
+		topPanel.setBorder(BorderFactory.createCompoundBorder(new EtchedBorder(EtchedBorder.LOWERED),
+				BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+		tests = createComboboxForTests();
+
+		topPanel.add(new JLabel("Choose a test:"));
+		topPanel.add(tests);
+
+		addSettings(topPanel, settings, SettingType.DRAWING);
+		return topPanel;
+	}
+	
+	public Component [] createSubPanels() {
+		Component [] panels = new Component[3];
+		
+		panels[0] = createMiddlePanel(this.settings);
+		panels[1] = createButtonPanel();
+		
+		add(panels[0], "Center");
+		add(panels[1], "South");
+		
+		return panels;
 	}
 
-	public void addListeners() {
+	private void initComponents() {
+		setLayout(new BorderLayout());
+		setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		JPanel topPanel = createTopPanel(this.settings);
+		add(topPanel, "North");
+		createSubPanels();
+		
+		
+		addListeners();
+	}
+
+	private void addListeners() {
+		log.debug("addListener() called!!!!!!");
 		pauseButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (model.getSettings().pause) {
