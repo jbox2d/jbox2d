@@ -38,6 +38,7 @@ import org.jbox2d.testbed.framework.TestbedController.MouseBehavior;
 import org.jbox2d.testbed.framework.TestbedController.UpdateBehavior;
 import org.jbox2d.testbed.framework.TestbedErrorHandler;
 import org.jbox2d.testbed.framework.TestbedModel;
+import org.jbox2d.testbed.framework.j2d.custompanels.VertexTestPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +75,8 @@ public class TestbedMain {
     JFrame testbed = new JFrame();
     testbed.setTitle("JBox2D Testbed");
     testbed.setLayout(new BorderLayout());
-    TestbedSidePanel side = new TestbedSidePanel(model, controller);
+    //TestbedSidePanel side = new TestbedSidePanel(model, controller);
+    TestbedSidePanel side = new VertexTestPanel(model, controller);
     testbed.add((Component) panel, "Center");
     testbed.add(new JScrollPane(side), "East");
     testbed.pack();

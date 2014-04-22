@@ -80,9 +80,9 @@ public class TestList {
   public static void populateModel(TestbedModel model) {
 
     model.addCategory("Featured");
+    model.addTest(new VertexTest());
     model.addTest(new Graph());
     model.addTest(new Myconvex());
-    model.addTest(new VertexTest());
     model.addTest(new Car());
     model.addTest(new DominoTest());
     model.addTest(new CompoundShapes());
