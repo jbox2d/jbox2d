@@ -30,6 +30,7 @@ import javax.swing.DefaultComboBoxModel;
 
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.common.IViewportTransform;
+import org.jbox2d.testbed.framework.j2d.DebugDrawJ2D;
 
 /**
  * Model for the testbed
@@ -40,7 +41,7 @@ public class TestbedModel {
 
   private final DefaultComboBoxModel tests = new DefaultComboBoxModel();
   private final TestbedSettings settings = new TestbedSettings();
-  private DebugDraw draw;
+  private DebugDrawJ2D draw;
   private TestbedTest test;
   private final Vector<TestChangedListener> listeners = new Vector<TestChangedListener>();
   private final boolean[] keys = new boolean[512];
@@ -90,7 +91,7 @@ public class TestbedModel {
     draw.setViewportTransform(transform);
   }
 
-  public void setDebugDraw(DebugDraw argDraw) {
+  public void setDebugDraw(DebugDrawJ2D argDraw) {
     draw = argDraw;
   }
 

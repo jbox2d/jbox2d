@@ -122,6 +122,14 @@ public abstract class DebugDraw {
 	public abstract void drawCircle(Vec2 center, float radius, Color3f color);
 	
 	/**
+	 * Draw a string next to object.
+	 * @param st the vector for the object 
+	 * @param s the string 
+	 * @param color
+	 */
+	public abstract void drawObjectString(Vec2 st, String s, Color3f color);
+	
+	/**
 	 * Draw a solid circle.
 	 * @param center
 	 * @param radius

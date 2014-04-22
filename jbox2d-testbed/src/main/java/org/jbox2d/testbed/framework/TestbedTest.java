@@ -348,6 +348,11 @@ public abstract class TestbedTest
   private final Vec2 p2 = new Vec2();
   private final Vec2 tangent = new Vec2();
   private final List<String> statsList = new ArrayList<String>();
+  
+  public void debugDraw()
+  {
+	//overide in test   
+  }
 
   public void step(TestbedSettings settings) {
     float hz = settings.getSetting(TestbedSettings.Hz).value;
@@ -358,6 +363,8 @@ public abstract class TestbedTest
 
     final DebugDraw debugDraw = model.getDebugDraw();
     m_textLine = 20;
+    
+    debugDraw();
 
     if (title != null) {
       debugDraw.drawString(camera.getTransform().getExtents().x, 15, title, Color3f.WHITE);
