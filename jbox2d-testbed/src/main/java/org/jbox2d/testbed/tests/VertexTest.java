@@ -50,6 +50,9 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.InputEvent;
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.LinkedList;
 
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.QueryCallback;
@@ -76,6 +79,7 @@ import org.jbox2d.dynamics.joints.MouseJointDef;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jbox2d.dynamics.joints.RopeJointDef;
 import org.jbox2d.dynamics.joints.WheelJointDef;
+import org.jbox2d.testbed.framework.SelectionManager;
 import org.jbox2d.testbed.framework.TestbedTest;
 import org.jbox2d.testbed.framework.j2d.DebugDrawJ2D;
 import org.jbox2d.testbed.framework.j2d.TestbedMain;
@@ -85,18 +89,22 @@ import org.slf4j.LoggerFactory;
 
 public class VertexTest extends TestbedTest {
 	private static final Logger log = LoggerFactory.getLogger(TestbedTest.class);
-	ArrayList<Body> g_vertecies;
-
+	//ArrayList<Body> g_vertecies;
+	Hashtable<Body, Vertex> g_vertecies;
+	Hashtable<Joint, GraphObject> g_edges;
 	private boolean m_isCreatingEdge = false;
 	private Vec2 mFrom;
 	private Vec2 mTo;
 	private Body selectedBody; 
-	private Body recentBody; 
+	//private Body recentBody;
+	private SelectionManager mSelMgr;
 	
 	
   public VertexTest()
   {
-	  g_vertecies = new ArrayList<Body>();
+	  //g_vertecies = new ArrayList<Body>();
+	  g_vertecies = new Hashtable<Body, Vertex>();
+	  mSelMgr = SelectionManager.getInstance();
   }
 	
   @Override
@@ -260,7 +268,8 @@ public class VertexTest extends TestbedTest {
 		  this.mouseDrag(p, button);
 	  }
   }
-  public Body findBody(Vec2 p) {
+  
+  public GraphObject findBody(Vec2 p) {
 
 	    queryAABB.lowerBound.set(p.x - .001f, p.y - .001f);
 	    queryAABB.upperBound.set(p.x + .001f, p.y + .001f);
@@ -280,13 +289,19 @@ public class VertexTest extends TestbedTest {
 	      
 	      //mouseJoint = (MouseJoint) m_world.createJoint(def);
 	      body.setAwake(true);
-	      return body;
+	      
+	      GraphObject g = g_vertecies.get(body);
+	      if (g == null){
+	    	  log.error("This body is not in our map!!!!!!");
+	      }
+	      return g;
+	      
 	    }
 	    return null;
 	  }
   
-  
-  public void mouseDown(Vec2 p, int button, InputEvent rawInput) {
+  /*
+  public void mouseDown2(Vec2 p, int button, InputEvent rawInput) {
 		log.debug("mouseDown!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		if(this.findBody(p) != null)
 		{
@@ -315,7 +330,7 @@ public class VertexTest extends TestbedTest {
 			log.debug("Clicked on Empty space!!!!");
 			if (rawInput.isControlDown()){
 				recentBody = this.createNewVertex(p);  // sets recent body as the one being vreated
-				boolean res = g_vertecies.add(recentBody);
+				//boolean res = g_vertecies.add(recentBody);
 				if (res){
 					log.debug("there are" + g_vertecies.size() + " vertices in the list");
 					
@@ -330,12 +345,64 @@ public class VertexTest extends TestbedTest {
 			}
 		}
 
-		debugDraw();
+		//debugDraw();
 	}
-  
+  */
+  public void mouseDown(Vec2 p, int button, InputEvent rawInput) {
+		log.debug("mouseDown!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		SelectionManager selMgr = SelectionManager.getInstance();
+		
+		GraphObject go = this.findBody(p);
+		boolean bDoExtendSelection = rawInput.isShiftDown();
+		
+		
+		if(go != null)
+		{
+			
+			selMgr.select(go, bDoExtendSelection);
+			
+			
+			
+			/*
+			selectedBody = this.findBody(p); //sets selected body as the one clicked on
+			if(recentBody == null) //if null (clicked empty space) sets recent as selected
+			{
+				recentBody = selectedBody; 
+			}
+			
+			if(g_vertecies.indexOf(recentBody) != g_vertecies.indexOf(selectedBody)) //to make sure not to add an edge to itself
+			{
+				if (rawInput.isControlDown())
+				{
+					this.createEdge(g_vertecies.get(g_vertecies.indexOf(recentBody)), 
+							g_vertecies.get(g_vertecies.indexOf(selectedBody)));
+				} 
+			}
+			else
+			{
+				super.mouseDown(p, button);
+			}
+			recentBody = selectedBody;   //sets recent body as selected for next click
+			*/
+		 }
+		else {
+			log.debug("Clicked on Empty space!!!!");
+			if (rawInput.isControlDown()){
+				this.createNewVertex(p);  // sets recent body as the one being vreated
+				
+			}
+			/*
+			else
+			{
+				recentBody = null;  //if clicking empty space, set recent body to null 
+			}
+			*/
+		}
 
+		//debugDraw();
+	}
 	
-public void createEdge(Body v1, Body v2) {
+public Edge createEdge(Body v1, Body v2) {
 		
 		DistanceJointDef j = new DistanceJointDef();
 		//calculate distance between the two bodies. 
@@ -347,12 +414,17 @@ public void createEdge(Body v1, Body v2) {
 	    j.dampingRatio = 1.0f;	   
 	    j.bodyA = v1;
 	    j.bodyB = v2;
-	    getWorld().createJoint(j); 
+	    Joint joint = getWorld().createJoint(j);
+	    Edge e = new Edge(joint);
+	    g_edges.put(joint, e);
+	    
+	    return e;
+	    
 	}
   
-  public Body createNewVertex(Vec2 p) {
+  public Vertex createNewVertex(Vec2 p) {
 	  	Body theBall;
-	  	
+	  	//Vertex theBall;
 		CircleShape circle = new CircleShape();
 		circle.m_radius = 0.5f;
 	
@@ -370,7 +442,10 @@ public void createEdge(Body v1, Body v2) {
 
 		theBall.createFixture(fd);
 		
-		return theBall;
+		Vertex v = new Vertex(theBall);
+		this.g_vertecies.put(theBall, v);
+		
+		return v;
   }
 
   public String getCustomPanel(){
@@ -390,12 +465,12 @@ public void createEdge(Body v1, Body v2) {
       db.drawString(20.0f, 20.0f, "TEST", col);
       if(!g_vertecies.isEmpty())
       {
-    	  for(int i = 0; i < g_vertecies.size(); i++)
-    	  {
-    		  db.drawObjectString(g_vertecies.get(i).getPosition(), "Vertex " + (i+1), col);
+    	  Enumeration<Body> itr = g_vertecies.keys();
+    	  int i = 0;
+    	  while (itr.hasMoreElements()){
+    		  Body v = itr.nextElement();
+    		  db.drawObjectString(v.getPosition(), "Vertex " + (i+1), col);  
     	  }
-   
-   
       }
       
   }
