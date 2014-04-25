@@ -141,6 +141,13 @@ public class TestbedController implements Runnable {
       inputQueue.add(new QueueItem(QueueItemType.MouseDown, screenPos, button, rawInput));
     }
   }
+  
+  public void queueMouseClick(Vec2 screenPos, int button, InputEvent rawInput) {
+	    synchronized (inputQueue) {
+	      inputQueue.add(new QueueItem(QueueItemType.MouseClick, screenPos, button, rawInput));
+	    }
+	  }
+  
 
   public void queueMouseMove(Vec2 screenPos, InputEvent rawInput) {
     synchronized (inputQueue) {
@@ -256,6 +263,10 @@ public class TestbedController implements Runnable {
               case MouseMove:
                 currTest.mouseMove(i.p, i._rawEvent);
                 break;
+              case MouseClick:
+              	currTest.mouseClick(i.p, i.button, i._rawEvent);
+                break;
+                
               case MouseUp:
             	//log.debug("MouseUp");
                 currTest.mouseUp(i.p, i.button, i._rawEvent);
@@ -276,6 +287,7 @@ public class TestbedController implements Runnable {
     }
 
     if (currTest != null) {
+    	//log.debug("Step.........................................");
       currTest.step(model.getSettings());
     }
   }
@@ -473,7 +485,7 @@ public class TestbedController implements Runnable {
 
 
 enum QueueItemType {
-  MouseDown, MouseMove, MouseUp, MouseDrag, KeyPressed, KeyReleased, LaunchBomb, Pause
+  MouseDown, MouseMove, MouseUp, MouseClick, MouseDrag, KeyPressed, KeyReleased, LaunchBomb, Pause
 }
 
 

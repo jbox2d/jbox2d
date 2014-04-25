@@ -517,6 +517,14 @@ public abstract class TestbedTest
   public void mouseUp(Vec2 p, int button, InputEvent rawInput) {
 	    this.mouseUp(p, button);    
   }
+  
+  public void mouseClick(Vec2 p, int button) {
+	    //this.mouseClick(p, button);    
+  }
+  
+  public void mouseClick(Vec2 p, int button, InputEvent rawInput) {
+	    this.mouseClick(p, button);    
+  }
 
   public void keyPressed(char keyCar, int keyCode) {}
 

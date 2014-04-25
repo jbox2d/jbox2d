@@ -49,10 +49,14 @@ package org.jbox2d.testbed.tests;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.callbacks.QueryCallback;
@@ -88,7 +92,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class VertexTest extends TestbedTest {
-	private static final Logger log = LoggerFactory.getLogger(TestbedTest.class);
+	private static final Logger log = LoggerFactory.getLogger(VertexTest.class);
 	//ArrayList<Body> g_vertecies;
 	Hashtable<Body, Vertex> g_vertecies;
 	Hashtable<Joint, GraphObject> g_edges;
@@ -98,6 +102,7 @@ public class VertexTest extends TestbedTest {
 	private Body selectedBody; 
 	//private Body recentBody;
 	private SelectionManager mSelMgr;
+	private static boolean m_wasDoubleClick = false;
 	
 	
   public VertexTest()
@@ -256,8 +261,51 @@ public class VertexTest extends TestbedTest {
 	*/
   
   public void mouseUp(Vec2 p, int button, InputEvent rawInput) {
-	  log.info("MouseUp !!!!!");
-	  super.mouseUp(p, button);    
+
+	  super.mouseUp(p, button);
+	  final MouseEvent ev = (MouseEvent)rawInput;
+	  final Vec2 finalp = p;
+	  
+	  if (ev.getClickCount() == 2) {
+		  log.debug("mouseUp() : a double click!");
+		  synchronized (this) {
+			  m_wasDoubleClick = true;
+		  }
+          
+          createNewVertex(finalp);
+      } 
+	  else
+	  {
+    	  Integer timerinterval = 200;
+    	  Timer timer = new Timer();
+    	  timer.schedule(new TimerTask(){
+    		  public void run(){
+    			  synchronized(this){
+    				  if (m_wasDoubleClick) {
+        				  // double click had occurred, so 
+        				  // resetting the flag, and doing nothing else
+                    	  m_wasDoubleClick = false; // reset flag
+                      } else {
+                    	  /*
+                    	  if (ev.isControlDown()){
+                    		  createNewVertex(finalp);  // sets recent body as the one being vreated
+                    	  }
+                    	  */
+                    	  log.debug("mouseUp() : a single click!");
+                      }
+        			  this.cancel();
+    			  }
+    			  
+    			  
+    		  }
+    		  
+    	  }, timerinterval);
+      }
+	  
+	  
+	  
+	  
+	  
   }
   
 
@@ -387,10 +435,12 @@ public class VertexTest extends TestbedTest {
 		 }
 		else {
 			log.debug("Clicked on Empty space!!!!");
+			/*
 			if (rawInput.isControlDown()){
 				this.createNewVertex(p);  // sets recent body as the one being vreated
 				
 			}
+			*/
 			/*
 			else
 			{

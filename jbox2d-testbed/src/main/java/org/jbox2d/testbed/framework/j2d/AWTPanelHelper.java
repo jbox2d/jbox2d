@@ -32,6 +32,7 @@ public class AWTPanelHelper {
 	private static final int nextTimerIndex = -1;
 	private static final boolean [] mIsTimerRunning = new boolean[10];
 	
+	
   /**
    * Adds common help text and listeners for awt-based testbeds.
    */
@@ -70,11 +71,12 @@ public class AWTPanelHelper {
         if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
           controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), 10, arg0);
         }
+        log.debug("mouseUp from mouseReleased()");
       }
 
       @Override
       public void mousePressed(MouseEvent arg0) {
-    	log.debug("mousePressed$$$$$$$$");
+    	//log.debug("mousePressed$$$$$$$$");
         controller.queueMouseDown(new Vec2(arg0.getX(), arg0.getY()), arg0.getButton(), arg0);
 
         if (arg0.getButton() == screenDragButton) {
@@ -87,18 +89,14 @@ public class AWTPanelHelper {
       
       @Override
       public void mouseClicked(MouseEvent arg0) {
+    	  final MouseEvent ev = arg0;
     	  
           controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), arg0.getButton(), arg0);
-
+          
           if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
             controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), 10, arg0);
           }
-          /*
-    	  if(arg0.getClickCount() == 1)
-    		  log.debug("mouseClicked(1)$$$$$$$$");
-    	  else if(arg0.getClickCount() == 2)
-    		  log.debug("mouseClicked(2)$$$$$$$$");
-    		  */
+          log.debug("mouseUp from mouseClicked()");
         }
     
       
