@@ -259,10 +259,7 @@ public class VertexTest extends TestbedTest {
 		
 	}
 	*/
-  
-  public void mouseUp(Vec2 p, int button, InputEvent rawInput) {
-
-	  super.mouseUp(p, button);
+  public void mouseClick(Vec2 p, int button, InputEvent rawInput){
 	  final MouseEvent ev = (MouseEvent)rawInput;
 	  final Vec2 finalp = p;
 	  
@@ -301,6 +298,12 @@ public class VertexTest extends TestbedTest {
     		  
     	  }, timerinterval);
       }
+  }
+  
+  public void mouseUp(Vec2 p, int button, InputEvent rawInput) {
+
+	  super.mouseUp(p, button);
+	  
 	  
 	  
 	  

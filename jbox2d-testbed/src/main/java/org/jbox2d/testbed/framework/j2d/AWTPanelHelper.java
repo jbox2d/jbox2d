@@ -90,11 +90,18 @@ public class AWTPanelHelper {
       @Override
       public void mouseClicked(MouseEvent arg0) {
     	  final MouseEvent ev = arg0;
+		/*
+		 * controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), arg0.getButton(), arg0);
+		          
+		          if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
+		            controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), 10, arg0);
+		          }
+		 */
     	  
-          controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), arg0.getButton(), arg0);
+          controller.queueMouseClick(new Vec2(arg0.getX(), arg0.getY()), arg0.getButton(), arg0);
           
           if (model.getCodedKeys()[KeyEvent.VK_SHIFT]) {
-            controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), 10, arg0);
+            controller.queueMouseClick(new Vec2(arg0.getX(), arg0.getY()), 10, arg0);
           }
           log.debug("mouseUp from mouseClicked()");
         }
