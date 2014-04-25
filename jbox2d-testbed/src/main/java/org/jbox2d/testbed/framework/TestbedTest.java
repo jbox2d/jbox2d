@@ -592,7 +592,8 @@ public abstract class TestbedTest
       def.bodyB = body;
       def.collideConnected = true;
       def.target.set(p);
-      def.maxForce = 1000f * body.getMass();
+      //def.maxForce = 1000f * body.getMass();
+      def.maxForce = 100000f * body.getMass();
       mouseJoint = (MouseJoint) m_world.createJoint(def);
       body.setAwake(true);
     }

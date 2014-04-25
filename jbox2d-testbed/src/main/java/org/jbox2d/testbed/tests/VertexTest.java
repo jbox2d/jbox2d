@@ -95,7 +95,7 @@ public class VertexTest extends TestbedTest {
 	private static final Logger log = LoggerFactory.getLogger(VertexTest.class);
 	//ArrayList<Body> g_vertecies;
 	Hashtable<Body, Vertex> g_vertecies;
-	Hashtable<Joint, GraphObject> g_edges;
+	Hashtable<Joint, Edge> g_edges;
 	private boolean m_isCreatingEdge = false;
 	private Vec2 mFrom;
 	private Vec2 mTo;
@@ -104,11 +104,14 @@ public class VertexTest extends TestbedTest {
 	private SelectionManager mSelMgr;
 	private static boolean m_wasDoubleClick = false;
 	
+	private Vertex mDragFrom = null;
+	
 	
   public VertexTest()
   {
 	  //g_vertecies = new ArrayList<Body>();
 	  g_vertecies = new Hashtable<Body, Vertex>();
+	  g_edges = new Hashtable<Joint, Edge>();
 	  mSelMgr = SelectionManager.getInstance();
   }
 	
@@ -301,12 +304,29 @@ public class VertexTest extends TestbedTest {
   }
   
   public void mouseUp(Vec2 p, int button, InputEvent rawInput) {
+		
+		Vertex v = this.findVertex(p);		
+		boolean bDoExtendSelection = rawInput.isShiftDown();
+		
+		
+		if(v != null)
+		{
+			if (rawInput.isControlDown() && mDragFrom != null){
+				createEdge(mDragFrom.getBody(), v.getBody());
+				
+				mDragFrom = null;
+				
+			} else {
+			
+				super.mouseUp(p, button);
+			}
+			
+		 }
+		else {
+			log.debug("Clicked on Empty space!!!!");
+			
+		}
 
-	  super.mouseUp(p, button);
-	  
-	  
-	  
-	  
 	  
 	  
   }
@@ -320,7 +340,7 @@ public class VertexTest extends TestbedTest {
 	  }
   }
   
-  public GraphObject findBody(Vec2 p) {
+  public Vertex findVertex(Vec2 p) {
 
 	    queryAABB.lowerBound.set(p.x - .001f, p.y - .001f);
 	    queryAABB.upperBound.set(p.x + .001f, p.y + .001f);
@@ -341,11 +361,12 @@ public class VertexTest extends TestbedTest {
 	      //mouseJoint = (MouseJoint) m_world.createJoint(def);
 	      body.setAwake(true);
 	      
-	      GraphObject g = g_vertecies.get(body);
-	      if (g == null){
+	      Vertex v = g_vertecies.get(body);
+	      if (v == null){
 	    	  log.error("This body is not in our map!!!!!!");
 	      }
-	      return g;
+	      //return g;
+	      return v;
 	      
 	    }
 	    return null;
@@ -403,16 +424,19 @@ public class VertexTest extends TestbedTest {
 		log.debug("mouseDown!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		SelectionManager selMgr = SelectionManager.getInstance();
 		
-		GraphObject go = this.findBody(p);
+		Vertex v = this.findVertex(p);		
 		boolean bDoExtendSelection = rawInput.isShiftDown();
 		
 		
-		if(go != null)
+		if(v != null)
 		{
-			
-			selMgr.select(go, bDoExtendSelection);
-			
-			
+			if (rawInput.isControlDown()){
+				mDragFrom = v;
+				
+			} else {
+				selMgr.select(v, bDoExtendSelection);
+				super.mouseDown(p, button);
+			}
 			
 			/*
 			selectedBody = this.findBody(p); //sets selected body as the one clicked on

@@ -87,8 +87,8 @@ import org.slf4j.LoggerFactory;
 public class Edge extends GraphObject {
 	private static final Logger log = LoggerFactory.getLogger(Edge.class);
 	
-	//private Body mBody1;
-	//private Body mBody2;
+	private Vertex mV1;
+	private Vertex mV2;
 	private Joint mJoint;
 	
 

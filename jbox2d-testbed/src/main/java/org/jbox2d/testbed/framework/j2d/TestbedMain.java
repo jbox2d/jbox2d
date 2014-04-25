@@ -32,6 +32,8 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import org.jbox2d.common.Color3f;
+import org.jbox2d.common.Vec2;
 import org.jbox2d.testbed.framework.TestList;
 import org.jbox2d.testbed.framework.TestbedController;
 import org.jbox2d.testbed.framework.TestbedController.MouseBehavior;
@@ -70,6 +72,18 @@ public class TestbedMain {
     TestPanelJ2D panel = new TestPanelJ2D(model, controller);
     model.setPanel(panel);
     model.setDebugDraw(new DebugDrawJ2D(panel, true));
+    /*
+    model.setDebugDraw(new DebugDrawJ2D(panel, true) {
+    	public void drawSolidCircle(Vec2 center, float radius, Vec2 axis, Color3f color){
+    		float newradius = radius;
+    		for(int i = 1; i < 10; i++){
+    			super.drawSolidCircle(center, newradius, axis, color);
+    			newradius = newradius * (float)(95/100);
+    		}
+    	}
+    	
+    });
+    */
     TestList.populateModel(model);
 
     JFrame testbed = new JFrame();
