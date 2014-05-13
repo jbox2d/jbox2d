@@ -1,4 +1,4 @@
-package org.jbox2d.profile.worlds;
+package org.jbox2d.profile.world;
 
 import org.jbox2d.dynamics.World;
 

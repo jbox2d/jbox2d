@@ -3,8 +3,8 @@ package org.jbox2d.profile;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.World;
-import org.jbox2d.profile.worlds.PerformanceTestWorld;
-import org.jbox2d.profile.worlds.PistonWorld;
+import org.jbox2d.profile.world.PerformanceTestWorld;
+import org.jbox2d.profile.world.PistonWorld;
 
 public class SettingsPerformanceTest extends BasicPerformanceTest {
 
