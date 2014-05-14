@@ -5,8 +5,8 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.pooling.IWorldPool;
 import org.jbox2d.pooling.normal.DefaultWorldPool;
-import org.jbox2d.profile.world.PerformanceTestWorld;
-import org.jbox2d.profile.world.PistonWorld;
+import org.jbox2d.profile.worlds.PerformanceTestWorld;
+import org.jbox2d.profile.worlds.PistonWorld;
 
 public class BroadphasePerformanceTest extends BasicPerformanceTest {
 

@@ -1,4 +1,4 @@
-package org.jbox2d.profile.world;
+package org.jbox2d.profile.worlds;
 
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
