@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>jbox2d</artifactId>
@@ -11,12 +12,12 @@
 	<url>https://github.com/jbox2d/jbox2d</url>
 	<description>The testbed for JBox2D, a 2d java physics engine, ported from the C++ Box2d engine.</description>
 	<dependencies>
-	  	<dependency>
-	  		<groupId>org.apache.commons</groupId>
-	  		<artifactId>commons-math3</artifactId>
-	  		<version>3.2</version>
-	  		<scope>compile</scope>
-	  	</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>3.2</version>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.jbox2d</groupId>
 			<artifactId>jbox2d-library</artifactId>
