@@ -34,7 +34,7 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Settings;
 import org.jbox2d.common.Vec2;
 
-public class DynamicTreeFlatNodes implements BroadPhaseStrategy {
+public strictfp class DynamicTreeFlatNodes implements BroadPhaseStrategy {
   public static final int MAX_STACK_SIZE = 64;
   public static final int NULL_NODE = -1;
   public static final int INITIAL_BUFFER_LENGTH = 16;

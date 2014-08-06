@@ -16,7 +16,7 @@ import org.jbox2d.pooling.IWorldPool;
  * 
  * @author Daniel Murphy
  */
-public class RopeJoint extends Joint {
+public strictfp class RopeJoint extends Joint {
   // Solver shared
   private final Vec2 m_localAnchorA = new Vec2();
   private final Vec2 m_localAnchorB = new Vec2();

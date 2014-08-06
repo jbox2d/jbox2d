@@ -41,7 +41,7 @@ import org.jbox2d.common.Vec2;
  * 
  * @author Daniel
  */
-public class ChainShape extends Shape {
+public strictfp class ChainShape extends Shape {
 
   public Vec2[] m_vertices;
   public int m_count;

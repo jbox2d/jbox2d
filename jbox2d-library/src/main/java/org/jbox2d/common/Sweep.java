@@ -30,7 +30,7 @@ import java.io.Serializable;
  * the body origin, which may no coincide with the center of mass. However, to support dynamics we
  * must interpolate the center of mass position.
  */
-public class Sweep implements Serializable {
+public strictfp class Sweep implements Serializable {
   private static final long serialVersionUID = 1L;
 
   /** Local center of mass position */

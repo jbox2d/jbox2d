@@ -43,7 +43,7 @@ import org.jbox2d.pooling.IWorldPool;
  * 
  * @author daniel
  */
-public abstract class Contact {
+public strictfp abstract class Contact {
 
   // Flags stored in m_flags
   // Used when crawling contact graph when forming islands.

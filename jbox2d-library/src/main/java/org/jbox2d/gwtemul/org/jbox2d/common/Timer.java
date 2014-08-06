@@ -23,7 +23,7 @@
  ******************************************************************************/
 package org.jbox2d.common;
 
-public class Timer {
+public strictfp class Timer {
 
   private double resetMillis;
 

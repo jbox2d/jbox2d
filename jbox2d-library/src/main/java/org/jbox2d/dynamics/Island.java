@@ -161,7 +161,7 @@ import org.jbox2d.dynamics.joints.Joint;
  * 
  * @author Daniel Murphy
  */
-public class Island {
+public strictfp class Island {
 
   public ContactListener m_listener;
 

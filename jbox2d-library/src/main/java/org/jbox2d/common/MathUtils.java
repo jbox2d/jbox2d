@@ -51,7 +51,7 @@ import java.util.Random;
 /**
  * A few math methods that don't fit very well anywhere else.
  */
-public class MathUtils extends PlatformMathUtils {
+public strictfp class MathUtils extends PlatformMathUtils {
   public static final float PI = (float) Math.PI;
   public static final float TWOPI = (float) (Math.PI * 2);
   public static final float INV_PI = 1f / PI;

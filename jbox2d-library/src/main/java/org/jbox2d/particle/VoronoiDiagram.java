@@ -4,7 +4,7 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.pooling.normal.MutableStack;
 
-public class VoronoiDiagram {
+public strictfp class VoronoiDiagram {
   public static class Generator {
     final Vec2 center = new Vec2();
     int tag;

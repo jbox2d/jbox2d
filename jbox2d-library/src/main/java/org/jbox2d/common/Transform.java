@@ -31,7 +31,7 @@ import java.io.Serializable;
  * A transform contains translation and rotation. It is used to represent the position and
  * orientation of rigid frames.
  */
-public class Transform implements Serializable {
+public strictfp class Transform implements Serializable {
   private static final long serialVersionUID = 1L;
 
   /** The translation caused by the transform */

@@ -30,7 +30,7 @@ import java.io.Serializable;
  * 
  * @author Daniel Murphy
  */
-public class Mat33 implements Serializable {
+public strictfp class Mat33 implements Serializable {
   private static final long serialVersionUID = 2L;
 
   public static final Mat33 IDENTITY = new Mat33(new Vec3(1, 0, 0), new Vec3(0, 1, 0), new Vec3(0,

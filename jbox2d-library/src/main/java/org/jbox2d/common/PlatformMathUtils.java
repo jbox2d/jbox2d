@@ -27,7 +27,7 @@ package org.jbox2d.common;
  * Contains methods from MathUtils that rely on JVM features. These are separated out from
  * MathUtils so that they can be overridden when compiling for GWT.
  */
-class PlatformMathUtils {
+strictfp class PlatformMathUtils {
 
   private static final float SHIFT23 = 1 << 23;
   private static final float INV_SHIFT23 = 1.0f / SHIFT23;

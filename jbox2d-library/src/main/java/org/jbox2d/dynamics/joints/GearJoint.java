@@ -64,7 +64,7 @@ import org.jbox2d.pooling.IWorldPool;
  * @warning You have to manually destroy the gear joint if joint1 or joint2 is destroyed.
  * @author Daniel Murphy
  */
-public class GearJoint extends Joint {
+public strictfp class GearJoint extends Joint {
 
   private final Joint m_joint1;
   private final Joint m_joint2;

@@ -55,7 +55,7 @@ import org.jbox2d.pooling.IWorldPool;
  * 
  * @author Daniel Murphy
  */
-public class WeldJoint extends Joint {
+public strictfp class WeldJoint extends Joint {
 
   private float m_frequencyHz;
   private float m_dampingRatio;

@@ -38,7 +38,7 @@ import org.jbox2d.common.Vec2;
  * 
  * @author Daniel
  */
-public class EdgeShape extends Shape {
+public strictfp class EdgeShape extends Shape {
 
   /**
    * edge vertex 1

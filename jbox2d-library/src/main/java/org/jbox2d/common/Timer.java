@@ -40,7 +40,7 @@ public class Timer {
     resetNanos = System.nanoTime();
   }
 
-  public float getMilliseconds() {
+  public strictfp float getMilliseconds() {
     return (System.nanoTime() - resetNanos) / 1000 * 1f / 1000;
   }
 }

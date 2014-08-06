@@ -32,7 +32,7 @@ import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.contacts.Position;
 import org.jbox2d.dynamics.contacts.Velocity;
 
-public class ConstantVolumeJoint extends Joint {
+public strictfp class ConstantVolumeJoint extends Joint {
 
   private final Body[] bodies;
   private float[] targetLengths;

@@ -34,7 +34,7 @@ import org.jbox2d.common.Vec2;
  * 
  * @author daniel
  */
-public class WorldManifold {
+public strictfp class WorldManifold {
   /**
    * World vector pointing from A to B
    */

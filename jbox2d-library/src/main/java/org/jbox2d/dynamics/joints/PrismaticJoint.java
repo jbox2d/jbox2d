@@ -108,7 +108,7 @@ import org.jbox2d.pooling.IWorldPool;
  * 
  * @author Daniel
  */
-public class PrismaticJoint extends Joint {
+public strictfp class PrismaticJoint extends Joint {
 
   // Solver shared
   protected final Vec2 m_localAnchorA;

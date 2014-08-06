@@ -40,7 +40,7 @@ import org.jbox2d.dynamics.joints.JointEdge;
  * 
  * @author Daniel Murphy
  */
-public class Body {
+public strictfp class Body {
   public static final int e_islandFlag = 0x0001;
   public static final int e_awakeFlag = 0x0002;
   public static final int e_autoSleepFlag = 0x0004;

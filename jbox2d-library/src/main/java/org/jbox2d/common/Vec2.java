@@ -28,7 +28,7 @@ import java.io.Serializable;
 /**
  * A 2D column vector
  */
-public class Vec2 implements Serializable {
+public strictfp class Vec2 implements Serializable {
   private static final long serialVersionUID = 1L;
 
   public float x, y;
