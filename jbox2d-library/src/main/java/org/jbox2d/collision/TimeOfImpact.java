@@ -35,7 +35,7 @@ import org.jbox2d.pooling.IWorldPool;
 
 /**
  * Class used for computing the time of impact. This class should not be constructed usually, just
- * retrieve from the {@link SingletonPool#getTOI()}.
+ * retrieve from the {@link IWorldPool#getTimeOfImpact()}.
  * 
  * @author daniel
  */
