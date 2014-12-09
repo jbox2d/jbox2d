@@ -40,7 +40,7 @@ import org.jbox2d.pooling.IWorldPool;
  * @author daniel
  */
 public class TimeOfImpact {
-  public static final int MAX_ITERATIONS = 1000;
+  public static final int MAX_ITERATIONS = 20;
 
   public static int toiCalls = 0;
   public static int toiIters = 0;
