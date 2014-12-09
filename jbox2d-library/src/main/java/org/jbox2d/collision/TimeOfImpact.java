@@ -242,6 +242,9 @@ public class TimeOfImpact {
             t = 0.5f * (a1 + a2);
           }
 
+          ++rootIterCount;
+          ++toiRootIters;
+
           float s = fcn.evaluate(indexes[0], indexes[1], t);
 
           if (MathUtils.abs(s - target) < tolerance) {
@@ -258,9 +261,6 @@ public class TimeOfImpact {
             a2 = t;
             s2 = s;
           }
-
-          ++rootIterCount;
-          ++toiRootIters;
 
           // djm: whats with this? put in settings?
           if (rootIterCount == 50) {
