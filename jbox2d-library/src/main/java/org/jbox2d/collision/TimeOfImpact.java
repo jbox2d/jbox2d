@@ -272,7 +272,7 @@ public class TimeOfImpact {
 
         ++pushBackIter;
 
-        if (pushBackIter == Settings.maxPolygonVertices) {
+        if (pushBackIter == Settings.maxPolygonVertices || rootIterCount == 50) {
           break;
         }
       }
