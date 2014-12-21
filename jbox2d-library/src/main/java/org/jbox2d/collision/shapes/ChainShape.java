@@ -57,6 +57,11 @@ public class ChainShape extends Shape {
     m_count = 0;
   }
 
+  public void clear() {
+    m_vertices = null;
+    m_count = 0;
+  }
+
   @Override
   public int getChildCount() {
     return m_count - 1;
