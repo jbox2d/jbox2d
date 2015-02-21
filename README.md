@@ -7,7 +7,7 @@ jbox2d
 
 JBox2d is a Java port of the C++ physics engines [LiquidFun](http://google.github.io/liquidfun/) and [Box2d](http://box2d.org).
 
-If you're looking for *help*, see the [old wiki](http://code.google.com/p/jbox2d/w/list) or come visit us at the [Java Box2d subforum](http://box2d.org/forum/viewforum.php?f=9).  Please post bugs here on the [issues](https://github.com/dmurph/jbox2d/issues) page.
+If you're looking for *help*, see the [wiki](https://github.com/jbox2d/jbox2d/wiki) or come visit us at the [Java Box2d subforum](http://box2d.org/forum/viewforum.php?f=9).  Please post bugs here on the [issues](https://github.com/dmurph/jbox2d/issues) page.
 
 If you're planning on maintaining/customizing your *own copy* of the code, please join our [group](http://groups.google.com/group/jbox2d-announce) so we can keep you updated.
 
