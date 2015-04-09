@@ -1,8 +1,6 @@
 jbox2d
 ======
 
-**This project is currently being moved from [Google Code](https://code.google.com/p/jbox2d/) to Github.**
-
 **Please see the [project's BountySource page](https://www.bountysource.com/teams/jbox2d) to vote on issues that matter to you.**  Commenting/voting on issues helps me prioritize the small amount of time I have to maintain this library :)
 
 JBox2d is a Java port of the C++ physics engines [LiquidFun](http://google.github.io/liquidfun/) and [Box2d](http://box2d.org).
