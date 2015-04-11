@@ -23,7 +23,7 @@ import org.jbox2d.dynamics.TimeStep;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.particle.VoronoiDiagram.VoronoiDiagramCallback;
 
-public class ParticleSystem {
+public strictfp class ParticleSystem {
   /** All particle types that require creating pairs */
   private static final int k_pairFlags = ParticleType.b2_springParticle;
   /** All particle types that require creating triads */

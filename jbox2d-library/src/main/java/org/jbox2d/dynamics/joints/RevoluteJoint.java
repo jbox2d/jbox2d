@@ -56,7 +56,7 @@ import org.jbox2d.pooling.IWorldPool;
  * 
  * @author Daniel Murphy
  */
-public class RevoluteJoint extends Joint {
+public strictfp class RevoluteJoint extends Joint {
 
   // Solver shared
   protected final Vec2 m_localAnchorA = new Vec2();

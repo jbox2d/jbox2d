@@ -51,7 +51,7 @@ public class Distance {
   /**
    * GJK using Voronoi regions (Christer Ericson) and Barycentric coordinates.
    */
-  private class SimplexVertex {
+  private strictfp class SimplexVertex {
     public final Vec2 wA = new Vec2(); // support point in shapeA
     public final Vec2 wB = new Vec2(); // support point in shapeB
     public final Vec2 w = new Vec2(); // wB - wA

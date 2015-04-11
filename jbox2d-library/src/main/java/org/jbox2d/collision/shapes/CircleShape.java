@@ -36,7 +36,7 @@ import org.jbox2d.common.Vec2;
 /**
  * A circle shape.
  */
-public class CircleShape extends Shape {
+public strictfp class CircleShape extends Shape {
 
   public final Vec2 m_p;
 

@@ -3,7 +3,7 @@ package org.jbox2d.particle;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 
-public class ParticleGroup {
+public strictfp class ParticleGroup {
 
   ParticleSystem m_system;
   int m_firstIndex;

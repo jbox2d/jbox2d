@@ -82,7 +82,7 @@ import org.jbox2d.pooling.normal.DefaultWorldPool;
  * 
  * @author Daniel Murphy
  */
-public class World {
+public strictfp class World {
   public static final int WORLD_POOL_SIZE = 100;
   public static final int WORLD_POOL_CONTAINER_SIZE = 10;
 
@@ -2034,7 +2034,7 @@ class WorldRayCastWrapper implements TreeRayCastCallback {
 
     if (hit) {
       float fraction = output.fraction;
-      // Vec2 point = (1.0f - fraction) * input.p1 + fraction * input.p2;
+      // Vec2 point = (1.0f - fraction) * input.p1 + fraction * input.p2; If uncommented, add strictfp
       temp.set(input.p2).mulLocal(fraction);
       point.set(input.p1).mulLocal(1 - fraction).addLocal(temp);
       return callback.reportFixture(fixture, point, output.normal, fraction);

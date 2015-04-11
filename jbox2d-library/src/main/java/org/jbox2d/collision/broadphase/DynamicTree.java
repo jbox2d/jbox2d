@@ -41,7 +41,7 @@ import org.jbox2d.common.Vec2;
  * 
  * @author daniel
  */
-public class DynamicTree implements BroadPhaseStrategy {
+public strictfp class DynamicTree implements BroadPhaseStrategy {
   public static final int MAX_STACK_SIZE = 64;
   public static final int NULL_NODE = -1;
 

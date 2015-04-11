@@ -30,7 +30,7 @@ import org.jbox2d.pooling.IWorldPool;
 import org.jbox2d.pooling.normal.DefaultWorldPool;
 
 /** An axis-aligned bounding box. */
-public class AABB {
+public strictfp class AABB {
   /** Bottom left vertex of bounding box. */
   public final Vec2 lowerBound;
   /** Top right vertex of bounding box. */

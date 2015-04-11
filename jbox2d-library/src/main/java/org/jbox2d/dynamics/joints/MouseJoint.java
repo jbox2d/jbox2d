@@ -40,7 +40,7 @@ import org.jbox2d.pooling.IWorldPool;
  * 
  * @author Daniel
  */
-public class MouseJoint extends Joint {
+public strictfp class MouseJoint extends Joint {
 
   private final Vec2 m_localAnchorB = new Vec2();
   private final Vec2 m_targetA = new Vec2();

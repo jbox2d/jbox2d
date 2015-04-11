@@ -45,7 +45,7 @@ import org.jbox2d.dynamics.contacts.ContactEdge;
  * 
  * @author daniel
  */
-public class Fixture {
+public strictfp class Fixture {
 
   public float m_density;
 

@@ -42,7 +42,7 @@ import org.jbox2d.pooling.IWorldPool;
  * 
  * @author Daniel Murphy
  */
-public class PulleyJoint extends Joint {
+public strictfp class PulleyJoint extends Joint {
 
   public static final float MIN_PULLEY_LENGTH = 2.0f;
 

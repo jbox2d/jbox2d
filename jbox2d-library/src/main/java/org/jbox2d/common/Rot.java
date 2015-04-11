@@ -30,7 +30,7 @@ import java.io.Serializable;
  * 
  * @author Daniel
  */
-public class Rot implements Serializable {
+public strictfp class Rot implements Serializable {
   private static final long serialVersionUID = 1L;
 
   public float s, c; // sin and cos

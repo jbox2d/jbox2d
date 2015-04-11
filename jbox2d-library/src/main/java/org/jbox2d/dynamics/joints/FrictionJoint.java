@@ -36,7 +36,7 @@ import org.jbox2d.pooling.IWorldPool;
 /**
  * @author Daniel Murphy
  */
-public class FrictionJoint extends Joint {
+public strictfp class FrictionJoint extends Joint {
 
   private final Vec2 m_localAnchorA;
   private final Vec2 m_localAnchorB;

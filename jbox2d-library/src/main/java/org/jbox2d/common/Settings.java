@@ -27,7 +27,7 @@ package org.jbox2d.common;
  * Global tuning constants based on MKS units and various integer maximums (vertices per shape,
  * pairs, etc.).
  */
-public class Settings {
+public strictfp class Settings {
 
   /** A "close to zero" float epsilon value for use */
   public static final float EPSILON = 1.1920928955078125E-7f;

@@ -27,13 +27,13 @@ import java.util.List;
 
 import org.jbox2d.common.MathUtils;
 
-public class Profile {
+public strictfp class Profile {
   private static final int LONG_AVG_NUMS = 20;
   private static final float LONG_FRACTION = 1f / LONG_AVG_NUMS;
   private static final int SHORT_AVG_NUMS = 5;
   private static final float SHORT_FRACTION = 1f / SHORT_AVG_NUMS;
 
-  public static class ProfileEntry {
+  public static strictfp class ProfileEntry {
     float longAvg;
     float shortAvg;
     float min;

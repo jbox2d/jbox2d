@@ -25,7 +25,7 @@ import org.jbox2d.pooling.IWorldPool;
  * 
  * @author dmurph
  */
-public class MotorJoint extends Joint {
+public strictfp class MotorJoint extends Joint {
 
   // Solver shared
   private final Vec2 m_linearOffset = new Vec2();

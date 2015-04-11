@@ -41,7 +41,7 @@ import org.jbox2d.dynamics.contacts.ContactVelocityConstraint.VelocityConstraint
 /**
  * @author Daniel
  */
-public class ContactSolver {
+public strictfp class ContactSolver {
 
   public static final boolean DEBUG_SOLVER = false;
   public static final float k_errorTol = 1e-3f;

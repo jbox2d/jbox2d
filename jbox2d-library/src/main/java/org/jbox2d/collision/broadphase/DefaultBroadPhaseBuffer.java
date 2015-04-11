@@ -40,7 +40,7 @@ import org.jbox2d.common.Vec2;
  * 
  * @author Daniel Murphy
  */
-public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
+public strictfp class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
 
   private final BroadPhaseStrategy m_tree;
 

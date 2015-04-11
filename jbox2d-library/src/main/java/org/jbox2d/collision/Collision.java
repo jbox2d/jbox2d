@@ -43,7 +43,7 @@ import org.jbox2d.pooling.IWorldPool;
  * 
  * @author Daniel Murphy
  */
-public class Collision {
+public strictfp class Collision {
   public static final int NULL_FEATURE = Integer.MAX_VALUE;
 
   private final IWorldPool pool;
