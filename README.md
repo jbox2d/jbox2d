@@ -59,6 +59,14 @@ The LiquidFun project has documentation on both the liquid particle physics and 
 
 If you would like to help out with this project, or if you have any questions, please head over to the [Box2D](http://www.box2d.org/ "box2d.org" ) site and discuss with us in the [Java Box2D subforum](http://www.box2d.org/forum/viewforum.php?f=9). 
 
+### Donate
+
+This project is maintained in free time. Happy with the engine? Want to buy me a beer? Want to see more development?
+- Dwolla: 812-638-9391
+- Bitcoin: 1Fd564w4SK5FKtCprVFCgkD2iimSCzUego
+- Paypal: <a href='https://www.paypal.com/us/cgi-bin/webscr?cmd=_flow&SESSION=PYq8DP8sAWHQD6uaiekt5oeCwO4mrkvZqXFbdwrwqkGDMn2cuWCpbUxlMKy&dispatch=5885d80a13c0db1f8e263663d3faee8d96f000117187ac9edec8a65b311f447e'>![Paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif "Donate!")</a>
+
+
 ***
 
 ###Licenece
