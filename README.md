@@ -3,11 +3,11 @@ JBox2D
 JBox2d is a 2D Java physics engine ported from the C++ physics engines [LiquidFun](http://google.github.io/liquidfun/ "google.github.io/liquidfun" ) and [Box2d](http://box2d.org "box2d.org" ).
 See the [project page](http://code.google.com/p/jbox2d/ "code.google.com/p/jbox2d" ) for more information.
 
-**Please see the [project's BountySource page](https://www.bountysource.com/teams/jbox2d) to vote on issues that matter to you.**  Commenting/voting on issues helps me prioritize the small amount of time I have to maintain this library :)
+**Please see the project's [BountySource page](https://www.bountysource.com/teams/jbox2d) to vote on issues that matter to you.**  Commenting/voting on issues helps me prioritize the small amount of time I have to maintain this library :)
 
 **Watch/star to follow along with progress!**
 
-If you're planning on maintaining/customizing your *own copy* of the code, please join our [group](http://groups.google.com/group/jbox2d-announce) so we can keep you updated.
+If you're planning on maintaining/customizing your *own copy* of the code, please join our [group](http://groups.google.com/group/jbox2d-announce "groups.google.com/group/jbox2d-announce" ) so we can keep you updated.
 
 If you've downloaded this as an archive, you should find the built java jars in the 'target' directories of each project.
 
@@ -41,8 +41,8 @@ If you've downloaded this as an archive, you should find the built java jars in 
 - [Releases](https://github.com/jbox2d/jbox2d/releases "github.com/jbox2d/jbox2d/releases" )
 
 
-If you're looking for *help*, see the [wiki](https://github.com/jbox2d/jbox2d/wiki) or come visit us at the [Java Box2d subforum](http://box2d.org/forum/viewforum.php?f=9).
-If you're looking to deploy on the web, see [PlayN](https://code.google.com/p/playn/), which compiles JBox2d through GWT so it runs in the browser.  The JBox2d library has GWT support out of the box.   Also, [TeaVM](http://teavm.org/) support jbox2d in the browser as well.
+If you're looking for *help*, see the [wiki](https://github.com/jbox2d/jbox2d/wiki) or come visit us at the [Java Box2d subforum](http://box2d.org/forum/viewforum.php?f=9 "box2d.org/forum" ).
+If you're looking to deploy on the web, see [PlayN](https://code.google.com/p/playn/), which compiles JBox2d through GWT so it runs in the browser.  The JBox2d library has GWT support out of the box.   Also, [TeaVM](http://teavm.org/ "teavm.org" ) support jbox2d in the browser as well.
 
 ### Report Issues
 
@@ -53,17 +53,17 @@ If you're looking to deploy on the web, see [PlayN](https://code.google.com/p/pl
 
 This project is led by [Daniel Murphy](https://plus.google.com/100658035699683088671) (toucansam in the forums). It was started in late 2007 by [quixote_arg](https://plus.google.com/109274381780655535035) and [ewjordan](https://plus.google.com/106822299978153756812), and is released under the permissive and commercial-friendly open source zlib license, like the original Box2D engine.
 
-For documentation, you can always refer to the included Javadocs, but JBox2D is very closely related to the C++ Box2D, so please see the C++ documentation at [Box2D.org](http://www.box2d.org/manual.html "www.box2d.org/manual.html" ) which, apart from minor name changes (b2Body -> Body, for instance, and in the Java port methods are camel-cased instead of capitalized), should apply equally well to JBox2D. Also see the source code of the demos (the [org.jbox2d.testbed.tests](https://github.com/jbox2d/jbox2d/tree/master/jbox2d-testbed/src/main/java/org/jbox2d/testbed/tests) package) to see how various effects are achieved in JBox2D.
+For documentation, you can always refer to the included Javadocs, but JBox2D is very closely related to the C++ Box2D, so please see the C++ documentation at [Box2D.org](http://www.box2d.org/manual.html "box2d.org/manual.html" ) which, apart from minor name changes (b2Body -> Body, for instance, and in the Java port methods are camel-cased instead of capitalized), should apply equally well to JBox2D. Also see the source code of the demos (the [org.jbox2d.testbed.tests](https://github.com/jbox2d/jbox2d/tree/master/jbox2d-testbed/src/main/java/org/jbox2d/testbed/tests) package) to see how various effects are achieved in JBox2D.
 
 The LiquidFun project has documentation on both the liquid particle physics and the base engine itself, which you can access on their website.
 
-If you would like to help out with this project, or if you have any questions, please head over to the [Box2D](http://www.box2d.org/ "box2d.org" ) site and discuss with us in the [Java Box2D subforum](http://www.box2d.org/forum/viewforum.php?f=9). 
+If you would like to help out with this project, or if you have any questions, please head over to the [Box2D](http://www.box2d.org/ "box2d.org" ) site and discuss with us in the [Java Box2D subforum](http://www.box2d.org/forum/viewforum.php?f=9 "www.box2d.org/forum" ). 
 
 ### Donate
 
 This project is maintained in free time. Happy with the engine? Want to buy me a beer? Want to see more development?
 - Dwolla: 812-638-9391
-- Bitcoin: 1Fd564w4SK5FKtCprVFCgkD2iimSCzUego
+- Bitcoin: [1Fd564w4SK5FKtCprVFCgkD2iimSCzUego](bitcoin:1Fd564w4SK5FKtCprVFCgkD2iimSCzUego)
 - Paypal: <a href='https://www.paypal.com/us/cgi-bin/webscr?cmd=_flow&SESSION=PYq8DP8sAWHQD6uaiekt5oeCwO4mrkvZqXFbdwrwqkGDMn2cuWCpbUxlMKy&dispatch=5885d80a13c0db1f8e263663d3faee8d96f000117187ac9edec8a65b311f447e'>![Paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif "Donate!")</a>
 
 
