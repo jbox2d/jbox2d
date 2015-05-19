@@ -41,6 +41,7 @@ import org.jbox2d.pooling.IWorldPool;
  */
 public class TimeOfImpact {
   public static final int MAX_ITERATIONS = 20;
+  public static final int MAX_ROOT_ITERATIONS = 50;
 
   public static int toiCalls = 0;
   public static int toiIters = 0;
@@ -262,8 +263,7 @@ public class TimeOfImpact {
             s2 = s;
           }
 
-          // djm: whats with this? put in settings?
-          if (rootIterCount == 50) {
+          if (rootIterCount == MAX_ROOT_ITERATIONS) {
             break;
           }
         }
@@ -272,7 +272,7 @@ public class TimeOfImpact {
 
         ++pushBackIter;
 
-        if (pushBackIter == Settings.maxPolygonVertices || rootIterCount == 50) {
+        if (pushBackIter == Settings.maxPolygonVertices || rootIterCount == MAX_ROOT_ITERATIONS) {
           break;
         }
       }
