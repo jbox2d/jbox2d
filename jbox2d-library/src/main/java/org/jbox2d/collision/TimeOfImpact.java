@@ -35,12 +35,13 @@ import org.jbox2d.pooling.IWorldPool;
 
 /**
  * Class used for computing the time of impact. This class should not be constructed usually, just
- * retrieve from the {@link SingletonPool#getTOI()}.
+ * retrieve from the {@link IWorldPool#getTimeOfImpact()}.
  * 
  * @author daniel
  */
 public class TimeOfImpact {
-  public static final int MAX_ITERATIONS = 1000;
+  public static final int MAX_ITERATIONS = 20;
+  public static final int MAX_ROOT_ITERATIONS = 50;
 
   public static int toiCalls = 0;
   public static int toiIters = 0;
@@ -242,6 +243,9 @@ public class TimeOfImpact {
             t = 0.5f * (a1 + a2);
           }
 
+          ++rootIterCount;
+          ++toiRootIters;
+
           float s = fcn.evaluate(indexes[0], indexes[1], t);
 
           if (MathUtils.abs(s - target) < tolerance) {
@@ -259,11 +263,7 @@ public class TimeOfImpact {
             s2 = s;
           }
 
-          ++rootIterCount;
-          ++toiRootIters;
-
-          // djm: whats with this? put in settings?
-          if (rootIterCount == 50) {
+          if (rootIterCount == MAX_ROOT_ITERATIONS) {
             break;
           }
         }
@@ -272,7 +272,7 @@ public class TimeOfImpact {
 
         ++pushBackIter;
 
-        if (pushBackIter == Settings.maxPolygonVertices) {
+        if (pushBackIter == Settings.maxPolygonVertices || rootIterCount == MAX_ROOT_ITERATIONS) {
           break;
         }
       }
@@ -490,10 +490,6 @@ class SeparationFunction {
 
     switch (m_type) {
       case POINTS: {
-        Rot.mulTransUnsafe(xfa.q, m_axis, axisA);
-        Rot.mulTransUnsafe(xfb.q, m_axis.negateLocal(), axisB);
-        m_axis.negateLocal();
-
         localPointA.set(m_proxyA.getVertex(indexA));
         localPointB.set(m_proxyB.getVertex(indexB));
 
@@ -507,9 +503,6 @@ class SeparationFunction {
         Rot.mulToOutUnsafe(xfa.q, m_axis, normal);
         Transform.mulToOutUnsafe(xfa, m_localPoint, pointA);
 
-        Rot.mulTransUnsafe(xfb.q, normal.negateLocal(), axisB);
-        normal.negateLocal();
-
         localPointB.set(m_proxyB.getVertex(indexB));
         Transform.mulToOutUnsafe(xfb, localPointB, pointB);
         float separation = Vec2.dot(pointB.subLocal(pointA), normal);
@@ -518,9 +511,6 @@ class SeparationFunction {
       case FACE_B: {
         Rot.mulToOutUnsafe(xfb.q, m_axis, normal);
         Transform.mulToOutUnsafe(xfb, m_localPoint, pointB);
-
-        Rot.mulTransUnsafe(xfa.q, normal.negateLocal(), axisA);
-        normal.negateLocal();
 
         localPointA.set(m_proxyA.getVertex(indexA));
         Transform.mulToOutUnsafe(xfa, localPointA, pointA);
