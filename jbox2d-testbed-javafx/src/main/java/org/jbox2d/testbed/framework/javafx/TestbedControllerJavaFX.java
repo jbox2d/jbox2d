@@ -21,10 +21,13 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-package org.jbox2d.testbed.framework;
+package org.jbox2d.testbed.framework.javafx;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jbox2d.testbed.framework.AbstractTestbedController;
+import org.jbox2d.testbed.framework.TestbedErrorHandler;
+import org.jbox2d.testbed.framework.TestbedModel;
+
+import javafx.animation.AnimationTimer;
 
 /**
  * This class contains most control logic for the testbed and the update loop. It also watches the
@@ -32,48 +35,34 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Daniel Murphy
  */
-public class TestbedController extends AbstractTestbedController implements Runnable {
-	private static final Logger log = LoggerFactory.getLogger(TestbedController.class);
+public class TestbedControllerJavaFX extends AbstractTestbedController {
 
-	private Thread animator;
-
-	public TestbedController(TestbedModel argModel, UpdateBehavior behavior, MouseBehavior mouseBehavior, TestbedErrorHandler errorHandler) {
+	public TestbedControllerJavaFX(TestbedModel argModel, UpdateBehavior behavior, MouseBehavior mouseBehavior, TestbedErrorHandler errorHandler) {
 		super(argModel, behavior, mouseBehavior, errorHandler);
-		animator = new Thread(this, "Testbed");
 	}
 
+	private AnimationTimer animator = new AnimationTimer() {
+		long last = -1;
+		@Override
+		public void handle(long now) {
+			if (last >= 0) {
+				long dt = (now - last) / 1000000; // convert til millis
+				sleepTime -= dt;
+				if (sleepTime < 0) {
+					stepAndRender();
+				}
+			}
+			last = now;
+		}
+	};
+	
 	@Override
 	public void startAnimator() {
-		super.startAnimator();
-		if (! animator.isAlive()) {
-			animator.start();
-		}
+		animator.start();
 	}
 
 	@Override
 	public void stopAnimator() {
-		super.stopAnimator();
 		animator.stop();
-	}
-
-	@Override
-	public void run() {
-		beforeTime = startTime = updateTime = System.nanoTime();
-		sleepTime = 0;
-		startAnimator();
-		loopInit();
-		while (isAnimating()) {
-			stepAndRender();
-		}
-	}
-
-	@Override
-	protected void stepAndRender() {
-		super.stepAndRender();
-		if (sleepTime > 0) {
-			try {
-				Thread.sleep(sleepTime);
-			} catch (InterruptedException ex) {}
-		}
 	}
 }

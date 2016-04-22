@@ -47,7 +47,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.jbox2d.testbed.framework.TestbedController;
+import org.jbox2d.testbed.framework.AbstractTestbedController;
 import org.jbox2d.testbed.framework.TestbedModel;
 import org.jbox2d.testbed.framework.TestbedModel.ListItem;
 import org.jbox2d.testbed.framework.TestbedSetting;
@@ -68,7 +68,7 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
   private static final String LABEL_TAG = "label";
 
   final TestbedModel model;
-  final TestbedController controller;
+  final AbstractTestbedController controller;
 
   public JComboBox tests;
 
@@ -80,7 +80,7 @@ public class TestbedSidePanel extends JPanel implements ChangeListener, ActionLi
   public JButton saveButton = new JButton("Save");
   public JButton loadButton = new JButton("Load");
 
-  public TestbedSidePanel(TestbedModel argModel, TestbedController argController) {
+  public TestbedSidePanel(TestbedModel argModel, AbstractTestbedController argController) {
     model = argModel;
     controller = argController;
     initComponents();

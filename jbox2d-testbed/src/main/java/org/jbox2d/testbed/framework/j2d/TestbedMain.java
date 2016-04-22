@@ -32,11 +32,12 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
 import org.jbox2d.testbed.framework.TestList;
-import org.jbox2d.testbed.framework.TestbedController;
-import org.jbox2d.testbed.framework.TestbedController.MouseBehavior;
-import org.jbox2d.testbed.framework.TestbedController.UpdateBehavior;
+import org.jbox2d.testbed.framework.AbstractTestbedController;
+import org.jbox2d.testbed.framework.AbstractTestbedController.MouseBehavior;
+import org.jbox2d.testbed.framework.AbstractTestbedController.UpdateBehavior;
 import org.jbox2d.testbed.framework.TestbedErrorHandler;
 import org.jbox2d.testbed.framework.TestbedModel;
+import org.jbox2d.testbed.framework.TestbedController;
 
 /**
  * The entry point for the testbed application
@@ -54,7 +55,7 @@ public class TestbedMain {
     // + "Hopefully you're on a mac so the window isn't ugly as crap.");
     // }
     TestbedModel model = new TestbedModel();
-    final TestbedController controller =
+    final AbstractTestbedController controller =
         new TestbedController(model, UpdateBehavior.UPDATE_CALLED, MouseBehavior.NORMAL,
             new TestbedErrorHandler() {
               @Override

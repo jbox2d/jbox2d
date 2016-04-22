@@ -36,7 +36,7 @@ import java.awt.event.ComponentEvent;
 
 import javax.swing.JPanel;
 
-import org.jbox2d.testbed.framework.TestbedController;
+import org.jbox2d.testbed.framework.AbstractTestbedController;
 import org.jbox2d.testbed.framework.TestbedModel;
 import org.jbox2d.testbed.framework.TestbedPanel;
 import org.slf4j.Logger;
@@ -60,9 +60,9 @@ public class TestPanelJ2D extends JPanel implements TestbedPanel {
   private int panelWidth;
   private int panelHeight;
 
-  private final TestbedController controller;
+  private final AbstractTestbedController controller;
 
-  public TestPanelJ2D(final TestbedModel model, final TestbedController controller) {
+  public TestPanelJ2D(final TestbedModel model, final AbstractTestbedController controller) {
     this.controller = controller;
     setBackground(Color.black);
     setPreferredSize(new Dimension(INIT_WIDTH, INIT_HEIGHT));

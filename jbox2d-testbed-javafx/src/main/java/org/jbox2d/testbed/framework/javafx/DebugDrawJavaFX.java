@@ -21,15 +21,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-package org.jbox2d.testbed.framework.j2d;
-
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
+package org.jbox2d.testbed.framework.javafx;
 
 import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.collision.AABB;
@@ -40,35 +32,38 @@ import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Transform;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.particle.ParticleColor;
-import org.jbox2d.pooling.arrays.IntArray;
 import org.jbox2d.pooling.arrays.Vec2Array;
 import org.jbox2d.testbed.pooling.ColorPool;
 
-// pooling local, not thread-safe
+import javafx.geometry.Rectangle2D;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.transform.Affine;
+
 /**
- * Implementation of {@link DebugDraw} that uses Java2D! Hooray!</br>
+ * Implementation of {@link DebugDraw} that uses JavaFX! Hooray!</br>
  * 
- * @author Daniel Murphy
+ * @author Daniel Murphy Initial Java 2D implementation
+ * @author Hallvard Traetteberg JavaFX port
  */
-public class DebugDrawJ2D extends DebugDraw {
+public class DebugDrawJavaFX extends DebugDraw {
 	public static int circlePoints = 13;
 	public static final float edgeWidth = 0.02f;
 
-	private final TestPanelJ2D panel;
+	private final TestPanelJavaFX panel;
 	private final ColorPool<Color> cpool = new ColorPool<Color>() {
 		protected Color newColor(float r, float g, float b, float alpha) {
 			return new Color(r, g, b, alpha);
 		}
 	};
 	private final boolean yFlip;
-	private final BasicStroke stroke;
-	private final Shape circle;
+	private Rectangle2D circle;
 
-	public DebugDrawJ2D(TestPanelJ2D argTestPanel, boolean yFlip) {
+	public DebugDrawJavaFX(TestPanelJavaFX argTestPanel, boolean yFlip) {
 		panel = argTestPanel;
 		this.yFlip = yFlip;
-		stroke = new BasicStroke(0);
-		circle = new Ellipse2D.Float(-1, -1, 2, 2);
+		stroke = 1.0;
+		circle = new Rectangle2D(-1, -1, 2, 2);
 	}
 
 	@Override
@@ -82,10 +77,10 @@ public class DebugDrawJ2D extends DebugDraw {
 	@Override
 	public void drawPoint(Vec2 argPoint, float argRadiusOnScreen, Color3f argColor) {
 		getWorldToScreenToOut(argPoint, sp1);
-		Graphics2D g = getGraphics();
+		GraphicsContext g = getGraphics();
 
 		Color c = cpool.getColor(argColor.x, argColor.y, argColor.z);
-		g.setColor(c);
+		g.setStroke(c);
 		sp1.x -= argRadiusOnScreen;
 		sp1.y -= argRadiusOnScreen;
 		g.fillOval((int) sp1.x, (int) sp1.y, (int) argRadiusOnScreen * 2, (int) argRadiusOnScreen * 2);
@@ -100,10 +95,10 @@ public class DebugDrawJ2D extends DebugDraw {
 		getWorldToScreenToOut(p2, sp2);
 
 		Color c = cpool.getColor(color.x, color.y, color.z);
-		Graphics2D g = getGraphics();
-		g.setColor(c);
-		g.setStroke(stroke);
-		g.drawLine((int) sp1.x, (int) sp1.y, (int) sp2.x, (int) sp2.y);
+		GraphicsContext g = getGraphics();
+		g.setStroke(c);
+		g.setLineWidth(0.0);
+		g.strokeLine(sp1.x, sp1.y, sp2.x, sp2.y);
 	}
 
 	public void drawAABB(AABB argAABB, Color3f color) {
@@ -112,78 +107,78 @@ public class DebugDrawJ2D extends DebugDraw {
 		drawPolygon(vecs, 4, color);
 	}
 
-	private final AffineTransform tr = new AffineTransform();
-	private AffineTransform oldTrans = new AffineTransform();
-	private Stroke oldStroke;
+	private Affine tr = new Affine(), oldTrans = new Affine();
+	private double stroke, oldStroke;
 
-	private void saveState(Graphics2D g) {
+	private void saveState(GraphicsContext g) {
 		oldTrans = g.getTransform();
-		oldStroke = g.getStroke();
+		oldStroke = g.getLineWidth();
 	}
 
-	private void restoreState(Graphics2D g) {
+	private void restoreState(GraphicsContext g) {
 		g.setTransform(oldTrans);
-		g.setStroke(oldStroke);
+		g.setLineWidth(oldStroke);
 	}
 
-	private void transformGraphics(Graphics2D g, Vec2 center) {
+	private double transformGraphics(GraphicsContext g, Vec2 center) {
 		Vec2 e = viewportTransform.getExtents();
 		Vec2 vc = viewportTransform.getCenter();
 		Mat22 vt = viewportTransform.getMat22Representation();
-
+		
 		int flip = yFlip ? -1 : 1;
-		tr.setTransform(vt.ex.x, flip * vt.ex.y, vt.ey.x, flip * vt.ey.y, e.x, e.y);
-		tr.translate(-vc.x, -vc.y);
-		tr.translate(center.x, center.y);
-		g.transform(tr);
+		tr.setToTransform(vt.ex.x, flip * vt.ex.y, e.x, vt.ey.x, flip * vt.ey.y, e.y);
+		tr.appendTranslation(-vc.x, -vc.y);
+		tr.appendTranslation(center.x, center.y);
+		g.setTransform(tr);
+		return vt.ex.x;
 	}
-
+	
 	@Override
 	public void drawCircle(Vec2 center, float radius, Color3f color) {
-		Graphics2D g = getGraphics();
-		Color s = cpool.getColor(color.x, color.y, color.z, 1f);
+		GraphicsContext g = getGraphics();
+		Color s = cpool.getColor(color.x, color.y, color.z, 1.0f);
 		saveState(g);
-		transformGraphics(g, center);
-		g.setStroke(stroke);
+		double scaling = transformGraphics(g, center) * radius;
+		g.setLineWidth(stroke / scaling);
 		g.scale(radius, radius);
-		g.setColor(s);
-		g.drawOval(-1, -1, 2, 2);
+		g.setStroke(s);
+		g.strokeOval(circle.getMinX(), circle.getMinX(), circle.getWidth(), circle.getHeight());
 		restoreState(g);
 	}
 
 	@Override
 	public void drawCircle(Vec2 center, float radius, Vec2 axis, Color3f color) {
-		Graphics2D g = getGraphics();
-		saveState(g);
-		transformGraphics(g, center);
-		g.setStroke(stroke);
+		GraphicsContext g = getGraphics();
 		Color s = cpool.getColor(color.x, color.y, color.z, 1f);
+		saveState(g);
+		double scaling = transformGraphics(g, center) * radius;
+		g.setLineWidth(stroke / scaling);
 		g.scale(radius, radius);
-		g.setColor(s);
-		g.draw(circle);
+		g.setStroke(s);
+		g.strokeOval(circle.getMinX(), circle.getMinX(), circle.getWidth(), circle.getHeight());
 		if (axis != null) {
 			g.rotate(MathUtils.atan2(axis.y, axis.x));
-			g.drawLine(0, 0, 1, 0);
+			g.strokeLine(0, 0, 1, 0);
 		}
 		restoreState(g);
 	}
 
 	@Override
 	public void drawSolidCircle(Vec2 center, float radius, Vec2 axis, Color3f color) {
-		Graphics2D g = getGraphics();
-		saveState(g);
-		transformGraphics(g, center);
-		g.setStroke(stroke);
+		GraphicsContext g = getGraphics();
 		Color f = cpool.getColor(color.x, color.y, color.z, .4f);
 		Color s = cpool.getColor(color.x, color.y, color.z, 1f);
+		saveState(g);
+		double scaling = transformGraphics(g, center) * radius;
+		g.setLineWidth(stroke / scaling);
 		g.scale(radius, radius);
-		g.setColor(f);
-		g.fill(circle);
-		g.setColor(s);
-		g.draw(circle);
+		g.setFill(f);
+		g.fillOval(circle.getMinX(), circle.getMinX(), circle.getWidth(), circle.getHeight());
+		g.setStroke(s);
+		g.strokeOval(circle.getMinX(), circle.getMinX(), circle.getWidth(), circle.getHeight());
 		if (axis != null) {
 			g.rotate(MathUtils.atan2(axis.y, axis.x));
-			g.drawLine(0, 0, 1, 0);
+			g.strokeLine(0, 0, 1, 0);
 		}
 		restoreState(g);
 	}
@@ -193,10 +188,10 @@ public class DebugDrawJ2D extends DebugDraw {
 
 	@Override
 	public void drawParticles(Vec2[] centers, float radius, ParticleColor[] colors, int count) {
-		Graphics2D g = getGraphics();
+		GraphicsContext g = getGraphics();
 		saveState(g);
-		transformGraphics(g, zero);
-		g.setStroke(stroke);
+		double scaling = transformGraphics(g, zero) * radius;
+		g.setLineWidth(stroke / scaling);
 		for (int i = 0; i < count; i++) {
 			Vec2 center = centers[i];
 			Color color;
@@ -206,11 +201,11 @@ public class DebugDrawJ2D extends DebugDraw {
 				ParticleColor c = colors[i];
 				color = cpool.getColor(c.r * 1f / 127, c.g * 1f / 127, c.b * 1f / 127, c.a * 1f / 127);
 			}
-			AffineTransform old = g.getTransform();
+			Affine old = g.getTransform();
 			g.translate(center.x, center.y);
 			g.scale(radius, radius);
-			g.setColor(color);
-			g.fill(circle);
+			g.setFill(color);
+			g.fillOval(circle.getMinX(), circle.getMinX(), circle.getWidth(), circle.getHeight());
 			g.setTransform(old);
 		}
 		restoreState(g);
@@ -220,10 +215,10 @@ public class DebugDrawJ2D extends DebugDraw {
 
 	@Override
 	public void drawParticlesWireframe(Vec2[] centers, float radius, ParticleColor[] colors, int count) {
-		Graphics2D g = getGraphics();
+		GraphicsContext g = getGraphics();
 		saveState(g);
-		transformGraphics(g, zero);
-		g.setStroke(stroke);
+		double scaling = transformGraphics(g, zero) * radius;
+		g.setLineWidth(stroke / scaling);
 		for (int i = 0; i < count; i++) {
 			Vec2 center = centers[i];
 			Color color;
@@ -234,71 +229,71 @@ public class DebugDrawJ2D extends DebugDraw {
 				ParticleColor c = colors[i];
 				color = new Color(c.r * 1f / 127, c.g * 1f / 127, c.b * 1f / 127, 1);
 			}
-			AffineTransform old = g.getTransform();
+			Affine old = g.getTransform();
 			g.translate(center.x, center.y);
 			g.scale(radius, radius);
-			g.setColor(color);
-			g.draw(circle);
+			g.setStroke(color);
+			g.strokeOval(circle.getMinX(), circle.getMinX(), circle.getWidth(), circle.getHeight());
 			g.setTransform(old);
 		}
 		restoreState(g);
 	}
 
 	private final Vec2 temp = new Vec2();
-	private final static IntArray xIntsPool = new IntArray();
-	private final static IntArray yIntsPool = new IntArray();
+	private final static DoubleArray xDoublePool = new DoubleArray();
+	private final static DoubleArray yDoublePool = new DoubleArray();
 
 	@Override
 	public void drawSolidPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
 		Color f = cpool.getColor(color.x, color.y, color.z, .4f);
 		Color s = cpool.getColor(color.x, color.y, color.z, 1f);
-		Graphics2D g = getGraphics();
+		GraphicsContext g = getGraphics();
 		saveState(g);
-		int[] xInts = xIntsPool.get(vertexCount);
-		int[] yInts = yIntsPool.get(vertexCount);
+		double[] xs = xDoublePool.get(vertexCount);
+		double[] ys = yDoublePool.get(vertexCount);
 		for (int i = 0; i < vertexCount; i++) {
 			getWorldToScreenToOut(vertices[i], temp);
-			xInts[i] = (int) temp.x;
-			yInts[i] = (int) temp.y;
+			xs[i] = temp.x;
+			ys[i] = temp.y;
 		}
-		g.setStroke(stroke);
-		g.setColor(f);
-		g.fillPolygon(xInts, yInts, vertexCount);
-		g.setColor(s);
-		g.drawPolygon(xInts, yInts, vertexCount);
+		g.setLineWidth(stroke);
+		g.setFill(f);
+		g.fillPolygon(xs, ys, vertexCount);
+		g.setStroke(s);
+		g.strokePolygon(xs, ys, vertexCount);
 		restoreState(g);
 	}
 
 	@Override
 	public void drawPolygon(Vec2[] vertices, int vertexCount, Color3f color) {
 		Color s = cpool.getColor(color.x, color.y, color.z, 1f);
-		Graphics2D g = getGraphics();
+		GraphicsContext g = getGraphics();
 		saveState(g);
-		int[] xInts = xIntsPool.get(vertexCount);
-		int[] yInts = yIntsPool.get(vertexCount);
+		double[] xs = xDoublePool.get(vertexCount);
+		double[] ys = yDoublePool.get(vertexCount);
 		for (int i = 0; i < vertexCount; i++) {
 			getWorldToScreenToOut(vertices[i], temp);
-			xInts[i] = (int) temp.x;
-			yInts[i] = (int) temp.y;
+			xs[i] = temp.x;
+			ys[i] = temp.y;
 		}
-		g.setStroke(stroke);
-		g.setColor(s);
-		g.drawPolygon(xInts, yInts, vertexCount);
+		g.setLineWidth(stroke);
+		g.setStroke(s);
+		g.strokePolygon(xs, ys, vertexCount);
 		restoreState(g);
 	}
 
 	@Override
 	public void drawString(float x, float y, String s, Color3f color) {
-		Graphics2D g = getGraphics();
+		GraphicsContext g = getGraphics();
 		if (g == null) {
 			return;
 		}
 		Color c = cpool.getColor(color.x, color.y, color.z);
-		g.setColor(c);
-		g.drawString(s, x, y);
+		g.setFill(c);
+		g.fillText(s, x, y);
 	}
 
-	private Graphics2D getGraphics() {
+	private GraphicsContext getGraphics() {
 		return panel.getDBGraphics();
 	}
 
@@ -306,24 +301,24 @@ public class DebugDrawJ2D extends DebugDraw {
 
 	@Override
 	public void drawTransform(Transform xf) {
-		Graphics2D g = getGraphics();
+		GraphicsContext g = getGraphics();
 		getWorldToScreenToOut(xf.p, temp);
 		temp2.setZero();
 		float k_axisScale = 0.4f;
 
 		Color c = cpool.getColor(1, 0, 0);
-		g.setColor(c);
+		g.setStroke(c);
 
 		temp2.x = xf.p.x + k_axisScale * xf.q.c;
 		temp2.y = xf.p.y + k_axisScale * xf.q.s;
 		getWorldToScreenToOut(temp2, temp2);
-		g.drawLine((int) temp.x, (int) temp.y, (int) temp2.x, (int) temp2.y);
+		g.strokeLine(temp.x, temp.y, temp2.x, temp2.y);
 
 		c = cpool.getColor(0, 1, 0);
-		g.setColor(c);
+		g.setStroke(c);
 		temp2.x = xf.p.x + -k_axisScale * xf.q.s;
 		temp2.y = xf.p.y + k_axisScale * xf.q.c;
 		getWorldToScreenToOut(temp2, temp2);
-		g.drawLine((int) temp.x, (int) temp.y, (int) temp2.x, (int) temp2.y);
+		g.strokeLine(temp.x, temp.y, temp2.x, temp2.y);
 	}
 }

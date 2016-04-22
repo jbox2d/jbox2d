@@ -26,7 +26,6 @@
  */
 package org.jbox2d.testbed.pooling;
 
-import java.awt.Color;
 import java.util.HashMap;
 
 /**
@@ -34,18 +33,18 @@ import java.util.HashMap;
  * stupid pool and now I'm all hot and bothered.  Also, this pool isn't thread safe!
  * @author Daniel Murphy
  */
-public class ColorPool {
+public abstract class ColorPool<C> {
 	
-	private HashMap<ColorKey, Color> colorMap = new HashMap<ColorKey, Color>();
+	private HashMap<ColorKey, C> colorMap = new HashMap<ColorKey, C>();
 	
 	private final ColorKey queryKey = new ColorKey();
-	public Color getColor(float r, float g, float b, float alpha){
+	public C getColor(float r, float g, float b, float alpha){
 		
 		queryKey.set(r, g, b, alpha);
 		if(colorMap.containsKey(queryKey)){
 			return colorMap.get(queryKey);
 		}else{
-			Color c = new Color(r, g, b, alpha);
+			C c = newColor(r, g, b, alpha);
 			ColorKey ck = new ColorKey();
 			ck.set(r, g, b, alpha);
 			colorMap.put(ck, c);
@@ -53,7 +52,9 @@ public class ColorPool {
 		}
 	}
 	
-	public Color getColor(float r, float g, float b){
+	protected abstract C newColor(float r, float g, float b, float alpha);
+
+	public C getColor(float r, float g, float b){
 		return getColor(r, g, b, 1);
 	}
 }
