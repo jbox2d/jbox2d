@@ -55,7 +55,8 @@ public class AWTPanelHelper {
         if (arg0.getButton() == screenDragButton) {
           screenDragButtonDown = false;
         } else if (model.getCodedKeys()[KeyEvent.VK_SHIFT] && !mouseJointButtonDown) {
-          controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), TestbedTest.BOMB_SPAWN_BUTTON);
+          controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()),
+              TestbedTest.BOMB_SPAWN_BUTTON);
         } else {
           if (arg0.getButton() == TestbedTest.MOUSE_JOINT_BUTTON) {
             mouseJointButtonDown = false;
