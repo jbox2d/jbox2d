@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.jbox2d.common.Vec2;
 import org.jbox2d.testbed.framework.TestbedCamera.ZoomType;
-import org.jbox2d.testbed.framework.TestbedController;
+import org.jbox2d.testbed.framework.AbstractTestbedController;
 import org.jbox2d.testbed.framework.TestbedModel;
 import org.jbox2d.testbed.framework.TestbedTest;
 
@@ -26,7 +26,7 @@ public class AWTPanelHelper {
    * Adds common help text and listeners for awt-based testbeds.
    */
   public static void addHelpAndPanelListeners(Component panel, final TestbedModel model,
-      final TestbedController controller, final int screenDragButton) {
+      final AbstractTestbedController controller, final int screenDragButton) {
     final Vec2 oldDragMouse = new Vec2();
     final Vec2 mouse = new Vec2();
     List<String> help = Lists.newArrayList();
@@ -55,7 +55,8 @@ public class AWTPanelHelper {
         if (arg0.getButton() == screenDragButton) {
           screenDragButtonDown = false;
         } else if (model.getCodedKeys()[KeyEvent.VK_SHIFT] && !mouseJointButtonDown) {
-          controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()), TestbedTest.BOMB_SPAWN_BUTTON);
+          controller.queueMouseUp(new Vec2(arg0.getX(), arg0.getY()),
+              TestbedTest.BOMB_SPAWN_BUTTON);
         } else {
           if (arg0.getButton() == TestbedTest.MOUSE_JOINT_BUTTON) {
             mouseJointButtonDown = false;

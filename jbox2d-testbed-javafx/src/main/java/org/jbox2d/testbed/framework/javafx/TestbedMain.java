@@ -16,70 +16,63 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
-package org.jbox2d.testbed.framework.j2d;
-
-import java.awt.BorderLayout;
-import java.awt.Component;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
+package org.jbox2d.testbed.framework.javafx;
 
 import org.jbox2d.testbed.framework.TestList;
 import org.jbox2d.testbed.framework.AbstractTestbedController;
 import org.jbox2d.testbed.framework.AbstractTestbedController.MouseBehavior;
 import org.jbox2d.testbed.framework.AbstractTestbedController.UpdateBehavior;
-import org.jbox2d.testbed.framework.TestbedErrorHandler;
 import org.jbox2d.testbed.framework.TestbedModel;
-import org.jbox2d.testbed.framework.TestbedController;
+
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 
 /**
  * The entry point for the testbed application
  * 
  * @author Daniel Murphy
  */
-public class TestbedMain {
+public class TestbedMain extends Application {
   // private static final Logger log = LoggerFactory.getLogger(TestbedMain.class);
 
-  public static void main(String[] args) {
-    // try {
-    // UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-    // } catch (Exception e) {
-    // log.warn("Could not set the look and feel to nimbus. "
-    // + "Hopefully you're on a mac so the window isn't ugly as crap.");
-    // }
+  @Override
+  public void start(Stage primaryStage) throws Exception {
     TestbedModel model = new TestbedModel();
-    final AbstractTestbedController controller = new TestbedController(model,
-        UpdateBehavior.UPDATE_CALLED, MouseBehavior.NORMAL, new TestbedErrorHandler() {
-          @Override
-          public void serializationError(Exception e, String message) {
-            JOptionPane.showMessageDialog(null, message, "Serialization Error",
-                JOptionPane.ERROR_MESSAGE);
-          }
+    final AbstractTestbedController controller = new TestbedControllerJavaFX(model,
+        UpdateBehavior.UPDATE_CALLED, MouseBehavior.NORMAL, (Exception e, String message) -> {
+          new Alert(Alert.AlertType.ERROR).showAndWait();
         });
-    TestPanelJ2D panel = new TestPanelJ2D(model, controller);
+    TestPanelJavaFX panel = new TestPanelJavaFX(model, controller);
     model.setPanel(panel);
-    model.setDebugDraw(new DebugDrawJ2D(panel, true));
+    model.setDebugDraw(new DebugDrawJavaFX(panel, true));
     TestList.populateModel(model);
 
-    JFrame testbed = new JFrame();
-    testbed.setTitle("JBox2D Testbed");
-    testbed.setLayout(new BorderLayout());
-    TestbedSidePanel side = new TestbedSidePanel(model, controller);
-    testbed.add((Component) panel, "Center");
-    testbed.add(new JScrollPane(side), "East");
-    testbed.pack();
-    testbed.setVisible(true);
-    testbed.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    BorderPane testbed = new BorderPane();
+    testbed.setCenter(panel);
+
+    testbed.setRight(new ScrollPane(new TestbedSidePanel(model, controller)));
+
+    Scene scene = new Scene(testbed, TestPanelJavaFX.INIT_WIDTH + 175, TestPanelJavaFX.INIT_HEIGHT);
+    primaryStage.setScene(scene);
+    primaryStage.setTitle("JBox2D Testbed");
+    primaryStage.show();
     System.out.println(System.getProperty("java.home"));
 
-    SwingUtilities.invokeLater(new Runnable() {
+    Platform.runLater(new Runnable() {
       @Override
       public void run() {
         controller.playTest(0);
         controller.start();
       }
     });
+  }
+
+  public static void main(String[] args) {
+    launch(TestbedMain.class, args);
   }
 }
