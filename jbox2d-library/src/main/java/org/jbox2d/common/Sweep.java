@@ -27,7 +27,7 @@ import java.io.Serializable;
 
 /**
  * This describes the motion of a body/shape for TOI computation. Shapes are defined with respect to
- * the body origin, which may no coincide with the center of mass. However, to support dynamics we
+ * the body origin, which may not coincide with the center of mass. However, to support dynamics we
  * must interpolate the center of mass position.
  */
 public class Sweep implements Serializable {
