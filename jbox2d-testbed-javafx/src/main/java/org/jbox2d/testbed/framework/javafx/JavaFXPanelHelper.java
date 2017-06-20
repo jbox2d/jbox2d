@@ -36,6 +36,15 @@ public class JavaFXPanelHelper {
     help.add("Press '[' or ']' to change tests, and 'r' to restart.");
     model.setImplSpecificHelp(help);
 
+    panel.setOnZoom((zoomEvent) -> {
+      TestbedTest currTest = model.getCurrTest();
+      if (currTest == null) {
+        return;
+      }
+      ZoomType zoom = zoomEvent.getZoomFactor() > 1 ? ZoomType.ZOOM_IN : ZoomType.ZOOM_OUT;
+      currTest.getCamera().zoomToPoint(mouse, zoom);
+    });
+    
     panel.setOnScroll((scrollEvent) -> {
       TestbedTest currTest = model.getCurrTest();
       if (currTest == null || scrollEvent.getDeltaY() == 0) {
