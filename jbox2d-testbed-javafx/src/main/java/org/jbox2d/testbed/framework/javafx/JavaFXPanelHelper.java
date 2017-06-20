@@ -44,6 +44,15 @@ public class JavaFXPanelHelper {
       ZoomType zoom = zoomEvent.getZoomFactor() > 1 ? ZoomType.ZOOM_IN : ZoomType.ZOOM_OUT;
       currTest.getCamera().zoomToPoint(mouse, zoom);
     });
+    
+    panel.setOnScroll((scrollEvent) -> {
+      TestbedTest currTest = model.getCurrTest();
+      if (currTest == null || scrollEvent.getDeltaY() == 0) {
+        return;
+      }
+      ZoomType zoom = scrollEvent.getDeltaY() > 1 ? ZoomType.ZOOM_IN : ZoomType.ZOOM_OUT;
+      currTest.getCamera().zoomToPoint(mouse, zoom);
+    });
 
     panel.setOnMouseReleased((mouseEvent) -> {
       if (toInt(mouseEvent.getButton()) == screenDragButton) {
