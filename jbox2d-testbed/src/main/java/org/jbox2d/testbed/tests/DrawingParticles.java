@@ -70,7 +70,7 @@ public class DrawingParticles extends TestbedTest {
 
     addTextLine("Keys: (L) liquid, (E) elastic, (S) spring");
     addTextLine("(F) rigid, (W) wall, (V) viscous, (T) tensile");
-    addTextLine("(Z) erase, (X) move");
+    addTextLine("(O) powder (Z) erase, (X) move");
   }
 
   public void keyPressed(char keyChar, int keyCode) {
@@ -83,7 +83,7 @@ public class DrawingParticles extends TestbedTest {
         m_particleFlags = ParticleType.b2_elasticParticle;
         m_groupFlags = ParticleGroupType.b2_solidParticleGroup;
         break;
-      case 'p':
+      case 'o':
         m_particleFlags = ParticleType.b2_powderParticle;
         break;
       case 'f':
