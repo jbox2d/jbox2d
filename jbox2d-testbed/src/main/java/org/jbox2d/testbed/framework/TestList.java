@@ -81,7 +81,7 @@ public class TestList {
 
   public static void populateModel(TestbedModel model) {
     // particles
-    model.addCategory("Particles");
+    model.addCategory("- Particles -");
     model.addTest(new BulletTest());
     model.addTest(new DamBreak());
     model.addTest(new DrawingParticles());
@@ -89,7 +89,7 @@ public class TestList {
     model.addTest(new WaveMachine());
     model.addTest(new Particles());
     
-    model.addCategory("Featured");
+    model.addCategory("- Featured -");
     model.addTest(new DominoTest());
     model.addTest(new Car());
     model.addTest(new CompoundShapes());
@@ -97,7 +97,7 @@ public class TestList {
     model.addTest(new TheoJansen());
     
     // watching...
-    model.addCategory("Collision Watching");
+    model.addCategory("- Collision Watching -");
     model.addTest(new VaryingRestitution());
     model.addTest(new VaryingFrictionTest());
     model.addTest(new ConveyorBelt());
@@ -109,7 +109,7 @@ public class TestList {
     model.addTest(new DominoTower());
 
     // more interactive..
-    model.addCategory("Interactive");
+    model.addCategory("- Interactive -");
     model.addTest(new VerticalStack());
     model.addTest(new Breakable());
     model.addTest(new ShapeEditing());
@@ -120,13 +120,13 @@ public class TestList {
     model.addTest(new ApplyForce());
 
     // processing/filtering
-    model.addCategory("Processing/Filtering");
+    model.addCategory("- Processing/Filtering -");
     model.addTest(new CollisionFiltering());
     model.addTest(new CollisionProcessing());
     model.addTest(new SensorTest());
 
     // joints
-    model.addCategory("Joints");
+    model.addCategory("- Joints -");
     model.addTest(new PrismaticTest());
     model.addTest(new RevoluteTest());
     model.addTest(new FixedPendulumTest(true));
@@ -141,17 +141,17 @@ public class TestList {
     model.addTest(new SliderCrankTest());
 
     // ccd
-    model.addCategory("CCD");
+    model.addCategory("- CCD -");
     model.addTest(new ContinuousTest());
     model.addTest(new ConfinedTest());
 
     // raycast
-    model.addCategory("Raycast");
+    model.addCategory("- Raycast -");
     model.addTest(new RayCastTest());
     model.addTest(new EdgeShapes());
 
     // misc
-    model.addCategory("Misc");
+    model.addCategory("- Misc -");
     model.addTest(new ConvexHull());
     model.addTest(new DynamicTreeTest());
     model.addTest(new DistanceTest());

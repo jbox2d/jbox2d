@@ -41,14 +41,13 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
-import javafx.scene.control.cell.ComboBoxListCell;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.util.StringConverter;
 
 
 /**
@@ -126,28 +125,21 @@ public class TestbedSidePanel extends BorderPane {
       }
     });
 
-    tests = new ComboBox<ListItem>();
-    updateTests((ComboBoxModel<ListItem>) testList);
+    tests = new ComboBox<>();
+    updateTests((ComboBoxModel<TestbedModel.ListItem>) testList);
     tests.setOnAction((actionEvent) -> {
       testSelected();
     });
-    tests.setCellFactory(ComboBoxListCell.<ListItem>forListView(new StringConverter<ListItem>() {
-      @Override
-      public String toString(ListItem listItem) {
-        if (listItem == null) {
-          return ("");
-        } else if (listItem.isCategory()) {
-          return (listItem.category);
-        } else {
-          return (listItem.test.getTestName());
+    
+    tests.setCellFactory((ListView<ListItem> param) -> new ListCell<ListItem>() {
+      @Override public void updateItem(ListItem item, boolean empty) {
+        super.updateItem(item, empty);
+        if (item != null) {
+            setText(item.isCategory() ? item.category : item.test.getTestName());
+            setDisable(item.isCategory());
         }
       }
-
-      @Override
-      public ListItem fromString(String string) {
-        return null;
-      }
-    }, tests.getItems()));
+    });
 
     top.getChildren().add(new Label("Choose a test:"));
     top.getChildren().add(tests);
