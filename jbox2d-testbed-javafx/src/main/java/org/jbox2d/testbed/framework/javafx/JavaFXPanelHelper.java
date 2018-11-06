@@ -108,7 +108,9 @@ public class JavaFXPanelHelper {
     });
 
     panel.setOnKeyReleased((keyEvent) -> {
-      controller.queueKeyReleased(keyEvent.getCharacter().charAt(0), toInt(keyEvent.getCode()));
+      String keyName = keyEvent.getText();
+      char c = (keyName.length() == 1 ? keyName.charAt(0) : '\0');
+      controller.queueKeyReleased(c, toInt(keyEvent.getCode()));
     });
 
     panel.setOnKeyPressed((keyEvent) -> {
