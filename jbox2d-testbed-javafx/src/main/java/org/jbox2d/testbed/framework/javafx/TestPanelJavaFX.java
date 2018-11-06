@@ -30,6 +30,7 @@ import javafx.geometry.Bounds;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
@@ -47,6 +48,14 @@ public class TestPanelJavaFX extends Canvas implements TestbedPanel {
 
   private final AbstractTestbedController controller;
 
+  public TestPanelJavaFX(final TestbedModel model, final AbstractTestbedController controller, final BorderPane parent) {
+    this(model, controller);
+      
+    //bind canvas size to parent
+    widthProperty().bind(parent.widthProperty().subtract(175));
+    heightProperty().bind(parent.heightProperty());
+  }
+  
   public TestPanelJavaFX(final TestbedModel model, final AbstractTestbedController controller) {
     super(INIT_WIDTH, INIT_HEIGHT);
     this.controller = controller;

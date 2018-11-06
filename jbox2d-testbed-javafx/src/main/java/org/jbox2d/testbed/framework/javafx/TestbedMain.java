@@ -47,12 +47,13 @@ public class TestbedMain extends Application {
         UpdateBehavior.UPDATE_CALLED, MouseBehavior.NORMAL, (Exception e, String message) -> {
           new Alert(Alert.AlertType.ERROR).showAndWait();
         });
-    TestPanelJavaFX panel = new TestPanelJavaFX(model, controller);
+    
+    BorderPane testbed = new BorderPane();
+    TestPanelJavaFX panel = new TestPanelJavaFX(model, controller, testbed);
     model.setPanel(panel);
     model.setDebugDraw(new DebugDrawJavaFX(panel, true));
     TestList.populateModel(model);
-
-    BorderPane testbed = new BorderPane();
+    
     testbed.setCenter(panel);
 
     testbed.setRight(new ScrollPane(new TestbedSidePanel(model, controller)));
