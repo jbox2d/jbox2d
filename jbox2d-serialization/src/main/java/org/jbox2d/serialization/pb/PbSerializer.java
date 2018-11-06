@@ -130,6 +130,7 @@ public class PbSerializer implements JbSerializer {
     }
 
     builder.setGravity(vecToPb(argWorld.getGravity()));
+    builder.setAutoClearForces(argWorld.getAutoClearForces());
     builder.setAllowSleep(argWorld.isAllowSleep());
     builder.setContinuousPhysics(argWorld.isContinuousPhysics());
     builder.setWarmStarting(argWorld.isWarmStarting());
