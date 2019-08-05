@@ -255,7 +255,7 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
     }
 
     if (proxyId < m_queryProxyId) {
-      m_pairBuffer[m_pairCount] = ((long) proxyIdA << 32) + m_queryProxyId;
+      m_pairBuffer[m_pairCount] = ((long) proxyId << 32) + m_queryProxyId;
     } else {
       m_pairBuffer[m_pairCount] = ((long) m_queryProxyId << 32) + proxyId;
     }
