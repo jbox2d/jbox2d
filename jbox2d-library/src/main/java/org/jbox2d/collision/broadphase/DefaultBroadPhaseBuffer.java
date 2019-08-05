@@ -50,7 +50,7 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
   private int m_moveCapacity;
   private int m_moveCount;
 
-  private Pair[] m_pairBuffer;
+  private long[] m_pairBuffer;
   private int m_pairCapacity;
   private int m_pairCount;
 
@@ -61,9 +61,9 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
 
     m_pairCapacity = 16;
     m_pairCount = 0;
-    m_pairBuffer = new Pair[m_pairCapacity];
+    m_pairBuffer = new long[m_pairCapacity];
     for (int i = 0; i < m_pairCapacity; i++) {
-      m_pairBuffer[i] = new Pair();
+      m_pairBuffer[i] = 0;
     }
 
     m_moveCapacity = 16;
@@ -170,9 +170,9 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
     // Send the pairs back to the client.
     int i = 0;
     while (i < m_pairCount) {
-      Pair primaryPair = m_pairBuffer[i];
-      Object userDataA = m_tree.getUserData(primaryPair.proxyIdA);
-      Object userDataB = m_tree.getUserData(primaryPair.proxyIdB);
+      long primaryPair = m_pairBuffer[i];
+      Object userDataA = m_tree.getUserData((int) (primaryPair >> 32));
+      Object userDataB = m_tree.getUserData((int) (primaryPair));
 
       // log.debug("returning pair: "+userDataA+", "+userDataB);
       callback.addPair(userDataA, userDataB);
@@ -180,8 +180,8 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
 
       // Skip any duplicate pairs.
       while (i < m_pairCount) {
-        Pair pair = m_pairBuffer[i];
-        if (pair.proxyIdA != primaryPair.proxyIdA || pair.proxyIdB != primaryPair.proxyIdB) {
+        long pair = m_pairBuffer[i];
+        if (pair != primaryPair) {
           break;
         }
         ++i;
@@ -245,21 +245,19 @@ public class DefaultBroadPhaseBuffer implements TreeCallback, BroadPhase {
 
     // Grow the pair buffer as needed.
     if (m_pairCount == m_pairCapacity) {
-      Pair[] oldBuffer = m_pairBuffer;
+      long[] oldBuffer = m_pairBuffer;
       m_pairCapacity *= 2;
-      m_pairBuffer = new Pair[m_pairCapacity];
+      m_pairBuffer = new long[m_pairCapacity];
       System.arraycopy(oldBuffer, 0, m_pairBuffer, 0, oldBuffer.length);
       for (int i = oldBuffer.length; i < m_pairCapacity; i++) {
-        m_pairBuffer[i] = new Pair();
+        m_pairBuffer[i] = 0;
       }
     }
 
     if (proxyId < m_queryProxyId) {
-      m_pairBuffer[m_pairCount].proxyIdA = proxyId;
-      m_pairBuffer[m_pairCount].proxyIdB = m_queryProxyId;
+      m_pairBuffer[m_pairCount] = ((long) proxyId << 32) | m_queryProxyId;
     } else {
-      m_pairBuffer[m_pairCount].proxyIdA = m_queryProxyId;
-      m_pairBuffer[m_pairCount].proxyIdB = proxyId;
+      m_pairBuffer[m_pairCount] = ((long) m_queryProxyId << 32) | proxyId;
     }
 
     ++m_pairCount;
