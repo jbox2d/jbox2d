@@ -41,6 +41,22 @@ public class TimeStep {
 	public int velocityIterations;
 	
 	public int positionIterations;
-	
+
+	public int particleIterations;
+
 	public boolean warmStarting;
+
+	public TimeStep clone() {
+		TimeStep ts = new TimeStep();
+
+		ts.dt = dt;
+		ts.inv_dt = inv_dt;
+		ts.dtRatio = dtRatio;
+		ts.velocityIterations = velocityIterations;
+		ts.positionIterations = positionIterations;
+		ts.particleIterations = particleIterations;
+		ts.warmStarting = warmStarting;
+
+		return ts;
+	}
 }
