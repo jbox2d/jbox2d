@@ -1175,10 +1175,10 @@ public class ParticleSystem {
       if ((m_flagsBuffer.data[a] & m_flagsBuffer.data[b] & ParticleType.b2_colorMixingParticle) != 0) {
         ParticleColor colorA = m_colorBuffer.data[a];
         ParticleColor colorB = m_colorBuffer.data[b];
-        int dr = (colorMixing256 * (colorB.r - colorA.r)) >> 8;
-        int dg = (colorMixing256 * (colorB.g - colorA.g)) >> 8;
-        int db = (colorMixing256 * (colorB.b - colorA.b)) >> 8;
-        int da = (colorMixing256 * (colorB.a - colorA.a)) >> 8;
+        int dr = (colorMixing256 * ((colorB.r & 0xFF) - (colorA.r & 0xFF))) >> 8;
+        int dg = (colorMixing256 * ((colorB.g & 0xFF) - (colorA.g & 0xFF))) >> 8;
+        int db = (colorMixing256 * ((colorB.b & 0xFF) - (colorA.b & 0xFF))) >> 8;
+        int da = (colorMixing256 * ((colorB.a & 0xFF) - (colorA.a & 0xFF))) >> 8;
         colorA.r += dr;
         colorA.g += dg;
         colorA.b += db;
