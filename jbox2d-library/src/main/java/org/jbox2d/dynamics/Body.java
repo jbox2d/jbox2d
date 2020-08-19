@@ -955,9 +955,9 @@ public class Body {
 
   /**
    * Set the sleep state of the body. A sleeping body has very low CPU cost.
+   * Note that putting it to sleep will set its velocities and forces to zero.
    * 
-   * @param flag set to true to put body to sleep, false to wake it.
-   * @param flag
+   * @param flag set to true to wake the body, false to put it to sleep
    */
   public void setAwake(boolean flag) {
     if (flag) {
