@@ -588,13 +588,26 @@ public class World {
   private final Timer tempTimer = new Timer();
 
   /**
-   * Take a time step. This performs collision detection, integration, and constraint solution.
+   * Take a time step. This performs collision detection, integration, and 
+   * constraint solution. particleIterations defaults to 1
    * 
    * @param timeStep the amount of time to simulate, this should not vary.
    * @param velocityIterations for the velocity constraint solver.
    * @param positionIterations for the position constraint solver.
    */
   public void step(float dt, int velocityIterations, int positionIterations) {
+    step(dt, velocityIterations, positionIterations, 1);
+  }
+
+  /**
+   * Take a time step. This performs collision detection, integration, and constraint solution.
+   * 
+   * @param timeStep the amount of time to simulate, this should not vary.
+   * @param velocityIterations for the velocity constraint solver.
+   * @param positionIterations for the position constraint solver.
+   * @param particleIterations for the particle solver.
+   */
+  public void step(float dt, int velocityIterations, int positionIterations, int particleIterations) {
     stepTimer.reset();
     tempTimer.reset();
     // log.debug("Starting step");
@@ -610,6 +623,7 @@ public class World {
     step.dt = dt;
     step.velocityIterations = velocityIterations;
     step.positionIterations = positionIterations;
+    step.particleIterations = particleIterations;
     if (dt > 0.0f) {
       step.inv_dt = 1.0f / dt;
     } else {
