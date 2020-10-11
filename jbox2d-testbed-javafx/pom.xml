@@ -11,6 +11,11 @@
 	<packaging>jar</packaging>
 	<url>https://github.com/jbox2d/jbox2d</url>
 	<description>The testbed for JBox2D, a 2d java physics engine, ported from the C++ Box2d engine.</description>
+        
+        <properties>
+            <mainClass>org.jbox2d.testbed.framework.javafx.TestbedMain</mainClass>
+        </properties>
+        
 	<dependencies>
 	  	<dependency>
 	  		<groupId>org.apache.commons</groupId>
@@ -39,35 +44,18 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.6.1</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.6.1</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.14</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>14.0.1</version>
-		</dependency>
-		 -->
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-base</artifactId>
+                    <version>${maven.compiler.target}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-controls</artifactId>
+                    <version>${maven.compiler.target}</version>
+                </dependency>
 	</dependencies>
+        
 	<build>
 		<plugins>
 			<plugin>
@@ -78,21 +66,29 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>org.jbox2d.testbed.framework.javafx.TestbedMain</mainClass>
+							<mainClass>${mainClass}</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
 			</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.1</version>
-					<configuration>
-						<source>1.8</source>
-						<target>1.8</target>
-						<optimise>true</optimise>
-					</configuration>
-				</plugin>
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.4</version>
+                <configuration>
+                    <mainClass>${mainClass}</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>debug</id>
+                        <configuration>
+                            <options>
+                                <option>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</option>
+                            </options>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
 	</build>
 </project>
