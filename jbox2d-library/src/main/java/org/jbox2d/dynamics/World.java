@@ -214,6 +214,24 @@ public class World {
     return m_allowSleep;
   }
 
+  public Body addBody(Body body){
+    assert (isLocked() == false);
+    if (isLocked()) {
+      return null;
+    }
+    
+    // add to world doubly linked list
+    body.m_prev = null;
+    body.m_next = m_bodyList;
+    if (m_bodyList != null) {
+      m_bodyList.m_prev = body;
+    }
+    m_bodyList = body;
+    ++m_bodyCount;
+
+    return body;
+  }
+
   private void addType(IDynamicStack<Contact> creator, ShapeType type1, ShapeType type2) {
     ContactRegister register = new ContactRegister();
     register.creator = creator;
